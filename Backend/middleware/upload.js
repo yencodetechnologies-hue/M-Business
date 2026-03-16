@@ -1,15 +1,8 @@
 const multer = require("multer");
-const cloudinary = require("../config/cloudinary");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "logos",
-    allowed_formats: ["jpg", "png", "jpeg"]
-  }
-});
-
+// ✅ multer-storage-cloudinary தேவையில்ல — memory storage use பண்ணோம்
+// Register-ல logo தேவையில்ல, எல்லாருக்கும் company logo fixed ஆ இருக்கும்
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 module.exports = upload;

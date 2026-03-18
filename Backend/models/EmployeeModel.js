@@ -7,6 +7,7 @@ const employeeSchema = new mongoose.Schema({
   role:       { type: String, default: "" },
   department: { type: String, default: "" },
   salary:     { type: String, default: "" },
+  password: { type: String, default: "" } , 
   status:     { type: String, enum: ["Active","Inactive"], default: "Active" }
 }, { timestamps: true });
 

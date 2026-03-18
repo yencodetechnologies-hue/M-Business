@@ -30,7 +30,6 @@ const upload  = multer({
 router.post("/logo", upload.single("file"), (req, res) => {
   console.log("FILES:", req.file);
   console.log("BODY:", req.body);
-  
   if (!req.file) {
     return res.status(400).json({ msg: "No file uploaded" });
   }

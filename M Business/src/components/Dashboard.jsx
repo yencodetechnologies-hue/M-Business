@@ -3,14 +3,15 @@ import React from "react";
 import axios from "axios";
 import InvoiceCreator from "./InvoiceCreator";
 import TaskPage from "./TaskPage";
+import CalendarPage from "./CalendarPage";
+import AccountsPage from "./AccountsPage";
+import ReportsPage  from "./ReportsPage";
 import { QRCodeSVG } from "qrcode.react";
 
 const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"#9333ea",bg:"#f5f3ff",card:"#FFFFFF",text:"#1e0a3c",muted:"#7c3aed",border:"#ede9fe"};
 const QUOTATIONS=[{id:"QT001",client:"TechNova Pvt Ltd",project:"Website Redesign",final:"₹2,59,600",date:"2024-01-25",expiry:"2024-02-25",status:"Approved"},{id:"QT002",client:"Bloom Creatives",project:"Mobile App Dev",final:"₹5,31,000",date:"2024-03-01",expiry:"2024-03-31",status:"Sent"},{id:"QT003",client:"Infra Solutions",project:"ERP Integration",final:"₹8,49,600",date:"2024-01-05",expiry:"2024-01-20",status:"Rejected"}];
 const INVOICES=[{id:"INV001",client:"TechNova Pvt Ltd",project:"Website Redesign",date:"2024-04-01",due:"2024-04-30",total:"₹1,47,500",status:"Paid"},{id:"INV002",client:"Infra Solutions",project:"ERP Integration",date:"2024-05-01",due:"2024-05-15",total:"₹4,24,800",status:"Overdue"},{id:"INV003",client:"Bloom Creatives",project:"Mobile App Dev",date:"2024-05-10",due:"2024-06-10",total:"₹1,18,000",status:"Pending"}];
 const TRACKING_SEED=[{id:"PRJ001",name:"Website Redesign",client:"TechNova Pvt Ltd",deadline:"2024-05-30",pct:65,status:"In Progress",note:"Design done, dev ongoing"},{id:"PRJ002",name:"Mobile App Dev",client:"Bloom Creatives",deadline:"2024-08-15",pct:15,status:"Pending",note:"Requirements gathering"},{id:"PRJ003",name:"ERP Integration",client:"Infra Solutions",deadline:"2024-04-30",pct:100,status:"Completed",note:"Signed off by client"}];
-const EVENTS=[{id:"EVT001",name:"Client Review",project:"Website Redesign",client:"TechNova Pvt Ltd",date:"2024-05-20",start:"10:00",end:"11:30"},{id:"EVT002",name:"Sprint Planning",project:"Mobile App Dev",client:"Bloom Creatives",date:"2024-05-22",start:"14:00",end:"16:00"},{id:"EVT003",name:"Handover Call",project:"ERP Integration",client:"Infra Solutions",date:"2024-04-30",start:"11:00",end:"12:00"}];
-const REPORTS=[{id:"RPT001",type:"Monthly Revenue",range:"Jan–Mar 2024",total:8,revenue:"₹14,50,000",done:3,pending:5},{id:"RPT002",type:"Project Summary",range:"Q1 2024",total:12,revenue:"₹22,80,000",done:7,pending:5},{id:"RPT003",type:"Client Activity",range:"Apr 2024",total:5,revenue:"₹6,30,000",done:2,pending:3}];
 const ACCOUNTS=[{id:"ACC001",name:"Arjun Sharma",email:"arjun@gmail.com",role:"Client",joined:"2024-01-15",status:"Active"},{id:"ACC002",name:"Priya Nair",email:"priya@gmail.com",role:"Client",joined:"2024-02-20",status:"Active"},{id:"ACC003",name:"Ravi Mehta",email:"ravi@gmail.com",role:"Client",joined:"2024-03-10",status:"Inactive"},{id:"ACC004",name:"Kiran Dev",email:"kiran@gmail.com",role:"Employee",joined:"2024-01-05",status:"Active"},{id:"ACC005",name:"Meena Raj",email:"meena@gmail.com",role:"Employee",joined:"2024-02-01",status:"Active"}];
 
 const NAV=[
@@ -28,9 +29,12 @@ const NAV=[
   {key:"reports",icon:"📈",label:"Reports"}
 ];
 
-// ── Role based nav ────────────────────────────────────────────
 function getNavForRole(role){
   const r=(role||"").toLowerCase().trim();
+  if(r==="subadmin"||r==="sub_admin"||r==="sub-admin")
+    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","reports"].includes(n.key));
+  if(r==="manager")
+    return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","reports"].includes(n.key));
   if(r==="employee")
     return NAV.filter(n=>["dashboard","tasks","calendar"].includes(n.key));
   return NAV;
@@ -210,6 +214,7 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
         <div style={{padding:"12px 24px 18px",borderTop:"1px solid #ede9fe",flexShrink:0}}>
           <div style={{display:"flex",gap:10}}>
             <button onClick={onClose} style={{flex:1,padding:"10px",background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:9,fontSize:13,fontWeight:600,color:"#1e0a3c",cursor:"pointer",fontFamily:"inherit"}}>Close</button>
+            <button onClick={()=>logoRef.current.click()} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:9,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>📷 Upload Logo</button>
             <button onClick={onLogout} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:9,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🚪 Logout</button>
           </div>
         </div>
@@ -221,9 +226,8 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
   );
 }
 
-// ── SIDEBAR — navItems prop accept பண்ணும் ─────────────────────
 function Sidebar({active,setActive,onLogout,open,onClose,navItems}){
-  const items = navItems || NAV;
+  const items=navItems||NAV;
   return(
     <>
       {open&&<div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:998,display:"block"}} className="mob-overlay"/>}
@@ -259,9 +263,7 @@ function ProjectStatusPage({clients,employees,managers}){
   const [tsErr,setTsErr]=useState({});
   const [tsSaving,setTsSaving]=useState(false);
   const [tsToast,setTsToast]=useState("");
-
   useEffect(()=>{axios.get("http://localhost:5000/api/project-status").then(r=>{if(r.data?.length)setTrackList(r.data);}).catch(()=>{});},[]);
-
   const showToast=(msg)=>{setTsToast(msg);setTimeout(()=>setTsToast(""),2800);};
   const clientNames=clients.map(c=>({name:c.clientName||c.name||""}));
   const managerNames=managers.map(m=>({name:m.managerName||m.name||""}));
@@ -338,8 +340,8 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const [modal,setModal]=useState(null);
   const [showProfile,setShowProfile]=useState(false);
   const [sidebarOpen,setSidebarOpen]=useState(false);
-  const [companyLogo,setCompanyLogo]=useState(user?.logoUrl||fixedLogo||null);
-  useEffect(()=>{setCompanyLogo(user?.logoUrl||fixedLogo||null);},[user,fixedLogo]);
+  const [companyLogo,setCompanyLogo]=useState(user?.logoUrl?user.logoUrl:(fixedLogo||null));
+  useEffect(()=>{setCompanyLogo(user?.logoUrl?user.logoUrl:(fixedLogo||null));},[user,fixedLogo]);
 
   const [clients,setClients]=useState([]);
   const [clientsLoading,setClientsLoading]=useState(false);
@@ -352,16 +354,19 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const [employees,setEmployees]=useState([]);
   const [empLoading,setEmpLoading]=useState(false);
   const [empSearch,setEmpSearch]=useState("");
-  const [ne,setNe]=useState({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active"});
+  const [ne,setNe]=useState({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});
+  const [showEmpPass,setShowEmpPass]=useState(false);
   const [neError,setNeError]=useState({});
   const [empSaveLoading,setEmpSaveLoading]=useState(false);
 
   const [projects,setProjects]=useState([]);
   const [projLoading,setProjLoading]=useState(false);
   const [projSearch,setProjSearch]=useState("");
-  const [np,setNp]=useState({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending"});
+  const [np,setNp]=useState({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:""});
   const [npError,setNpError]=useState({});
   const [projSaveLoading,setProjSaveLoading]=useState(false);
+  const [editProjectId,setEditProjectId]=useState(null);
+  const [editAssignedTo,setEditAssignedTo]=useState("");
 
   const [managers,setManagers]=useState([]);
   const [mgrLoading,setMgrLoading]=useState(false);
@@ -382,8 +387,11 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const fetchManagers=async()=>{try{setMgrLoading(true);const res=await axios.get("http://localhost:5000/api/managers");setManagers(res.data);}catch(e){console.log(e);}finally{setMgrLoading(false);}};
 
   const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,projectAssigned:nc.project,password:nc.password,status:nc.status};const res=await axios.post("http://localhost:5000/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
-  const addEmployee=async()=>{const errors={};if(!ne.name.trim())errors.name="Name is required";if(!ne.email.trim())errors.email="Email is required";if(Object.keys(errors).length>0){setNeError(errors);return;}try{setEmpSaveLoading(true);const res=await axios.post("http://localhost:5000/api/employees/add",ne);setEmployees(prev=>[res.data.employee,...prev]);setNe({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active"});setNeError({});setModal(null);}catch(err){setNeError({email:err.response?.data?.msg||"Failed to save"});}finally{setEmpSaveLoading(false);}};
-  const addProject=async()=>{const errors={};if(!np.name.trim())errors.name="Project name is required";if(!np.client.trim())errors.client="Client is required";if(Object.keys(errors).length>0){setNpError(errors);return;}try{setProjSaveLoading(true);await axios.post("http://localhost:5000/api/projects/add",np);await fetchProjects();setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending"});setNpError({});setModal(null);}catch(err){setNpError({name:err.response?.data?.msg||"Failed to save"});}finally{setProjSaveLoading(false);}};
+
+  const addEmployee=async()=>{const errors={};if(!ne.name.trim())errors.name="Name is required";if(!ne.email.trim())errors.email="Email is required";if(!ne.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNeError(errors);return;}try{setEmpSaveLoading(true);const res=await axios.post("http://localhost:5000/api/employees/add",ne);setEmployees(prev=>[res.data.employee,...prev]);setNe({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});setShowEmpPass(false);setNeError({});setModal(null);}catch(err){setNeError({email:err.response?.data?.msg||"Failed to save"});}finally{setEmpSaveLoading(false);}};
+
+  const addProject=async()=>{const errors={};if(!np.name.trim())errors.name="Project name is required";if(!np.client.trim())errors.client="Client is required";if(Object.keys(errors).length>0){setNpError(errors);return;}try{setProjSaveLoading(true);await axios.post("http://localhost:5000/api/projects/add",np);await fetchProjects();setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:""});setNpError({});setModal(null);}catch(err){setNpError({name:err.response?.data?.msg||"Failed to save"});}finally{setProjSaveLoading(false);}};
+
   const addManager=async()=>{const errors={};if(!nm.managerName.trim())errors.managerName="Name is required";if(!nm.email.trim())errors.email="Email is required";if(!nm.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNmError(errors);return;}try{setMgrSaveLoading(true);const res=await axios.post("http://localhost:5000/api/managers/add",nm);setManagers(prev=>[res.data.manager,...prev]);setNm({managerName:"",email:"",phone:"",department:"",role:"Manager",address:"",password:"",status:"Active"});setNmError({});setModal(null);}catch(err){setNmError({email:err.response?.data?.msg||"Failed to save"});}finally{setMgrSaveLoading(false);}};
 
   const filteredClients=clients.filter(c=>(c.clientName||c.name||"").toLowerCase().includes(clientSearch.toLowerCase())||(c.email||"").toLowerCase().includes(clientSearch.toLowerCase())||(c.companyName||c.company||"").toLowerCase().includes(clientSearch.toLowerCase()));
@@ -391,17 +399,10 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const filteredProjects=projects.filter(p=>(p.name||"").toLowerCase().includes(projSearch.toLowerCase())||(p.client||"").toLowerCase().includes(projSearch.toLowerCase()));
   const filteredManagers=managers.filter(m=>(m.managerName||"").toLowerCase().includes(mgrSearch.toLowerCase())||(m.email||"").toLowerCase().includes(mgrSearch.toLowerCase()));
 
-  // role based nav
-  const navItems = getNavForRole(user?.role);
-  // active page — fallback to first nav item if current active not in navItems
-const validActive = navItems.find(n=>n.key===active) ? active : navItems[0]?.key || "dashboard";
-const page = navItems.find(n=>n.key===validActive) || navItems[0];
-
-useEffect(() => {
-  if (validActive !== active) {
-    setActive(validActive);
-  }
-}, [user?.role]);
+  const navItems=getNavForRole(user?.role);
+  const validActive=navItems.find(n=>n.key===active)?active:navItems[0]?.key||"dashboard";
+  const page=navItems.find(n=>n.key===validActive)||navItems[0];
+  useEffect(()=>{if(validActive!==active)setActive(validActive);},[user?.role]);
 
   const displayName=user?.name||user?.email?.split("@")[0]||"Admin";
   const initials=displayName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
@@ -415,23 +416,8 @@ useEffect(() => {
         ::-webkit-scrollbar{width:5px}
         ::-webkit-scrollbar-thumb{background:#d8b4fe;border-radius:3px}
         button,input,select,textarea{font-family:inherit}
-        @media (min-width: 769px) {
-          .sidebar{transform:translateX(0) !important;position:sticky !important;top:0 !important;}
-          .sidebar-close{display:none !important;}
-          .mob-overlay{display:none !important;}
-          .mob-topbar{display:none !important;}
-          .sidebar-spacer{display:none !important;}
-        }
-        @media (max-width: 768px) {
-          .sidebar-spacer{display:none !important;}
-          .mob-topbar-hide{display:none !important;}
-          .main-content{padding:12px !important;}
-          .dash-stats{grid-template-columns:repeat(2,1fr) !important;gap:10px !important;}
-          .dash-2col{grid-template-columns:1fr !important;}
-          .modal-2col{grid-template-columns:1fr !important;}
-          .page-header{flex-wrap:wrap;gap:8px;}
-          .header-actions{flex-wrap:wrap;gap:8px;}
-        }
+        @media(min-width:769px){.sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}}
+        @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
       `}</style>
 
       <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} navItems={navItems}/>
@@ -491,16 +477,60 @@ useEffect(() => {
           </>}
 
           {validActive==="clients"&&<SC title={`All Clients (${filteredClients.length})`}><Search value={clientSearch} onChange={setClientSearch} placeholder="Search by name, email, company..."/>{clientsLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>:<Tbl cols={["ID","Name","Company","Email","Phone","Status","Created"]} rows={filteredClients.map((c,i)=>[`CLT${String(i+1).padStart(3,"0")}`,c.clientName||c.name||"—",c.companyName||c.company||"—",c.email,c.phone||"—",<Badge label={c.status}/>,c.createdAt?new Date(c.createdAt).toLocaleDateString():"—"])}/>}</SC>}
+
           {validActive==="employees"&&<SC title={`All Employees (${filteredEmployees.length})`}><Search value={empSearch} onChange={setEmpSearch} placeholder="Search by name, email, role..."/>{empLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>:<Tbl cols={["ID","Name","Email","Phone","Role","Department","Status","Joined"]} rows={filteredEmployees.map((e,i)=>[`EMP${String(i+1).padStart(3,"0")}`,e.name,e.email,e.phone||"—",e.role||"—",e.department||"—",<Badge label={e.status}/>,e.createdAt?new Date(e.createdAt).toLocaleDateString():"—"])}/>}</SC>}
-          {validActive==="projects"&&<SC title={`All Projects (${filteredProjects.length})`}><Search value={projSearch} onChange={setProjSearch} placeholder="Search by project name, client..."/>{projLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>:<Tbl cols={["ID","Name","Client","Start","End","Budget","Status","Created"]} rows={filteredProjects.map((p,i)=>[`PRJ${String(i+1).padStart(3,"0")}`,p.name,p.client,p.start||"—",p.end||"—",p.budget||"—",<Badge label={p.status}/>,p.createdAt?new Date(p.createdAt).toLocaleDateString():"—"])}/>}</SC>}
+
+          {validActive==="projects"&&<SC title={`All Projects (${filteredProjects.length})`}>
+            <Search value={projSearch} onChange={setProjSearch} placeholder="Search by project name, client..."/>
+            {projLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>
+            :<div style={{overflowX:"auto"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:600}}>
+                <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
+                  {["ID","Name","Client","Budget","Status","Assigned To","Action"].map(c=>(
+                    <th key={c} style={{padding:"10px 14px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
+                  ))}
+                </tr></thead>
+                <tbody>
+                  {filteredProjects.length===0
+                    ?<tr><td colSpan={7} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No projects found</td></tr>
+                    :filteredProjects.map((p,i)=>(
+                      <tr key={p._id||i} style={{borderBottom:"1px solid #f3f0ff"}}
+                        onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                        onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                        <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`PRJ${String(i+1).padStart(3,"0")}`}</td>
+                        <td style={{padding:"12px 14px",fontWeight:700,color:"#1e0a3c"}}>{p.name}</td>
+                        <td style={{padding:"12px 14px",color:"#7c3aed"}}>{p.client||"—"}</td>
+                        <td style={{padding:"12px 14px",color:"#7c3aed"}}>{p.budget||"—"}</td>
+                        <td style={{padding:"12px 14px"}}><Badge label={p.status||"Pending"}/></td>
+                        <td style={{padding:"12px 14px"}}>
+                          {p.assignedTo
+                            ?<div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,flexShrink:0}}>{p.assignedTo[0].toUpperCase()}</div><span style={{color:"#6366f1",fontWeight:600,fontSize:12}}>{p.assignedTo}</span></div>
+                            :<span style={{color:"#a78bfa",fontSize:12}}>Not assigned</span>
+                          }
+                        </td>
+                        <td style={{padding:"12px 14px"}}>
+                          <button onClick={()=>{setEditProjectId(p._id);setEditAssignedTo(p.assignedTo||"");setModal("assignEmployee");}}
+                            style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)",borderRadius:7,padding:"4px 12px",fontSize:12,color:"#6366f1",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+                            Assign
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>}
+          </SC>}
+
           {validActive==="managers"&&(<div style={{display:"flex",flexDirection:"column",gap:14}}><div className="dash-stats" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>{[{t:"Total Managers",v:managers.length,i:"🧑‍💼",c:"#f59e0b"},{t:"Active",v:managers.filter(m=>m.status==="Active").length,i:"✅",c:"#22C55E"},{t:"Inactive",v:managers.filter(m=>m.status==="Inactive").length,i:"⛔",c:"#EF4444"}].map(({t,v,i,c})=>(<div key={t} style={{background:"#fff",borderRadius:14,padding:"16px 14px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",display:"flex",alignItems:"center",gap:12}}><div style={{width:40,height:40,borderRadius:11,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{i}</div><div><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5}}>{t.toUpperCase()}</div><div style={{fontSize:24,fontWeight:800,color:c}}>{v}</div></div></div>))}</div><SC title={`All Managers (${filteredManagers.length})`}><Search value={mgrSearch} onChange={setMgrSearch} placeholder="Search by name, email, department..."/>{mgrLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>:<Tbl cols={["ID","Name","Email","Phone","Role","Department","Status","Joined"]} rows={filteredManagers.map((m,i)=>[`MGR${String(i+1).padStart(3,"0")}`,<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:26,height:26,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{(m.managerName||"?")[0].toUpperCase()}</div><span style={{fontWeight:600}}>{m.managerName}</span></div>,m.email,m.phone||"—",m.role||"Manager",m.department||"—",<Badge label={m.status}/>,m.createdAt?new Date(m.createdAt).toLocaleDateString():"—"])}/>}</SC></div>)}
+
           {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
           {validActive==="quotations"&&<SC title="All Quotations"><Tbl cols={["ID","Client","Project","Amount","Date","Expiry","Status"]} rows={QUOTATIONS.map(q=>[q.id,q.client,q.project,q.final,q.date,q.expiry,<Badge label={q.status}/>])}/></SC>}
           {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers}/>}
           {validActive==="tasks"&&<TaskPage projects={projects} employees={employees}/>}
-          {validActive==="calendar"&&<div style={{display:"flex",flexDirection:"column",gap:12}}>{EVENTS.map(e=>(<div key={e.id} style={{background:"#fff",borderRadius:14,padding:18,boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",display:"flex",gap:14,alignItems:"center",flexWrap:"wrap"}}><div style={{background:"linear-gradient(135deg,#9333ea22,#c084fc22)",border:"1.5px solid #c084fc44",borderRadius:10,padding:"10px 14px",textAlign:"center",minWidth:52,flexShrink:0}}><div style={{fontSize:20,fontWeight:800,color:"#9333ea"}}>{e.date.split("-")[2]}</div><div style={{fontSize:9,color:"#a78bfa",fontWeight:700,letterSpacing:1}}>MAY</div></div><div style={{flex:1,minWidth:0}}><div style={{fontSize:14,fontWeight:700,color:T.text}}>{e.name}</div><div style={{color:"#a78bfa",fontSize:12,marginTop:2}}>{e.project} · {e.client}</div><div style={{color:"#a78bfa",fontSize:12,marginTop:2}}>🕐 {e.start} – {e.end}</div></div></div>))}</div>}
-          {validActive==="accounts"&&(<div style={{display:"flex",flexDirection:"column",gap:14}}><div className="dash-stats" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:4}}>{[{t:"Total Accounts",v:ACCOUNTS.length,i:"👤",c:"#9333ea"},{t:"Active",v:ACCOUNTS.filter(a=>a.status==="Active").length,i:"✅",c:"#22C55E"},{t:"Inactive",v:ACCOUNTS.filter(a=>a.status==="Inactive").length,i:"⛔",c:"#EF4444"}].map(({t,v,i,c})=>(<div key={t} style={{background:"#fff",borderRadius:14,padding:"16px 14px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",display:"flex",alignItems:"center",gap:12}}><div style={{width:40,height:40,borderRadius:11,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{i}</div><div><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5}}>{t.toUpperCase()}</div><div style={{fontSize:24,fontWeight:800,color:c}}>{v}</div></div></div>))}</div><SC title={`All Accounts (${ACCOUNTS.length})`}><Tbl cols={["ID","Name","Email","Role","Joined","Status"]} rows={ACCOUNTS.map(a=>[a.id,<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:26,height:26,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700}}>{a.name.split(" ").map(w=>w[0]).join("").slice(0,2)}</div><span style={{fontWeight:600}}>{a.name}</span></div>,a.email,<Badge label={a.role}/>,a.joined,<Badge label={a.status}/>])}/></SC></div>)}
-          {validActive==="reports"&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:14}}>{REPORTS.map(r=>(<div key={r.id} style={{background:"#fff",borderRadius:14,padding:20,boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe"}}><div style={{marginBottom:12}}><div style={{fontSize:10,color:"#a78bfa",fontWeight:700}}>{r.id}</div><h3 style={{margin:"4px 0",fontSize:15,color:T.text}}>{r.type}</h3><div style={{fontSize:12,color:"#a78bfa"}}>📅 {r.range}</div></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>{[["Total",r.total],["Revenue",r.revenue],["Done",r.done],["Pending",r.pending]].map(([k,v])=>(<div key={k} style={{background:"#faf5ff",borderRadius:9,padding:"9px 11px",border:"1px solid #ede9fe"}}><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,marginBottom:3}}>{k.toUpperCase()}</div><div style={{fontSize:15,fontWeight:800,color:T.text}}>{v}</div></div>))}</div></div>))}</div>}
+          {validActive==="calendar"&&<CalendarPage projects={projects} clients={clients}/>}
+          {validActive==="accounts"&&<AccountsPage/>}
+          {validActive==="reports"&&<ReportsPage clients={clients} projects={projects} employees={employees} managers={managers}/>}
         </div>
       </div>
 
@@ -532,13 +562,22 @@ useEffect(() => {
 
       {modal==="employee"&&<Mdl title="Add New Employee" onClose={()=>setModal(null)}>
         <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
-          <Fld label="Full Name *" value={ne.name} onChange={v=>setNe({...ne,name:v})} error={neError.name}/>
-          <Fld label="Email *" value={ne.email} onChange={v=>{setNe({...ne,email:v});setNeError(p=>({...p,email:""}));}} type="email" error={neError.email}/>
-          <Fld label="Phone Number" value={ne.phone} onChange={v=>setNe({...ne,phone:v})}/>
-          <Fld label="Role / Position" value={ne.role} onChange={v=>setNe({...ne,role:v})}/>
-          <Fld label="Department" value={ne.department} onChange={v=>setNe({...ne,department:v})}/>
-          <Fld label="Salary" value={ne.salary} onChange={v=>setNe({...ne,salary:v})}/>
-          <Fld label="Status" value={ne.status} onChange={v=>setNe({...ne,status:v})} options={["Active","Inactive"]}/>
+          <Fld label="Full Name *"     value={ne.name}       onChange={v=>setNe({...ne,name:v})}       error={neError.name}/>
+          <Fld label="Email *"         value={ne.email}      onChange={v=>{setNe({...ne,email:v});setNeError(p=>({...p,email:""}));}} type="email" error={neError.email}/>
+          <Fld label="Phone Number"    value={ne.phone}      onChange={v=>setNe({...ne,phone:v})}/>
+          <Fld label="Role / Position" value={ne.role}       onChange={v=>setNe({...ne,role:v})}/>
+          <Fld label="Department"      value={ne.department} onChange={v=>setNe({...ne,department:v})}/>
+          <Fld label="Salary"          value={ne.salary}     onChange={v=>setNe({...ne,salary:v})}/>
+          <Fld label="Status"          value={ne.status}     onChange={v=>setNe({...ne,status:v})} options={["Active","Inactive"]}/>
+        </div>
+        <div style={{marginBottom:14,marginTop:4}}>
+          <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>PASSWORD * <span style={{fontSize:10,color:"#a78bfa",fontWeight:400}}>(Employee login-க்கு use ஆகும்)</span></label>
+          <div style={{position:"relative"}}>
+            <input type={showEmpPass?"text":"password"} value={ne.password} onChange={e=>{setNe({...ne,password:e.target.value});setNeError(p=>({...p,password:""}));}} style={{width:"100%",border:`1.5px solid ${neError.password?"#EF4444":"#ede9fe"}`,borderRadius:10,padding:"10px 46px 10px 14px",fontSize:13,color:T.text,background:"#faf5ff",boxSizing:"border-box",outline:"none"}} placeholder="Set employee login password"/>
+            <button type="button" onClick={()=>setShowEmpPass(!showEmpPass)} style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"#a78bfa",fontSize:11,fontWeight:700,fontFamily:"inherit"}}>{showEmpPass?"HIDE":"SHOW"}</button>
+          </div>
+          {neError.password&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {neError.password}</div>}
+          <div style={{fontSize:11,color:"#a78bfa",marginTop:5}}>💡 Employee இந்த email + password use பண்ணி login பண்ணா <strong style={{color:"#9333ea"}}>Employee Dashboard</strong> திறக்கும்</div>
         </div>
         <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>
           <button onClick={()=>setModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13}}>Cancel</button>
@@ -554,17 +593,43 @@ useEffect(() => {
             <ClientDropdown clients={clients} value={np.client} onChange={v=>setNp({...np,client:v})} error={npError.client} onAddClient={()=>{setModal("client");setNcError({});setShowClientPass(false);}}/>
             {npError.client&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {npError.client}</div>}
           </div>
-          <Fld label="Purpose" value={np.purpose} onChange={v=>setNp({...np,purpose:v})}/>
-          <Fld label="Budget" value={np.budget} onChange={v=>setNp({...np,budget:v})}/>
-          <Fld label="Start Date" value={np.start} onChange={v=>setNp({...np,start:v})} type="date"/>
-          <Fld label="End Date" value={np.end} onChange={v=>setNp({...np,end:v})} type="date"/>
-          <Fld label="Team Members" value={np.team} onChange={v=>setNp({...np,team:v})}/>
-          <Fld label="Status" value={np.status} onChange={v=>setNp({...np,status:v})} options={["Pending","In Progress","Completed","On Hold"]}/>
+          <Fld label="Purpose"      value={np.purpose}  onChange={v=>setNp({...np,purpose:v})}/>
+          <Fld label="Budget"       value={np.budget}   onChange={v=>setNp({...np,budget:v})}/>
+          <Fld label="Start Date"   value={np.start}    onChange={v=>setNp({...np,start:v})}   type="date"/>
+          <Fld label="End Date"     value={np.end}      onChange={v=>setNp({...np,end:v})}     type="date"/>
+          <Fld label="Team Members" value={np.team}     onChange={v=>setNp({...np,team:v})}/>
+          <Fld label="Status"       value={np.status}   onChange={v=>setNp({...np,status:v})}  options={["Pending","In Progress","Completed","On Hold"]}/>
+        </div>
+        <div style={{marginBottom:14}}>
+          <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEE <span style={{fontSize:10,color:"#a78bfa",fontWeight:400}}>(optional)</span></label>
+          <select value={np.assignedTo} onChange={e=>setNp({...np,assignedTo:e.target.value})} style={{width:"100%",border:"1.5px solid #ede9fe",borderRadius:10,padding:"10px 14px",fontSize:13,color:np.assignedTo?"#1e0a3c":"#a78bfa",background:"#faf5ff",boxSizing:"border-box",outline:"none",fontFamily:"inherit"}}>
+            <option value="">-- Select Employee --</option>
+            {employees.map(e=><option key={e._id||e.email} value={e.name}>{e.name}{e.department?` (${e.department})`:""}</option>)}
+          </select>
+          {np.assignedTo&&<div style={{fontSize:11,color:"#9333ea",marginTop:5}}>✅ <strong>{np.assignedTo}</strong> — Employee Dashboard-ல் show ஆகும்</div>}
         </div>
         <Fld label="Description" value={np.description} onChange={v=>setNp({...np,description:v})}/>
         <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>
           <button onClick={()=>setModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13}}>Cancel</button>
           <button onClick={addProject} disabled={projSaveLoading} style={{...B("#a855f7"),opacity:projSaveLoading?0.7:1}}>{projSaveLoading?"Saving...":"Save Project →"}</button>
+        </div>
+      </Mdl>}
+
+      {modal==="assignEmployee"&&<Mdl title="Assign Employee to Project" onClose={()=>setModal(null)}>
+        <div style={{marginBottom:18}}>
+          <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:8}}>SELECT EMPLOYEE</label>
+          <select value={editAssignedTo} onChange={e=>setEditAssignedTo(e.target.value)} style={{width:"100%",border:"1.5px solid #ede9fe",borderRadius:10,padding:"10px 14px",fontSize:13,color:editAssignedTo?"#1e0a3c":"#a78bfa",background:"#faf5ff",outline:"none",fontFamily:"inherit"}}>
+            <option value="">-- Select Employee --</option>
+            {employees.map(e=><option key={e._id||e.email} value={e.name}>{e.name}{e.department?` (${e.department})`:""}</option>)}
+          </select>
+          {editAssignedTo&&<div style={{fontSize:11,color:"#9333ea",marginTop:8}}>✅ <strong>{editAssignedTo}</strong> — Employee Dashboard-ல் இந்த project show ஆகும்</div>}
+        </div>
+        <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>
+          <button onClick={()=>setModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:"#1e0a3c",borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
+          <button onClick={async()=>{if(!editAssignedTo){alert("Please select an employee");return;}try{await axios.put(`http://localhost:5000/api/projects/${editProjectId}`,{assignedTo:editAssignedTo});setProjects(prev=>prev.map(p=>p._id===editProjectId?{...p,assignedTo:editAssignedTo}:p));setModal(null);setEditProjectId(null);setEditAssignedTo("");}catch(err){alert(err.response?.data?.msg||"Failed to assign");}}}
+            style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)",color:"#fff",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+            Save Assignment →
+          </button>
         </div>
       </Mdl>}
 

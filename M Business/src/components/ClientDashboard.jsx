@@ -352,7 +352,106 @@ function ProgressBar({ pct, animate = true, color }) {
     </div>
   );
 }
+function ProjectTimeline({ project }) {
+  const { status, progress = 0, startDate, deadline, budget, spent } = project;
 
+  // Payment % of budget spent
+  const spentNum  = parseFloat((spent  || "0").replace(/[^0-9.]/g, "")) || 0;
+  const budgetNum = parseFloat((budget || "1").replace(/[^0-9.]/g, "")) || 1;
+  const paidPct   = Math.min(100, Math.round((spentNum / budgetNum) * 100));
+
+  const isComplete = status === "Completed";
+  const isOverdue  = project.paymentStatus === "Overdue";
+
+  const fillColor = isComplete
+    ? "linear-gradient(90deg,#10b981,#34d399)"
+    : status === "Pending"
+    ? "linear-gradient(90deg,#f59e0b,#fbbf24)"
+    : "linear-gradient(90deg,#6366f1,#8b5cf6)";
+
+  const dotColor  = isComplete ? "#10b981" : status === "Pending" ? "#f59e0b" : "#6366f1";
+  const payColor  = isOverdue  ? "#ef4444" : "#10b981";
+  const paySize   = isComplete ? 20 : 13;
+
+  return (
+    <div style={{ margin: "14px 0 6px", position: "relative" }}>
+
+      {/* Track */}
+      <div style={{
+        position: "relative", height: 6,
+        background: "#f1f5f9", borderRadius: 99,
+        overflow: "visible",
+      }}>
+
+        {/* Animated fill */}
+        <div style={{
+          width: `${progress}%`, height: "100%",
+          background: fillColor, borderRadius: 99,
+          transition: "width 1.2s cubic-bezier(0.4,0,0.2,1)",
+          overflow: "hidden", position: "relative",
+        }}>
+          {!isComplete && (
+            <div style={{
+              position: "absolute", top: 0, left: 0, bottom: 0, width: 40,
+              background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent)",
+              animation: "shimmer 2s ease-in-out infinite",
+            }} />
+          )}
+        </div>
+
+        {/* Start dot */}
+        <div style={{
+          position: "absolute", top: "50%", left: 0,
+          transform: "translate(-50%,-50%)",
+          width: 12, height: 12, borderRadius: "50%",
+          background: dotColor, border: "2px solid #fff",
+          boxShadow: `0 0 0 3px ${dotColor}35`,
+          animation: "blink-pulse 1.5s ease-in-out infinite",
+          zIndex: 2,
+        }} />
+
+        {/* Payment marker — center when complete, at paidPct otherwise */}
+        <div style={{
+          position: "absolute", top: "50%",
+          left: isComplete ? "50%" : `${paidPct}%`,
+          transform: "translate(-50%,-50%)",
+          width: paySize, height: paySize, borderRadius: "50%",
+          background: payColor, border: `${isComplete ? 3 : 2}px solid #fff`,
+          boxShadow: `0 0 0 ${isComplete ? 5 : 3}px ${payColor}40`,
+          animation: isOverdue
+            ? "blink-pulse-red 1.1s ease-in-out infinite"
+            : "blink-pulse-green 1.4s ease-in-out infinite",
+          zIndex: 3,
+        }} />
+
+        {/* End dot */}
+        <div style={{
+          position: "absolute", top: "50%", right: 0,
+          transform: "translate(50%,-50%)",
+          width: 12, height: 12, borderRadius: "50%",
+          background: isComplete ? "#10b981" : "#e2e8f0",
+          border: `2px solid ${isComplete ? "#fff" : dotColor}`,
+          opacity: isComplete ? 1 : 0.5,
+          animation: isComplete ? "blink-pulse-green 1.8s ease-in-out infinite" : "none",
+          zIndex: 2,
+        }} />
+      </div>
+
+      {/* Date labels */}
+      <div style={{ display:"flex", justifyContent:"space-between", marginTop: 8 }}>
+        <span style={{ fontSize:10, color:"#94a3b8", fontFamily:"monospace" }}>
+          📅 {project.startDate || "—"}
+        </span>
+        <span style={{ fontSize:11, fontWeight:700, color: dotColor }}>
+          {isComplete ? "✓ Done" : `${progress}%`}
+        </span>
+        <span style={{ fontSize:10, color:"#94a3b8", fontFamily:"monospace" }}>
+          {isComplete ? "✅" : "⏱"} {project.deadline}
+        </span>
+      </div>
+    </div>
+  );
+}
 // ── Animated Milestone Line (Flipkart-style) ─────────────────
 function MilestoneLine({ tasks, completedTasks }) {
   const steps = [

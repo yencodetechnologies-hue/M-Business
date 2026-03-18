@@ -11,10 +11,8 @@ const {
   moveTask,
 } = require("../controllers/taskController");
 
-// Board load — all groups + tasks in one call
 router.get("/board",          getBoardData);
 
-// Task CRUD
 router.get("/",               getAllTasks);
 router.get("/:id",            getTask);
 router.post("/",              createTask);

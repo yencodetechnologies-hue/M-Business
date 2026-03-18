@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Manager = require("../models/ManagerModel");
 
-// GET managers
 router.get("/", async (req, res) => {
   try {
     const managers = await Manager.find().sort({ createdAt: -1 });
@@ -12,7 +11,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ADD manager
 router.post("/add", async (req, res) => {
   try {
 

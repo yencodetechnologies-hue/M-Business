@@ -4,10 +4,9 @@ const User = require("../models/UserModels");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// REGISTER
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body; // ✅ phone add
+    const { name, email, password, phone } = req.body; 
 
     if (!name || !email || !password) {
       return res.status(400).json({ msg: "All fields required" });
@@ -24,7 +23,7 @@ router.post("/signup", async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      phone: phone || ""  // ✅ phone save
+      phone: phone || "" 
     });
 
     await user.save();
@@ -34,7 +33,7 @@ router.post("/signup", async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        phone: user.phone,  // ✅ phone return
+        phone: user.phone, 
         role: user.role
       }
     });
@@ -45,7 +44,6 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// LOGIN
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -76,7 +74,7 @@ router.post("/login", async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        phone: user.phone,  // ✅ phone return
+        phone: user.phone,  
         role: user.role
       }
     });

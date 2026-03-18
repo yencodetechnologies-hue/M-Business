@@ -12,4 +12,4 @@ const projectSchema = new mongoose.Schema({
   status:      { type: String, enum: ["Pending","In Progress","Completed","On Hold"], default: "Pending" }
 }, { timestamps: true });
 
-module.exports = mongoose.model("Project", projectSchema); // ✅ இதை add பண்ணுங்க
+module.exports = mongoose.model("Project", projectSchema); 

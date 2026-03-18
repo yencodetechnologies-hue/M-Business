@@ -1,53 +1,40 @@
 const express = require("express");
-const cors    = require("cors");
+const mongoose = require("mongoose");
+const cors = require("cors");
 require("dotenv").config();
 
-const connectDB = require("./config/db");
-
-// ── Existing Routes ───────────────────────────────────────────────────────────
-const userRoutes          = require("./routes/userroutes");
-const clientRoutes        = require("./routes/clientroutes");
-const employeeRoutes      = require("./routes/employeeroutes");
-const managerRoutes       = require("./routes/managerroutes");
-const projectRoutes       = require("./routes/projectroutes");
-const authRoutes          = require("./routes/authroutes");
-const uploadRoutes        = require("./routes/uploadroutes");
-const projectStatusRoutes = require("./routes/projectstatusroutes");
-
-// ── New Task Board Routes ─────────────────────────────────────────────────────
-const taskRoutes  = require("./routes/taskroutes");
-const groupRoutes = require("./routes/grouproutes");
-
 const app = express();
-
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
-// ── Existing API ──────────────────────────────────────────────────────────────
-app.use("/api/user",           userRoutes);
-app.use("/api/clients",        clientRoutes);
-app.use("/api/employees",      employeeRoutes);
-app.use("/api/managers",       managerRoutes);
-app.use("/api/projects",       projectRoutes);
-app.use("/api/auth",           authRoutes);
-app.use("/api/upload",         uploadRoutes);
-app.use("/api/project-status", projectStatusRoutes);
 
-// ── Task Board API ────────────────────────────────────────────────────────────
-app.use("/api/tasks",  taskRoutes);
-app.use("/api/groups", groupRoutes);
+const authRoutes     = require("./routes/authroutes");
+const clientRoutes   = require("./routes/clientroutes");
+const employeeRoutes = require("./routes/employeeRoutes");
+const managerRoutes  = require("./routes/managerRoutes");
+const projectRoutes  = require("./routes/projectRoutes");
+const projectStatusRoutes   = require("./routes/projectstatusroutes");
+const TaskPage = require("./routes/taskroutes");
+const Group  = require("./routes/grouproutes");
+const clientDashRoutes = require("./routes/clientdashboardroutes");
+const Invoices = require("./routes/invoiceroutes");
 
-const PORT = process.env.PORT || 5000;
+app.use("/api/auth",        authRoutes);
+app.use("/api/clients",     clientRoutes);
+app.use("/api/employees",   employeeRoutes);
+app.use("/api/managers",    managerRoutes);
+app.use("/api/projects",    projectRoutes);
+app.use("/api/project-status",projectStatusRoutes);
+app.use("/api/tasks",    TaskPage);
+app.use("/api/groups",    Group);
+app.use("/api/client-dashboard", clientDashRoutes);
+app.use("/api/invoices", Invoices);
 
-const start = async () => {
-  await connectDB();
-
-  // Seed default groups only if none exist
-  const { seedDefaultGroups } = require("./controllers/groupController");
-  await seedDefaultGroups();
-
-  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-};
-
-start();
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ MongoDB Connected");
+    app.listen(process.env.PORT || 5000, () => {
+      console.log(`🚀 Server running on port ${process.env.PORT || 5000}`);
+    });
+  })
+  .catch(err => console.error("❌ MongoDB Error:", err));

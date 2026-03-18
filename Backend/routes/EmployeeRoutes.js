@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Employee = require("../models/EmployeeModel");
 
-// GET all
 router.get("/", async (req, res) => {
   try {
     const employees = await Employee.find().sort({ createdAt: -1 });
@@ -12,7 +11,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST add
 router.post("/add", async (req, res) => {
   try {
     const { name, email, phone, role, department, salary, status } = req.body;

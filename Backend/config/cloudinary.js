@@ -4,7 +4,7 @@ const onLogoChange = async (e) => {
 
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", "ml_default"); // important
+  formData.append("upload_preset", "ml_default"); 
 
   try {
 

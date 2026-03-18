@@ -87,7 +87,12 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
   const upd = (f, v) => setInv(p => ({ ...p, [f]: v }));
   const selectedClient = clients.find(c => (c.clientName || c.name) === inv.client);
-  const filteredProjects = projects.filter(p => !inv.client || p.client === inv.client);
+  const filteredProjects = projects.filter(p => 
+  !inv.client || 
+  p.client === inv.client || 
+  p.clientName === inv.client ||
+  p.clientId === selectedClient?._id
+);
 
   const addItem = () => {
     const last = items[items.length - 1];
@@ -109,12 +114,34 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     setErrors(prev => { const next = { ...prev }; delete next[`item_${id}_${f}`]; return next; });
   };
 
-  const handleSaveDraft = () => {
+const handleSaveDraft = async () => {
+  try {
+    // MongoDB la save
+    const res = await fetch("http://localhost:5000/api/invoices", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inv, items }),
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      // localStorage la also save (offline backup)
+      saveDraftToList(inv, items);
+      setDrafts(loadAllDrafts());
+      setDraftSaved(true);
+      setTimeout(() => setDraftSaved(false), 2500);
+    } else {
+      alert("Save failed: " + data.msg);
+    }
+  } catch (err) {
+    console.error(err);
+    // Backend illa-na localStorage fallback
     saveDraftToList(inv, items);
     setDrafts(loadAllDrafts());
     setDraftSaved(true);
     setTimeout(() => setDraftSaved(false), 2500);
-  };
+  }
+};
 
   const clearForm = () => {
     setInv({ ...blankInv, invoiceNo: generateInvoiceNo() });

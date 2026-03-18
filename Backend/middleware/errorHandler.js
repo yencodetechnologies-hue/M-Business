@@ -1,4 +1,4 @@
-// Central error handler — add as last middleware in server.js
+
 const errorHandler = (err, req, res, next) => {
   console.error("🔴 Error:", err.stack);
 
@@ -10,7 +10,6 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-// 404 handler — add before errorHandler
 const notFound = (req, res, next) => {
   const err = new Error(`Route not found: ${req.originalUrl}`);
   res.status(404);

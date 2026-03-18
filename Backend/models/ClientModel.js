@@ -1,14 +1,15 @@
-const mongoose = require("mongoose"); // ✅ இதை top-ல add பண்ணுங்க
+const mongoose = require("mongoose");
 
-const clientSchema = new mongoose.Schema({
+const ClientSchema = new mongoose.Schema({
   clientName:      { type: String, required: true },
   companyName:     { type: String, default: "" },
   email:           { type: String, required: true, unique: true },
   phone:           { type: String, default: "" },
   address:         { type: String, default: "" },
   projectAssigned: { type: String, default: "" },
-  status:          { type: String, enum: ["Active","Inactive"], default: "Active" },
-  password:        { type: String, default: "" }, // ✅ password field
+  password:        { type: String, default: "" },
+  status:          { type: String, default: "Active" },
+  role:            { type: String, default: "client" }, 
 }, { timestamps: true });
 
-module.exports = mongoose.model("Client", clientSchema);
+module.exports = mongoose.model("Client", ClientSchema);

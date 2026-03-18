@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone:    { type: String, default: "" },
   role:     { type: String, default: "user" },
-  logoUrl:  { type: String, default: "" },   // ✅ logo Cloudinary URL save ஆகும்
+  logoUrl:  { type: String, default: "" },  
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);

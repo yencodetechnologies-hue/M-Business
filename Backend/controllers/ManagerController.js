@@ -1,6 +1,5 @@
 const Manager = require("../models/ManagerModel");
 
-// Add Manager
 exports.addManager = async (req, res) => {
   try {
 

@@ -1,72 +1,63 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/UserModels"); // உங்கள் User model path
+const User = require("../models/UserModels");
+const Client = require("../models/ClientModel");
+const Manager = require("../models/ManagerModel");
 
-// ✅ SIGNUP
-router.post("/signup", async (req, res) => {
-  try {
-    const { name, email, password, phone, logo } = req.body;
-
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ msg: "Email already exists" });
-
-    const hashed = await bcrypt.hash(password, 10);
-
-    const user = new User({
-      name,
-      email,
-      password: hashed,
-      phone: phone || "",
-      role: "user",
-      logoUrl: logo || "",   // ✅ register-ல logo URL save
-    });
-
-    await user.save();
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-
-    res.status(201).json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        logoUrl: user.logoUrl,  // ✅ response-ல logoUrl
-      }
-    });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
-
-// ✅ LOGIN
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("🔍 Login attempt:", email);
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ msg: "User not found" });
+    let user = null;
+    let role = "user";
+
+    user = await User.findOne({ email });
+    if (user) {
+      console.log("✅ Found in User collection, role:", user.role);
+      role = user.role || "admin";
+    }
+
+    if (!user) {
+      user = await Client.findOne({ email });
+      if (user) {
+        console.log("✅ Found in Client collection");
+        role = "client";
+      }
+    }
+
+    if (!user) {
+      user = await Manager.findOne({ email });
+      if (user) {
+        console.log("✅ Found in Manager collection");
+        role = user.role || "manager";
+      }
+    }
+
+    if (!user) {
+      console.log("❌ User not found in any collection");
+      return res.status(400).json({ msg: "Invalid email or password" });
+    }
+
+    console.log("🔐 Stored hash:", user.password);
+    console.log("🔑 Entered:", password);
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Invalid password" });
+    console.log("🔑 Match:", isMatch);
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Invalid email or password" });
+    }
 
     res.json({
-      token,
       user: {
         id: user._id,
-        name: user.name,
+        name: user.clientName || user.managerName || user.name || "",
         email: user.email,
-        phone: user.phone,
-        role: user.role,
-        logoUrl: user.logoUrl || "",  // ✅ login-லயும் logoUrl
+        phone: user.phone || "",
+        role: role,
+        logoUrl: user.logoUrl || "",
       }
     });
 
@@ -75,21 +66,50 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-// ... உன் existing routes ...
 
-// ✅ paste பண்ண snippet இங்க வரும்
-router.post("/save-logo", async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
-    const { userId, logoUrl } = req.body;
-    if (!userId) return res.status(400).json({ msg: "userId required" });
+    const { name, email, password, role, phone } = req.body;
 
-    const User = require("../models/UserModels");
-    await User.findByIdAndUpdate(userId, { logoUrl: logoUrl || "" });
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ msg: "Email already exists" });
+    }
 
-    res.json({ msg: "Logo saved", logoUrl });
+    const hashed = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      name,
+      email,
+      password: hashed,
+      role: role || "admin",
+      phone,
+    });
+    await newUser.save();
+
+    res.status(201).json({ msg: "Account created successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error" });
+  }
+});
+
+router.post("/save-logo", async (req, res) => {
+  try {
+    const { userId, logoUrl } = req.body;
+    await User.findByIdAndUpdate(userId, { logoUrl });
+    res.json({ msg: "Logo saved" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+router.get("/debug-clients", async (req, res) => {
+  try {
+    const clients = await Client.find({});
+    console.log("📋 All clients:", clients);
+    res.json(clients);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
   }
 });
 

@@ -1,7 +1,6 @@
 const Task  = require("../models/TaskModels");
 const Group = require("../models/GroupModels");
 
-// GET all tasks
 exports.getAllTasks = async (req, res) => {
   try {
     const filter = { isDeleted: false };
@@ -18,7 +17,6 @@ exports.getAllTasks = async (req, res) => {
   }
 };
 
-// GET board data — all groups WITH tasks (used by frontend on load)
 exports.getBoardData = async (req, res) => {
   try {
     const groups = await Group.find({ isDeleted: false }).sort({ order: 1, createdAt: 1 });
@@ -62,7 +60,6 @@ exports.getBoardData = async (req, res) => {
   }
 };
 
-// GET single task
 exports.getTask = async (req, res) => {
   try {
     const task = await Task.findOne({ _id: req.params.id, isDeleted: false })
@@ -75,7 +72,6 @@ exports.getTask = async (req, res) => {
   }
 };
 
-// CREATE task
 exports.createTask = async (req, res) => {
   try {
     const {
@@ -107,7 +103,6 @@ exports.createTask = async (req, res) => {
   }
 };
 
-// UPDATE task (full PUT)
 exports.updateTask = async (req, res) => {
   try {
     const allowed = [
@@ -139,7 +134,6 @@ exports.updateTask = async (req, res) => {
   }
 };
 
-// PATCH checked toggle
 exports.toggleChecked = async (req, res) => {
   try {
     const task = await Task.findOne({ _id: req.params.id, isDeleted: false });
@@ -152,7 +146,6 @@ exports.toggleChecked = async (req, res) => {
   }
 };
 
-// DELETE task (soft)
 exports.deleteTask = async (req, res) => {
   try {
     const task = await Task.findOneAndUpdate(
@@ -167,7 +160,6 @@ exports.deleteTask = async (req, res) => {
   }
 };
 
-// MOVE task to another group
 exports.moveTask = async (req, res) => {
   try {
     const { groupId } = req.body;

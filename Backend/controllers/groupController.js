@@ -1,7 +1,6 @@
 const Group = require("../models/GroupModels");
 const Task  = require("../models/TaskModels");
 
-// GET all groups
 exports.getAllGroups = async (req, res) => {
   try {
     const groups = await Group.find({ isDeleted: false }).sort({ order: 1, createdAt: 1 });
@@ -11,7 +10,6 @@ exports.getAllGroups = async (req, res) => {
   }
 };
 
-// CREATE group
 exports.createGroup = async (req, res) => {
   try {
     const { label, color, open } = req.body;
@@ -33,7 +31,6 @@ exports.createGroup = async (req, res) => {
   }
 };
 
-// UPDATE group (label, color, open/collapse)
 exports.updateGroup = async (req, res) => {
   try {
     const updates = {};
@@ -53,7 +50,6 @@ exports.updateGroup = async (req, res) => {
   }
 };
 
-// DELETE group (soft) — also soft-deletes all tasks in group
 exports.deleteGroup = async (req, res) => {
   try {
     const group = await Group.findOneAndUpdate(
@@ -71,7 +67,6 @@ exports.deleteGroup = async (req, res) => {
   }
 };
 
-// SEED default groups (called once on app init)
 exports.seedDefaultGroups = async () => {
   const count = await Group.countDocuments({ isDeleted: false });
   if (count > 0) return;

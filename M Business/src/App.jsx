@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
@@ -8,9 +7,10 @@ import ClientDashboard   from "./components/ClientDashboard";
 import EmployeeDashboard from "./components/EmployeeDashboard";
 import InvoiceViewer     from "./components/InvoiceViewer";
 import TasksPage         from "./components/TaskPage";
-import CalendarPage         from "./components/CalendarPage";
-import AccountsPage         from "./components/AccountsPage";
-import ReportsPage         from "./components/ReportsPage";
+import CalendarPage      from "./components/CalendarPage";
+import AccountsPage      from "./components/AccountsPage";
+import ReportsPage       from "./components/ReportsPage";
+import QuotationCreator  from "./components/QuotationCreator";
 
 export default function App() {
   const [user, setUser] = useState(undefined);
@@ -25,7 +25,6 @@ export default function App() {
     }
   }, []);
 
-  // Loading from localStorage
   if (user === undefined) return null;
 
   const handleSetUser = (userData) => {
@@ -40,31 +39,17 @@ export default function App() {
 
   const role = (user?.role || "").toLowerCase().trim();
 
-  // ── Role → Dashboard mapping ───────────────────────────────────────────────
   const getRootPage = () => {
     if (!user) return <AuthPage setUser={handleSetUser} />;
-
-    // Employee → EmployeeDashboard
-    if (role === "employee") {
-      return <EmployeeDashboard user={user} setUser={handleSetUser} />;
-    }
-
-    // Client → ClientDashboard
-    if (role === "client" || role === "user") {
-      return <ClientDashboard user={user} setUser={handleSetUser} />;
-    }
-
-    // Admin / SubAdmin / Manager → Main Dashboard
+    if (role === "employee") return <EmployeeDashboard user={user} setUser={handleSetUser} />;
+    if (role === "client" || role === "user") return <ClientDashboard user={user} setUser={handleSetUser} />;
     return <Dashboard user={user} setUser={handleSetUser} />;
   };
 
   return (
     <Router>
       <Routes>
-        {/* Root — auto-routes by role */}
         <Route path="/" element={getRootPage()} />
-
-        {/* Direct URL access with role guard */}
         <Route
           path="/employeedashboard"
           element={
@@ -73,17 +58,13 @@ export default function App() {
               : <Navigate to="/" replace />
           }
         />
-
-        {/* Other pages */}
-        <Route path="/tasks"        element={<TasksPage />} />
-        <Route path="/invoice-view" element={<InvoiceViewer />} />
-                <Route path="/calendar" element={<CalendarPage />} />
-                        <Route path="/accounts" element={<AccountsPage />} />
-                                <Route path="/reports" element={<ReportsPage />} />
-
-
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/tasks"             element={<TasksPage />} />
+        <Route path="/invoice-view"      element={<InvoiceViewer />} />
+        <Route path="/calendar"          element={<CalendarPage />} />
+        <Route path="/accounts"          element={<AccountsPage />} />
+        <Route path="/reports"           element={<ReportsPage />} />
+        <Route path="/quotation-creator" element={<QuotationCreator />} />
+        <Route path="*"                  element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

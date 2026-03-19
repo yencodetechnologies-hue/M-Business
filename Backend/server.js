@@ -22,6 +22,7 @@ const accountRoutes       = require("./routes/accountroutes");
 const reportRoutes        = require("./routes/reportroutes");
 const uploadRoutes        = require("./routes/uploadroutes");
 const employeeDashRoutes  = require("./routes/employeedashboardroutes");
+const QuotationRoutes  = require("./routes/quotationroutes");
 
 app.use("/api/auth",               authRoutes);
 app.use("/api/clients",            clientRoutes);
@@ -38,6 +39,7 @@ app.use("/api/accounts",           accountRoutes);
 app.use("/api/reports",            reportRoutes);
 app.use("/api/upload",             uploadRoutes);
 app.use("/api/employee-dashboard", employeeDashRoutes);
+app.use("/api/quotations",         QuotationRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

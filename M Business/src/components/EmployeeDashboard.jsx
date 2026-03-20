@@ -10,6 +10,7 @@ const sc = (s) => ({
   high:"#ef4444",medium:"#f59e0b",low:"#10b981",
   present:"#10b981",absent:"#ef4444",leave:"#f59e0b",holiday:"#8b5cf6",
   approved:"#10b981",rejected:"#ef4444",overdue:"#ef4444",
+  cancelled:"#94a3b8",
 }[(s||"").toLowerCase()]||"#6366f1");
 
 const NAV = [
@@ -25,22 +26,38 @@ const SEED_PROJECTS = [
   { _id:"p2", name:"HR Portal",          client:"TechCorp",    budget:"₹95,000",   deadline:"2026-04-10", status:"review", progress:85 },
   { _id:"p3", name:"Mobile App Design",  client:"Kavi Labs",   budget:"₹75,000",   deadline:"2026-03-22", status:"active", progress:40 },
 ];
-
 const SEED_TASKS = [
   { _id:"t1", title:"Homepage wireframe review",     project:"E-Commerce Revamp", priority:"High",   status:"done",        dueDate:"2026-03-10", description:"Review all desktop and mobile layouts" },
   { _id:"t2", title:"UI Component library approval", project:"E-Commerce Revamp", priority:"High",   status:"in progress", dueDate:"2026-03-22", description:"Sign off on color palette and typography" },
   { _id:"t3", title:"App feature requirements doc",  project:"HR Portal",         priority:"Medium", status:"in progress", dueDate:"2026-03-28", description:"List core features and user flow diagrams" },
-  { _id:"t4", title:"API endpoint testing",          project:"Mobile App Design", priority:"Medium", status:"pending",     dueDate:"2026-04-05", description:"Test all REST endpoints with Postman" },
+  { _id:"t4", title:"API endpoint testing",          project:"Mobile App Design", priority:"Medium", status:"pending",     dueDate:"2026-04-05", description:"REST endpoints with Postman" },
 ];
-
 const SEED_SALARY = [
   { _id:"s1", month:"March 2026",    basic:35000, hra:14000, allowances:5000, deductions:4500, net:49500, status:"paid", paidOn:"2026-03-31" },
   { _id:"s2", month:"February 2026", basic:35000, hra:14000, allowances:5000, deductions:4500, net:49500, status:"paid", paidOn:"2026-02-28" },
   { _id:"s3", month:"January 2026",  basic:35000, hra:14000, allowances:5000, deductions:4500, net:49500, status:"paid", paidOn:"2026-01-31" },
 ];
 
+// Permission types with icons
+const PERMISSION_TYPES = [
+  { value:"late_arrival",   label:"Late Arrival",    icon:"🕐", desc:"Coming in late today" },
+  { value:"early_departure",label:"Early Departure", icon:"🚶", desc:"Leaving early today"  },
+  { value:"od",             label:"On Duty (OD)",    icon:"🏢", desc:"Working outside office" },
+  { value:"wfh",            label:"Work From Home",  icon:"🏠", desc:"Working from home"     },
+  { value:"half_day",       label:"Half Day",        icon:"🌗", desc:"Half day off"          },
+  { value:"other",          label:"Other",           icon:"📝", desc:"Other reason"          },
+];
+
 const todayStr = () => new Date().toISOString().split("T")[0];
 const fmt = (n) => Number(n||0).toLocaleString("en-IN");
+
+const statusIcon = (s) => {
+  const l = (s||"").toLowerCase();
+  if(l==="approved")  return "✅";
+  if(l==="rejected")  return "❌";
+  if(l==="cancelled") return "🚫";
+  return "⏳";
+};
 
 // ── UI Atoms ──────────────────────────────────────────────────────────────────
 
@@ -115,6 +132,20 @@ function Toast({ msg, type }) {
   );
 }
 
+function InputField({ label, children }) {
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+      <label style={{ fontSize:11, color:"#64748b", fontWeight:700, textTransform:"uppercase", letterSpacing:0.4 }}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+const inputStyle = {
+  padding:"9px 12px", border:"1.5px solid #e2e8f0", borderRadius:10,
+  fontSize:13, color:"#0f172a", background:"#f8fafc", outline:"none", fontFamily:"inherit",
+};
+
 function Sidebar({ active, setActive, open, onClose, onLogout, user }) {
   const initials = (user?.name||"E").slice(0,2).toUpperCase();
   return (
@@ -176,7 +207,6 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage }) {
   const presentDays = attendance.filter(a => a.status === "present").length;
   const pendingTasks = tasks.filter(t => t.status !== "done" && t.status !== "completed").length;
   const latestSalary = salary[0];
-
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
@@ -184,26 +214,21 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage }) {
           <h1 style={{ fontSize:22, fontWeight:800, color:"#0f172a", margin:0 }}>Welcome back, {name.split(" ")[0]} 👋</h1>
           <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Here's your work summary for today</p>
         </div>
-        {!todayAtt && (
+        {!todayAtt ? (
           <div style={{ background:"#fef2f2", border:"1px solid #fecaca", borderRadius:12, padding:"10px 16px", fontSize:13, color:"#ef4444", fontWeight:600, display:"flex", alignItems:"center", gap:8 }}>
             ⚠️ Mark today's attendance →
             <button onClick={()=>setPage("attendance")} style={{ background:"#ef4444", border:"none", borderRadius:8, padding:"5px 12px", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Mark Now</button>
           </div>
-        )}
-        {todayAtt && (
-          <div style={{ background:"#f0fdf4", border:"1px solid #bbf7d0", borderRadius:12, padding:"10px 16px", fontSize:13, color:"#10b981", fontWeight:600 }}>
-            ✅ Today: {todayAtt.status}
-          </div>
+        ) : (
+          <div style={{ background:"#f0fdf4", border:"1px solid #bbf7d0", borderRadius:12, padding:"10px 16px", fontSize:13, color:"#10b981", fontWeight:600 }}>✅ Today: {todayAtt.status}</div>
         )}
       </div>
-
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }} className="stat-grid">
-        <StatCard icon="◈" label="My Projects"   value={projects.length}   sub="Assigned to you"  color="#6366f1" onClick={()=>setPage("projects")}/>
-        <StatCard icon="◉" label="Pending Tasks" value={pendingTasks}       sub="Need attention"   color="#f59e0b" onClick={()=>setPage("tasks")}/>
-        <StatCard icon="◷" label="Present Days"  value={presentDays}        sub="This month"       color="#10b981" onClick={()=>setPage("attendance")}/>
-        <StatCard icon="◆" label="Last Salary"   value={latestSalary ? `₹${fmt(latestSalary.net)}` : "—"} sub={latestSalary?.month||"Not yet"} color="#8b5cf6" onClick={()=>setPage("salary")}/>
+        <StatCard icon="◈" label="My Projects"   value={projects.length}  sub="Assigned to you" color="#6366f1" onClick={()=>setPage("projects")}/>
+        <StatCard icon="◉" label="Pending Tasks" value={pendingTasks}      sub="Need attention"  color="#f59e0b" onClick={()=>setPage("tasks")}/>
+        <StatCard icon="◷" label="Present Days"  value={presentDays}       sub="This month"      color="#10b981" onClick={()=>setPage("attendance")}/>
+        <StatCard icon="◆" label="Last Salary"   value={latestSalary?`₹${fmt(latestSalary.net)}`:"—"} sub={latestSalary?.month||"Not yet"} color="#8b5cf6" onClick={()=>setPage("salary")}/>
       </div>
-
       <div style={{ display:"grid", gridTemplateColumns:"3fr 2fr", gap:16 }} className="two-col">
         <Card title="My Projects" action={<button onClick={()=>setPage("projects")} style={{ background:"none", border:"none", color:"#6366f1", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>View all →</button>}>
           {projects.slice(0,4).map((p,i) => (
@@ -213,8 +238,7 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage }) {
                 <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</div>
                 <div style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>{p.client||"—"} · Due {p.deadline||"—"}</div>
                 <div style={{ marginTop:6, display:"flex", alignItems:"center", gap:8 }}>
-                  <ProgressBar pct={p.progress||0}/>
-                  <span style={{ fontSize:11, color:"#94a3b8" }}>{p.progress||0}%</span>
+                  <ProgressBar pct={p.progress||0}/><span style={{ fontSize:11, color:"#94a3b8" }}>{p.progress||0}%</span>
                 </div>
               </div>
               <Badge label={p.status||"active"}/>
@@ -222,7 +246,6 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage }) {
           ))}
           {projects.length===0 && <div style={{ textAlign:"center", padding:"1.5rem", color:"#94a3b8", fontSize:13 }}>No projects assigned</div>}
         </Card>
-
         <Card title="My Tasks" action={<button onClick={()=>setPage("tasks")} style={{ background:"none", border:"none", color:"#6366f1", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>View all →</button>}>
           {tasks.slice(0,5).map((t,i) => (
             <div key={t._id||i} style={{ display:"flex", alignItems:"flex-start", gap:10, padding:"9px 0", borderBottom:i<4?"1px solid #f8fafc":"none" }}>
@@ -239,7 +262,6 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage }) {
           {tasks.length===0 && <div style={{ textAlign:"center", padding:"1.5rem", color:"#94a3b8", fontSize:13 }}>No tasks assigned</div>}
         </Card>
       </div>
-
       <Card title="This Month Attendance">
         <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
           {Array.from({length:31},(_,i) => {
@@ -249,18 +271,13 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage }) {
             const rec = attendance.find(a => a.date===date);
             const bg = rec ? sc(rec.status) : "#f1f5f9";
             const tc = rec ? "#fff" : "#94a3b8";
-            return (
-              <div key={i} style={{ width:32, height:32, borderRadius:8, background:bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, color:tc }}>
-                {i+1}
-              </div>
-            );
+            return <div key={i} style={{ width:32, height:32, borderRadius:8, background:bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, color:tc }}>{i+1}</div>;
           })}
         </div>
         <div style={{ display:"flex", gap:16, marginTop:12, flexWrap:"wrap" }}>
           {[["#10b981","Present"],["#ef4444","Absent"],["#f59e0b","Leave"],["#f1f5f9","Not marked"]].map(([c,l]) => (
             <div key={l} style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"#64748b" }}>
-              <div style={{ width:10, height:10, borderRadius:3, background:c }}/>
-              {l}
+              <div style={{ width:10, height:10, borderRadius:3, background:c }}/>{l}
             </div>
           ))}
         </div>
@@ -274,79 +291,64 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage }) {
 function ProjectsPage({ projects }) {
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState(null);
-
   const tabs = [
     { key:"all",    label:`All (${projects.length})` },
     { key:"active", label:`Active (${projects.filter(p=>["active","in progress"].includes((p.status||"").toLowerCase())).length})` },
     { key:"review", label:`Review (${projects.filter(p=>["review","in review"].includes((p.status||"").toLowerCase())).length})` },
     { key:"done",   label:`Done (${projects.filter(p=>["done","completed"].includes((p.status||"").toLowerCase())).length})` },
   ];
-
   const list = filter==="all" ? projects : projects.filter(p => {
-    const s = (p.status||"").toLowerCase();
+    const s=(p.status||"").toLowerCase();
     if(filter==="active") return s==="active"||s==="in progress";
     if(filter==="review") return s==="review"||s==="in review";
     if(filter==="done")   return s==="done"||s==="completed";
     return true;
   });
-
-  if (selected) {
-    return (
-      <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-        <Card>
-          <button onClick={()=>setSelected(null)} style={{ background:"none", border:"none", color:"#6366f1", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", marginBottom:16 }}>← Back</button>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20, flexWrap:"wrap", gap:10 }}>
-            <div>
-              <h2 style={{ fontSize:18, fontWeight:800, color:"#0f172a", margin:0 }}>{selected.name}</h2>
-              <div style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Client: {selected.client||"—"} · Deadline: {selected.deadline||"—"}</div>
+  if(selected) return (
+    <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+      <Card>
+        <button onClick={()=>setSelected(null)} style={{ background:"none", border:"none", color:"#6366f1", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", marginBottom:16 }}>← Back</button>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20, flexWrap:"wrap", gap:10 }}>
+          <div><h2 style={{ fontSize:18, fontWeight:800, color:"#0f172a", margin:0 }}>{selected.name}</h2>
+            <div style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Client: {selected.client||"—"} · Deadline: {selected.deadline||"—"}</div></div>
+          <Badge label={selected.status||"active"}/>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12, marginBottom:20 }}>
+          {[["Budget",selected.budget||"—"],["Progress",`${selected.progress||0}%`],["Manager",selected.manager||"—"]].map(([k,v]) => (
+            <div key={k} style={{ background:"#f8fafc", borderRadius:12, padding:"12px 14px" }}>
+              <div style={{ fontSize:11, color:"#94a3b8", fontWeight:700, textTransform:"uppercase", marginBottom:4 }}>{k}</div>
+              <div style={{ fontSize:16, fontWeight:800, color:"#0f172a" }}>{v}</div>
             </div>
-            <Badge label={selected.status||"active"}/>
+          ))}
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+          <div style={{ flex:1, background:"#f1f5f9", borderRadius:99, height:10, overflow:"hidden" }}>
+            <div style={{ width:`${selected.progress||0}%`, background:"linear-gradient(90deg,#6366f1,#8b5cf6)", height:"100%", borderRadius:99 }}/>
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12, marginBottom:20 }}>
-            {[["Budget",selected.budget||"—"],["Progress",`${selected.progress||0}%`],["Manager",selected.manager||"—"]].map(([k,v]) => (
-              <div key={k} style={{ background:"#f8fafc", borderRadius:12, padding:"12px 14px" }}>
-                <div style={{ fontSize:11, color:"#94a3b8", fontWeight:700, textTransform:"uppercase", marginBottom:4 }}>{k}</div>
-                <div style={{ fontSize:16, fontWeight:800, color:"#0f172a" }}>{v}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-            <div style={{ flex:1, background:"#f1f5f9", borderRadius:99, height:10, overflow:"hidden" }}>
-              <div style={{ width:`${selected.progress||0}%`, background:"linear-gradient(90deg,#6366f1,#8b5cf6)", height:"100%", borderRadius:99 }}/>
-            </div>
-            <span style={{ fontSize:14, fontWeight:800, color:"#6366f1" }}>{selected.progress||0}%</span>
-          </div>
-          {selected.description && <p style={{ marginTop:16, fontSize:13, color:"#374151", lineHeight:1.7 }}>{selected.description}</p>}
-        </Card>
-      </div>
-    );
-  }
-
+          <span style={{ fontSize:14, fontWeight:800, color:"#6366f1" }}>{selected.progress||0}%</span>
+        </div>
+        {selected.description && <p style={{ marginTop:16, fontSize:13, color:"#374151", lineHeight:1.7 }}>{selected.description}</p>}
+      </Card>
+    </div>
+  );
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-      <div>
-        <h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>My Projects</h1>
-        <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>All projects assigned to you</p>
-      </div>
+      <div><h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>My Projects</h1>
+        <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>All projects assigned to you</p></div>
       <Card>
         <TabBar tabs={tabs} active={filter} onChange={setFilter}/>
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
           {list.map((p,i) => (
-            <div key={p._id||i} onClick={()=>setSelected(p)}
-              style={{ background:"#f8fafc", borderRadius:14, border:"1px solid #f1f5f9", padding:"16px 18px", cursor:"pointer" }}
+            <div key={p._id||i} onClick={()=>setSelected(p)} style={{ background:"#f8fafc", borderRadius:14, border:"1px solid #f1f5f9", padding:"16px 18px", cursor:"pointer" }}
               onMouseEnter={e=>{ e.currentTarget.style.background="#f0f0fe"; e.currentTarget.style.borderColor="#c7d2fe"; }}
-              onMouseLeave={e=>{ e.currentTarget.style.background="#f8fafc"; e.currentTarget.style.borderColor="#f1f5f9"; }}
-            >
+              onMouseLeave={e=>{ e.currentTarget.style.background="#f8fafc"; e.currentTarget.style.borderColor="#f1f5f9"; }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 }}>
-                <div>
-                  <div style={{ fontSize:14, fontWeight:800, color:"#0f172a" }}>{p.name}</div>
-                  <div style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>Client: {p.client||"—"} · Budget: {p.budget||"—"} · Due: {p.deadline||"—"}</div>
-                </div>
+                <div><div style={{ fontSize:14, fontWeight:800, color:"#0f172a" }}>{p.name}</div>
+                  <div style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>Client: {p.client||"—"} · Budget: {p.budget||"—"} · Due: {p.deadline||"—"}</div></div>
                 <Badge label={p.status||"active"}/>
               </div>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                <ProgressBar pct={p.progress||0}/>
-                <span style={{ fontSize:12, fontWeight:700, color:"#6366f1", minWidth:36 }}>{p.progress||0}%</span>
+                <ProgressBar pct={p.progress||0}/><span style={{ fontSize:12, fontWeight:700, color:"#6366f1", minWidth:36 }}>{p.progress||0}%</span>
               </div>
             </div>
           ))}
@@ -362,26 +364,21 @@ function ProjectsPage({ projects }) {
 function TasksPage({ tasks }) {
   const [filter, setFilter] = useState("all");
   const [expanded, setExpanded] = useState(null);
-
   const tabs = [
     { key:"all",         label:`All (${tasks.length})` },
     { key:"in progress", label:`In Progress (${tasks.filter(t=>(t.status||"").toLowerCase()==="in progress").length})` },
     { key:"pending",     label:`Pending (${tasks.filter(t=>(t.status||"").toLowerCase()==="pending").length})` },
     { key:"done",        label:`Done (${tasks.filter(t=>["done","completed"].includes((t.status||"").toLowerCase())).length})` },
   ];
-
   const list = filter==="all" ? tasks : tasks.filter(t => {
-    const s = (t.status||"").toLowerCase();
+    const s=(t.status||"").toLowerCase();
     if(filter==="done") return s==="done"||s==="completed";
     return s===filter;
   });
-
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-      <div>
-        <h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>My Tasks</h1>
-        <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Tasks assigned to you</p>
-      </div>
+      <div><h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>My Tasks</h1>
+        <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Tasks assigned to you</p></div>
       <Card>
         <TabBar tabs={tabs} active={filter} onChange={setFilter}/>
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
@@ -397,19 +394,16 @@ function TasksPage({ tasks }) {
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:14, fontWeight:700, color:done?"#94a3b8":"#0f172a", textDecoration:done?"line-through":"none" }}>{t.title}</div>
                     <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginTop:5, alignItems:"center" }}>
-                      <Badge label={t.priority||"medium"}/>
-                      <Badge label={t.status||"pending"}/>
+                      <Badge label={t.priority||"medium"}/><Badge label={t.status||"pending"}/>
                       <span style={{ fontSize:11, color:"#94a3b8" }}>📁 {t.project}</span>
                       <span style={{ fontSize:11, color:"#94a3b8" }}>⏱ {t.dueDate||"—"}</span>
                     </div>
                   </div>
                   <span style={{ fontSize:12, color:"#94a3b8", transform:isOpen?"rotate(180deg)":"rotate(0)", display:"inline-block" }}>▾</span>
                 </div>
-                {isOpen && (
-                  <div style={{ padding:"0 16px 16px", borderTop:"1px solid #f1f5f9" }}>
-                    {t.description && <p style={{ fontSize:13, color:"#374151", marginTop:12, lineHeight:1.6 }}>{t.description}</p>}
-                  </div>
-                )}
+                {isOpen && <div style={{ padding:"0 16px 16px", borderTop:"1px solid #f1f5f9" }}>
+                  {t.description && <p style={{ fontSize:13, color:"#374151", marginTop:12, lineHeight:1.6 }}>{t.description}</p>}
+                </div>}
               </div>
             );
           })}
@@ -420,165 +414,432 @@ function TasksPage({ tasks }) {
   );
 }
 
-// ── Page 4: Attendance ────────────────────────────────────────────────────────
+// ── Page 4: Attendance (with Leaves + Permissions tabs) ───────────────────────
 
 function AttendancePage({ attendance, setAttendance, empName, notify }) {
-  const [leaveForm,   setLeaveForm]   = useState(false);
-  const [leaveType,   setLeaveType]   = useState("Sick Leave");
-  const [leaveFrom,   setLeaveFrom]   = useState(todayStr());
-  const [leaveTo,     setLeaveTo]     = useState(todayStr());
-  const [leaveReason, setLeaveReason] = useState("");
-  const [marking,     setMarking]     = useState(false);
+  const [activeTab,      setActiveTab]      = useState("attendance");
+
+  // ─ Leave state ─
+  const [leaveForm,      setLeaveForm]      = useState(false);
+  const [leaveType,      setLeaveType]      = useState("Sick Leave");
+  const [leaveFrom,      setLeaveFrom]      = useState(todayStr());
+  const [leaveTo,        setLeaveTo]        = useState(todayStr());
+  const [leaveReason,    setLeaveReason]    = useState("");
+  const [leaveHistory,   setLeaveHistory]   = useState([]);
+  const [leaveSubmitting,setLeaveSubmitting]= useState(false);
+
+  // ─ Permission state ─
+  const [permForm,       setPermForm]       = useState(false);
+  const [permType,       setPermType]       = useState("late_arrival");
+  const [permDate,       setPermDate]       = useState(todayStr());
+  const [permFromTime,   setPermFromTime]   = useState("09:00");
+  const [permToTime,     setPermToTime]     = useState("10:00");
+  const [permReason,     setPermReason]     = useState("");
+  const [permHistory,    setPermHistory]    = useState([]);
+  const [permSubmitting, setPermSubmitting] = useState(false);
+
+  const [marking,        setMarking]        = useState(false);
 
   const today      = todayStr();
-  const thisMonth  = today.slice(0, 7);
-  const todayRec   = attendance.find(a => a.date === today);
+  const thisMonth  = today.slice(0,7);
+  const todayRec   = attendance.find(a => a.date===today);
   const monthRecs  = attendance.filter(a => a.date.startsWith(thisMonth));
   const present    = monthRecs.filter(a => a.status==="present").length;
   const absent     = monthRecs.filter(a => a.status==="absent").length;
   const leave      = monthRecs.filter(a => a.status==="leave").length;
-  const workingDays = new Date().getDate();
+  const workingDays= new Date().getDate();
+
+  // Fetch leave & permission history
+  useEffect(() => {
+    if (!empName) return;
+    const enc = encodeURIComponent(empName);
+    axios.get(`${BASE}/leave/${enc}`).then(r => { if(r.data?.length) setLeaveHistory(r.data); }).catch(()=>{});
+    axios.get(`${BASE}/permission/${enc}`).then(r => { if(r.data?.length) setPermHistory(r.data); }).catch(()=>{});
+  }, [empName]);
 
   const markAttendance = async (status) => {
-    if (todayRec) { notify("Already marked for today","error"); return; }
+    if(todayRec){ notify("Already marked for today","error"); return; }
     setMarking(true);
     const rec = { date:today, status, employeeName:empName, markedAt:new Date().toISOString() };
-    try { await axios.post(`${BASE}/attendance`, rec); } catch(e) {}
+    try { await axios.post(`${BASE}/attendance`, rec); } catch(e){}
     setAttendance(prev => [...prev, rec]);
     notify(`Marked as ${status} ✓`);
     setMarking(false);
   };
 
   const submitLeave = async () => {
-    if (!leaveReason.trim()) { notify("Please enter a reason","error"); return; }
-    const req = { type:leaveType, from:leaveFrom, to:leaveTo, reason:leaveReason, employeeName:empName };
+    if(!leaveReason.trim()){ notify("Please enter a reason","error"); return; }
+    setLeaveSubmitting(true);
+    const newLeave = { _id:`leave_${Date.now()}`, type:leaveType, from:leaveFrom, to:leaveTo, reason:leaveReason, employeeName:empName, status:"pending", appliedOn:new Date().toISOString() };
     try {
-      await axios.post(`${BASE}/leave`, req);
-      notify("Leave request submitted ✓");
-    } catch {
-      notify("Leave request saved ✓");
-    }
-    setLeaveForm(false);
-    setLeaveReason("");
+      const res = await axios.post(`${BASE}/leave`, newLeave);
+      setLeaveHistory(prev => [{ ...newLeave, ...(res.data?.leave||{}) }, ...prev]);
+    } catch { setLeaveHistory(prev => [newLeave, ...prev]); }
+    notify("Leave request submitted ✓");
+    setLeaveForm(false); setLeaveReason(""); setLeaveType("Sick Leave"); setLeaveFrom(todayStr()); setLeaveTo(todayStr());
+    setLeaveSubmitting(false); setActiveTab("leaves");
   };
 
+  const submitPermission = async () => {
+    if(!permReason.trim()){ notify("Please enter a reason","error"); return; }
+    setPermSubmitting(true);
+    const typeLabel = PERMISSION_TYPES.find(t=>t.value===permType)?.label || permType;
+    const newPerm = {
+      _id:`perm_${Date.now()}`, type:permType, typeLabel, date:permDate,
+      fromTime:permFromTime, toTime:permToTime, reason:permReason,
+      employeeName:empName, status:"pending", appliedOn:new Date().toISOString(),
+    };
+    try {
+      const res = await axios.post(`${BASE}/permission`, newPerm);
+      setPermHistory(prev => [{ ...newPerm, ...(res.data?.permission||{}) }, ...prev]);
+    } catch { setPermHistory(prev => [newPerm, ...prev]); }
+    notify("Permission request submitted ✓");
+    setPermForm(false); setPermReason(""); setPermType("late_arrival"); setPermDate(todayStr()); setPermFromTime("09:00"); setPermToTime("10:00");
+    setPermSubmitting(false); setActiveTab("permissions");
+  };
+
+  // Cancel a pending permission
+  const cancelPermission = async (perm) => {
+    if((perm.status||"pending").toLowerCase()!=="pending"){ notify("Only pending requests can be cancelled","error"); return; }
+    try {
+      await axios.patch(`${BASE}/permission/${perm._id}/cancel`, { employeeName:empName });
+    } catch{}
+    setPermHistory(prev => prev.map(p => p._id===perm._id ? {...p, status:"cancelled"} : p));
+    notify("Permission request cancelled");
+  };
+
+  const pendingLeaves = leaveHistory.filter(l=>(l.status||"pending").toLowerCase()==="pending").length;
+  const pendingPerms  = permHistory.filter(p=>(p.status||"pending").toLowerCase()==="pending").length;
+
+  const tabs = [
+    { key:"attendance",  label:"Attendance" },
+    { key:"leaves",      label: pendingLeaves>0 ? `My Leaves (${pendingLeaves})` : "My Leaves" },
+    { key:"permissions", label: pendingPerms>0  ? `Permissions (${pendingPerms})` : "Permissions" },
+  ];
+
+  // ── render ────────────────────────────────────────────────────────────────
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+
+      {/* Header row with action buttons */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
         <div>
           <h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>Attendance</h1>
-          <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Track your attendance and apply for leave</p>
+          <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Track attendance, apply leave & permission requests</p>
         </div>
-        <button onClick={()=>setLeaveForm(!leaveForm)} style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-          + Apply Leave
-        </button>
+        <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+          <button onClick={()=>{ setPermForm(v=>!v); setLeaveForm(false); setActiveTab("attendance"); }}
+            style={{ background:"linear-gradient(135deg,#0ea5e9,#6366f1)", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+            🔑 Request Permission
+          </button>
+          <button onClick={()=>{ setLeaveForm(v=>!v); setPermForm(false); setActiveTab("attendance"); }}
+            style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+            🌴 Apply Leave
+          </button>
+        </div>
       </div>
 
-      {leaveForm && (
-        <Card title="Apply for Leave">
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-            <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-              <label style={{ fontSize:11, color:"#64748b", fontWeight:700, textTransform:"uppercase" }}>Leave Type</label>
-              <select value={leaveType} onChange={e=>setLeaveType(e.target.value)} style={{ padding:"9px 12px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:13, color:"#0f172a", background:"#f8fafc", outline:"none", fontFamily:"inherit" }}>
-                {["Sick Leave","Casual Leave","Earned Leave","Maternity Leave","Paternity Leave"].map(o=><option key={o}>{o}</option>)}
-              </select>
-            </div>
-            <div/>
-            <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-              <label style={{ fontSize:11, color:"#64748b", fontWeight:700, textTransform:"uppercase" }}>From Date</label>
-              <input type="date" value={leaveFrom} onChange={e=>setLeaveFrom(e.target.value)} style={{ padding:"9px 12px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:13, color:"#0f172a", background:"#f8fafc", outline:"none", fontFamily:"inherit" }}/>
-            </div>
-            <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-              <label style={{ fontSize:11, color:"#64748b", fontWeight:700, textTransform:"uppercase" }}>To Date</label>
-              <input type="date" value={leaveTo} onChange={e=>setLeaveTo(e.target.value)} style={{ padding:"9px 12px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:13, color:"#0f172a", background:"#f8fafc", outline:"none", fontFamily:"inherit" }}/>
-            </div>
-            <div style={{ gridColumn:"1/-1", display:"flex", flexDirection:"column", gap:5 }}>
-              <label style={{ fontSize:11, color:"#64748b", fontWeight:700, textTransform:"uppercase" }}>Reason *</label>
-              <textarea value={leaveReason} onChange={e=>setLeaveReason(e.target.value)} rows={3} placeholder="Enter reason…" style={{ padding:"9px 12px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:13, color:"#0f172a", background:"#f8fafc", outline:"none", fontFamily:"inherit", resize:"vertical" }}/>
+      {/* ── Permission Form ── */}
+      {permForm && (
+        <Card title="🔑 Request Permission">
+          {/* Permission type selector — card grid */}
+          <div style={{ marginBottom:14 }}>
+            <div style={{ fontSize:11, color:"#64748b", fontWeight:700, textTransform:"uppercase", letterSpacing:0.4, marginBottom:8 }}>Permission Type</div>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }} className="perm-type-grid">
+              {PERMISSION_TYPES.map(pt => (
+                <div key={pt.value} onClick={()=>setPermType(pt.value)}
+                  style={{ padding:"10px 12px", borderRadius:12, border:`2px solid ${permType===pt.value?"#6366f1":"#e2e8f0"}`, background:permType===pt.value?"#eef2ff":"#f8fafc", cursor:"pointer", transition:"all 0.15s" }}>
+                  <div style={{ fontSize:18, marginBottom:4 }}>{pt.icon}</div>
+                  <div style={{ fontSize:12, fontWeight:700, color:permType===pt.value?"#6366f1":"#374151" }}>{pt.label}</div>
+                  <div style={{ fontSize:10, color:"#94a3b8", marginTop:2 }}>{pt.desc}</div>
+                </div>
+              ))}
             </div>
           </div>
+
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14, marginBottom:14 }} className="perm-form-grid">
+            <InputField label="Date">
+              <input type="date" value={permDate} onChange={e=>setPermDate(e.target.value)} style={inputStyle}/>
+            </InputField>
+            <InputField label="From Time">
+              <input type="time" value={permFromTime} onChange={e=>setPermFromTime(e.target.value)} style={inputStyle}/>
+            </InputField>
+            <InputField label="To Time">
+              <input type="time" value={permToTime} onChange={e=>setPermToTime(e.target.value)} style={inputStyle}/>
+            </InputField>
+          </div>
+
+          <InputField label="Reason *">
+            <textarea value={permReason} onChange={e=>setPermReason(e.target.value)} rows={3} placeholder="Briefly explain your reason…"
+              style={{ ...inputStyle, resize:"vertical" }}/>
+          </InputField>
+
           <div style={{ display:"flex", gap:10, justifyContent:"flex-end", marginTop:14 }}>
-            <button onClick={()=>setLeaveForm(false)} style={{ padding:"9px 20px", border:"1.5px solid #e2e8f0", borderRadius:10, background:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", color:"#374151" }}>Cancel</button>
-            <button onClick={submitLeave} style={{ padding:"9px 20px", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Submit</button>
+            <button onClick={()=>setPermForm(false)} style={{ padding:"9px 20px", border:"1.5px solid #e2e8f0", borderRadius:10, background:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", color:"#374151" }}>Cancel</button>
+            <button onClick={submitPermission} disabled={permSubmitting}
+              style={{ padding:"9px 20px", background:"linear-gradient(135deg,#0ea5e9,#6366f1)", border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:permSubmitting?0.7:1 }}>
+              {permSubmitting ? "Submitting…" : "Submit Request"}
+            </button>
           </div>
         </Card>
       )}
 
-      <Card title="Mark Today's Attendance">
-        <div style={{ display:"flex", gap:12, alignItems:"center", flexWrap:"wrap" }}>
-          <div style={{ fontSize:13, color:"#374151", fontWeight:600 }}>Today — <span style={{ color:"#6366f1" }}>{today}</span></div>
-          {todayRec ? (
-            <div style={{ background:`${sc(todayRec.status)}18`, border:`1px solid ${sc(todayRec.status)}30`, borderRadius:10, padding:"8px 16px", fontSize:13, fontWeight:700, color:sc(todayRec.status) }}>
-              ✓ Marked as {todayRec.status}
+      {/* ── Leave Form ── */}
+      {leaveForm && (
+        <Card title="🌴 Apply for Leave">
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+            <InputField label="Leave Type">
+              <select value={leaveType} onChange={e=>setLeaveType(e.target.value)} style={inputStyle}>
+                {["Sick Leave","Casual Leave","Earned Leave","Maternity Leave","Paternity Leave"].map(o=><option key={o}>{o}</option>)}
+              </select>
+            </InputField>
+            <div/>
+            <InputField label="From Date">
+              <input type="date" value={leaveFrom} onChange={e=>setLeaveFrom(e.target.value)} style={inputStyle}/>
+            </InputField>
+            <InputField label="To Date">
+              <input type="date" value={leaveTo} onChange={e=>setLeaveTo(e.target.value)} style={inputStyle}/>
+            </InputField>
+            <div style={{ gridColumn:"1/-1" }}>
+              <InputField label="Reason *">
+                <textarea value={leaveReason} onChange={e=>setLeaveReason(e.target.value)} rows={3} placeholder="Enter reason…" style={{ ...inputStyle, resize:"vertical" }}/>
+              </InputField>
             </div>
-          ) : (
-            <div style={{ display:"flex", gap:10 }}>
-              <button disabled={marking} onClick={()=>markAttendance("present")} style={{ background:"rgba(16,185,129,0.1)", border:"1px solid rgba(16,185,129,0.3)", borderRadius:10, padding:"9px 20px", fontSize:13, color:"#10b981", fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>✅ Present</button>
-              <button disabled={marking} onClick={()=>markAttendance("absent")} style={{ background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.3)", borderRadius:10, padding:"9px 20px", fontSize:13, color:"#ef4444", fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>❌ Absent</button>
+          </div>
+          <div style={{ display:"flex", gap:10, justifyContent:"flex-end", marginTop:14 }}>
+            <button onClick={()=>setLeaveForm(false)} style={{ padding:"9px 20px", border:"1.5px solid #e2e8f0", borderRadius:10, background:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", color:"#374151" }}>Cancel</button>
+            <button onClick={submitLeave} disabled={leaveSubmitting}
+              style={{ padding:"9px 20px", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:leaveSubmitting?0.7:1 }}>
+              {leaveSubmitting ? "Submitting…" : "Submit"}
+            </button>
+          </div>
+        </Card>
+      )}
+
+      {/* ── Tabs Card ── */}
+      <Card>
+        <TabBar tabs={tabs} active={activeTab} onChange={setActiveTab}/>
+
+        {/* ─── ATTENDANCE TAB ─── */}
+        {activeTab==="attendance" && (
+          <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
+            {/* Mark today */}
+            <div style={{ background:"#f8fafc", borderRadius:12, padding:"14px 16px", display:"flex", gap:12, alignItems:"center", flexWrap:"wrap" }}>
+              <div style={{ fontSize:13, color:"#374151", fontWeight:600 }}>Today — <span style={{ color:"#6366f1" }}>{today}</span></div>
+              {todayRec ? (
+                <div style={{ background:`${sc(todayRec.status)}18`, border:`1px solid ${sc(todayRec.status)}30`, borderRadius:10, padding:"8px 16px", fontSize:13, fontWeight:700, color:sc(todayRec.status) }}>
+                  ✓ Marked as {todayRec.status}
+                </div>
+              ) : (
+                <div style={{ display:"flex", gap:10 }}>
+                  <button disabled={marking} onClick={()=>markAttendance("present")} style={{ background:"rgba(16,185,129,0.1)", border:"1px solid rgba(16,185,129,0.3)", borderRadius:10, padding:"9px 20px", fontSize:13, color:"#10b981", fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>✅ Present</button>
+                  <button disabled={marking} onClick={()=>markAttendance("absent")}  style={{ background:"rgba(239,68,68,0.1)",  border:"1px solid rgba(239,68,68,0.3)",  borderRadius:10, padding:"9px 20px", fontSize:13, color:"#ef4444", fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>❌ Absent</button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </Card>
 
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }} className="stat-grid">
-        <StatCard icon="📅" label="Working Days" value={workingDays} sub="This month" color="#6366f1"/>
-        <StatCard icon="✅" label="Present"      value={present}    sub="Days"       color="#10b981"/>
-        <StatCard icon="❌" label="Absent"       value={absent}     sub="Days"       color="#ef4444"/>
-        <StatCard icon="🌴" label="On Leave"     value={leave}      sub="Days"       color="#f59e0b"/>
-      </div>
+            {/* Stats */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }} className="stat-grid">
+              <StatCard icon="📅" label="Working Days" value={workingDays} sub="This month" color="#6366f1"/>
+              <StatCard icon="✅" label="Present"      value={present}    sub="Days"       color="#10b981"/>
+              <StatCard icon="❌" label="Absent"       value={absent}     sub="Days"       color="#ef4444"/>
+              <StatCard icon="🌴" label="On Leave"     value={leave}      sub="Days"       color="#f59e0b"/>
+            </div>
 
-      <Card title="Monthly Calendar">
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:6 }}>
-          {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => (
-            <div key={d} style={{ textAlign:"center", fontSize:10, fontWeight:700, color:"#94a3b8", padding:"4px 0" }}>{d}</div>
-          ))}
-          {Array.from({length:31},(_,i) => {
-            const day  = String(i+1).padStart(2,"0");
-            const date = `${thisMonth}-${day}`;
-            const rec  = attendance.find(a => a.date===date);
-            const isToday = date===today;
-            const bg = isToday ? "#6366f1" : rec ? sc(rec.status) : "#f8fafc";
-            const tc = (isToday||rec) ? "#fff" : "#94a3b8";
-            return (
-              <div key={i} style={{ aspectRatio:"1", borderRadius:10, background:bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:isToday?800:600, color:tc }}>
-                {i+1}
+            {/* Calendar */}
+            <div>
+              <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:10 }}>Monthly Calendar</div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:6 }}>
+                {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => (
+                  <div key={d} style={{ textAlign:"center", fontSize:10, fontWeight:700, color:"#94a3b8", padding:"4px 0" }}>{d}</div>
+                ))}
+                {Array.from({length:31},(_,i) => {
+                  const day=String(i+1).padStart(2,"0"), date=`${thisMonth}-${day}`;
+                  const rec=attendance.find(a=>a.date===date), isToday=date===today;
+                  const bg=isToday?"#6366f1":rec?sc(rec.status):"#f8fafc";
+                  const tc=(isToday||rec)?"#fff":"#94a3b8";
+                  return <div key={i} style={{ aspectRatio:"1", borderRadius:10, background:bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:isToday?800:600, color:tc }}>{i+1}</div>;
+                })}
               </div>
-            );
-          })}
-        </div>
-        <div style={{ display:"flex", gap:14, marginTop:14, flexWrap:"wrap" }}>
-          {[["#10b981","Present"],["#ef4444","Absent"],["#f59e0b","Leave"],["#6366f1","Today"],["#f8fafc","Not marked"]].map(([c,l]) => (
-            <div key={l} style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"#64748b" }}>
-              <div style={{ width:10, height:10, borderRadius:3, background:c }}/>
-              {l}
+              <div style={{ display:"flex", gap:14, marginTop:14, flexWrap:"wrap" }}>
+                {[["#10b981","Present"],["#ef4444","Absent"],["#f59e0b","Leave"],["#6366f1","Today"],["#f8fafc","Not marked"]].map(([c,l]) => (
+                  <div key={l} style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"#64748b" }}>
+                    <div style={{ width:10, height:10, borderRadius:3, background:c }}/>{l}
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-      </Card>
 
-      <Card title="Attendance History">
-        <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
-          <thead>
-            <tr>
-              {["Date","Day","Status","Marked At"].map(h => (
-                <th key={h} style={{ textAlign:"left", fontSize:11, fontWeight:700, color:"#94a3b8", padding:"0 10px 10px 0", borderBottom:"1px solid #f1f5f9", textTransform:"uppercase" }}>{h}</th>
+            {/* History table */}
+            <div>
+              <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:10 }}>Attendance History</div>
+              <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
+                <thead>
+                  <tr>{["Date","Day","Status","Marked At"].map(h=>(
+                    <th key={h} style={{ textAlign:"left", fontSize:11, fontWeight:700, color:"#94a3b8", padding:"0 10px 10px 0", borderBottom:"1px solid #f1f5f9", textTransform:"uppercase" }}>{h}</th>
+                  ))}</tr>
+                </thead>
+                <tbody>
+                  {attendance.slice().reverse().slice(0,15).map((a,i) => (
+                    <tr key={i}>
+                      <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc", color:"#334155" }}>{a.date}</td>
+                      <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc", color:"#334155" }}>{new Date(a.date).toLocaleDateString("en-IN",{weekday:"long"})}</td>
+                      <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc" }}><Badge label={a.status}/></td>
+                      <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc", color:"#334155" }}>{a.markedAt?new Date(a.markedAt).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}):"—"}</td>
+                    </tr>
+                  ))}
+                  {attendance.length===0 && <tr><td colSpan={4} style={{ textAlign:"center", padding:"2rem", color:"#94a3b8" }}>No attendance records yet</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ─── MY LEAVES TAB ─── */}
+        {activeTab==="leaves" && (
+          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+            {/* Summary pills */}
+            <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+              {[
+                { label:"Total",    val:leaveHistory.length, color:"#6366f1" },
+                { label:"Pending",  val:leaveHistory.filter(l=>(l.status||"pending").toLowerCase()==="pending").length,  color:"#f59e0b" },
+                { label:"Approved", val:leaveHistory.filter(l=>(l.status||"").toLowerCase()==="approved").length, color:"#10b981" },
+                { label:"Rejected", val:leaveHistory.filter(l=>(l.status||"").toLowerCase()==="rejected").length, color:"#ef4444" },
+              ].map(({label,val,color}) => (
+                <div key={label} style={{ background:`${color}10`, border:`1px solid ${color}25`, borderRadius:12, padding:"10px 18px", display:"flex", flexDirection:"column", gap:2, minWidth:90 }}>
+                  <div style={{ fontSize:20, fontWeight:800, color }}>{val}</div>
+                  <div style={{ fontSize:11, color:"#64748b", fontWeight:600 }}>{label}</div>
+                </div>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {attendance.slice().reverse().slice(0,15).map((a,i) => (
-              <tr key={i}>
-                <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc", color:"#334155" }}>{a.date}</td>
-                <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc", color:"#334155" }}>{new Date(a.date).toLocaleDateString("en-IN",{weekday:"long"})}</td>
-                <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc" }}><Badge label={a.status}/></td>
-                <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc", color:"#334155" }}>{a.markedAt ? new Date(a.markedAt).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}) : "—"}</td>
-              </tr>
-            ))}
-            {attendance.length===0 && (
-              <tr><td colSpan={4} style={{ textAlign:"center", padding:"2rem", color:"#94a3b8" }}>No attendance records yet</td></tr>
-            )}
-          </tbody>
-        </table>
+            </div>
+            {leaveHistory.length===0 ? (
+              <div style={{ textAlign:"center", padding:"3rem", color:"#94a3b8", fontSize:13 }}>
+                <div style={{ fontSize:32, marginBottom:10 }}>🌴</div>
+                No leave requests yet. Click <strong>"Apply Leave"</strong> to submit one.
+              </div>
+            ) : leaveHistory.map((lv,i) => {
+              const s=(lv.status||"pending").toLowerCase();
+              const sc2=sc(s);
+              const days=lv.from&&lv.to?Math.max(1,Math.round((new Date(lv.to)-new Date(lv.from))/86400000)+1):1;
+              return (
+                <div key={lv._id||i} style={{ background:"#f8fafc", borderRadius:14, border:`1.5px solid ${sc2}25`, padding:"16px 18px" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:8 }}>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                        <span style={{ fontSize:16 }}>{statusIcon(s)}</span>
+                        <span style={{ fontSize:14, fontWeight:800, color:"#0f172a" }}>{lv.type||"Leave"}</span>
+                        <Badge label={s}/>
+                      </div>
+                      <div style={{ display:"flex", gap:14, flexWrap:"wrap" }}>
+                        <span style={{ fontSize:12, color:"#64748b" }}>📅 <strong>From:</strong> {lv.from||"—"}</span>
+                        <span style={{ fontSize:12, color:"#64748b" }}>📅 <strong>To:</strong> {lv.to||"—"}</span>
+                        <span style={{ fontSize:12, color:"#64748b" }}>🗓 <strong>{days} day{days>1?"s":""}</strong></span>
+                      </div>
+                      {lv.reason && <div style={{ marginTop:8, fontSize:12, color:"#374151", background:"#fff", borderRadius:8, padding:"8px 12px", border:"1px solid #e2e8f0" }}>💬 {lv.reason}</div>}
+                      {lv.appliedOn && <div style={{ marginTop:6, fontSize:11, color:"#94a3b8" }}>Applied: {new Date(lv.appliedOn).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</div>}
+                      {lv.managerNote && (
+                        <div style={{ marginTop:8, fontSize:12, color:s==="rejected"?"#ef4444":"#10b981", background:s==="rejected"?"#fef2f2":"#f0fdf4", borderRadius:8, padding:"8px 12px", border:`1px solid ${s==="rejected"?"#fecaca":"#bbf7d0"}` }}>
+                          🗒 Manager: {lv.managerNote}
+                          {lv.reviewedBy && <span style={{ color:"#94a3b8", marginLeft:6 }}>— {lv.reviewedBy}</span>}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4, minWidth:60 }}>
+                      <div style={{ width:36, height:36, borderRadius:"50%", background:`${sc2}18`, border:`2px solid ${sc2}40`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>{statusIcon(s)}</div>
+                      <div style={{ fontSize:10, fontWeight:700, color:sc2, textTransform:"uppercase", letterSpacing:0.5 }}>{s}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ─── PERMISSIONS TAB ─── */}
+        {activeTab==="permissions" && (
+          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+            {/* Summary pills */}
+            <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+              {[
+                { label:"Total",     val:permHistory.length, color:"#6366f1" },
+                { label:"Pending",   val:permHistory.filter(p=>(p.status||"pending").toLowerCase()==="pending").length,  color:"#f59e0b" },
+                { label:"Approved",  val:permHistory.filter(p=>(p.status||"").toLowerCase()==="approved").length, color:"#10b981" },
+                { label:"Rejected",  val:permHistory.filter(p=>(p.status||"").toLowerCase()==="rejected").length, color:"#ef4444" },
+              ].map(({label,val,color}) => (
+                <div key={label} style={{ background:`${color}10`, border:`1px solid ${color}25`, borderRadius:12, padding:"10px 18px", display:"flex", flexDirection:"column", gap:2, minWidth:90 }}>
+                  <div style={{ fontSize:20, fontWeight:800, color }}>{val}</div>
+                  <div style={{ fontSize:11, color:"#64748b", fontWeight:600 }}>{label}</div>
+                </div>
+              ))}
+            </div>
+
+            {permHistory.length===0 ? (
+              <div style={{ textAlign:"center", padding:"3rem", color:"#94a3b8", fontSize:13 }}>
+                <div style={{ fontSize:32, marginBottom:10 }}>🔑</div>
+                No permission requests yet. Click <strong>"Request Permission"</strong> to submit one.
+              </div>
+            ) : permHistory.map((perm,i) => {
+              const s=(perm.status||"pending").toLowerCase();
+              const sc2=sc(s);
+              const pt=PERMISSION_TYPES.find(t=>t.value===perm.type);
+              const isPending=s==="pending";
+              return (
+                <div key={perm._id||i} style={{ background:"#f8fafc", borderRadius:14, border:`1.5px solid ${sc2}25`, padding:"16px 18px" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:8 }}>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      {/* Type + status */}
+                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8, flexWrap:"wrap" }}>
+                        <span style={{ fontSize:20 }}>{pt?.icon||"📝"}</span>
+                        <span style={{ fontSize:14, fontWeight:800, color:"#0f172a" }}>{perm.typeLabel||pt?.label||perm.type}</span>
+                        <Badge label={s}/>
+                      </div>
+
+                      {/* Date + time range */}
+                      <div style={{ display:"flex", gap:14, flexWrap:"wrap", marginBottom:6 }}>
+                        <span style={{ fontSize:12, color:"#64748b" }}>📅 <strong>{perm.date||"—"}</strong></span>
+                        {perm.fromTime && perm.toTime && (
+                          <span style={{ fontSize:12, color:"#64748b" }}>
+                            🕐 <strong>{perm.fromTime}</strong> → <strong>{perm.toTime}</strong>
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Reason */}
+                      {perm.reason && (
+                        <div style={{ fontSize:12, color:"#374151", background:"#fff", borderRadius:8, padding:"8px 12px", border:"1px solid #e2e8f0", marginBottom:6 }}>
+                          💬 {perm.reason}
+                        </div>
+                      )}
+                      {perm.appliedOn && (
+                        <div style={{ fontSize:11, color:"#94a3b8" }}>Applied: {new Date(perm.appliedOn).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</div>
+                      )}
+
+                      {/* Manager note */}
+                      {perm.managerNote && (
+                        <div style={{ marginTop:8, fontSize:12, color:s==="rejected"?"#ef4444":"#10b981", background:s==="rejected"?"#fef2f2":"#f0fdf4", borderRadius:8, padding:"8px 12px", border:`1px solid ${s==="rejected"?"#fecaca":"#bbf7d0"}` }}>
+                          🗒 Manager: {perm.managerNote}
+                          {perm.reviewedBy && <span style={{ color:"#94a3b8", marginLeft:6 }}>— {perm.reviewedBy}</span>}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right side: status circle + cancel */}
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:8, minWidth:60 }}>
+                      <div style={{ width:36, height:36, borderRadius:"50%", background:`${sc2}18`, border:`2px solid ${sc2}40`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>{statusIcon(s)}</div>
+                      <div style={{ fontSize:10, fontWeight:700, color:sc2, textTransform:"uppercase", letterSpacing:0.5 }}>{s}</div>
+                      {isPending && (
+                        <button onClick={()=>cancelPermission(perm)}
+                          style={{ fontSize:11, fontWeight:700, color:"#ef4444", background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.25)", borderRadius:8, padding:"4px 10px", cursor:"pointer", fontFamily:"inherit" }}>
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -588,40 +849,31 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
 
 function SalaryPage({ salary, user }) {
   const [selected, setSelected] = useState(salary[0]||null);
-
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-      <div>
-        <h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>Salary Slip</h1>
-        <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Your monthly salary breakdown</p>
-      </div>
+      <div><h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>Salary Slip</h1>
+        <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Your monthly salary breakdown</p></div>
       <div style={{ display:"grid", gridTemplateColumns:"1fr 2fr", gap:16, alignItems:"start" }} className="two-col">
         <Card title="Select Month">
           {salary.map((s,i) => (
             <div key={s._id||i} onClick={()=>setSelected(s)}
               style={{ padding:"12px 14px", borderRadius:12, cursor:"pointer", background:selected?._id===s._id?"rgba(99,102,241,0.08)":"transparent", border:selected?._id===s._id?"1px solid rgba(99,102,241,0.25)":"1px solid transparent", marginBottom:6 }}
               onMouseEnter={e=>{ if(selected?._id!==s._id) e.currentTarget.style.background="#f8fafc"; }}
-              onMouseLeave={e=>{ if(selected?._id!==s._id) e.currentTarget.style.background="transparent"; }}
-            >
+              onMouseLeave={e=>{ if(selected?._id!==s._id) e.currentTarget.style.background="transparent"; }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                <div>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#0f172a" }}>{s.month}</div>
-                  <div style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>₹{fmt(s.net)} net</div>
-                </div>
+                <div><div style={{ fontSize:13, fontWeight:700, color:"#0f172a" }}>{s.month}</div>
+                  <div style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>₹{fmt(s.net)} net</div></div>
                 <Badge label={s.status||"paid"}/>
               </div>
             </div>
           ))}
           {salary.length===0 && <div style={{ textAlign:"center", padding:"1.5rem", color:"#94a3b8", fontSize:13 }}>No salary records</div>}
         </Card>
-
         {selected ? (
           <Card>
             <div style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:12, padding:"20px 22px", marginBottom:20, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <div>
-                <div style={{ fontSize:16, fontWeight:800, color:"#fff" }}>Salary Slip</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,0.7)", marginTop:2 }}>{selected.month}</div>
-              </div>
+              <div><div style={{ fontSize:16, fontWeight:800, color:"#fff" }}>Salary Slip</div>
+                <div style={{ fontSize:13, color:"rgba(255,255,255,0.7)", marginTop:2 }}>{selected.month}</div></div>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,0.6)" }}>{user?.name||"Employee"}</div>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,0.5)", marginTop:2 }}>{user?.department||"—"}</div>
@@ -648,10 +900,8 @@ function SalaryPage({ salary, user }) {
               </div>
             </div>
             <div style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:12, padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:600 }}>NET SALARY</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.5)", marginTop:2 }}>Paid on {selected.paidOn||"—"}</div>
-              </div>
+              <div><div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:600 }}>NET SALARY</div>
+                <div style={{ fontSize:11, color:"rgba(255,255,255,0.5)", marginTop:2 }}>Paid on {selected.paidOn||"—"}</div></div>
               <div style={{ fontSize:26, fontWeight:800, color:"#fff" }}>₹{fmt(selected.net)}</div>
             </div>
             <button onClick={()=>window.print()} style={{ marginTop:14, width:"100%", padding:"10px", background:"rgba(99,102,241,0.08)", border:"1px solid rgba(99,102,241,0.2)", borderRadius:10, fontSize:13, color:"#6366f1", fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
@@ -688,43 +938,40 @@ export default function EmployeeDashboard({ user, setUser }) {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    if (setUser) setUser(null);
+    if(setUser) setUser(null);
     else window.location.href = "/";
   };
 
   useEffect(() => {
-    if (!empName) return;
+    if(!empName) return;
     const enc = encodeURIComponent(empName);
-    axios.get(`${BASE}/projects/${enc}`).then(r => { if(r.data?.length) setProjects(r.data); }).catch(()=>{});
-    axios.get(`${BASE}/tasks/${enc}`).then(r => { if(r.data?.length) setTasks(r.data); }).catch(()=>{});
-    axios.get(`${BASE}/attendance/${enc}`).then(r => { if(r.data) setAttendance(r.data); }).catch(()=>{});
-    axios.get(`${BASE}/salary/${enc}`).then(r => { if(r.data?.length) setSalary(r.data); }).catch(()=>{});
+    axios.get(`${BASE}/projects/${enc}`).then(r=>{ if(r.data?.length) setProjects(r.data); }).catch(()=>{});
+    axios.get(`${BASE}/tasks/${enc}`).then(r=>{ if(r.data?.length) setTasks(r.data); }).catch(()=>{});
+    axios.get(`${BASE}/attendance/${enc}`).then(r=>{ if(r.data) setAttendance(r.data); }).catch(()=>{});
+    axios.get(`${BASE}/salary/${enc}`).then(r=>{ if(r.data?.length) setSalary(r.data); }).catch(()=>{});
   }, [empName]);
 
-  const currentNav = NAV.find(n => n.key===page) || NAV[0];
+  const currentNav = NAV.find(n=>n.key===page)||NAV[0];
 
   return (
     <div style={{ display:"flex", minHeight:"100vh", background:"#f8fafc", fontFamily:"'DM Sans','Segoe UI',sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
-        @media(min-width:769px) {
-          .emp-sidebar { transform: translateX(0) !important; position: sticky !important; top: 0 !important; height: 100vh !important; }
-          .emp-sb-close { display: none !important; }
-          .emp-sb-spacer { display: none !important; }
-          .emp-mob-bar { display: none !important; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        ::-webkit-scrollbar { width:4px; }
+        ::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:4px; }
+        @media(min-width:769px){
+          .emp-sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;height:100vh!important;}
+          .emp-sb-close{display:none!important;} .emp-sb-spacer{display:none!important;} .emp-mob-bar{display:none!important;}
         }
-        @media(max-width:900px) { .two-col { grid-template-columns: 1fr !important; } }
-        @media(max-width:768px) {
-          .emp-sb-spacer { display: none !important; }
-          .main-pad { padding: 14px !important; }
-          .stat-grid { grid-template-columns: repeat(2,1fr) !important; }
+        @media(max-width:900px){.two-col{grid-template-columns:1fr!important;}}
+        @media(max-width:768px){
+          .emp-sb-spacer{display:none!important;} .main-pad{padding:14px!important;}
+          .stat-grid{grid-template-columns:repeat(2,1fr)!important;}
+          .perm-type-grid{grid-template-columns:repeat(2,1fr)!important;}
+          .perm-form-grid{grid-template-columns:1fr 1fr!important;}
         }
-        @media print {
-          .emp-sidebar, .emp-mob-bar, .emp-sb-spacer { display: none !important; }
-        }
+        @media print{.emp-sidebar,.emp-mob-bar,.emp-sb-spacer{display:none!important;}}
       `}</style>
 
       <Sidebar active={page} setActive={setPage} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={handleLogout} user={resolvedUser}/>
@@ -733,16 +980,12 @@ export default function EmployeeDashboard({ user, setUser }) {
         <div className="emp-mob-bar" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background:"#fff", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
           <button onClick={()=>setSidebarOpen(true)} style={{ background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#6366f1" }}>☰</button>
           <span style={{ fontWeight:800, fontSize:14, color:"#0f172a" }}>M Business</span>
-          <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12 }}>
-            {(empName||"E").slice(0,2).toUpperCase()}
-          </div>
+          <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12 }}>{(empName||"E").slice(0,2).toUpperCase()}</div>
         </div>
-
         <div style={{ background:"#fff", borderBottom:"1px solid #f1f5f9", padding:"14px 28px" }}>
           <h2 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:0 }}>{currentNav.icon} {currentNav.label}</h2>
           <p style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>{empName||"Employee"} · Employee Portal</p>
         </div>
-
         <div className="main-pad" style={{ flex:1, padding:"24px 28px", overflowY:"auto" }}>
           {page==="dashboard"  && <DashboardPage  user={resolvedUser} projects={projects} tasks={tasks} attendance={attendance} salary={salary} setPage={setPage}/>}
           {page==="projects"   && <ProjectsPage   projects={projects}/>}
@@ -751,7 +994,6 @@ export default function EmployeeDashboard({ user, setUser }) {
           {page==="salary"     && <SalaryPage     salary={salary} user={resolvedUser}/>}
         </div>
       </div>
-
       <Toast msg={toast} type={toastType}/>
     </div>
   );

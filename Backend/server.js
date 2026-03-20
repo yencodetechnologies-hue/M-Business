@@ -23,7 +23,14 @@ const reportRoutes        = require("./routes/reportroutes");
 const uploadRoutes        = require("./routes/uploadroutes");
 const employeeDashRoutes  = require("./routes/employeedashboardroutes");
 const QuotationRoutes  = require("./routes/quotationroutes");
+const interviewRoutes = require("./routes/interviews");
 
+// Static files (local resume storage)
+const path = require("path");
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Routes
+app.use("/api/interviews", interviewRoutes);
 app.use("/api/auth",               authRoutes);
 app.use("/api/clients",            clientRoutes);
 app.use("/api/employees",          employeeRoutes);

@@ -4,6 +4,8 @@ import axios from "axios";
 const API = "http://localhost:5000/api/events";
 const T = { text:"#1e0a3c", muted:"#7c3aed", border:"#ede9fe" };
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const FULL_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const TYPES  = ["Meeting","Call","Review","Planning","Handover","Other"];
 const TC = { Meeting:"#9333ea", Call:"#7c3aed", Review:"#22C55E", Planning:"#f59e0b", Handover:"#a855f7", Other:"#6b7280" };
 const EMPTY = { name:"", project:"", client:"", date:"", start:"", end:"", notes:"", type:"Meeting" };
@@ -19,6 +21,12 @@ export default function CalendarPage({ projects=[], clients=[] }) {
   const [err,     setErr]     = useState({});
   const [saving,  setSaving]  = useState(false);
   const [toast,   setToast]   = useState("");
+
+  // Calendar state
+  const now = new Date();
+  const [calYear,  setCalYear]  = useState(now.getFullYear());
+  const [calMonth, setCalMonth] = useState(now.getMonth());
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const today = new Date().toISOString().slice(0,10);
 
@@ -37,8 +45,9 @@ export default function CalendarPage({ projects=[], clients=[] }) {
     setLoading(false);
   };
 
-  const openAdd = () => {
-    setForm(EMPTY); setErr({}); setEditId(null); setModal("add");
+  const openAdd = (dateStr) => {
+    setForm({ ...EMPTY, date: dateStr || "" });
+    setErr({}); setEditId(null); setModal("add");
   };
 
   const openEdit = (ev) => {
@@ -75,7 +84,6 @@ export default function CalendarPage({ projects=[], clients=[] }) {
       }
       setModal(null);
     } catch {
-      // offline fallback
       if (modal === "add") {
         setEvents(p => [{ ...form, _id: Date.now().toString() }, ...p]);
         showToast("✅ Saved locally!");
@@ -95,28 +103,70 @@ export default function CalendarPage({ projects=[], clients=[] }) {
     showToast("🗑️ Deleted!");
   };
 
+  // ─── Calendar helpers ───────────────────────────────────────────
+  const prevMonth = () => {
+    if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
+    else setCalMonth(m => m - 1);
+    setSelectedDate(null);
+  };
+  const nextMonth = () => {
+    if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
+    else setCalMonth(m => m + 1);
+    setSelectedDate(null);
+  };
+
+  const getCalendarDays = () => {
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+    const cells = [];
+    for (let i = firstDay - 1; i >= 0; i--) {
+      cells.push({ day: daysInPrev - i, curr: false });
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      cells.push({ day: d, curr: true });
+    }
+    while (cells.length % 7 !== 0) {
+      cells.push({ day: cells.length - daysInMonth - firstDay + 1, curr: false });
+    }
+    return cells;
+  };
+
+  const dateStr = (d) =>
+    `${calYear}-${String(calMonth + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+
+  const eventsOnDay = (d) =>
+    events.filter(e => e.date === dateStr(d));
+
+  // ─── List filter ────────────────────────────────────────────────
   const f = (x) => {
     const q = search.toLowerCase();
     const ms = !q ||
       (x.name||"").toLowerCase().includes(q) ||
       (x.project||"").toLowerCase().includes(q) ||
       (x.client||"").toLowerCase().includes(q);
-    const mf =
-      filter==="All"      ? true :
-      filter==="Today"    ? x.date===today :
-      filter==="Upcoming" ? x.date>today :
-      filter==="Past"     ? x.date<today :
-      (x.type||"Meeting")===filter;
+
+    let mf = true;
+    if (selectedDate) {
+      mf = x.date === selectedDate;
+    } else {
+      mf =
+        filter==="All"      ? true :
+        filter==="Today"    ? x.date===today :
+        filter==="Upcoming" ? x.date>today :
+        filter==="Past"     ? x.date<today :
+        (x.type||"Meeting")===filter;
+    }
     return ms && mf;
   };
 
-  const shown = events.filter(f);
+  const shown = [...events].filter(f).sort((a,b) => (a.date||"") < (b.date||"") ? -1 : 1);
 
   const stats = [
-    { t:"Total",    v:events.length,                                    c:"#9333ea", i:"📅" },
-    { t:"Today",    v:events.filter(x=>x.date===today).length,          c:"#7c3aed", i:"📌" },
-    { t:"Upcoming", v:events.filter(x=>x.date>today).length,            c:"#f59e0b", i:"⏰" },
-    { t:"Past",     v:events.filter(x=>x.date<today).length,            c:"#22C55E", i:"✅" },
+    { t:"Total",    v:events.length,                           c:"#9333ea", i:"📅" },
+    { t:"Today",    v:events.filter(x=>x.date===today).length, c:"#7c3aed", i:"📌" },
+    { t:"Upcoming", v:events.filter(x=>x.date>today).length,   c:"#f59e0b", i:"⏰" },
+    { t:"Past",     v:events.filter(x=>x.date<today).length,   c:"#22C55E", i:"✅" },
   ];
 
   const pNames = projects.map(p=>p.name||"");
@@ -128,12 +178,14 @@ export default function CalendarPage({ projects=[], clients=[] }) {
     fontWeight:700, fontSize:13, cursor:"pointer"
   };
 
-  const inp = (err) => ({
-    width:"100%", border:`1.5px solid ${err?"#ef4444":"#ede9fe"}`,
+  const inp = (hasErr) => ({
+    width:"100%", border:`1.5px solid ${hasErr?"#ef4444":"#ede9fe"}`,
     borderRadius:10, padding:"10px 14px", fontSize:13,
     color:T.text, background:"#faf5ff", outline:"none",
     fontFamily:"inherit", boxSizing:"border-box"
   });
+
+  const calendarDays = getCalendarDays();
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
@@ -161,7 +213,157 @@ export default function CalendarPage({ projects=[], clients=[] }) {
         ))}
       </div>
 
-      {/* Toolbar */}
+      {/* ── MONTHLY CALENDAR GRID ────────────────────────────────── */}
+      <div style={{ background:"#fff", borderRadius:16, padding:22,
+        boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid #ede9fe" }}>
+
+        {/* Month navigation */}
+        <div style={{ display:"flex", justifyContent:"space-between",
+          alignItems:"center", marginBottom:16 }}>
+          <button onClick={prevMonth} style={{ background:"#f5f3ff",
+            border:"1px solid #ede9fe", borderRadius:8, width:34, height:34,
+            cursor:"pointer", fontSize:16, color:"#7c3aed", fontWeight:700 }}>‹</button>
+
+          <div style={{ textAlign:"center" }}>
+            <div style={{ fontSize:17, fontWeight:800, color:T.text }}>
+              {FULL_MONTHS[calMonth]} {calYear}
+            </div>
+            {selectedDate && (
+              <div style={{ fontSize:11, color:"#a78bfa", marginTop:2 }}>
+                Showing events for {selectedDate}
+                <span onClick={() => { setSelectedDate(null); }}
+                  style={{ marginLeft:8, cursor:"pointer", color:"#9333ea",
+                    textDecoration:"underline" }}>Clear</span>
+              </div>
+            )}
+          </div>
+
+          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+            <button onClick={() => { setCalYear(now.getFullYear()); setCalMonth(now.getMonth()); setSelectedDate(null); }}
+              style={{ background:"#f5f3ff", border:"1px solid #ede9fe",
+                borderRadius:8, padding:"5px 12px", cursor:"pointer",
+                fontSize:11, color:"#7c3aed", fontWeight:700 }}>Today</button>
+            <button onClick={nextMonth} style={{ background:"#f5f3ff",
+              border:"1px solid #ede9fe", borderRadius:8, width:34, height:34,
+              cursor:"pointer", fontSize:16, color:"#7c3aed", fontWeight:700 }}>›</button>
+          </div>
+        </div>
+
+        {/* Day headers */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2, marginBottom:4 }}>
+          {DAYS.map(d => (
+            <div key={d} style={{ textAlign:"center", fontSize:10, fontWeight:700,
+              color:"#a78bfa", letterSpacing:0.5, padding:"4px 0" }}>
+              {d.toUpperCase()}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar cells */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2 }}>
+          {calendarDays.map((cell, idx) => {
+            const ds = cell.curr ? dateStr(cell.day) : null;
+            const dayEvents = cell.curr ? eventsOnDay(cell.day) : [];
+            const isToday   = ds === today;
+            const isSelected = ds === selectedDate;
+            const hasDots   = dayEvents.length > 0;
+
+            return (
+              <div key={idx}
+                onClick={() => {
+                  if (!cell.curr) return;
+                  setSelectedDate(prev => prev === ds ? null : ds);
+                  setFilter("All");
+                  setSearch("");
+                }}
+                style={{
+                  minHeight:64,
+                  borderRadius:10,
+                  padding:"6px 6px 4px",
+                  cursor: cell.curr ? "pointer" : "default",
+                  background: isSelected
+                    ? "#f3e8ff"
+                    : isToday
+                      ? "#faf5ff"
+                      : cell.curr ? "#fff" : "#fafafa",
+                  border: isSelected
+                    ? "2px solid #9333ea"
+                    : isToday
+                      ? "1.5px solid #c4b5fd"
+                      : "1px solid #f0edff",
+                  opacity: cell.curr ? 1 : 0.4,
+                  transition:"all 0.15s",
+                  position:"relative",
+                  boxSizing:"border-box",
+                }}>
+
+                {/* Day number */}
+                <div style={{
+                  width:24, height:24, borderRadius:"50%",
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  fontSize:12, fontWeight: isToday || isSelected ? 800 : 600,
+                  color: isSelected ? "#7c3aed" : isToday ? "#9333ea" : cell.curr ? T.text : "#c4b5fd",
+                  background: isToday && !isSelected ? "#ede9fe" : "transparent",
+                  marginBottom:4,
+                }}>{cell.day}</div>
+
+                {/* Event dots / mini-pills */}
+                {hasDots && (
+                  <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
+                    {dayEvents.slice(0,2).map((ev, ei) => (
+                      <div key={ei} style={{
+                        background:`${TC[ev.type||"Meeting"]}22`,
+                        border:`1px solid ${TC[ev.type||"Meeting"]}44`,
+                        borderRadius:4, padding:"1px 4px",
+                        fontSize:9, color:TC[ev.type||"Meeting"],
+                        fontWeight:700, overflow:"hidden",
+                        whiteSpace:"nowrap", textOverflow:"ellipsis",
+                      }}>{ev.name}</div>
+                    ))}
+                    {dayEvents.length > 2 && (
+                      <div style={{ fontSize:9, color:"#a78bfa", fontWeight:600,
+                        paddingLeft:2 }}>+{dayEvents.length - 2} more</div>
+                    )}
+                  </div>
+                )}
+
+                {/* Quick add button on hover handled via title */}
+                {cell.curr && (
+                  <div
+                    onClick={e => { e.stopPropagation(); openAdd(ds); }}
+                    title="Add event"
+                    style={{
+                      position:"absolute", top:4, right:4,
+                      width:16, height:16, borderRadius:"50%",
+                      background:"#ede9fe", color:"#7c3aed",
+                      fontSize:12, fontWeight:800,
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      cursor:"pointer", opacity:0, transition:"opacity 0.15s",
+                      lineHeight:1,
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.opacity="1"}
+                    onMouseLeave={e => e.currentTarget.style.opacity="0"}
+                  >+</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Legend */}
+        <div style={{ display:"flex", gap:14, marginTop:12, flexWrap:"wrap" }}>
+          {Object.entries(TC).map(([type, color]) => (
+            <div key={type} style={{ display:"flex", alignItems:"center", gap:5,
+              fontSize:10, color:"#a78bfa", fontWeight:600 }}>
+              <div style={{ width:8, height:8, borderRadius:2,
+                background:color, flexShrink:0 }} />
+              {type}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── TOOLBAR ─────────────────────────────────────────────── */}
       <div style={{ display:"flex", justifyContent:"space-between",
         alignItems:"center", flexWrap:"wrap", gap:10 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
@@ -169,30 +371,34 @@ export default function CalendarPage({ projects=[], clients=[] }) {
             <span style={{ position:"absolute", left:12, top:"50%",
               transform:"translateY(-50%)" }}>🔍</span>
             <input placeholder="Search events..." value={search}
-              onChange={e=>setSearch(e.target.value)}
+              onChange={e=>{ setSearch(e.target.value); setSelectedDate(null); }}
               style={{ ...inp(false), paddingLeft:36, width:200 }} />
           </div>
           {["All","Today","Upcoming","Past",...TYPES].map((fil,fi) => (
-            <button key={`filter-${fi}-${fil}`} onClick={()=>setFilter(fil)} style={{
-              padding:"6px 12px", borderRadius:8, fontSize:11, fontWeight:700,
-              cursor:"pointer", border:"1.5px solid",
-              borderColor: filter===fil ? "#9333ea" : "#ede9fe",
-              background:  filter===fil ? "#f3e8ff"  : "#fff",
-              color:        filter===fil ? "#9333ea"  : "#a78bfa"
-            }}>{fil}</button>
+            <button key={`filter-${fi}-${fil}`}
+              onClick={() => { setFilter(fil); setSelectedDate(null); }}
+              style={{
+                padding:"6px 12px", borderRadius:8, fontSize:11, fontWeight:700,
+                cursor:"pointer", border:"1.5px solid",
+                borderColor: !selectedDate && filter===fil ? "#9333ea" : "#ede9fe",
+                background:  !selectedDate && filter===fil ? "#f3e8ff"  : "#fff",
+                color:       !selectedDate && filter===fil ? "#9333ea"  : "#a78bfa"
+              }}>{fil}</button>
           ))}
         </div>
-        <button onClick={openAdd} style={Btn}>+ Add Event</button>
+        <button onClick={() => openAdd("")} style={Btn}>+ Add Event</button>
       </div>
 
-      {/* Event List */}
+      {/* ── EVENT LIST ──────────────────────────────────────────── */}
       <div style={{ background:"#fff", borderRadius:16, padding:22,
         boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid #ede9fe" }}>
 
         <div style={{ display:"flex", justifyContent:"space-between",
           alignItems:"center", marginBottom:16 }}>
           <h3 style={{ margin:0, fontSize:15, fontWeight:800, color:T.text }}>
-            📅 All Events ({shown.length})
+            {selectedDate
+              ? `📅 Events on ${selectedDate} (${shown.length})`
+              : `📅 All Events (${shown.length})`}
           </h3>
         </div>
 
@@ -205,13 +411,17 @@ export default function CalendarPage({ projects=[], clients=[] }) {
           <div style={{ textAlign:"center", padding:60 }}>
             <div style={{ fontSize:48, marginBottom:14 }}>📅</div>
             <div style={{ fontSize:15, fontWeight:700, color:T.text }}>
-              {search ? "No events found" : "No events yet!"}
+              {search || selectedDate ? "No events found" : "No events yet!"}
             </div>
             <div style={{ fontSize:13, color:"#a78bfa", marginTop:6, marginBottom:20 }}>
-              {search ? "Try a different search term" : "Create your first event by clicking the button below"}
+              {search || selectedDate
+                ? "Try a different filter or click a date on the calendar"
+                : "Create your first event by clicking the button above"}
             </div>
             {!search && (
-              <button onClick={openAdd} style={Btn}>+ Add Your First Event</button>
+              <button onClick={() => openAdd(selectedDate||"")} style={Btn}>
+                + Add {selectedDate ? "Event on this day" : "Your First Event"}
+              </button>
             )}
           </div>
         ) : (
@@ -301,7 +511,7 @@ export default function CalendarPage({ projects=[], clients=[] }) {
         )}
       </div>
 
-      {/* Modal */}
+      {/* ── MODAL ───────────────────────────────────────────────── */}
       {modal && (
         <div style={{ position:"fixed", inset:0, background:"rgba(59,7,100,0.6)",
           backdropFilter:"blur(8px)", zIndex:1000, display:"flex",

@@ -6,6 +6,9 @@ import TaskPage from "./TaskPage";
 import CalendarPage from "./CalendarPage";
 import AccountsPage from "./AccountsPage";
 import ReportsPage  from "./ReportsPage";
+import QuotationCreator   from "./QuotationCreator";
+
+
 import { QRCodeSVG } from "qrcode.react";
 
 const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"#9333ea",bg:"#f5f3ff",card:"#FFFFFF",text:"#1e0a3c",muted:"#7c3aed",border:"#ede9fe"};
@@ -26,21 +29,22 @@ const NAV=[
   {key:"tasks",icon:"✅",label:"Tasks"},
   {key:"calendar",icon:"📅",label:"Calendar"},
   {key:"accounts",icon:"👤",label:"Accounts"},
+  {key:"interviews",icon:"🎯",label:"Interviews"},
   {key:"reports",icon:"📈",label:"Reports"}
 ];
 
 function getNavForRole(role){
   const r=(role||"").toLowerCase().trim();
   if(r==="subadmin"||r==="sub_admin"||r==="sub-admin")
-    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","reports"].includes(n.key));
+    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","interviews","reports"].includes(n.key));
   if(r==="manager")
-    return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","reports"].includes(n.key));
+    return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
   if(r==="employee")
     return NAV.filter(n=>["dashboard","tasks","calendar"].includes(n.key));
   return NAV;
 }
 
-const sc=s=>({Active:"#22C55E",Inactive:"#EF4444","In Progress":"#9333ea",Pending:"#F59E0B",Completed:"#22C55E","On Hold":"#a855f7",Sent:"#9333ea",Approved:"#22C55E",Rejected:"#EF4444",Paid:"#22C55E",Overdue:"#EF4444",Client:"#9333ea",Employee:"#c084fc",Manager:"#f59e0b"}[s]||"#a855f7");
+const sc=s=>({Active:"#22C55E",Inactive:"#EF4444","In Progress":"#9333ea",Pending:"#F59E0B",Completed:"#22C55E","On Hold":"#a855f7",Sent:"#9333ea",Approved:"#22C55E",Rejected:"#EF4444",Paid:"#22C55E",Overdue:"#EF4444",Client:"#9333ea",Employee:"#c084fc",Manager:"#f59e0b",pending:"#F59E0B",hired:"#22C55E",rejected:"#EF4444"}[s]||"#a855f7");
 
 function Badge({label}){const c=sc(label);return <span style={{background:`${c}18`,color:c,border:`1px solid ${c}33`,padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>{label}</span>;}
 
@@ -252,6 +256,250 @@ function Sidebar({active,setActive,onLogout,open,onClose,navItems}){
   );
 }
 
+// ═══════════════════════════════════════════════════════════
+// INTERVIEW PAGE COMPONENT
+// ═══════════════════════════════════════════════════════════
+function InterviewPage({companyId,companyName}){
+  const STORAGE_KEY=`hr_candidates_${companyId||"default"}`;
+  const [candidates,setCandidates]=useState([]);
+  const [filter,setFilter]=useState("all");
+  const [search,setSearch]=useState("");
+  const [viewModal,setViewModal]=useState(null);
+  const [toast,setToast]=useState("");
+  const [linkCopied,setLinkCopied]=useState(false);
+
+  useEffect(()=>{
+    // Load from localStorage
+    const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+    setCandidates(saved);
+    // Try API too
+    axios.get(`http://localhost:5000/api/interviews?companyId=${companyId||"default"}`).then(r=>{
+      if(r.data?.length){setCandidates(r.data);localStorage.setItem(STORAGE_KEY,JSON.stringify(r.data));}
+    }).catch(()=>{});
+  },[companyId]);
+
+  const save=(list)=>{setCandidates(list);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));};
+
+  const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
+
+  const appLink=`${window.location.origin}?apply=${companyId||"default"}`;
+
+  const copyLink=()=>{
+    navigator.clipboard.writeText(appLink).then(()=>{setLinkCopied(true);showToast("📋 Link copied!");setTimeout(()=>setLinkCopied(false),2000);});
+  };
+
+  const updateStatus=(idx,val)=>{
+    const updated=[...candidates];
+    updated[idx]={...updated[idx],status:val};
+    save(updated);
+    // sync to API
+    const c=updated[idx];
+    if(c._id||c.id){
+      axios.put(`http://localhost:5000/api/interviews/${c._id||c.id}`,{status:val}).catch(()=>{});
+    }
+    showToast(`✅ Status updated to "${val}"`);
+  };
+
+  const deleteCandidate=(idx)=>{
+    if(!window.confirm("Delete this candidate?"))return;
+    const c=candidates[idx];
+    if(c._id||c.id){axios.delete(`http://localhost:5000/api/interviews/${c._id||c.id}`).catch(()=>{});}
+    const updated=candidates.filter((_,i)=>i!==idx);
+    save(updated);
+    showToast("🗑️ Deleted!");
+  };
+
+  const downloadResume=(c)=>{
+    if(!c.resumeData){showToast("❗ Resume not available");return;}
+    const a=document.createElement("a");
+    a.href=c.resumeData;
+    a.download=c.resumeName||"resume.pdf";
+    a.click();
+    // if viewing for first time, auto-set pending if somehow unset
+    showToast("📄 Downloading resume...");
+  };
+
+  const displayed=candidates.filter(c=>{
+    const okFilter=filter==="all"||c.status===filter;
+    const q=search.toLowerCase();
+    const okSearch=!q||(c.name||"").toLowerCase().includes(q)||(c.role||"").toLowerCase().includes(q)||(c.email||"").toLowerCase().includes(q);
+    return okFilter&&okSearch;
+  });
+
+  const stats=[
+    {t:"Total",v:candidates.length,i:"🎯",c:"#9333ea"},
+    {t:"Pending",v:candidates.filter(c=>c.status==="pending").length,i:"⏳",c:"#F59E0B"},
+    {t:"Hired",v:candidates.filter(c=>c.status==="hired").length,i:"✅",c:"#22C55E"},
+    {t:"Rejected",v:candidates.filter(c=>c.status==="rejected").length,i:"❌",c:"#EF4444"},
+  ];
+
+  const statusLabel={pending:"⏳ Pending",hired:"✅ Hired",rejected:"❌ Rejected"};
+  const formatDate=(iso)=>{if(!iso)return"—";return new Date(iso).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});};
+
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      {toast&&<div style={{position:"fixed",bottom:24,right:24,zIndex:9999,background:"#fff",border:"1.5px solid #22c55e",borderRadius:12,padding:"12px 20px",fontSize:13,fontWeight:700,color:"#22c55e",boxShadow:"0 8px 24px rgba(0,0,0,0.12)"}}>{toast}</div>}
+
+      {/* Application Link Banner */}
+      <div style={{background:"linear-gradient(135deg,#1e0a3c,#2d1057)",borderRadius:16,padding:"20px 24px",display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",boxShadow:"0 8px 24px rgba(59,7,100,0.25)"}}>
+        <div style={{width:42,height:42,borderRadius:12,background:"rgba(147,51,234,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🔗</div>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:4}}>Candidate Application Link</div>
+          <div style={{fontSize:13,color:"#c084fc",fontFamily:"monospace",wordBreak:"break-all"}}>{appLink}</div>
+        </div>
+        <div style={{display:"flex",gap:8,flexShrink:0}}>
+          <button onClick={copyLink} style={{background:linkCopied?"rgba(34,197,94,0.2)":"rgba(147,51,234,0.25)",border:`1px solid ${linkCopied?"rgba(34,197,94,0.5)":"rgba(147,51,234,0.5)"}`,borderRadius:9,padding:"9px 16px",color:linkCopied?"#4ade80":"#c084fc",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s"}}>
+            {linkCopied?"✅ Copied!":"📋 Copy Link"}
+          </button>
+          <button onClick={()=>window.open(appLink,"_blank")} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:9,padding:"9px 16px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+            👁 Preview Form
+          </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="dash-stats" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+        {stats.map(({t,v,i,c})=>(
+          <div key={t} style={{background:"#fff",borderRadius:14,padding:"18px 16px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${c},${c}88)`}}/>
+            <div style={{width:38,height:38,borderRadius:10,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,marginBottom:8}}>{i}</div>
+            <div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5,marginBottom:2}}>{t.toUpperCase()}</div>
+            <div style={{fontSize:26,fontWeight:800,color:c}}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Table */}
+      <SC title={`All Candidates (${displayed.length})`}>
+        {/* Filters + Search */}
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,flexWrap:"wrap"}}>
+          <div style={{position:"relative",flex:1,minWidth:180}}>
+            <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>🔍</span>
+            <input placeholder="Search name, role, email..." value={search} onChange={e=>setSearch(e.target.value)}
+              style={{width:"100%",padding:"9px 14px 9px 34px",border:"1.5px solid #ede9fe",borderRadius:10,fontSize:13,background:"#faf5ff",outline:"none",fontFamily:"inherit",color:T.text,boxSizing:"border-box"}}/>
+          </div>
+          {["all","pending","hired","rejected"].map(f=>(
+            <button key={f} onClick={()=>setFilter(f)} style={{padding:"7px 14px",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",border:"1.5px solid",borderColor:filter===f?sc(f==="all"?"Active":f):"#ede9fe",background:filter===f?`${sc(f==="all"?"Active":f)}15`:"#fff",color:filter===f?sc(f==="all"?"Active":f):"#a78bfa",transition:"all 0.15s"}}>
+              {f==="all"?"All":f.charAt(0).toUpperCase()+f.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {displayed.length===0?(
+          <div style={{textAlign:"center",padding:"50px 20px",color:"#a78bfa"}}>
+            <div style={{fontSize:48,marginBottom:12}}>📭</div>
+            <div style={{fontSize:16,fontWeight:700,color:T.text,marginBottom:6}}>
+              {candidates.length===0?"No applications yet":"No results found"}
+            </div>
+            <div style={{fontSize:13}}>{candidates.length===0?"Share the link above to start receiving applications":""}</div>
+          </div>
+        ):(
+          <div style={{overflowX:"auto"}}>
+            <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:900}}>
+              <thead>
+                <tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
+                  {["Candidate","Email","Mobile","Experience","Role","Status","Applied Date","Resume","Actions"].map(c=>(
+                    <th key={c} style={{padding:"10px 12px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {displayed.map((c,i)=>{
+                  const idx=candidates.indexOf(c);
+                  return(
+                    <tr key={c._id||c.id||i} style={{borderBottom:"1px solid #f3f0ff"}}
+                      onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                      onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                      {/* Candidate */}
+                      <td style={{padding:"12px 12px"}}>
+                        <div style={{display:"flex",alignItems:"center",gap:8}}>
+                          <div style={{width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(c.name||"?")[0].toUpperCase()}</div>
+                          <div>
+                            <div style={{fontWeight:700,color:T.text,fontSize:13}}>{c.name||"—"}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{padding:"12px 12px",color:"#7c3aed",fontSize:12}}>{c.email||"—"}</td>
+                      <td style={{padding:"12px 12px",fontSize:12,color:T.text}}>{c.mobile||"—"}</td>
+                      {/* Experience */}
+                      <td style={{padding:"12px 12px"}}>
+                        {c.experience==="Fresher"
+                          ?<span style={{background:"rgba(34,197,94,0.12)",color:"#22C55E",border:"1px solid rgba(34,197,94,0.25)",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>🎓 Fresher</span>
+                          :<span style={{background:"rgba(147,51,234,0.12)",color:"#9333ea",border:"1px solid rgba(147,51,234,0.25)",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>💼 {c.years||"?"}y Exp</span>
+                        }
+                      </td>
+                      <td style={{padding:"12px 12px",fontWeight:600,color:T.text,fontSize:12,maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.role||"—"}</td>
+                      {/* Status dropdown */}
+                      <td style={{padding:"12px 12px"}}>
+                        <select value={c.status||"pending"} onChange={e=>updateStatus(idx,e.target.value)}
+                          style={{background:c.status==="hired"?"rgba(34,197,94,0.1)":c.status==="rejected"?"rgba(239,68,68,0.1)":"rgba(245,158,11,0.1)",border:`1.5px solid ${sc(c.status||"pending")}44`,borderRadius:8,padding:"5px 10px",color:sc(c.status||"pending"),fontSize:12,fontWeight:700,cursor:"pointer",outline:"none",fontFamily:"inherit"}}>
+                          <option value="pending">⏳ Pending</option>
+                          <option value="hired">✅ Hired</option>
+                          <option value="rejected">❌ Rejected</option>
+                        </select>
+                      </td>
+                      <td style={{padding:"12px 12px",fontSize:12,color:"#a78bfa",fontFamily:"monospace",whiteSpace:"nowrap"}}>{formatDate(c.date||c.createdAt)}</td>
+                      {/* Resume */}
+                      <td style={{padding:"12px 12px"}}>
+                        {c.resumeData||c.resumeUrl
+                          ?<button onClick={()=>downloadResume(c)} style={{background:"rgba(147,51,234,0.1)",border:"1px solid rgba(147,51,234,0.25)",borderRadius:7,padding:"5px 12px",fontSize:11,color:"#9333ea",cursor:"pointer",fontWeight:700,fontFamily:"inherit",whiteSpace:"nowrap"}}>📄 Download</button>
+                          :<span style={{fontSize:11,color:"#a78bfa"}}>—</span>
+                        }
+                      </td>
+                      {/* Actions */}
+                      <td style={{padding:"12px 12px"}}>
+                        <div style={{display:"flex",gap:5}}>
+                          <button onClick={()=>setViewModal(c)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#7c3aed",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>👤 View</button>
+                          <button onClick={()=>deleteCandidate(idx)} style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>🗑</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </SC>
+
+      {/* Candidate Detail Modal */}
+      {viewModal&&(
+        <Mdl title="Candidate Profile" onClose={()=>setViewModal(null)}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}} className="modal-2col">
+            {[
+              {icon:"👤",label:"Full Name",value:viewModal.name},
+              {icon:"📧",label:"Email",value:viewModal.email},
+              {icon:"📱",label:"Mobile",value:viewModal.mobile},
+              {icon:"💼",label:"Experience",value:`${viewModal.experience}${viewModal.years?` — ${viewModal.years} years`:""}`},
+              {icon:"🎯",label:"Applied Role",value:viewModal.role},
+              {icon:"📅",label:"Applied Date",value:formatDate(viewModal.date||viewModal.createdAt)},
+            ].map(({icon,label,value})=>(
+              <div key={label} style={{background:"#faf5ff",borderRadius:10,padding:"12px 14px",border:"1px solid #ede9fe"}}>
+                <div style={{fontSize:10,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:4,textTransform:"uppercase"}}>{icon} {label}</div>
+                <div style={{fontSize:14,fontWeight:600,color:T.text}}>{value||"—"}</div>
+              </div>
+            ))}
+            <div style={{background:"#faf5ff",borderRadius:10,padding:"12px 14px",border:"1px solid #ede9fe"}}>
+              <div style={{fontSize:10,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:4,textTransform:"uppercase"}}>🔖 Status</div>
+              <Badge label={viewModal.status?.charAt(0).toUpperCase()+(viewModal.status||"pending").slice(1)}/>
+            </div>
+          </div>
+          {(viewModal.resumeData||viewModal.resumeUrl)&&(
+            <div style={{background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:12,padding:"18px",border:"1px solid #ede9fe",marginTop:18,textAlign:"center"}}>
+              <div style={{fontSize:32,marginBottom:8}}>📄</div>
+              <div style={{fontSize:14,color:"#9333ea",fontWeight:600,marginBottom:4}}>{viewModal.resumeName||"Resume"}</div>
+              {viewModal.resumeSize&&<div style={{fontSize:12,color:"#a78bfa",marginBottom:12}}>{viewModal.resumeSize}</div>}
+              <button onClick={()=>downloadResume(viewModal)} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:9,padding:"10px 22px",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+                ⬇️ Download Resume
+              </button>
+            </div>
+          )}
+        </Mdl>
+      )}
+    </div>
+  );
+}
+
 function ProjectStatusPage({clients,employees,managers}){
   const EMPTY={projectId:"",name:"",client:"",manager:"",employee:"",deadline:"",status:"In Progress",progress:0,notes:""};
   const [trackList,setTrackList]=useState(TRACKING_SEED);
@@ -408,6 +656,10 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const initials=displayName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
   const B=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
 
+  // Derive companyId from user for InterviewPage
+  const companyId=user?.companyId||user?.company||user?._id||user?.id||"default";
+  const companyNameStr=user?.companyName||user?.name||"Company";
+
   return(
     <div style={{display:"flex",minHeight:"100vh",background:"linear-gradient(135deg,#f5f3ff 0%,#faf5ff 50%,#f3e8ff 100%)",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
       <style>{`
@@ -525,11 +777,12 @@ export default function Dashboard({setUser,user,fixedLogo}){
           {validActive==="managers"&&(<div style={{display:"flex",flexDirection:"column",gap:14}}><div className="dash-stats" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>{[{t:"Total Managers",v:managers.length,i:"🧑‍💼",c:"#f59e0b"},{t:"Active",v:managers.filter(m=>m.status==="Active").length,i:"✅",c:"#22C55E"},{t:"Inactive",v:managers.filter(m=>m.status==="Inactive").length,i:"⛔",c:"#EF4444"}].map(({t,v,i,c})=>(<div key={t} style={{background:"#fff",borderRadius:14,padding:"16px 14px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",display:"flex",alignItems:"center",gap:12}}><div style={{width:40,height:40,borderRadius:11,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{i}</div><div><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5}}>{t.toUpperCase()}</div><div style={{fontSize:24,fontWeight:800,color:c}}>{v}</div></div></div>))}</div><SC title={`All Managers (${filteredManagers.length})`}><Search value={mgrSearch} onChange={setMgrSearch} placeholder="Search by name, email, department..."/>{mgrLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>:<Tbl cols={["ID","Name","Email","Phone","Role","Department","Status","Joined"]} rows={filteredManagers.map((m,i)=>[`MGR${String(i+1).padStart(3,"0")}`,<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:26,height:26,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{(m.managerName||"?")[0].toUpperCase()}</div><span style={{fontWeight:600}}>{m.managerName}</span></div>,m.email,m.phone||"—",m.role||"Manager",m.department||"—",<Badge label={m.status}/>,m.createdAt?new Date(m.createdAt).toLocaleDateString():"—"])}/>}</SC></div>)}
 
           {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
-          {validActive==="quotations"&&<SC title="All Quotations"><Tbl cols={["ID","Client","Project","Amount","Date","Expiry","Status"]} rows={QUOTATIONS.map(q=>[q.id,q.client,q.project,q.final,q.date,q.expiry,<Badge label={q.status}/>])}/></SC>}
+          {validActive==="quotations"&&<QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
           {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers}/>}
           {validActive==="tasks"&&<TaskPage projects={projects} employees={employees}/>}
           {validActive==="calendar"&&<CalendarPage projects={projects} clients={clients}/>}
           {validActive==="accounts"&&<AccountsPage/>}
+          {validActive==="interviews"&&<InterviewPage companyId={companyId} companyName={companyNameStr}/>}
           {validActive==="reports"&&<ReportsPage clients={clients} projects={projects} employees={employees} managers={managers}/>}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { EmployeeProfilePanel  } from "./EmployeeProfile";
 
 const BASE = "http://localhost:5000/api/employee-dashboard";
 
@@ -38,7 +39,6 @@ const SEED_SALARY = [
   { _id:"s3", month:"January 2026",  basic:35000, hra:14000, allowances:5000, deductions:4500, net:49500, status:"paid", paidOn:"2026-01-31" },
 ];
 
-// Permission types with icons
 const PERMISSION_TYPES = [
   { value:"late_arrival",   label:"Late Arrival",    icon:"🕐", desc:"Coming in late today" },
   { value:"early_departure",label:"Early Departure", icon:"🚶", desc:"Leaving early today"  },
@@ -440,6 +440,24 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
 
   const [marking,        setMarking]        = useState(false);
 
+  // ─ Add Attendance state ─
+  const [addForm,        setAddForm]        = useState(false);
+  const [addDate,        setAddDate]        = useState(todayStr());
+  const [addStatus,      setAddStatus]      = useState("present");
+  const [addNote,        setAddNote]        = useState("");
+  const [addSaving,      setAddSaving]      = useState(false);
+
+  // ─ Attendance filter + calendar state ─
+  const [attSearch,      setAttSearch]      = useState("");       // search by date string
+  const [attMonthFilter, setAttMonthFilter] = useState("");       // "YYYY-MM" or ""
+  const [attFromDate,    setAttFromDate]    = useState("");       // date range from
+  const [attToDate,      setAttToDate]      = useState("");       // date range to
+  const [showAdvFilter,  setShowAdvFilter]  = useState(false);   // toggle advanced
+  const [attFilter,      setAttFilter]      = useState("all");   // all | present | absent | leave | holiday
+  const [calYear,        setCalYear]        = useState(new Date().getFullYear());
+  const [calMonth,       setCalMonth]       = useState(new Date().getMonth());
+  const [selectedDate,   setSelectedDate]   = useState(null);
+
   const today      = todayStr();
   const thisMonth  = today.slice(0,7);
   const todayRec   = attendance.find(a => a.date===today);
@@ -448,6 +466,56 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
   const absent     = monthRecs.filter(a => a.status==="absent").length;
   const leave      = monthRecs.filter(a => a.status==="leave").length;
   const workingDays= new Date().getDate();
+
+  const FULL_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const DAYS_SHORT  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  // Calendar helpers
+  const calDateStr = (d) =>
+    `${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+
+  const getCalDays = () => {
+    const firstDay    = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+    const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+    const cells = [];
+    for(let i=firstDay-1; i>=0; i--) cells.push({ day:daysInPrev-i, curr:false });
+    for(let d=1; d<=daysInMonth; d++) cells.push({ day:d, curr:true });
+    while(cells.length%7!==0) cells.push({ day:cells.length-daysInMonth-firstDay+1, curr:false });
+    return cells;
+  };
+
+  const prevCalMonth = () => {
+    if(calMonth===0){ setCalMonth(11); setCalYear(y=>y-1); } else setCalMonth(m=>m-1);
+    setSelectedDate(null);
+  };
+  const nextCalMonth = () => {
+    if(calMonth===11){ setCalMonth(0); setCalYear(y=>y+1); } else setCalMonth(m=>m+1);
+    setSelectedDate(null);
+  };
+
+  // Filtered history list
+  const filteredHistory = attendance
+    .filter(a => {
+      const statusMatch  = attFilter==="all" || a.status===attFilter;
+      const dateMatch    = selectedDate ? a.date===selectedDate : true;
+      const searchMatch  = !attSearch.trim() || a.date.includes(attSearch.trim());
+      const monthMatch   = !attMonthFilter || a.date.startsWith(attMonthFilter);
+      const fromMatch    = !attFromDate || a.date >= attFromDate;
+      const toMatch      = !attToDate   || a.date <= attToDate;
+      return statusMatch && dateMatch && searchMatch && monthMatch && fromMatch && toMatch;
+    })
+    .sort((a,b) => b.date.localeCompare(a.date));
+
+  const hasActiveFilter = attFilter!=="all" || selectedDate || attSearch || attMonthFilter || attFromDate || attToDate;
+
+  const resetAllFilters = () => {
+    setAttFilter("all"); setSelectedDate(null); setAttSearch("");
+    setAttMonthFilter(""); setAttFromDate(""); setAttToDate("");
+  };
+
+  // Month options from attendance data
+  const availableMonths = [...new Set(attendance.map(a => a.date.slice(0,7)))].sort().reverse();
 
   // Fetch leave & permission history
   useEffect(() => {
@@ -465,6 +533,19 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
     setAttendance(prev => [...prev, rec]);
     notify(`Marked as ${status} ✓`);
     setMarking(false);
+  };
+
+  const addAttendance = async () => {
+    if(!addDate){ return; }
+    const exists = attendance.find(a => a.date === addDate);
+    if(exists){ notify("Attendance already marked for this date","error"); return; }
+    setAddSaving(true);
+    const rec = { date:addDate, status:addStatus, employeeName:empName, markedAt:new Date().toISOString(), note:addNote };
+    try { await axios.post(`${BASE}/attendance`, rec); } catch(e){}
+    setAttendance(prev => [...prev, { ...rec, _id:`local_${Date.now()}` }]);
+    notify(`Attendance added for ${addDate} ✓`);
+    setAddForm(false); setAddDate(todayStr()); setAddStatus("present"); setAddNote("");
+    setAddSaving(false);
   };
 
   const submitLeave = async () => {
@@ -498,7 +579,6 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
     setPermSubmitting(false); setActiveTab("permissions");
   };
 
-  // Cancel a pending permission
   const cancelPermission = async (perm) => {
     if((perm.status||"pending").toLowerCase()!=="pending"){ notify("Only pending requests can be cancelled","error"); return; }
     try {
@@ -517,32 +597,89 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
     { key:"permissions", label: pendingPerms>0  ? `Permissions (${pendingPerms})` : "Permissions" },
   ];
 
-  // ── render ────────────────────────────────────────────────────────────────
+  const calDays = getCalDays();
+
+  // Filter chips config
+  const filterChips = [
+    { key:"all",     label:"All",     color:"#6366f1", count:attendance.length },
+    { key:"present", label:"Present", color:"#10b981", count:attendance.filter(a=>a.status==="present").length },
+    { key:"absent",  label:"Absent",  color:"#ef4444", count:attendance.filter(a=>a.status==="absent").length },
+    { key:"leave",   label:"Leave",   color:"#f59e0b", count:attendance.filter(a=>a.status==="leave").length },
+    { key:"holiday", label:"Holiday", color:"#8b5cf6", count:attendance.filter(a=>a.status==="holiday").length },
+  ];
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
 
-      {/* Header row with action buttons */}
+      {/* Header row */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
         <div>
           <h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>Attendance</h1>
           <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Track attendance, apply leave & permission requests</p>
         </div>
         <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-          <button onClick={()=>{ setPermForm(v=>!v); setLeaveForm(false); setActiveTab("attendance"); }}
+          <button onClick={()=>{ setAddForm(v=>!v); setPermForm(false); setLeaveForm(false); setActiveTab("attendance"); }}
+            style={{ background:"linear-gradient(135deg,#10b981,#059669)", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+            ➕ Add Attendance
+          </button>
+          <button onClick={()=>{ setPermForm(v=>!v); setLeaveForm(false); setAddForm(false); setActiveTab("attendance"); }}
             style={{ background:"linear-gradient(135deg,#0ea5e9,#6366f1)", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
             🔑 Request Permission
           </button>
-          <button onClick={()=>{ setLeaveForm(v=>!v); setPermForm(false); setActiveTab("attendance"); }}
+          <button onClick={()=>{ setLeaveForm(v=>!v); setPermForm(false); setAddForm(false); setActiveTab("attendance"); }}
             style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
             🌴 Apply Leave
           </button>
         </div>
       </div>
 
-      {/* ── Permission Form ── */}
+      {/* ── Add Attendance Form ── */}
+      {addForm && (
+        <Card title="➕ Add Attendance">
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14, marginBottom:14 }} className="perm-form-grid">
+            <InputField label="Date *">
+              <input type="date" value={addDate} onChange={e=>setAddDate(e.target.value)} style={inputStyle}/>
+            </InputField>
+            <InputField label="Status">
+              <div style={{ display:"flex", gap:8 }}>
+                {[
+                  { val:"present", label:"Present", color:"#10b981", icon:"✅" },
+                  { val:"absent",  label:"Absent",  color:"#ef4444", icon:"❌" },
+                  { val:"leave",   label:"Leave",   color:"#f59e0b", icon:"🌴" },
+                  { val:"holiday", label:"Holiday", color:"#8b5cf6", icon:"🎉" },
+                ].map(opt => (
+                  <button key={opt.val} onClick={()=>setAddStatus(opt.val)}
+                    style={{
+                      flex:1, padding:"8px 4px", borderRadius:10, border:`2px solid ${addStatus===opt.val?opt.color:"#e2e8f0"}`,
+                      background:addStatus===opt.val?`${opt.color}15`:"#f8fafc",
+                      color:addStatus===opt.val?opt.color:"#94a3b8",
+                      fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit",
+                      display:"flex", flexDirection:"column", alignItems:"center", gap:2,
+                    }}>
+                    <span style={{ fontSize:14 }}>{opt.icon}</span>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </InputField>
+            <InputField label="Note (optional)">
+              <input value={addNote} onChange={e=>setAddNote(e.target.value)} placeholder="e.g. WFH, field visit…" style={inputStyle}/>
+            </InputField>
+          </div>
+          <div style={{ display:"flex", gap:10, justifyContent:"flex-end" }}>
+            <button onClick={()=>{ setAddForm(false); setAddDate(todayStr()); setAddStatus("present"); setAddNote(""); }}
+              style={{ padding:"9px 20px", border:"1.5px solid #e2e8f0", borderRadius:10, background:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", color:"#374151" }}>Cancel</button>
+            <button onClick={addAttendance} disabled={addSaving}
+              style={{ padding:"9px 24px", background:"linear-gradient(135deg,#10b981,#059669)", border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:addSaving?0.7:1 }}>
+              {addSaving ? "Saving…" : "💾 Save Attendance"}
+            </button>
+          </div>
+        </Card>
+      )}
+
+      {/* Permission Form */}
       {permForm && (
         <Card title="🔑 Request Permission">
-          {/* Permission type selector — card grid */}
           <div style={{ marginBottom:14 }}>
             <div style={{ fontSize:11, color:"#64748b", fontWeight:700, textTransform:"uppercase", letterSpacing:0.4, marginBottom:8 }}>Permission Type</div>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }} className="perm-type-grid">
@@ -556,24 +693,14 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
               ))}
             </div>
           </div>
-
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14, marginBottom:14 }} className="perm-form-grid">
-            <InputField label="Date">
-              <input type="date" value={permDate} onChange={e=>setPermDate(e.target.value)} style={inputStyle}/>
-            </InputField>
-            <InputField label="From Time">
-              <input type="time" value={permFromTime} onChange={e=>setPermFromTime(e.target.value)} style={inputStyle}/>
-            </InputField>
-            <InputField label="To Time">
-              <input type="time" value={permToTime} onChange={e=>setPermToTime(e.target.value)} style={inputStyle}/>
-            </InputField>
+            <InputField label="Date"><input type="date" value={permDate} onChange={e=>setPermDate(e.target.value)} style={inputStyle}/></InputField>
+            <InputField label="From Time"><input type="time" value={permFromTime} onChange={e=>setPermFromTime(e.target.value)} style={inputStyle}/></InputField>
+            <InputField label="To Time"><input type="time" value={permToTime} onChange={e=>setPermToTime(e.target.value)} style={inputStyle}/></InputField>
           </div>
-
           <InputField label="Reason *">
-            <textarea value={permReason} onChange={e=>setPermReason(e.target.value)} rows={3} placeholder="Briefly explain your reason…"
-              style={{ ...inputStyle, resize:"vertical" }}/>
+            <textarea value={permReason} onChange={e=>setPermReason(e.target.value)} rows={3} placeholder="Briefly explain your reason…" style={{ ...inputStyle, resize:"vertical" }}/>
           </InputField>
-
           <div style={{ display:"flex", gap:10, justifyContent:"flex-end", marginTop:14 }}>
             <button onClick={()=>setPermForm(false)} style={{ padding:"9px 20px", border:"1.5px solid #e2e8f0", borderRadius:10, background:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", color:"#374151" }}>Cancel</button>
             <button onClick={submitPermission} disabled={permSubmitting}
@@ -584,7 +711,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         </Card>
       )}
 
-      {/* ── Leave Form ── */}
+      {/* Leave Form */}
       {leaveForm && (
         <Card title="🌴 Apply for Leave">
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
@@ -594,12 +721,8 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
               </select>
             </InputField>
             <div/>
-            <InputField label="From Date">
-              <input type="date" value={leaveFrom} onChange={e=>setLeaveFrom(e.target.value)} style={inputStyle}/>
-            </InputField>
-            <InputField label="To Date">
-              <input type="date" value={leaveTo} onChange={e=>setLeaveTo(e.target.value)} style={inputStyle}/>
-            </InputField>
+            <InputField label="From Date"><input type="date" value={leaveFrom} onChange={e=>setLeaveFrom(e.target.value)} style={inputStyle}/></InputField>
+            <InputField label="To Date"><input type="date" value={leaveTo} onChange={e=>setLeaveTo(e.target.value)} style={inputStyle}/></InputField>
             <div style={{ gridColumn:"1/-1" }}>
               <InputField label="Reason *">
                 <textarea value={leaveReason} onChange={e=>setLeaveReason(e.target.value)} rows={3} placeholder="Enter reason…" style={{ ...inputStyle, resize:"vertical" }}/>
@@ -616,13 +739,14 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         </Card>
       )}
 
-      {/* ── Tabs Card ── */}
+      {/* Tabs Card */}
       <Card>
         <TabBar tabs={tabs} active={activeTab} onChange={setActiveTab}/>
 
         {/* ─── ATTENDANCE TAB ─── */}
         {activeTab==="attendance" && (
           <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
+
             {/* Mark today */}
             <div style={{ background:"#f8fafc", borderRadius:12, padding:"14px 16px", display:"flex", gap:12, alignItems:"center", flexWrap:"wrap" }}>
               <div style={{ fontSize:13, color:"#374151", fontWeight:600 }}>Today — <span style={{ color:"#6366f1" }}>{today}</span></div>
@@ -646,59 +770,243 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
               <StatCard icon="🌴" label="On Leave"     value={leave}      sub="Days"       color="#f59e0b"/>
             </div>
 
-            {/* Calendar */}
-            <div>
-              <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:10 }}>Monthly Calendar</div>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:6 }}>
-                {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => (
-                  <div key={d} style={{ textAlign:"center", fontSize:10, fontWeight:700, color:"#94a3b8", padding:"4px 0" }}>{d}</div>
-                ))}
-                {Array.from({length:31},(_,i) => {
-                  const day=String(i+1).padStart(2,"0"), date=`${thisMonth}-${day}`;
-                  const rec=attendance.find(a=>a.date===date), isToday=date===today;
-                  const bg=isToday?"#6366f1":rec?sc(rec.status):"#f8fafc";
-                  const tc=(isToday||rec)?"#fff":"#94a3b8";
-                  return <div key={i} style={{ aspectRatio:"1", borderRadius:10, background:bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:isToday?800:600, color:tc }}>{i+1}</div>;
-                })}
-              </div>
-              <div style={{ display:"flex", gap:14, marginTop:14, flexWrap:"wrap" }}>
-                {[["#10b981","Present"],["#ef4444","Absent"],["#f59e0b","Leave"],["#6366f1","Today"],["#f8fafc","Not marked"]].map(([c,l]) => (
-                  <div key={l} style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"#64748b" }}>
-                    <div style={{ width:10, height:10, borderRadius:3, background:c }}/>{l}
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* ── SPLIT LAYOUT: Left Calendar | Right History ── */}
+            <div style={{ display:"grid", gridTemplateColumns:"340px 1fr", gap:16, alignItems:"start" }} className="att-split">
 
-            {/* History table */}
-            <div>
-              <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:10 }}>Attendance History</div>
-              <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
-                <thead>
-                  <tr>{["Date","Day","Status","Marked At"].map(h=>(
-                    <th key={h} style={{ textAlign:"left", fontSize:11, fontWeight:700, color:"#94a3b8", padding:"0 10px 10px 0", borderBottom:"1px solid #f1f5f9", textTransform:"uppercase" }}>{h}</th>
-                  ))}</tr>
-                </thead>
-                <tbody>
-                  {attendance.slice().reverse().slice(0,15).map((a,i) => (
-                    <tr key={i}>
-                      <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc", color:"#334155" }}>{a.date}</td>
-                      <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc", color:"#334155" }}>{new Date(a.date).toLocaleDateString("en-IN",{weekday:"long"})}</td>
-                      <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc" }}><Badge label={a.status}/></td>
-                      <td style={{ padding:"10px 10px 10px 0", borderBottom:"1px solid #f8fafc", color:"#334155" }}>{a.markedAt?new Date(a.markedAt).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}):"—"}</td>
-                    </tr>
+              {/* ── LEFT: Calendar ── */}
+              <div style={{ background:"#f8fafc", borderRadius:14, padding:16, border:"1px solid #f1f5f9", position:"sticky", top:16 }}>
+
+                {/* Month nav */}
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+                  <button onClick={prevCalMonth} style={{ background:"#fff", border:"1px solid #e2e8f0", borderRadius:8, width:30, height:30, cursor:"pointer", fontSize:14, color:"#6366f1", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
+                  <div style={{ textAlign:"center" }}>
+                    <div style={{ fontSize:13, fontWeight:800, color:"#0f172a" }}>{FULL_MONTHS[calMonth]} {calYear}</div>
+                    {selectedDate && (
+                      <div style={{ fontSize:10, color:"#6366f1", marginTop:2 }}>
+                        {selectedDate}
+                        <span onClick={()=>setSelectedDate(null)} style={{ marginLeft:6, cursor:"pointer", textDecoration:"underline", color:"#94a3b8" }}>✕ Clear</span>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display:"flex", gap:5 }}>
+                    <button onClick={()=>{ setCalYear(new Date().getFullYear()); setCalMonth(new Date().getMonth()); setSelectedDate(null); }}
+                      style={{ background:"#fff", border:"1px solid #e2e8f0", borderRadius:7, padding:"3px 8px", cursor:"pointer", fontSize:9, color:"#6366f1", fontWeight:700 }}>Today</button>
+                    <button onClick={nextCalMonth} style={{ background:"#fff", border:"1px solid #e2e8f0", borderRadius:8, width:30, height:30, cursor:"pointer", fontSize:14, color:"#6366f1", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
+                  </div>
+                </div>
+
+                {/* Day headers */}
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2, marginBottom:4 }}>
+                  {DAYS_SHORT.map(d => (
+                    <div key={d} style={{ textAlign:"center", fontSize:9, fontWeight:700, color:"#94a3b8", letterSpacing:0.3, padding:"3px 0" }}>{d}</div>
                   ))}
-                  {attendance.length===0 && <tr><td colSpan={4} style={{ textAlign:"center", padding:"2rem", color:"#94a3b8" }}>No attendance records yet</td></tr>}
-                </tbody>
-              </table>
+                </div>
+
+                {/* Calendar cells */}
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2 }}>
+                  {calDays.map((cell, idx) => {
+                    const ds   = cell.curr ? calDateStr(cell.day) : null;
+                    const rec  = cell.curr ? attendance.find(a=>a.date===ds) : null;
+                    const isToday    = ds===today;
+                    const isSelected = ds===selectedDate;
+                    const bg = isSelected
+                      ? "#6366f1"
+                      : isToday
+                        ? "#eef2ff"
+                        : rec ? `${sc(rec.status)}20` : "#fff";
+                    const textColor = isSelected
+                      ? "#fff"
+                      : isToday
+                        ? "#6366f1"
+                        : rec ? sc(rec.status) : cell.curr ? "#374151" : "#cbd5e1";
+
+                    return (
+                      <div key={idx}
+                        onClick={()=>{ if(!cell.curr) return; setSelectedDate(prev=>prev===ds?null:ds); }}
+                        style={{
+                          aspectRatio:"1", borderRadius:8, display:"flex", flexDirection:"column",
+                          alignItems:"center", justifyContent:"center",
+                          background:bg,
+                          border: isSelected ? "2px solid #6366f1" : isToday ? "1.5px solid #c7d2fe" : rec ? `1px solid ${sc(rec.status)}30` : "1px solid transparent",
+                          cursor:cell.curr?"pointer":"default",
+                          opacity:cell.curr?1:0.3,
+                          transition:"all 0.12s",
+                          fontSize:11, fontWeight:isToday||isSelected?800:600, color:textColor,
+                          position:"relative",
+                        }}
+                        title={rec?`${ds}: ${rec.status}`:""}
+                      >
+                        {cell.day}
+                        {rec && !isSelected && (
+                          <div style={{ width:4, height:4, borderRadius:"50%", background:sc(rec.status), position:"absolute", bottom:3 }}/>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Legend */}
+                <div style={{ display:"flex", gap:10, marginTop:12, flexWrap:"wrap" }}>
+                  {[["#10b981","Present"],["#ef4444","Absent"],["#f59e0b","Leave"],["#8b5cf6","Holiday"],["#6366f1","Today"]].map(([c,l]) => (
+                    <div key={l} style={{ display:"flex", alignItems:"center", gap:4, fontSize:9, color:"#64748b" }}>
+                      <div style={{ width:8, height:8, borderRadius:2, background:c }}/>{l}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── RIGHT: Filter + History ── */}
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+
+                {/* ── Filter Panel ── */}
+                <div style={{ background:"#f8fafc", borderRadius:14, border:"1px solid #f1f5f9", padding:"14px 16px" }}>
+
+                  {/* Row 1: Status chips + search + advanced toggle */}
+                  <div style={{ display:"flex", gap:8, flexWrap:"wrap", alignItems:"center", marginBottom:10 }}>
+                    <span style={{ fontSize:11, color:"#64748b", fontWeight:700, whiteSpace:"nowrap" }}>Status:</span>
+                    {filterChips.map(chip => {
+                      const active = attFilter===chip.key;
+                      return (
+                        <button key={chip.key} onClick={()=>{ setAttFilter(chip.key); setSelectedDate(null); }}
+                          style={{
+                            padding:"4px 12px", borderRadius:20, fontSize:11, fontWeight:700,
+                            cursor:"pointer", border:`1.5px solid ${active?chip.color:"#e2e8f0"}`,
+                            background: active?`${chip.color}15`:"#fff",
+                            color: active?chip.color:"#94a3b8",
+                            display:"flex", alignItems:"center", gap:5, fontFamily:"inherit",
+                            transition:"all 0.15s",
+                          }}>
+                          <span style={{ width:6, height:6, borderRadius:"50%", background:active?chip.color:"#cbd5e1", display:"inline-block" }}/>
+                          {chip.label}
+                          <span style={{ background:active?`${chip.color}25`:"#f1f5f9", color:active?chip.color:"#94a3b8", borderRadius:99, padding:"0 5px", fontSize:10, fontWeight:800 }}>{chip.count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Row 2: Search + Month dropdown + Advanced toggle */}
+                  <div style={{ display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}>
+                    {/* Search by date */}
+                    <div style={{ position:"relative", flex:1, minWidth:140 }}>
+                      <span style={{ position:"absolute", left:10, top:"50%", transform:"translateY(-50%)", fontSize:12, color:"#94a3b8" }}>🔍</span>
+                      <input
+                        placeholder="Search date (e.g. 2026-03)"
+                        value={attSearch}
+                        onChange={e=>{ setAttSearch(e.target.value); setSelectedDate(null); }}
+                        style={{ ...inputStyle, paddingLeft:32, width:"100%", fontSize:12, padding:"7px 10px 7px 30px" }}
+                      />
+                    </div>
+
+                    {/* Month filter */}
+                    <select value={attMonthFilter} onChange={e=>{ setAttMonthFilter(e.target.value); setSelectedDate(null); }}
+                      style={{ ...inputStyle, fontSize:12, padding:"7px 10px", minWidth:140 }}>
+                      <option value="">All Months</option>
+                      {availableMonths.map(m => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+
+                    {/* Advanced toggle */}
+                    <button onClick={()=>setShowAdvFilter(v=>!v)}
+                      style={{ padding:"7px 12px", borderRadius:10, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit",
+                        border:`1.5px solid ${showAdvFilter?"#6366f1":"#e2e8f0"}`,
+                        background:showAdvFilter?"#eef2ff":"#fff",
+                        color:showAdvFilter?"#6366f1":"#94a3b8",
+                        whiteSpace:"nowrap", display:"flex", alignItems:"center", gap:5 }}>
+                      ⚙️ {showAdvFilter ? "Hide" : "Date Range"}
+                    </button>
+
+                    {/* Reset */}
+                    {hasActiveFilter && (
+                      <button onClick={resetAllFilters}
+                        style={{ padding:"7px 12px", borderRadius:10, fontSize:11, fontWeight:700, cursor:"pointer", border:"1px solid #fecaca", background:"#fef2f2", color:"#ef4444", fontFamily:"inherit", whiteSpace:"nowrap" }}>
+                        ✕ Reset All
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Row 3: Advanced — Date range */}
+                  {showAdvFilter && (
+                    <div style={{ display:"flex", gap:10, alignItems:"center", marginTop:10, flexWrap:"wrap" }}>
+                      <span style={{ fontSize:11, color:"#64748b", fontWeight:700 }}>From:</span>
+                      <input type="date" value={attFromDate} onChange={e=>{ setAttFromDate(e.target.value); setSelectedDate(null); }}
+                        style={{ ...inputStyle, fontSize:12, padding:"7px 10px" }}/>
+                      <span style={{ fontSize:11, color:"#64748b", fontWeight:700 }}>To:</span>
+                      <input type="date" value={attToDate} onChange={e=>{ setAttToDate(e.target.value); setSelectedDate(null); }}
+                        style={{ ...inputStyle, fontSize:12, padding:"7px 10px" }}/>
+                      {(attFromDate||attToDate) && (
+                        <button onClick={()=>{ setAttFromDate(""); setAttToDate(""); }}
+                          style={{ padding:"6px 10px", borderRadius:8, fontSize:11, fontWeight:700, cursor:"pointer", border:"1px solid #e2e8f0", background:"#fff", color:"#94a3b8", fontFamily:"inherit" }}>
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* History label */}
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#0f172a" }}>
+                    {selectedDate
+                      ? `📅 ${selectedDate} (${filteredHistory.length} record${filteredHistory.length!==1?"s":""})`
+                      : `Attendance History (${filteredHistory.length}${hasActiveFilter?" filtered":""})`}
+                  </div>
+                  {hasActiveFilter && (
+                    <span style={{ fontSize:11, color:"#6366f1", fontWeight:600 }}>
+                      Filtered from {attendance.length} total
+                    </span>
+                  )}
+                </div>
+
+                {/* History list */}
+                {filteredHistory.length===0 ? (
+                  <div style={{ textAlign:"center", padding:"2rem", color:"#94a3b8", fontSize:13, background:"#f8fafc", borderRadius:12, border:"1px solid #f1f5f9" }}>
+                    <div style={{ fontSize:28, marginBottom:8 }}>📋</div>
+                    {selectedDate ? `No records for ${selectedDate}` : `No ${attFilter==="all"?"":attFilter} records found`}
+                  </div>
+                ) : (
+                  <div style={{ display:"flex", flexDirection:"column", gap:8, maxHeight:460, overflowY:"auto", paddingRight:2 }}>
+                    {filteredHistory.map((a, i) => {
+                      const c = sc(a.status);
+                      const d = new Date(a.date);
+                      const dayName = d.toLocaleDateString("en-IN",{ weekday:"short" });
+                      return (
+                        <div key={i} style={{ background:"#fff", borderRadius:12, border:`1px solid ${c}25`, padding:"12px 14px", display:"flex", alignItems:"center", gap:12 }}>
+                          {/* Date badge */}
+                          <div style={{ background:`${c}12`, border:`2px solid ${c}30`, borderRadius:10, padding:"8px 10px", textAlign:"center", minWidth:48, flexShrink:0 }}>
+                            <div style={{ fontSize:17, fontWeight:800, color:c, lineHeight:1 }}>{d.getDate()}</div>
+                            <div style={{ fontSize:8, color:"#94a3b8", fontWeight:700, letterSpacing:0.5, marginTop:2 }}>{["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()].toUpperCase()}</div>
+                          </div>
+                          {/* Info */}
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
+                              <span style={{ fontSize:13, fontWeight:700, color:"#0f172a" }}>{dayName}, {a.date}</span>
+                              <Badge label={a.status}/>
+                            </div>
+                            <div style={{ fontSize:11, color:"#94a3b8" }}>
+                              {a.markedAt
+                                ? `🕐 Marked at ${new Date(a.markedAt).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}`
+                                : "Not marked"}
+                              {a.note ? ` · 📝 ${a.note}` : ""}
+                            </div>
+                          </div>
+                          {/* Status dot */}
+                          <div style={{ width:10, height:10, borderRadius:"50%", background:c, flexShrink:0 }}/>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
+            {/* END SPLIT */}
+
           </div>
         )}
 
         {/* ─── MY LEAVES TAB ─── */}
         {activeTab==="leaves" && (
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            {/* Summary pills */}
             <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
               {[
                 { label:"Total",    val:leaveHistory.length, color:"#6366f1" },
@@ -758,7 +1066,6 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         {/* ─── PERMISSIONS TAB ─── */}
         {activeTab==="permissions" && (
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            {/* Summary pills */}
             <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
               {[
                 { label:"Total",     val:permHistory.length, color:"#6366f1" },
@@ -772,7 +1079,6 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                 </div>
               ))}
             </div>
-
             {permHistory.length===0 ? (
               <div style={{ textAlign:"center", padding:"3rem", color:"#94a3b8", fontSize:13 }}>
                 <div style={{ fontSize:32, marginBottom:10 }}>🔑</div>
@@ -787,34 +1093,21 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                 <div key={perm._id||i} style={{ background:"#f8fafc", borderRadius:14, border:`1.5px solid ${sc2}25`, padding:"16px 18px" }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:8 }}>
                     <div style={{ flex:1, minWidth:0 }}>
-                      {/* Type + status */}
                       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8, flexWrap:"wrap" }}>
                         <span style={{ fontSize:20 }}>{pt?.icon||"📝"}</span>
                         <span style={{ fontSize:14, fontWeight:800, color:"#0f172a" }}>{perm.typeLabel||pt?.label||perm.type}</span>
                         <Badge label={s}/>
                       </div>
-
-                      {/* Date + time range */}
                       <div style={{ display:"flex", gap:14, flexWrap:"wrap", marginBottom:6 }}>
                         <span style={{ fontSize:12, color:"#64748b" }}>📅 <strong>{perm.date||"—"}</strong></span>
                         {perm.fromTime && perm.toTime && (
-                          <span style={{ fontSize:12, color:"#64748b" }}>
-                            🕐 <strong>{perm.fromTime}</strong> → <strong>{perm.toTime}</strong>
-                          </span>
+                          <span style={{ fontSize:12, color:"#64748b" }}>🕐 <strong>{perm.fromTime}</strong> → <strong>{perm.toTime}</strong></span>
                         )}
                       </div>
-
-                      {/* Reason */}
                       {perm.reason && (
-                        <div style={{ fontSize:12, color:"#374151", background:"#fff", borderRadius:8, padding:"8px 12px", border:"1px solid #e2e8f0", marginBottom:6 }}>
-                          💬 {perm.reason}
-                        </div>
+                        <div style={{ fontSize:12, color:"#374151", background:"#fff", borderRadius:8, padding:"8px 12px", border:"1px solid #e2e8f0", marginBottom:6 }}>💬 {perm.reason}</div>
                       )}
-                      {perm.appliedOn && (
-                        <div style={{ fontSize:11, color:"#94a3b8" }}>Applied: {new Date(perm.appliedOn).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</div>
-                      )}
-
-                      {/* Manager note */}
+                      {perm.appliedOn && <div style={{ fontSize:11, color:"#94a3b8" }}>Applied: {new Date(perm.appliedOn).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</div>}
                       {perm.managerNote && (
                         <div style={{ marginTop:8, fontSize:12, color:s==="rejected"?"#ef4444":"#10b981", background:s==="rejected"?"#fef2f2":"#f0fdf4", borderRadius:8, padding:"8px 12px", border:`1px solid ${s==="rejected"?"#fecaca":"#bbf7d0"}` }}>
                           🗒 Manager: {perm.managerNote}
@@ -822,8 +1115,6 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                         </div>
                       )}
                     </div>
-
-                    {/* Right side: status circle + cancel */}
                     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:8, minWidth:60 }}>
                       <div style={{ width:36, height:36, borderRadius:"50%", background:`${sc2}18`, border:`2px solid ${sc2}40`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>{statusIcon(s)}</div>
                       <div style={{ fontSize:10, fontWeight:700, color:sc2, textTransform:"uppercase", letterSpacing:0.5 }}>{s}</div>
@@ -964,7 +1255,7 @@ export default function EmployeeDashboard({ user, setUser }) {
           .emp-sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;height:100vh!important;}
           .emp-sb-close{display:none!important;} .emp-sb-spacer{display:none!important;} .emp-mob-bar{display:none!important;}
         }
-        @media(max-width:900px){.two-col{grid-template-columns:1fr!important;}}
+        @media(max-width:900px){.two-col{grid-template-columns:1fr!important;} .att-split{grid-template-columns:1fr!important;}}
         @media(max-width:768px){
           .emp-sb-spacer{display:none!important;} .main-pad{padding:14px!important;}
           .stat-grid{grid-template-columns:repeat(2,1fr)!important;}
@@ -982,10 +1273,6 @@ export default function EmployeeDashboard({ user, setUser }) {
           <span style={{ fontWeight:800, fontSize:14, color:"#0f172a" }}>M Business</span>
           <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12 }}>{(empName||"E").slice(0,2).toUpperCase()}</div>
         </div>
-        <div style={{ background:"#fff", borderBottom:"1px solid #f1f5f9", padding:"14px 28px" }}>
-          <h2 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:0 }}>{currentNav.icon} {currentNav.label}</h2>
-          <p style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>{empName||"Employee"} · Employee Portal</p>
-        </div>
         <div className="main-pad" style={{ flex:1, padding:"24px 28px", overflowY:"auto" }}>
           {page==="dashboard"  && <DashboardPage  user={resolvedUser} projects={projects} tasks={tasks} attendance={attendance} salary={salary} setPage={setPage}/>}
           {page==="projects"   && <ProjectsPage   projects={projects}/>}
@@ -994,6 +1281,11 @@ export default function EmployeeDashboard({ user, setUser }) {
           {page==="salary"     && <SalaryPage     salary={salary} user={resolvedUser}/>}
         </div>
       </div>
+      <EmployeeProfilePanel
+  empName={empName}
+  user={resolvedUser}
+  notify={notify}
+/>
       <Toast msg={toast} type={toastType}/>
     </div>
   );

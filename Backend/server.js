@@ -21,9 +21,9 @@ const eventRoutes         = require("./routes/eventroutes");
 const accountRoutes       = require("./routes/accountroutes");
 const reportRoutes        = require("./routes/reportroutes");
 const uploadRoutes        = require("./routes/uploadroutes");
-const employeeDashRoutes  = require("./routes/employeedashboardroutes");
+const employeeDashRoutes    = require("./routes/employeedashboardroutes");
 const QuotationRoutes  = require("./routes/quotationroutes");
-const interviewRoutes = require("./routes/interviews");
+const interviewRoutes = require("./routes/interviewroutes");
 
 // Static files (local resume storage)
 const path = require("path");
@@ -47,7 +47,7 @@ app.use("/api/reports",            reportRoutes);
 app.use("/api/upload",             uploadRoutes);
 app.use("/api/employee-dashboard", employeeDashRoutes);
 app.use("/api/quotations",         QuotationRoutes);
-
+app.use("/uploads", express.static("uploads"));
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB Connected");

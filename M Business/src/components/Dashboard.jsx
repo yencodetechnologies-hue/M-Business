@@ -4,18 +4,18 @@ import axios from "axios";
 import InvoiceCreator from "./InvoiceCreator";
 import TaskPage from "./TaskPage";
 import CalendarPage from "./CalendarPage";
-import AccountsPage from "./AccountsPage";
+import AccountsPage, { ExpensesPage } from "./AccountsPage";
 import ReportsPage  from "./ReportsPage";
 import QuotationCreator   from "./QuotationCreator";
-
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { QRCodeSVG } from "qrcode.react";
+import { SubAdminDocumentsPage } from "./EmployeeProfile";
+
 
 const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"#9333ea",bg:"#f5f3ff",card:"#FFFFFF",text:"#1e0a3c",muted:"#7c3aed",border:"#ede9fe"};
-const QUOTATIONS=[{id:"QT001",client:"TechNova Pvt Ltd",project:"Website Redesign",final:"₹2,59,600",date:"2024-01-25",expiry:"2024-02-25",status:"Approved"},{id:"QT002",client:"Bloom Creatives",project:"Mobile App Dev",final:"₹5,31,000",date:"2024-03-01",expiry:"2024-03-31",status:"Sent"},{id:"QT003",client:"Infra Solutions",project:"ERP Integration",final:"₹8,49,600",date:"2024-01-05",expiry:"2024-01-20",status:"Rejected"}];
-const INVOICES=[{id:"INV001",client:"TechNova Pvt Ltd",project:"Website Redesign",date:"2024-04-01",due:"2024-04-30",total:"₹1,47,500",status:"Paid"},{id:"INV002",client:"Infra Solutions",project:"ERP Integration",date:"2024-05-01",due:"2024-05-15",total:"₹4,24,800",status:"Overdue"},{id:"INV003",client:"Bloom Creatives",project:"Mobile App Dev",date:"2024-05-10",due:"2024-06-10",total:"₹1,18,000",status:"Pending"}];
 const TRACKING_SEED=[{id:"PRJ001",name:"Website Redesign",client:"TechNova Pvt Ltd",deadline:"2024-05-30",pct:65,status:"In Progress",note:"Design done, dev ongoing"},{id:"PRJ002",name:"Mobile App Dev",client:"Bloom Creatives",deadline:"2024-08-15",pct:15,status:"Pending",note:"Requirements gathering"},{id:"PRJ003",name:"ERP Integration",client:"Infra Solutions",deadline:"2024-04-30",pct:100,status:"Completed",note:"Signed off by client"}];
-const ACCOUNTS=[{id:"ACC001",name:"Arjun Sharma",email:"arjun@gmail.com",role:"Client",joined:"2024-01-15",status:"Active"},{id:"ACC002",name:"Priya Nair",email:"priya@gmail.com",role:"Client",joined:"2024-02-20",status:"Active"},{id:"ACC003",name:"Ravi Mehta",email:"ravi@gmail.com",role:"Client",joined:"2024-03-10",status:"Inactive"},{id:"ACC004",name:"Kiran Dev",email:"kiran@gmail.com",role:"Employee",joined:"2024-01-05",status:"Active"},{id:"ACC005",name:"Meena Raj",email:"meena@gmail.com",role:"Employee",joined:"2024-02-01",status:"Active"}];
+const INVOICES=[{id:"INV001",client:"TechNova Pvt Ltd",project:"Website Redesign",date:"2024-04-01",due:"2024-04-30",total:"₹1,47,500",status:"Paid"},{id:"INV002",client:"Infra Solutions",project:"ERP Integration",date:"2024-05-01",due:"2024-05-15",total:"₹4,24,800",status:"Overdue"},{id:"INV003",client:"Bloom Creatives",project:"Mobile App Dev",date:"2024-05-10",due:"2024-06-10",total:"₹1,18,000",status:"Pending"}];
 
 const NAV=[
   {key:"dashboard",icon:"🏠",label:"Dashboard"},
@@ -30,6 +30,7 @@ const NAV=[
   {key:"calendar",icon:"📅",label:"Calendar"},
   {key:"accounts",icon:"👤",label:"Accounts"},
   {key:"interviews",icon:"🎯",label:"Interviews"},
+   {key:"documents",icon:"📂",label:"Documents"}, 
   {key:"reports",icon:"📈",label:"Reports"}
 ];
 
@@ -37,10 +38,10 @@ function getNavForRole(role){
   const r=(role||"").toLowerCase().trim();
   if(r==="subadmin"||r==="sub_admin"||r==="sub-admin")
     return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","interviews","reports"].includes(n.key));
-  if(r==="manager")
-    return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
-  if(r==="employee")
-    return NAV.filter(n=>["dashboard","tasks","calendar"].includes(n.key));
+  // if(r==="manager")
+  //   return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
+  // if(r==="employee")
+  //   return NAV.filter(n=>["dashboard","tasks","calendar"].includes(n.key));
   return NAV;
 }
 
@@ -60,55 +61,6 @@ function SC({title,children,action}){
   );
 }
 
-function Tbl({cols,rows}){
-  return(
-    <div style={{overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
-      <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:500}}>
-        <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
-          {cols.map(c=><th key={c} style={{padding:"10px 14px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>)}
-        </tr></thead>
-        <tbody>
-          {rows.length===0
-            ?<tr><td colSpan={cols.length} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No results found</td></tr>
-            :rows.map((row,i)=>(
-              <tr key={i} style={{borderBottom:"1px solid #f3f0ff"}}
-                onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
-                onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                {row.map((cell,j)=><td key={j} style={{padding:"12px 14px",color:T.text,whiteSpace:"nowrap"}}>{cell}</td>)}
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function Mdl({title,onClose,children}){
-  return(
-    <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}}>
-      <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:820,maxHeight:"90vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(147,51,234,0.25)"}}>
-        <div style={{padding:"16px 22px",borderBottom:"1px solid #ede9fe",display:"flex",justifyContent:"space-between",alignItems:"center",background:"linear-gradient(90deg,#f5f3ff,#faf5ff)",flexShrink:0}}>
-          <h2 style={{margin:0,fontSize:17,fontWeight:800,color:T.text}}>{title}</h2>
-          <button onClick={onClose} style={{background:"none",border:"none",fontSize:20,cursor:"pointer",color:"#7c3aed",padding:"4px 8px"}}>✕</button>
-        </div>
-        <div style={{overflowY:"auto",padding:"20px 22px",flex:1}}>{children}</div>
-      </div>
-    </div>
-  );
-}
-
-function Fld({label,value,onChange,options,type="text",error,placeholder}){
-  const s={width:"100%",border:`1.5px solid ${error?"#EF4444":"#ede9fe"}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:T.text,background:"#faf5ff",boxSizing:"border-box",outline:"none",fontFamily:"inherit"};
-  return(
-    <div style={{marginBottom:14}}>
-      <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>{label.toUpperCase()}</label>
-      {options?<select value={value} onChange={e=>onChange(e.target.value)} style={s}>{options.map(o=><option key={o}>{o}</option>)}</select>
-        :<input type={type} value={value} onChange={e=>onChange(e.target.value)} style={s} placeholder={placeholder||""}/>}
-      {error&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {error}</div>}
-    </div>
-  );
-}
-
 function Search({value,onChange,placeholder}){
   return(
     <div style={{position:"relative",marginBottom:16}}>
@@ -119,45 +71,67 @@ function Search({value,onChange,placeholder}){
   );
 }
 
-function SearchDropdown({label,items,displayKey,value,onChange,error,placeholder}){
-  const [open,setOpen]=useState(false);
-  const [search,setSearch]=useState("");
-  const filtered=items.filter(i=>(i[displayKey]||"").toLowerCase().includes(search.toLowerCase()));
+function Mdl({title,onClose,children,maxWidth=820}){
   return(
-    <div style={{marginBottom:14,position:"relative"}}>
-      <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>{label.toUpperCase()}</label>
-      <div onClick={()=>setOpen(!open)} style={{width:"100%",border:`1.5px solid ${error?"#EF4444":open?"#9333ea":"#ede9fe"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"#a78bfa",background:"#faf5ff",cursor:"pointer",position:"relative",userSelect:"none",minHeight:42,boxSizing:"border-box"}}>
-        {value||placeholder||"-- Select --"}
-        <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"#a78bfa",transition:"0.2s"}}>▼</span>
-      </div>
-      {open&&(
-        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,boxShadow:"0 8px 32px rgba(147,51,234,0.15)",zIndex:999,overflow:"hidden"}}>
-          <div style={{padding:"8px 10px"}}>
-            <input autoFocus placeholder="Search..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()}
-              style={{width:"100%",padding:"7px 10px",border:"1.5px solid #ede9fe",borderRadius:8,fontSize:12,background:"#faf5ff",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/>
-          </div>
-          <div style={{maxHeight:180,overflowY:"auto"}}>
-            {filtered.length===0
-              ?<div style={{padding:14,textAlign:"center",color:"#a78bfa",fontSize:13}}>No results</div>
-              :filtered.map((item,i)=>{
-                const name=item[displayKey]||"";
-                const isSel=value===name;
-                return(
-                  <div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}}
-                    style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"#f3e8ff":"transparent",borderBottom:"1px solid #f5f3ff"}}
-                    onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
-                    onMouseLeave={e=>e.currentTarget.style.background=isSel?"#f3e8ff":"transparent"}>
-                    <div style={{width:26,height:26,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{name[0]?.toUpperCase()||"?"}</div>
-                    <span style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</span>
-                    {isSel&&<span style={{marginLeft:"auto",color:"#9333ea"}}>✓</span>}
-                  </div>
-                );
-              })}
-          </div>
+    <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}}>
+      <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth,maxHeight:"90vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(147,51,234,0.25)"}}>
+        <div style={{padding:"16px 22px",borderBottom:"1px solid #ede9fe",display:"flex",justifyContent:"space-between",alignItems:"center",background:"linear-gradient(90deg,#f5f3ff,#faf5ff)",flexShrink:0}}>
+          <h2 style={{margin:0,fontSize:17,fontWeight:800,color:T.text}}>{title}</h2>
+          <button onClick={onClose} style={{background:"none",border:"none",fontSize:20,cursor:"pointer",color:"#7c3aed",padding:"4px 8px"}}>✕</button>
         </div>
-      )}
-      {open&&<div style={{position:"fixed",inset:0,zIndex:998}} onClick={()=>{setOpen(false);setSearch("");}}/>}
+        <div style={{overflowY:"auto",padding:"20px 22px",flex:1}}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function Fld({label,value,onChange,options,type="text",error,placeholder,disabled}){
+  const s={width:"100%",border:`1.5px solid ${error?"#EF4444":"#ede9fe"}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:T.text,background:disabled?"#f3f0ff":"#faf5ff",boxSizing:"border-box",outline:"none",fontFamily:"inherit",opacity:disabled?0.7:1};
+  return(
+    <div style={{marginBottom:14}}>
+      <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>{label.toUpperCase()}</label>
+      {options?<select value={value} onChange={e=>onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o=><option key={o}>{o}</option>)}</select>
+        :<input type={type} value={value} onChange={e=>onChange(e.target.value)} style={s} placeholder={placeholder||""} disabled={disabled}/>}
       {error&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {error}</div>}
+    </div>
+  );
+}
+
+function ConfirmModal({title,message,onConfirm,onCancel,confirmLabel="Delete",danger=true}){
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.6)",backdropFilter:"blur(8px)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div style={{background:"#fff",borderRadius:18,width:"100%",maxWidth:400,padding:"28px 28px 22px",boxShadow:"0 32px 80px rgba(147,51,234,0.25)"}}>
+        <div style={{width:52,height:52,borderRadius:"50%",background:danger?"#fee2e2":"#f0fdf4",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,margin:"0 auto 14px"}}>
+          {danger?"🗑️":"✅"}
+        </div>
+        <h3 style={{textAlign:"center",margin:"0 0 8px",fontSize:16,fontWeight:800,color:T.text}}>{title}</h3>
+        <p style={{textAlign:"center",color:"#6b7280",fontSize:13,margin:"0 0 22px"}}>{message}</p>
+        <div style={{display:"flex",gap:10}}>
+          <button onClick={onCancel} style={{flex:1,padding:"10px",background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:10,fontSize:13,fontWeight:600,color:T.text,cursor:"pointer",fontFamily:"inherit"}}>Cancel</button>
+          <button onClick={onConfirm} style={{flex:1,padding:"10px",background:danger?"linear-gradient(135deg,#EF4444,#dc2626)":"linear-gradient(135deg,#22C55E,#16a34a)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>{confirmLabel}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Action Buttons (View / Edit / Delete) ────────────────────
+function ActionBtns({onView,onEdit,onDelete}){
+  return(
+    <div style={{display:"flex",gap:5,flexWrap:"nowrap"}}>
+      {onView&&<button onClick={onView} title="View" style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.3)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#6366f1",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>👁 View</button>}
+      <button onClick={onEdit} title="Edit" style={{background:"rgba(147,51,234,0.1)",border:"1px solid rgba(147,51,234,0.3)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#9333ea",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>✏️ Edit</button>
+      <button onClick={onDelete} title="Delete" style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>🗑 Del</button>
+    </div>
+  );
+}
+
+function InfoRow({icon,label,value}){
+  if(!value) return null;
+  return(
+    <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#faf5ff",borderRadius:9,border:"1px solid #ede9fe",marginBottom:7}}>
+      <div style={{width:32,height:32,borderRadius:8,background:"rgba(147,51,234,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{icon}</div>
+      <div><div style={{fontSize:10,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,textTransform:"uppercase"}}>{label}</div><div style={{fontSize:13,fontWeight:600,color:"#1e0a3c",marginTop:1}}>{value}</div></div>
     </div>
   );
 }
@@ -176,10 +150,7 @@ function ClientDropdown({clients,value,onChange,error,onAddClient}){
       {open&&(
         <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,boxShadow:"0 8px 32px rgba(147,51,234,0.15)",zIndex:999,overflow:"hidden"}}>
           <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid #ede9fe",borderRadius:8,fontSize:12,background:"#faf5ff",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
-          <div onClick={()=>{setOpen(false);setSearch("");onAddClient&&onAddClient();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,#f3e8ff,#faf5ff)",borderBottom:"2px solid #ede9fe"}} onMouseEnter={e=>e.currentTarget.style.background="#ede9fe"} onMouseLeave={e=>e.currentTarget.style.background="linear-gradient(90deg,#f3e8ff,#faf5ff)"}>
-            <div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div>
-            <div><div style={{fontSize:13,fontWeight:700,color:"#9333ea"}}>Add New Client</div><div style={{fontSize:11,color:"#a78bfa"}}>Create a new client profile</div></div>
-          </div>
+          {onAddClient&&<div onClick={()=>{setOpen(false);setSearch("");onAddClient();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,#f3e8ff,#faf5ff)",borderBottom:"2px solid #ede9fe"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"#9333ea"}}>Add New Client</div></div></div>}
           <div style={{maxHeight:180,overflowY:"auto"}}>
             {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"#a78bfa",fontSize:13}}>No clients found</div>
               :filtered.map((c,i)=>{const name=c.clientName||c.name||"";const company=c.companyName||c.company||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"#f3e8ff":"transparent",borderBottom:"1px solid #f5f3ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"#f3e8ff":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div>{company&&<div style={{fontSize:11,color:"#a78bfa"}}>{company}</div>}</div>{isSel&&<span style={{fontSize:14,color:"#9333ea"}}>✓</span>}</div>);})}
@@ -191,311 +162,664 @@ function ClientDropdown({clients,value,onChange,error,onAddClient}){
   );
 }
 
-function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
-  const logoRef=useRef();
-  const displayName=user?.name||user?.email?.split("@")[0]||"Admin";
-  const initials=displayName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
-  return(
-    <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.6)",backdropFilter:"blur(10px)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:16}} onClick={onClose}>
-      <div style={{background:"#fff",borderRadius:22,width:"100%",maxWidth:420,maxHeight:"90vh",boxShadow:"0 32px 80px rgba(147,51,234,0.3)",display:"flex",flexDirection:"column",overflow:"hidden"}} onClick={e=>e.stopPropagation()}>
-        <div style={{background:"linear-gradient(135deg,#7c3aed,#a855f7,#c084fc)",padding:"28px 28px 22px",textAlign:"center",flexShrink:0}}>
-          <button onClick={onClose} style={{position:"absolute",top:14,right:14,background:"rgba(255,255,255,0.2)",border:"none",width:30,height:30,borderRadius:8,color:"#fff",fontSize:16,cursor:"pointer"}}>✕</button>
-          <div style={{width:72,height:72,borderRadius:16,background:"rgba(255,255,255,0.22)",border:"3px solid rgba(255,255,255,0.45)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",overflow:"hidden"}}>
-            {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:5,background:"#fff"}}/>:<span style={{fontSize:24,fontWeight:800,color:"#fff"}}>{initials}</span>}
-          </div>
-          <h2 style={{margin:0,fontSize:18,fontWeight:800,color:"#fff"}}>{displayName}</h2>
-          <p style={{margin:"4px 0 0",fontSize:12,color:"rgba(255,255,255,0.65)"}}>{user?.email||"—"}</p>
-          <span style={{display:"inline-block",marginTop:8,background:"rgba(255,255,255,0.18)",border:"1px solid rgba(255,255,255,0.28)",borderRadius:100,padding:"3px 12px",fontSize:10,fontWeight:700,color:"#fff",letterSpacing:1,textTransform:"uppercase"}}>{user?.role||"user"}</span>
-        </div>
-        <div style={{padding:"18px 24px",overflowY:"auto",flex:1}}>
-          {[{icon:"👤",label:"Full Name",value:displayName},{icon:"📧",label:"Email",value:user?.email||"—"},{icon:"📱",label:"Phone",value:user?.phone||"—"},{icon:"🎭",label:"Role",value:user?.role||"user"},{icon:"🔑",label:"User ID",value:(user?.id||user?._id)?`#${String(user?.id||user?._id).slice(-8).toUpperCase()}`:"—"}].map(({icon,label,value})=>(
-            <div key={label} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#faf5ff",borderRadius:9,border:"1px solid #ede9fe",marginBottom:7}}>
-              <div style={{width:32,height:32,borderRadius:8,background:"rgba(147,51,234,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{icon}</div>
-              <div><div style={{fontSize:10,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,textTransform:"uppercase"}}>{label}</div><div style={{fontSize:13,fontWeight:600,color:"#1e0a3c",marginTop:1}}>{value}</div></div>
-            </div>
-          ))}
-        </div>
-        <div style={{padding:"12px 24px 18px",borderTop:"1px solid #ede9fe",flexShrink:0}}>
-          <div style={{display:"flex",gap:10}}>
-            <button onClick={onClose} style={{flex:1,padding:"10px",background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:9,fontSize:13,fontWeight:600,color:"#1e0a3c",cursor:"pointer",fontFamily:"inherit"}}>Close</button>
-            <button onClick={()=>logoRef.current.click()} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:9,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>📷 Upload Logo</button>
-            <button onClick={onLogout} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:9,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🚪 Logout</button>
-          </div>
-        </div>
-        <input ref={logoRef} type="file" accept="image/*" style={{display:"none"}}
-          onChange={async(e)=>{const file=e.target.files[0];if(!file)return;const formData=new FormData();formData.append("file",file);try{const cloudRes=await axios.post("http://localhost:5000/api/upload/logo",formData);const uploadedUrl=cloudRes.data.logoUrl;await axios.post("http://localhost:5000/api/auth/save-logo",{userId:user.id||user._id,logoUrl:uploadedUrl});const updatedUser={...user,logoUrl:uploadedUrl};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);onLogoChange(uploadedUrl);}catch(err){console.error(err);alert("Upload failed!");}}}
-        />
-      </div>
-    </div>
-  );
-}
-
-function Sidebar({active,setActive,onLogout,open,onClose,navItems}){
-  const items=navItems||NAV;
-  return(
-    <>
-      {open&&<div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:998,display:"block"}} className="mob-overlay"/>}
-      <div style={{width:225,background:"linear-gradient(180deg,#1e0a3c 0%,#2d1057 60%,#1e0a3c 100%)",color:"#fff",display:"flex",flexDirection:"column",height:"100vh",position:"fixed",top:0,left:0,zIndex:999,flexShrink:0,overflow:"hidden",boxShadow:"4px 0 24px rgba(0,0,0,0.25)",transform:open?"translateX(0)":"translateX(-100%)",transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)"}} className="sidebar">
-        <div style={{position:"absolute",width:140,height:140,borderRadius:"50%",background:"radial-gradient(circle,rgba(168,85,247,0.18),transparent)",top:-40,right:-40,pointerEvents:"none"}}/>
-        <div style={{padding:"18px 16px 14px",borderBottom:"1px solid rgba(255,255,255,0.08)",position:"relative",zIndex:1,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{width:36,height:36,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:11,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:17,color:"#fff",boxShadow:"0 4px 14px rgba(147,51,234,0.5)"}}>M</div>
-            <div><div style={{fontWeight:800,fontSize:14,color:"#fff"}}>M Business</div><div style={{fontSize:8,color:"rgba(255,255,255,0.35)",letterSpacing:1.5,marginTop:1}}>MANAGEMENT SUITE</div></div>
-          </div>
-          <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(255,255,255,0.4)",fontSize:18,cursor:"pointer",padding:"2px 6px",lineHeight:1}} className="sidebar-close">✕</button>
-        </div>
-        <nav style={{flex:1,minHeight:0,padding:"10px 8px",overflowY:"auto",position:"relative",zIndex:1}}>
-          {items.map(n=>{const on=active===n.key;return(<button key={n.key} onClick={()=>{setActive(n.key);onClose();}} style={{width:"100%",display:"flex",alignItems:"center",gap:9,padding:"9px 12px",background:on?"linear-gradient(90deg,rgba(147,51,234,0.35),rgba(168,85,247,0.15))":"transparent",border:on?"1px solid rgba(168,85,247,0.35)":"1px solid transparent",borderRadius:11,color:on?"#e9d5ff":"rgba(255,255,255,0.45)",fontWeight:on?700:400,fontSize:12.5,cursor:"pointer",marginBottom:2,textAlign:"left",fontFamily:"inherit"}}><span style={{fontSize:15}}>{n.icon}</span><span style={{flex:1}}>{n.label}</span>{on&&<div style={{width:5,height:5,borderRadius:"50%",background:"#c084fc",flexShrink:0}}/>}</button>);})}
-        </nav>
-        <div style={{padding:"10px 8px 14px",borderTop:"1px solid rgba(255,255,255,0.07)",position:"relative",zIndex:1,flexShrink:0}}>
-          <button onClick={onLogout} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:9,padding:"10px 12px",background:"rgba(239,68,68,0.15)",border:"1px solid rgba(239,68,68,0.35)",borderRadius:11,color:"#fca5a5",fontSize:12.5,cursor:"pointer",fontWeight:700,fontFamily:"inherit"}}>🚪 Logout</button>
-        </div>
-      </div>
-      <div className="sidebar-spacer" style={{width:225,flexShrink:0}}/>
-    </>
-  );
-}
-
 // ═══════════════════════════════════════════════════════════
-// INTERVIEW PAGE COMPONENT
+// CLIENTS PAGE
 // ═══════════════════════════════════════════════════════════
-function InterviewPage({companyId,companyName}){
-  const STORAGE_KEY=`hr_candidates_${companyId||"default"}`;
-  const [candidates,setCandidates]=useState([]);
-  const [filter,setFilter]=useState("all");
+function ClientsPage({clients,setClients,onAddClient}){
   const [search,setSearch]=useState("");
-  const [viewModal,setViewModal]=useState(null);
+  const [viewClient,setViewClient]=useState(null);
+  const [editClient,setEditClient]=useState(null);
+  const [deleteTarget,setDeleteTarget]=useState(null);
+  const [editForm,setEditForm]=useState({});
+  const [editErr,setEditErr]=useState({});
+  const [saving,setSaving]=useState(false);
   const [toast,setToast]=useState("");
-  const [linkCopied,setLinkCopied]=useState(false);
-
-  useEffect(()=>{
-    // Load from localStorage
-    const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
-    setCandidates(saved);
-    // Try API too
-    axios.get(`http://localhost:5000/api/interviews?companyId=${companyId||"default"}`).then(r=>{
-      if(r.data?.length){setCandidates(r.data);localStorage.setItem(STORAGE_KEY,JSON.stringify(r.data));}
-    }).catch(()=>{});
-  },[companyId]);
-
-  const save=(list)=>{setCandidates(list);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));};
 
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
 
-  const appLink=`${window.location.origin}?apply=${companyId||"default"}`;
+  const filtered=clients.filter(c=>
+    (c.clientName||c.name||"").toLowerCase().includes(search.toLowerCase())||
+    (c.email||"").toLowerCase().includes(search.toLowerCase())||
+    (c.companyName||c.company||"").toLowerCase().includes(search.toLowerCase())
+  );
 
-  const copyLink=()=>{
-    navigator.clipboard.writeText(appLink).then(()=>{setLinkCopied(true);showToast("📋 Link copied!");setTimeout(()=>setLinkCopied(false),2000);});
+  const openEdit=(c)=>{
+    setEditForm({
+      clientName:c.clientName||c.name||"",
+      companyName:c.companyName||c.company||"",
+      email:c.email||"",
+      phone:c.phone||"",
+      address:c.address||"",
+      projectAssigned:c.projectAssigned||"",
+      status:c.status||"Active",
+    });
+    setEditErr({});
+    setEditClient(c);
   };
 
-  const updateStatus=(idx,val)=>{
-    const updated=[...candidates];
-    updated[idx]={...updated[idx],status:val};
-    save(updated);
-    // sync to API
-    const c=updated[idx];
-    if(c._id||c.id){
-      axios.put(`http://localhost:5000/api/interviews/${c._id||c.id}`,{status:val}).catch(()=>{});
-    }
-    showToast(`✅ Status updated to "${val}"`);
+  const saveEdit=async()=>{
+    const errs={};
+    if(!editForm.clientName.trim())errs.clientName="Name required";
+    if(!editForm.email.trim())errs.email="Email required";
+    if(Object.keys(errs).length){setEditErr(errs);return;}
+    try{
+      setSaving(true);
+      const res=await axios.put(`http://localhost:5000/api/clients/${editClient._id}`,editForm);
+      setClients(prev=>prev.map(c=>c._id===editClient._id?{...c,...(res.data.client||editForm)}:c));
+      setEditClient(null);
+      showToast("✅ Client updated!");
+    }catch(err){
+      // fallback local update
+      setClients(prev=>prev.map(c=>c._id===editClient._id?{...c,...editForm}:c));
+      setEditClient(null);
+      showToast("✅ Updated locally!");
+    }finally{setSaving(false);}
   };
 
-  const deleteCandidate=(idx)=>{
-    if(!window.confirm("Delete this candidate?"))return;
-    const c=candidates[idx];
-    if(c._id||c.id){axios.delete(`http://localhost:5000/api/interviews/${c._id||c.id}`).catch(()=>{});}
-    const updated=candidates.filter((_,i)=>i!==idx);
-    save(updated);
-    showToast("🗑️ Deleted!");
+  const doDelete=async()=>{
+    try{
+      await axios.delete(`http://localhost:5000/api/clients/${deleteTarget._id}`);
+    }catch{}
+    setClients(prev=>prev.filter(c=>c._id!==deleteTarget._id));
+    setDeleteTarget(null);
+    showToast("🗑️ Client deleted!");
   };
-
-  const downloadResume=(c)=>{
-    if(!c.resumeData){showToast("❗ Resume not available");return;}
-    const a=document.createElement("a");
-    a.href=c.resumeData;
-    a.download=c.resumeName||"resume.pdf";
-    a.click();
-    // if viewing for first time, auto-set pending if somehow unset
-    showToast("📄 Downloading resume...");
-  };
-
-  const displayed=candidates.filter(c=>{
-    const okFilter=filter==="all"||c.status===filter;
-    const q=search.toLowerCase();
-    const okSearch=!q||(c.name||"").toLowerCase().includes(q)||(c.role||"").toLowerCase().includes(q)||(c.email||"").toLowerCase().includes(q);
-    return okFilter&&okSearch;
-  });
-
-  const stats=[
-    {t:"Total",v:candidates.length,i:"🎯",c:"#9333ea"},
-    {t:"Pending",v:candidates.filter(c=>c.status==="pending").length,i:"⏳",c:"#F59E0B"},
-    {t:"Hired",v:candidates.filter(c=>c.status==="hired").length,i:"✅",c:"#22C55E"},
-    {t:"Rejected",v:candidates.filter(c=>c.status==="rejected").length,i:"❌",c:"#EF4444"},
-  ];
-
-  const statusLabel={pending:"⏳ Pending",hired:"✅ Hired",rejected:"❌ Rejected"};
-  const formatDate=(iso)=>{if(!iso)return"—";return new Date(iso).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});};
 
   return(
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",flexDirection:"column",gap:14}}>
       {toast&&<div style={{position:"fixed",bottom:24,right:24,zIndex:9999,background:"#fff",border:"1.5px solid #22c55e",borderRadius:12,padding:"12px 20px",fontSize:13,fontWeight:700,color:"#22c55e",boxShadow:"0 8px 24px rgba(0,0,0,0.12)"}}>{toast}</div>}
 
-      {/* Application Link Banner */}
-      <div style={{background:"linear-gradient(135deg,#1e0a3c,#2d1057)",borderRadius:16,padding:"20px 24px",display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",boxShadow:"0 8px 24px rgba(59,7,100,0.25)"}}>
-        <div style={{width:42,height:42,borderRadius:12,background:"rgba(147,51,234,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🔗</div>
-        <div style={{flex:1,minWidth:0}}>
-          <div style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:4}}>Candidate Application Link</div>
-          <div style={{fontSize:13,color:"#c084fc",fontFamily:"monospace",wordBreak:"break-all"}}>{appLink}</div>
-        </div>
-        <div style={{display:"flex",gap:8,flexShrink:0}}>
-          <button onClick={copyLink} style={{background:linkCopied?"rgba(34,197,94,0.2)":"rgba(147,51,234,0.25)",border:`1px solid ${linkCopied?"rgba(34,197,94,0.5)":"rgba(147,51,234,0.5)"}`,borderRadius:9,padding:"9px 16px",color:linkCopied?"#4ade80":"#c084fc",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s"}}>
-            {linkCopied?"✅ Copied!":"📋 Copy Link"}
-          </button>
-          <button onClick={()=>window.open(appLink,"_blank")} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:9,padding:"9px 16px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
-            👁 Preview Form
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="dash-stats" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
-        {stats.map(({t,v,i,c})=>(
-          <div key={t} style={{background:"#fff",borderRadius:14,padding:"18px 16px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",position:"relative",overflow:"hidden"}}>
-            <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${c},${c}88)`}}/>
-            <div style={{width:38,height:38,borderRadius:10,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,marginBottom:8}}>{i}</div>
-            <div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5,marginBottom:2}}>{t.toUpperCase()}</div>
-            <div style={{fontSize:26,fontWeight:800,color:c}}>{v}</div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+        {[{t:"Total Clients",v:clients.length,i:"👥",c:"#9333ea"},{t:"Active",v:clients.filter(c=>c.status==="Active").length,i:"✅",c:"#22C55E"},{t:"Inactive",v:clients.filter(c=>c.status==="Inactive").length,i:"⛔",c:"#EF4444"}].map(({t,v,i,c})=>(
+          <div key={t} style={{background:"#fff",borderRadius:14,padding:"16px 14px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:40,height:40,borderRadius:11,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{i}</div>
+            <div><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5}}>{t.toUpperCase()}</div><div style={{fontSize:24,fontWeight:800,color:c}}>{v}</div></div>
           </div>
         ))}
       </div>
 
-      {/* Table */}
-      <SC title={`All Candidates (${displayed.length})`}>
-        {/* Filters + Search */}
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,flexWrap:"wrap"}}>
-          <div style={{position:"relative",flex:1,minWidth:180}}>
-            <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>🔍</span>
-            <input placeholder="Search name, role, email..." value={search} onChange={e=>setSearch(e.target.value)}
-              style={{width:"100%",padding:"9px 14px 9px 34px",border:"1.5px solid #ede9fe",borderRadius:10,fontSize:13,background:"#faf5ff",outline:"none",fontFamily:"inherit",color:T.text,boxSizing:"border-box"}}/>
-          </div>
-          {["all","pending","hired","rejected"].map(f=>(
-            <button key={f} onClick={()=>setFilter(f)} style={{padding:"7px 14px",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",border:"1.5px solid",borderColor:filter===f?sc(f==="all"?"Active":f):"#ede9fe",background:filter===f?`${sc(f==="all"?"Active":f)}15`:"#fff",color:filter===f?sc(f==="all"?"Active":f):"#a78bfa",transition:"all 0.15s"}}>
-              {f==="all"?"All":f.charAt(0).toUpperCase()+f.slice(1)}
-            </button>
-          ))}
+      <SC title={`All Clients (${filtered.length})`}>
+        <Search value={search} onChange={setSearch} placeholder="Search by name, email, company..."/>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:700}}>
+            <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
+              {["#","Name","Company","Email","Phone","Status","Joined","Actions"].map(c=>(
+                <th key={c} style={{padding:"10px 14px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {filtered.length===0?<tr><td colSpan={8} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No clients found</td></tr>
+                :filtered.map((c,i)=>(
+                  <tr key={c._id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`CLT${String(i+1).padStart(3,"0")}`}</td>
+                    <td style={{padding:"12px 14px"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8}}>
+                        <div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(c.clientName||c.name||"?")[0].toUpperCase()}</div>
+                        <span style={{fontWeight:700,color:T.text}}>{c.clientName||c.name||"—"}</span>
+                      </div>
+                    </td>
+                    <td style={{padding:"12px 14px",color:"#7c3aed"}}>{c.companyName||c.company||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{c.email||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{c.phone||"—"}</td>
+                    <td style={{padding:"12px 14px"}}><Badge label={c.status||"Active"}/></td>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:12}}>{c.createdAt?new Date(c.createdAt).toLocaleDateString():"—"}</td>
+                    <td style={{padding:"12px 14px"}}>
+                      <ActionBtns
+                        onView={()=>setViewClient(c)}
+                        onEdit={()=>openEdit(c)}
+                        onDelete={()=>setDeleteTarget(c)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
         </div>
-
-        {displayed.length===0?(
-          <div style={{textAlign:"center",padding:"50px 20px",color:"#a78bfa"}}>
-            <div style={{fontSize:48,marginBottom:12}}>📭</div>
-            <div style={{fontSize:16,fontWeight:700,color:T.text,marginBottom:6}}>
-              {candidates.length===0?"No applications yet":"No results found"}
-            </div>
-            <div style={{fontSize:13}}>{candidates.length===0?"Share the link above to start receiving applications":""}</div>
-          </div>
-        ):(
-          <div style={{overflowX:"auto"}}>
-            <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:900}}>
-              <thead>
-                <tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
-                  {["Candidate","Email","Mobile","Experience","Role","Status","Applied Date","Resume","Actions"].map(c=>(
-                    <th key={c} style={{padding:"10px 12px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {displayed.map((c,i)=>{
-                  const idx=candidates.indexOf(c);
-                  return(
-                    <tr key={c._id||c.id||i} style={{borderBottom:"1px solid #f3f0ff"}}
-                      onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
-                      onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                      {/* Candidate */}
-                      <td style={{padding:"12px 12px"}}>
-                        <div style={{display:"flex",alignItems:"center",gap:8}}>
-                          <div style={{width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(c.name||"?")[0].toUpperCase()}</div>
-                          <div>
-                            <div style={{fontWeight:700,color:T.text,fontSize:13}}>{c.name||"—"}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{padding:"12px 12px",color:"#7c3aed",fontSize:12}}>{c.email||"—"}</td>
-                      <td style={{padding:"12px 12px",fontSize:12,color:T.text}}>{c.mobile||"—"}</td>
-                      {/* Experience */}
-                      <td style={{padding:"12px 12px"}}>
-                        {c.experience==="Fresher"
-                          ?<span style={{background:"rgba(34,197,94,0.12)",color:"#22C55E",border:"1px solid rgba(34,197,94,0.25)",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>🎓 Fresher</span>
-                          :<span style={{background:"rgba(147,51,234,0.12)",color:"#9333ea",border:"1px solid rgba(147,51,234,0.25)",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>💼 {c.years||"?"}y Exp</span>
-                        }
-                      </td>
-                      <td style={{padding:"12px 12px",fontWeight:600,color:T.text,fontSize:12,maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.role||"—"}</td>
-                      {/* Status dropdown */}
-                      <td style={{padding:"12px 12px"}}>
-                        <select value={c.status||"pending"} onChange={e=>updateStatus(idx,e.target.value)}
-                          style={{background:c.status==="hired"?"rgba(34,197,94,0.1)":c.status==="rejected"?"rgba(239,68,68,0.1)":"rgba(245,158,11,0.1)",border:`1.5px solid ${sc(c.status||"pending")}44`,borderRadius:8,padding:"5px 10px",color:sc(c.status||"pending"),fontSize:12,fontWeight:700,cursor:"pointer",outline:"none",fontFamily:"inherit"}}>
-                          <option value="pending">⏳ Pending</option>
-                          <option value="hired">✅ Hired</option>
-                          <option value="rejected">❌ Rejected</option>
-                        </select>
-                      </td>
-                      <td style={{padding:"12px 12px",fontSize:12,color:"#a78bfa",fontFamily:"monospace",whiteSpace:"nowrap"}}>{formatDate(c.date||c.createdAt)}</td>
-                      {/* Resume */}
-                      <td style={{padding:"12px 12px"}}>
-                        {c.resumeData||c.resumeUrl
-                          ?<button onClick={()=>downloadResume(c)} style={{background:"rgba(147,51,234,0.1)",border:"1px solid rgba(147,51,234,0.25)",borderRadius:7,padding:"5px 12px",fontSize:11,color:"#9333ea",cursor:"pointer",fontWeight:700,fontFamily:"inherit",whiteSpace:"nowrap"}}>📄 Download</button>
-                          :<span style={{fontSize:11,color:"#a78bfa"}}>—</span>
-                        }
-                      </td>
-                      {/* Actions */}
-                      <td style={{padding:"12px 12px"}}>
-                        <div style={{display:"flex",gap:5}}>
-                          <button onClick={()=>setViewModal(c)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#7c3aed",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>👤 View</button>
-                          <button onClick={()=>deleteCandidate(idx)} style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>🗑</button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
       </SC>
 
-      {/* Candidate Detail Modal */}
-      {viewModal&&(
-        <Mdl title="Candidate Profile" onClose={()=>setViewModal(null)}>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}} className="modal-2col">
-            {[
-              {icon:"👤",label:"Full Name",value:viewModal.name},
-              {icon:"📧",label:"Email",value:viewModal.email},
-              {icon:"📱",label:"Mobile",value:viewModal.mobile},
-              {icon:"💼",label:"Experience",value:`${viewModal.experience}${viewModal.years?` — ${viewModal.years} years`:""}`},
-              {icon:"🎯",label:"Applied Role",value:viewModal.role},
-              {icon:"📅",label:"Applied Date",value:formatDate(viewModal.date||viewModal.createdAt)},
-            ].map(({icon,label,value})=>(
-              <div key={label} style={{background:"#faf5ff",borderRadius:10,padding:"12px 14px",border:"1px solid #ede9fe"}}>
-                <div style={{fontSize:10,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:4,textTransform:"uppercase"}}>{icon} {label}</div>
-                <div style={{fontSize:14,fontWeight:600,color:T.text}}>{value||"—"}</div>
-              </div>
-            ))}
-            <div style={{background:"#faf5ff",borderRadius:10,padding:"12px 14px",border:"1px solid #ede9fe"}}>
-              <div style={{fontSize:10,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:4,textTransform:"uppercase"}}>🔖 Status</div>
-              <Badge label={viewModal.status?.charAt(0).toUpperCase()+(viewModal.status||"pending").slice(1)}/>
+      {/* View Modal */}
+      {viewClient&&(
+        <Mdl title="Client Profile" onClose={()=>setViewClient(null)} maxWidth={500}>
+          <div style={{display:"flex",alignItems:"center",gap:14,padding:16,background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:14,border:"1px solid #ede9fe",marginBottom:18}}>
+            <div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:20,fontWeight:800,flexShrink:0}}>{(viewClient.clientName||viewClient.name||"?")[0].toUpperCase()}</div>
+            <div>
+              <div style={{fontSize:17,fontWeight:800,color:T.text}}>{viewClient.clientName||viewClient.name}</div>
+              <div style={{fontSize:13,color:"#9333ea",marginTop:2}}>{viewClient.companyName||viewClient.company||"—"}</div>
             </div>
+            <div style={{marginLeft:"auto"}}><Badge label={viewClient.status||"Active"}/></div>
           </div>
-          {(viewModal.resumeData||viewModal.resumeUrl)&&(
-            <div style={{background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:12,padding:"18px",border:"1px solid #ede9fe",marginTop:18,textAlign:"center"}}>
-              <div style={{fontSize:32,marginBottom:8}}>📄</div>
-              <div style={{fontSize:14,color:"#9333ea",fontWeight:600,marginBottom:4}}>{viewModal.resumeName||"Resume"}</div>
-              {viewModal.resumeSize&&<div style={{fontSize:12,color:"#a78bfa",marginBottom:12}}>{viewModal.resumeSize}</div>}
-              <button onClick={()=>downloadResume(viewModal)} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:9,padding:"10px 22px",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
-                ⬇️ Download Resume
-              </button>
-            </div>
-          )}
+          <InfoRow icon="📧" label="Email" value={viewClient.email}/>
+          <InfoRow icon="📱" label="Phone" value={viewClient.phone}/>
+          <InfoRow icon="📍" label="Address" value={viewClient.address}/>
+          <InfoRow icon="📁" label="Project Assigned" value={viewClient.projectAssigned}/>
+          <InfoRow icon="📅" label="Joined" value={viewClient.createdAt?new Date(viewClient.createdAt).toLocaleDateString():"—"}/>
+          <div style={{display:"flex",gap:10,marginTop:16}}>
+            <button onClick={()=>{setViewClient(null);openEdit(viewClient);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
+            <button onClick={()=>{setViewClient(null);setDeleteTarget(viewClient);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
+          </div>
         </Mdl>
       )}
+
+      {/* Edit Modal */}
+      {editClient&&(
+        <Mdl title="Edit Client" onClose={()=>setEditClient(null)}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}} className="modal-2col">
+            <Fld label="Client Name *" value={editForm.clientName} onChange={v=>{setEditForm(p=>({...p,clientName:v}));setEditErr(p=>({...p,clientName:""}));}} error={editErr.clientName}/>
+            <Fld label="Company Name" value={editForm.companyName} onChange={v=>setEditForm(p=>({...p,companyName:v}))}/>
+            <Fld label="Email *" value={editForm.email} onChange={v=>{setEditForm(p=>({...p,email:v}));setEditErr(p=>({...p,email:""}));}} type="email" error={editErr.email}/>
+            <Fld label="Phone" value={editForm.phone} onChange={v=>setEditForm(p=>({...p,phone:v}))}/>
+            <Fld label="Project Assigned" value={editForm.projectAssigned} onChange={v=>setEditForm(p=>({...p,projectAssigned:v}))}/>
+            <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Active","Inactive"]}/>
+          </div>
+          <Fld label="Address" value={editForm.address} onChange={v=>setEditForm(p=>({...p,address:v}))}/>
+          <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:4}}>
+            <button onClick={()=>setEditClient(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,color:"#fff",cursor:saving?"not-allowed":"pointer",fontFamily:"inherit",opacity:saving?0.7:1}}>{saving?"Saving…":"Save Changes →"}</button>
+          </div>
+        </Mdl>
+      )}
+
+      {deleteTarget&&<ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName||deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={()=>setDeleteTarget(null)}/>}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// EMPLOYEES PAGE
+// ═══════════════════════════════════════════════════════════
+function EmployeesPage({employees,setEmployees}){
+  const [search,setSearch]=useState("");
+  const [viewEmp,setViewEmp]=useState(null);
+  const [editEmp,setEditEmp]=useState(null);
+  const [deleteTarget,setDeleteTarget]=useState(null);
+  const [editForm,setEditForm]=useState({});
+  const [editErr,setEditErr]=useState({});
+  const [saving,setSaving]=useState(false);
+  const [toast,setToast]=useState("");
+
+  const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
+
+  const filtered=employees.filter(e=>
+    (e.name||"").toLowerCase().includes(search.toLowerCase())||
+    (e.email||"").toLowerCase().includes(search.toLowerCase())||
+    (e.role||"").toLowerCase().includes(search.toLowerCase())||
+    (e.department||"").toLowerCase().includes(search.toLowerCase())
+  );
+
+  const openEdit=(e)=>{
+    setEditForm({name:e.name||"",email:e.email||"",phone:e.phone||"",role:e.role||"",department:e.department||"",salary:e.salary||"",status:e.status||"Active"});
+    setEditErr({});
+    setEditEmp(e);
+  };
+
+  const saveEdit=async()=>{
+    const errs={};
+    if(!editForm.name.trim())errs.name="Name required";
+    if(!editForm.email.trim())errs.email="Email required";
+    if(Object.keys(errs).length){setEditErr(errs);return;}
+    try{
+      setSaving(true);
+      const res=await axios.put(`http://localhost:5000/api/employees/${editEmp._id}`,editForm);
+      setEmployees(prev=>prev.map(e=>e._id===editEmp._id?{...e,...(res.data||editForm)}:e));
+      setEditEmp(null);
+      showToast("✅ Employee updated!");
+    }catch{
+      setEmployees(prev=>prev.map(e=>e._id===editEmp._id?{...e,...editForm}:e));
+      setEditEmp(null);
+      showToast("✅ Updated locally!");
+    }finally{setSaving(false);}
+  };
+
+  const doDelete=async()=>{
+    try{await axios.delete(`http://localhost:5000/api/employees/${deleteTarget._id}`);}catch{}
+    setEmployees(prev=>prev.filter(e=>e._id!==deleteTarget._id));
+    setDeleteTarget(null);
+    showToast("🗑️ Employee deleted!");
+  };
+
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:14}}>
+      {toast&&<div style={{position:"fixed",bottom:24,right:24,zIndex:9999,background:"#fff",border:"1.5px solid #22c55e",borderRadius:12,padding:"12px 20px",fontSize:13,fontWeight:700,color:"#22c55e",boxShadow:"0 8px 24px rgba(0,0,0,0.12)"}}>{toast}</div>}
+
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+        {[{t:"Total",v:employees.length,i:"👨‍💼",c:"#7c3aed"},{t:"Active",v:employees.filter(e=>e.status==="Active").length,i:"✅",c:"#22C55E"},{t:"Inactive",v:employees.filter(e=>e.status==="Inactive").length,i:"⛔",c:"#EF4444"}].map(({t,v,i,c})=>(
+          <div key={t} style={{background:"#fff",borderRadius:14,padding:"16px 14px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:40,height:40,borderRadius:11,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{i}</div>
+            <div><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5}}>{t.toUpperCase()}</div><div style={{fontSize:24,fontWeight:800,color:c}}>{v}</div></div>
+          </div>
+        ))}
+      </div>
+
+      <SC title={`All Employees (${filtered.length})`}>
+        <Search value={search} onChange={setSearch} placeholder="Search by name, email, role..."/>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:750}}>
+            <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
+              {["#","Name","Email","Phone","Role","Department","Salary","Status","Actions"].map(c=>(
+                <th key={c} style={{padding:"10px 14px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {filtered.length===0?<tr><td colSpan={9} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No employees found</td></tr>
+                :filtered.map((e,i)=>(
+                  <tr key={e._id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={ev=>ev.currentTarget.style.background="#faf5ff"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`EMP${String(i+1).padStart(3,"0")}`}</td>
+                    <td style={{padding:"12px 14px"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8}}>
+                        <div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#7c3aed,#a855f7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(e.name||"?")[0].toUpperCase()}</div>
+                        <span style={{fontWeight:700,color:T.text}}>{e.name||"—"}</span>
+                      </div>
+                    </td>
+                    <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{e.email||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{e.phone||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#7c3aed",fontSize:12,fontWeight:600}}>{e.role||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{e.department||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#22C55E",fontSize:12,fontWeight:600}}>{e.salary||"—"}</td>
+                    <td style={{padding:"12px 14px"}}><Badge label={e.status||"Active"}/></td>
+                    <td style={{padding:"12px 14px"}}>
+                      <ActionBtns onView={()=>setViewEmp(e)} onEdit={()=>openEdit(e)} onDelete={()=>setDeleteTarget(e)}/>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </SC>
+
+      {viewEmp&&(
+        <Mdl title="Employee Profile" onClose={()=>setViewEmp(null)} maxWidth={500}>
+          <div style={{display:"flex",alignItems:"center",gap:14,padding:16,background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:14,border:"1px solid #ede9fe",marginBottom:18}}>
+            <div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#7c3aed,#a855f7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:20,fontWeight:800,flexShrink:0}}>{(viewEmp.name||"?")[0].toUpperCase()}</div>
+            <div>
+              <div style={{fontSize:17,fontWeight:800,color:T.text}}>{viewEmp.name}</div>
+              <div style={{fontSize:13,color:"#9333ea",marginTop:2}}>{viewEmp.role||"Employee"}</div>
+            </div>
+            <div style={{marginLeft:"auto"}}><Badge label={viewEmp.status||"Active"}/></div>
+          </div>
+          <InfoRow icon="📧" label="Email" value={viewEmp.email}/>
+          <InfoRow icon="📱" label="Phone" value={viewEmp.phone}/>
+          <InfoRow icon="🏢" label="Department" value={viewEmp.department}/>
+          <InfoRow icon="💰" label="Salary" value={viewEmp.salary}/>
+          <InfoRow icon="📅" label="Joined" value={viewEmp.createdAt?new Date(viewEmp.createdAt).toLocaleDateString():"—"}/>
+          <div style={{display:"flex",gap:10,marginTop:16}}>
+            <button onClick={()=>{setViewEmp(null);openEdit(viewEmp);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#7c3aed,#9333ea)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
+            <button onClick={()=>{setViewEmp(null);setDeleteTarget(viewEmp);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
+          </div>
+        </Mdl>
+      )}
+
+      {editEmp&&(
+        <Mdl title="Edit Employee" onClose={()=>setEditEmp(null)}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}} className="modal-2col">
+            <Fld label="Full Name *" value={editForm.name} onChange={v=>{setEditForm(p=>({...p,name:v}));setEditErr(p=>({...p,name:""}));}} error={editErr.name}/>
+            <Fld label="Email *" value={editForm.email} onChange={v=>{setEditForm(p=>({...p,email:v}));setEditErr(p=>({...p,email:""}));}} type="email" error={editErr.email}/>
+            <Fld label="Phone" value={editForm.phone} onChange={v=>setEditForm(p=>({...p,phone:v}))}/>
+            <Fld label="Role" value={editForm.role} onChange={v=>setEditForm(p=>({...p,role:v}))}/>
+            <Fld label="Department" value={editForm.department} onChange={v=>setEditForm(p=>({...p,department:v}))}/>
+            <Fld label="Salary" value={editForm.salary} onChange={v=>setEditForm(p=>({...p,salary:v}))}/>
+            <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Active","Inactive"]}/>
+          </div>
+          <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:4}}>
+            <button onClick={()=>setEditEmp(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{background:"linear-gradient(135deg,#7c3aed,#9333ea)",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,color:"#fff",cursor:saving?"not-allowed":"pointer",fontFamily:"inherit",opacity:saving?0.7:1}}>{saving?"Saving…":"Save Changes →"}</button>
+          </div>
+        </Mdl>
+      )}
+
+      {deleteTarget&&<ConfirmModal title="Delete Employee" message={`Delete "${deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={()=>setDeleteTarget(null)}/>}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// MANAGERS PAGE
+// ═══════════════════════════════════════════════════════════
+function ManagersPage({managers,setManagers}){
+  const [search,setSearch]=useState("");
+  const [viewMgr,setViewMgr]=useState(null);
+  const [editMgr,setEditMgr]=useState(null);
+  const [deleteTarget,setDeleteTarget]=useState(null);
+  const [editForm,setEditForm]=useState({});
+  const [editErr,setEditErr]=useState({});
+  const [saving,setSaving]=useState(false);
+  const [toast,setToast]=useState("");
+
+  const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
+  const filtered=managers.filter(m=>(m.managerName||"").toLowerCase().includes(search.toLowerCase())||(m.email||"").toLowerCase().includes(search.toLowerCase())||(m.department||"").toLowerCase().includes(search.toLowerCase()));
+
+  const openEdit=(m)=>{
+    setEditForm({managerName:m.managerName||"",email:m.email||"",phone:m.phone||"",department:m.department||"",role:m.role||"Manager",address:m.address||"",status:m.status||"Active"});
+    setEditErr({});
+    setEditMgr(m);
+  };
+
+  const saveEdit=async()=>{
+    const errs={};
+    if(!editForm.managerName.trim())errs.managerName="Name required";
+    if(!editForm.email.trim())errs.email="Email required";
+    if(Object.keys(errs).length){setEditErr(errs);return;}
+    try{
+      setSaving(true);
+      const res=await axios.put(`http://localhost:5000/api/managers/${editMgr._id}`,editForm);
+      setManagers(prev=>prev.map(m=>m._id===editMgr._id?{...m,...(res.data||editForm)}:m));
+      setEditMgr(null);
+      showToast("✅ Manager updated!");
+    }catch{
+      setManagers(prev=>prev.map(m=>m._id===editMgr._id?{...m,...editForm}:m));
+      setEditMgr(null);
+      showToast("✅ Updated locally!");
+    }finally{setSaving(false);}
+  };
+
+  const doDelete=async()=>{
+    try{await axios.delete(`http://localhost:5000/api/managers/${deleteTarget._id}`);}catch{}
+    setManagers(prev=>prev.filter(m=>m._id!==deleteTarget._id));
+    setDeleteTarget(null);
+    showToast("🗑️ Manager deleted!");
+  };
+
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:14}}>
+      {toast&&<div style={{position:"fixed",bottom:24,right:24,zIndex:9999,background:"#fff",border:"1.5px solid #22c55e",borderRadius:12,padding:"12px 20px",fontSize:13,fontWeight:700,color:"#22c55e",boxShadow:"0 8px 24px rgba(0,0,0,0.12)"}}>{toast}</div>}
+
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+        {[{t:"Total Managers",v:managers.length,i:"🧑‍💼",c:"#f59e0b"},{t:"Active",v:managers.filter(m=>m.status==="Active").length,i:"✅",c:"#22C55E"},{t:"Inactive",v:managers.filter(m=>m.status==="Inactive").length,i:"⛔",c:"#EF4444"}].map(({t,v,i,c})=>(
+          <div key={t} style={{background:"#fff",borderRadius:14,padding:"16px 14px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:40,height:40,borderRadius:11,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{i}</div>
+            <div><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5}}>{t.toUpperCase()}</div><div style={{fontSize:24,fontWeight:800,color:c}}>{v}</div></div>
+          </div>
+        ))}
+      </div>
+
+      <SC title={`All Managers (${filtered.length})`}>
+        <Search value={search} onChange={setSearch} placeholder="Search by name, email, department..."/>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:750}}>
+            <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
+              {["#","Name","Email","Phone","Role","Department","Status","Joined","Actions"].map(c=>(
+                <th key={c} style={{padding:"10px 14px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {filtered.length===0?<tr><td colSpan={9} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No managers found</td></tr>
+                :filtered.map((m,i)=>(
+                  <tr key={m._id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={ev=>ev.currentTarget.style.background="#faf5ff"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`MGR${String(i+1).padStart(3,"0")}`}</td>
+                    <td style={{padding:"12px 14px"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8}}>
+                        <div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(m.managerName||"?")[0].toUpperCase()}</div>
+                        <span style={{fontWeight:700,color:T.text}}>{m.managerName||"—"}</span>
+                      </div>
+                    </td>
+                    <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{m.email||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{m.phone||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#f59e0b",fontSize:12,fontWeight:600}}>{m.role||"Manager"}</td>
+                    <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{m.department||"—"}</td>
+                    <td style={{padding:"12px 14px"}}><Badge label={m.status||"Active"}/></td>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:12}}>{m.createdAt?new Date(m.createdAt).toLocaleDateString():"—"}</td>
+                    <td style={{padding:"12px 14px"}}>
+                      <ActionBtns onView={()=>setViewMgr(m)} onEdit={()=>openEdit(m)} onDelete={()=>setDeleteTarget(m)}/>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </SC>
+
+      {viewMgr&&(
+        <Mdl title="Manager Profile" onClose={()=>setViewMgr(null)} maxWidth={500}>
+          <div style={{display:"flex",alignItems:"center",gap:14,padding:16,background:"linear-gradient(135deg,#fffbeb,#fef3c7)",borderRadius:14,border:"1px solid #fde68a",marginBottom:18}}>
+            <div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:20,fontWeight:800,flexShrink:0}}>{(m=>m[0].toUpperCase())(viewMgr.managerName||"M")}</div>
+            <div>
+              <div style={{fontSize:17,fontWeight:800,color:T.text}}>{viewMgr.managerName}</div>
+              <div style={{fontSize:13,color:"#f59e0b",marginTop:2}}>{viewMgr.role||"Manager"}</div>
+            </div>
+            <div style={{marginLeft:"auto"}}><Badge label={viewMgr.status||"Active"}/></div>
+          </div>
+          <InfoRow icon="📧" label="Email" value={viewMgr.email}/>
+          <InfoRow icon="📱" label="Phone" value={viewMgr.phone}/>
+          <InfoRow icon="🏢" label="Department" value={viewMgr.department}/>
+          <InfoRow icon="📍" label="Address" value={viewMgr.address}/>
+          <InfoRow icon="📅" label="Joined" value={viewMgr.createdAt?new Date(viewMgr.createdAt).toLocaleDateString():"—"}/>
+          <div style={{display:"flex",gap:10,marginTop:16}}>
+            <button onClick={()=>{setViewMgr(null);openEdit(viewMgr);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
+            <button onClick={()=>{setViewMgr(null);setDeleteTarget(viewMgr);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
+          </div>
+        </Mdl>
+      )}
+
+      {editMgr&&(
+        <Mdl title="Edit Manager" onClose={()=>setEditMgr(null)}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}} className="modal-2col">
+            <Fld label="Manager Name *" value={editForm.managerName} onChange={v=>{setEditForm(p=>({...p,managerName:v}));setEditErr(p=>({...p,managerName:""}));}} error={editErr.managerName}/>
+            <Fld label="Email *" value={editForm.email} onChange={v=>{setEditForm(p=>({...p,email:v}));setEditErr(p=>({...p,email:""}));}} type="email" error={editErr.email}/>
+            <Fld label="Phone" value={editForm.phone} onChange={v=>setEditForm(p=>({...p,phone:v}))}/>
+            <Fld label="Role" value={editForm.role} onChange={v=>setEditForm(p=>({...p,role:v}))}/>
+            <Fld label="Department" value={editForm.department} onChange={v=>setEditForm(p=>({...p,department:v}))}/>
+            <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Active","Inactive"]}/>
+          </div>
+          <Fld label="Address" value={editForm.address} onChange={v=>setEditForm(p=>({...p,address:v}))}/>
+          <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:4}}>
+            <button onClick={()=>setEditMgr(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{background:"linear-gradient(135deg,#f59e0b,#fbbf24)",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,color:"#fff",cursor:saving?"not-allowed":"pointer",fontFamily:"inherit",opacity:saving?0.7:1}}>{saving?"Saving…":"Save Changes →"}</button>
+          </div>
+        </Mdl>
+      )}
+
+      {deleteTarget&&<ConfirmModal title="Delete Manager" message={`Delete "${deleteTarget.managerName}"? This cannot be undone.`} onConfirm={doDelete} onCancel={()=>setDeleteTarget(null)}/>}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROJECTS PAGE
+// ═══════════════════════════════════════════════════════════
+function ProjectsPage({projects,setProjects,clients,employees}){
+  const [search,setSearch]=useState("");
+  const [viewProj,setViewProj]=useState(null);
+  const [editProj,setEditProj]=useState(null);
+  const [deleteTarget,setDeleteTarget]=useState(null);
+  const [assignModal,setAssignModal]=useState(null);
+  const [editForm,setEditForm]=useState({});
+  const [editErr,setEditErr]=useState({});
+  const [assignTo,setAssignTo]=useState("");
+  const [saving,setSaving]=useState(false);
+  const [toast,setToast]=useState("");
+
+  const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
+  const filtered=projects.filter(p=>(p.name||"").toLowerCase().includes(search.toLowerCase())||(p.client||"").toLowerCase().includes(search.toLowerCase()));
+
+  const openEdit=(p)=>{
+    setEditForm({name:p.name||"",client:p.client||"",purpose:p.purpose||"",description:p.description||"",start:p.start||"",end:p.end||"",budget:p.budget||"",team:p.team||"",status:p.status||"Pending",assignedTo:p.assignedTo||""});
+    setEditErr({});
+    setEditProj(p);
+  };
+
+  const saveEdit=async()=>{
+    const errs={};
+    if(!editForm.name.trim())errs.name="Name required";
+    if(!editForm.client.trim())errs.client="Client required";
+    if(Object.keys(errs).length){setEditErr(errs);return;}
+    try{
+      setSaving(true);
+      const res=await axios.put(`http://localhost:5000/api/projects/${editProj._id}`,editForm);
+      setProjects(prev=>prev.map(p=>p._id===editProj._id?{...p,...(res.data.project||editForm)}:p));
+      setEditProj(null);
+      showToast("✅ Project updated!");
+    }catch{
+      setProjects(prev=>prev.map(p=>p._id===editProj._id?{...p,...editForm}:p));
+      setEditProj(null);
+      showToast("✅ Updated locally!");
+    }finally{setSaving(false);}
+  };
+
+  const doDelete=async()=>{
+    try{await axios.delete(`http://localhost:5000/api/projects/${deleteTarget._id}`);}catch{}
+    setProjects(prev=>prev.filter(p=>p._id!==deleteTarget._id));
+    setDeleteTarget(null);
+    showToast("🗑️ Project deleted!");
+  };
+
+  const doAssign=async()=>{
+    if(!assignTo){alert("Please select an employee");return;}
+    try{
+      await axios.put(`http://localhost:5000/api/projects/${assignModal._id}`,{assignedTo:assignTo});
+      setProjects(prev=>prev.map(p=>p._id===assignModal._id?{...p,assignedTo:assignTo}:p));
+      setAssignModal(null);setAssignTo("");
+      showToast("✅ Employee assigned!");
+    }catch(err){alert(err.response?.data?.msg||"Failed to assign");}
+  };
+
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:14}}>
+      {toast&&<div style={{position:"fixed",bottom:24,right:24,zIndex:9999,background:"#fff",border:"1.5px solid #22c55e",borderRadius:12,padding:"12px 20px",fontSize:13,fontWeight:700,color:"#22c55e",boxShadow:"0 8px 24px rgba(0,0,0,0.12)"}}>{toast}</div>}
+
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+        {[{t:"Total",v:projects.length,i:"📁",c:"#a855f7"},{t:"Active",v:projects.filter(p=>p.status==="In Progress").length,i:"⚡",c:"#9333ea"},{t:"Completed",v:projects.filter(p=>p.status==="Completed").length,i:"✅",c:"#22C55E"},{t:"Pending",v:projects.filter(p=>p.status==="Pending").length,i:"⏳",c:"#F59E0B"}].map(({t,v,i,c})=>(
+          <div key={t} style={{background:"#fff",borderRadius:14,padding:"16px 14px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:40,height:40,borderRadius:11,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{i}</div>
+            <div><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5}}>{t.toUpperCase()}</div><div style={{fontSize:24,fontWeight:800,color:c}}>{v}</div></div>
+          </div>
+        ))}
+      </div>
+
+      <SC title={`All Projects (${filtered.length})`}>
+        <Search value={search} onChange={setSearch} placeholder="Search by project name, client..."/>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:800}}>
+            <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
+              {["#","Name","Client","Budget","Status","Assigned To","Actions"].map(c=>(
+                <th key={c} style={{padding:"10px 14px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {filtered.length===0?<tr><td colSpan={7} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No projects found</td></tr>
+                :filtered.map((p,i)=>(
+                  <tr key={p._id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={ev=>ev.currentTarget.style.background="#faf5ff"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`PRJ${String(i+1).padStart(3,"0")}`}</td>
+                    <td style={{padding:"12px 14px",fontWeight:700,color:T.text}}>{p.name}</td>
+                    <td style={{padding:"12px 14px",color:"#7c3aed"}}>{p.client||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#22C55E",fontWeight:600}}>{p.budget||"—"}</td>
+                    <td style={{padding:"12px 14px"}}><Badge label={p.status||"Pending"}/></td>
+                    <td style={{padding:"12px 14px"}}>
+                      {p.assignedTo
+                        ?<div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,flexShrink:0}}>{p.assignedTo[0].toUpperCase()}</div><span style={{color:"#6366f1",fontWeight:600,fontSize:12}}>{p.assignedTo}</span></div>
+                        :<button onClick={()=>{setAssignModal(p);setAssignTo("");}} style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)",borderRadius:7,padding:"4px 10px",fontSize:11,color:"#6366f1",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Assign</button>
+                      }
+                    </td>
+                    <td style={{padding:"12px 14px"}}>
+                      <ActionBtns onView={()=>setViewProj(p)} onEdit={()=>openEdit(p)} onDelete={()=>setDeleteTarget(p)}/>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </SC>
+
+      {viewProj&&(
+        <Mdl title="Project Details" onClose={()=>setViewProj(null)} maxWidth={550}>
+          <div style={{padding:16,background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:14,border:"1px solid #ede9fe",marginBottom:18}}>
+            <div style={{fontSize:18,fontWeight:800,color:T.text,marginBottom:6}}>{viewProj.name}</div>
+            <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+              <Badge label={viewProj.status||"Pending"}/>
+              {viewProj.client&&<span style={{fontSize:12,color:"#9333ea",fontWeight:600}}>👥 {viewProj.client}</span>}
+            </div>
+          </div>
+          <InfoRow icon="💰" label="Budget" value={viewProj.budget}/>
+          <InfoRow icon="👤" label="Assigned To" value={viewProj.assignedTo}/>
+          <InfoRow icon="📅" label="Start Date" value={viewProj.start}/>
+          <InfoRow icon="🏁" label="End Date" value={viewProj.end}/>
+          <InfoRow icon="🎯" label="Purpose" value={viewProj.purpose}/>
+          <InfoRow icon="👥" label="Team" value={viewProj.team}/>
+          <InfoRow icon="📝" label="Description" value={viewProj.description}/>
+          <div style={{display:"flex",gap:10,marginTop:16}}>
+            <button onClick={()=>{setViewProj(null);openEdit(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
+            <button onClick={()=>{setViewProj(null);setAssignModal(viewProj);setAssignTo(viewProj.assignedTo||"");}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>👤 Assign</button>
+            <button onClick={()=>{setViewProj(null);setDeleteTarget(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
+          </div>
+        </Mdl>
+      )}
+
+      {editProj&&(
+        <Mdl title="Edit Project" onClose={()=>setEditProj(null)}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}} className="modal-2col">
+            <Fld label="Project Name *" value={editForm.name} onChange={v=>{setEditForm(p=>({...p,name:v}));setEditErr(p=>({...p,name:""}));}} error={editErr.name}/>
+            <div style={{marginBottom:14}}>
+              <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>CLIENT *</label>
+              <ClientDropdown clients={clients} value={editForm.client} onChange={v=>{setEditForm(p=>({...p,client:v}));setEditErr(p=>({...p,client:""}));}} error={editErr.client}/>
+              {editErr.client&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {editErr.client}</div>}
+            </div>
+            <Fld label="Purpose" value={editForm.purpose} onChange={v=>setEditForm(p=>({...p,purpose:v}))}/>
+            <Fld label="Budget" value={editForm.budget} onChange={v=>setEditForm(p=>({...p,budget:v}))}/>
+            <Fld label="Start Date" value={editForm.start} type="date" onChange={v=>setEditForm(p=>({...p,start:v}))}/>
+            <Fld label="End Date" value={editForm.end} type="date" onChange={v=>setEditForm(p=>({...p,end:v}))}/>
+            <Fld label="Team Members" value={editForm.team} onChange={v=>setEditForm(p=>({...p,team:v}))}/>
+            <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Pending","In Progress","Completed","On Hold"]}/>
+          </div>
+          <div style={{marginBottom:14}}>
+            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEE</label>
+            <select value={editForm.assignedTo} onChange={e=>setEditForm(p=>({...p,assignedTo:e.target.value}))} style={{width:"100%",border:"1.5px solid #ede9fe",borderRadius:10,padding:"10px 14px",fontSize:13,color:editForm.assignedTo?T.text:"#a78bfa",background:"#faf5ff",boxSizing:"border-box",outline:"none",fontFamily:"inherit"}}>
+              <option value="">-- Select Employee --</option>
+              {employees.map(e=><option key={e._id||e.email} value={e.name}>{e.name}{e.department?` (${e.department})`:""}</option>)}
+            </select>
+          </div>
+          <Fld label="Description" value={editForm.description} onChange={v=>setEditForm(p=>({...p,description:v}))}/>
+          <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:4}}>
+            <button onClick={()=>setEditProj(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{background:"linear-gradient(135deg,#a855f7,#9333ea)",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,color:"#fff",cursor:saving?"not-allowed":"pointer",fontFamily:"inherit",opacity:saving?0.7:1}}>{saving?"Saving…":"Save Changes →"}</button>
+          </div>
+        </Mdl>
+      )}
+
+      {assignModal&&(
+        <Mdl title="Assign Employee" onClose={()=>setAssignModal(null)} maxWidth={420}>
+          <div style={{marginBottom:18}}>
+            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:8}}>SELECT EMPLOYEE</label>
+            <select value={assignTo} onChange={e=>setAssignTo(e.target.value)} style={{width:"100%",border:"1.5px solid #ede9fe",borderRadius:10,padding:"10px 14px",fontSize:13,color:assignTo?T.text:"#a78bfa",background:"#faf5ff",outline:"none",fontFamily:"inherit"}}>
+              <option value="">-- Select Employee --</option>
+              {employees.map(e=><option key={e._id||e.email} value={e.name}>{e.name}{e.department?` (${e.department})`:""}</option>)}
+            </select>
+            {assignTo&&<div style={{fontSize:11,color:"#9333ea",marginTop:8}}>✅ <strong>{assignTo}</strong> will be assigned</div>}
+          </div>
+          <div style={{display:"flex",justifyContent:"flex-end",gap:10}}>
+            <button onClick={()=>setAssignModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
+            <button onClick={doAssign} style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)",color:"#fff",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Save Assignment →</button>
+          </div>
+        </Mdl>
+      )}
+
+      {deleteTarget&&<ConfirmModal title="Delete Project" message={`Delete "${deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={()=>setDeleteTarget(null)}/>}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROJECT STATUS PAGE (unchanged, just pass managers properly)
+// ═══════════════════════════════════════════════════════════
+function SearchDropdown({label,items,displayKey,value,onChange,error,placeholder}){
+  const [open,setOpen]=useState(false);
+  const [search,setSearch]=useState("");
+  const filtered=items.filter(i=>(i[displayKey]||"").toLowerCase().includes(search.toLowerCase()));
+  return(
+    <div style={{marginBottom:14,position:"relative"}}>
+      <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>{label.toUpperCase()}</label>
+      <div onClick={()=>setOpen(!open)} style={{width:"100%",border:`1.5px solid ${error?"#EF4444":open?"#9333ea":"#ede9fe"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"#a78bfa",background:"#faf5ff",cursor:"pointer",position:"relative",userSelect:"none",minHeight:42,boxSizing:"border-box"}}>
+        {value||placeholder||"-- Select --"}
+        <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"#a78bfa",transition:"0.2s"}}>▼</span>
+      </div>
+      {open&&(
+        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,boxShadow:"0 8px 32px rgba(147,51,234,0.15)",zIndex:999,overflow:"hidden"}}>
+          <div style={{padding:"8px 10px"}}><input autoFocus placeholder="Search..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px",border:"1.5px solid #ede9fe",borderRadius:8,fontSize:12,background:"#faf5ff",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div>
+          <div style={{maxHeight:180,overflowY:"auto"}}>
+            {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"#a78bfa",fontSize:13}}>No results</div>
+              :filtered.map((item,i)=>{const name=item[displayKey]||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"#f3e8ff":"transparent",borderBottom:"1px solid #f5f3ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"#f3e8ff":"transparent"}><div style={{width:26,height:26,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{name[0]?.toUpperCase()||"?"}</div><span style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</span>{isSel&&<span style={{marginLeft:"auto",color:"#9333ea"}}>✓</span>}</div>);})}
+          </div>
+        </div>
+      )}
+      {open&&<div style={{position:"fixed",inset:0,zIndex:998}} onClick={()=>{setOpen(false);setSearch("");}}/>}
+      {error&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {error}</div>}
     </div>
   );
 }
@@ -552,7 +876,7 @@ function ProjectStatusPage({clients,employees,managers}){
                   <td style={{padding:"11px 12px"}}><Badge label={p.status}/></td>
                   <td style={{padding:"11px 12px",minWidth:130}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{flex:1,background:"#ede9fe",borderRadius:6,height:7}}><div style={{width:`${p.progress||p.pct||0}%`,background:p.progress===100||p.pct===100?"linear-gradient(90deg,#22C55E,#4ade80)":"linear-gradient(90deg,#9333ea,#c084fc)",borderRadius:6,height:"100%"}}/></div><span style={{fontSize:12,fontWeight:700,color:sc(p.status),width:32,textAlign:"right"}}>{p.progress||p.pct||0}%</span></div></td>
                   <td style={{padding:"11px 12px",maxWidth:180}}><span style={{fontSize:12,color:"#a78bfa",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",display:"block"}} title={p.notes||p.note}>{(p.notes||p.note)?`📝 ${p.notes||p.note}`:"—"}</span></td>
-                  <td style={{padding:"11px 12px"}}><div style={{display:"flex",gap:5}}><button onClick={()=>openEdit(p)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:7,padding:"4px 10px",fontSize:12,color:"#7c3aed",cursor:"pointer",fontWeight:600}}>Edit</button><button onClick={()=>deleteTs(p._id||p.id)} style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"4px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600}}>Del</button></div></td>
+                  <td style={{padding:"11px 12px"}}><ActionBtns onEdit={()=>openEdit(p)} onDelete={()=>deleteTs(p._id||p.id)}/></td>
                 </tr>))}
             </tbody>
           </table>
@@ -583,6 +907,175 @@ function ProjectStatusPage({clients,employees,managers}){
   );
 }
 
+// ═══════════════════════════════════════════════════════════
+// INTERVIEW PAGE (unchanged)
+// ═══════════════════════════════════════════════════════════
+function InterviewPage({companyId,companyName}){
+  const CID=companyId||"69b8fe0a6e3d6f1e056f3109";
+  const CNAME=companyName||"M Business";
+  const STORAGE_KEY=`hr_candidates_${CID}`;
+  const API="http://localhost:5000";
+  const [candidates,setCandidates]=useState([]);
+  const [filter,setFilter]=useState("all");
+  const [search,setSearch]=useState("");
+  const [viewModal,setViewModal]=useState(null);
+  const [toast,setToast]=useState("");
+  const [linkCopied,setLinkCopied]=useState(false);
+  const [loading,setLoading]=useState(true);
+  const appLink=`${window.location.origin}/interview-apply/${CNAME.replace(/\s+/g,"-")}-${CID}`;
+  useEffect(()=>{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");if(saved.length){setCandidates(saved);setLoading(false);}axios.get(`${API}/api/interviews?companyId=${CID}`).then(r=>{const list=r.data?.data||(Array.isArray(r.data)?r.data:[]);if(list.length){setCandidates(list);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));}}).catch(()=>{}).finally(()=>setLoading(false));},[CID]);
+  const persist=(list)=>{setCandidates(list);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));};
+  const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
+ // ✅ Fix — works in HTTP + HTTPS + all browsers
+const copyLink = async () => {
+  try {
+      const companySlug = `${companyName}-${companyId}`.replace(/\s+/g, "-");
+    const link = `${window.location.origin}/interview-apply/${companySlug}`;
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(link);
+    } else {
+      const el = document.createElement("textarea");
+      el.value = link;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    showToast("✅ Link copied!");          // ← toast.success பதிலா
+  } catch (err) {
+    console.error("Copy failed:", err);
+    showToast("❌ Copy failed. Please copy manually.");  // ← toast.error பதிலா
+  }
+};
+  const updateStatus=(idx,val)=>{const updated=[...candidates];updated[idx]={...updated[idx],status:val};persist(updated);const c=updated[idx];const id=c._id||c.id;if(id)axios.patch(`${API}/api/interviews/${id}/status`,{status:val}).catch(()=>{});showToast(`✅ Status → "${val}"`);if(viewModal&&(viewModal._id||viewModal.id)===id)setViewModal(updated[idx]);};
+  const deleteCandidate=(idx)=>{if(!window.confirm("Delete this candidate?"))return;const c=candidates[idx];const id=c._id||c.id;if(id)axios.delete(`${API}/api/interviews/${id}`).catch(()=>{});persist(candidates.filter((_,i)=>i!==idx));showToast("🗑️ Deleted");setViewModal(null);};
+  const fmt=(iso)=>iso?new Date(iso).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}):"—";
+  const displayed=candidates.filter(c=>{const okF=filter==="all"||(c.status||"pending").toLowerCase()===filter;const q=search.toLowerCase();const okS=!q||(c.name||"").toLowerCase().includes(q)||(c.role||"").toLowerCase().includes(q)||(c.email||"").toLowerCase().includes(q)||(c.mobile||"").includes(q);return okF&&okS;});
+  const counts={total:candidates.length,pending:candidates.filter(c=>(c.status||"pending").toLowerCase()==="pending").length,hired:candidates.filter(c=>(c.status||"").toLowerCase()==="hired").length,rejected:candidates.filter(c=>(c.status||"").toLowerCase()==="rejected").length};
+  const sColor={pending:"#F59E0B",hired:"#22C55E",rejected:"#EF4444"};
+  const sC=(s="pending")=>sColor[s.toLowerCase()]||"#a855f7";
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      {toast&&<div style={{position:"fixed",bottom:24,right:24,zIndex:9999,background:"#fff",border:"1.5px solid #22c55e",borderRadius:12,padding:"12px 20px",fontSize:13,fontWeight:700,color:"#22c55e",boxShadow:"0 8px 24px rgba(0,0,0,0.12)"}}>{toast}</div>}
+      <div style={{background:"linear-gradient(135deg,#1e0a3c,#2d1057)",borderRadius:16,padding:"20px 24px",display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",boxShadow:"0 8px 24px rgba(59,7,100,0.25)"}}>
+        <div style={{width:42,height:42,borderRadius:12,background:"rgba(147,51,234,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🔗</div>
+        <div style={{flex:1,minWidth:0}}><div style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:4}}>Candidate Application Link</div><div style={{fontSize:12,color:"#c084fc",fontFamily:"monospace",wordBreak:"break-all"}}>{appLink}</div></div>
+        <div style={{display:"flex",gap:8,flexShrink:0}}>
+          <button onClick={copyLink} style={{background:linkCopied?"rgba(34,197,94,0.2)":"rgba(147,51,234,0.25)",border:`1px solid ${linkCopied?"rgba(34,197,94,0.5)":"rgba(147,51,234,0.5)"}`,borderRadius:9,padding:"9px 16px",color:linkCopied?"#4ade80":"#c084fc",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{linkCopied?"✅ Copied!":"📋 Copy Link"}</button>
+          <button onClick={()=>window.open(appLink,"_blank")} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:9,padding:"9px 16px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>👁 Preview Form</button>
+        </div>
+      </div>
+      <div className="dash-stats" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+        {[{t:"Total",v:counts.total,i:"🎯",c:"#9333ea"},{t:"Pending",v:counts.pending,i:"⏳",c:"#F59E0B"},{t:"Hired",v:counts.hired,i:"✅",c:"#22C55E"},{t:"Rejected",v:counts.rejected,i:"❌",c:"#EF4444"}].map(({t,v,i,c})=>(<div key={t} style={{background:"#fff",borderRadius:14,padding:"18px 16px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",position:"relative",overflow:"hidden"}}><div style={{position:"absolute",top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${c},${c}88)`}}/><div style={{width:36,height:36,borderRadius:10,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,marginBottom:8}}>{i}</div><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5,marginBottom:2}}>{t.toUpperCase()}</div><div style={{fontSize:26,fontWeight:800,color:c}}>{v}</div></div>))}
+      </div>
+      <div style={{background:"#fff",borderRadius:16,padding:22,boxShadow:"0 4px 24px rgba(147,51,234,0.08)",border:"1px solid #ede9fe"}}>
+        <h3 style={{margin:"0 0 16px",fontSize:15,fontWeight:700,color:"#1e0a3c"}}>All Candidates ({displayed.length})</h3>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,flexWrap:"wrap"}}>
+          <div style={{position:"relative",flex:1,minWidth:200}}><span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>🔍</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e=>setSearch(e.target.value)} style={{width:"100%",padding:"9px 14px 9px 34px",border:"1.5px solid #ede9fe",borderRadius:10,fontSize:13,background:"#faf5ff",outline:"none",fontFamily:"inherit",color:"#1e0a3c",boxSizing:"border-box"}}/></div>
+          {["all","pending","hired","rejected"].map(f=>(<button key={f} onClick={()=>setFilter(f)} style={{padding:"7px 14px",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",border:"1.5px solid",borderColor:filter===f?(f==="all"?"#9333ea":sC(f)):"#ede9fe",background:filter===f?`${f==="all"?"#9333ea":sC(f)}15`:"#fff",color:filter===f?(f==="all"?"#9333ea":sC(f)):"#a78bfa",transition:"all 0.15s"}}>{f==="all"?"🎯 All":f==="pending"?"⏳ Pending":f==="hired"?"✅ Hired":"❌ Rejected"}</button>))}
+        </div>
+        {loading?(<div style={{textAlign:"center",padding:50,color:"#a78bfa"}}>Loading candidates...</div>):displayed.length===0?(<div style={{textAlign:"center",padding:"50px 20px",color:"#a78bfa"}}><div style={{fontSize:48,marginBottom:12}}>📭</div><div style={{fontSize:15,fontWeight:700,color:"#1e0a3c",marginBottom:6}}>{candidates.length===0?"No applications yet":"No results found"}</div></div>):(
+          <div style={{overflowX:"auto"}}>
+            <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:950}}>
+              <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>{["#","Candidate","Contact","Experience","Role","Interviewer","Date","Status","Resume","Actions"].map(h=>(<th key={h} style={{padding:"10px 12px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:10,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{h.toUpperCase()}</th>))}</tr></thead>
+              <tbody>
+                {displayed.map((c,i)=>{const idx=candidates.indexOf(c);const status=(c.status||"pending").toLowerCase();const resumeUrl=c.resumeUrl||(c.resumePath?`${API}/uploads/resumes/${c.resumePath.split(/[\\/]/).pop()}`:null);return(
+                  <tr key={c._id||c.id||i} style={{borderBottom:"1px solid #f3f0ff",transition:"background 0.15s"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                    <td style={{padding:"12px 12px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{String(i+1).padStart(3,"0")}</td>
+                    <td style={{padding:"12px 12px"}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(c.name||"?")[0].toUpperCase()}</div><span style={{fontWeight:700,color:"#1e0a3c"}}>{c.name||"—"}</span></div></td>
+                    <td style={{padding:"12px 12px"}}><div style={{fontSize:12,color:"#7c3aed"}}>{c.email||"—"}</div><div style={{fontSize:11,color:"#a78bfa",marginTop:2}}>{c.mobile||""}</div></td>
+                    <td style={{padding:"12px 12px"}}>{(c.experience||"").toLowerCase()==="fresher"?<span style={{background:"rgba(34,197,94,0.12)",color:"#22C55E",border:"1px solid rgba(34,197,94,0.25)",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>🎓 Fresher</span>:<span style={{background:"rgba(147,51,234,0.12)",color:"#9333ea",border:"1px solid rgba(147,51,234,0.25)",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>💼 {c.years||"?"}yrs</span>}</td>
+                    <td style={{padding:"12px 12px",fontWeight:600,color:"#1e0a3c",fontSize:12}}>{c.role||"—"}</td>
+                    <td style={{padding:"12px 12px",fontSize:12,color:"#7c3aed"}}>{c.interviewerName||<span style={{color:"#ddd"}}>—</span>}</td>
+                    <td style={{padding:"12px 12px",fontSize:12,color:"#a78bfa",fontFamily:"monospace",whiteSpace:"nowrap"}}>{fmt(c.date||c.createdAt)}</td>
+                    <td style={{padding:"12px 12px"}}><select value={status} onChange={e=>updateStatus(idx,e.target.value)} style={{background:status==="hired"?"rgba(34,197,94,0.1)":status==="rejected"?"rgba(239,68,68,0.1)":"rgba(245,158,11,0.1)",border:`1.5px solid ${sC(status)}44`,borderRadius:8,padding:"5px 10px",color:sC(status),fontSize:12,fontWeight:700,cursor:"pointer",outline:"none",fontFamily:"inherit"}}><option value="pending">⏳ Pending</option><option value="hired">✅ Hired</option><option value="rejected">❌ Rejected</option></select></td>
+                    <td style={{padding:"12px 12px"}}>{resumeUrl?<button onClick={()=>setViewModal({...c,_resolvedResumeUrl:resumeUrl})} style={{background:"rgba(147,51,234,0.1)",border:"1px solid rgba(147,51,234,0.3)",borderRadius:8,padding:"6px 12px",fontSize:12,color:"#9333ea",cursor:"pointer",fontWeight:700,fontFamily:"inherit",whiteSpace:"nowrap"}}>📄 View</button>:<span style={{fontSize:11,color:"#ddd"}}>—</span>}</td>
+                    <td style={{padding:"12px 12px"}}><div style={{display:"flex",gap:5}}><button onClick={()=>setViewModal({...c,_resolvedResumeUrl:resumeUrl})} style={{background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#7c3aed",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>👤</button><button onClick={()=>deleteCandidate(idx)} style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>🗑</button></div></td>
+                  </tr>
+                );})}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+      {viewModal&&(<div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}><div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:820,maxHeight:"90vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(147,51,234,0.25)"}}><div style={{padding:"16px 22px",borderBottom:"1px solid #ede9fe",display:"flex",justifyContent:"space-between",alignItems:"center",background:"linear-gradient(90deg,#f5f3ff,#faf5ff)",flexShrink:0}}><h2 style={{margin:0,fontSize:16,fontWeight:800,color:"#1e0a3c"}}>👤 Candidate Profile</h2><button onClick={()=>setViewModal(null)} style={{background:"none",border:"none",fontSize:18,cursor:"pointer",color:"#7c3aed",padding:"4px 8px"}}>✕</button></div><div style={{overflowY:"auto",padding:"20px 22px",flex:1}}><div style={{display:"flex",alignItems:"center",gap:14,padding:16,background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:14,border:"1px solid #ede9fe",marginBottom:18}}><div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:20,fontWeight:800,flexShrink:0}}>{(viewModal.name||"?")[0].toUpperCase()}</div><div style={{flex:1}}><div style={{fontSize:17,fontWeight:800,color:"#1e0a3c"}}>{viewModal.name}</div><div style={{fontSize:13,color:"#9333ea",fontWeight:600,marginTop:2}}>{viewModal.role||"—"}</div></div><span style={{background:`${sC(viewModal.status||"pending")}18`,color:sC(viewModal.status||"pending"),border:`1px solid ${sC(viewModal.status||"pending")}33`,padding:"4px 12px",borderRadius:20,fontSize:12,fontWeight:700}}>{(viewModal.status||"pending")==="pending"?"⏳ Pending":(viewModal.status||"")==="hired"?"✅ Hired":"❌ Rejected"}</span></div></div></div></div>)}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROFILE MODAL
+// ═══════════════════════════════════════════════════════════
+function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
+  const logoRef=useRef();
+  const displayName=user?.name||user?.email?.split("@")[0]||"Admin";
+  const initials=displayName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.6)",backdropFilter:"blur(10px)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:16}} onClick={onClose}>
+      <div style={{background:"#fff",borderRadius:22,width:"100%",maxWidth:420,maxHeight:"90vh",boxShadow:"0 32px 80px rgba(147,51,234,0.3)",display:"flex",flexDirection:"column",overflow:"hidden"}} onClick={e=>e.stopPropagation()}>
+        <div style={{background:"linear-gradient(135deg,#7c3aed,#a855f7,#c084fc)",padding:"28px 28px 22px",textAlign:"center",flexShrink:0}}>
+          <button onClick={onClose} style={{position:"absolute",top:14,right:14,background:"rgba(255,255,255,0.2)",border:"none",width:30,height:30,borderRadius:8,color:"#fff",fontSize:16,cursor:"pointer"}}>✕</button>
+          <div style={{width:72,height:72,borderRadius:16,background:"rgba(255,255,255,0.22)",border:"3px solid rgba(255,255,255,0.45)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",overflow:"hidden"}}>
+            {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:5,background:"#fff"}}/>:<span style={{fontSize:24,fontWeight:800,color:"#fff"}}>{initials}</span>}
+          </div>
+          <h2 style={{margin:0,fontSize:18,fontWeight:800,color:"#fff"}}>{displayName}</h2>
+          <p style={{margin:"4px 0 0",fontSize:12,color:"rgba(255,255,255,0.65)"}}>{user?.email||"—"}</p>
+          <span style={{display:"inline-block",marginTop:8,background:"rgba(255,255,255,0.18)",border:"1px solid rgba(255,255,255,0.28)",borderRadius:100,padding:"3px 12px",fontSize:10,fontWeight:700,color:"#fff",letterSpacing:1,textTransform:"uppercase"}}>{user?.role||"user"}</span>
+        </div>
+        <div style={{padding:"18px 24px",overflowY:"auto",flex:1}}>
+          {[{icon:"👤",label:"Full Name",value:displayName},{icon:"📧",label:"Email",value:user?.email||"—"},{icon:"📱",label:"Phone",value:user?.phone||"—"},{icon:"🎭",label:"Role",value:user?.role||"user"},{icon:"🔑",label:"User ID",value:(user?.id||user?._id)?`#${String(user?.id||user?._id).slice(-8).toUpperCase()}`:"—"}].map(({icon,label,value})=>(
+            <div key={label} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#faf5ff",borderRadius:9,border:"1px solid #ede9fe",marginBottom:7}}>
+              <div style={{width:32,height:32,borderRadius:8,background:"rgba(147,51,234,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{icon}</div>
+              <div><div style={{fontSize:10,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,textTransform:"uppercase"}}>{label}</div><div style={{fontSize:13,fontWeight:600,color:"#1e0a3c",marginTop:1}}>{value}</div></div>
+            </div>
+          ))}
+        </div>
+        <div style={{padding:"12px 24px 18px",borderTop:"1px solid #ede9fe",flexShrink:0}}>
+          <div style={{display:"flex",gap:10}}>
+            <button onClick={onClose} style={{flex:1,padding:"10px",background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:9,fontSize:13,fontWeight:600,color:"#1e0a3c",cursor:"pointer",fontFamily:"inherit"}}>Close</button>
+            <button onClick={()=>logoRef.current.click()} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:9,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>📷 Upload Logo</button>
+            <button onClick={onLogout} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:9,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🚪 Logout</button>
+          </div>
+        </div>
+        <input ref={logoRef} type="file" accept="image/*" style={{display:"none"}}
+          onChange={async(e)=>{const file=e.target.files[0];if(!file)return;const formData=new FormData();formData.append("file",file);try{const cloudRes=await axios.post("http://localhost:5000/api/upload/logo",formData);const uploadedUrl=cloudRes.data.logoUrl;await axios.post("http://localhost:5000/api/auth/save-logo",{userId:user.id||user._id,logoUrl:uploadedUrl});const updatedUser={...user,logoUrl:uploadedUrl};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);onLogoChange(uploadedUrl);}catch(err){console.error(err);alert("Upload failed!");}}}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════════
+function Sidebar({active,setActive,onLogout,open,onClose,navItems}){
+  const items=navItems||NAV;
+  return(
+    <>
+      {open&&<div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:998,display:"block"}} className="mob-overlay"/>}
+      <div style={{width:225,background:"linear-gradient(180deg,#1e0a3c 0%,#2d1057 60%,#1e0a3c 100%)",color:"#fff",display:"flex",flexDirection:"column",height:"100vh",position:"fixed",top:0,left:0,zIndex:999,flexShrink:0,overflow:"hidden",boxShadow:"4px 0 24px rgba(0,0,0,0.25)",transform:open?"translateX(0)":"translateX(-100%)",transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)"}} className="sidebar">
+        <div style={{padding:"18px 16px 14px",borderBottom:"1px solid rgba(255,255,255,0.08)",position:"relative",zIndex:1,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:36,height:36,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:11,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:17,color:"#fff",boxShadow:"0 4px 14px rgba(147,51,234,0.5)"}}>M</div>
+            <div><div style={{fontWeight:800,fontSize:14,color:"#fff"}}>M Business</div><div style={{fontSize:8,color:"rgba(255,255,255,0.35)",letterSpacing:1.5,marginTop:1}}>MANAGEMENT SUITE</div></div>
+          </div>
+          <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(255,255,255,0.4)",fontSize:18,cursor:"pointer",padding:"2px 6px",lineHeight:1}} className="sidebar-close">✕</button>
+        </div>
+        <nav style={{flex:1,minHeight:0,padding:"10px 8px",overflowY:"auto",position:"relative",zIndex:1}}>
+          {items.map(n=>{const on=active===n.key;return(<button key={n.key} onClick={()=>{setActive(n.key);onClose();}} style={{width:"100%",display:"flex",alignItems:"center",gap:9,padding:"9px 12px",background:on?"linear-gradient(90deg,rgba(147,51,234,0.35),rgba(168,85,247,0.15))":"transparent",border:on?"1px solid rgba(168,85,247,0.35)":"1px solid transparent",borderRadius:11,color:on?"#e9d5ff":"rgba(255,255,255,0.45)",fontWeight:on?700:400,fontSize:12.5,cursor:"pointer",marginBottom:2,textAlign:"left",fontFamily:"inherit"}}><span style={{fontSize:15}}>{n.icon}</span><span style={{flex:1}}>{n.label}</span>{on&&<div style={{width:5,height:5,borderRadius:"50%",background:"#c084fc",flexShrink:0}}/>}</button>);})}
+        </nav>
+        <div style={{padding:"10px 8px 14px",borderTop:"1px solid rgba(255,255,255,0.07)",position:"relative",zIndex:1,flexShrink:0}}>
+          <button onClick={onLogout} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:9,padding:"10px 12px",background:"rgba(239,68,68,0.15)",border:"1px solid rgba(239,68,68,0.35)",borderRadius:11,color:"#fca5a5",fontSize:12.5,cursor:"pointer",fontWeight:700,fontFamily:"inherit"}}>🚪 Logout</button>
+        </div>
+      </div>
+      <div className="sidebar-spacer" style={{width:225,flexShrink:0}}/>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAIN DASHBOARD
+// ═══════════════════════════════════════════════════════════
 export default function Dashboard({setUser,user,fixedLogo}){
   const [active,setActive]=useState("dashboard");
   const [modal,setModal]=useState(null);
@@ -592,16 +1085,12 @@ export default function Dashboard({setUser,user,fixedLogo}){
   useEffect(()=>{setCompanyLogo(user?.logoUrl?user.logoUrl:(fixedLogo||null));},[user,fixedLogo]);
 
   const [clients,setClients]=useState([]);
-  const [clientsLoading,setClientsLoading]=useState(false);
-  const [clientSearch,setClientSearch]=useState("");
   const [nc,setNc]=useState({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});
   const [ncError,setNcError]=useState({});
   const [saveLoading,setSaveLoading]=useState(false);
   const [showClientPass,setShowClientPass]=useState(false);
 
   const [employees,setEmployees]=useState([]);
-  const [empLoading,setEmpLoading]=useState(false);
-  const [empSearch,setEmpSearch]=useState("");
   const [ne,setNe]=useState({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});
   const [showEmpPass,setShowEmpPass]=useState(false);
   const [neError,setNeError]=useState({});
@@ -609,16 +1098,11 @@ export default function Dashboard({setUser,user,fixedLogo}){
 
   const [projects,setProjects]=useState([]);
   const [projLoading,setProjLoading]=useState(false);
-  const [projSearch,setProjSearch]=useState("");
   const [np,setNp]=useState({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:""});
   const [npError,setNpError]=useState({});
   const [projSaveLoading,setProjSaveLoading]=useState(false);
-  const [editProjectId,setEditProjectId]=useState(null);
-  const [editAssignedTo,setEditAssignedTo]=useState("");
 
   const [managers,setManagers]=useState([]);
-  const [mgrLoading,setMgrLoading]=useState(false);
-  const [mgrSearch,setMgrSearch]=useState("");
   const [nm,setNm]=useState({managerName:"",email:"",phone:"",department:"",role:"Manager",address:"",password:"",status:"Active"});
   const [nmError,setNmError]=useState({});
   const [mgrSaveLoading,setMgrSaveLoading]=useState(false);
@@ -629,10 +1113,10 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const handleLogout=()=>{localStorage.removeItem("user");setUser(null);};
   const onLogoChange=async(logo)=>{setCompanyLogo(logo||fixedLogo);const updatedUser={...user,logoUrl:logo||""};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);try{await axios.post("http://localhost:5000/api/auth/save-logo",{userId:user._id||user.id,logoUrl:logo||""});}catch(e){console.log(e);}};
 
-  const fetchClients=async()=>{try{setClientsLoading(true);const res=await axios.get("http://localhost:5000/api/clients");setClients(res.data);}catch(e){console.log(e);}finally{setClientsLoading(false);}};
-  const fetchEmployees=async()=>{try{setEmpLoading(true);const res=await axios.get("http://localhost:5000/api/employees");setEmployees(res.data);}catch(e){console.log(e);}finally{setEmpLoading(false);}};
+  const fetchClients=async()=>{try{const res=await axios.get("http://localhost:5000/api/clients");setClients(res.data);}catch(e){console.log(e);}};
+  const fetchEmployees=async()=>{try{const res=await axios.get("http://localhost:5000/api/employees");setEmployees(res.data);}catch(e){console.log(e);}};
   const fetchProjects=async()=>{try{setProjLoading(true);const res=await axios.get("http://localhost:5000/api/projects");setProjects(res.data);}catch(e){console.log(e);}finally{setProjLoading(false);}};
-  const fetchManagers=async()=>{try{setMgrLoading(true);const res=await axios.get("http://localhost:5000/api/managers");setManagers(res.data);}catch(e){console.log(e);}finally{setMgrLoading(false);}};
+  const fetchManagers=async()=>{try{const res=await axios.get("http://localhost:5000/api/managers");setManagers(res.data);}catch(e){console.log(e);}};
 
   const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,projectAssigned:nc.project,password:nc.password,status:nc.status};const res=await axios.post("http://localhost:5000/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
 
@@ -641,11 +1125,6 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const addProject=async()=>{const errors={};if(!np.name.trim())errors.name="Project name is required";if(!np.client.trim())errors.client="Client is required";if(Object.keys(errors).length>0){setNpError(errors);return;}try{setProjSaveLoading(true);await axios.post("http://localhost:5000/api/projects/add",np);await fetchProjects();setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:""});setNpError({});setModal(null);}catch(err){setNpError({name:err.response?.data?.msg||"Failed to save"});}finally{setProjSaveLoading(false);}};
 
   const addManager=async()=>{const errors={};if(!nm.managerName.trim())errors.managerName="Name is required";if(!nm.email.trim())errors.email="Email is required";if(!nm.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNmError(errors);return;}try{setMgrSaveLoading(true);const res=await axios.post("http://localhost:5000/api/managers/add",nm);setManagers(prev=>[res.data.manager,...prev]);setNm({managerName:"",email:"",phone:"",department:"",role:"Manager",address:"",password:"",status:"Active"});setNmError({});setModal(null);}catch(err){setNmError({email:err.response?.data?.msg||"Failed to save"});}finally{setMgrSaveLoading(false);}};
-
-  const filteredClients=clients.filter(c=>(c.clientName||c.name||"").toLowerCase().includes(clientSearch.toLowerCase())||(c.email||"").toLowerCase().includes(clientSearch.toLowerCase())||(c.companyName||c.company||"").toLowerCase().includes(clientSearch.toLowerCase()));
-  const filteredEmployees=employees.filter(e=>(e.name||"").toLowerCase().includes(empSearch.toLowerCase())||(e.email||"").toLowerCase().includes(empSearch.toLowerCase()));
-  const filteredProjects=projects.filter(p=>(p.name||"").toLowerCase().includes(projSearch.toLowerCase())||(p.client||"").toLowerCase().includes(projSearch.toLowerCase()));
-  const filteredManagers=managers.filter(m=>(m.managerName||"").toLowerCase().includes(mgrSearch.toLowerCase())||(m.email||"").toLowerCase().includes(mgrSearch.toLowerCase()));
 
   const navItems=getNavForRole(user?.role);
   const validActive=navItems.find(n=>n.key===active)?active:navItems[0]?.key||"dashboard";
@@ -656,9 +1135,8 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const initials=displayName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
   const B=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
 
-  // Derive companyId from user for InterviewPage
   const companyId=user?.companyId||user?.company||user?._id||user?.id||"default";
-  const companyNameStr=user?.companyName||user?.name||"Company";
+const companyNameStr = "M Business";
 
   return(
     <div style={{display:"flex",minHeight:"100vh",background:"linear-gradient(135deg,#f5f3ff 0%,#faf5ff 50%,#f3e8ff 100%)",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
@@ -675,6 +1153,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
       <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} navItems={navItems}/>
 
       <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}>
+        {/* Mobile Topbar */}
         <div className="mob-topbar" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:"#fff",borderBottom:"1px solid #ede9fe",position:"sticky",top:0,zIndex:100,boxShadow:"0 2px 8px rgba(147,51,234,0.07)"}}>
           <button onClick={()=>setSidebarOpen(true)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:"#7c3aed",padding:"2px 6px",lineHeight:1}}>☰</button>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -687,6 +1166,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
         </div>
 
         <div className="main-content" style={{flex:1,padding:"22px 24px",overflowY:"auto"}}>
+          {/* Page Header */}
           <div className="page-header" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
             <div>
               <h1 style={{margin:0,fontSize:22,fontWeight:800,color:T.text}}>{page?.icon} {page?.label}</h1>
@@ -697,6 +1177,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
               {validActive==="employees"&&<button onClick={()=>{setNeError({});setModal("employee");}} style={B("#7c3aed")}>+ Add Employee</button>}
               {validActive==="projects"&&<button onClick={()=>{setNpError({});setModal("project");}} style={B("#a855f7")}>+ New Project</button>}
               {validActive==="managers"&&<button onClick={()=>{setNmError({});setShowMgrPass(false);setModal("manager");}} style={B("#f59e0b")}>+ Add Manager</button>}
+             
               <div onClick={()=>setShowProfile(true)} className="mob-topbar-hide" style={{background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,padding:"6px 12px",display:"flex",alignItems:"center",gap:8,cursor:"pointer",boxShadow:"0 2px 10px rgba(147,51,234,0.08)",flexShrink:0}}>
                 <div style={{width:30,height:30,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:12,overflow:"hidden",flexShrink:0}}>
                   {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:3,background:"#fff"}} onError={()=>setCompanyLogo(null)}/>:<span>{initials}</span>}
@@ -707,6 +1188,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
             </div>
           </div>
 
+          {/* ── Dashboard ── */}
           {validActive==="dashboard"&&<>
             <div className="dash-stats" style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12,marginBottom:18}}>
               {[{t:"Total Clients",v:clients.length,i:"👥",c:"#9333ea"},{t:"Employees",v:employees.length,i:"👨‍💼",c:"#7c3aed"},{t:"Managers",v:managers.length,i:"🧑‍💼",c:"#f59e0b"},{t:"Projects",v:projects.length,i:"📁",c:"#a855f7"},{t:"Invoices",v:INVOICES.length,i:"🧾",c:"#22C55E"}].map(({t,v,i,c})=>(
@@ -728,67 +1210,27 @@ export default function Dashboard({setUser,user,fixedLogo}){
             </div>
           </>}
 
-          {validActive==="clients"&&<SC title={`All Clients (${filteredClients.length})`}><Search value={clientSearch} onChange={setClientSearch} placeholder="Search by name, email, company..."/>{clientsLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>:<Tbl cols={["ID","Name","Company","Email","Phone","Status","Created"]} rows={filteredClients.map((c,i)=>[`CLT${String(i+1).padStart(3,"0")}`,c.clientName||c.name||"—",c.companyName||c.company||"—",c.email,c.phone||"—",<Badge label={c.status}/>,c.createdAt?new Date(c.createdAt).toLocaleDateString():"—"])}/>}</SC>}
-
-          {validActive==="employees"&&<SC title={`All Employees (${filteredEmployees.length})`}><Search value={empSearch} onChange={setEmpSearch} placeholder="Search by name, email, role..."/>{empLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>:<Tbl cols={["ID","Name","Email","Phone","Role","Department","Status","Joined"]} rows={filteredEmployees.map((e,i)=>[`EMP${String(i+1).padStart(3,"0")}`,e.name,e.email,e.phone||"—",e.role||"—",e.department||"—",<Badge label={e.status}/>,e.createdAt?new Date(e.createdAt).toLocaleDateString():"—"])}/>}</SC>}
-
-          {validActive==="projects"&&<SC title={`All Projects (${filteredProjects.length})`}>
-            <Search value={projSearch} onChange={setProjSearch} placeholder="Search by project name, client..."/>
-            {projLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>
-            :<div style={{overflowX:"auto"}}>
-              <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:600}}>
-                <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
-                  {["ID","Name","Client","Budget","Status","Assigned To","Action"].map(c=>(
-                    <th key={c} style={{padding:"10px 14px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
-                  ))}
-                </tr></thead>
-                <tbody>
-                  {filteredProjects.length===0
-                    ?<tr><td colSpan={7} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No projects found</td></tr>
-                    :filteredProjects.map((p,i)=>(
-                      <tr key={p._id||i} style={{borderBottom:"1px solid #f3f0ff"}}
-                        onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
-                        onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                        <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`PRJ${String(i+1).padStart(3,"0")}`}</td>
-                        <td style={{padding:"12px 14px",fontWeight:700,color:"#1e0a3c"}}>{p.name}</td>
-                        <td style={{padding:"12px 14px",color:"#7c3aed"}}>{p.client||"—"}</td>
-                        <td style={{padding:"12px 14px",color:"#7c3aed"}}>{p.budget||"—"}</td>
-                        <td style={{padding:"12px 14px"}}><Badge label={p.status||"Pending"}/></td>
-                        <td style={{padding:"12px 14px"}}>
-                          {p.assignedTo
-                            ?<div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,flexShrink:0}}>{p.assignedTo[0].toUpperCase()}</div><span style={{color:"#6366f1",fontWeight:600,fontSize:12}}>{p.assignedTo}</span></div>
-                            :<span style={{color:"#a78bfa",fontSize:12}}>Not assigned</span>
-                          }
-                        </td>
-                        <td style={{padding:"12px 14px"}}>
-                          <button onClick={()=>{setEditProjectId(p._id);setEditAssignedTo(p.assignedTo||"");setModal("assignEmployee");}}
-                            style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)",borderRadius:7,padding:"4px 12px",fontSize:12,color:"#6366f1",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
-                            Assign
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  }
-                </tbody>
-              </table>
-            </div>}
-          </SC>}
-
-          {validActive==="managers"&&(<div style={{display:"flex",flexDirection:"column",gap:14}}><div className="dash-stats" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>{[{t:"Total Managers",v:managers.length,i:"🧑‍💼",c:"#f59e0b"},{t:"Active",v:managers.filter(m=>m.status==="Active").length,i:"✅",c:"#22C55E"},{t:"Inactive",v:managers.filter(m=>m.status==="Inactive").length,i:"⛔",c:"#EF4444"}].map(({t,v,i,c})=>(<div key={t} style={{background:"#fff",borderRadius:14,padding:"16px 14px",boxShadow:"0 4px 18px rgba(147,51,234,0.07)",border:"1px solid #ede9fe",display:"flex",alignItems:"center",gap:12}}><div style={{width:40,height:40,borderRadius:11,background:`${c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{i}</div><div><div style={{fontSize:10,color:"#a78bfa",fontWeight:700,letterSpacing:0.5}}>{t.toUpperCase()}</div><div style={{fontSize:24,fontWeight:800,color:c}}>{v}</div></div></div>))}</div><SC title={`All Managers (${filteredManagers.length})`}><Search value={mgrSearch} onChange={setMgrSearch} placeholder="Search by name, email, department..."/>{mgrLoading?<div style={{textAlign:"center",padding:40,color:"#a78bfa"}}>Loading...</div>:<Tbl cols={["ID","Name","Email","Phone","Role","Department","Status","Joined"]} rows={filteredManagers.map((m,i)=>[`MGR${String(i+1).padStart(3,"0")}`,<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:26,height:26,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{(m.managerName||"?")[0].toUpperCase()}</div><span style={{fontWeight:600}}>{m.managerName}</span></div>,m.email,m.phone||"—",m.role||"Manager",m.department||"—",<Badge label={m.status}/>,m.createdAt?new Date(m.createdAt).toLocaleDateString():"—"])}/>}</SC></div>)}
+          {/* ── Pages using new components ── */}
+          {validActive==="clients"&&<ClientsPage clients={clients} setClients={setClients} onAddClient={()=>{setNcError({});setShowClientPass(false);setModal("client");}}/>}
+          {validActive==="employees"&&<EmployeesPage employees={employees} setEmployees={setEmployees}/>}
+          {validActive==="managers"&&<ManagersPage managers={managers} setManagers={setManagers}/>}
+          {validActive==="projects"&&<ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees}/>}
 
           {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
           {validActive==="quotations"&&<QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
           {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers}/>}
           {validActive==="tasks"&&<TaskPage projects={projects} employees={employees}/>}
           {validActive==="calendar"&&<CalendarPage projects={projects} clients={clients}/>}
-          {validActive==="accounts"&&<AccountsPage/>}
+         {validActive==="accounts"&&<AccountsPage ExpensesPage={ExpensesPage}/>}
           {validActive==="interviews"&&<InterviewPage companyId={companyId} companyName={companyNameStr}/>}
+          {validActive==="documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive==="reports"&&<ReportsPage clients={clients} projects={projects} employees={employees} managers={managers}/>}
         </div>
       </div>
 
       {showProfile&&<ProfileModal user={user} setUser={setUser} onClose={()=>setShowProfile(false)} onLogout={handleLogout} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
 
+      {/* ── Add Client Modal ── */}
       {modal==="client"&&<Mdl title="Add New Client" onClose={()=>setModal(null)}>
         <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
           <Fld label="Client Name *" value={nc.name} onChange={v=>{setNc({...nc,name:v});setNcError(p=>({...p,name:""}));}} error={ncError.name}/>
@@ -813,24 +1255,24 @@ export default function Dashboard({setUser,user,fixedLogo}){
         </div>
       </Mdl>}
 
+      {/* ── Add Employee Modal ── */}
       {modal==="employee"&&<Mdl title="Add New Employee" onClose={()=>setModal(null)}>
         <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
-          <Fld label="Full Name *"     value={ne.name}       onChange={v=>setNe({...ne,name:v})}       error={neError.name}/>
-          <Fld label="Email *"         value={ne.email}      onChange={v=>{setNe({...ne,email:v});setNeError(p=>({...p,email:""}));}} type="email" error={neError.email}/>
-          <Fld label="Phone Number"    value={ne.phone}      onChange={v=>setNe({...ne,phone:v})}/>
-          <Fld label="Role / Position" value={ne.role}       onChange={v=>setNe({...ne,role:v})}/>
-          <Fld label="Department"      value={ne.department} onChange={v=>setNe({...ne,department:v})}/>
-          <Fld label="Salary"          value={ne.salary}     onChange={v=>setNe({...ne,salary:v})}/>
-          <Fld label="Status"          value={ne.status}     onChange={v=>setNe({...ne,status:v})} options={["Active","Inactive"]}/>
+          <Fld label="Full Name *" value={ne.name} onChange={v=>setNe({...ne,name:v})} error={neError.name}/>
+          <Fld label="Email *" value={ne.email} onChange={v=>{setNe({...ne,email:v});setNeError(p=>({...p,email:""}));}} type="email" error={neError.email}/>
+          <Fld label="Phone Number" value={ne.phone} onChange={v=>setNe({...ne,phone:v})}/>
+          <Fld label="Role / Position" value={ne.role} onChange={v=>setNe({...ne,role:v})}/>
+          <Fld label="Department" value={ne.department} onChange={v=>setNe({...ne,department:v})}/>
+          <Fld label="Salary" value={ne.salary} onChange={v=>setNe({...ne,salary:v})}/>
+          <Fld label="Status" value={ne.status} onChange={v=>setNe({...ne,status:v})} options={["Active","Inactive"]}/>
         </div>
         <div style={{marginBottom:14,marginTop:4}}>
-          <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>PASSWORD * <span style={{fontSize:10,color:"#a78bfa",fontWeight:400}}>(Employee login-க்கு use ஆகும்)</span></label>
+          <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>PASSWORD *</label>
           <div style={{position:"relative"}}>
             <input type={showEmpPass?"text":"password"} value={ne.password} onChange={e=>{setNe({...ne,password:e.target.value});setNeError(p=>({...p,password:""}));}} style={{width:"100%",border:`1.5px solid ${neError.password?"#EF4444":"#ede9fe"}`,borderRadius:10,padding:"10px 46px 10px 14px",fontSize:13,color:T.text,background:"#faf5ff",boxSizing:"border-box",outline:"none"}} placeholder="Set employee login password"/>
             <button type="button" onClick={()=>setShowEmpPass(!showEmpPass)} style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"#a78bfa",fontSize:11,fontWeight:700,fontFamily:"inherit"}}>{showEmpPass?"HIDE":"SHOW"}</button>
           </div>
           {neError.password&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {neError.password}</div>}
-          <div style={{fontSize:11,color:"#a78bfa",marginTop:5}}>💡 Employee இந்த email + password use பண்ணி login பண்ணா <strong style={{color:"#9333ea"}}>Employee Dashboard</strong> திறக்கும்</div>
         </div>
         <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>
           <button onClick={()=>setModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13}}>Cancel</button>
@@ -838,6 +1280,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
         </div>
       </Mdl>}
 
+      {/* ── Add Project Modal ── */}
       {modal==="project"&&<Mdl title="Create New Project" onClose={()=>setModal(null)}>
         <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
           <Fld label="Project Name *" value={np.name} onChange={v=>setNp({...np,name:v})} error={npError.name}/>
@@ -846,12 +1289,12 @@ export default function Dashboard({setUser,user,fixedLogo}){
             <ClientDropdown clients={clients} value={np.client} onChange={v=>setNp({...np,client:v})} error={npError.client} onAddClient={()=>{setModal("client");setNcError({});setShowClientPass(false);}}/>
             {npError.client&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {npError.client}</div>}
           </div>
-          <Fld label="Purpose"      value={np.purpose}  onChange={v=>setNp({...np,purpose:v})}/>
-          <Fld label="Budget"       value={np.budget}   onChange={v=>setNp({...np,budget:v})}/>
-          <Fld label="Start Date"   value={np.start}    onChange={v=>setNp({...np,start:v})}   type="date"/>
-          <Fld label="End Date"     value={np.end}      onChange={v=>setNp({...np,end:v})}     type="date"/>
-          <Fld label="Team Members" value={np.team}     onChange={v=>setNp({...np,team:v})}/>
-          <Fld label="Status"       value={np.status}   onChange={v=>setNp({...np,status:v})}  options={["Pending","In Progress","Completed","On Hold"]}/>
+          <Fld label="Purpose" value={np.purpose} onChange={v=>setNp({...np,purpose:v})}/>
+          <Fld label="Budget" value={np.budget} onChange={v=>setNp({...np,budget:v})}/>
+          <Fld label="Start Date" value={np.start} onChange={v=>setNp({...np,start:v})} type="date"/>
+          <Fld label="End Date" value={np.end} onChange={v=>setNp({...np,end:v})} type="date"/>
+          <Fld label="Team Members" value={np.team} onChange={v=>setNp({...np,team:v})}/>
+          <Fld label="Status" value={np.status} onChange={v=>setNp({...np,status:v})} options={["Pending","In Progress","Completed","On Hold"]}/>
         </div>
         <div style={{marginBottom:14}}>
           <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEE <span style={{fontSize:10,color:"#a78bfa",fontWeight:400}}>(optional)</span></label>
@@ -859,7 +1302,6 @@ export default function Dashboard({setUser,user,fixedLogo}){
             <option value="">-- Select Employee --</option>
             {employees.map(e=><option key={e._id||e.email} value={e.name}>{e.name}{e.department?` (${e.department})`:""}</option>)}
           </select>
-          {np.assignedTo&&<div style={{fontSize:11,color:"#9333ea",marginTop:5}}>✅ <strong>{np.assignedTo}</strong> — Employee Dashboard-ல் show ஆகும்</div>}
         </div>
         <Fld label="Description" value={np.description} onChange={v=>setNp({...np,description:v})}/>
         <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>
@@ -868,24 +1310,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
         </div>
       </Mdl>}
 
-      {modal==="assignEmployee"&&<Mdl title="Assign Employee to Project" onClose={()=>setModal(null)}>
-        <div style={{marginBottom:18}}>
-          <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:8}}>SELECT EMPLOYEE</label>
-          <select value={editAssignedTo} onChange={e=>setEditAssignedTo(e.target.value)} style={{width:"100%",border:"1.5px solid #ede9fe",borderRadius:10,padding:"10px 14px",fontSize:13,color:editAssignedTo?"#1e0a3c":"#a78bfa",background:"#faf5ff",outline:"none",fontFamily:"inherit"}}>
-            <option value="">-- Select Employee --</option>
-            {employees.map(e=><option key={e._id||e.email} value={e.name}>{e.name}{e.department?` (${e.department})`:""}</option>)}
-          </select>
-          {editAssignedTo&&<div style={{fontSize:11,color:"#9333ea",marginTop:8}}>✅ <strong>{editAssignedTo}</strong> — Employee Dashboard-ல் இந்த project show ஆகும்</div>}
-        </div>
-        <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>
-          <button onClick={()=>setModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:"#1e0a3c",borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
-          <button onClick={async()=>{if(!editAssignedTo){alert("Please select an employee");return;}try{await axios.put(`http://localhost:5000/api/projects/${editProjectId}`,{assignedTo:editAssignedTo});setProjects(prev=>prev.map(p=>p._id===editProjectId?{...p,assignedTo:editAssignedTo}:p));setModal(null);setEditProjectId(null);setEditAssignedTo("");}catch(err){alert(err.response?.data?.msg||"Failed to assign");}}}
-            style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)",color:"#fff",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
-            Save Assignment →
-          </button>
-        </div>
-      </Mdl>}
-
+      {/* ── Add Manager Modal ── */}
       {modal==="manager"&&<Mdl title="Add New Manager" onClose={()=>setModal(null)}>
         <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
           <Fld label="Manager Name *" value={nm.managerName} onChange={v=>{setNm({...nm,managerName:v});setNmError(p=>({...p,managerName:""}));}} error={nmError.managerName}/>

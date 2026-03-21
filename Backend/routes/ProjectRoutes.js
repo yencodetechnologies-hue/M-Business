@@ -1,9 +1,9 @@
-// routes/project.js  ← உங்கள் existing file-ஐ இதுவாக replace பண்ணுங்க
 const express = require("express");
 const router  = express.Router();
 const Project = require("../models/ProjectModel");
 
 // GET all
+// GET all projects
 router.get("/", async (req, res) => {
   try {
     const projects = await Project.find().sort({ createdAt: -1 });
@@ -12,8 +12,20 @@ router.get("/", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
+// GET projects by client name  ← add this
+router.get("/by-client/:clientName", async (req, res) => {
+  try {
+    const projects = await Project.find({
+      client: req.params.clientName
+    }).sort({ createdAt: -1 });
 
-// POST add — assignedTo save பண்றோம்
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// POST add
 router.post("/add", async (req, res) => {
   try {
     const {
@@ -40,7 +52,7 @@ router.post("/add", async (req, res) => {
       progress:       Number(progress)       || 0,
       tasks:          Number(tasks)          || 0,
       completedTasks: Number(completedTasks) || 0,
-      assignedTo:     assignedTo     || "",  // ← employee name save
+      assignedTo:     assignedTo     || "",
       manager:        manager        || "",
     });
 
@@ -52,16 +64,26 @@ router.post("/add", async (req, res) => {
   }
 });
 
-// PUT update
+// PUT update  ← { new: true } → { returnDocument: "after" } fix
 router.put("/:id", async (req, res) => {
   try {
     const project = await Project.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
-      { new: true }
+      { returnDocument: "after" }
     );
     if (!project) return res.status(404).json({ msg: "Project not found" });
     res.json(project);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// DELETE project
+router.delete("/:id", async (req, res) => {
+  try {
+    await Project.findByIdAndDelete(req.params.id);
+    res.json({ msg: "Project deleted" });
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
   }

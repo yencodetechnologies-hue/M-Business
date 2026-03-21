@@ -1,268 +1,254 @@
-// routes/interviews.js
-// Full backend for HR Interview Management
-// Install: npm install express mongoose multer cloudinary multer-storage-cloudinary
+// =============================================
+//  routes/interviewroutes.js
+//  Interview Portal — Routes + Model
+// =============================================
+//
+//  Already added in server.js:
+//    const interviewRoutes = require("./routes/interviewroutes");
+//    app.use("/api/interviews", interviewRoutes);
+//
+//  Install (if not already):
+//    npm install multer
+// =============================================
 
-const express = require("express");
-const router = express.Router();
-const multer = require("multer");
-const path = require("path");
-const mongoose = require("mongoose");
+const express    = require("express");
+const multer     = require("multer");
+const mongoose   = require("mongoose");
+const path       = require("path");
+const fs         = require("fs");
+const router     = express.Router();
 
-// ─── SCHEMA ──────────────────────────────────────────────────────────────────
-const InterviewSchema = new mongoose.Schema({
-  companyId:  { type: String, required: true, index: true },
-  name:       { type: String, required: true },
-  email:      { type: String, required: true },
-  mobile:     { type: String, required: true },
-  experience: { type: String, enum: ["Fresher", "Experienced"], required: true },
-  years:      { type: String, default: "" },
-  role:       { type: String, required: true },
-  notes:      { type: String, default: "" },
-  resumeUrl:  { type: String, default: "" },   // Cloudinary URL
-  resumeName: { type: String, default: "" },   // Original filename
-  resumeSize: { type: String, default: "" },   // e.g. "245 KB"
-  status:     { type: String, enum: ["pending", "hired", "rejected"], default: "pending" },
-  viewedAt:   { type: Date, default: null },   // when HR first viewed resume
-}, { timestamps: true });
+// ── Upload Directory ──────────────────────────
+const UPLOAD_DIR = path.join(__dirname, "../uploads/resumes");
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
-const Interview = mongoose.model("Interview", InterviewSchema);
-
-// ─── FILE UPLOAD SETUP ───────────────────────────────────────────────────────
-// OPTION A: Local storage (simple, no cloud needed)
-const localStorage_storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/resumes/"),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
-  }
+// ── Multer Config ─────────────────────────────
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+  filename:    (req, file, cb) => {
+    const safe = file.originalname.replace(/\s+/g, "_");
+    cb(null, `${Date.now()}_${safe}`);
+  },
 });
 
-// OPTION B: Cloudinary (recommended for production)
-// Uncomment if you have Cloudinary set up:
-/*
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key:    process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-const cloudinary_storage = new CloudinaryStorage({
-  cloudinary,
-  params: { folder: "resumes", resource_type: "raw", allowed_formats: ["pdf","doc","docx"] }
-});
-*/
+const fileFilter = (req, file, cb) => {
+  const allowed = [".pdf", ".doc", ".docx"];
+  const ext = path.extname(file.originalname).toLowerCase();
+  allowed.includes(ext)
+    ? cb(null, true)
+    : cb(new Error("Only PDF, DOC, DOCX files are allowed"));
+};
 
 const upload = multer({
-  storage: localStorage_storage,   // Switch to cloudinary_storage if using Cloudinary
-  limits: { fileSize: 5 * 1024 * 1024 },  // 5MB
-  fileFilter: (req, file, cb) => {
-    const allowed = [".pdf", ".doc", ".docx"];
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (allowed.includes(ext)) cb(null, true);
-    else cb(new Error("Only PDF, DOC, DOCX files allowed"));
-  }
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
-// ─── HELPER ──────────────────────────────────────────────────────────────────
-function formatBytes(bytes) {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-}
+// ── Schema & Model ────────────────────────────
+const interviewSchema = new mongoose.Schema(
+  {
+    companyId:     { type: String, default: "DEFAULT" },
+    companyName:   { type: String, default: "M Business" },
+    name:          { type: String, required: true, trim: true },
+    email:         { type: String, required: true, trim: true, lowercase: true },
+    mobile:        { type: String, required: true, trim: true },
+    experience:    { type: String, enum: ["Fresher", "Experienced"], required: true },
+    years:         { type: String, default: "" },
+    role:          { type: String, required: true, trim: true },
+    notes:         { type: String, default: "" },
+    resumeName:    { type: String, default: "" },
+    resumePath:    { type: String, default: "" },
+    status: {
+      type:    String,
+      enum:    ["Pending", "Hired", "Rejected"],
+      default: "Pending",
+    },
+    interviewDate: { type: Date, default: null },
+  },
+  { timestamps: true }
+);
 
-// ─── ROUTES ──────────────────────────────────────────────────────────────────
+const Interview = mongoose.models.Interview || mongoose.model("Interview", interviewSchema);
 
-// GET /api/interviews/company/:companyId
-// Returns company info for the apply form header
-router.get("/company/:companyId", async (req, res) => {
-  try {
-    // You can extend this to look up from your Company/User collection
-    // For now returns a basic response — extend as needed
-    const { companyId } = req.params;
-    // Try to find from your existing auth model (import as needed)
-    // const user = await User.findById(companyId).select("name logoUrl");
-    // if (user) return res.json({ name: user.name, logoUrl: user.logoUrl });
-    res.json({ name: "Company Portal", logoUrl: null });
-  } catch (err) {
-    res.status(500).json({ msg: "Server error" });
-  }
-});
+// ── Helper: attach resumeUrl ──────────────────
+const withResumeUrl = (req, doc) => {
+  const base = `${req.protocol}://${req.get("host")}`;
+  const plain = doc.toObject ? doc.toObject() : { ...doc };
+  return {
+    ...plain,
+    resumeUrl: plain.resumePath
+      ? `${base}/uploads/resumes/${path.basename(plain.resumePath)}`
+      : null,
+  };
+};
 
-// GET /api/interviews?companyId=xxx
-// HR Dashboard - get all candidates for a company
-router.get("/", async (req, res) => {
-  try {
-    const { companyId, status, search } = req.query;
-    if (!companyId) return res.status(400).json({ msg: "companyId required" });
+// ═══════════════════════════════════════════════
+//  ROUTES
+// ═══════════════════════════════════════════════
 
-    const query = { companyId };
-    if (status && status !== "all") query.status = status;
-    if (search) {
-      query.$or = [
-        { name:  { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-        { role:  { $regex: search, $options: "i" } },
-      ];
-    }
-    const interviews = await Interview.find(query).sort({ createdAt: -1 });
-    res.json(interviews);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
-
-// POST /api/interviews/apply
-// Candidate submits application (with resume file)
+// ── POST /api/interviews/apply ────────────────
+//    Candidate submits application form
 router.post("/apply", upload.single("resume"), async (req, res) => {
   try {
-    const { companyId, name, email, mobile, experience, years, role, notes } = req.body;
+    const { companyId, companyName, name, email, mobile, experience, years, role, notes } = req.body;
 
-    // Validation
-    if (!companyId || !name || !email || !mobile || !experience || !role) {
-      return res.status(400).json({ msg: "All required fields must be filled" });
+    if (!name || !email || !mobile || !role || !experience) {
+      return res.status(400).json({ msg: "Name, email, mobile, role, and experience are required" });
     }
     if (!req.file) {
       return res.status(400).json({ msg: "Resume file is required" });
     }
 
-    // Check for duplicate email in same company
-    const exists = await Interview.findOne({ companyId, email });
-    if (exists) {
-      return res.status(400).json({ msg: "You have already applied for this company" });
-    }
-
-    // Build resume URL
-    // For local storage:
-    const resumeUrl = `http://localhost:5000/uploads/resumes/${req.file.filename}`;
-    // For Cloudinary: req.file.path (secure_url from cloudinary)
-
-    const interview = new Interview({
-      companyId,
-      name:       name.trim(),
-      email:      email.trim().toLowerCase(),
-      mobile:     mobile.trim(),
+    const doc = await Interview.create({
+      companyId:   companyId   || "DEFAULT",
+      companyName: companyName || "M Business",
+      name,
+      email,
+      mobile,
       experience,
-      years:      years || "",
-      role:       role.trim(),
-      notes:      notes || "",
-      resumeUrl,
-      resumeName: req.file.originalname,
-      resumeSize: formatBytes(req.file.size),
-      status:     "pending",
+      years:       years || "",
+      role,
+      notes:       notes || "",
+      resumeName:  req.file.originalname,
+      resumePath:  req.file.filename,
+      status:      "Pending",
     });
 
-    await interview.save();
-    res.status(201).json({ msg: "Application submitted successfully", id: interview._id });
+    res.status(201).json({ msg: "Application submitted successfully", id: doc._id });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Server error. Please try again." });
+    console.error("Interview apply error:", err);
+    res.status(500).json({ msg: err.message || "Server error" });
   }
 });
 
-// PUT /api/interviews/:id/status
-// HR updates candidate status (pending → hired / rejected)
-router.put("/:id/status", async (req, res) => {
+// ── GET /api/interviews ───────────────────────
+//    Admin: list all candidates (search / filter / paginate)
+//    Query: ?search= &status= &experience= &page=1 &limit=20
+router.get("/", async (req, res) => {
+  try {
+    const { search = "", status = "", experience = "", page = 1, limit = 20 } = req.query;
+
+    const query = {};
+    if (status)     query.status     = status;
+    if (experience) query.experience = experience;
+    if (search) {
+      const re = new RegExp(search, "i");
+      query.$or = [{ name: re }, { email: re }, { mobile: re }, { role: re }];
+    }
+
+    const total = await Interview.countDocuments(query);
+    const docs  = await Interview.find(query)
+      .sort({ createdAt: -1 })
+      .skip((+page - 1) * +limit)
+      .limit(+limit);
+
+    const base = `${req.protocol}://${req.get("host")}`;
+    const data = docs.map((d) => ({
+      ...d.toObject(),
+      resumeUrl: d.resumePath
+        ? `${base}/uploads/resumes/${path.basename(d.resumePath)}`
+        : null,
+    }));
+
+    res.json({ total, page: +page, limit: +limit, data });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
+// ── GET /api/interviews/stats ─────────────────
+//    Admin: dashboard counts
+router.get("/stats", async (req, res) => {
+  try {
+    const [total, pending, hired, rejected] = await Promise.all([
+      Interview.countDocuments(),
+      Interview.countDocuments({ status: "Pending"  }),
+      Interview.countDocuments({ status: "Hired"    }),
+      Interview.countDocuments({ status: "Rejected" }),
+    ]);
+    res.json({ total, pending, hired, rejected });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
+// ── GET /api/interviews/:id ───────────────────
+//    Single candidate detail
+router.get("/:id", async (req, res) => {
+  try {
+    const doc = await Interview.findById(req.params.id);
+    if (!doc) return res.status(404).json({ msg: "Candidate not found" });
+    res.json(withResumeUrl(req, doc));
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
+// ── PATCH /api/interviews/:id/status ─────────
+//    Admin: Pending → Hired / Rejected
+router.patch("/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
-    if (!["pending", "hired", "rejected"].includes(status)) {
-      return res.status(400).json({ msg: "Invalid status value" });
+    if (!["Pending", "Hired", "Rejected"].includes(status)) {
+      return res.status(400).json({ msg: "status must be Pending | Hired | Rejected" });
     }
-    const interview = await Interview.findByIdAndUpdate(
+    const doc = await Interview.findByIdAndUpdate(
       req.params.id,
       { status },
       { new: true }
     );
-    if (!interview) return res.status(404).json({ msg: "Candidate not found" });
-    res.json(interview);
+    if (!doc) return res.status(404).json({ msg: "Candidate not found" });
+    res.json({ msg: "Status updated", status: doc.status });
   } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ msg: err.message });
   }
 });
 
-// PUT /api/interviews/:id
-// General update (status + any other fields)
-router.put("/:id", async (req, res) => {
+// ── PATCH /api/interviews/:id/interview-date ──
+//    Admin: set / update interview date
+router.patch("/:id/interview-date", async (req, res) => {
   try {
-    const allowed = ["status", "notes"];
-    const update = {};
-    allowed.forEach(f => { if (req.body[f] !== undefined) update[f] = req.body[f]; });
-
-    // When HR views resume → auto-set status to pending if still unset
-    if (req.body.viewed && !update.status) {
-      update.viewedAt = new Date();
-    }
-
-    const interview = await Interview.findByIdAndUpdate(req.params.id, update, { new: true });
-    if (!interview) return res.status(404).json({ msg: "Not found" });
-    res.json(interview);
+    const { interviewDate } = req.body;
+    const doc = await Interview.findByIdAndUpdate(
+      req.params.id,
+      { interviewDate: interviewDate ? new Date(interviewDate) : null },
+      { new: true }
+    );
+    if (!doc) return res.status(404).json({ msg: "Candidate not found" });
+    res.json({ msg: "Interview date updated", interviewDate: doc.interviewDate });
   } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ msg: err.message });
   }
 });
 
-// GET /api/interviews/:id/resume
-// Serve resume file (marks as viewed, auto-sets pending status)
-router.get("/:id/resume", async (req, res) => {
-  try {
-    const interview = await Interview.findById(req.params.id);
-    if (!interview) return res.status(404).json({ msg: "Not found" });
-
-    // Mark viewed time if first view
-    if (!interview.viewedAt) {
-      interview.viewedAt = new Date();
-      await interview.save();
-    }
-
-    // Redirect to file URL (for local storage)
-    res.redirect(interview.resumeUrl);
-    // For Cloudinary, this redirects to the CDN URL directly
-  } catch (err) {
-    res.status(500).json({ msg: "Server error" });
-  }
-});
-
-// GET /api/interviews/:id
-// Single candidate detail
-router.get("/:id", async (req, res) => {
-  try {
-    const interview = await Interview.findById(req.params.id);
-    if (!interview) return res.status(404).json({ msg: "Not found" });
-    res.json(interview);
-  } catch (err) {
-    res.status(500).json({ msg: "Server error" });
-  }
-});
-
-// DELETE /api/interviews/:id
-// HR deletes a candidate record
+// ── DELETE /api/interviews/:id ────────────────
+//    Admin: delete candidate + remove resume file
 router.delete("/:id", async (req, res) => {
   try {
-    const interview = await Interview.findByIdAndDelete(req.params.id);
-    if (!interview) return res.status(404).json({ msg: "Not found" });
-    // Optional: delete file from disk/cloudinary too
-    res.json({ msg: "Deleted successfully" });
+    const doc = await Interview.findByIdAndDelete(req.params.id);
+    if (!doc) return res.status(404).json({ msg: "Candidate not found" });
+
+    // Remove resume file from disk
+    if (doc.resumePath) {
+      const filePath = path.join(UPLOAD_DIR, path.basename(doc.resumePath));
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+    res.json({ msg: "Candidate deleted successfully" });
   } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ msg: err.message });
   }
 });
 
-// GET /api/interviews/stats/:companyId
-// Dashboard stats count
-router.get("/stats/:companyId", async (req, res) => {
-  try {
-    const { companyId } = req.params;
-    const [total, pending, hired, rejected] = await Promise.all([
-      Interview.countDocuments({ companyId }),
-      Interview.countDocuments({ companyId, status: "pending" }),
-      Interview.countDocuments({ companyId, status: "hired" }),
-      Interview.countDocuments({ companyId, status: "rejected" }),
-    ]);
-    res.json({ total, pending, hired, rejected });
-  } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+// ── Multer error handler ──────────────────────
+router.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE")
+      return res.status(400).json({ msg: "File too large (max 5MB)" });
+    return res.status(400).json({ msg: err.message });
   }
+  if (err) return res.status(400).json({ msg: err.message });
+  next();
 });
 
 module.exports = router;

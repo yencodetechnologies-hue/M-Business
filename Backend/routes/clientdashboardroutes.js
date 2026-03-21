@@ -12,16 +12,17 @@ router.get("/profile/:email", async (req, res) => {
     res.status(500).json({ msg: e.message });
   }
 });
-
-router.get("/projects/:clientName", async (req, res) => {
+// GET tasks by client name (via project name match)
+router.get("/:clientName", async (req, res) => {
   try {
-    const projects = await Project.find({ 
-      client: req.params.clientName 
+    const name = decodeURIComponent(req.params.clientName);
+    // Task model-ல client field இருந்தா இப்படி:
+    const tasks = await Task.find({ 
+      assignedTo: { $regex: new RegExp(name, "i") }
     }).sort({ createdAt: -1 });
-    res.json(projects);
-  } catch(e) {
-    res.status(500).json({ msg: e.message });
+    res.json(tasks);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
   }
 });
-
 module.exports = router;

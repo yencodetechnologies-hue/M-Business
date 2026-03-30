@@ -3472,7 +3472,7 @@ useEffect(() => {
   if (!user?.name) return;
   const name = encodeURIComponent(user.name);
   setLoading(true);
-  axios.get(`http://localhost:m-business-tau.vercel.app/api/clients/my-projects/${name}`)
+  axios.get(`https://m-business-r2vd.onrender.com/api/clients/my-projects/${name}`)
     .then(res => {
       if (res.data?.length) setProjects(res.data);
     })

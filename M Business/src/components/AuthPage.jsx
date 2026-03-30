@@ -24,7 +24,7 @@ const handleLogin = async () => {
     setError("");
 
     const res = await axios.post(
-      "https://m-business.onrender.com/api/auth/login",
+      `${BASE_URL}/api/auth/login`,
       loginData
     );
 
@@ -63,7 +63,7 @@ const handleLogin = async () => {
     console.log("Sending data:", regData); // 🔥 debug
 
     const res = await axios.post(
-      "https://m-business.onrender.com/api/auth/signup",
+      `${BASE_URL}/api/auth/signup`,
       {
         name: regData.name,
         email: regData.email,

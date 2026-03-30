@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import React from "react";
 import axios from "axios";
+import { BASE_URL } from "../config";
 import InvoiceCreator from "./InvoiceCreator";
 import TaskPage from "./TaskPage";
 import CalendarPage from "./CalendarPage";
@@ -204,7 +205,7 @@ function ClientsPage({clients,setClients,onAddClient}){
     if(Object.keys(errs).length){setEditErr(errs);return;}
     try{
       setSaving(true);
-      const res=await axios.put(`http://localhost:m-business-tau.vercel.app/api/clients/${editClient._id}`,editForm);
+      const res=await axios.put(`${BASE_URL}/api/clients/${editClient._id}`,editForm);
       setClients(prev=>prev.map(c=>c._id===editClient._id?{...c,...(res.data.client||editForm)}:c));
       setEditClient(null);
       showToast("✅ Client updated!");
@@ -218,7 +219,7 @@ function ClientsPage({clients,setClients,onAddClient}){
 
   const doDelete=async()=>{
     try{
-      await axios.delete(`http://localhost:m-business-tau.vercel.app/api/clients/${deleteTarget._id}`);
+      await axios.delete(`${BASE_URL}/api/clients/${deleteTarget._id}`);
     }catch{}
     setClients(prev=>prev.filter(c=>c._id!==deleteTarget._id));
     setDeleteTarget(null);
@@ -344,8 +345,7 @@ const loadEmpDocs = async (emp) => {
   setEmpDocsLoading(true);
   try {
     const r = await axios.get(
-      `http://localhost:
-      rd/documents/${encodeURIComponent(emp.name)}/all`
+      `${BASE_URL}/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
     );
     const map = {};
     (r.data || []).forEach(d => { map[d.docType] = d; });
@@ -375,7 +375,7 @@ const loadEmpDocs = async (emp) => {
     if(Object.keys(errs).length){setEditErr(errs);return;}
     try{
       setSaving(true);
-      const res=await axios.put(`http://localhost:m-business-tau.vercel.app/api/employees/${editEmp._id}`,editForm);
+      const res=await axios.put(`${BASE_URL}/api/employees/${editEmp._id}`,editForm);
       setEmployees(prev=>prev.map(e=>e._id===editEmp._id?{...e,...(res.data||editForm)}:e));
       setEditEmp(null);
       showToast("✅ Employee updated!");
@@ -387,7 +387,7 @@ const loadEmpDocs = async (emp) => {
   };
 
   const doDelete=async()=>{
-    try{await axios.delete(`http://localhost:m-business-tau.vercel.app/api/employees/${deleteTarget._id}`);}catch{}
+    try{await axios.delete(`${BASE_URL}/api/employees/${deleteTarget._id}`);}catch{}
     setEmployees(prev=>prev.filter(e=>e._id!==deleteTarget._id));
     setDeleteTarget(null);
     showToast("🗑️ Employee deleted!");
@@ -559,7 +559,7 @@ const loadEmpDocs = async (emp) => {
   setEmpDocsLoading(true);
   try {
     const r = await axios.get(
-      `http://localhost:m-business-tau.vercel.app/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
+      `${BASE_URL}/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
     );
     const map = {};
     (r.data || []).forEach(d => { map[d.docType] = d; });
@@ -574,7 +574,7 @@ const loadEmpDocs = async (emp) => {
     if(Object.keys(errs).length){setEditErr(errs);return;}
     try{
       setSaving(true);
-      const res=await axios.put(`http://localhost:m-business-tau.vercel.app/api/managers/${editMgr._id}`,editForm);
+      const res=await axios.put(`${BASE_URL}/api/managers/${editMgr._id}`,editForm);
       setManagers(prev=>prev.map(m=>m._id===editMgr._id?{...m,...(res.data||editForm)}:m));
       setEditMgr(null);
       showToast("✅ Manager updated!");
@@ -586,7 +586,7 @@ const loadEmpDocs = async (emp) => {
   };
 
   const doDelete=async()=>{
-    try{await axios.delete(`http://localhost:m-business-tau.vercel.app/api/managers/${deleteTarget._id}`);}catch{}
+    try{await axios.delete(`${BASE_URL}/api/managers/${deleteTarget._id}`);}catch{}
     setManagers(prev=>prev.filter(m=>m._id!==deleteTarget._id));
     setDeleteTarget(null);
     showToast("🗑️ Manager deleted!");
@@ -718,7 +718,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
     if(Object.keys(errs).length){setEditErr(errs);return;}
     try{
       setSaving(true);
-      const res=await axios.put(`http://localhost:m-business-tau.vercel.app/api/projects/${editProj._id}`,editForm);
+      const res=await axios.put(`${BASE_URL}/api/projects/${editProj._id}`,editForm);
       setProjects(prev=>prev.map(p=>p._id===editProj._id?{...p,...(res.data.project||editForm)}:p));
       setEditProj(null);
       showToast("✅ Project updated!");
@@ -730,7 +730,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
   };
 
   const doDelete=async()=>{
-    try{await axios.delete(`http://localhost:m-business-tau.vercel.app/api/projects/${deleteTarget._id}`);}catch{}
+    try{await axios.delete(`${BASE_URL}/api/projects/${deleteTarget._id}`);}catch{}
     setProjects(prev=>prev.filter(p=>p._id!==deleteTarget._id));
     setDeleteTarget(null);
     showToast("🗑️ Project deleted!");
@@ -739,7 +739,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
   const doAssign=async()=>{
     if(!assignTo){alert("Please select an employee");return;}
     try{
-      await axios.put(`http://localhost:m-business-tau.vercel.app/api/projects/${assignModal._id}`,{assignedTo:assignTo});
+      await axios.put(`${BASE_URL}/api/projects/${assignModal._id}`,{assignedTo:assignTo});
       setProjects(prev=>prev.map(p=>p._id===assignModal._id?{...p,assignedTo:assignTo}:p));
       setAssignModal(null);setAssignTo("");
       showToast("✅ Employee assigned!");

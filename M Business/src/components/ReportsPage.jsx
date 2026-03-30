@@ -6,7 +6,8 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-const API = "http://localhost:m-business-tau.vercel.app/api/reports";
+import { BASE_URL } from "../config";
+const API = `${BASE_URL}/api/reports`;
 const T   = { text:"#1e0a3c" };
 
 const RPT_ICONS   = { "Monthly Revenue":"💰", "Project Summary":"📁", "Client Activity":"👥", "Team Overview":"👨‍💼" };

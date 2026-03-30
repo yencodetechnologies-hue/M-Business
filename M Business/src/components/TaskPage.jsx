@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
-const API = "http://localhost:m-business-tau.vercel.app/api";
+import { BASE_URL } from "../config";
+const API = `${BASE_URL}/api`;
 
 const P = {
   accent:  "#9333ea",

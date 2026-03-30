@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { EmployeeProfilePanel, DOC_TYPES } from "./EmployeeProfilePanel";
 
-const BASE = "http://localhost:m-business-tau.vercel.app/api/employee-dashboard";
+const BASE = "https://m-business-r2vd.onrender.com/api/employee-dashboard";
 
 const sc = (s) => ({
   active:"#6366f1","in progress":"#6366f1",
@@ -1079,7 +1079,7 @@ function SalaryPage({ salary, user }) {
             </div>
             <div style={{ marginBottom:16 }}>
               <div style={{ fontSize:12, fontWeight:700, color:"#94a3b8", textTransform:"uppercase", letterSpacing:0.5, marginBottom:10 }}>Earnings</div>
-              {[["m-business-tau.vercel.app Salary",selected.m-business-tau.vercel.app],["HRA",selected.hra],["Allowances",selected.allowances]].map(([k,v])=>(
+              {[["Basic Salary",selected.basic],["HRA",selected.hra],["Allowances",selected.allowances]].map(([k,v])=>(
                 <div key={k} style={{ display:"flex", justifyContent:"space-between", padding:"8px 0", borderBottom:"1px solid #f8fafc" }}>
                   <span style={{ fontSize:13, color:"#374151" }}>{k}</span>
                   <span style={{ fontSize:13, fontWeight:600, color:"#0f172a" }}>₹{fmt(v)}</span>
@@ -1087,7 +1087,7 @@ function SalaryPage({ salary, user }) {
               ))}
               <div style={{ display:"flex", justifyContent:"space-between", padding:"10px", background:"#f0fdf4", borderRadius:8, marginTop:6 }}>
                 <span style={{ fontSize:13, fontWeight:700, color:"#10b981" }}>Gross Earnings</span>
-                <span style={{ fontSize:13, fontWeight:800, color:"#10b981" }}>₹{fmt((selected.m-business-tau.vercel.app||0)+(selected.hra||0)+(selected.allowances||0))}</span>
+                <span style={{ fontSize:13, fontWeight:800, color:"#10b981" }}>₹{fmt((selected.basic||0)+(selected.hra||0)+(selected.allowances||0))}</span>
               </div>
             </div>
             <div style={{ marginBottom:16 }}>

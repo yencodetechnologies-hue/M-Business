@@ -82,7 +82,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
   const fetchList = async () => {
     setListLoading(true);
     try {
-      const res  = await fetch("http://localhost:m-business-tau.vercel.app/api/quotations");
+      const res  = await fetch("https://m-business-r2vd.onrender.com/api/quotations");
       const data = await res.json();
       if (data.success && Array.isArray(data.quotations)) setQtList(data.quotations);
       else setQtList(loadLocal());
@@ -115,7 +115,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     if (!validate()) return;
     setSaving("draft");
     try {
-      await fetch("http://localhost:m-business-tau.vercel.app/api/quotations", {
+      await fetch("https://m-business-r2vd.onrender.com/api/quotations", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qt, items, status: "draft" }),
       });
@@ -130,7 +130,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     if (!validate()) return;
     setSaving("preview");
     try {
-      await fetch("http://localhost:m-business-tau.vercel.app/api/quotations", {
+      await fetch("https://m-business-r2vd.onrender.com/api/quotations", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qt, items, status: "draft" }),
       });
@@ -157,7 +157,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     if (!window.confirm(`Convert "${entry.quoteNo}" to Invoice?`)) return;
     setConvertingId(entry.id);
     try {
-      const res  = await fetch(`http://localhost:m-business-tau.vercel.app/api/quotations/${entry.id}/convert`, { method: "POST" });
+      const res  = await fetch(`https://m-business-r2vd.onrender.com/api/quotations/${entry.id}/convert`, { method: "POST" });
       const data = await res.json();
       if (data.success) {
         alert(`✅ Invoice ${data.invoiceNo} created!`);
@@ -170,7 +170,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
 
   const handleStatusChange = async (entry, newStatus) => {
     try {
-      await fetch(`http://localhost:m-business-tau.vercel.app/api/quotations/${entry.id}/status`, {
+      await fetch(`https://m-business-r2vd.onrender.com/api/quotations/${entry.id}/status`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });

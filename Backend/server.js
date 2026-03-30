@@ -36,6 +36,7 @@ const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
+app.use("/api/users",            userRoutes);
 app.use("/api/interviews",        interviewRoutes);
 app.use("/api/auth",              authRoutes);
 app.use("/api/clients",           clientRoutes);

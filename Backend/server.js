@@ -6,7 +6,8 @@ require("dotenv").config();
 const app = express();
 app.use(cors({
   origin: [
-    "http://localhost:3000",              // local frontend
+    "http://localhost:3000",
+    "https://m-business-tau.vercel.app",       // local frontend
     "https://m-business-r2vd.onrender.com"  // deployed frontend
   ],
   credentials: true

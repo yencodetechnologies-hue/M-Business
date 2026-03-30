@@ -15,9 +15,9 @@ app.use(express.json());
 
 const authRoutes = require("./routes/authroutes");
 const clientRoutes = require("./routes/clientroutes");
-const employeeRoutes      = require("./routes/employeeroutes");
-const managerRoutes       = require("./routes/managerroutes");
-const projectRoutes       = require("./routes/projectroutes");
+const employeeRoutes = require("./routes/employeeroutes");
+const managerRoutes = require("./routes/managerroutes");
+const projectRoutes = require("./routes/projectroutes");
 const projectStatusRoutes = require("./routes/projectstatusroutes");
 const TaskPage = require("./routes/taskroutes");
 const Group = require("./routes/grouproutes");
@@ -28,8 +28,8 @@ const accountRoutes = require("./routes/accountroutes");
 const reportRoutes = require("./routes/reportroutes");
 const uploadRoutes = require("./routes/uploadroutes");
 const employeeDashRoutes = require("./routes/employeedashboardroutes");
-const QuotationRoutes     = require("./routes/quotationroutes");
-const interviewRoutes     = require("./routes/interviewroutes");
+const QuotationRoutes = require("./routes/quotationroutes");
+const interviewRoutes = require("./routes/interviewroutes");
 const userRoutes = require("./routes/userroutes");
 
 // Static files (local resume storage)
@@ -56,11 +56,23 @@ app.use("/api/employee-dashboard", employeeDashRoutes);
 app.use("/api/quotations", QuotationRoutes);
 app.use("/uploads", express.static("uploads"));
 
+app.get("/", (req, res) => {
+  res.send("Server is running!");
+});
+
+// -------------------- DATABASE CONNECTION & SERVER START --------------------
+// Workaround for local network DNS blocking SRV records (ECONNREFUSED)
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB Connected");
-    app.listen(process.env.PORT || 5000, () => {
-      console.log(`🚀 Server running on port ${process.env.PORT || 5000}`);
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
     });
   })
-  .catch(err => console.error("❌ MongoDB Error:", err));
+  .catch(err => {
+    console.error("❌ MongoDB Connection Error:", err);
+  });

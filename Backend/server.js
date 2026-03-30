@@ -4,7 +4,13 @@ const cors     = require("cors");
 require("dotenv").config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000",              // local frontend
+    "https://m-business-tau.vercel.app"  // deployed frontend
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 const authRoutes          = require("./routes/authroutes");
@@ -21,33 +27,34 @@ const eventRoutes         = require("./routes/eventroutes");
 const accountRoutes       = require("./routes/accountroutes");
 const reportRoutes        = require("./routes/reportroutes");
 const uploadRoutes        = require("./routes/uploadroutes");
-const employeeDashRoutes    = require("./routes/employeedashboardroutes");
-const QuotationRoutes  = require("./routes/quotationroutes");
-const interviewRoutes = require("./routes/interviewroutes");
+const employeeDashRoutes  = require("./routes/employeedashboardroutes");
+const QuotationRoutes     = require("./routes/quotationroutes");
+const interviewRoutes     = require("./routes/interviewroutes");
 
 // Static files (local resume storage)
 const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
-app.use("/api/interviews", interviewRoutes);
-app.use("/api/auth",               authRoutes);
-app.use("/api/clients",            clientRoutes);
-app.use("/api/employees",          employeeRoutes);
-app.use("/api/managers",           managerRoutes);
-app.use("/api/projects",           projectRoutes);
-app.use("/api/project-status",     projectStatusRoutes);
-app.use("/api/tasks",              TaskPage);
-app.use("/api/groups",             Group);
-app.use("/api/client-dashboard",   clientDashRoutes);
-app.use("/api/invoices",           Invoices);
-app.use("/api/events",             eventRoutes);
-app.use("/api/accounts",           accountRoutes);
-app.use("/api/reports",            reportRoutes);
-app.use("/api/upload",             uploadRoutes);
-app.use("/api/employee-dashboard", employeeDashRoutes);
-app.use("/api/quotations",         QuotationRoutes);
+app.use("/api/interviews",        interviewRoutes);
+app.use("/api/auth",              authRoutes);
+app.use("/api/clients",           clientRoutes);
+app.use("/api/employees",         employeeRoutes);
+app.use("/api/managers",          managerRoutes);
+app.use("/api/projects",          projectRoutes);
+app.use("/api/project-status",    projectStatusRoutes);
+app.use("/api/tasks",             TaskPage);
+app.use("/api/groups",            Group);
+app.use("/api/client-dashboard",  clientDashRoutes);
+app.use("/api/invoices",          Invoices);
+app.use("/api/events",            eventRoutes);
+app.use("/api/accounts",          accountRoutes);
+app.use("/api/reports",           reportRoutes);
+app.use("/api/upload",            uploadRoutes);
+app.use("/api/employee-dashboard",employeeDashRoutes);
+app.use("/api/quotations",        QuotationRoutes);
 app.use("/uploads", express.static("uploads"));
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB Connected");

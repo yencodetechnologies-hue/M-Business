@@ -72,7 +72,7 @@ const handleLogin = async () => {
         phone: regData.phone,
       },
       {
-        timeout: 15000 // ⏱️ important (15 sec)
+        timeout: 15000  // ⏱️ important (15 sec)
       }
     );
 

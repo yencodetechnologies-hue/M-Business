@@ -77,7 +77,7 @@ function Fld({ label, value, onChange, options, type="text", error, placeholder,
 // ════════════════════════════════════════════════════════════
 //  ACCOUNTS PAGE  (default export)
 // ════════════════════════════════════════════════════════════
-const ACCOUNTS_API = "http://localhost:5000/api/accounts";
+const ACCOUNTS_API = "http://localhost:m-business-tau.vercel.app/api/accounts";
 const ROLES        = ["Client","Employee","Manager","Admin","SubAdmin"];
 const ACC_STATUSES = ["Active","Inactive"];
 const ACC_EMPTY = {
@@ -394,7 +394,7 @@ const openEdit = (a) => {
 // ════════════════════════════════════════════════════════════
 //  EXPENSES PAGE  (named export)
 // ════════════════════════════════════════════════════════════
-const EXPENSES_API   = "http://localhost:5000/api/expenses";
+const EXPENSES_API   = "http://localhost:m-business-tau.vercel.app/api/expenses";
 const CATEGORIES     = ["Food","Travel","Office","Utilities","Marketing","Salary","Miscellaneous"];
 const EXPENSE_TYPES  = ["Operational","Capital","Recurring","One-Time"];
 const PAYMENT_MODES  = ["Cash","Card","UPI","Bank Transfer","Cheque"];

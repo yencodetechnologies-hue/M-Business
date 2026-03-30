@@ -134,7 +134,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   const fetchList = async () => {
     setListLoading(true);
     try {
-      const res  = await fetch("http://localhost:5000/api/invoices");
+      const res  = await fetch("http://localhost:m-business-tau.vercel.app/api/invoices");
       const data = await res.json();
       if (data.success && Array.isArray(data.invoices)) setInvoiceList(data.invoices);
       else setInvoiceList(loadAllDrafts());
@@ -191,8 +191,8 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     try {
       const method = editingId ? "PUT" : "POST";
       const url    = editingId
-        ? `http://localhost:5000/api/invoices/${editingId}`
-        : "http://localhost:5000/api/invoices";
+        ? `http://localhost:m-business-tau.vercel.appsiness-tau.vercel.app/api/invoices/${editingId}`
+          : "http://localhosm-business-tau.vercel.appbusiness-tau.vercel.app/api/invoices";
       const res  = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -232,7 +232,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   const handleDelete = async (entry) => {
     const id = entry.id;
     // Try backend
-    try { await fetch(`http://localhost:5000/api/invoices/${id}`, { method: "DELETE" }); } catch {}
+    try { await fetch(`http://localhost:m-business-tau.vercel.appsiness-tau.vercel.app/api/invoices/${id}`, { method: "DELETE" }); } catch {}
     // Remove locally
     deleteDraftLocal(entry.invoiceNo);
     setInvoiceList(prev => prev.filter(e => (e.id || e.invoiceNo) !== (id || entry.invoiceNo)));
@@ -245,7 +245,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     const id = entry.id;
     setStatusUpdating(id);
     try {
-      await fetch(`http://localhost:5000/api/invoices/${id}/status`, {
+      await fetch(`http://localhost:m-business-tau.vercel.app/api/invoices/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),

@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 
 
-const BASE = "http://localhost:5000/api/employee-dashboard";
+const BASE = "http://localhost:m-business-tau.vercel.app/api/employee-dashboard";
 
 export const DOC_TYPES = [
   { key:"aadhaar",  label:"Aadhaar Card",   icon:"🪪", desc:"Government issued identity card", color:"#f97316", accept:"image/*,application/pdf", maxMB:5  },

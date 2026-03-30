@@ -6,7 +6,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:m-business-tau.vercel.app";
 
 const statusColor = { pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" };
 const sc = (s = "pending") => statusColor[s.toLowerCase()] || "#a855f7";

@@ -1654,7 +1654,7 @@
 //  useEffect(() => {
 //   if (user?.name) {
 //     console.log("🔍 Fetching projects for:", user.name); // ← இது terminal-ல் வருதா?
-//     axios.get(`http://localhost:5000/api/client-dashboard/projects/${encodeURIComponent(user.name)}`)
+//     axios.get(`http://localhost:m-business-tau.vercel.app/api/client-dashboard/projects/${encodeURIComponent(user.name)}`)
 //       .then(res => {
 //         console.log("📁 Projects received:", res.data); // ← data வருதா?
 //         if (res.data?.length) setProjects(res.data);
@@ -2591,7 +2591,7 @@
 
 //   useEffect(() => {
 //     if(user?.name) {
-//       axios.get(`http://localhost:5000/api/client-dashboard/projects/${encodeURIComponent(user.name)}`)
+//       axios.get(`http://localhost:m-business-tau.vercel.app/api/client-dashboard/projects/${encodeURIComponent(user.name)}`)
 //         .then(res => { if(res.data?.length) setProjects(res.data); })
 //         .catch(()=>{});
 //     }
@@ -3472,7 +3472,7 @@ useEffect(() => {
   if (!user?.name) return;
   const name = encodeURIComponent(user.name);
   setLoading(true);
-  axios.get(`http://localhost:5000/api/clients/my-projects/${name}`)
+  axios.get(`http://localhost:m-business-tau.vercel.app/api/clients/my-projects/${name}`)
     .then(res => {
       if (res.data?.length) setProjects(res.data);
     })

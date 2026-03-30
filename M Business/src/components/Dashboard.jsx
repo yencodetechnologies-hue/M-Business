@@ -204,7 +204,7 @@ function ClientsPage({clients,setClients,onAddClient}){
     if(Object.keys(errs).length){setEditErr(errs);return;}
     try{
       setSaving(true);
-      const res=await axios.put(`http://localhost:5000/api/clients/${editClient._id}`,editForm);
+      const res=await axios.put(`http://localhost:m-business-tau.vercel.app/api/clients/${editClient._id}`,editForm);
       setClients(prev=>prev.map(c=>c._id===editClient._id?{...c,...(res.data.client||editForm)}:c));
       setEditClient(null);
       showToast("✅ Client updated!");
@@ -218,7 +218,7 @@ function ClientsPage({clients,setClients,onAddClient}){
 
   const doDelete=async()=>{
     try{
-      await axios.delete(`http://localhost:5000/api/clients/${deleteTarget._id}`);
+      await axios.delete(`http://localhost:m-business-tau.vercel.app/api/clients/${deleteTarget._id}`);
     }catch{}
     setClients(prev=>prev.filter(c=>c._id!==deleteTarget._id));
     setDeleteTarget(null);
@@ -344,7 +344,8 @@ const loadEmpDocs = async (emp) => {
   setEmpDocsLoading(true);
   try {
     const r = await axios.get(
-      `http://localhost:5000/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
+      `http://localhost:
+      rd/documents/${encodeURIComponent(emp.name)}/all`
     );
     const map = {};
     (r.data || []).forEach(d => { map[d.docType] = d; });
@@ -374,7 +375,7 @@ const loadEmpDocs = async (emp) => {
     if(Object.keys(errs).length){setEditErr(errs);return;}
     try{
       setSaving(true);
-      const res=await axios.put(`http://localhost:5000/api/employees/${editEmp._id}`,editForm);
+      const res=await axios.put(`http://localhost:m-business-tau.vercel.app/api/employees/${editEmp._id}`,editForm);
       setEmployees(prev=>prev.map(e=>e._id===editEmp._id?{...e,...(res.data||editForm)}:e));
       setEditEmp(null);
       showToast("✅ Employee updated!");
@@ -386,7 +387,7 @@ const loadEmpDocs = async (emp) => {
   };
 
   const doDelete=async()=>{
-    try{await axios.delete(`http://localhost:5000/api/employees/${deleteTarget._id}`);}catch{}
+    try{await axios.delete(`http://localhost:m-business-tau.vercel.app/api/employees/${deleteTarget._id}`);}catch{}
     setEmployees(prev=>prev.filter(e=>e._id!==deleteTarget._id));
     setDeleteTarget(null);
     showToast("🗑️ Employee deleted!");
@@ -558,7 +559,7 @@ const loadEmpDocs = async (emp) => {
   setEmpDocsLoading(true);
   try {
     const r = await axios.get(
-      `http://localhost:5000/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
+      `http://localhost:m-business-tau.vercel.app/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
     );
     const map = {};
     (r.data || []).forEach(d => { map[d.docType] = d; });
@@ -573,7 +574,7 @@ const loadEmpDocs = async (emp) => {
     if(Object.keys(errs).length){setEditErr(errs);return;}
     try{
       setSaving(true);
-      const res=await axios.put(`http://localhost:5000/api/managers/${editMgr._id}`,editForm);
+      const res=await axios.put(`http://localhost:m-business-tau.vercel.app/api/managers/${editMgr._id}`,editForm);
       setManagers(prev=>prev.map(m=>m._id===editMgr._id?{...m,...(res.data||editForm)}:m));
       setEditMgr(null);
       showToast("✅ Manager updated!");
@@ -585,7 +586,7 @@ const loadEmpDocs = async (emp) => {
   };
 
   const doDelete=async()=>{
-    try{await axios.delete(`http://localhost:5000/api/managers/${deleteTarget._id}`);}catch{}
+    try{await axios.delete(`http://localhost:m-business-tau.vercel.app/api/managers/${deleteTarget._id}`);}catch{}
     setManagers(prev=>prev.filter(m=>m._id!==deleteTarget._id));
     setDeleteTarget(null);
     showToast("🗑️ Manager deleted!");
@@ -717,7 +718,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
     if(Object.keys(errs).length){setEditErr(errs);return;}
     try{
       setSaving(true);
-      const res=await axios.put(`http://localhost:5000/api/projects/${editProj._id}`,editForm);
+      const res=await axios.put(`http://localhost:m-business-tau.vercel.app/api/projects/${editProj._id}`,editForm);
       setProjects(prev=>prev.map(p=>p._id===editProj._id?{...p,...(res.data.project||editForm)}:p));
       setEditProj(null);
       showToast("✅ Project updated!");
@@ -729,7 +730,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
   };
 
   const doDelete=async()=>{
-    try{await axios.delete(`http://localhost:5000/api/projects/${deleteTarget._id}`);}catch{}
+    try{await axios.delete(`http://localhost:m-business-tau.vercel.app/api/projects/${deleteTarget._id}`);}catch{}
     setProjects(prev=>prev.filter(p=>p._id!==deleteTarget._id));
     setDeleteTarget(null);
     showToast("🗑️ Project deleted!");
@@ -738,7 +739,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
   const doAssign=async()=>{
     if(!assignTo){alert("Please select an employee");return;}
     try{
-      await axios.put(`http://localhost:5000/api/projects/${assignModal._id}`,{assignedTo:assignTo});
+      await axios.put(`http://localhost:m-business-tau.vercel.app/api/projects/${assignModal._id}`,{assignedTo:assignTo});
       setProjects(prev=>prev.map(p=>p._id===assignModal._id?{...p,assignedTo:assignTo}:p));
       setAssignModal(null);setAssignTo("");
       showToast("✅ Employee assigned!");
@@ -909,7 +910,7 @@ function ProjectStatusPage({clients,employees,managers}){
   const [tsErr,setTsErr]=useState({});
   const [tsSaving,setTsSaving]=useState(false);
   const [tsToast,setTsToast]=useState("");
-  useEffect(()=>{axios.get("http://localhost:5000/api/project-status").then(r=>{if(r.data?.length)setTrackList(r.data);}).catch(()=>{});},[]);
+  useEffect(()=>{axios.get("http://localhost:m-business-tau.vercel.app/api/project-status").then(r=>{if(r.data?.length)setTrackList(r.data);}).catch(()=>{});},[]);
   const showToast=(msg)=>{setTsToast(msg);setTimeout(()=>setTsToast(""),2800);};
   const clientNames=clients.map(c=>({name:c.clientName||c.name||""}));
   const managerNames=managers.map(m=>({name:m.managerName||m.name||""}));
@@ -918,8 +919,8 @@ function ProjectStatusPage({clients,employees,managers}){
   const tsStats=[{t:"Total",v:trackList.length,i:"📁",c:"#9333ea"},{t:"In Progress",v:trackList.filter(p=>p.status==="In Progress").length,i:"⚡",c:"#7c3aed"},{t:"Completed",v:trackList.filter(p=>p.status==="Completed").length,i:"✅",c:"#22C55E"},{t:"Pending",v:trackList.filter(p=>p.status==="Pending").length,i:"🕐",c:"#F59E0B"},{t:"On Hold",v:trackList.filter(p=>p.status==="On Hold").length,i:"⏸️",c:"#a855f7"}];
   const openAdd=()=>{setTsForm(EMPTY);setTsErr({});setTsEditId(null);setTsModal("add");};
   const openEdit=(p)=>{setTsForm({projectId:p.projectId||p.id||"",name:p.name||"",client:p.client||"",manager:p.manager||"",employee:p.employee||"",deadline:p.deadline||"",status:p.status||"In Progress",progress:p.progress||p.pct||0,notes:p.notes||p.note||""});setTsErr({});setTsEditId(p._id||p.id);setTsModal("edit");};
-  const saveTs=async()=>{const errs={};if(!tsForm.name.trim())errs.name="Project name required";if(!tsForm.client.trim())errs.client="Client required";if(!tsForm.deadline)errs.deadline="Deadline required";const pv=Number(tsForm.progress);if(isNaN(pv)||pv<0||pv>100)errs.progress="0–100 only";if(Object.keys(errs).length){setTsErr(errs);return;}try{setTsSaving(true);const payload={...tsForm,progress:Number(tsForm.progress)};if(tsModal==="add"){const res=await axios.post("http://localhost:5000/api/project-status",payload);setTrackList(prev=>[res.data,...prev]);}else{const res=await axios.put(`http://localhost:5000/api/project-status/${tsEditId}`,payload);setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?res.data:p));}showToast(tsModal==="add"?"✅ Project added!":"✅ Project updated!");setTsModal(null);}catch{if(tsModal==="add"){const local={...tsForm,_id:Date.now().toString(),projectId:tsForm.projectId||`PRJ${String(trackList.length+1).padStart(3,"0")}`,progress:Number(tsForm.progress)};setTrackList(prev=>[local,...prev]);}else{setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?{...p,...tsForm,progress:Number(tsForm.progress)}:p));}showToast("✅ Saved locally!");setTsModal(null);}finally{setTsSaving(false);}};
-  const deleteTs=async(id)=>{if(!window.confirm("Delete?"))return;try{await axios.delete(`http://localhost:5000/api/project-status/${id}`);}catch{}setTrackList(prev=>prev.filter(p=>(p._id||p.id)!==id));showToast("🗑️ Deleted!");};
+  const saveTs=async()=>{const errs={};if(!tsForm.name.trim())errs.name="Project name required";if(!tsForm.client.trim())errs.client="Client required";if(!tsForm.deadline)errs.deadline="Deadline required";const pv=Number(tsForm.progress);if(isNaN(pv)||pv<0||pv>100)errs.progress="0–100 only";if(Object.keys(errs).length){setTsErr(errs);return;}try{setTsSaving(true);const payload={...tsForm,progress:Number(tsForm.progress)};if(tsModal==="add"){const res=await axios.post("http://localhost:m-business-tau.vercel.app/api/project-status",payload);setTrackList(prev=>[res.data,...prev]);}else{const res=await axios.put(`http://localhost:m-business-tau.vercel.app/api/project-status/${tsEditId}`,payload);setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?res.data:p));}showToast(tsModal==="add"?"✅ Project added!":"✅ Project updated!");setTsModal(null);}catch{if(tsModal==="add"){const local={...tsForm,_id:Date.now().toString(),projectId:tsForm.projectId||`PRJ${String(trackList.length+1).padStart(3,"0")}`,progress:Number(tsForm.progress)};setTrackList(prev=>[local,...prev]);}else{setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?{...p,...tsForm,progress:Number(tsForm.progress)}:p));}showToast("✅ Saved locally!");setTsModal(null);}finally{setTsSaving(false);}};
+  const deleteTs=async(id)=>{if(!window.confirm("Delete?"))return;try{await axios.delete(`http://localhost:m-business-tau.vercel.app/api/project-status/${id}`);}catch{}setTrackList(prev=>prev.filter(p=>(p._id||p.id)!==id));showToast("🗑️ Deleted!");};
   const B2=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
   return(
     <div style={{display:"flex",flexDirection:"column",gap:14}}>
@@ -988,7 +989,7 @@ function InterviewPage({companyId,companyName}){
   const CID=companyId||"69b8fe0a6e3d6f1e056f3109";
   const CNAME=companyName||"M Business";
   const STORAGE_KEY=`hr_candidates_${CID}`;
-  const API="http://localhost:5000";
+const API_URL = "https://m-business-tau.vercel.app";
   const [candidates,setCandidates]=useState([]);
   const [filter,setFilter]=useState("all");
   const [search,setSearch]=useState("");
@@ -1112,7 +1113,7 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
           </div>
         </div>
         <input ref={logoRef} type="file" accept="image/*" style={{display:"none"}}
-          onChange={async(e)=>{const file=e.target.files[0];if(!file)return;const formData=new FormData();formData.append("file",file);try{const cloudRes=await axios.post("http://localhost:5000/api/upload/logo",formData);const uploadedUrl=cloudRes.data.logoUrl;await axios.post("http://localhost:5000/api/auth/save-logo",{userId:user.id||user._id,logoUrl:uploadedUrl});const updatedUser={...user,logoUrl:uploadedUrl};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);onLogoChange(uploadedUrl);}catch(err){console.error(err);alert("Upload failed!");}}}
+          onChange={async(e)=>{const file=e.target.files[0];if(!file)return;const formData=new FormData();formData.append("file",file);try{const cloudRes=await axios.post("http://localhost:m-business-tau.vercel.app/api/upload/logo",formData);const uploadedUrl=cloudRes.data.logoUrl;await axios.post("http://localhost:m-business-tau.vercel.app/api/auth/save-logo",{userId:user.id||user._id,logoUrl:uploadedUrl});const updatedUser={...user,logoUrl:uploadedUrl};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);onLogoChange(uploadedUrl);}catch(err){console.error(err);alert("Upload failed!");}}}
         />
       </div>
     </div>
@@ -1185,20 +1186,19 @@ export default function Dashboard({setUser,user,fixedLogo}){
   useEffect(()=>{fetchClients();fetchEmployees();fetchProjects();fetchManagers();},[]);
 
   const handleLogout=()=>{localStorage.removeItem("user");setUser(null);};
-  const onLogoChange=async(logo)=>{setCompanyLogo(logo||fixedLogo);const updatedUser={...user,logoUrl:logo||""};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);try{await axios.post("http://localhost:5000/api/auth/save-logo",{userId:user._id||user.id,logoUrl:logo||""});}catch(e){console.log(e);}};
+  const onLogoChange=async(logo)=>{setCompanyLogo(logo||fixedLogo);const updatedUser={...user,logoUrl:logo||""};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);try{await axios.post("http://localhost:m-business-tau.vercel.app/api/auth/save-logo",{userId:user._id||user.id,logoUrl:logo||""});}catch(e){console.log(e);}};
 
-  const fetchClients=async()=>{try{const res=await axios.get("http://localhost:5000/api/clients");setClients(res.data);}catch(e){console.log(e);}};
-  const fetchEmployees=async()=>{try{const res=await axios.get("http://localhost:5000/api/employees");setEmployees(res.data);}catch(e){console.log(e);}};
-  const fetchProjects=async()=>{try{setProjLoading(true);const res=await axios.get("http://localhost:5000/api/projects");setProjects(res.data);}catch(e){console.log(e);}finally{setProjLoading(false);}};
-  const fetchManagers=async()=>{try{const res=await axios.get("http://localhost:5000/api/managers");setManagers(res.data);}catch(e){console.log(e);}};
+  const fetchClients=async()=>{try{const res=await axios.get("http://localhost:m-business-tau.vercel.app/api/clients");setClients(res.data);}catch(e){console.log(e);}};
+  const fetchEmployees=async()=>{try{const res=await axios.get("http://localhost:m-business-tau.vercel.app/api/employees");setEmployees(res.data);}catch(e){console.log(e);}};
+const fetchManagers=async()=>{try{const res=await axios.get("http://localhost:m-business-tau.vercel.app/api/managers");setManagers(res.data);}catch(e){console.log(e);}};
 
-  const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,projectAssigned:nc.project,password:nc.password,status:nc.status};const res=await axios.post("http://localhost:5000/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
+  const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,projectAssigned:nc.project,password:nc.password,status:nc.status};const res=await axios.post("http://localhost:m-business-tau.vercel.app/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
 
-  const addEmployee=async()=>{const errors={};if(!ne.name.trim())errors.name="Name is required";if(!ne.email.trim())errors.email="Email is required";if(!ne.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNeError(errors);return;}try{setEmpSaveLoading(true);const res=await axios.post("http://localhost:5000/api/employees/add",ne);setEmployees(prev=>[res.data.employee,...prev]);setNe({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});setShowEmpPass(false);setNeError({});setModal(null);}catch(err){setNeError({email:err.response?.data?.msg||"Failed to save"});}finally{setEmpSaveLoading(false);}};
+  const addEmployee=async()=>{const errors={};if(!ne.name.trim())errors.name="Name is required";if(!ne.email.trim())errors.email="Email is required";if(!ne.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNeError(errors);return;}try{setEmpSaveLoading(true);const res=await axios.post("http://localhost:m-business-tau.vercel.app/api/employees/add",ne);setEmployees(prev=>[res.data.employee,...prev]);setNe({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});setShowEmpPass(false);setNeError({});setModal(null);}catch(err){setNeError({email:err.response?.data?.msg||"Failed to save"});}finally{setEmpSaveLoading(false);}};
 
-  const addProject=async()=>{const errors={};if(!np.name.trim())errors.name="Project name is required";if(!np.client.trim())errors.client="Client is required";if(Object.keys(errors).length>0){setNpError(errors);return;}try{setProjSaveLoading(true);await axios.post("http://localhost:5000/api/projects/add",np);await fetchProjects();setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:""});setNpError({});setModal(null);}catch(err){setNpError({name:err.response?.data?.msg||"Failed to save"});}finally{setProjSaveLoading(false);}};
+  const addProject=async()=>{const errors={};if(!np.name.trim())errors.name="Project name is required";if(!np.client.trim())errors.client="Client is required";if(Object.keys(errors).length>0){setNpError(errors);return;}try{setProjSaveLoading(true);await axios.post("http://localhost:m-business-tau.vercel.app/api/projects/add",np);await fetchProjects();setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:""});setNpError({});setModal(null);}catch(err){setNpError({name:err.response?.data?.msg||"Failed to save"});}finally{setProjSaveLoading(false);}};
 
-  const addManager=async()=>{const errors={};if(!nm.managerName.trim())errors.managerName="Name is required";if(!nm.email.trim())errors.email="Email is required";if(!nm.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNmError(errors);return;}try{setMgrSaveLoading(true);const res=await axios.post("http://localhost:5000/api/managers/add",nm);setManagers(prev=>[res.data.manager,...prev]);setNm({managerName:"",email:"",phone:"",department:"",role:"Manager",address:"",password:"",status:"Active"});setNmError({});setModal(null);}catch(err){setNmError({email:err.response?.data?.msg||"Failed to save"});}finally{setMgrSaveLoading(false);}};
+  const addManager=async()=>{const errors={};if(!nm.managerName.trim())errors.managerName="Name is required";if(!nm.email.trim())errors.email="Email is required";if(!nm.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNmError(errors);return;}try{setMgrSaveLoading(true);const res=await axios.post("http://localhost:m-business-tau.vercel.app/api/managers/add",nm);setManagers(prev=>[res.data.manager,...prev]);setNm({managerName:"",email:"",phone:"",department:"",role:"Manager",address:"",password:"",status:"Active"});setNmError({});setModal(null);}catch(err){setNmError({email:err.response?.data?.msg||"Failed to save"});}finally{setMgrSaveLoading(false);}};
 
   const navItems=getNavForRole(user?.role);
   const validActive=navItems.find(n=>n.key===active)?active:navItems[0]?.key||"dashboard";

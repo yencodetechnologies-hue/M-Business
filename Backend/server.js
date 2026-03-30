@@ -30,7 +30,7 @@ const uploadRoutes        = require("./routes/uploadroutes");
 const employeeDashRoutes  = require("./routes/employeedashboardroutes");
 const QuotationRoutes     = require("./routes/quotationroutes");
 const interviewRoutes     = require("./routes/interviewroutes");
-
+const userRoutes = require('./routes/userroutes');
 // Static files (local resume storage)
 const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

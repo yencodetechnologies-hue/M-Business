@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-
+import { BASE_URL } from "../config";
 export default function AuthPage({ setUser }) {
   const [tab, setTab] = useState("login");
   const [showPass, setShowPass] = useState(false);
@@ -13,47 +13,77 @@ export default function AuthPage({ setUser }) {
   const [loginErr, setLoginErr] = useState({});
   const [regData, setRegData] = useState({ name: "", email: "", phone: "", password: "", confirm: "", role: "Admin" });
   const [regErr, setRegErr] = useState({});
+const handleLogin = async () => {
+  const errs = {};
+  if (!loginData.email.trim()) errs.email = "Email is required";
+  if (!loginData.password.trim()) errs.password = "Password is required";
+  if (Object.keys(errs).length) { setLoginErr(errs); return; }
 
-  const handleLogin = async () => {
-    const errs = {};
-    if (!loginData.email.trim()) errs.email = "Email is required";
-    if (!loginData.password.trim()) errs.password = "Password is required";
-    if (Object.keys(errs).length) { setLoginErr(errs); return; }
-    try {
-      setLoading(true); setError("");
-      const res = await axios.post("http://localhost:5000/api/auth/login", loginData);
+  try {
+    setLoading(true);
+    setError("");
+
+    const res = await axios.post(
+      "https://m-business.onrender.com/api/auth/login",
+      loginData
+    );
+
     const userData = res.data.user || res.data;
-const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
-localStorage.setItem("user", JSON.stringify(userWithLogo));
-setUser(userWithLogo);
-    } catch (e) {
-      setError(e.response?.data?.msg || e.response?.data?.message || "Invalid email or password.");
-    } finally { setLoading(false); }
-  };
+    const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
 
-  const handleRegister = async () => {
-    const errs = {};
-    if (!regData.name.trim()) errs.name = "Name is required";
-    if (!regData.email.trim()) errs.email = "Email is required";
-    if (!regData.password.trim()) errs.password = "Password is required";
-    else if (regData.password.length < 6) errs.password = "Minimum 6 characters";
-    if (regData.password !== regData.confirm) errs.confirm = "Passwords do not match";
-    if (Object.keys(errs).length) { setRegErr(errs); return; }
-    try {
-      setLoading(true); setError("");
-      await axios.post("http://localhost:5000/api/auth/signup", {
-        name: regData.name, email: regData.email,
-        password: regData.password, role: regData.role, phone: regData.phone,
-      });
-      setSuccess("Account created successfully! Please log in.");
-      setTab("login");
-      setLoginData({ email: regData.email, password: "" });
-      setRegData({ name: "", email: "", phone: "", password: "", confirm: "", role: "Admin" });
-    } catch (e) {
-      setError(e.response?.data?.msg || e.response?.data?.message || "Registration failed. Please try again.");
-    } finally { setLoading(false); }
-  };
+    localStorage.setItem("user", JSON.stringify(userWithLogo));
+    setUser(userWithLogo);
 
+  } catch (e) {
+    setError(
+      e.response?.data?.msg ||
+      e.response?.data?.message ||
+      "Invalid email or password."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+const handleRegister = async () => {
+  const errs = {};
+  if (!regData.name.trim()) errs.name = "Name is required";
+  if (!regData.email.trim()) errs.email = "Email is required";
+  if (!regData.password.trim()) errs.password = "Password is required";
+  else if (regData.password.length < 6) errs.password = "Minimum 6 characters";
+  if (regData.password !== regData.confirm) errs.confirm = "Passwords do not match";
+
+  if (Object.keys(errs).length) { 
+    setRegErr(errs); 
+    return; 
+  }
+
+  try {
+    setLoading(true);
+    setError("");
+
+    await axios.post(`${BASE_URL}/api/auth/signup`, {
+      name: regData.name,
+      email: regData.email,
+      password: regData.password,
+      role: regData.role,
+      phone: regData.phone,
+    });
+
+    setSuccess("Account created successfully! Please log in.");
+    setTab("login");
+    setLoginData({ email: regData.email, password: "" });
+    setRegData({ name: "", email: "", phone: "", password: "", confirm: "", role: "Admin" });
+
+  } catch (e) {
+    setError(
+      e.response?.data?.msg ||
+      e.response?.data?.message ||
+      "Registration failed. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   const iStyle = (err) => ({
     width: "100%", padding: "12px 16px",
     background: "rgba(255,255,255,0.1)",

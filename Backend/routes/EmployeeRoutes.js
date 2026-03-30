@@ -74,7 +74,35 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE employee
+// DELETE route-க்கு முன்னாடி போடுங்க
+
+// POST login
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password)
+      return res.status(400).json({ msg: "Email and password required" });
+
+    const employee = await Employee.findOne({ email });
+    if (!employee)
+      return res.status(404).json({ msg: "Employee not found" });
+
+    const isMatch = await bcrypt.compare(password, employee.password);
+    if (!isMatch)
+      return res.status(401).json({ msg: "Invalid password" });
+
+    const { password: _, ...userData } = employee.toObject();
+    res.json({ msg: "Login successful", user: userData });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// DELETE employee 
+
 router.delete("/:id", async (req, res) => {
   try {
     await Employee.findByIdAndDelete(req.params.id);

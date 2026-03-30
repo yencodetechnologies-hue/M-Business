@@ -10,7 +10,8 @@ import QuotationCreator   from "./QuotationCreator";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { QRCodeSVG } from "qrcode.react";
-import { SubAdminDocumentsPage } from "./EmployeeProfile";
+import { SubAdminDocumentsPage } from "./EmployeeProfilePanel";
+import { DOC_TYPES } from "./EmployeeProfilePanel";
 
 
 const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"#9333ea",bg:"#f5f3ff",card:"#FFFFFF",text:"#1e0a3c",muted:"#7c3aed",border:"#ede9fe"};
@@ -30,7 +31,6 @@ const NAV=[
   {key:"calendar",icon:"📅",label:"Calendar"},
   {key:"accounts",icon:"👤",label:"Accounts"},
   {key:"interviews",icon:"🎯",label:"Interviews"},
-   {key:"documents",icon:"📂",label:"Documents"}, 
   {key:"reports",icon:"📈",label:"Reports"}
 ];
 
@@ -336,7 +336,22 @@ function EmployeesPage({employees,setEmployees}){
   const [editErr,setEditErr]=useState({});
   const [saving,setSaving]=useState(false);
   const [toast,setToast]=useState("");
+const [empDocs, setEmpDocs] = useState({});
+const [empDocsLoading, setEmpDocsLoading] = useState(false);
 
+const loadEmpDocs = async (emp) => {
+  setEmpDocs({});
+  setEmpDocsLoading(true);
+  try {
+    const r = await axios.get(
+      `http://localhost:5000/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
+    );
+    const map = {};
+    (r.data || []).forEach(d => { map[d.docType] = d; });
+    setEmpDocs(map);
+  } catch { setEmpDocs({}); }
+  finally { setEmpDocsLoading(false); }
+};
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
 
   const filtered=employees.filter(e=>
@@ -417,7 +432,8 @@ function EmployeesPage({employees,setEmployees}){
                     <td style={{padding:"12px 14px",color:"#22C55E",fontSize:12,fontWeight:600}}>{e.salary||"—"}</td>
                     <td style={{padding:"12px 14px"}}><Badge label={e.status||"Active"}/></td>
                     <td style={{padding:"12px 14px"}}>
-                      <ActionBtns onView={()=>setViewEmp(e)} onEdit={()=>openEdit(e)} onDelete={()=>setDeleteTarget(e)}/>
+                      <ActionBtns onView={()=>{ setViewEmp(e); loadEmpDocs(e); }}
+ onEdit={()=>openEdit(e)} onDelete={()=>setDeleteTarget(e)}/>
                     </td>
                   </tr>
                 ))}
@@ -441,6 +457,51 @@ function EmployeesPage({employees,setEmployees}){
           <InfoRow icon="🏢" label="Department" value={viewEmp.department}/>
           <InfoRow icon="💰" label="Salary" value={viewEmp.salary}/>
           <InfoRow icon="📅" label="Joined" value={viewEmp.createdAt?new Date(viewEmp.createdAt).toLocaleDateString():"—"}/>
+
+<div style={{marginTop:14}}>
+  <div style={{fontSize:12,fontWeight:800,color:"#1e0a3c",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
+    📂 Documents
+    {empDocsLoading&&<span style={{fontSize:10,color:"#a78bfa"}}>Loading...</span>}
+  </div>
+  <div style={{display:"flex",flexDirection:"column",gap:8}}>
+    {DOC_TYPES.map(dt=>{
+      const doc=empDocs[dt.key];
+      const hasDoc=!!doc?.url;
+      const isImg=(url="")=>/\.(jpg|jpeg|png|gif|webp)$/i.test(url)||url.startsWith("data:image");
+      return(
+        <div key={dt.key} style={{border:`1.5px solid ${hasDoc?dt.color+"35":"#f1f5f9"}`,borderRadius:12,overflow:"hidden",background:hasDoc?`${dt.color}04`:"#f8fafc"}}>
+          <div style={{padding:"10px 12px",display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:16}}>{dt.icon}</span>
+            <div style={{flex:1,fontSize:12,fontWeight:700,color:"#1e0a3c"}}>{dt.label}</div>
+            {hasDoc
+              ?<span style={{background:`${dt.color}15`,border:`1px solid ${dt.color}30`,borderRadius:20,padding:"2px 10px",fontSize:10,fontWeight:700,color:dt.color}}>✓ Uploaded</span>
+              :<span style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:20,padding:"2px 10px",fontSize:10,fontWeight:700,color:"#ef4444"}}>✗ Missing</span>}
+          </div>
+          {hasDoc&&(
+            <div style={{padding:"0 12px 10px"}}>
+              {isImg(doc.url)
+                ?<img src={doc.url} alt={dt.label} style={{width:"100%",maxHeight:120,objectFit:"contain",borderRadius:8,border:"1px solid #f1f5f9",background:"#fff"}}/>
+                :<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:"#fff",borderRadius:8,border:"1px solid #f1f5f9"}}>
+                  <span style={{fontSize:20}}>📄</span>
+                  <div style={{fontSize:11,fontWeight:600,color:"#1e0a3c"}}>{doc.fileName||`${dt.label}.pdf`}</div>
+                </div>}
+              <div style={{display:"flex",gap:6,marginTop:8}}>
+                <button onClick={()=>window.open(doc.url,"_blank")}
+                  style={{flex:1,padding:"6px 10px",background:`${dt.color}10`,border:`1px solid ${dt.color}30`,borderRadius:7,fontSize:11,fontWeight:700,color:dt.color,cursor:"pointer",fontFamily:"inherit"}}>
+                  👁 View
+                </button>
+                <a href={doc.url} download
+                  style={{flex:1,padding:"6px 10px",background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,fontSize:11,fontWeight:700,color:"#475569",textDecoration:"none",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  ⬇ Download
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</div>
           <div style={{display:"flex",gap:10,marginTop:16}}>
             <button onClick={()=>{setViewEmp(null);openEdit(viewEmp);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#7c3aed,#9333ea)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
             <button onClick={()=>{setViewEmp(null);setDeleteTarget(viewEmp);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
@@ -492,7 +553,19 @@ function ManagersPage({managers,setManagers}){
     setEditErr({});
     setEditMgr(m);
   };
-
+const loadEmpDocs = async (emp) => {
+  setEmpDocs({});
+  setEmpDocsLoading(true);
+  try {
+    const r = await axios.get(
+      `http://localhost:5000/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
+    );
+    const map = {};
+    (r.data || []).forEach(d => { map[d.docType] = d; });
+    setEmpDocs(map);
+  } catch { setEmpDocs({}); }
+  finally { setEmpDocsLoading(false); }
+};
   const saveEdit=async()=>{
     const errs={};
     if(!editForm.managerName.trim())errs.managerName="Name required";
@@ -582,6 +655,7 @@ function ManagersPage({managers,setManagers}){
           <InfoRow icon="🏢" label="Department" value={viewMgr.department}/>
           <InfoRow icon="📍" label="Address" value={viewMgr.address}/>
           <InfoRow icon="📅" label="Joined" value={viewMgr.createdAt?new Date(viewMgr.createdAt).toLocaleDateString():"—"}/>
+         
           <div style={{display:"flex",gap:10,marginTop:16}}>
             <button onClick={()=>{setViewMgr(null);openEdit(viewMgr);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
             <button onClick={()=>{setViewMgr(null);setDeleteTarget(viewMgr);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>

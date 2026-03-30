@@ -3472,14 +3472,12 @@ useEffect(() => {
   if (!user?.name) return;
   const name = encodeURIComponent(user.name);
   setLoading(true);
-  Promise.allSettled([
-    axios.get(`http://localhost:5000/api/projects/by-client/${name}`),
-    // axios.get(`http://localhost:5000/api/tasks/${name}`),     ← comment
-    // axios.get(`http://localhost:5000/api/payments/${name}`),  ← comment
-  ]).then(([projRes]) => {
-    if (projRes.status==="fulfilled" && projRes.value.data?.length) 
-      setProjects(projRes.value.data);
-  }).finally(() => setLoading(false));
+  axios.get(`http://localhost:5000/api/clients/my-projects/${name}`)
+    .then(res => {
+      if (res.data?.length) setProjects(res.data);
+    })
+    .catch(() => {})
+    .finally(() => setLoading(false));
 }, [user]);
   const handleLogout = () => { localStorage.removeItem("user"); if(setUser) setUser(null); };
   const markRead     = (id) => setNotifications(prev=>prev.map(n=>n.id===id?{...n,read:true}:n));

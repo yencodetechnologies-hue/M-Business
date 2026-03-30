@@ -1,8 +1,33 @@
-const express = require("express");
+const mongoose = require("mongoose");const express = require("express");
 const router = express.Router();
 const Client = require("../models/ClientModel");
 const { addClient } = require("../controllers/ClientController");
+const Project = require("../models/ProjectModel");
 
+router.get("/projects/:name", async (req, res) => {
+  try {
+    const name = decodeURIComponent(req.params.name);
+    const projects = await Project.find({
+      $or: [
+        { assignedTo: { $regex: new RegExp(name, "i") } },
+        { manager: { $regex: new RegExp(name, "i") } }
+      ]
+    }).sort({ createdAt: -1 });
+    res.json(projects);
+  } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
+});
+// GET projects by client name
+router.get("/my-projects/:clientName", async (req, res) => {
+  try {
+    const name = decodeURIComponent(req.params.clientName);
+    const projects = await Project.find({
+      client: { $regex: new RegExp(`^${name}$`, "i") }
+    }).sort({ createdAt: -1 });
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
 // GET all clients
 router.get("/", async (req, res) => {
   try {

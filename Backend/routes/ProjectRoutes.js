@@ -3,7 +3,6 @@ const router  = express.Router();
 const Project = require("../models/ProjectModel");
 
 // GET all
-// GET all projects
 router.get("/", async (req, res) => {
   try {
     const projects = await Project.find().sort({ createdAt: -1 });

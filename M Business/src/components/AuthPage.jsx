@@ -43,8 +43,7 @@ const handleLogin = async () => {
   } finally {
     setLoading(false);
   }
-};
-const handleRegister = async () => {
+};const handleRegister = async () => {
   const errs = {};
   if (!regData.name.trim()) errs.name = "Name is required";
   if (!regData.email.trim()) errs.email = "Email is required";
@@ -61,25 +60,39 @@ const handleRegister = async () => {
     setLoading(true);
     setError("");
 
-    await axios.post(`${BASE_URL}/api/auth/signup`, {
-      name: regData.name,
-      email: regData.email,
-      password: regData.password,
-      role: regData.role,
-      phone: regData.phone,
-    });
+    console.log("Sending data:", regData); // 🔥 debug
 
-    setSuccess("Account created successfully! Please log in.");
+    const res = await axios.post(
+      "https://m-business.onrender.com/api/auth/signup",
+      {
+        name: regData.name,
+        email: regData.email,
+        password: regData.password,
+        role: regData.role,
+        phone: regData.phone,
+      },
+      {
+        timeout: 15000 // ⏱️ important (15 sec)
+      }
+    );
+
+    console.log("Response:", res.data); // 🔥 debug
+
+    setSuccess("Account created successfully!");
     setTab("login");
-    setLoginData({ email: regData.email, password: "" });
-    setRegData({ name: "", email: "", phone: "", password: "", confirm: "", role: "Admin" });
 
   } catch (e) {
-    setError(
-      e.response?.data?.msg ||
-      e.response?.data?.message ||
-      "Registration failed. Please try again."
-    );
+    console.log("ERROR:", e); // 🔥 debug
+
+    if (e.code === "ECONNABORTED") {
+      setError("Server slow (Render sleep). Please try again.");
+    } else {
+      setError(
+        e.response?.data?.msg ||
+        e.response?.data?.message ||
+        "Registration failed."
+      );
+    }
   } finally {
     setLoading(false);
   }

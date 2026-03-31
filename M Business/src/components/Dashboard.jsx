@@ -695,7 +695,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
   const [assignModal,setAssignModal]=useState(null);
   const [editForm,setEditForm]=useState({});
   const [editErr,setEditErr]=useState({});
-  const [assignTo,setAssignTo]=useState("");
+  const [assignTo,setAssignTo]=useState([]);
   const [saving,setSaving]=useState(false);
   const [toast,setToast]=useState("");
 
@@ -703,7 +703,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
   const filtered=projects.filter(p=>(p.name||"").toLowerCase().includes(search.toLowerCase())||(p.client||"").toLowerCase().includes(search.toLowerCase()));
 
   const openEdit=(p)=>{
-    setEditForm({name:p.name||"",client:p.client||"",purpose:p.purpose||"",description:p.description||"",start:p.start||"",end:p.end||"",budget:p.budget||"",team:p.team||"",status:p.status||"Pending",assignedTo:p.assignedTo||""});
+    setEditForm({name:p.name||"",client:p.client||"",purpose:p.purpose||"",description:p.description||"",start:p.start||"",end:p.end||"",budget:p.budget||"",team:p.team||"",status:p.status||"Pending",assignedTo:p.assignedTo||[]});
     setEditErr({});
     setEditProj(p);
   };
@@ -734,12 +734,12 @@ function ProjectsPage({projects,setProjects,clients,employees}){
   };
 
   const doAssign=async()=>{
-    if(!assignTo){alert("Please select an employee");return;}
+    if(!assignTo || assignTo.length===0){alert("Please select at least one employee");return;}
     try{
       await axios.put(`${BASE_URL}/api/projects/${assignModal._id}`,{assignedTo:assignTo});
       setProjects(prev=>prev.map(p=>p._id===assignModal._id?{...p,assignedTo:assignTo}:p));
-      setAssignModal(null);setAssignTo("");
-      showToast("✅ Employee assigned!");
+      setAssignModal(null);setAssignTo([]);
+      showToast("✅ Employees assigned!");
     }catch(err){alert(err.response?.data?.msg||"Failed to assign");}
   };
 
@@ -775,9 +775,17 @@ function ProjectsPage({projects,setProjects,clients,employees}){
                     <td style={{padding:"12px 14px",color:"#22C55E",fontWeight:600}}>{p.budget||"—"}</td>
                     <td style={{padding:"12px 14px"}}><Badge label={p.status||"Pending"}/></td>
                     <td style={{padding:"12px 14px"}}>
-                      {p.assignedTo
-                        ?<div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,flexShrink:0}}>{p.assignedTo[0].toUpperCase()}</div><span style={{color:"#6366f1",fontWeight:600,fontSize:12}}>{p.assignedTo}</span></div>
-                        :<button onClick={()=>{setAssignModal(p);setAssignTo("");}} style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)",borderRadius:7,padding:"4px 10px",fontSize:11,color:"#6366f1",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Assign</button>
+                      {p.assignedTo && p.assignedTo.length > 0
+                        ?<div style={{display:"flex",flexDirection:"column",gap:4}}>
+                           {p.assignedTo.slice(0,2).map((emp, idx)=>(
+                             <div key={idx} style={{display:"flex",alignItems:"center",gap:6}}>
+                               <div style={{width:20,height:20,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:8,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
+                               <span style={{color:"#6366f1",fontWeight:600,fontSize:11}}>{emp}</span>
+                             </div>
+                           ))}
+                           {p.assignedTo.length > 2 && <div style={{fontSize:10,color:"#a78bfa",fontStyle:"italic"}}>+{p.assignedTo.length - 2} more</div>}
+                         </div>
+                        :<button onClick={()=>{setAssignModal(p);setAssignTo(p.assignedTo||[]);}} style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)",borderRadius:7,padding:"4px 10px",fontSize:11,color:"#6366f1",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Assign</button>
                       }
                     </td>
                     <td style={{padding:"12px 14px"}}>
@@ -800,7 +808,20 @@ function ProjectsPage({projects,setProjects,clients,employees}){
             </div>
           </div>
           <InfoRow icon="💰" label="Budget" value={viewProj.budget}/>
-          <InfoRow icon="👤" label="Assigned To" value={viewProj.assignedTo}/>
+          <div style={{marginBottom:14}}>
+            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGNED EMPLOYEES</label>
+            {viewProj.assignedTo && viewProj.assignedTo.length > 0
+              ?<div style={{display:"flex",flexDirection:"column",gap:6}}>
+                 {viewProj.assignedTo.map((emp, idx)=>(
+                   <div key={idx} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:"#f8fafc",borderRadius:8,border:"1px solid #e2e8f0"}}>
+                     <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
+                     <span style={{color:"#1e0a3c",fontWeight:600,fontSize:12}}>{emp}</span>
+                   </div>
+                 ))}
+               </div>
+              :<div style={{color:"#a78bfa",fontSize:13,fontStyle:"italic"}}>No employees assigned</div>
+            }
+          </div>
           <InfoRow icon="📅" label="Start Date" value={viewProj.start}/>
           <InfoRow icon="🏁" label="End Date" value={viewProj.end}/>
           <InfoRow icon="🎯" label="Purpose" value={viewProj.purpose}/>
@@ -808,7 +829,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
           <InfoRow icon="📝" label="Description" value={viewProj.description}/>
           <div style={{display:"flex",gap:10,marginTop:16}}>
             <button onClick={()=>{setViewProj(null);openEdit(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
-            <button onClick={()=>{setViewProj(null);setAssignModal(viewProj);setAssignTo(viewProj.assignedTo||"");}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>👤 Assign</button>
+            <button onClick={()=>{setViewProj(null);setAssignModal(viewProj);setAssignTo(viewProj.assignedTo||[]);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>👤 Assign</button>
             <button onClick={()=>{setViewProj(null);setDeleteTarget(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
           </div>
         </Mdl>
@@ -831,11 +852,33 @@ function ProjectsPage({projects,setProjects,clients,employees}){
             <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Pending","In Progress","Completed","On Hold"]}/>
           </div>
           <div style={{marginBottom:14}}>
-            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEE</label>
-            <select value={editForm.assignedTo} onChange={e=>setEditForm(p=>({...p,assignedTo:e.target.value}))} style={{width:"100%",border:"1.5px solid #ede9fe",borderRadius:10,padding:"10px 14px",fontSize:13,color:editForm.assignedTo?T.text:"#a78bfa",background:"#faf5ff",boxSizing:"border-box",outline:"none",fontFamily:"inherit"}}>
-              <option value="">-- Select Employee --</option>
-              {employees.map(e=><option key={e._id||e.email} value={e.name}>{e.name}{e.department?` (${e.department})`:""}</option>)}
-            </select>
+            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEES</label>
+            <div style={{border:"1.5px solid #ede9fe",borderRadius:10,padding:"12px",background:"#faf5ff",maxHeight:200,overflowY:"auto"}}>
+              {employees.length===0?<div style={{color:"#a78bfa",fontSize:13,textAlign:"center",padding:"20px"}}>No employees available</div>
+                :employees.map(e=>(
+                  <div key={e._id||e.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
+                    <input 
+                      type="checkbox" 
+                      id={`edit-emp-${e._id||e.email}`}
+                      checked={editForm.assignedTo && editForm.assignedTo.includes(e.name)}
+                      onChange={e=>{
+                        const currentAssigned = editForm.assignedTo || [];
+                        if(e.target.checked){
+                          setEditForm({...editForm,assignedTo:[...currentAssigned,e.name]});
+                        }else{
+                          setEditForm({...editForm,assignedTo:currentAssigned.filter(name=>name!==e.name)});
+                        }
+                      }}
+                      style={{width:16,height:16,cursor:"pointer"}}
+                    />
+                    <label htmlFor={`edit-emp-${e._id||e.email}`} style={{flex:1,cursor:"pointer",fontSize:13,color:"#1e0a3c",display:"flex",alignItems:"center",gap:8}}>
+                      <span>{e.name}</span>
+                      {e.department&&<span style={{fontSize:11,color:"#a78bba",background:"#f3e8ff",padding:"2px 6px",borderRadius:4}}>{e.department}</span>}
+                    </label>
+                  </div>
+                ))}
+            </div>
+            {editForm.assignedTo && editForm.assignedTo.length>0&&<div style={{marginTop:6,fontSize:11,color:"#9333ea",fontWeight:600}}>{editForm.assignedTo.length} employee(s) selected</div>}
           </div>
           <Fld label="Description" value={editForm.description} onChange={v=>setEditForm(p=>({...p,description:v}))}/>
           <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:4}}>
@@ -846,14 +889,35 @@ function ProjectsPage({projects,setProjects,clients,employees}){
       )}
 
       {assignModal&&(
-        <Mdl title="Assign Employee" onClose={()=>setAssignModal(null)} maxWidth={420}>
+        <Mdl title="Assign Employees" onClose={()=>setAssignModal(null)} maxWidth={450}>
           <div style={{marginBottom:18}}>
-            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:8}}>SELECT EMPLOYEE</label>
-            <select value={assignTo} onChange={e=>setAssignTo(e.target.value)} style={{width:"100%",border:"1.5px solid #ede9fe",borderRadius:10,padding:"10px 14px",fontSize:13,color:assignTo?T.text:"#a78bfa",background:"#faf5ff",outline:"none",fontFamily:"inherit"}}>
-              <option value="">-- Select Employee --</option>
-              {employees.map(e=><option key={e._id||e.email} value={e.name}>{e.name}{e.department?` (${e.department})`:""}</option>)}
-            </select>
-            {assignTo&&<div style={{fontSize:11,color:"#9333ea",marginTop:8}}>✅ <strong>{assignTo}</strong> will be assigned</div>}
+            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:8}}>SELECT EMPLOYEES TO ASSIGN</label>
+            <div style={{border:"1.5px solid #ede9fe",borderRadius:10,padding:"12px",background:"#faf5ff",maxHeight:200,overflowY:"auto"}}>
+              {employees.length===0?<div style={{color:"#a78bfa",fontSize:13,textAlign:"center",padding:"20px"}}>No employees available</div>
+                :employees.map(e=>(
+                  <div key={e._id||e.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
+                    <input 
+                      type="checkbox" 
+                      id={`assign-emp-${e._id||e.email}`}
+                      checked={assignTo && assignTo.includes(e.name)}
+                      onChange={e=>{
+                        const currentAssigned = assignTo || [];
+                        if(e.target.checked){
+                          setAssignTo([...currentAssigned,e.name]);
+                        }else{
+                          setAssignTo(currentAssigned.filter(name=>name!==e.name));
+                        }
+                      }}
+                      style={{width:16,height:16,cursor:"pointer"}}
+                    />
+                    <label htmlFor={`assign-emp-${e._id||e.email}`} style={{flex:1,cursor:"pointer",fontSize:13,color:"#1e0a3c",display:"flex",alignItems:"center",gap:8}}>
+                      <span>{e.name}</span>
+                      {e.department&&<span style={{fontSize:11,color:"#a78bba",background:"#f3e8ff",padding:"2px 6px",borderRadius:4}}>{e.department}</span>}
+                    </label>
+                  </div>
+                ))}
+            </div>
+            {assignTo && assignTo.length>0&&<div style={{marginTop:8,fontSize:11,color:"#9333ea",fontWeight:600}}>{assignTo.length} employee(s) will be assigned</div>}
           </div>
           <div style={{display:"flex",justifyContent:"flex-end",gap:10}}>
             <button onClick={()=>setAssignModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
@@ -1170,7 +1234,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
 
   const [projects,setProjects]=useState([]);
   const [projLoading,setProjLoading]=useState(false);
-  const [np,setNp]=useState({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:""});
+  const [np,setNp]=useState({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:[]});
   const [npError,setNpError]=useState({});
   const [projSaveLoading,setProjSaveLoading]=useState(false);
 
@@ -1194,7 +1258,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
 
   const addEmployee=async()=>{const errors={};if(!ne.name.trim())errors.name="Name is required";if(!ne.email.trim())errors.email="Email is required";if(!ne.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNeError(errors);return;}try{setEmpSaveLoading(true);const res=await axios.post("https://m-business-r2vd.onrender.com/api/employees/add",ne);setEmployees(prev=>[res.data.employee,...prev]);setNe({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});setShowEmpPass(false);setNeError({});setModal(null);}catch(err){setNeError({email:err.response?.data?.msg||"Failed to save"});}finally{setEmpSaveLoading(false);}};
 
-  const addProject=async()=>{const errors={};if(!np.name.trim())errors.name="Project name is required";if(!np.client.trim())errors.client="Client is required";if(Object.keys(errors).length>0){setNpError(errors);return;}try{setProjSaveLoading(true);await axios.post("https://m-business-r2vd.onrender.com/api/projects/add",np);await fetchProjects();setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:""});setNpError({});setModal(null);}catch(err){setNpError({name:err.response?.data?.msg||"Failed to save"});}finally{setProjSaveLoading(false);}};
+  const addProject=async()=>{const errors={};if(!np.name.trim())errors.name="Project name is required";if(!np.client.trim())errors.client="Client is required";if(Object.keys(errors).length>0){setNpError(errors);return;}try{setProjSaveLoading(true);await axios.post("https://m-business-r2vd.onrender.com/api/projects/add",np);await fetchProjects();setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:[]});setNpError({});setModal(null);}catch(err){setNpError({name:err.response?.data?.msg||"Failed to save"});}finally{setProjSaveLoading(false);}};
 
   const addManager=async()=>{const errors={};if(!nm.managerName.trim())errors.managerName="Name is required";if(!nm.email.trim())errors.email="Email is required";if(!nm.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNmError(errors);return;}try{setMgrSaveLoading(true);const res=await axios.post("https://m-business-r2vd.onrender.com/api/managers/add",nm);setManagers(prev=>[res.data.manager,...prev]);setNm({managerName:"",email:"",phone:"",department:"",role:"Manager",address:"",password:"",status:"Active"});setNmError({});setModal(null);}catch(err){setNmError({email:err.response?.data?.msg||"Failed to save"});}finally{setMgrSaveLoading(false);}};
 
@@ -1368,11 +1432,32 @@ const companyNameStr = "M Business";
           <Fld label="Status" value={np.status} onChange={v=>setNp({...np,status:v})} options={["Pending","In Progress","Completed","On Hold"]}/>
         </div>
         <div style={{marginBottom:14}}>
-          <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEE <span style={{fontSize:10,color:"#a78bfa",fontWeight:400}}>(optional)</span></label>
-          <select value={np.assignedTo} onChange={e=>setNp({...np,assignedTo:e.target.value})} style={{width:"100%",border:"1.5px solid #ede9fe",borderRadius:10,padding:"10px 14px",fontSize:13,color:np.assignedTo?"#1e0a3c":"#a78bfa",background:"#faf5ff",boxSizing:"border-box",outline:"none",fontFamily:"inherit"}}>
-            <option value="">-- Select Employee --</option>
-            {employees.map(e=><option key={e._id||e.email} value={e.name}>{e.name}{e.department?` (${e.department})`:""}</option>)}
-          </select>
+          <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEES <span style={{fontSize:10,color:"#a78bfa",fontWeight:400}}>(select multiple)</span></label>
+          <div style={{border:"1.5px solid #ede9fe",borderRadius:10,padding:"12px",background:"#faf5ff",maxHeight:200,overflowY:"auto"}}>
+            {employees.length===0?<div style={{color:"#a78bfa",fontSize:13,textAlign:"center",padding:"20px"}}>No employees available</div>
+              :employees.map(e=>(
+                <div key={e._id||e.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
+                  <input 
+                    type="checkbox" 
+                    id={`emp-${e._id||e.email}`}
+                    checked={np.assignedTo.includes(e.name)}
+                    onChange={e=>{
+                      if(e.target.checked){
+                        setNp({...np,assignedTo:[...np.assignedTo,e.name]});
+                      }else{
+                        setNp({...np,assignedTo:np.assignedTo.filter(name=>name!==e.name)});
+                      }
+                    }}
+                    style={{width:16,height:16,cursor:"pointer"}}
+                  />
+                  <label htmlFor={`emp-${e._id||e.email}`} style={{flex:1,cursor:"pointer",fontSize:13,color:"#1e0a3c",display:"flex",alignItems:"center",gap:8}}>
+                    <span>{e.name}</span>
+                    {e.department&&<span style={{fontSize:11,color:"#a78bba",background:"#f3e8ff",padding:"2px 6px",borderRadius:4}}>{e.department}</span>}
+                  </label>
+                </div>
+              ))}
+          </div>
+          {np.assignedTo.length>0&&<div style={{marginTop:6,fontSize:11,color:"#9333ea",fontWeight:600}}>{np.assignedTo.length} employee(s) selected</div>}
         </div>
         <Fld label="Description" value={np.description} onChange={v=>setNp({...np,description:v})}/>
         <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>

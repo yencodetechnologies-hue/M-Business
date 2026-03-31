@@ -6,7 +6,6 @@ const ClientSchema = new mongoose.Schema({
   email:           { type: String, required: true, unique: true },
   phone:           { type: String, default: "" },
   address:         { type: String, default: "" },
-  projectAssigned: { type: String, default: "" },
   password:        { type: String, default: "" },
   status:          { type: String, default: "Active" },
   role:            { type: String, default: "client" }, 

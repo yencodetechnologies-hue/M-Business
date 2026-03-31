@@ -191,7 +191,6 @@ function ClientsPage({clients,setClients,onAddClient}){
       email:c.email||"",
       phone:c.phone||"",
       address:c.address||"",
-      projectAssigned:c.projectAssigned||"",
       status:c.status||"Active",
     });
     setEditErr({});
@@ -292,7 +291,6 @@ function ClientsPage({clients,setClients,onAddClient}){
           <InfoRow icon="📧" label="Email" value={viewClient.email}/>
           <InfoRow icon="📱" label="Phone" value={viewClient.phone}/>
           <InfoRow icon="📍" label="Address" value={viewClient.address}/>
-          <InfoRow icon="📁" label="Project Assigned" value={viewClient.projectAssigned}/>
           <InfoRow icon="📅" label="Joined" value={viewClient.createdAt?new Date(viewClient.createdAt).toLocaleDateString():"—"}/>
           <div style={{display:"flex",gap:10,marginTop:16}}>
             <button onClick={()=>{setViewClient(null);openEdit(viewClient);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
@@ -309,7 +307,6 @@ function ClientsPage({clients,setClients,onAddClient}){
             <Fld label="Company Name" value={editForm.companyName} onChange={v=>setEditForm(p=>({...p,companyName:v}))}/>
             <Fld label="Email *" value={editForm.email} onChange={v=>{setEditForm(p=>({...p,email:v}));setEditErr(p=>({...p,email:""}));}} type="email" error={editErr.email}/>
             <Fld label="Phone" value={editForm.phone} onChange={v=>setEditForm(p=>({...p,phone:v}))}/>
-            <Fld label="Project Assigned" value={editForm.projectAssigned} onChange={v=>setEditForm(p=>({...p,projectAssigned:v}))}/>
             <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Active","Inactive"]}/>
           </div>
           <Fld label="Address" value={editForm.address} onChange={v=>setEditForm(p=>({...p,address:v}))}/>
@@ -1193,7 +1190,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const fetchProjects=async()=>{try{const res=await axios.get("https://m-business-r2vd.onrender.com/api/projects");setProjects(res.data);}catch(e){console.log(e);}};
   const fetchManagers=async()=>{try{const res=await axios.get("https://m-business-r2vd.onrender.com/api/managers");setManagers(res.data);}catch(e){console.log(e);}};
 
-  const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,projectAssigned:nc.project,password:nc.password,status:nc.status};const res=await axios.post("https://m-business-r2vd.onrender.com/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
+  const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,password:nc.password,status:nc.status};const res=await axios.post("https://m-business-r2vd.onrender.com/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
 
   const addEmployee=async()=>{const errors={};if(!ne.name.trim())errors.name="Name is required";if(!ne.email.trim())errors.email="Email is required";if(!ne.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNeError(errors);return;}try{setEmpSaveLoading(true);const res=await axios.post("https://m-business-r2vd.onrender.com/api/employees/add",ne);setEmployees(prev=>[res.data.employee,...prev]);setNe({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});setShowEmpPass(false);setNeError({});setModal(null);}catch(err){setNeError({email:err.response?.data?.msg||"Failed to save"});}finally{setEmpSaveLoading(false);}};
 
@@ -1312,7 +1309,6 @@ const companyNameStr = "M Business";
           <Fld label="Company Name" value={nc.company} onChange={v=>setNc({...nc,company:v})}/>
           <Fld label="Email" value={nc.email} onChange={v=>{setNc({...nc,email:v});setNcError(p=>({...p,email:""}));}} type="email" error={ncError.email}/>
           <Fld label="Phone Number" value={nc.phone} onChange={v=>setNc({...nc,phone:v})}/>
-          <Fld label="Project Assigned" value={nc.project} onChange={v=>setNc({...nc,project:v})}/>
           <Fld label="Status" value={nc.status} onChange={v=>setNc({...nc,status:v})} options={["Active","Inactive"]}/>
         </div>
         <Fld label="Address" value={nc.address} onChange={v=>setNc({...nc,address:v})}/>

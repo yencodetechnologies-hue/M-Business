@@ -290,7 +290,7 @@ const handleLogin = async () => {
                 <div style={{ marginBottom:18 }}>
                   <label style={lStyle}>Role</label>
                   <div className="role-btns" style={{ display:"flex", gap:8 }}>
-                    {[["Admin","🛡️"],["Manager","👔"],["Employee","👤"]].map(([r,ic])=>(
+                    {[["Admin","🛡️"],["Manager","👔"],["Employee","👤"],["Client","🤝"]].map(([r,ic])=>(
                       <button key={r} onClick={()=>setRegData(p=>({...p,role:r}))} style={{ flex:1, padding:"9px 6px", border:`1.5px solid ${regData.role===r?"rgba(255,255,255,0.45)":"rgba(255,255,255,0.14)"}`, borderRadius:9, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", background: regData.role===r?"rgba(255,255,255,0.16)":"rgba(255,255,255,0.04)", color: regData.role===r?"#fff":"rgba(255,255,255,0.38)", transition:"all 0.2s" }}>
                         {ic} {r}
                       </button>

@@ -1310,7 +1310,7 @@ const companyNameStr = "M Business";
         <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
           <Fld label="Client Name *" value={nc.name} onChange={v=>{setNc({...nc,name:v});setNcError(p=>({...p,name:""}));}} error={ncError.name}/>
           <Fld label="Company Name" value={nc.company} onChange={v=>setNc({...nc,company:v})}/>
-          <Fld label="Email * (@gmail.com)" value={nc.email} onChange={v=>{setNc({...nc,email:v});setNcError(p=>({...p,email:""}));}} type="email" error={ncError.email}/>
+          <Fld label="Email" value={nc.email} onChange={v=>{setNc({...nc,email:v});setNcError(p=>({...p,email:""}));}} type="email" error={ncError.email}/>
           <Fld label="Phone Number" value={nc.phone} onChange={v=>setNc({...nc,phone:v})}/>
           <Fld label="Project Assigned" value={nc.project} onChange={v=>setNc({...nc,project:v})}/>
           <Fld label="Status" value={nc.status} onChange={v=>setNc({...nc,status:v})} options={["Active","Inactive"]}/>

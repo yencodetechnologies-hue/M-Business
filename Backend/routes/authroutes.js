@@ -82,19 +82,37 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-// ── POST /api/auth/signup (உங்கள் existing — touch பண்ணல) ───────────────────
+// ── POST /api/auth/signup ───────────────────────────────────────────────────
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password, role, phone } = req.body;
 
-    const existing = await User.findOne({ email });
-    if (existing) {
+    // Ensure email is unique across all collections
+    const existUser = await User.findOne({ email });
+    const existClient = await Client.findOne({ email });
+    const existManager = await Manager.findOne({ email });
+    const existEmployee = await Employee.findOne({ email });
+
+    if (existUser || existClient || existManager || existEmployee) {
       return res.status(400).json({ msg: "Email already exists" });
     }
 
-    const hashed  = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashed, role: role || "admin", phone });
-    await newUser.save();
+    const hashed = await bcrypt.hash(password, 10);
+    const selectedRole = (role || "admin").toLowerCase().trim();
+
+    if (selectedRole === "client") {
+      const newClient = new Client({ clientName: name, email, password: hashed, role: "client", phone });
+      await newClient.save();
+    } else if (selectedRole === "manager") {
+      const newManager = new Manager({ managerName: name, email, password: hashed, role: "Manager", phone });
+      await newManager.save();
+    } else if (selectedRole === "employee") {
+      const newEmployee = new Employee({ name, email, password: hashed, role: "employee", phone });
+      await newEmployee.save();
+    } else {
+      const newUser = new User({ name, email, password: hashed, role: "admin", phone });
+      await newUser.save();
+    }
 
     res.status(201).json({ msg: "Account created successfully" });
   } catch (err) {

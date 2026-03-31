@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");const express = require("express");
+const express = require("express");
 const router = express.Router();
 const Client = require("../models/ClientModel");
 const { addClient } = require("../controllers/ClientController");
@@ -10,13 +10,15 @@ router.get("/projects/:name", async (req, res) => {
     const projects = await Project.find({
       $or: [
         { assignedTo: { $regex: new RegExp(name, "i") } },
-        { manager: { $regex: new RegExp(name, "i") } }
+        { manager:    { $regex: new RegExp(name, "i") } }
       ]
     }).sort({ createdAt: -1 });
     res.json(projects);
-  } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
 });
-// GET projects by client name
+
 router.get("/my-projects/:clientName", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.clientName);
@@ -28,7 +30,7 @@ router.get("/my-projects/:clientName", async (req, res) => {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 });
-// GET all clients
+
 router.get("/", async (req, res) => {
   try {
     const clients = await Client.find().sort({ createdAt: -1 });
@@ -38,10 +40,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST add client
 router.post("/add", addClient);
 
-// PUT update client
 router.put("/:id", async (req, res) => {
   try {
     const client = await Client.findByIdAndUpdate(
@@ -56,7 +56,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE client
 router.delete("/:id", async (req, res) => {
   try {
     await Client.findByIdAndDelete(req.params.id);

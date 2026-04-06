@@ -12,6 +12,7 @@ import { ExpensesPage }   from "./components/AccountsPage";
 import ReportsPage        from "./components/ReportsPage";
 import QuotationCreator   from "./components/QuotationCreator";
 import InterviewApplyForm from "./components/InterviewApplyForm";
+import CanvasPage         from "./components/CanvasPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -90,6 +91,7 @@ const getRootPage = () => {
         />
 
         <Route path="/tasks"             element={<TasksPage />} />
+        <Route path="/canvas"            element={<CanvasPage />} />
         <Route path="/invoice-view"      element={<InvoiceViewer />} />
         <Route path="/calendar"          element={<CalendarPage />} />
         <Route path="/expenses"          element={<ExpensesPage />} />

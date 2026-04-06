@@ -53,8 +53,9 @@ const COL_W = {
   person: 150,
   status: 190,
   date: 160,
-  dots: 36,
-  addcol: 36,
+  priority_col: 190,
+  addcol: 44,
+  dots: 80
 };
 function extraColWidth(type) {
   if (type === "text")     return 140;
@@ -730,17 +731,30 @@ const TB = React.forwardRef(({icon,label,active,onClick,badge},ref)=>(
 /* ══════════════════════════════════════════════════════════
    NEW TASK BTN
 ══════════════════════════════════════════════════════════ */
-function NewTaskBtn({onAddTask,onTriggerGroup,showToast,onImport,groups,onAddTaskToGroup}){
+function NewTaskBtn({onAddTask,onTriggerGroup,showToast,onImport,groups,onAddTaskToGroup,setGroups}){
   const [open,setOpen]=useState(false);
   const [showPicker,setShowPicker]=useState(false);
   const [taskTitle,setTaskTitle]=useState("");
   const [selGroup,setSelGroup]=useState("");
   const arrowRef=useRef(); const inputRef=useRef();
   useEffect(()=>{ if(showPicker) setTimeout(()=>inputRef.current?.focus(),50); if(!showPicker) setTaskTitle(""); },[showPicker]);
-  const submit=()=>{
-    const gid=selGroup||(groups&&groups[0]&&(groups[0]._id||groups[0].id))||null;
-    if(!gid){showToast("No group found","error");return;}
-    if(taskTitle.trim()) onAddTaskToGroup(gid,taskTitle.trim()); else onAddTask();
+  const submit=async()=>{
+    let gid=groups&&groups[0]&&(groups[0]._id||groups[0].id);
+    if(!gid){
+      // Create a default group if none exists
+      try {
+        const color=GRP_COLORS[0];
+        const r=await axios.post(`${API}/groups`,{label:"Tasks",color});
+        gid=r.data._id||r.data.id;
+        // Update local groups state
+        setGroups(p=>[...p,{...r.data,tasks:[],open:true}]);
+      } catch {
+        showToast("Failed to create group","error");
+        return;
+      }
+    }
+    const title=taskTitle.trim()||"New task";
+    onAddTaskToGroup(gid,title);
     setShowPicker(false);setSelGroup("");setTaskTitle("");setOpen(false);
   };
   return(
@@ -761,19 +775,7 @@ function NewTaskBtn({onAddTask,onTriggerGroup,showToast,onImport,groups,onAddTas
               onFocus={e=>e.target.style.borderColor="#0073ea"}
               onBlur={e=>e.target.style.borderColor="#d0d4e4"}/>
             <div style={{marginBottom:16}}>
-              <div style={{fontSize:11,color:"#676879",fontWeight:700,marginBottom:6,letterSpacing:.4}}>ADD TO GROUP</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-                {(groups||[]).map(g=>{
-                  const gid=g._id||g.id;
-                  const isSel=selGroup===gid||(selGroup===""&&groups[0]&&(groups[0]._id||groups[0].id)===gid);
-                  return(
-                    <div key={gid} onClick={()=>setSelGroup(gid)}
-                      style={{display:"flex",alignItems:"center",gap:6,padding:"5px 11px",borderRadius:20,cursor:"pointer",fontSize:12,fontWeight:isSel?700:500,background:isSel?"#e8f4fd":"#f5f6f8",border:`1.5px solid ${isSel?"#0073ea":"transparent"}`,color:isSel?"#0073ea":"#323338"}}>
-                      <div style={{width:8,height:8,borderRadius:"50%",background:g.color,flexShrink:0}}/>{g.label}
-                    </div>
-                  );
-                })}
-              </div>
+              <div style={{fontSize:11,color:"#676879",fontWeight:700,marginBottom:6,letterSpacing:.4}}>Task will be added to the first available group</div>
             </div>
             <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
               <button onClick={()=>setShowPicker(false)} style={{background:"#f5f6f8",border:"none",borderRadius:8,padding:"8px 18px",fontSize:13,fontWeight:600,color:"#676879",cursor:"pointer",fontFamily:"inherit"}}>Cancel</button>
@@ -1238,7 +1240,37 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
       {/* + col placeholder */}
       <div style={{width:COL_W.addcol,flexShrink:0,borderRight:`1px solid ${P.border}`}}/>
       {/* dots */}
-      <div style={{width:COL_W.dots,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{width:COL_W.dots,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+        <button 
+          onClick={e=>{e.stopPropagation();onDel(id);}}
+          style={{
+            background: "linear-gradient(135deg,#ef4444,#dc2626)",
+            border: "none",
+            borderRadius: 4,
+            width: 22,
+            height: 22,
+            cursor: "pointer",
+            fontSize: 11,
+            fontWeight: 700,
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 2px 6px rgba(239,68,68,0.3)",
+            transition: "all 0.2s",
+            opacity: hovered ? 1 : 0.6
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.transform = "scale(1.1)";
+            e.currentTarget.style.opacity = "1";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.opacity = hovered ? "1" : "0.6";
+          }}
+        >
+          🗑
+        </button>
         <div ref={dotsRef} onClick={e=>{e.stopPropagation();setDotsOpen(v=>!v);}} style={{width:26,height:26,borderRadius:5,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,color:P.muted,letterSpacing:1,userSelect:"none"}} onMouseEnter={e=>e.currentTarget.style.background=P.border} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>···</div>
         {dotsOpen&&(<DD anchor={dotsRef} onClose={()=>setDotsOpen(false)} w={160}><MI icon="⎘" title="Duplicate" onClick={()=>{onDup(task);setDotsOpen(false);}}/><Sep/><MI icon="🗑" title="Delete task" danger onClick={()=>{onDel(id);setDotsOpen(false);}}/></DD>)}
       </div>
@@ -1649,7 +1681,7 @@ export default function TaskPage({ projects = [], employees = [] }) {
         {/* TOOLBAR — only for table view */}
         {currentView==="table"&&(
           <div style={{background:"#fff",borderBottom:`1.5px solid ${P.border}`,padding:"6px 18px",display:"flex",alignItems:"center",gap:4,flexShrink:0,zIndex:100,boxShadow:"0 2px 8px rgba(124,58,237,0.06)"}}>
-            <NewTaskBtn onAddTask={addNewTask} onTriggerGroup={()=>addGroupTrigger.current?.trigger()} showToast={showToast} onImport={()=>setShowImport(true)} groups={groups} onAddTaskToGroup={addTask}/>
+            <NewTaskBtn onAddTask={addNewTask} onTriggerGroup={()=>addGroupTrigger.current?.trigger()} showToast={showToast} onImport={()=>setShowImport(true)} groups={groups} onAddTaskToGroup={addTask} setGroups={setGroups}/>
             <div style={{width:1,height:22,background:P.border,margin:"0 4px",flexShrink:0}}/>
             <div style={{position:"relative",flexShrink:0}}>
               <span style={{position:"absolute",left:8,top:"50%",transform:"translateY(-50%)",fontSize:13,pointerEvents:"none",color:P.muted}}>🔍</span>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { BASE_URL } from "../config";
 
 const GST_RATES = [0, 5, 12, 18, 28];
 const DEFAULT_LOGO_URL = "https://res.cloudinary.com/dvbzhmysy/image/upload/v1773851516/mbusiness/logos/okhahqag5ttqwfvhfphw.png";
@@ -82,7 +83,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
   const fetchList = async () => {
     setListLoading(true);
     try {
-      const res  = await fetch("https://m-business-r2vd.onrender.com/api/quotations");
+      const res  = await fetch(`${BASE_URL}/api/quotations`);
       const data = await res.json();
       if (data.success && Array.isArray(data.quotations)) setQtList(data.quotations);
       else setQtList(loadLocal());
@@ -115,7 +116,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     if (!validate()) return;
     setSaving("draft");
     try {
-      await fetch("https://m-business-r2vd.onrender.com/api/quotations", {
+      await fetch(`${BASE_URL}/api/quotations`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qt, items, status: "draft" }),
       });
@@ -130,7 +131,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     if (!validate()) return;
     setSaving("preview");
     try {
-      await fetch("https://m-business-r2vd.onrender.com/api/quotations", {
+      await fetch(`${BASE_URL}/api/quotations`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qt, items, status: "draft" }),
       });
@@ -157,7 +158,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     if (!window.confirm(`Convert "${entry.quoteNo}" to Invoice?`)) return;
     setConvertingId(entry.id);
     try {
-      const res  = await fetch(`https://m-business-r2vd.onrender.com/api/quotations/${entry.id}/convert`, { method: "POST" });
+      const res  = await fetch(`${BASE_URL}/api/quotations/${entry.id}/convert`, { method: "POST" });
       const data = await res.json();
       if (data.success) {
         alert(`✅ Invoice ${data.invoiceNo} created!`);
@@ -170,9 +171,10 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
 
   const handleStatusChange = async (entry, newStatus) => {
     try {
-      await fetch(`https://m-business-r2vd.onrender.com/api/quotations/${entry.id}/status`, {
-        method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+      await fetch(`${BASE_URL}/api/quotations/${entry.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
       });
       fetchList();
     } catch { alert("Status update failed"); }
@@ -210,7 +212,6 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#111827" }}>📋 Quotations</h2>
             <p style={{ margin: "3px 0 0", color: "#9ca3af", fontSize: 13 }}>{enriched.length} total</p>
           </div>
           <button onClick={() => { clearForm(); setStep("form"); }}

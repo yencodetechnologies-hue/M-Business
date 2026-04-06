@@ -1,4 +1,3 @@
-// models/ProjectModel.js
 const mongoose = require("mongoose");
 
 const projectSchema = new mongoose.Schema({
@@ -8,14 +7,14 @@ const projectSchema = new mongoose.Schema({
   description:    { type: String, default: "" },
   start:          { type: String, default: "" },
   end:            { type: String, default: "" },
-  deadline:       { type: String, default: "" },   // same as end
+  deadline:       { type: String, default: "" },
   budget:         { type: String, default: "" },
   team:           { type: String, default: "" },
   status:         { type: String, default: "Pending" },
   progress:       { type: Number, default: 0 },
   tasks:          { type: Number, default: 0 },
   completedTasks: { type: Number, default: 0 },
-  assignedTo:     { type: String, default: "" },   // ← employee name
+  assignedTo:     { type: [String], default: [] },  // ✅ Fixed
   manager:        { type: String, default: "" },
 }, { timestamps: true });
 

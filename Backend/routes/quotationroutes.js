@@ -110,7 +110,7 @@ router.post("/:id/convert", async (req, res) => {
       companyAddress: qt.companyAddress|| "",
       items: items.map((i) => ({ description: i.description, quantity: parseFloat(i.quantity)||0, rate: parseFloat(i.rate)||0 })),
       subtotal, gstAmt, total,
-      status: "unpaid",
+      status: "draft",
     });
     await invoice.save();
 

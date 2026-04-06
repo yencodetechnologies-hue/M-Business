@@ -322,7 +322,6 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#111827" }}>🧾 Invoices</h2>
             <p style={{ margin: "3px 0 0", color: "#9ca3af", fontSize: 13 }}>{enriched.length} total invoice{enriched.length !== 1 ? "s" : ""}</p>
           </div>
           <button onClick={() => { clearForm(); setStep("form"); }}

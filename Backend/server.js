@@ -4,14 +4,29 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
+// Allow localhost with any port for local development
+const isLocalhost = (origin) => origin && origin.startsWith('http://localhost') || origin?.startsWith('http://127.0.0.1');
+
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-     "http://localhost:5173",
-    "http://192.168.1.125:5173", 
-    "https://m-business-tau.vercel.app",       // local frontend
-    "https://m-business-r2vd.onrender.com"  // deployed frontend
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow any localhost/127.0.0.1 origin for development
+    if (isLocalhost(origin)) return callback(null, true);
+    
+    // Allow specific deployed origins
+    const allowedOrigins = [
+      "https://m-business-tau.vercel.app",
+      "https://m-business-r2vd.onrender.com"
+    ];
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());

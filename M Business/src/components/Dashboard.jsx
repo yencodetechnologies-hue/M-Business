@@ -8,6 +8,7 @@ import CalendarPage from "./CalendarPage";
 import AccountsPage, { ExpensesPage } from "./AccountsPage";
 import ReportsPage  from "./ReportsPage";
 import QuotationCreator   from "./QuotationCreator";
+import ProjectProposalCreator from "./ProjectProposalCreator";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { QRCodeSVG } from "qrcode.react";
@@ -26,6 +27,7 @@ const NAV=[
   {key:"managers",icon:"🧑‍💼",label:"Managers"},
   {key:"projects",icon:"📁",label:"Projects"},
   {key:"quotations",icon:"📋",label:"Quotations"},
+  {key:"proposals",icon:"🎨",label:"Proposals"},
   {key:"invoices",icon:"🧾",label:"Invoices"},
   {key:"tracking",icon:"📊",label:"Project Status"},
   {key:"tasks",icon:"✅",label:"Tasks"},
@@ -384,7 +386,9 @@ const loadEmpDocs = async (emp) => {
   };
 
   const doDelete=async()=>{
-    try{await axios.delete(`${BASE_URL}/api/employees/${deleteTarget._id}`);}catch{}
+    try{
+      await axios.delete(`${BASE_URL}/api/employees/${deleteTarget._id}`);
+    }catch{}
     setEmployees(prev=>prev.filter(e=>e._id!==deleteTarget._id));
     setDeleteTarget(null);
     showToast("🗑️ Employee deleted!");
@@ -430,8 +434,11 @@ const loadEmpDocs = async (emp) => {
                     <td style={{padding:"12px 14px",color:"#22C55E",fontSize:12,fontWeight:600}}>{e.salary||"—"}</td>
                     <td style={{padding:"12px 14px"}}><Badge label={e.status||"Active"}/></td>
                     <td style={{padding:"12px 14px"}}>
-                      <ActionBtns onView={()=>{ setViewEmp(e); loadEmpDocs(e); }}
- onEdit={()=>openEdit(e)} onDelete={()=>setDeleteTarget(e)}/>
+                      <ActionBtns 
+                        onView={()=>{ setViewEmp(e); loadEmpDocs(e); }}
+                        onEdit={()=>openEdit(e)} 
+                        onDelete={()=>setDeleteTarget(e)}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -488,8 +495,7 @@ const loadEmpDocs = async (emp) => {
                   style={{flex:1,padding:"6px 10px",background:`${dt.color}10`,border:`1px solid ${dt.color}30`,borderRadius:7,fontSize:11,fontWeight:700,color:dt.color,cursor:"pointer",fontFamily:"inherit"}}>
                   👁 View
                 </button>
-                <a href={doc.url} download
-                  style={{flex:1,padding:"6px 10px",background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,fontSize:11,fontWeight:700,color:"#475569",textDecoration:"none",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <a href={doc.url} downloadstyle={{flex:1,padding:"6px 10px",background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,fontSize:11,fontWeight:700,color:"#475569",textDecoration:"none",display:"flex",alignItems:"center",justifyContent:"center"}}>
                   ⬇ Download
                 </a>
               </div>
@@ -583,7 +589,9 @@ const loadEmpDocs = async (emp) => {
   };
 
   const doDelete=async()=>{
-    try{await axios.delete(`${BASE_URL}/api/managers/${deleteTarget._id}`);}catch{}
+    try{
+      await axios.delete(`${BASE_URL}/api/managers/${deleteTarget._id}`);
+    }catch{}
     setManagers(prev=>prev.filter(m=>m._id!==deleteTarget._id));
     setDeleteTarget(null);
     showToast("🗑️ Manager deleted!");
@@ -703,7 +711,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
   const filtered=projects.filter(p=>(p.name||"").toLowerCase().includes(search.toLowerCase())||(p.client||"").toLowerCase().includes(search.toLowerCase()));
 
   const openEdit=(p)=>{
-    setEditForm({name:p.name||"",client:p.client||"",purpose:p.purpose||"",description:p.description||"",start:p.start||"",end:p.end||"",budget:p.budget||"",team:p.team||"",status:p.status||"Pending",assignedTo:p.assignedTo||[]});
+    setEditForm({name:p.name||"",client:p.client||"",purpose:p.purpose||"",description:p.description||"",start:p.start||"",end:p.end||"",budget:p.budget||"",team:p.team||"",status:p.status||"Pending",assignedTo:Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])});
     setEditErr({});
     setEditProj(p);
   };
@@ -775,18 +783,20 @@ function ProjectsPage({projects,setProjects,clients,employees}){
                     <td style={{padding:"12px 14px",color:"#22C55E",fontWeight:600}}>{p.budget||"—"}</td>
                     <td style={{padding:"12px 14px"}}><Badge label={p.status||"Pending"}/></td>
                     <td style={{padding:"12px 14px"}}>
-                      {p.assignedTo && p.assignedTo.length > 0
-                        ?<div style={{display:"flex",flexDirection:"column",gap:4}}>
-                           {p.assignedTo.slice(0,2).map((emp, idx)=>(
-                             <div key={idx} style={{display:"flex",alignItems:"center",gap:6}}>
-                               <div style={{width:20,height:20,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:8,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
-                               <span style={{color:"#6366f1",fontWeight:600,fontSize:11}}>{emp}</span>
-                             </div>
-                           ))}
-                           {p.assignedTo.length > 2 && <div style={{fontSize:10,color:"#a78bfa",fontStyle:"italic"}}>+{p.assignedTo.length - 2} more</div>}
-                         </div>
-                        :<button onClick={()=>{setAssignModal(p);setAssignTo(p.assignedTo||[]);}} style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)",borderRadius:7,padding:"4px 10px",fontSize:11,color:"#6366f1",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Assign</button>
-                      }
+                      {(() => {
+                        const assignedEmployees = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
+                        return assignedEmployees.length > 0
+                          ?<div style={{display:"flex",flexDirection:"column",gap:4}}>
+                             {assignedEmployees.slice(0,2).map((emp, idx)=>(
+                               <div key={idx} style={{display:"flex",alignItems:"center",gap:6}}>
+                                 <div style={{width:20,height:20,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:8,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
+                                 <span style={{color:"#6366f1",fontWeight:600,fontSize:11}}>{emp}</span>
+                               </div>
+                             ))}
+                             {assignedEmployees.length > 2 && <div style={{fontSize:10,color:"#a78bfa",fontStyle:"italic"}}>+{assignedEmployees.length - 2} more</div>}
+                           </div>
+                          :<button onClick={()=>{setAssignModal(p);setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []));}} style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)",borderRadius:7,padding:"4px 10px",fontSize:11,color:"#6366f1",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Assign</button>
+                      })()}
                     </td>
                     <td style={{padding:"12px 14px"}}>
                       <ActionBtns onView={()=>setViewProj(p)} onEdit={()=>openEdit(p)} onDelete={()=>setDeleteTarget(p)}/>
@@ -810,17 +820,19 @@ function ProjectsPage({projects,setProjects,clients,employees}){
           <InfoRow icon="💰" label="Budget" value={viewProj.budget}/>
           <div style={{marginBottom:14}}>
             <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGNED EMPLOYEES</label>
-            {viewProj.assignedTo && viewProj.assignedTo.length > 0
-              ?<div style={{display:"flex",flexDirection:"column",gap:6}}>
-                 {viewProj.assignedTo.map((emp, idx)=>(
-                   <div key={idx} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:"#f8fafc",borderRadius:8,border:"1px solid #e2e8f0"}}>
-                     <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
-                     <span style={{color:"#1e0a3c",fontWeight:600,fontSize:12}}>{emp}</span>
-                   </div>
-                 ))}
-               </div>
-              :<div style={{color:"#a78bfa",fontSize:13,fontStyle:"italic"}}>No employees assigned</div>
-            }
+            {(() => {
+              const assignedEmployees = Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : []);
+              return assignedEmployees.length > 0
+                ?<div style={{display:"flex",flexDirection:"column",gap:6}}>
+                   {assignedEmployees.map((emp, idx)=>(
+                     <div key={idx} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:"#f8fafc",borderRadius:8,border:"1px solid #e2e8f0"}}>
+                       <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
+                       <span style={{color:"#1e0a3c",fontWeight:600,fontSize:12}}>{emp}</span>
+                     </div>
+                   ))}
+                 </div>
+                :<div style={{color:"#a78bfa",fontSize:13,fontStyle:"italic"}}>No employees assigned</div>
+            })()}
           </div>
           <InfoRow icon="📅" label="Start Date" value={viewProj.start}/>
           <InfoRow icon="🏁" label="End Date" value={viewProj.end}/>
@@ -829,7 +841,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
           <InfoRow icon="📝" label="Description" value={viewProj.description}/>
           <div style={{display:"flex",gap:10,marginTop:16}}>
             <button onClick={()=>{setViewProj(null);openEdit(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
-            <button onClick={()=>{setViewProj(null);setAssignModal(viewProj);setAssignTo(viewProj.assignedTo||[]);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>👤 Assign</button>
+            <button onClick={()=>{setViewProj(null);setAssignModal(viewProj);setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : []));}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>👤 Assign</button>
             <button onClick={()=>{setViewProj(null);setDeleteTarget(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
           </div>
         </Mdl>
@@ -857,12 +869,11 @@ function ProjectsPage({projects,setProjects,clients,employees}){
               {employees.length===0?<div style={{color:"#a78bfa",fontSize:13,textAlign:"center",padding:"20px"}}>No employees available</div>
                 :employees.map(e=>(
                   <div key={e._id||e.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
-                    <input 
-                      type="checkbox" 
+                    <input type="checkbox" 
                       id={`edit-emp-${e._id||e.email}`}
-                      checked={editForm.assignedTo && editForm.assignedTo.includes(e.name)}
+                      checked={Array.isArray(editForm.assignedTo) ? editForm.assignedTo.includes(e.name) : (editForm.assignedTo === e.name)}
                       onChange={e=>{
-                        const currentAssigned = editForm.assignedTo || [];
+                        const currentAssigned = Array.isArray(editForm.assignedTo) ? editForm.assignedTo : (editForm.assignedTo ? [editForm.assignedTo] : []);
                         if(e.target.checked){
                           setEditForm({...editForm,assignedTo:[...currentAssigned,e.name]});
                         }else{
@@ -896,12 +907,11 @@ function ProjectsPage({projects,setProjects,clients,employees}){
               {employees.length===0?<div style={{color:"#a78bfa",fontSize:13,textAlign:"center",padding:"20px"}}>No employees available</div>
                 :employees.map(e=>(
                   <div key={e._id||e.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
-                    <input 
-                      type="checkbox" 
+                    <input type="checkbox" 
                       id={`assign-emp-${e._id||e.email}`}
-                      checked={assignTo && assignTo.includes(e.name)}
+                      checked={Array.isArray(assignTo) ? assignTo.includes(e.name) : (assignTo === e.name)}
                       onChange={e=>{
-                        const currentAssigned = assignTo || [];
+                        const currentAssigned = Array.isArray(assignTo) ? assignTo : (assignTo ? [assignTo] : []);
                         if(e.target.checked){
                           setAssignTo([...currentAssigned,e.name]);
                         }else{
@@ -971,7 +981,7 @@ function ProjectStatusPage({clients,employees,managers}){
   const [tsErr,setTsErr]=useState({});
   const [tsSaving,setTsSaving]=useState(false);
   const [tsToast,setTsToast]=useState("");
-  useEffect(()=>{axios.get("https://m-business-r2vd.onrender.com/api/project-status").then(r=>{if(r.data?.length)setTrackList(r.data);}).catch(()=>{});},[]);
+  useEffect(()=>{axios.get(BASE_URL + "/api/project-status").then(r=>{if(r.data?.length)setTrackList(r.data);}).catch(()=>{});},[]);
   const showToast=(msg)=>{setTsToast(msg);setTimeout(()=>setTsToast(""),2800);};
   const clientNames=clients.map(c=>({name:c.clientName||c.name||""}));
   const managerNames=managers.map(m=>({name:m.managerName||m.name||""}));
@@ -980,7 +990,7 @@ function ProjectStatusPage({clients,employees,managers}){
   const tsStats=[{t:"Total",v:trackList.length,i:"📁",c:"#9333ea"},{t:"In Progress",v:trackList.filter(p=>p.status==="In Progress").length,i:"⚡",c:"#7c3aed"},{t:"Completed",v:trackList.filter(p=>p.status==="Completed").length,i:"✅",c:"#22C55E"},{t:"Pending",v:trackList.filter(p=>p.status==="Pending").length,i:"🕐",c:"#F59E0B"},{t:"On Hold",v:trackList.filter(p=>p.status==="On Hold").length,i:"⏸️",c:"#a855f7"}];
   const openAdd=()=>{setTsForm(EMPTY);setTsErr({});setTsEditId(null);setTsModal("add");};
   const openEdit=(p)=>{setTsForm({projectId:p.projectId||p.id||"",name:p.name||"",client:p.client||"",manager:p.manager||"",employee:p.employee||"",deadline:p.deadline||"",status:p.status||"In Progress",progress:p.progress||p.pct||0,notes:p.notes||p.note||""});setTsErr({});setTsEditId(p._id||p.id);setTsModal("edit");};
-  const saveTs=async()=>{const errs={};if(!tsForm.name.trim())errs.name="Project name required";if(!tsForm.client.trim())errs.client="Client required";if(!tsForm.deadline)errs.deadline="Deadline required";const pv=Number(tsForm.progress);if(isNaN(pv)||pv<0||pv>100)errs.progress="0–100 only";if(Object.keys(errs).length){setTsErr(errs);return;}try{setTsSaving(true);const payload={...tsForm,progress:Number(tsForm.progress)};if(tsModal==="add"){const res=await axios.post("https://m-business-r2vd.onrender.com/api/project-status",payload);setTrackList(prev=>[res.data,...prev]);}else{const res=await axios.put(`https://m-business-r2vd.onrender.com/api/project-status/${tsEditId}`,payload);setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?res.data:p));}showToast(tsModal==="add"?"✅ Project added!":"✅ Project updated!");setTsModal(null);}catch{if(tsModal==="add"){const local={...tsForm,_id:Date.now().toString(),projectId:tsForm.projectId||`PRJ${String(trackList.length+1).padStart(3,"0")}`,progress:Number(tsForm.progress)};setTrackList(prev=>[local,...prev]);}else{setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?{...p,...tsForm,progress:Number(tsForm.progress)}:p));}showToast("✅ Saved locally!");setTsModal(null);}finally{setTsSaving(false);}};
+  const saveTs=async()=>{const errs={};if(!tsForm.name.trim())errs.name="Project name required";if(!tsForm.client.trim())errs.client="Client required";if(!tsForm.deadline)errs.deadline="Deadline required";const pv=Number(tsForm.progress);if(isNaN(pv)||pv<0||pv>100)errs.progress="0–100 only";if(Object.keys(errs).length){setTsErr(errs);return;}try{setTsSaving(true);const payload={...tsForm,progress:Number(tsForm.progress)};if(tsModal==="add"){const res=await axios.post(BASE_URL + "/api/project-status",payload);setTrackList(prev=>[res.data,...prev]);}else{const res=await axios.put(`https://m-business-r2vd.onrender.com/api/project-status/${tsEditId}`,payload);setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?res.data:p));}showToast(tsModal==="add"?"✅ Project added!":"✅ Project updated!");setTsModal(null);}catch{if(tsModal==="add"){const local={...tsForm,_id:Date.now().toString(),projectId:tsForm.projectId||`PRJ${String(trackList.length+1).padStart(3,"0")}`,progress:Number(tsForm.progress)};setTrackList(prev=>[local,...prev]);}else{setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?{...p,...tsForm,progress:Number(tsForm.progress)}:p));}showToast("✅ Saved locally!");setTsModal(null);}finally{setTsSaving(false);}};
   const deleteTs=async(id)=>{if(!window.confirm("Delete?"))return;try{await axios.delete(`https://m-business-r2vd.onrender.com/api/project-status/${id}`);}catch{}setTrackList(prev=>prev.filter(p=>(p._id||p.id)!==id));showToast("🗑️ Deleted!");};
   const B2=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
   return(
@@ -1050,7 +1060,7 @@ function InterviewPage({companyId,companyName}){
   const CID=companyId||"69b8fe0a6e3d6f1e056f3109";
   const CNAME=companyName||"M Business";
   const STORAGE_KEY=`hr_candidates_${CID}`;
-const API_URL = "https://m-business-tau.vercel.app";
+  const API_URL = BASE_URL;
   const [candidates,setCandidates]=useState([]);
   const [filter,setFilter]=useState("all");
   const [search,setSearch]=useState("");
@@ -1059,11 +1069,11 @@ const API_URL = "https://m-business-tau.vercel.app";
   const [linkCopied,setLinkCopied]=useState(false);
   const [loading,setLoading]=useState(true);
   const appLink=`${window.location.origin}/interview-apply/${CNAME.replace(/\s+/g,"-")}-${CID}`;
-  useEffect(()=>{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");if(saved.length){setCandidates(saved);setLoading(false);}axios.get(`${API}/api/interviews?companyId=${CID}`).then(r=>{const list=r.data?.data||(Array.isArray(r.data)?r.data:[]);if(list.length){setCandidates(list);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));}}).catch(()=>{}).finally(()=>setLoading(false));},[CID]);
+  useEffect(()=>{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");if(saved.length){setCandidates(saved);setLoading(false);}axios.get(`${BASE_URL}/api/interviews?companyId=${CID}`).then(r=>{const list=r.data?.data||(Array.isArray(r.data)?r.data:[]);if(list.length){setCandidates(list);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));}}).catch(()=>{}).finally(()=>setLoading(false));},[CID]);
   const persist=(list)=>{setCandidates(list);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));};
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
  // ✅ Fix — works in HTTP + HTTPS + all browsers
-const copyLink = async () => {
+  const copyLink = async () => {
   try {
       const companySlug = `${companyName}-${companyId}`.replace(/\s+/g, "-");
     const link = `${window.location.origin}/interview-apply/${companySlug}`;
@@ -1083,8 +1093,8 @@ const copyLink = async () => {
     showToast("❌ Copy failed. Please copy manually.");  // ← toast.error பதிலா
   }
 };
-  const updateStatus=(idx,val)=>{const updated=[...candidates];updated[idx]={...updated[idx],status:val};persist(updated);const c=updated[idx];const id=c._id||c.id;if(id)axios.patch(`${API}/api/interviews/${id}/status`,{status:val}).catch(()=>{});showToast(`✅ Status → "${val}"`);if(viewModal&&(viewModal._id||viewModal.id)===id)setViewModal(updated[idx]);};
-  const deleteCandidate=(idx)=>{if(!window.confirm("Delete this candidate?"))return;const c=candidates[idx];const id=c._id||c.id;if(id)axios.delete(`${API}/api/interviews/${id}`).catch(()=>{});persist(candidates.filter((_,i)=>i!==idx));showToast("🗑️ Deleted");setViewModal(null);};
+  const updateStatus=(idx,val)=>{const updated=[...candidates];updated[idx]={...updated[idx],status:val};persist(updated);const c=updated[idx];const id=c._id||c.id;if(id)axios.patch(`${API_URL}/api/interviews/${id}/status`,{status:val},{headers:{"Content-Type":"application/json"}}).catch(()=>{});showToast(`✅ Status → "${val}"`);if(viewModal&&(viewModal._id||viewModal.id)===id)setViewModal(updated[idx]);};
+  const deleteCandidate=(idx)=>{if(!window.confirm("Delete this candidate?"))return;const c=candidates[idx];const id=c._id||c.id;if(id)axios.delete(`${API_URL}/api/interviews/${id}`).catch(()=>{});persist(candidates.filter((_,i)=>i!==idx));showToast("🗑️ Deleted");setViewModal(null);};
   const fmt=(iso)=>iso?new Date(iso).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}):"—";
   const displayed=candidates.filter(c=>{const okF=filter==="all"||(c.status||"pending").toLowerCase()===filter;const q=search.toLowerCase();const okS=!q||(c.name||"").toLowerCase().includes(q)||(c.role||"").toLowerCase().includes(q)||(c.email||"").toLowerCase().includes(q)||(c.mobile||"").includes(q);return okF&&okS;});
   const counts={total:candidates.length,pending:candidates.filter(c=>(c.status||"pending").toLowerCase()==="pending").length,hired:candidates.filter(c=>(c.status||"").toLowerCase()==="hired").length,rejected:candidates.filter(c=>(c.status||"").toLowerCase()==="rejected").length};
@@ -1115,7 +1125,8 @@ const copyLink = async () => {
             <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:950}}>
               <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>{["#","Candidate","Contact","Experience","Role","Interviewer","Date","Status","Resume","Actions"].map(h=>(<th key={h} style={{padding:"10px 12px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:10,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{h.toUpperCase()}</th>))}</tr></thead>
               <tbody>
-                {displayed.map((c,i)=>{const idx=candidates.indexOf(c);const status=(c.status||"pending").toLowerCase();const resumeUrl=c.resumeUrl||(c.resumePath?`${API}/uploads/resumes/${c.resumePath.split(/[\\/]/).pop()}`:null);return(
+                {displayed.map((c,i)=>{const idx=candidates.indexOf(c);const status=(c.status||"pending").toLowerCase();const resumeUrl=c.resumeUrl||(c.resumePath?`https://m-business-r2vd.onrender.com/uploads/resumes/${c.resumePath.split(/[\\/]/).pop()}`:null);
+const finalResumeUrl=resumeUrl;return(
                   <tr key={c._id||c.id||i} style={{borderBottom:"1px solid #f3f0ff",transition:"background 0.15s"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                     <td style={{padding:"12px 12px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{String(i+1).padStart(3,"0")}</td>
                     <td style={{padding:"12px 12px"}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(c.name||"?")[0].toUpperCase()}</div><span style={{fontWeight:700,color:"#1e0a3c"}}>{c.name||"—"}</span></div></td>
@@ -1125,8 +1136,8 @@ const copyLink = async () => {
                     <td style={{padding:"12px 12px",fontSize:12,color:"#7c3aed"}}>{c.interviewerName||<span style={{color:"#ddd"}}>—</span>}</td>
                     <td style={{padding:"12px 12px",fontSize:12,color:"#a78bfa",fontFamily:"monospace",whiteSpace:"nowrap"}}>{fmt(c.date||c.createdAt)}</td>
                     <td style={{padding:"12px 12px"}}><select value={status} onChange={e=>updateStatus(idx,e.target.value)} style={{background:status==="hired"?"rgba(34,197,94,0.1)":status==="rejected"?"rgba(239,68,68,0.1)":"rgba(245,158,11,0.1)",border:`1.5px solid ${sC(status)}44`,borderRadius:8,padding:"5px 10px",color:sC(status),fontSize:12,fontWeight:700,cursor:"pointer",outline:"none",fontFamily:"inherit"}}><option value="pending">⏳ Pending</option><option value="hired">✅ Hired</option><option value="rejected">❌ Rejected</option></select></td>
-                    <td style={{padding:"12px 12px"}}>{resumeUrl?<button onClick={()=>setViewModal({...c,_resolvedResumeUrl:resumeUrl})} style={{background:"rgba(147,51,234,0.1)",border:"1px solid rgba(147,51,234,0.3)",borderRadius:8,padding:"6px 12px",fontSize:12,color:"#9333ea",cursor:"pointer",fontWeight:700,fontFamily:"inherit",whiteSpace:"nowrap"}}>📄 View</button>:<span style={{fontSize:11,color:"#ddd"}}>—</span>}</td>
-                    <td style={{padding:"12px 12px"}}><div style={{display:"flex",gap:5}}><button onClick={()=>setViewModal({...c,_resolvedResumeUrl:resumeUrl})} style={{background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#7c3aed",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>👤</button><button onClick={()=>deleteCandidate(idx)} style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>🗑</button></div></td>
+                    <td style={{padding:"12px 12px"}}>{finalResumeUrl?<button onClick={()=>setViewModal({...c,_resolvedResumeUrl:finalResumeUrl})} style={{background:"rgba(147,51,234,0.1)",border:"1px solid rgba(147,51,234,0.3)",borderRadius:8,padding:"6px 12px",fontSize:12,color:"#9333ea",cursor:"pointer",fontWeight:700,fontFamily:"inherit",whiteSpace:"nowrap"}}>📄 View</button>:<span style={{fontSize:11,color:"#ddd"}}>—</span>}</td>
+                    <td style={{padding:"12px 12px"}}><div style={{display:"flex",gap:5}}><button onClick={()=>setViewModal({...c,_resolvedResumeUrl:finalResumeUrl})} style={{background:"#f5f3ff",border:"1px solid #ede9fe",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#7c3aed",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>👤</button><button onClick={()=>deleteCandidate(idx)} style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>🗑</button></div></td>
                   </tr>
                 );})}
               </tbody>
@@ -1134,13 +1145,86 @@ const copyLink = async () => {
           </div>
         )}
       </div>
-      {viewModal&&(<div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}><div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:820,maxHeight:"90vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(147,51,234,0.25)"}}><div style={{padding:"16px 22px",borderBottom:"1px solid #ede9fe",display:"flex",justifyContent:"space-between",alignItems:"center",background:"linear-gradient(90deg,#f5f3ff,#faf5ff)",flexShrink:0}}><h2 style={{margin:0,fontSize:16,fontWeight:800,color:"#1e0a3c"}}>👤 Candidate Profile</h2><button onClick={()=>setViewModal(null)} style={{background:"none",border:"none",fontSize:18,cursor:"pointer",color:"#7c3aed",padding:"4px 8px"}}>✕</button></div><div style={{overflowY:"auto",padding:"20px 22px",flex:1}}><div style={{display:"flex",alignItems:"center",gap:14,padding:16,background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:14,border:"1px solid #ede9fe",marginBottom:18}}><div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:20,fontWeight:800,flexShrink:0}}>{(viewModal.name||"?")[0].toUpperCase()}</div><div style={{flex:1}}><div style={{fontSize:17,fontWeight:800,color:"#1e0a3c"}}>{viewModal.name}</div><div style={{fontSize:13,color:"#9333ea",fontWeight:600,marginTop:2}}>{viewModal.role||"—"}</div></div><span style={{background:`${sC(viewModal.status||"pending")}18`,color:sC(viewModal.status||"pending"),border:`1px solid ${sC(viewModal.status||"pending")}33`,padding:"4px 12px",borderRadius:20,fontSize:12,fontWeight:700}}>{(viewModal.status||"pending")==="pending"?"⏳ Pending":(viewModal.status||"")==="hired"?"✅ Hired":"❌ Rejected"}</span></div></div></div></div>)}
+      {viewModal && (
+        <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+          <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:820,maxHeight:"90vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(147,51,234,0.25)"}}>
+            <div style={{padding:"16px 22px",borderBottom:"1px solid #ede9fe",display:"flex",justifyContent:"space-between",alignItems:"center",background:"linear-gradient(90deg,#f5f3ff,#faf5ff)",flexShrink:0}}>
+              <h2 style={{margin:0,fontSize:16,fontWeight:800,color:"#1e0a3c"}}>👤 Candidate Profile</h2>
+              <button onClick={()=>setViewModal(null)} style={{background:"none",border:"none",fontSize:18,cursor:"pointer",color:"#7c3aed",padding:"4px 8px"}}>✕</button>
+            </div>
+            <div style={{overflowY:"auto",padding:"20px 22px",flex:1}}>
+              <div style={{display:"flex",alignItems:"center",gap:14,padding:16,background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:14,border:"1px solid #ede9fe",marginBottom:18}}>
+                <div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:20,fontWeight:800,flexShrink:0}}>
+                  {(viewModal.name||"?")[0].toUpperCase()}
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:17,fontWeight:800,color:"#1e0a3c"}}>{viewModal.name}</div>
+                  <div style={{fontSize:13,color:"#9333ea",fontWeight:600,marginTop:2}}>{viewModal.role||"—"}</div>
+                </div>
+                <span style={{background:`${sC(viewModal.status||"pending")}18`,color:sC(viewModal.status||"pending"),border:`1px solid ${sC(viewModal.status||"pending")}33`,padding:"4px 12px",borderRadius:20,fontSize:12,fontWeight:700}}>
+                  {(viewModal.status||"pending")==="pending"?"⏳ Pending":(viewModal.status||"")==="hired"?"✅ Hired":"❌ Rejected"}
+                </span>
+              </div>
+              
+              {viewModal._resolvedResumeUrl && (
+                <div style={{marginBottom:20}}>
+                  <h3 style={{margin:"0 0 12px",fontSize:14,fontWeight:700,color:"#1e0a3c"}}>📄 Resume</h3>
+                  <div style={{border:"1.5px solid #ede9fe",borderRadius:12,overflow:"hidden",background:"#faf5ff"}}>
+                    <iframe 
+                      src={viewModal._resolvedResumeUrl} 
+                      style={{width:"100%",height:"500px",border:"none"}} 
+                      title="Resume"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const errorDiv = document.createElement('div');
+                        errorDiv.style.cssText = 'padding: 50px; text-align: center; color: #ef4444; font-size: 14px; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 12px; margin: 20px;';
+                        errorDiv.innerHTML = '📄 Resume file not found<br><span style="font-size: 12px; color: #991b1b;">The resume file may have been deleted or moved</span>';
+                        e.target.parentNode.appendChild(errorDiv);
+                      }}
+                    />
+                    <div style={{padding:"12px",background:"#fff",borderTop:"1px solid #ede9fe",display:"flex",justifyContent:"center"}}>
+                      <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:6,background:"#9333ea",color:"#fff",padding:"8px 16px",borderRadius:8,textDecoration:"none",fontSize:13,fontWeight:600,fontFamily:"inherit"}}>
+                        🔗 Open in New Tab
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:12}}>
+                <div style={{padding:12,background:"#f5f3ff",borderRadius:10,border:"1px solid #ede9fe"}}>
+                  <div style={{fontSize:11,color:"#7c3aed",fontWeight:700,marginBottom:4,textTransform:"uppercase",letterSpacing:0.5}}>📧 Email</div>
+                  <div style={{fontSize:13,fontWeight:600,color:"#1e0a3c"}}>{viewModal.email||"—"}</div>
+                </div>
+                <div style={{padding:12,background:"#f5f3ff",borderRadius:10,border:"1px solid #ede9fe"}}>
+                  <div style={{fontSize:11,color:"#7c3aed",fontWeight:700,marginBottom:4,textTransform:"uppercase",letterSpacing:0.5}}>📱 Mobile</div>
+                  <div style={{fontSize:13,fontWeight:600,color:"#1e0a3c"}}>{viewModal.mobile||"—"}</div>
+                </div>
+                <div style={{padding:12,background:"#f5f3ff",borderRadius:10,border:"1px solid #ede9fe"}}>
+                  <div style={{fontSize:11,color:"#7c3aed",fontWeight:700,marginBottom:4,textTransform:"uppercase",letterSpacing:0.5}}>💼 Experience</div>
+                  <div style={{fontSize:13,fontWeight:600,color:"#1e0a3c"}}>
+                    {(viewModal.experience||"").toLowerCase()==="fresher"?"🎓 Fresher":`💼 ${viewModal.years||"?"} years`}
+                  </div>
+                </div>
+                <div style={{padding:12,background:"#f5f3ff",borderRadius:10,border:"1px solid #ede9fe"}}>
+                  <div style={{fontSize:11,color:"#7c3aed",fontWeight:700,marginBottom:4,textTransform:"uppercase",letterSpacing:0.5}}>📅 Applied Date</div>
+                  <div style={{fontSize:13,fontWeight:600,color:"#1e0a3c"}}>{fmt(viewModal.date||viewModal.createdAt)}</div>
+                </div>
+                <div style={{padding:12,background:"#f5f3ff",borderRadius:10,border:"1px solid #ede9fe"}}>
+                  <div style={{fontSize:11,color:"#7c3aed",fontWeight:700,marginBottom:4,textTransform:"uppercase",letterSpacing:0.5}}>👨‍💼 Interviewer</div>
+                  <div style={{fontSize:13,fontWeight:600,color:"#1e0a3c"}}>{viewModal.interviewerName||"—"}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // ═══════════════════════════════════════════════════════════
-// PROFILE MODAL
+// PROFILE MODAL  
 // ═══════════════════════════════════════════════════════════
 function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
   const logoRef=useRef();
@@ -1174,7 +1258,7 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
           </div>
         </div>
         <input ref={logoRef} type="file" accept="image/*" style={{display:"none"}}
-          onChange={async(e)=>{const file=e.target.files[0];if(!file)return;const formData=new FormData();formData.append("file",file);try{const cloudRes=await axios.post("https://m-business-r2vd.onrender.com/api/upload/logo",formData);const uploadedUrl=cloudRes.data.logoUrl;await axios.post("https://m-business-r2vd.onrender.com/api/auth/save-logo",{userId:user.id||user._id,logoUrl:uploadedUrl});const updatedUser={...user,logoUrl:uploadedUrl};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);onLogoChange(uploadedUrl);}catch(err){console.error(err);alert("Upload failed!");}}}
+          onChange={async(e)=>{const file=e.target.files[0];if(!file)return;const formData=new FormData();formData.append("file",file);try{const cloudRes=await axios.post(BASE_URL + "/api/upload/logo",formData);const uploadedUrl=cloudRes.data.logoUrl;await axios.post(BASE_URL + "/api/auth/save-logo",{userId:user.id||user._id,logoUrl:uploadedUrl});const updatedUser={...user,logoUrl:uploadedUrl};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);onLogoChange(uploadedUrl);}catch(err){console.error(err);alert("Upload failed!");}}}
         />
       </div>
     </div>
@@ -1247,20 +1331,50 @@ export default function Dashboard({setUser,user,fixedLogo}){
   useEffect(()=>{fetchClients();fetchEmployees();fetchProjects();fetchManagers();},[]);
 
   const handleLogout=()=>{localStorage.removeItem("user");setUser(null);};
-  const onLogoChange=async(logo)=>{setCompanyLogo(logo||fixedLogo);const updatedUser={...user,logoUrl:logo||""};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);try{await axios.post("https://m-business-r2vd.onrender.com/api/auth/save-logo",{userId:user._id||user.id,logoUrl:logo||""});}catch(e){console.log(e);}};
+  const onLogoChange=async(logo)=>{setCompanyLogo(logo||fixedLogo);const updatedUser={...user,logoUrl:logo||""};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);try{await axios.post(BASE_URL + "/api/auth/save-logo",{userId:user._id||user.id,logoUrl:logo||""});}catch(e){console.log(e);}};
 
-  const fetchClients=async()=>{try{const res=await axios.get("https://m-business-r2vd.onrender.com/api/clients");setClients(res.data);}catch(e){console.log(e);}};
-  const fetchEmployees=async()=>{try{const res=await axios.get("https://m-business-r2vd.onrender.com/api/employees");setEmployees(res.data);}catch(e){console.log(e);}};
-  const fetchProjects=async()=>{try{const res=await axios.get("https://m-business-r2vd.onrender.com/api/projects");setProjects(res.data);}catch(e){console.log(e);}};
-  const fetchManagers=async()=>{try{const res=await axios.get("https://m-business-r2vd.onrender.com/api/managers");setManagers(res.data);}catch(e){console.log(e);}};
+  const fetchClients=async()=>{try{const res=await axios.get(BASE_URL + "/api/clients");setClients(res.data);}catch(e){console.log(e);}};
+  const fetchEmployees=async()=>{try{const res=await axios.get(BASE_URL + "/api/employees");setEmployees(res.data);}catch(e){console.log(e);}};
+  const fetchProjects=async()=>{try{const res=await axios.get(BASE_URL + "/api/projects");setProjects(res.data);}catch(e){console.log(e);}};
+  const fetchManagers=async()=>{try{const res=await axios.get(BASE_URL + "/api/managers");setManagers(res.data);}catch(e){console.log(e);}};
 
-  const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,password:nc.password,status:nc.status};const res=await axios.post("https://m-business-r2vd.onrender.com/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
+  const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,password:nc.password,status:nc.status};const res=await axios.post(BASE_URL + "/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
 
-  const addEmployee=async()=>{const errors={};if(!ne.name.trim())errors.name="Name is required";if(!ne.email.trim())errors.email="Email is required";if(!ne.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNeError(errors);return;}try{setEmpSaveLoading(true);const res=await axios.post("https://m-business-r2vd.onrender.com/api/employees/add",ne);setEmployees(prev=>[res.data.employee,...prev]);setNe({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});setShowEmpPass(false);setNeError({});setModal(null);}catch(err){setNeError({email:err.response?.data?.msg||"Failed to save"});}finally{setEmpSaveLoading(false);}};
+  const addEmployee=async()=>{const errors={};if(!ne.name.trim())errors.name="Name is required";if(!ne.email.trim())errors.email="Email is required";if(!ne.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNeError(errors);return;}try{setEmpSaveLoading(true);const res=await axios.post(BASE_URL + "/api/employees/add",ne);setEmployees(prev=>[res.data.employee,...prev]);setNe({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});setShowEmpPass(false);setNeError({});setModal(null);}catch(err){setNeError({email:err.response?.data?.msg||"Failed to save"});}finally{setEmpSaveLoading(false);}};
 
-  const addProject=async()=>{const errors={};if(!np.name.trim())errors.name="Project name is required";if(!np.client.trim())errors.client="Client is required";if(Object.keys(errors).length>0){setNpError(errors);return;}try{setProjSaveLoading(true);await axios.post("https://m-business-r2vd.onrender.com/api/projects/add",np);await fetchProjects();setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:[]});setNpError({});setModal(null);}catch(err){setNpError({name:err.response?.data?.msg||"Failed to save"});}finally{setProjSaveLoading(false);}};
+  const addProject=async()=>{
+    const errors={};
+    if(!np.name.trim())errors.name="Project name is required";
+    if(!np.client.trim())errors.client="Client is required";
+    if(Object.keys(errors).length>0){
+      setNpError(errors);
+      return;
+    }
+    try{
+      setProjSaveLoading(true);
+      console.log("Sending project data:", np);
+      const res=await axios.post(BASE_URL + "/api/projects/add", np);
+      console.log("Project created:", res.data);
+      await fetchProjects();
+      setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:[]});
+      setNpError({});
+      setModal(null);
+      toast.success("✅ Project created successfully!");
+    }catch(err){
+      console.error("Add project error:", err.response?.data);
+      const errorMsg = err.response?.data?.msg || err.response?.data?.error || "Failed to save project";
+      if(err.response?.data?.errors && Array.isArray(err.response.data.errors)){
+        setNpError({name: err.response.data.errors.join(", ")});
+      }else{
+        setNpError({name: errorMsg});
+      }
+      toast.error(`❌ ${errorMsg}`);
+    }finally{
+      setProjSaveLoading(false);
+    }
+  };
 
-  const addManager=async()=>{const errors={};if(!nm.managerName.trim())errors.managerName="Name is required";if(!nm.email.trim())errors.email="Email is required";if(!nm.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNmError(errors);return;}try{setMgrSaveLoading(true);const res=await axios.post("https://m-business-r2vd.onrender.com/api/managers/add",nm);setManagers(prev=>[res.data.manager,...prev]);setNm({managerName:"",email:"",phone:"",department:"",role:"Manager",address:"",password:"",status:"Active"});setNmError({});setModal(null);}catch(err){setNmError({email:err.response?.data?.msg||"Failed to save"});}finally{setMgrSaveLoading(false);}};
+  const addManager=async()=>{const errors={};if(!nm.managerName.trim())errors.managerName="Name is required";if(!nm.email.trim())errors.email="Email is required";if(!nm.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNmError(errors);return;}try{setMgrSaveLoading(true);const res=await axios.post(BASE_URL + "/api/managers/add",nm);setManagers(prev=>[res.data.manager,...prev]);setNm({managerName:"",email:"",phone:"",department:"",role:"Manager",address:"",password:"",status:"Active"});setNmError({});setModal(null);}catch(err){setNmError({email:err.response?.data?.msg||"Failed to save"});}finally{setMgrSaveLoading(false);}};
 
   const navItems=getNavForRole(user?.role);
   const validActive=navItems.find(n=>n.key===active)?active:navItems[0]?.key||"dashboard";
@@ -1354,6 +1468,7 @@ const companyNameStr = "M Business";
 
           {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
           {validActive==="quotations"&&<QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
+          {validActive==="proposals"&&<ProjectProposalCreator clients={clients} projects={projects} companyLogo={companyLogo}/>}
           {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers}/>}
           {validActive==="tasks"&&<TaskPage projects={projects} employees={employees}/>}
           {validActive==="calendar"&&<CalendarPage projects={projects} clients={clients}/>}
@@ -1437,17 +1552,16 @@ const companyNameStr = "M Business";
             {employees.length===0?<div style={{color:"#a78bfa",fontSize:13,textAlign:"center",padding:"20px"}}>No employees available</div>
               :employees.map(e=>(
                 <div key={e._id||e.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
-                  <input 
-                    type="checkbox" 
+                  <input type="checkbox" 
                     id={`emp-${e._id||e.email}`}
                     checked={np.assignedTo.includes(e.name)}
-                    onChange={e=>{
-                      if(e.target.checked){
-                        setNp({...np,assignedTo:[...np.assignedTo,e.name]});
-                      }else{
-                        setNp({...np,assignedTo:np.assignedTo.filter(name=>name!==e.name)});
-                      }
-                    }}
+           onChange={evt=>{
+  if(evt.target.checked){
+    setNp(prev=>({...prev,assignedTo:[...prev.assignedTo,e.name]}));
+  }else{
+    setNp(prev=>({...prev,assignedTo:prev.assignedTo.filter(n=>n!==e.name)}));
+  }
+}}
                     style={{width:16,height:16,cursor:"pointer"}}
                   />
                   <label htmlFor={`emp-${e._id||e.email}`} style={{flex:1,cursor:"pointer",fontSize:13,color:"#1e0a3c",display:"flex",alignItems:"center",gap:8}}>
@@ -1493,3 +1607,4 @@ const companyNameStr = "M Business";
     </div>
   );
 }
+

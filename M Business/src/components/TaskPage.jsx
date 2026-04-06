@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
-import { BASE_URL } from "../config";
-const API = `${BASE_URL}/api`;
+
+const API = "http://localhost:5000/api";
 
 const P = {
   accent:  "#9333ea",
@@ -939,7 +939,7 @@ function ShareModal({ onClose }) {
    INTEGRATE MODAL
 ══════════════════════════════════════════════════════════ */
 function IntegrateModal({ onClose }) {
-  const integrations=[{icon:"📧",name:"Gmail",desc:"Email notifications on status change",badge:"Popular"},{icon:"💬",name:"Slack",desc:"Post updates to Slack channels",badge:"Popular"},{icon:"📅",name:"Google Calendar",desc:"Sync due dates with your calendar",badge:null},{icon:"🐙",name:"GitHub",desc:"Link commits and PRs to tasks",badge:null},{icon:"🔗",name:"Zapier",desc:"Connect to m-business-tau.vercel.app+ apps via Zapier",badge:"New"}];
+  const integrations=[{icon:"📧",name:"Gmail",desc:"Email notifications on status change",badge:"Popular"},{icon:"💬",name:"Slack",desc:"Post updates to Slack channels",badge:"Popular"},{icon:"📅",name:"Google Calendar",desc:"Sync due dates with your calendar",badge:null},{icon:"🐙",name:"GitHub",desc:"Link commits and PRs to tasks",badge:null},{icon:"🔗",name:"Zapier",desc:"Connect to 5000+ apps via Zapier",badge:"New"}];
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(30,10,60,0.45)",zIndex:8000,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"inherit"}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
       <div style={{background:"#fff",borderRadius:16,width:520,maxHeight:"80vh",boxShadow:"0 24px 80px rgba(124,58,237,0.25)",display:"flex",flexDirection:"column",overflow:"hidden"}}>

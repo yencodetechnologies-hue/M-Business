@@ -5,7 +5,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://m-business-r2vd.onrender.com";
+import { BASE_URL as API_URL } from "../config";
 
 const ROLES = [
   "Software Engineer","Frontend Developer","Backend Developer","Full Stack Developer",

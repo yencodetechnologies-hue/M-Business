@@ -452,13 +452,13 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                     ✏️ Edit
                   </button>
                   {/* Delete */}
-                  <button
-                    className="inv-action-btn"
-                    onClick={() => setDeleteTarget(entry)}
-                    title="Delete Invoice"
-                    style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 9px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                    🗑 Del
-                  </button>
+                    <button
+                      className="inv-action-btn"
+                      onClick={() => setDeleteTarget(entry)}
+                      title="Delete Invoice"
+                      style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 9px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                      🗑 Delete
+                    </button>
                 </div>
               </div>
             );

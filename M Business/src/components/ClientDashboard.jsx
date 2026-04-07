@@ -281,6 +281,7 @@
 // const NAV = [
 //   { key: "dashboard", icon: "⌂", label: "Dashboard" },
 //   { key: "projects", icon: "◈", label: "My Projects" },
+//   { key: "proposals", icon: "📄", label: "Proposals" },
 //   { key: "tasks", icon: "◉", label: "Active Tasks" },
 //   { key: "payments", icon: "◆", label: "Payments" },
 //   { key: "calendar", icon: "◷", label: "Calendar" },
@@ -3467,18 +3468,36 @@ export default function ClientDashboard({ user, setUser }) {
     plan:    "Pro",
   };
 
-  // ── 3 API calls — projects, tasks, payments ────────────────
-useEffect(() => {
-  if (!user?.name) return;
-  const name = encodeURIComponent(user.name);
-  setLoading(true);
-  axios.get(`https://m-business-r2vd.onrender.com/api/clients/my-projects/${name}`)
-    .then(res => {
-      if (res.data?.length) setProjects(res.data);
-    })
-    .catch(() => {})
-    .finally(() => setLoading(false));
-}, [user]);
+  const [proposals,     setProposals]     = useState([]);
+
+  // ── API calls ─────────────────────────────────────────────
+  useEffect(() => {
+    // Load proposals from backend
+    const currentClientName = (user?.name || user?.clientName || "").trim();
+    if (currentClientName) {
+      axios.get(`/api/proposals/client/${encodeURIComponent(currentClientName)}`)
+        .then(res => {
+          // Filter viewable statuses for client
+          const viewable = res.data.filter(p => ["pending", "approved", "rejected"].includes(p.status));
+          setProposals(viewable);
+          console.log(`Loaded ${viewable.length} proposals from backend for ${currentClientName}`);
+        })
+        .catch(err => console.error("Error loading proposals from backend:", err));
+    }
+
+    if (!user?.name) return;
+    const name = encodeURIComponent(user.name);
+    setLoading(true);
+    // Standardizing to local API
+    axios.get(`/api/projects/by-client/${name}`)
+      .then(res => {
+        if (res.data) setProjects(res.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching projects:", err);
+      })
+      .finally(() => setLoading(false));
+  }, [user]);
   const handleLogout = () => { localStorage.removeItem("user"); if(setUser) setUser(null); };
   const markRead     = (id) => setNotifications(prev=>prev.map(n=>n.id===id?{...n,read:true}:n));
   const markAllRead  = ()   => setNotifications(prev=>prev.map(n=>({...n,read:true})));
@@ -3617,9 +3636,64 @@ useEffect(() => {
             </div>
           )}
 
-          {/* ── PROJECTS — ProjectTimeline with startDate ── */}
+          {/* ── PROJECTS & PROPOSALS ── */}
           {active==="projects" && (
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+              
+              {/* Proposals Section */}
+              {proposals.length > 0 && (
+                <>
+                  <div style={{ fontSize:15, fontWeight:800, color:"#94a3b8", textTransform:"uppercase", letterSpacing:1, marginTop:8 }}>Proposals Awaiting Action</div>
+                  {proposals.map(p=>(
+                    <div key={p.id} style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", padding:"20px 22px" }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+                        <div>
+                          <div style={{ fontSize:16, fontWeight:800, color:"#0f172a" }}>{p.title}</div>
+                          <div style={{ fontSize:11, color:"#94a3b8", marginTop:4 }}>{p.id} · {new Date(p.updated).toLocaleDateString()}</div>
+                        </div>
+                        <Badge label={p.status==="pending" ? "Pending" : p.status==="approved" ? "Completed" : "Inactive"} size="lg"/>
+                      </div>
+                      {p.status==="pending" && (
+                        <div style={{ marginTop:16, display:"flex", gap:10, paddingTop:16, borderTop:"1px solid #f1f5f9" }}>
+                          <button onClick={()=>{
+                            const updatedProposal = {...p, status:"approved", updated:new Date().toISOString()};
+                            axios.put(`/api/proposals/${p._id}`, updatedProposal)
+                              .then(res => {
+                                setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
+                              })
+                              .catch(err => console.error("Error approving proposal:", err));
+                          }} style={{ flex:1, background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Approve Proposal</button>
+                          
+                          <button onClick={()=>{
+                            const reason = window.prompt("Reason for rejection:");
+                            if(reason===null) return;
+                            const updatedProposal = {...p, status:"rejected", rejectNote:reason||"Needs revision", updated:new Date().toISOString()};
+                            axios.put(`/api/proposals/${p._id}`, updatedProposal)
+                              .then(res => {
+                                setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
+                              })
+                              .catch(err => console.error("Error rejecting proposal:", err));
+                          }} style={{ flex:1, background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Reject & Apply Changes</button>
+                        </div>
+                      )}
+                      {p.status==="rejected" && (
+                        <div style={{ marginTop:16, padding:12, background:"#fef2f2", borderRadius:8, color:"#9f1239", fontSize:12 }}>
+                          <strong style={{ display:"block", marginBottom:4 }}>❌ Rejected for revision:</strong>
+                          {p.rejectNote}
+                        </div>
+                      )}
+                      {p.status==="approved" && (
+                        <div style={{ marginTop:16, padding:12, background:"#f0fdf4", borderRadius:8, color:"#16a34a", fontSize:12, fontWeight:700 }}>
+                          ✅ Proposal successfully approved!
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <div style={{ fontSize:15, fontWeight:800, color:"#94a3b8", textTransform:"uppercase", letterSpacing:1, marginTop:8 }}>Active Projects</div>
+                </>
+              )}
+
+              {/* Projects Section */}
               {projects.map(p=>(
                 <div key={p.id||p._id} style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", padding:"20px 22px" }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10, marginBottom:14 }}>

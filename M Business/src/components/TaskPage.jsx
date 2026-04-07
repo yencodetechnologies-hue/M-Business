@@ -656,52 +656,73 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee })
   useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
   const filtered = employees.filter(e => !search || e.toLowerCase().includes(search.toLowerCase()));
   return (
-    <DD anchor={anchor} onClose={onClose} w={280}>
-      <div style={{ padding:"6px 8px 4px" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:6, border:`1.5px solid ${P.border}`, borderRadius:8, padding:"6px 10px", background:P.light }}>
-          <span style={{ fontSize:13, color:P.muted }}>🔍</span>
-          <input ref={inputRef} value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search names"
-            style={{ border:"none", outline:"none", background:"transparent", fontSize:12, color:P.text, fontFamily:"inherit", flex:1 }}/>
+    <DD anchor={anchor} onClose={onClose} w={320}>
+      <div style={{ padding:"12px 12px 4px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:6, border:`1px solid #0073ea`, borderRadius:6, padding:"8px 12px", background:"#fff" }}>
+          <span style={{ fontSize:14, color:P.muted }}>🔍</span>
+          <input ref={inputRef} value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search names, roles or teams"
+            style={{ border:"none", outline:"none", background:"transparent", fontSize:13, color:P.text, fontFamily:"inherit", flex:1 }}/>
+          <span style={{ fontSize:14, color:P.muted, cursor: "pointer", border: "1px solid #94a3b8", borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10 }}>i</span>
         </div>
       </div>
-      <Sep/>
-      <div style={{ maxHeight:200, overflowY:"auto" }}>
+      
+      <div style={{ padding:"12px 14px 4px", fontSize:13, color:P.muted }}>Suggested people</div>
+      
+      <div style={{ maxHeight:200, overflowY:"auto", padding: "0 8px" }}>
         {filtered.length===0
           ? <div style={{ padding:"10px 12px", fontSize:12, color:P.muted, textAlign:"center" }}>No people found</div>
           : filtered.map(emp => {
               const isActive = currentAssignee===emp;
               return (
                 <div key={emp} onClick={()=>{onSelect(emp);onClose();}}
-                  style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 10px", borderRadius:7, cursor:"pointer", background:isActive?"rgba(147,51,234,0.08)":"transparent" }}
-                  onMouseEnter={e=>e.currentTarget.style.background="rgba(147,51,234,0.08)"}
-                  onMouseLeave={e=>e.currentTarget.style.background=isActive?"rgba(147,51,234,0.08)":"transparent"}>
+                  style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 6px", borderRadius:6, cursor:"pointer", background:isActive?"#e8f4fd":"transparent" }}
+                  onMouseEnter={e=>e.currentTarget.style.background="#f0f2f5"}
+                  onMouseLeave={e=>e.currentTarget.style.background=isActive?"#e8f4fd":"transparent"}>
                   <div style={{ width:30, height:30, borderRadius:"50%", background:getAvatarColor(emp), display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:700, flexShrink:0 }}>
                     {emp.slice(0,2).toUpperCase()}
                   </div>
-                  <span style={{ fontSize:13, color:P.text, flex:1, fontWeight:isActive?600:400 }}>{emp}</span>
-                  {isActive && <span style={{ color:P.accent, fontSize:12 }}>✓</span>}
+                  <span style={{ fontSize:14, color:P.text, flex:1, fontWeight:isActive?500:400 }}>{emp}</span>
                 </div>
               );
             })
         }
       </div>
-      <Sep/>
+
+      <div style={{ padding: "8px 14px 12px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
+           onMouseEnter={e=>e.currentTarget.style.background="#f0f2f5"}
+           onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <span style={{ fontSize: 16 }}>👤</span>
+          <span style={{ fontSize: 10, position: 'relative', top: '2px', left: '-2px', fontWeight: 800 }}>+</span>
+        </div>
+        <span style={{ fontSize: 14, color: P.text }}>Invite a new member by email</span>
+      </div>
+      
       {currentAssignee && (
         <div onClick={()=>{onSelect("");onClose();}}
-          style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 10px", borderRadius:7, cursor:"pointer" }}
+          style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 14px", cursor:"pointer" }}
           onMouseEnter={e=>e.currentTarget.style.background="#fee2e2"}
           onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-          <div style={{ width:30, height:30, borderRadius:"50%", border:`1.5px dashed #e2445c`, display:"flex", alignItems:"center", justifyContent:"center", color:"#e2445c", fontSize:14 }}>✕</div>
+          <div style={{ width:24, height:24, borderRadius:"50%", border:`1px dashed #e2445c`, display:"flex", alignItems:"center", justifyContent:"center", color:"#e2445c", fontSize:12 }}>✕</div>
           <span style={{ fontSize:13, color:"#e2445c", fontWeight:500 }}>Unassign</span>
         </div>
       )}
-      <Sep/>
-      <div style={{ margin:"4px 6px 4px", background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:8, padding:"8px 10px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-          <span style={{ fontSize:14 }}>🔔</span>
-          <span style={{ fontSize:11, color:"#1d4ed8", fontWeight:500 }}>Assignees will be notified</span>
+      
+      <div style={{ margin:"8px 10px 10px", background:"#dbeafe", borderRadius:8, padding:"12px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <span style={{ fontSize:16 }}>🔔</span>
+          <span style={{ fontSize:13, color:P.text }}>Assignees will be notified</span>
         </div>
-        <button style={{ fontSize:11, color:"#1d4ed8", background:"#fff", border:"1px solid #bfdbfe", borderRadius:6, padding:"3px 10px", cursor:"pointer", fontFamily:"inherit", fontWeight:600 }}>Mute</button>
+        <button style={{ fontSize:12, color:P.text, background:"transparent", border:"1px solid #94a3b8", borderRadius:4, padding:"4px 12px", cursor:"pointer", fontFamily:"inherit" }}>Mute</button>
+      </div>
+
+      <div style={{ borderTop: `1px solid ${P.border}` }}>
+        <div style={{ padding: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", borderBottomLeftRadius: 10, borderBottomRightRadius: 10 }}
+             onMouseEnter={e=>e.currentTarget.style.background="#f0f2f5"}
+             onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+          <span style={{ fontSize: 16 }}>✨</span>
+          <span style={{ fontSize: 14, color: P.text }}>Auto-assign people</span>
+        </div>
       </div>
     </DD>
   );
@@ -1247,15 +1268,16 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             background: "linear-gradient(135deg,#ef4444,#dc2626)",
             border: "none",
             borderRadius: 4,
-            width: 22,
+            padding: "2px 8px",
             height: 22,
             cursor: "pointer",
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: 700,
             color: "#fff",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            gap: 4,
             boxShadow: "0 2px 6px rgba(239,68,68,0.3)",
             transition: "all 0.2s",
             opacity: hovered ? 1 : 0.6
@@ -1269,7 +1291,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             e.currentTarget.style.opacity = hovered ? "1" : "0.6";
           }}
         >
-          🗑
+          🗑 Delete
         </button>
         <div ref={dotsRef} onClick={e=>{e.stopPropagation();setDotsOpen(v=>!v);}} style={{width:26,height:26,borderRadius:5,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,color:P.muted,letterSpacing:1,userSelect:"none"}} onMouseEnter={e=>e.currentTarget.style.background=P.border} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>···</div>
         {dotsOpen&&(<DD anchor={dotsRef} onClose={()=>setDotsOpen(false)} w={160}><MI icon="⎘" title="Duplicate" onClick={()=>{onDup(task);setDotsOpen(false);}}/><Sep/><MI icon="🗑" title="Delete task" danger onClick={()=>{onDel(id);setDotsOpen(false);}}/></DD>)}
@@ -1367,7 +1389,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
           <span style={{fontSize:14,fontWeight:700,color:group.color,flex:1}}>{group.label}</span>
           <span style={{fontSize:11,color:P.muted,background:"#fff",border:`1px solid ${P.border}`,borderRadius:10,padding:"1px 8px",fontWeight:600}}>{tasks.length} items</span>
           <span style={{fontSize:11,color:"#00c875",fontWeight:600}}>{done} done</span>
-          {!isVirtual&&(<button onClick={e=>{e.stopPropagation();onDelGroup(gid);}} style={{background:"none",border:"none",cursor:"pointer",color:"#e2445c60",fontSize:13,padding:"2px 4px",borderRadius:4,transition:"color .15s"}} onMouseEnter={e=>e.currentTarget.style.color="#e2445c"} onMouseLeave={e=>e.currentTarget.style.color="#e2445c60"}>🗑</button>)}
+          {!isVirtual&&(<button onClick={e=>{e.stopPropagation();onDelGroup(gid);}} style={{background:"#fee2e2",border:"1px solid #fecaca",cursor:"pointer",color:"#ef4444",fontSize:11,padding:"4px 8px",borderRadius:6,fontWeight:700,display:"flex",gap:4,alignItems:"center",transition:"all .15s"}} onMouseEnter={e=>{e.currentTarget.style.background="#fecaca"}} onMouseLeave={e=>{e.currentTarget.style.background="#fee2e2"}}>🗑 Delete</button>)}
         </div>
       </div>
 

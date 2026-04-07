@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { EmployeeProfilePanel, DOC_TYPES } from "./EmployeeProfilePanel";
 
-const BASE = "https://m-business-r2vd.onrender.com/api/employee-dashboard";
+const BASE = "/api/employee-dashboard";
 
 const sc = (s) => ({
   active:"#6366f1","in progress":"#6366f1",
@@ -824,12 +824,6 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                 </div>
               )}
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }} className="stat-grid">
-              <StatCard icon="📅" label="Working Days" value={workingDays} sub="This month" color="#6366f1"/>
-              <StatCard icon="✅" label="Present"      value={present}    sub="Days"       color="#10b981"/>
-              <StatCard icon="❌" label="Absent"       value={absent}     sub="Days"       color="#ef4444"/>
-              <StatCard icon="🌴" label="On Leave"     value={leave}      sub="Days"       color="#f59e0b"/>
-            </div>
             <div style={{ display:"grid", gridTemplateColumns:"340px 1fr", gap:16, alignItems:"start" }} className="att-split">
               <div style={{ background:"#f8fafc", borderRadius:14, padding:16, border:"1px solid #f1f5f9", position:"sticky", top:16 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
@@ -1190,7 +1184,17 @@ useEffect(()=>{
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
         <div className="emp-mob-bar" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background:"#fff", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
           <button onClick={()=>setSidebarOpen(true)} style={{ background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#6366f1" }}>☰</button>
-          <span style={{ fontWeight:800, fontSize:14, color:"#0f172a" }}>M Business</span>
+          
+          {/* Notifications */}
+          <div style={{ position:"relative", display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ position:"relative" }}>
+              <button style={{ background:"none", border:"none", fontSize:18, cursor:"pointer", color:"#6366f1", position:"relative" }}>
+                🔔
+                <span style={{ position:"absolute", top:"-2px", right:"-2px", background:"#ef4444", color:"#fff", borderRadius:"50%", width:"16px", height:"16px", fontSize:"10px", fontWeight:"700", display:"flex", alignItems:"center", justifyContent:"center" }}>3</span>
+              </button>
+            </div>
+          </div>
+          
           <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12 }}>{(empName||"E").slice(0,2).toUpperCase()}</div>
         </div>
 

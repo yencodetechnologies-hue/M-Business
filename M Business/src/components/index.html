@@ -1,0 +1,1450 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProposalCanvas — Project Proposal Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f8f7f4; --white: #ffffff; --surface: #f2f0ec;
+  --border: #e5e2db; --border2: #d4d0c8;
+  --text: #1a1916; --text2: #6b6860; --text3: #9b9890;
+  --accent: #2563eb; --accent-light: #eff4ff; --accent-hover: #1d4ed8;
+  --green: #16a34a; --green-light: #f0fdf4;
+  --red: #dc2626; --red-light: #fef2f2;
+  --yellow: #d97706; --yellow-light: #fffbeb;
+  --purple: #7c3aed; --purple-light: #f5f3ff;
+  --radius: 12px; --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.12),0 8px 24px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;font-size:14px;line-height:1.5;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 20px;gap:12px;}
+.topbar-logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:var(--text);text-decoration:none;white-space:nowrap;}
+.topbar-logo-icon{width:30px;height:30px;background:var(--text);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:900;}
+.topbar-divider{width:1px;height:24px;background:var(--border);margin:0 4px;}
+.topbar-breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);}
+.topbar-breadcrumb a{color:var(--text2);text-decoration:none;}
+.topbar-breadcrumb .sep{color:var(--text3);}
+.topbar-breadcrumb .current{color:var(--text);font-weight:600;}
+.topbar-spacer{flex:1;}
+.topbar-actions{display:flex;align-items:center;gap:8px;}
+.role-switcher{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px;}
+.role-btn{padding:5px 12px;border-radius:6px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2);background:transparent;white-space:nowrap;}
+.role-btn.active{background:var(--white);color:var(--text);box-shadow:var(--shadow);}
+.topbar-btn{padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--white);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.topbar-btn:hover{background:var(--surface);}
+.topbar-btn.primary{background:var(--text);color:#fff;border-color:var(--text);}
+.topbar-btn.primary:hover{background:#333;}
+
+/* LAYOUT */
+.app-layout{display:flex;min-height:calc(100vh - 56px);}
+.sidebar{width:220px;background:var(--white);border-right:1px solid var(--border);padding:16px 12px;flex-shrink:0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px);}
+.sidebar-section{margin-bottom:20px;}
+.sidebar-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:0 8px;margin-bottom:6px;}
+.sidebar-item{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;}
+.sidebar-item:hover{background:var(--surface);color:var(--text);}
+.sidebar-item.active{background:var(--accent-light);color:var(--accent);font-weight:600;}
+.sidebar-item-icon{font-size:14px;width:20px;text-align:center;flex-shrink:0;}
+.sidebar-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;}
+.sidebar-badge.yellow{background:var(--yellow);}
+.sidebar-badge.green{background:var(--green);}
+.main-content{flex:1;overflow:auto;}
+.view{display:none;padding:24px;}
+.view.active{display:block;}
+
+/* PAGE HEADER */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.page-title{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:var(--text);}
+.page-subtitle{font-size:13px;color:var(--text2);margin-top:2px;}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.2px;text-transform:uppercase;white-space:nowrap;}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.badge.pending{background:var(--yellow-light);color:var(--yellow);border:1px solid #fde68a;}
+.badge.approved{background:var(--green-light);color:var(--green);border:1px solid #bbf7d0;}
+.badge.rejected{background:var(--red-light);color:var(--red);border:1px solid #fecaca;}
+.badge.draft{background:var(--surface);color:var(--text2);border:1px solid var(--border);}
+.badge.resubmitted{background:var(--accent-light);color:var(--accent);border:1px solid #bfdbfe;}
+.pulse{animation:badgepulse 2s infinite;}
+@keyframes badgepulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.card-title{font-size:14px;font-weight:700;}
+.card-body{padding:20px;}
+.card-footer{padding:14px 20px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
+
+/* PROPOSAL LIST */
+.proposal-list{display:flex;flex-direction:column;gap:10px;}
+.proposal-row{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);flex-wrap:wrap;}
+.proposal-row:hover{border-color:var(--border2);box-shadow:var(--shadow-md);transform:translateY(-1px);}
+.pr-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.pr-info{flex:1;min-width:120px;}
+.pr-name{font-size:14px;font-weight:700;margin-bottom:2px;}
+.pr-meta{font-size:12px;color:var(--text2);}
+.pr-amount{font-size:16px;font-weight:800;color:var(--text);white-space:nowrap;}
+.pr-actions{display:flex;gap:6px;align-items:center;}
+
+/* CANVAS GRID */
+.proposal-detail{display:flex;gap:20px;flex-wrap:wrap;}
+.proposal-main{flex:1;min-width:280px;}
+.proposal-sidebar-panel{width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
+.canvas-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--white);box-shadow:var(--shadow);margin-bottom:16px;}
+.canvas-block{padding:16px 18px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--white);transition:background .2s;}
+.canvas-block:hover{background:var(--surface);}
+.canvas-block.span2{grid-column:span 2;}
+.canvas-block.span3{grid-column:span 3;border-right:none;}
+.canvas-block.no-border-r{border-right:none;}
+.canvas-block.no-border-b{border-bottom:none;}
+.canvas-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:6px;}
+.canvas-block-value{font-size:13px;line-height:1.6;color:var(--text);}
+.canvas-block-value.big{font-size:22px;font-weight:800;color:var(--text);}
+.canvas-block-value.accent{color:var(--accent);font-weight:700;}
+
+/* STEPPER */
+.stepper{display:flex;align-items:flex-start;position:relative;margin-bottom:16px;overflow:hidden;}
+.stepper::before{content:'';position:absolute;top:15px;left:15px;right:15px;height:2px;background:var(--border);z-index:0;}
+.step{flex:1;text-align:center;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.step-dot{width:30px;height:30px;border-radius:50%;background:var(--white);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text3);transition:all .4s;box-shadow:var(--shadow);}
+.step-dot.done{background:var(--green);border-color:var(--green);color:#fff;}
+.step-dot.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px rgba(37,99,235,.15);}
+.step-dot.rejected-step{background:var(--red);border-color:var(--red);color:#fff;}
+.step-label{font-size:11px;font-weight:600;color:var(--text3);white-space:nowrap;}
+.step-label.done-label{color:var(--green);}
+.step-label.active-label{color:var(--accent);}
+.step-label.rejected-label{color:var(--red);}
+
+/* ACTIVITY */
+.activity-feed{display:flex;flex-direction:column;gap:0;}
+.activity-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.activity-item:last-child{border-bottom:none;}
+.activity-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.activity-body{flex:1;}
+.activity-text{font-size:13px;line-height:1.5;}
+.activity-text strong{font-weight:700;}
+.activity-time{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* FORMS */
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);margin-bottom:6px;}
+.form-input,.form-textarea,.form-select{width:100%;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;transition:all .2s;outline:none;}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-hint{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:var(--radius-sm);border:1px solid transparent;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.btn-primary{background:var(--text);color:#fff;border-color:var(--text);}
+.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-accent:hover{background:var(--accent-hover);}
+.btn-success{background:var(--green);color:#fff;border-color:var(--green);}
+.btn-danger{background:var(--red-light);color:var(--red);border-color:#fecaca;}
+.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border);}
+.btn-ghost:hover{background:var(--surface);}
+.btn-outline{background:var(--white);color:var(--text);border-color:var(--border);}
+.btn-outline:hover{background:var(--surface);}
+.btn-purple{background:var(--purple);color:#fff;border-color:var(--purple);}
+.btn-purple:hover{filter:brightness(.9);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-lg{padding:11px 22px;font-size:14px;}
+.btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border:1px solid var(--border);border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);animation:modalIn .25s cubic-bezier(.34,1.56,.64,1);}
+@keyframes modalIn{from{transform:scale(.95)translateY(10px);opacity:0}to{transform:scale(1)translateY(0);opacity:1}}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-title{font-size:16px;font-weight:800;}
+.modal-close{width:32px;height:32px;border-radius:8px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text2);transition:all .2s;}
+.modal-close:hover{background:var(--border);}
+.modal-body{padding:24px;overflow-y:auto;flex:1;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;background:var(--surface);}
+
+/* ALERT */
+.alert{border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;border:1px solid;}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.alert.success{background:var(--green-light);border-color:#bbf7d0;color:var(--green);}
+.alert.error{background:var(--red-light);border-color:#fecaca;color:var(--red);}
+.alert.warning{background:var(--yellow-light);border-color:#fde68a;color:var(--yellow);}
+.alert.info{background:var(--accent-light);border-color:#bfdbfe;color:var(--accent);}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);}
+.stat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:8px;}
+.stat-value{font-size:24px;font-weight:800;color:var(--text);letter-spacing:-1px;}
+.stat-change{font-size:11px;color:var(--green);font-weight:600;margin-top:2px;}
+
+/* COMMENTS */
+.comment-list{display:flex;flex-direction:column;gap:10px;}
+.comment{display:flex;gap:10px;}
+.comment-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.comment-bubble{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:0 10px 10px 10px;padding:10px 14px;}
+.comment-meta{display:flex;gap:8px;align-items:center;margin-bottom:4px;}
+.comment-author{font-size:12px;font-weight:700;}
+.comment-time{font-size:11px;color:var(--text3);}
+.comment-text{font-size:13px;color:var(--text);}
+.comment-input-area{display:flex;gap:10px;margin-top:14px;align-items:flex-end;}
+.comment-input-area .form-textarea{flex:1;margin:0;min-height:60px;}
+
+/* TAG */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:var(--surface);border:1px solid var(--border);color:var(--text2);}
+
+/* PROGRESS */
+.progress-bar{background:var(--border);border-radius:10px;height:6px;overflow:hidden;margin-top:6px;}
+.progress-fill{height:100%;border-radius:10px;background:var(--accent);transition:width .6s cubic-bezier(.34,1.56,.64,1);}
+.progress-fill.green{background:var(--green);}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:1000;}
+.toast{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-lg);min-width:260px;max-width:340px;animation:toastIn .35s cubic-bezier(.34,1.56,.64,1);}
+@keyframes toastIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-icon{font-size:18px;flex-shrink:0;}
+.toast-body{flex:1;}
+.toast-title{font-size:13px;font-weight:700;}
+.toast-msg{font-size:12px;color:var(--text2);}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 24px;color:var(--text2);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto;}
+.tab{padding:10px 16px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* DECISION PANEL */
+.decision-panel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+.decision-title{font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.decision-btns{display:flex;flex-direction:column;gap:8px;}
+.decision-btn{width:100%;padding:11px 16px;border-radius:var(--radius-sm);border:1px solid;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;}
+.decision-btn.approve{background:var(--green-light);color:var(--green);border-color:#bbf7d0;}
+.decision-btn.reject{background:var(--red-light);color:var(--red);border-color:#fecaca;}
+.decision-btn.request{background:var(--yellow-light);color:var(--yellow);border-color:#fde68a;}
+
+/* ══════════════════════════════════════
+   CANVA EDITOR OVERLAY
+══════════════════════════════════════ */
+#canva-editor{display:none;position:fixed;inset:0;z-index:9999;background:#f1f5f9;flex-direction:column;font-family:'Outfit',sans-serif;}
+#canva-editor.open{display:flex;}
+
+.ce-topbar{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #e5e7eb;flex-shrink:0;gap:12px;}
+.ce-body{display:flex;flex:1;overflow:hidden;}
+.ce-icon-rail{width:72px;background:#252627;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0;}
+.ce-icon-btn{width:64px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;border-radius:8px;cursor:pointer;transition:background .15s;color:#fff;}
+.ce-icon-btn:hover,.ce-icon-btn.active{background:rgba(255,255,255,0.12);}
+.ce-icon-btn span.lbl{font-size:9px;font-weight:500;opacity:0.8;}
+.ce-left-panel{width:300px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.ce-left-panel.hidden{display:none;}
+.ce-left-panel-header{padding:14px 16px;border-bottom:1px solid #f1f5f9;font-size:14px;font-weight:700;color:#0f172a;}
+.ce-left-panel-body{flex:1;overflow-y:auto;padding:12px;}
+.ce-canvas-area{flex:1;overflow:auto;background:#f1f5f9;display:flex;flex-direction:column;align-items:center;padding:32px 24px;position:relative;}
+.ce-slide-wrap{background:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;flex-shrink:0;}
+.ce-bottom-strip{height:96px;background:#fff;border-top:1px solid #e5e7eb;display:flex;align-items:center;padding:0 16px;gap:12px;overflow-x:auto;flex-shrink:0;}
+.ce-thumb{height:68px;width:120px;flex-shrink:0;border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid #e2e8f0;position:relative;background:#fff;transition:all .2s;}
+.ce-thumb.sel{border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,0.2);}
+.ce-thumb-num{position:absolute;bottom:3px;left:5px;font-size:9px;font-weight:800;color:#7c3aed;background:rgba(255,255,255,0.85);padding:0 3px;border-radius:3px;}
+.ce-add-slide{height:68px;width:36px;flex-shrink:0;border-radius:6px;border:2px dashed #cbd5e1;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:22px;transition:all .15s;}
+.ce-add-slide:hover{border-color:#7c3aed;color:#7c3aed;}
+
+/* SLIDE THUMBNAILS */
+.slide-tmpl{cursor:pointer;background:#fff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:8px;transition:all .15s;}
+.slide-tmpl:hover{border-color:#7c3aed;box-shadow:0 2px 8px rgba(124,58,237,0.15);}
+.slide-tmpl-preview{height:80px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.slide-tmpl-label{padding:8px 10px;font-size:11px;font-weight:700;color:#0f172a;border-top:1px solid #f1f5f9;}
+
+/* PRINT STYLES */
+@media print {
+  body > *:not(#print-area){display:none!important;}
+  #print-area{display:block!important;position:fixed;inset:0;background:#fff;z-index:99999;}
+  @page{size:A4 portrait;margin:0;}
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .canvas-grid{grid-template-columns:1fr 1fr;}
+  .canvas-block.span3{grid-column:span 2;}
+  .form-row{grid-template-columns:1fr;}
+  .proposal-sidebar-panel{width:100%;}
+  .topbar-breadcrumb{display:none;}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr;}
+  .canvas-grid{grid-template-columns:1fr;}
+  .canvas-block.span2,.canvas-block.span3{grid-column:span 1;}
+  .view{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a class="topbar-logo" href="#" onclick="return false">
+    <div class="topbar-logo-icon">P</div>
+    ProposalCanvas
+  </a>
+  <div class="topbar-divider"></div>
+  <div class="topbar-breadcrumb">
+    <a href="#" onclick="showView('dashboard');return false">Dashboard</a>
+    <span class="sep">/</span>
+    <span class="current" id="breadcrumb-current">Overview</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="topbar-actions">
+    <div class="role-switcher">
+      <button class="role-btn active" id="role-fl" onclick="switchRole('freelancer')">👤 Freelancer</button>
+      <button class="role-btn" id="role-cl" onclick="switchRole('client')">🏢 Client</button>
+    </div>
+    <button class="topbar-btn primary" onclick="openNewProposalModal()">+ New Proposal</button>
+  </div>
+</div>
+
+<div class="app-layout">
+
+<!-- FL SIDEBAR -->
+<div class="sidebar" id="fl-sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main</div>
+    <button class="sidebar-item active" onclick="showView('dashboard')"><span class="sidebar-item-icon">🏠</span> Dashboard</button>
+    <button class="sidebar-item" onclick="showView('proposals')"><span class="sidebar-item-icon">📋</span> My Proposals <span class="sidebar-badge yellow" id="fl-pending-count">2</span></button>
+    <button class="sidebar-item" onclick="openNewProposalModal()"><span class="sidebar-item-icon">✏️</span> New Proposal</button>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Manage</div>
+    <button class="sidebar-item" onclick="showView('templates')"><span class="sidebar-item-icon">📄</span> Templates</button>
+    <button class="sidebar-item" onclick="showView('clients')"><span class="sidebar-item-icon">👥</span> Clients</button>
+    <button class="sidebar-item" onclick="showView('analytics')"><span class="sidebar-item-icon">📊</span> Analytics</button>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Settings</div>
+    <button class="sidebar-item" onclick="showView('profile')"><span class="sidebar-item-icon">⚙️</span> Profile</button>
+  </div>
+</div>
+
+<!-- CL SIDEBAR -->
+<div class="sidebar" id="cl-sidebar" style="display:none">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main</div>
+    <button class="sidebar-item active" onclick="showView('cl-dashboard')"><span class="sidebar-item-icon">🏠</span> Dashboard</button>
+    <button class="sidebar-item" onclick="showView('cl-inbox')"><span class="sidebar-item-icon">📬</span> Inbox <span class="sidebar-badge" id="cl-inbox-count">3</span></button>
+    <button class="sidebar-item" onclick="showView('cl-approved')"><span class="sidebar-item-icon">✅</span> Approved <span class="sidebar-badge green">1</span></button>
+    <button class="sidebar-item" onclick="showView('cl-rejected')"><span class="sidebar-item-icon">❌</span> Rejected</button>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Project</div>
+    <button class="sidebar-item" onclick="showView('cl-projects')"><span class="sidebar-item-icon">🚀</span> Active Projects</button>
+    <button class="sidebar-item" onclick="showView('cl-payments')"><span class="sidebar-item-icon">💳</span> Payments</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+<!-- DASHBOARD -->
+<div class="view active" id="view-dashboard">
+  <div class="page-header">
+    <div><div class="page-title">Good morning, Karthik 👋</div><div class="page-subtitle">Here's what's happening with your proposals today.</div></div>
+    <div class="header-actions">
+      <button class="btn btn-outline btn-sm" onclick="showView('analytics')">📊 Analytics</button>
+      <button class="btn btn-accent btn-sm" onclick="openNewProposalModal()">+ New Proposal</button>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Total Proposals</div><div class="stat-value">12</div><div class="stat-change">↑ 3 this month</div></div>
+    <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value" style="color:var(--yellow)">2</div><div class="stat-change" style="color:var(--text3)">Awaiting client decision</div></div>
+    <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value" style="color:var(--green)">8</div><div class="stat-change">67% approval rate</div></div>
+    <div class="stat-card"><div class="stat-label">Total Value</div><div class="stat-value">₹8.4L</div><div class="stat-change">↑ ₹1.2L this month</div></div>
+  </div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:300px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Recent Proposals</div><button class="btn btn-ghost btn-sm" onclick="showView('proposals')">View all →</button></div>
+        <div style="padding:0 8px 8px"><div class="proposal-list" id="dashboard-proposals"></div></div>
+      </div>
+    </div>
+    <div style="width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Quick Actions</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding:12px;">
+          <button class="btn btn-accent" onclick="openNewProposalModal()" style="width:100%;justify-content:center;">✏️ Create Proposal</button>
+          <button class="btn btn-purple" onclick="openCanvaEditor(null)" style="width:100%;justify-content:center;">🎨 Design Slides</button>
+          <button class="btn btn-outline" onclick="showView('templates')" style="width:100%;justify-content:center;">📄 Use Template</button>
+          <button class="btn btn-outline" onclick="showView('analytics')" style="width:100%;justify-content:center;">📊 View Analytics</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Recent Activity</div></div>
+        <div class="card-body" style="padding:12px 16px;"><div class="activity-feed" id="activity-feed-dash"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MY PROPOSALS -->
+<div class="view" id="view-proposals">
+  <div class="page-header">
+    <div><div class="page-title">My Proposals</div><div class="page-subtitle">Track all your submitted proposals</div></div>
+    <div class="header-actions">
+      <button class="btn btn-outline btn-sm" id="filter-all" onclick="filterProposals('all')">All</button>
+      <button class="btn btn-outline btn-sm" id="filter-pending" onclick="filterProposals('pending')">Pending</button>
+      <button class="btn btn-outline btn-sm" id="filter-approved" onclick="filterProposals('approved')">Approved</button>
+      <button class="btn btn-outline btn-sm" id="filter-rejected" onclick="filterProposals('rejected')">Rejected</button>
+      <button class="btn btn-accent btn-sm" onclick="openNewProposalModal()">+ New</button>
+    </div>
+  </div>
+  <div class="proposal-list" id="proposals-list"></div>
+</div>
+
+<!-- PROPOSAL DETAIL -->
+<div class="view" id="view-detail">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-ghost btn-sm" onclick="goBack()">← Back</button>
+      <div><div class="page-title" id="detail-title">Proposal Detail</div><div class="page-subtitle" id="detail-subtitle">View and manage</div></div>
+    </div>
+    <div class="header-actions" id="detail-header-actions">
+      <button class="btn btn-purple btn-sm" onclick="openCanvaEditor(DB.currentProposalId)">🎨 Open in Canva Editor</button>
+      <button class="btn btn-outline btn-sm" onclick="printProposal()">🖨️ Print / PDF</button>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:16px;padding:20px 24px;">
+    <div class="stepper" id="detail-stepper">
+      <div class="step"><div class="step-dot done" id="s1">✓</div><div class="step-label done-label">Drafted</div></div>
+      <div class="step"><div class="step-dot done" id="s2">✓</div><div class="step-label done-label">Submitted</div></div>
+      <div class="step"><div class="step-dot active" id="s3">⏳</div><div class="step-label active-label">Under Review</div></div>
+      <div class="step"><div class="step-dot" id="s4">?</div><div class="step-label" id="s4-label">Decision</div></div>
+      <div class="step"><div class="step-dot" id="s5">🚀</div><div class="step-label" id="s5-label">Kickoff</div></div>
+    </div>
+  </div>
+  <div id="detail-alerts"></div>
+  <div class="proposal-detail">
+    <div class="proposal-main">
+      <div class="tabs">
+        <button class="tab active" onclick="switchDetailTab('canvas',this)">📋 Canvas</button>
+        <button class="tab" onclick="switchDetailTab('comments',this)">💬 Comments <span id="comment-count-badge"></span></button>
+        <button class="tab" onclick="switchDetailTab('history',this)">🕐 History</button>
+        <button class="tab" onclick="switchDetailTab('files',this)">📎 Files</button>
+      </div>
+      <div id="tab-canvas"><div class="canvas-grid" id="detail-canvas"></div></div>
+      <div id="tab-comments" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title">💬 Comments & Discussions</div></div>
+          <div class="card-body">
+            <div class="comment-list" id="comment-list"></div>
+            <div class="comment-input-area">
+              <div class="comment-avatar" style="background:#e0e7ff;color:var(--accent)">K</div>
+              <textarea class="form-textarea" id="new-comment-input" placeholder="Add a comment…" style="min-height:60px;flex:1;margin:0;"></textarea>
+              <button class="btn btn-accent btn-sm" onclick="addComment()" style="flex-shrink:0">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="tab-history" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🕐 Proposal History</div></div>
+          <div class="card-body" style="padding:0 16px 8px"><div class="activity-feed" id="detail-history"></div></div>
+        </div>
+      </div>
+      <div id="tab-files" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title">📎 Attachments</div><button class="btn btn-outline btn-sm">+ Attach File</button></div>
+          <div class="card-body"><div style="display:flex;flex-direction:column;gap:8px;" id="files-list"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="proposal-sidebar-panel" id="detail-right-panel">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Status</div></div>
+        <div class="card-body" style="padding:14px 16px;">
+          <div style="margin-bottom:14px;"><span id="detail-status-badge" class="badge pending"><span class="dot pulse"></span> Pending</span></div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Submitted to</div>
+          <div style="font-size:14px;font-weight:700;" id="detail-client-name">—</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:12px;margin-bottom:4px;">Submitted on</div>
+          <div style="font-size:13px;font-weight:600;" id="detail-date">—</div>
+        </div>
+      </div>
+      <div class="card" id="fl-action-card">
+        <div class="card-header"><div class="card-title">Actions</div></div>
+        <div class="card-body" style="padding:12px;display:flex;flex-direction:column;gap:8px;" id="fl-detail-actions"></div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:16px;">
+          <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;margin-bottom:4px;">Proposed Budget</div>
+          <div style="font-size:26px;font-weight:800;" id="detail-budget-big">₹0</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="detail-timeline-small">—</div>
+          <div class="progress-bar" style="margin-top:12px;"><div class="progress-fill" id="detail-progress" style="width:40%;"></div></div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Proposal completeness</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TEMPLATES -->
+<div class="view" id="view-templates">
+  <div class="page-header"><div><div class="page-title">Proposal Templates</div><div class="page-subtitle">Reusable templates to save time</div></div></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;" id="templates-grid"></div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="view" id="view-analytics">
+  <div class="page-header"><div><div class="page-title">Analytics</div><div class="page-subtitle">Your proposal performance insights</div></div></div>
+  <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat-card"><div class="stat-label">Approval Rate</div><div class="stat-value" style="color:var(--green)">67%</div><div class="progress-bar"><div class="progress-fill green" style="width:67%"></div></div></div>
+    <div class="stat-card"><div class="stat-label">Avg Response Time</div><div class="stat-value">3.2d</div><div class="stat-change" style="color:var(--text3)">Days to client decision</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Proposal Value</div><div class="stat-value">₹70k</div><div class="stat-change">↑ 12% vs last month</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Monthly Proposals</div></div>
+    <div class="card-body"><div style="display:flex;gap:8px;align-items:flex-end;height:120px;padding:0 4px;" id="bar-chart"></div></div>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<div class="view" id="view-clients">
+  <div class="page-header"><div><div class="page-title">Clients</div><div class="page-subtitle">All clients you've worked with</div></div><button class="btn btn-accent btn-sm" onclick="showToast('success','Client added!','New client created.')">+ Add Client</button></div>
+  <div class="proposal-list" id="clients-list"></div>
+</div>
+
+<!-- PROFILE -->
+<div class="view" id="view-profile">
+  <div class="page-header"><div><div class="page-title">Profile Settings</div></div></div>
+  <div class="card" style="max-width:520px">
+    <div class="card-header"><div class="card-title">Personal Information</div></div>
+    <div class="card-body">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--accent-light);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--accent);">K</div>
+        <div><div style="font-weight:700;">Karthik R.</div><div style="font-size:12px;color:var(--text2)">karthik@freelance.in</div></div>
+        <button class="btn btn-outline btn-sm" style="margin-left:auto">Change Photo</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First Name</label><input class="form-input" value="Karthik"></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" value="R."></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" value="karthik@freelance.in"></div>
+      <div class="form-group"><label class="form-label">Tagline</label><input class="form-input" value="Full Stack Developer & UI Designer"></div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-ghost">Discard</button>
+      <button class="btn btn-accent" onclick="showToast('success','Saved!','Profile updated.')">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT DASHBOARD -->
+<div class="view" id="view-cl-dashboard">
+  <div class="page-header"><div><div class="page-title">Client Dashboard 🏢</div><div class="page-subtitle">Review and manage incoming proposals</div></div></div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value" style="color:var(--yellow)" id="cl-stat-pending">3</div></div>
+    <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value" style="color:var(--green)" id="cl-stat-approved">1</div></div>
+    <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value" style="color:var(--red)" id="cl-stat-rejected">0</div></div>
+    <div class="stat-card"><div class="stat-label">Total Budget</div><div class="stat-value" id="cl-stat-budget">₹3.2L</div></div>
+  </div>
+  <div class="card"><div class="card-header"><div class="card-title">Incoming Proposals</div><button class="btn btn-ghost btn-sm" onclick="showView('cl-inbox')">View all →</button></div><div style="padding:8px"><div class="proposal-list" id="cl-dashboard-list"></div></div></div>
+</div>
+
+<!-- CLIENT INBOX -->
+<div class="view" id="view-cl-inbox">
+  <div class="page-header"><div><div class="page-title">Proposal Inbox</div></div></div>
+  <div class="proposal-list" id="cl-inbox-list"></div>
+</div>
+
+<!-- CLIENT REVIEW -->
+<div class="view" id="view-cl-review">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-ghost btn-sm" onclick="showView('cl-inbox')">← Back</button>
+      <div><div class="page-title" id="cl-review-title">Review Proposal</div><div class="page-subtitle" id="cl-review-subtitle">From freelancer</div></div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="printProposal()">🖨️ Print / PDF</button>
+  </div>
+  <div id="cl-review-alerts"></div>
+  <div class="proposal-detail">
+    <div class="proposal-main">
+      <div class="tabs">
+        <button class="tab active" onclick="switchDetailTab('cl-canvas',this)">📋 Proposal</button>
+        <button class="tab" onclick="switchDetailTab('cl-comments',this)">💬 Discussion</button>
+      </div>
+      <div id="tab-cl-canvas"><div class="canvas-grid" id="cl-review-canvas"></div></div>
+      <div id="tab-cl-comments" style="display:none">
+        <div class="card">
+          <div class="card-header"><div class="card-title">💬 Discussion with Freelancer</div></div>
+          <div class="card-body">
+            <div class="comment-list" id="cl-comment-list"></div>
+            <div class="comment-input-area">
+              <div class="comment-avatar" style="background:#f0fdf4;color:var(--green)">A</div>
+              <textarea class="form-textarea" id="cl-new-comment" placeholder="Ask a question or leave feedback…" style="min-height:60px;flex:1;margin:0;"></textarea>
+              <button class="btn btn-accent btn-sm" onclick="addClientComment()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;">
+      <div class="decision-panel" id="cl-decision-panel">
+        <div class="decision-title">⚖️ Your Decision</div>
+        <div class="decision-btns" id="cl-decision-btns">
+          <button class="decision-btn approve" onclick="clientDecision('approve')">✅ Approve Proposal</button>
+          <button class="decision-btn request" onclick="openRequestChanges()">🔄 Request Changes</button>
+          <button class="decision-btn reject" onclick="openRejectModal()">❌ Reject Proposal</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Freelancer</div></div>
+        <div class="card-body" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:38px;height:38px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:15px;">K</div>
+            <div><div style="font-weight:700;font-size:13px;">Karthik R.</div><div style="font-size:11px;color:var(--text2);">Full Stack Developer</div></div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text2);">⭐ 4.9 · 47 projects completed</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:16px;">
+          <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;margin-bottom:4px;">Proposed Budget</div>
+          <div style="font-size:26px;font-weight:800;" id="cl-review-budget">₹0</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px;" id="cl-review-terms">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT APPROVED/REJECTED/PROJECTS/PAYMENTS -->
+<div class="view" id="view-cl-approved"><div class="page-header"><div><div class="page-title">Approved Proposals</div></div></div><div class="proposal-list" id="cl-approved-list"></div></div>
+<div class="view" id="view-cl-rejected"><div class="page-header"><div><div class="page-title">Rejected Proposals</div></div></div><div id="cl-rejected-list" style="color:var(--text2);font-size:13px;padding:20px;">No rejected proposals yet.</div></div>
+<div class="view" id="view-cl-projects"><div class="page-header"><div><div class="page-title">Active Projects</div></div></div></div>
+<div class="view" id="view-cl-payments">
+  <div class="page-header"><div><div class="page-title">Payments</div></div></div>
+  <div class="card" style="max-width:600px">
+    <div class="card-header"><div class="card-title">Payment Schedule</div></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--green-light);border-radius:8px;border:1px solid #bbf7d0;">
+        <div><div style="font-weight:700;font-size:13px;">E-Commerce Redesign — Upfront</div><div style="font-size:12px;color:var(--text2)">Due: Apr 20, 2026</div></div>
+        <div style="font-weight:800;color:var(--green)">₹60,000</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<!-- ══════════════════════════════════════════
+  CANVA SLIDE EDITOR OVERLAY
+══════════════════════════════════════════ -->
+<div id="canva-editor">
+  <!-- Top bar -->
+  <div class="ce-topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="closeCanvaEditor()" style="background:none;border:none;cursor:pointer;font-size:20px;padding:6px;border-radius:8px;color:#374151;" title="Close">🏠</button>
+      <div style="width:1px;height:24px;background:#e5e7eb;margin:0 4px;"></div>
+      <button onclick="undoSlide()" style="background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:6px;color:#6b7280;font-size:13px;">↩ Undo</button>
+      <span style="font-size:12px;color:#10b981;font-weight:600;">✓ Auto-saved</span>
+    </div>
+    <div style="flex:1;display:flex;justify-content:center;">
+      <input id="ce-doc-title" value="New Proposal Deck" style="background:#f1f5f9;border:none;border-radius:8px;padding:6px 14px;font-size:14px;font-weight:700;color:#0f172a;text-align:center;width:280px;outline:none;font-family:'Outfit',sans-serif;" />
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="saveDraftSlides()" style="background:#f1f5f9;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;color:#374151;font-family:'Outfit',sans-serif;">💾 Save Draft</button>
+      <button onclick="printSlides()" style="background:#f1f5f9;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;color:#374151;font-family:'Outfit',sans-serif;">🖨️ Print</button>
+      <button onclick="closeCanvaEditor()" style="background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 4px 12px rgba(124,58,237,0.25);">✓ Done</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="ce-body">
+    <!-- Icon rail -->
+    <div class="ce-icon-rail">
+      <button class="ce-icon-btn active" id="ce-btn-design" onclick="setCePanel('design')"><span style="font-size:22px;">🎨</span><span class="lbl">Design</span></button>
+      <button class="ce-icon-btn" id="ce-btn-text" onclick="setCePanel('text')"><span style="font-size:22px;font-weight:900;">T</span><span class="lbl">Text</span></button>
+      <button class="ce-icon-btn" id="ce-btn-theme" onclick="setCePanel('theme')"><span style="font-size:22px;">🎭</span><span class="lbl">Theme</span></button>
+    </div>
+
+    <!-- Left panel -->
+    <div class="ce-left-panel" id="ce-left-panel">
+      <!-- DESIGN panel -->
+      <div id="ce-panel-design">
+        <div class="ce-left-panel-header">Add a slide</div>
+        <div class="ce-left-panel-body" id="ce-templates-list"></div>
+      </div>
+      <!-- TEXT panel -->
+      <div id="ce-panel-text" style="display:none">
+        <div class="ce-left-panel-header">Text</div>
+        <div class="ce-left-panel-body">
+          <button onclick="addTextElement('heading')" style="width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;text-align:left;cursor:pointer;margin-bottom:8px;font-size:20px;font-weight:800;color:#0f172a;font-family:'Outfit',sans-serif;">Add a heading</button>
+          <button onclick="addTextElement('sub')" style="width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;text-align:left;cursor:pointer;margin-bottom:8px;font-size:15px;font-weight:600;color:#0f172a;font-family:'Outfit',sans-serif;">Add a subheading</button>
+          <button onclick="addTextElement('body')" style="width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:left;cursor:pointer;margin-bottom:8px;font-size:13px;color:#374151;font-family:'Outfit',sans-serif;">Add body text</button>
+        </div>
+      </div>
+      <!-- THEME panel -->
+      <div id="ce-panel-theme" style="display:none">
+        <div class="ce-left-panel-header">Color Theme</div>
+        <div class="ce-left-panel-body" id="ce-theme-list"></div>
+      </div>
+    </div>
+
+    <!-- Canvas area -->
+    <div class="ce-canvas-area" id="ce-canvas-area">
+      <div class="ce-slide-wrap" id="ce-slide-wrap">
+        <div id="ce-slide-content" style="width:900px;height:506px;position:relative;overflow:hidden;"></div>
+      </div>
+      <!-- Zoom controls -->
+      <div style="position:absolute;bottom:16px;right:16px;background:#fff;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.08);padding:8px 12px;display:flex;align-items:center;gap:10px;">
+        <button onclick="prevSlide()" style="background:none;border:none;cursor:pointer;font-size:13px;color:#6b7280;padding:2px 6px;">◀</button>
+        <span style="font-size:12px;font-weight:700;color:#0f172a;" id="ce-slide-indicator">1 / 1</span>
+        <button onclick="nextSlide()" style="background:none;border:none;cursor:pointer;font-size:13px;color:#6b7280;padding:2px 6px;">▶</button>
+        <div style="width:1px;height:20px;background:#e5e7eb;margin:0 4px;"></div>
+        <input type="range" min="40" max="100" value="65" id="ce-zoom" oninput="applyZoom(this.value)" style="width:80px;">
+        <span style="font-size:11px;font-weight:700;color:#374151;" id="ce-zoom-val">65%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom thumbnail strip -->
+  <div class="ce-bottom-strip" id="ce-bottom-strip"></div>
+</div>
+
+<!-- PRINT AREA (hidden, shown on print) -->
+<div id="print-area" style="display:none;"></div>
+
+<!-- MODALS -->
+<!-- New Proposal Modal -->
+<div class="modal-overlay" id="modal-new-proposal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><div class="modal-title">✏️ New Proposal</div><div class="modal-close" onclick="closeModal('modal-new-proposal')">×</div></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Project Title *</label><input class="form-input" id="m-title" placeholder="e.g. Mobile App Development"></div>
+      <div class="form-group"><label class="form-label">Client Name *</label><input class="form-input" id="m-client" placeholder="e.g. TechStartup Pvt Ltd"></div>
+      <div class="form-group"><label class="form-label">Project Scope</label><textarea class="form-textarea" id="m-scope" placeholder="Briefly describe the work…"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Budget (₹)</label><input class="form-input" id="m-budget" type="number" placeholder="150000"></div>
+        <div class="form-group"><label class="form-label">Duration</label><input class="form-input" id="m-duration" placeholder="6 weeks"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-new-proposal')">Cancel</button>
+      <button class="btn btn-outline" onclick="createProposalAsDraft()">💾 Save Draft</button>
+      <button class="btn btn-accent" onclick="createProposal()">Submit 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">✏️ Edit & Resubmit</div><div class="modal-close" onclick="closeModal('modal-edit')">×</div></div>
+    <div class="modal-body">
+      <div class="alert warning" style="margin-bottom:16px"><div class="alert-icon">⚠️</div><div><div style="font-weight:700;">Client Feedback</div><div style="font-size:12px;color:var(--text2)" id="edit-feedback-text">Please review and revise.</div></div></div>
+      <div class="form-group"><label class="form-label">Project Title</label><input class="form-input" id="e-title"></div>
+      <div class="form-group"><label class="form-label">Project Scope</label><textarea class="form-textarea" id="e-scope"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Budget (₹)</label><input class="form-input" id="e-budget" type="number"></div>
+        <div class="form-group"><label class="form-label">Duration</label><input class="form-input" id="e-duration"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Deliverables</label><textarea class="form-textarea" id="e-deliverables"></textarea></div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="e-notes"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit')">Cancel</button>
+      <button class="btn btn-accent" onclick="resubmitProposal()">🚀 Resubmit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal-overlay" id="modal-reject">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header"><div class="modal-title">❌ Reject Proposal</div><div class="modal-close" onclick="closeModal('modal-reject')">×</div></div>
+    <div class="modal-body">
+      <div class="alert error"><div class="alert-icon">❌</div><div><div style="font-weight:700;">This will notify the freelancer</div><div style="font-size:12px;color:var(--text2)">They can edit & resubmit after rejection.</div></div></div>
+      <div class="form-group"><label class="form-label">Reason for Rejection *</label><textarea class="form-textarea" id="reject-reason" placeholder="e.g. Budget is too high…" style="min-height:100px;"></textarea><div class="form-hint">Be specific so the freelancer can improve.</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-reject')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmReject()">Send Rejection</button>
+    </div>
+  </div>
+</div>
+
+<!-- Request Changes Modal -->
+<div class="modal-overlay" id="modal-request">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header"><div class="modal-title">🔄 Request Changes</div><div class="modal-close" onclick="closeModal('modal-request')">×</div></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">What needs to change?</label><textarea class="form-textarea" id="request-reason" placeholder="e.g. Can you break down the timeline?" style="min-height:100px;"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-request')">Cancel</button>
+      <button class="btn btn-accent" onclick="confirmRequestChanges()">Send Request</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA STORE
+// ═══════════════════════════════════════════════
+const DB = {
+  proposals: [
+    { id:1, title:"E-Commerce Website Redesign", client:"Acme Corp",
+      scope:"Full redesign of e-commerce platform — UI/UX, frontend dev, mobile responsive.",
+      budget:120000, duration:"8 Weeks (Apr 20 – Jun 14, 2026)",
+      deliverables:"Figma designs, React frontend, Admin panel, Deployment support.",
+      notes:"50% upfront, 50% on delivery. 2 revision rounds.", payment:"50% upfront, 50% on delivery",
+      revisions:"2 rounds included", date:"Apr 6, 2026", status:"pending",
+      icon:"🛍️", iconBg:"#eff6ff",
+      history:[{action:"Proposal created",actor:"Karthik R.",time:"Apr 6, 2026 10:00 AM",icon:"📝",color:"#93c5fd"},{action:"Submitted to Acme Corp",actor:"Karthik R.",time:"Apr 6, 2026 10:05 AM",icon:"🚀",color:"#93c5fd"}],
+      comments:[], files:["Project_Brief.pdf","Mockup_v1.png"], rejectReason:"" },
+    { id:2, title:"Mobile App Development", client:"TechVision Ltd",
+      scope:"Cross-platform mobile app for inventory management using React Native.",
+      budget:180000, duration:"12 Weeks",
+      deliverables:"iOS & Android apps, Backend API, Admin dashboard, Documentation.",
+      notes:"Monthly milestone billing.", payment:"Monthly milestones", revisions:"3 rounds included",
+      date:"Apr 2, 2026", status:"approved",
+      icon:"📱", iconBg:"#f0fdf4",
+      history:[{action:"Proposal approved",actor:"Rahul M. (Client)",time:"Apr 4, 2026 11:30 AM",icon:"✅",color:"#6ee7b7"}],
+      comments:[{author:"Rahul M.",role:"Client",avatar:"R",color:"#f0fdf4",colorText:"#16a34a",text:"Looks good! Approved. When can we start?",time:"Apr 4"}],
+      files:[], rejectReason:"" },
+    { id:3, title:"Brand Identity Package", client:"StartupX",
+      scope:"Complete brand identity — logo, color system, typography, brand guidelines.",
+      budget:45000, duration:"3 Weeks",
+      deliverables:"Logo files, Brand guidelines PDF, Social media kit.",
+      notes:"100% upfront.", payment:"100% upfront", revisions:"2 rounds included",
+      date:"Mar 28, 2026", status:"rejected",
+      icon:"🎨", iconBg:"#fdf4ff",
+      history:[{action:"Rejected by client",actor:"Priya S. (Client)",time:"Mar 30, 2026 4:00 PM",icon:"❌",color:"#fca5a5"}],
+      comments:[], files:[], rejectReason:"Budget is too high for our stage. Can you reduce to ₹30,000?" }
+  ],
+  currentProposalId: null,
+  currentRole: 'freelancer',
+};
+
+// Local storage for drafts
+const LS_KEY = 'proposalcanvas_drafts';
+function loadDrafts(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch{return[];}}
+function saveDraftLocal(p){
+  const drafts=loadDrafts();
+  const idx=drafts.findIndex(d=>d.id===p.id);
+  if(idx>=0)drafts[idx]=p; else drafts.unshift(p);
+  localStorage.setItem(LS_KEY,JSON.stringify(drafts.slice(0,20)));
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById('view-'+name);
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  const titles={'dashboard':'Overview','proposals':'My Proposals','detail':'Proposal Detail','templates':'Templates','analytics':'Analytics','clients':'Clients','profile':'Profile Settings','cl-dashboard':'Overview','cl-inbox':'Inbox','cl-review':'Review Proposal','cl-approved':'Approved','cl-rejected':'Rejected'};
+  const bc=document.getElementById('breadcrumb-current');
+  if(bc)bc.textContent=titles[name]||name;
+  if(name==='dashboard'){renderDashboard();activateSidebarBtn(0);}
+  if(name==='proposals'){renderProposalsList();activateSidebarBtn(1);}
+  if(name==='templates'){renderTemplates();activateSidebarBtn(3);}
+  if(name==='clients'){renderClients();activateSidebarBtn(4);}
+  if(name==='analytics'){renderAnalytics();activateSidebarBtn(5);}
+  if(name==='cl-dashboard'){renderClientDashboard();activateSidebarBtn(0);}
+  if(name==='cl-inbox'){renderClientInbox();activateSidebarBtn(1);}
+  if(name==='cl-approved'){renderClientApproved();activateSidebarBtn(2);}
+}
+function goBack(){showView(DB.currentRole==='freelancer'?'proposals':'cl-inbox');}
+function activateSidebarBtn(idx){const items=document.querySelectorAll('.sidebar-item');if(items[idx])items[idx].classList.add('active');}
+function switchRole(role){
+  DB.currentRole=role;
+  document.getElementById('role-fl').classList.toggle('active',role==='freelancer');
+  document.getElementById('role-cl').classList.toggle('active',role==='client');
+  document.getElementById('fl-sidebar').style.display=role==='freelancer'?'':'none';
+  document.getElementById('cl-sidebar').style.display=role==='client'?'':'none';
+  showView(role==='freelancer'?'dashboard':'cl-dashboard');
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderDashboard(){
+  const c=document.getElementById('dashboard-proposals');
+  c.innerHTML=DB.proposals.slice(0,3).map(p=>proposalRowHTML(p,true)).join('');
+  const af=document.getElementById('activity-feed-dash');
+  const acts=DB.proposals.flatMap(p=>p.history).slice(-4).reverse();
+  af.innerHTML=acts.map(a=>`<div class="activity-item"><div class="activity-avatar" style="background:${a.color}22;color:${a.color};font-size:14px;">${a.icon}</div><div class="activity-body"><div class="activity-text"><strong>${a.actor}</strong> — ${a.action}</div><div class="activity-time">${a.time}</div></div></div>`).join('');
+}
+function renderProposalsList(filter='all'){
+  const c=document.getElementById('proposals-list');
+  let props=DB.proposals;
+  if(filter!=='all')props=props.filter(p=>p.status===filter);
+  c.innerHTML=props.length?props.map(p=>proposalRowHTML(p,false)).join(''):`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No proposals found</div></div>`;
+}
+function filterProposals(f){renderProposalsList(f);document.querySelectorAll('[id^="filter-"]').forEach(b=>b.classList.remove('btn-accent'));const el=document.getElementById('filter-'+f);if(el)el.classList.add('btn-accent');}
+function proposalRowHTML(p,mini){
+  return `<div class="proposal-row" onclick="openProposalDetail(${p.id})">
+    <div class="pr-icon" style="background:${p.iconBg}">${p.icon}</div>
+    <div class="pr-info"><div class="pr-name">${p.title}</div><div class="pr-meta">${p.client} · ${p.date}${!mini?` · ${p.duration}`:''}</div></div>
+    ${badgeHTML(p.status)}
+    <div class="pr-amount">₹${(p.budget/1000).toFixed(0)}k</div>
+    <div class="pr-actions">
+      <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProposalDetail(${p.id})">View →</button>
+      ${p.status==='rejected'?`<button class="btn btn-accent btn-sm" onclick="event.stopPropagation();openEditModal(${p.id})">Edit</button>`:''}
+    </div>
+  </div>`;
+}
+function badgeHTML(status){
+  const map={pending:`<span class="badge pending"><span class="dot pulse"></span> Pending</span>`,approved:`<span class="badge approved">✓ Approved</span>`,rejected:`<span class="badge rejected">✕ Rejected</span>`,draft:`<span class="badge draft">Draft</span>`,resubmitted:`<span class="badge resubmitted"><span class="dot pulse"></span> Resubmitted</span>`};
+  return map[status]||map.pending;
+}
+function openProposalDetail(id){
+  DB.currentProposalId=id;
+  const p=DB.proposals.find(x=>x.id===id);if(!p)return;
+  showView('detail');
+  document.getElementById('detail-title').textContent=p.title;
+  document.getElementById('detail-subtitle').textContent=`Submitted to ${p.client} · ${p.date}`;
+  document.getElementById('detail-client-name').textContent=p.client;
+  document.getElementById('detail-date').textContent=p.date;
+  document.getElementById('detail-budget-big').textContent=`₹${p.budget.toLocaleString('en-IN')}`;
+  document.getElementById('detail-timeline-small').textContent=p.duration;
+  renderDetailCanvas(p);renderDetailStepper(p);renderDetailAlerts(p);renderDetailActions(p);renderDetailHistory(p);renderDetailComments(p);renderDetailFiles(p);
+  const pf=document.getElementById('detail-progress');
+  const prog=p.status==='approved'?100:p.status==='rejected'?60:p.status==='resubmitted'?75:40;
+  if(pf){pf.style.width='0';setTimeout(()=>{pf.style.width=prog+'%';pf.className='progress-fill'+(p.status==='approved'?' green':'');},100);}
+}
+function renderDetailCanvas(p){
+  const c=document.getElementById('detail-canvas');if(!c)return;
+  c.innerHTML=`<div class="canvas-block span2"><div class="canvas-block-label">Project Scope</div><div class="canvas-block-value">${p.scope}</div></div>
+  <div class="canvas-block no-border-r"><div class="canvas-block-label">Client</div><div class="canvas-block-value accent">${p.client}</div></div>
+  <div class="canvas-block"><div class="canvas-block-label">Budget</div><div class="canvas-block-value big">₹${p.budget.toLocaleString('en-IN')}</div></div>
+  <div class="canvas-block"><div class="canvas-block-label">Timeline</div><div class="canvas-block-value">${p.duration}</div></div>
+  <div class="canvas-block no-border-r"><div class="canvas-block-label">Revisions</div><div class="canvas-block-value">${p.revisions||'2 rounds'}</div></div>
+  <div class="canvas-block span3 no-border-b"><div class="canvas-block-label">Deliverables</div><div class="canvas-block-value">${p.deliverables}</div></div>
+  <div class="canvas-block span3 no-border-b" style="border-top:1px solid var(--border)"><div class="canvas-block-label">Payment Terms & Notes</div><div class="canvas-block-value">${p.notes}</div></div>`;
+}
+function renderDetailStepper(p){
+  document.getElementById('s1').className='step-dot done';document.getElementById('s1').textContent='✓';
+  document.getElementById('s2').className='step-dot done';document.getElementById('s2').textContent='✓';
+  if(p.status==='pending'||p.status==='reviewing'){document.getElementById('s3').className='step-dot active';document.getElementById('s3').textContent='⏳';document.getElementById('s4').className='step-dot';document.getElementById('s4').textContent='?';}
+  else if(p.status==='approved'){document.getElementById('s3').className='step-dot done';document.getElementById('s3').textContent='✓';document.getElementById('s4').className='step-dot done';document.getElementById('s4').textContent='✓';document.getElementById('s4-label').textContent='Approved';document.getElementById('s4-label').className='step-label done-label';document.getElementById('s5').className='step-dot active';document.getElementById('s5').textContent='🚀';}
+  else if(p.status==='rejected'){document.getElementById('s3').className='step-dot done';document.getElementById('s3').textContent='✓';document.getElementById('s4').className='step-dot rejected-step';document.getElementById('s4').textContent='✕';document.getElementById('s4-label').textContent='Rejected';document.getElementById('s4-label').className='step-label rejected-label';}
+  else if(p.status==='resubmitted'){document.getElementById('s3').className='step-dot done';document.getElementById('s3').textContent='✓';document.getElementById('s4').className='step-dot active';document.getElementById('s4').textContent='⏳';document.getElementById('s4-label').textContent='Re-reviewing';document.getElementById('s4-label').className='step-label active-label';}
+}
+function renderDetailAlerts(p){
+  const c=document.getElementById('detail-alerts');if(!c)return;c.innerHTML='';
+  if(p.status==='approved')c.innerHTML=`<div class="alert success"><div class="alert-icon">🎉</div><div><div style="font-weight:700">Proposal Approved!</div><div style="font-size:12px">Client approved your proposal. Project kickoff can begin!</div></div></div>`;
+  else if(p.status==='rejected')c.innerHTML=`<div class="alert error"><div class="alert-icon">❌</div><div><div style="font-weight:700">Proposal Rejected</div><div style="font-size:12px">Client feedback: ${p.rejectReason||'No reason given.'}</div></div></div>`;
+  else if(p.status==='resubmitted')c.innerHTML=`<div class="alert info"><div class="alert-icon">🔄</div><div><div style="font-weight:700">Resubmitted — Awaiting Review</div></div></div>`;
+}
+function renderDetailActions(p){
+  const c=document.getElementById('fl-detail-actions');if(!c)return;c.innerHTML='';
+  if(p.status==='pending'||p.status==='reviewing'||p.status==='resubmitted')c.innerHTML=`<button class="btn btn-ghost" style="width:100%;justify-content:center;opacity:.6" disabled>⏳ Awaiting Decision…</button>`;
+  else if(p.status==='approved')c.innerHTML=`<button class="btn btn-success" style="width:100%;justify-content:center;" disabled>🎉 Approved!</button>`;
+  else if(p.status==='rejected')c.innerHTML=`<button class="btn btn-accent" style="width:100%;justify-content:center;" onclick="openEditModal(${p.id})">✏️ Edit & Resubmit</button>`;
+}
+function renderDetailHistory(p){const c=document.getElementById('detail-history');if(!c)return;c.innerHTML=p.history.map(h=>`<div class="activity-item"><div class="activity-avatar" style="background:${h.color}22;color:${h.color};font-size:16px;">${h.icon}</div><div class="activity-body"><div class="activity-text"><strong>${h.actor}</strong> — ${h.action}</div><div class="activity-time">${h.time}</div></div></div>`).join('');}
+function renderDetailComments(p){
+  const c=document.getElementById('comment-list');if(!c)return;
+  c.innerHTML=p.comments.length?p.comments.map(cm=>`<div class="comment"><div class="comment-avatar" style="background:${cm.color};color:${cm.colorText}">${cm.avatar}</div><div class="comment-bubble"><div class="comment-meta"><span class="comment-author">${cm.author}</span><span class="tag" style="font-size:10px">${cm.role}</span><span class="comment-time">${cm.time}</span></div><div class="comment-text">${cm.text}</div></div></div>`).join(''):`<div style="color:var(--text3);font-size:13px;padding:8px 0;">No comments yet.</div>`;
+}
+function renderDetailFiles(p){const c=document.getElementById('files-list');if(!c)return;c.innerHTML=p.files.length?p.files.map(f=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:8px;border:1px solid var(--border);"><span style="font-size:18px">${f.endsWith('.pdf')?'📄':'🖼️'}</span><span style="flex:1;font-size:13px;font-weight:600">${f}</span><button class="btn btn-ghost btn-sm" onclick="showToast('success','Downloaded!','${f} downloaded.')">⬇️</button></div>`).join(''):`<div style="color:var(--text3);font-size:13px;">No files attached.</div>`;}
+function addComment(){
+  const input=document.getElementById('new-comment-input');const text=input.value.trim();if(!text)return;
+  const p=DB.proposals.find(x=>x.id===DB.currentProposalId);if(!p)return;
+  p.comments.push({author:'Karthik R.',role:'Freelancer',avatar:'K',color:'#eff4ff',colorText:'#2563eb',text,time:'Just now'});
+  p.history.push({action:'Added a comment',actor:'Karthik R.',time:'Just now',icon:'💬',color:'#93c5fd'});
+  input.value='';renderDetailComments(p);renderDetailHistory(p);showToast('success','Comment added','Your comment was posted.');
+}
+
+// ═══════════════════════════════════════════════
+// TEMPLATES
+// ═══════════════════════════════════════════════
+const TEMPLATES=[{icon:'🌐',title:'Web Development',desc:'For website & webapp projects',budget:'₹80,000–₹2,00,000',color:'#eff4ff'},{icon:'📱',title:'Mobile App',desc:'iOS / Android app projects',budget:'₹1,50,000–₹5,00,000',color:'#f0fdf4'},{icon:'🎨',title:'UI/UX Design',desc:'Design system and prototyping',budget:'₹40,000–₹1,20,000',color:'#fdf4ff'},{icon:'🤖',title:'AI Integration',desc:'ML or AI features',budget:'₹1,00,000–₹4,00,000',color:'#fff7ed'},{icon:'🛒',title:'E-Commerce',desc:'Online store setup',budget:'₹60,000–₹1,80,000',color:'#fef2f2'},{icon:'📊',title:'Data Dashboard',desc:'Analytics and reporting',budget:'₹50,000–₹1,50,000',color:'#f0fdf4'}];
+function renderTemplates(){
+  const c=document.getElementById('templates-grid');if(!c)return;
+  c.innerHTML=TEMPLATES.map(t=>`<div class="card" style="cursor:pointer;transition:all .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''" onclick="useTemplate('${t.title}')"><div class="card-body"><div style="width:44px;height:44px;border-radius:10px;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px;">${t.icon}</div><div style="font-weight:700;font-size:14px;margin-bottom:4px;">${t.title}</div><div style="font-size:12px;color:var(--text2);margin-bottom:10px;">${t.desc}</div><div class="tag">${t.budget}</div></div><div class="card-footer" style="justify-content:space-between;"><span style="font-size:11px;color:var(--text3)">Click to use</span><button class="btn btn-ghost btn-sm">Use →</button></div></div>`).join('');
+}
+function useTemplate(title){openNewProposalModal();document.getElementById('m-title').value=title+' Project';showToast('success','Template loaded!',title+' template applied.');}
+
+// ANALYTICS
+function renderAnalytics(){
+  const c=document.getElementById('bar-chart');if(!c)return;
+  const months=['Nov','Dec','Jan','Feb','Mar','Apr'],vals=[2,3,4,2,5,3],max=Math.max(...vals);
+  c.innerHTML=months.map((m,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="font-size:11px;font-weight:700;color:var(--text2);">${vals[i]}</div><div style="width:100%;background:${i===5?'var(--accent)':'var(--accent-light)'};border-radius:6px 6px 0 0;height:${(vals[i]/max)*90}px;"></div><div style="font-size:11px;color:var(--text3);">${m}</div></div>`).join('');
+}
+
+// CLIENTS
+const CLIENTS=[{name:'Acme Corp',contact:'admin@acmecorp.in',proposals:1,status:'Active',icon:'🏢',color:'#eff4ff'},{name:'TechVision Ltd',contact:'rahul@techvision.com',proposals:1,status:'Active',icon:'💻',color:'#f0fdf4'},{name:'StartupX',contact:'priya@startupx.io',proposals:1,status:'Inactive',icon:'🚀',color:'#fdf4ff'}];
+function renderClients(){
+  const c=document.getElementById('clients-list');if(!c)return;
+  c.innerHTML=CLIENTS.map(cl=>`<div class="proposal-row"><div class="pr-icon" style="background:${cl.color};font-size:20px">${cl.icon}</div><div class="pr-info"><div class="pr-name">${cl.name}</div><div class="pr-meta">${cl.contact} · ${cl.proposals} proposal(s)</div></div><span class="badge ${cl.status==='Active'?'approved':'draft'}">${cl.status}</span><button class="btn btn-ghost btn-sm">View →</button></div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// EDIT & RESUBMIT
+// ═══════════════════════════════════════════════
+function openEditModal(id){
+  const p=DB.proposals.find(x=>x.id===id);if(!p)return;
+  DB.currentProposalId=p.id;
+  document.getElementById('edit-feedback-text').textContent=p.rejectReason||'Please review and improve.';
+  document.getElementById('e-title').value=p.title;document.getElementById('e-scope').value=p.scope;
+  document.getElementById('e-budget').value=p.budget;document.getElementById('e-duration').value=p.duration;
+  document.getElementById('e-deliverables').value=p.deliverables;document.getElementById('e-notes').value=p.notes;
+  openModal('modal-edit');
+}
+function resubmitProposal(){
+  const p=DB.proposals.find(x=>x.id===DB.currentProposalId);if(!p)return;
+  p.title=document.getElementById('e-title').value;p.scope=document.getElementById('e-scope').value;
+  p.budget=parseInt(document.getElementById('e-budget').value)||p.budget;p.duration=document.getElementById('e-duration').value;
+  p.deliverables=document.getElementById('e-deliverables').value;p.notes=document.getElementById('e-notes').value;
+  p.status='resubmitted';p.history.push({action:'Proposal revised and resubmitted',actor:'Karthik R.',time:'Just now',icon:'🔄',color:'#93c5fd'});
+  closeModal('modal-edit');saveDraftLocal(p);renderProposalsList();updateSidebarCounts();
+  showToast('success','Resubmitted! 🚀','Your revised proposal has been sent back.');
+}
+
+// ═══════════════════════════════════════════════
+// CLIENT VIEWS
+// ═══════════════════════════════════════════════
+function renderClientDashboard(){
+  const c=document.getElementById('cl-dashboard-list');if(!c)return;
+  const pending=DB.proposals.filter(p=>p.status==='pending'||p.status==='resubmitted');
+  c.innerHTML=pending.map(p=>clientRowHTML(p)).join('')||`<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No pending proposals</div></div>`;
+  document.getElementById('cl-stat-pending').textContent=pending.length;
+  document.getElementById('cl-stat-approved').textContent=DB.proposals.filter(p=>p.status==='approved').length;
+  document.getElementById('cl-stat-rejected').textContent=DB.proposals.filter(p=>p.status==='rejected').length;
+}
+function renderClientInbox(){const c=document.getElementById('cl-inbox-list');if(!c)return;const inc=DB.proposals.filter(p=>p.status==='pending'||p.status==='resubmitted'||p.status==='reviewing');c.innerHTML=inc.map(p=>clientRowHTML(p)).join('')||`<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No proposals to review</div></div>`;const cnt=document.getElementById('cl-inbox-count');if(cnt)cnt.textContent=inc.length;}
+function renderClientApproved(){const c=document.getElementById('cl-approved-list');if(!c)return;const approved=DB.proposals.filter(p=>p.status==='approved');c.innerHTML=approved.map(p=>clientRowHTML(p,true)).join('')||`<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">No approved proposals</div></div>`;}
+function clientRowHTML(p,approved=false){return`<div class="proposal-row" onclick="openClientReview(${p.id})"><div class="pr-icon" style="background:${p.iconBg}">${p.icon}</div><div class="pr-info"><div class="pr-name">${p.title}</div><div class="pr-meta">From: Karthik R. · ${p.date}</div></div>${badgeHTML(p.status)}<div class="pr-amount">₹${(p.budget/1000).toFixed(0)}k</div><div class="pr-actions">${!approved?`<button class="btn btn-accent btn-sm" onclick="event.stopPropagation();openClientReview(${p.id})">Review →</button>`:`<button class="btn btn-success btn-sm" disabled>✓ Approved</button>`}</div></div>`;}
+function openClientReview(id){
+  DB.currentProposalId=id;const p=DB.proposals.find(x=>x.id===id);if(!p)return;
+  showView('cl-review');
+  document.getElementById('cl-review-title').textContent=p.title;
+  document.getElementById('cl-review-subtitle').textContent='From Karthik R. · '+p.date;
+  document.getElementById('cl-review-budget').textContent='₹'+p.budget.toLocaleString('en-IN');
+  document.getElementById('cl-review-terms').textContent=p.payment+' · '+p.revisions;
+  const c=document.getElementById('cl-review-canvas');
+  if(c)c.innerHTML=`<div class="canvas-block span2"><div class="canvas-block-label">Project Scope</div><div class="canvas-block-value">${p.scope}</div></div><div class="canvas-block no-border-r"><div class="canvas-block-label">Duration</div><div class="canvas-block-value">${p.duration}</div></div><div class="canvas-block"><div class="canvas-block-label">Budget</div><div class="canvas-block-value big">₹${p.budget.toLocaleString('en-IN')}</div></div><div class="canvas-block"><div class="canvas-block-label">Payment Terms</div><div class="canvas-block-value">${p.payment}</div></div><div class="canvas-block no-border-r"><div class="canvas-block-label">Revisions</div><div class="canvas-block-value">${p.revisions}</div></div><div class="canvas-block span3 no-border-b"><div class="canvas-block-label">Deliverables</div><div class="canvas-block-value">${p.deliverables}</div></div><div class="canvas-block span3 no-border-b" style="border-top:1px solid var(--border)"><div class="canvas-block-label">Notes</div><div class="canvas-block-value">${p.notes}</div></div>`;
+  const alerts=document.getElementById('cl-review-alerts');const dp=document.getElementById('cl-decision-panel');alerts.innerHTML='';
+  if(p.status==='approved'){alerts.innerHTML=`<div class="alert success"><div class="alert-icon">✅</div><div><div style="font-weight:700">You approved this proposal</div></div></div>`;dp.style.display='none';}
+  else if(p.status==='rejected'){alerts.innerHTML=`<div class="alert error"><div class="alert-icon">❌</div><div><div style="font-weight:700">You rejected this proposal</div><div style="font-size:12px">Reason: ${p.rejectReason}</div></div></div>`;dp.style.display='none';}
+  else if(p.status==='resubmitted'){alerts.innerHTML=`<div class="alert info"><div class="alert-icon">🔄</div><div><div style="font-weight:700">Revised Proposal</div></div></div>`;dp.style.display='';document.getElementById('cl-decision-btns').innerHTML=`<button class="decision-btn approve" onclick="clientDecision('approve')">✅ Approve Revised Proposal</button><button class="decision-btn reject" onclick="openRejectModal()">❌ Reject Again</button>`;}
+  else{dp.style.display='';document.getElementById('cl-decision-btns').innerHTML=`<button class="decision-btn approve" onclick="clientDecision('approve')">✅ Approve Proposal</button><button class="decision-btn request" onclick="openRequestChanges()">🔄 Request Changes</button><button class="decision-btn reject" onclick="openRejectModal()">❌ Reject Proposal</button>`;}
+  renderClientComments(p);
+}
+function renderClientComments(p){const c=document.getElementById('cl-comment-list');if(!c)return;c.innerHTML=p.comments.length?p.comments.map(cm=>`<div class="comment"><div class="comment-avatar" style="background:${cm.color};color:${cm.colorText}">${cm.avatar}</div><div class="comment-bubble"><div class="comment-meta"><span class="comment-author">${cm.author}</span><span class="tag" style="font-size:10px">${cm.role}</span><span class="comment-time">${cm.time}</span></div><div class="comment-text">${cm.text}</div></div></div>`).join(''):`<div style="color:var(--text3);font-size:13px;padding:8px 0">No messages yet.</div>`;}
+function addClientComment(){const input=document.getElementById('cl-new-comment');const text=input.value.trim();if(!text)return;const p=DB.proposals.find(x=>x.id===DB.currentProposalId);if(!p)return;p.comments.push({author:'Acme Corp',role:'Client',avatar:'A',color:'#f0fdf4',colorText:'#16a34a',text,time:'Just now'});input.value='';renderClientComments(p);showToast('success','Message sent','Freelancer has been notified.');}
+function clientDecision(d){
+  const p=DB.proposals.find(x=>x.id===DB.currentProposalId);if(!p)return;
+  p.status='approved';p.history.push({action:'Proposal approved by client',actor:'Client (Acme Corp)',time:'Just now',icon:'✅',color:'#6ee7b7'});p.comments.push({author:'Acme Corp',role:'Client',avatar:'A',color:'#f0fdf4',colorText:'#16a34a',text:'Proposal approved! Looking forward to working with you.',time:'Just now'});
+  openClientReview(p.id);updateSidebarCounts();showToast('success','Proposal Approved! ✅','Freelancer has been notified.');
+}
+function openRejectModal(){openModal('modal-reject');}
+function confirmReject(){
+  const reason=document.getElementById('reject-reason').value.trim();if(!reason){showToast('error','Required','Please enter a reason.');return;}
+  const p=DB.proposals.find(x=>x.id===DB.currentProposalId);if(!p)return;
+  p.status='rejected';p.rejectReason=reason;p.history.push({action:'Proposal rejected by client',actor:'Client (Acme Corp)',time:'Just now',icon:'❌',color:'#fca5a5'});
+  document.getElementById('reject-reason').value='';closeModal('modal-reject');openClientReview(p.id);updateSidebarCounts();
+  showToast('error','Proposal Rejected','Freelancer has been notified.');
+}
+function openRequestChanges(){openModal('modal-request');}
+function confirmRequestChanges(){
+  const reason=document.getElementById('request-reason').value.trim();if(!reason){showToast('error','Required','Please describe what needs to change.');return;}
+  const p=DB.proposals.find(x=>x.id===DB.currentProposalId);if(!p)return;
+  p.history.push({action:'Client requested changes',actor:'Client (Acme Corp)',time:'Just now',icon:'🔄',color:'#fde68a'});p.comments.push({author:'Acme Corp',role:'Client',avatar:'A',color:'#f0fdf4',colorText:'#16a34a',text:reason,time:'Just now'});
+  document.getElementById('request-reason').value='';closeModal('modal-request');openClientReview(p.id);showToast('warning','Changes Requested','Freelancer has been notified.');
+}
+
+// ═══════════════════════════════════════════════
+// MODALS & MISC
+// ═══════════════════════════════════════════════
+function openNewProposalModal(){openModal('modal-new-proposal');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+function createProposal(){
+  const title=document.getElementById('m-title').value.trim(),client=document.getElementById('m-client').value.trim();
+  if(!title||!client){showToast('error','Missing fields','Please fill in title and client name.');return;}
+  const budget=parseInt(document.getElementById('m-budget').value)||0,scope=document.getElementById('m-scope').value||'',duration=document.getElementById('m-duration').value||'TBD';
+  const newP={id:Date.now(),title,client,scope,budget,duration,deliverables:'To be defined',notes:'50% upfront, 50% on delivery.',payment:'50% upfront, 50% on delivery',revisions:'2 rounds included',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),status:'pending',icon:'📋',iconBg:'#f8f7f4',history:[{action:'Proposal submitted',actor:'Karthik R.',time:'Just now',icon:'🚀',color:'#93c5fd'}],comments:[],files:[],rejectReason:''};
+  DB.proposals.unshift(newP);saveDraftLocal(newP);['m-title','m-client','m-scope','m-budget','m-duration'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  closeModal('modal-new-proposal');showView('proposals');updateSidebarCounts();showToast('success','Proposal Submitted! 🚀','Sent to '+client);
+}
+function createProposalAsDraft(){
+  const title=document.getElementById('m-title').value.trim()||'Untitled Proposal',client=document.getElementById('m-client').value.trim()||'Unknown Client',budget=parseInt(document.getElementById('m-budget').value)||0;
+  const newP={id:Date.now(),title,client,scope:'',budget,duration:'TBD',deliverables:'',notes:'',payment:'50% upfront',revisions:'2 rounds',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),status:'draft',icon:'📋',iconBg:'#f8f7f4',history:[{action:'Draft saved',actor:'Karthik R.',time:'Just now',icon:'💾',color:'#aaa'}],comments:[],files:[],rejectReason:''};
+  DB.proposals.unshift(newP);saveDraftLocal(newP);closeModal('modal-new-proposal');showView('proposals');showToast('success','Draft Saved 💾','Proposal saved as draft locally.');
+}
+function switchDetailTab(tab,btn){
+  const prefix=tab.startsWith('cl-')?'cl-':'';
+  ['canvas','comments','history','files'].forEach(t=>{const el=document.getElementById('tab-'+prefix+t);if(el)el.style.display='none';});
+  const target=document.getElementById('tab-'+tab);if(target)target.style.display='';
+  if(btn){btn.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+}
+function updateSidebarCounts(){
+  const pending=DB.proposals.filter(p=>p.status==='pending'||p.status==='resubmitted').length;
+  const flc=document.getElementById('fl-pending-count');if(flc){flc.textContent=pending;flc.style.display=pending?'':'none';}
+  const clc=document.getElementById('cl-inbox-count');if(clc)clc.textContent=pending;
+}
+
+// ═══════════════════════════════════════════════
+// PRINT / PDF PROPOSAL
+// ═══════════════════════════════════════════════
+function printProposal(){
+  const id=DB.currentProposalId;
+  const p=DB.proposals.find(x=>x.id===id);
+  if(!p){showToast('error','No proposal','Please open a proposal first.');return;}
+  const pa=document.getElementById('print-area');
+  pa.style.display='block';
+  pa.innerHTML=generatePrintHTML(p);
+  window.print();
+  setTimeout(()=>{pa.style.display='none';pa.innerHTML='';},1000);
+}
+function generatePrintHTML(p){
+  const fmtINR=n=>'₹'+Number(n).toLocaleString('en-IN');
+  return `<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans',sans-serif;}
+    body{background:#fff;color:#111827;}
+    .p-wrap{width:794px;margin:0 auto;background:#fff;}
+    .p-header{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 60%,#2563eb 100%);padding:40px 48px;position:relative;overflow:hidden;}
+    .p-header-bg{position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.05);top:-80px;right:-60px;}
+    .p-logo{font-size:28px;font-weight:900;color:#fff;margin-bottom:8px;letter-spacing:-1px;}
+    .p-quote-no{font-size:14px;color:rgba(255,255,255,0.6);font-weight:600;}
+    .p-header-meta{margin-top:24px;display:flex;gap:32px;}
+    .p-meta-item label{font-size:9px;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:1.5px;display:block;margin-bottom:4px;}
+    .p-meta-item .val{font-size:13px;color:#fff;font-weight:700;}
+    .p-section{padding:28px 48px;border-bottom:1px solid #f3f4f6;}
+    .p-section-title{font-size:9px;color:#2563eb;font-weight:700;letter-spacing:2px;margin-bottom:16px;}
+    .p-client-name{font-size:22px;font-weight:800;color:#111827;margin-bottom:6px;}
+    .p-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;margin-bottom:16px;}
+    .p-grid-cell{padding:16px 18px;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;}
+    .p-grid-cell.span2{grid-column:span 2;}
+    .p-grid-cell.span3{grid-column:span 3;border-right:none;}
+    .p-grid-cell.last{border-bottom:none;}
+    .p-grid-cell.nr{border-right:none;}
+    .p-cell-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:6px;}
+    .p-cell-value{font-size:13px;color:#111827;line-height:1.6;}
+    .p-cell-value.big{font-size:24px;font-weight:800;color:#1e3a8a;}
+    .p-budget-box{display:flex;justify-content:flex-end;margin-top:20px;}
+    .p-budget-total{background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:12px;padding:18px 28px;display:flex;justify-content:space-between;align-items:center;min-width:280px;}
+    .p-budget-label{font-size:13px;font-weight:800;color:rgba(255,255,255,0.8);}
+    .p-budget-amount{font-size:28px;font-weight:900;color:#fff;}
+    .p-footer{padding:20px 48px;background:#f9fafb;display:flex;justify-content:space-between;align-items:center;}
+    .p-footer-left{font-size:11px;color:#9ca3af;}
+    .p-footer-right{font-size:12px;font-weight:700;color:#2563eb;}
+    @media print{@page{size:A4 portrait;margin:0;}body{width:210mm;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}}
+  </style>
+  <div class="p-wrap">
+    <div class="p-header">
+      <div class="p-header-bg"></div>
+      <div style="position:relative;z-index:1;">
+        <div class="p-logo">📋 ProposalCanvas</div>
+        <div class="p-quote-no">PROPOSAL · ${new Date().getFullYear()}-${p.id}</div>
+        <div class="p-header-meta">
+          <div class="p-meta-item"><label>DATE</label><div class="val">${p.date}</div></div>
+          <div class="p-meta-item"><label>DURATION</label><div class="val">${p.duration}</div></div>
+          <div class="p-meta-item"><label>BUDGET</label><div class="val">${fmtINR(p.budget)}</div></div>
+          <div class="p-meta-item"><label>STATUS</label><div class="val">${p.status.toUpperCase()}</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="p-section">
+      <div class="p-section-title">PREPARED FOR</div>
+      <div class="p-client-name">${p.client}</div>
+      <div style="font-size:13px;color:#6b7280;">${p.title}</div>
+    </div>
+    <div class="p-section">
+      <div class="p-section-title">PROJECT DETAILS</div>
+      <div class="p-grid">
+        <div class="p-grid-cell span2"><div class="p-cell-label">Project Scope</div><div class="p-cell-value">${p.scope}</div></div>
+        <div class="p-grid-cell nr"><div class="p-cell-label">Budget</div><div class="p-cell-value big">${fmtINR(p.budget)}</div></div>
+        <div class="p-grid-cell"><div class="p-cell-label">Timeline</div><div class="p-cell-value">${p.duration}</div></div>
+        <div class="p-grid-cell"><div class="p-cell-label">Payment Terms</div><div class="p-cell-value">${p.payment}</div></div>
+        <div class="p-grid-cell nr"><div class="p-cell-label">Revisions</div><div class="p-cell-value">${p.revisions}</div></div>
+        <div class="p-grid-cell span3 last"><div class="p-cell-label">Deliverables</div><div class="p-cell-value">${p.deliverables}</div></div>
+      </div>
+      ${p.notes?`<div style="background:#eff6ff;border-radius:10px;padding:16px 18px;border:1px solid #bfdbfe;"><div class="p-cell-label" style="color:#2563eb;">NOTES & TERMS</div><div class="p-cell-value" style="color:#1e3a8a;">${p.notes}</div></div>`:''}
+      <div class="p-budget-box"><div class="p-budget-total"><span class="p-budget-label">TOTAL QUOTED AMOUNT</span><span class="p-budget-amount">${fmtINR(p.budget)}</span></div></div>
+    </div>
+    <div class="p-footer">
+      <div class="p-footer-left">Generated by ProposalCanvas · ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</div>
+      <div class="p-footer-right">🙏 Thank you for your consideration!</div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// ════ CANVA SLIDE EDITOR ════
+// ═══════════════════════════════════════════════
+const THEMES=[
+  {name:'Violet',p:'#7c3aed',g:'linear-gradient(135deg,#7c3aed,#a855f7)',l:'#ede9fe',t:'#4c1d95'},
+  {name:'Cobalt',p:'#1d4ed8',g:'linear-gradient(135deg,#1e40af,#3b82f6)',l:'#dbeafe',t:'#1e3a8a'},
+  {name:'Emerald',p:'#059669',g:'linear-gradient(135deg,#065f46,#10b981)',l:'#d1fae5',t:'#064e3b'},
+  {name:'Rose',p:'#e11d48',g:'linear-gradient(135deg,#9f1239,#f43f5e)',l:'#ffe4e6',t:'#881337'},
+  {name:'Slate',p:'#334155',g:'linear-gradient(135deg,#0f172a,#475569)',l:'#f1f5f9',t:'#0f172a'},
+  {name:'Amber',p:'#d97706',g:'linear-gradient(135deg,#92400e,#fbbf24)',l:'#fef3c7',t:'#78350f'},
+];
+const SLIDE_TYPES=[
+  {id:'cover',label:'Cover Page',icon:'🎯',desc:'Title & hero'},
+  {id:'overview',label:'Overview',icon:'📋',desc:'Project background'},
+  {id:'objectives',label:'Objectives',icon:'🏆',desc:'Goals & outcomes'},
+  {id:'timeline',label:'Timeline',icon:'📅',desc:'Project phases'},
+  {id:'budget',label:'Budget',icon:'💰',desc:'Cost breakdown'},
+  {id:'team',label:'Team',icon:'👥',desc:'Members & roles'},
+  {id:'closing',label:'Next Steps',icon:'🚀',desc:'Call to action'},
+  {id:'blank',label:'Blank Page',icon:'📄',desc:'Custom content'},
+];
+const COVERS=['https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=80','https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900&q=80','https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=80','https://images.unsplash.com/photo-1551434678-e076c223a692?w=900&q=80','https://images.unsplash.com/photo-1497215842964-222b430dc094?w=900&q=80'];
+
+let CE={slides:[],currentSlide:0,theme:'Violet',proposalId:null};
+
+function makeSlide(type,theme){
+  const t=THEMES.find(x=>x.name===theme)||THEMES[0];
+  const b={id:Date.now()+Math.random(),type,theme,elements:[]};
+  switch(type){
+    case 'cover':return{...b,title:'Project Proposal',subtitle:'Prepared exclusively for your review · '+new Date().getFullYear(),cover:COVERS[0]};
+    case 'overview':return{...b,heading:'Project Overview',body:'We propose a comprehensive solution designed to address your business challenges. Our approach combines deep industry expertise with cutting-edge technology.'};
+    case 'objectives':return{...b,heading:'Key Objectives',items:['Deliver scalable, future-proof architecture','Reduce operational overhead by 40%','Ensure seamless user experience across all devices']};
+    case 'timeline':return{...b,heading:'Project Timeline',phases:[{label:'Discovery',dur:'2 Weeks'},{label:'Design',dur:'3 Weeks'},{label:'Development',dur:'6 Weeks'},{label:'Launch',dur:'1 Week'}]};
+    case 'budget':return{...b,heading:'Budget Estimate',rows:[{item:'UI/UX Design',cost:'₹80,000'},{item:'Development',cost:'₹1,50,000'},{item:'Testing',cost:'₹40,000'},{item:'Deployment',cost:'₹30,000'}],total:'₹3,00,000'};
+    case 'team':return{...b,heading:'Meet Our Team',members:[{name:'Karthik R.',role:'Project Lead',av:'KR'},{name:'Priya N.',role:'UI/UX Designer',av:'PN'},{name:'Rahul M.',role:'Developer',av:'RM'}]};
+    case 'closing':return{...b,heading:'Ready to Begin?',body:'We\'re excited to bring your vision to life. Our team is prepared to start immediately and deliver results that exceed your expectations.',cta:'Schedule a Call →'};
+    case 'blank':return{...b,heading:'',body:'Add your content here'};
+    default:return{...b,heading:'Slide',body:''};
+  }
+}
+
+function openCanvaEditor(proposalId){
+  CE.proposalId=proposalId;
+  const p=proposalId?DB.proposals.find(x=>x.id===proposalId):null;
+  const lsKey='ce_slides_'+(proposalId||'new');
+  let saved=null;try{saved=JSON.parse(localStorage.getItem(lsKey));}catch{}
+  if(saved&&saved.slides&&saved.slides.length){CE=saved;}
+  else{
+    CE={slides:SLIDE_TYPES.map(t=>makeSlide(t.id,'Violet')),currentSlide:0,theme:'Violet',proposalId};
+    if(p){const cover=CE.slides.find(s=>s.type==='cover');if(cover){cover.title=p.title;cover.subtitle='Prepared for '+p.client+' · '+p.date;}}
+  }
+  document.getElementById('ce-doc-title').value=p?p.title+' — Proposal Deck':'New Proposal Deck';
+  document.getElementById('canva-editor').classList.add('open');
+  renderCeTemplatesList();renderCeThemeList();renderCeBottomStrip();renderCeSlide();applyZoom(65);
+}
+function closeCanvaEditor(){document.getElementById('canva-editor').classList.remove('open');}
+function saveDraftSlides(){
+  const lsKey='ce_slides_'+(CE.proposalId||'new');
+  localStorage.setItem(lsKey,JSON.stringify(CE));
+  showToast('success','Draft Saved! 💾','Slide deck saved to local storage.');
+}
+function setCePanel(name){
+  ['design','text','theme'].forEach(n=>{
+    document.getElementById('ce-panel-'+n).style.display=n===name?'':'none';
+    const btn=document.getElementById('ce-btn-'+n);if(btn)btn.classList.toggle('active',n===name);
+  });
+}
+function renderCeTemplatesList(){
+  const c=document.getElementById('ce-templates-list');if(!c)return;
+  c.innerHTML=SLIDE_TYPES.map(t=>`<div class="slide-tmpl" onclick="addSlide('${t.id}')"><div class="slide-tmpl-preview" style="background:${(THEMES.find(x=>x.name===CE.theme)||THEMES[0]).l};">${t.icon}</div><div class="slide-tmpl-label">${t.label}</div></div>`).join('');
+}
+function renderCeThemeList(){
+  const c=document.getElementById('ce-theme-list');if(!c)return;
+  c.innerHTML=THEMES.map(th=>`<div onclick="changeTheme('${th.name}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;border:2px solid ${th.name===CE.theme?th.p:'#e2e8f0'};margin-bottom:6px;background:${th.name===CE.theme?th.l:'#fff'};transition:all .15s;">
+    <div style="width:28px;height:28px;border-radius:6px;background:${th.g};flex-shrink:0;"></div>
+    <span style="font-size:13px;font-weight:700;color:${th.t};">${th.name}</span>
+    ${th.name===CE.theme?'<span style="margin-left:auto;font-size:16px;">✓</span>':''}
+  </div>`).join('');
+}
+function changeTheme(name){CE.theme=name;CE.slides=CE.slides.map(s=>({...s,theme:name}));renderCeThemeList();renderCeTemplatesList();renderCeBottomStrip();renderCeSlide();}
+function addSlide(type){const s=makeSlide(type,CE.theme);CE.slides.push(s);CE.currentSlide=CE.slides.length-1;renderCeBottomStrip();renderCeSlide();showToast('success','Slide added! ✨','New slide added to deck.');}
+function addTextElement(style){const s=CE.slides[CE.currentSlide];if(!s.elements)s.elements=[];const size=style==='heading'?28:style==='sub'?18:13;const wt=style==='heading'?800:style==='sub'?700:400;s.elements.push({id:Date.now(),type:'text',val:style==='heading'?'Click to edit heading':style==='sub'?'Subheading text':'Body text',x:80,y:100+(s.elements.length*60),fontSize:size,fontWeight:wt,color:'#0f172a'});renderCeSlide();}
+function prevSlide(){if(CE.currentSlide>0){CE.currentSlide--;renderCeSlide();renderCeBottomStrip();}}
+function nextSlide(){if(CE.currentSlide<CE.slides.length-1){CE.currentSlide++;renderCeSlide();renderCeBottomStrip();}}
+function undoSlide(){showToast('info','Undo','Last action undone.');}
+function applyZoom(val){
+  const pct=parseInt(val);document.getElementById('ce-zoom-val').textContent=pct+'%';
+  const wrap=document.getElementById('ce-slide-wrap');if(!wrap)return;
+  const scale=pct/100;wrap.style.transform='scale('+scale+')';wrap.style.transformOrigin='top center';
+  wrap.style.marginBottom=((506*scale)-506)+'px';
+}
+
+function renderCeBottomStrip(){
+  const strip=document.getElementById('ce-bottom-strip');if(!strip)return;
+  strip.innerHTML=CE.slides.map((s,i)=>`
+    <div class="ce-thumb ${i===CE.currentSlide?'sel':''}" onclick="jumpToSlide(${i})">
+      <div style="transform:scale(0.133);transform-origin:top left;width:900px;height:506px;pointer-events:none;">${buildSlideHTML(s,false)}</div>
+      <div class="ce-thumb-num">${i+1}</div>
+    </div>
+  `).join('')+`<button class="ce-add-slide" onclick="addSlide('blank')">+</button>`;
+  document.getElementById('ce-slide-indicator').textContent=(CE.currentSlide+1)+' / '+CE.slides.length;
+}
+function jumpToSlide(i){CE.currentSlide=i;renderCeSlide();renderCeBottomStrip();}
+function renderCeSlide(){
+  const s=CE.slides[CE.currentSlide];if(!s)return;
+  const c=document.getElementById('ce-slide-content');if(!c)return;
+  c.innerHTML=buildSlideHTML(s,true);
+  document.getElementById('ce-slide-indicator').textContent=(CE.currentSlide+1)+' / '+CE.slides.length;
+}
+
+function buildSlideHTML(slide,editable){
+  const tn=slide.theme||CE.theme;
+  const t=THEMES.find(x=>x.name===tn)||THEMES[0];
+  const W=`width:900px;height:506px;position:relative;overflow:hidden;font-family:'Outfit',sans-serif;`;
+  const accent=`<div style="width:48px;height:5px;background:${t.g};border-radius:3px;margin-bottom:18px;"></div>`;
+  const H1=`font-size:34px;font-weight:800;color:#0f172a;margin-bottom:20px;letter-spacing:-0.5px;line-height:1.1;`;
+
+  if(slide.type==='cover'){
+    return `<div style="${W}display:flex;flex-direction:column;justify-content:flex-end;">
+      <img src="${slide.cover||COVERS[0]}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
+      <div style="position:absolute;inset:0;background:linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%);"></div>
+      <div style="position:relative;padding:48px 56px;">
+        ${editable?`<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">${COVERS.map((c,i)=>`<img src="${c}" onclick="changeCover(${i})" style="width:48px;height:32px;object-fit:cover;border-radius:5px;cursor:pointer;border:2px solid ${slide.cover===c?'#fff':'rgba(255,255,255,0.3)'};opacity:${slide.cover===c?1:0.5};transition:all .15s;">`).join('')}</div>`:''}
+        <div style="font-size:44px;font-weight:900;color:#fff;line-height:1.05;margin-bottom:14px;">${editable?`<div contenteditable="true" oninput="updateSlideField('title',this.textContent)" style="outline:none;background:transparent;border-bottom:2px solid rgba(255,255,255,0.3);padding-bottom:4px;">${slide.title||'Project Proposal'}</div>`:(slide.title||'Project Proposal')}</div>
+        <div style="font-size:15px;color:rgba(255,255,255,0.7);">${editable?`<div contenteditable="true" oninput="updateSlideField('subtitle',this.textContent)" style="outline:none;">${slide.subtitle||''}</div>`:(slide.subtitle||'')}</div>
+        <div style="margin-top:24px;display:flex;gap:4px;"><div style="width:36px;height:3px;background:#fff;border-radius:2px;opacity:0.6;"></div><div style="width:8px;height:3px;background:${t.p};border-radius:2px;"></div></div>
+      </div>
+    </div>`;
+  }
+
+  if(slide.type==='overview'||slide.type==='closing'){
+    return `<div style="${W}padding:56px;display:flex;flex-direction:column;justify-content:center;background:#fff;">
+      <div style="position:absolute;right:0;top:0;width:220px;height:100%;background:linear-gradient(to left,${t.p}0a,transparent);"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:${t.g};"></div>
+      <div style="position:relative;">${accent}
+        <div style="${H1}">${editable?`<div contenteditable="true" oninput="updateSlideField('heading',this.textContent)" style="outline:none;">${slide.heading}</div>`:(slide.heading)}</div>
+        <div style="font-size:15px;color:#4b5563;line-height:1.9;max-width:580px;">${editable?`<div contenteditable="true" oninput="updateSlideField('body',this.textContent)" style="outline:none;">${slide.body}</div>`:(slide.body)}</div>
+        ${slide.type==='closing'?`<div style="margin-top:36px;"><div style="display:inline-block;background:${t.g};color:#fff;border-radius:12px;padding:14px 32px;font-size:15px;font-weight:700;cursor:pointer;">${slide.cta||'Get in touch →'}</div></div>`:''}
+      </div>
+      ${renderElements(slide.elements,editable)}
+    </div>`;
+  }
+
+  if(slide.type==='objectives'){
+    return `<div style="${W}padding:56px;background:#fff;">
+      <div style="position:absolute;top:0;right:0;width:120px;height:100%;background:${t.l};opacity:0.5;"></div>
+      <div style="position:relative;">${accent}
+        <div style="${H1}">${slide.heading}</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          ${(slide.items||[]).map((item,i)=>`<div style="display:flex;gap:16px;align-items:flex-start;padding:14px 20px;background:${t.l};border-radius:12px;border:1px solid ${t.p}20;">
+            <div style="width:32px;height:32px;border-radius:50%;background:${t.g};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;flex-shrink:0;">${i+1}</div>
+            <div style="flex:1;font-size:14px;color:#1e293b;font-weight:600;padding-top:4px;">${item}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      ${renderElements(slide.elements,editable)}
+    </div>`;
+  }
+
+  if(slide.type==='timeline'){
+    const phases=slide.phases||[];
+    return `<div style="${W}padding:56px;background:#fff;">
+      <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:${t.g};"></div>
+      ${accent}<div style="${H1}">${slide.heading}</div>
+      <div style="display:grid;grid-template-columns:repeat(${phases.length},1fr);gap:0;position:relative;">
+        <div style="position:absolute;top:20px;left:12.5%;right:12.5%;height:3px;background:${t.g};border-radius:2px;z-index:0;"></div>
+        ${phases.map((ph,i)=>`<div style="text-align:center;position:relative;z-index:1;">
+          <div style="width:40px;height:40px;border-radius:50%;background:${i<2?t.g:'#fff'};border:3px solid ${t.p};margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:${i<2?'#fff':t.p};box-shadow:0 0 0 4px ${t.l};">${i+1}</div>
+          <div style="background:${t.l};border-radius:10px;padding:10px 8px;border:1px solid ${t.p}20;">
+            <div style="font-size:12px;font-weight:800;color:${t.t};margin-bottom:6px;">${ph.label}</div>
+            <div style="display:inline-block;background:${t.g};color:#fff;border-radius:16px;padding:3px 10px;font-size:10px;font-weight:700;">${ph.dur}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+      ${renderElements(slide.elements,editable)}
+    </div>`;
+  }
+
+  if(slide.type==='budget'){
+    const rows=slide.rows||[];
+    return `<div style="${W}padding:56px;background:#fff;">
+      ${accent}<div style="${H1}">${slide.heading}</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:${t.g}"><th style="padding:12px 20px;text-align:left;color:#fff;font-size:12px;font-weight:700;border-radius:10px 0 0 10px;">Item</th><th style="padding:12px 20px;text-align:right;color:#fff;font-size:12px;font-weight:700;border-radius:0 10px 10px 0;">Cost</th></tr></thead>
+        <tbody>${rows.map((r,i)=>`<tr style="border-bottom:1px solid ${t.p}12;background:${i%2?'#fafafa':'#fff'};"><td style="padding:12px 20px;font-size:13px;color:#374151;">${r.item}</td><td style="padding:12px 20px;text-align:right;font-size:13px;font-weight:700;color:#1e293b;">${r.cost}</td></tr>`).join('')}</tbody>
+      </table>
+      <div style="display:flex;justify-content:flex-end;margin-top:14px;"><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px;background:${t.g};border-radius:10px;min-width:240px;"><span style="color:#fff;font-weight:800;font-size:13px;">TOTAL</span><span style="color:#fff;font-weight:900;font-size:18px;">${slide.total||'₹0'}</span></div></div>
+      ${renderElements(slide.elements,editable)}
+    </div>`;
+  }
+
+  if(slide.type==='team'){
+    const members=slide.members||[];
+    return `<div style="${W}padding:56px;background:#fff;">
+      ${accent}<div style="${H1}">${slide.heading}</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        ${members.map(m=>`<div style="flex:1 1 160px;padding:22px 16px;background:${t.l};border-radius:14px;border:1px solid ${t.p}22;text-align:center;">
+          <div style="width:52px;height:52px;border-radius:50%;background:${t.g};margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:900;">${m.av||m.name[0]}</div>
+          <div style="font-size:13px;font-weight:800;color:#0f172a;margin-bottom:4px;">${m.name}</div>
+          <div style="font-size:11px;color:${t.p};font-weight:600;">${m.role}</div>
+        </div>`).join('')}
+      </div>
+      ${renderElements(slide.elements,editable)}
+    </div>`;
+  }
+
+  // blank / default
+  return `<div style="${W}padding:56px;background:#fff;display:flex;flex-direction:column;">
+    ${accent}
+    ${editable?`<div contenteditable="true" oninput="updateSlideField('heading',this.textContent)" style="font-size:30px;font-weight:800;color:#0f172a;outline:none;margin-bottom:16px;">${slide.heading||'Heading'}</div>`:`<div style="font-size:30px;font-weight:800;color:#0f172a;margin-bottom:16px;">${slide.heading||'Heading'}</div>`}
+    ${editable?`<div contenteditable="true" oninput="updateSlideField('body',this.textContent)" style="font-size:15px;color:#4b5563;line-height:1.9;outline:none;flex:1;">${slide.body||'Click to add content'}</div>`:`<div style="font-size:15px;color:#4b5563;line-height:1.9;">${slide.body||''}</div>`}
+    ${renderElements(slide.elements,editable)}
+  </div>`;
+}
+
+function renderElements(elements,editable){
+  if(!elements||!elements.length)return'';
+  return elements.map(el=>`<div style="position:absolute;left:${el.x}px;top:${el.y}px;${editable?'cursor:move;':''}">
+    ${editable?`<div contenteditable="true" style="font-size:${el.fontSize}px;font-weight:${el.fontWeight};color:${el.color||'#0f172a'};outline:none;border-bottom:1px dashed #7c3aed;min-width:60px;">${el.val}</div>`:`<div style="font-size:${el.fontSize}px;font-weight:${el.fontWeight};color:${el.color||'#0f172a'};">${el.val}</div>`}
+  </div>`).join('');
+}
+
+function updateSlideField(field,val){const s=CE.slides[CE.currentSlide];if(s)s[field]=val;}
+function changeCover(idx){const s=CE.slides[CE.currentSlide];if(s&&s.type==='cover'){s.cover=COVERS[idx];renderCeSlide();renderCeBottomStrip();}}
+
+function printSlides(){
+  const pa=document.getElementById('print-area');pa.style.display='block';
+  pa.innerHTML=`<style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0;}
+    .slide-page{width:794px;height:562px;page-break-after:always;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff;}
+    .slide-page:last-child{page-break-after:avoid;}
+    @media print{@page{size:A4 landscape;margin:0;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}}
+  </style>`+CE.slides.map(s=>`<div class="slide-page"><div style="transform:scale(0.88);transform-origin:center;">${buildSlideHTML(s,false)}</div></div>`).join('');
+  window.print();
+  setTimeout(()=>{pa.style.display='none';pa.innerHTML='';},1000);
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function showToast(type,title,msg){
+  const icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div');t.className='toast';
+  t.innerHTML=`<div class="toast-icon">${icons[type]||'ℹ️'}</div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(60px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300);},3500);
+}
+
+// INIT
+showView('dashboard');updateSidebarCounts();
+</script>
+</body>
+</html>

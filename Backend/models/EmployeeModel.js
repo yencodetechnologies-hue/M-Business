@@ -8,7 +8,8 @@ const employeeSchema = new mongoose.Schema({
   department: { type: String, default: "" },
   salary:     { type: String, default: "" },
   password: { type: String, default: "" } , 
-  status:     { type: String, enum: ["Active","Inactive"], default: "Active" }
+  status:     { type: String, enum: ["Active","Inactive"], default: "Active" },
+  companyId: { type: String, default: "" },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Employee", employeeSchema);

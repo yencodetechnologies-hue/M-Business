@@ -31,6 +31,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.use((req, res, next) => {
+  req.companyId = req.headers['x-company-id'] || "";
+  next();
+});
+
 const authRoutes = require("./routes/authroutes");
 const clientRoutes = require("./routes/clientroutes");
 const employeeRoutes = require("./routes/employeeroutes");
@@ -50,6 +55,7 @@ const QuotationRoutes = require("./routes/quotationroutes");
 const interviewRoutes = require("./routes/interviewroutes");
 const userRoutes = require("./routes/userroutes");
 const ProposalRoutes = require("./routes/proposalroutes");
+const subscriptionRoutes = require("./routes/subscriptionroutes");
 
 // Static files (local resume storage)
 const path = require("path");
@@ -74,7 +80,8 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/employee-dashboard", employeeDashRoutes);
 app.use("/api/quotations", QuotationRoutes);
 app.use("/api/proposals", ProposalRoutes);
-app.use("/uploads", express.static("uploads"));
+app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/upload", express.static("uploads"));
 
 app.get("/", (req, res) => {
   res.send("Server is running!");

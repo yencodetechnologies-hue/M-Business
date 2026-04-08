@@ -5,7 +5,8 @@ const Manager = require("../models/ManagerModel");
 // GET all managers
 router.get("/", async (req, res) => {
   try {
-    const managers = await Manager.find().sort({ createdAt: -1 });
+    const filter = req.companyId ? { companyId: req.companyId } : {};
+    const managers = await Manager.find(filter).sort({ createdAt: -1 });
     res.json(managers);
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
@@ -33,6 +34,7 @@ router.post("/add", async (req, res) => {
       address:    address    || "",
       password:   password   || "",
       status:     status     || "Active",
+      companyId:  req.companyId || "",
     });
 
     await manager.save();

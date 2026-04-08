@@ -9,6 +9,7 @@ const ClientSchema = new mongoose.Schema({
   password:        { type: String, default: "" },
   status:          { type: String, default: "Active" },
   role:            { type: String, default: "client" }, 
+  companyId: { type: String, default: "" },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Client", ClientSchema);

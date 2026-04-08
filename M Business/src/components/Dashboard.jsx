@@ -9,11 +9,14 @@ import AccountsPage, { ExpensesPage } from "./AccountsPage";
 import ReportsPage  from "./ReportsPage";
 import QuotationCreator   from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
+import AdminProposalManagement from "./AdminProposalManagement";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { QRCodeSVG } from "qrcode.react";
 import { SubAdminDocumentsPage } from "./EmployeeProfilePanel";
 import { DOC_TYPES } from "./EmployeeProfilePanel";
+import AuthPage from "./AuthPage";
+import MySubscriptions from "./MySubscriptions";
 
 
 const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"#9333ea",bg:"#f5f3ff",card:"#FFFFFF",text:"#1e0a3c",muted:"#7c3aed",border:"#ede9fe"};
@@ -34,13 +37,14 @@ const NAV=[
   {key:"calendar",icon:"📅",label:"Calendar"},
   {key:"accounts",icon:"👤",label:"Accounts"},
   {key:"interviews",icon:"🎯",label:"Interviews"},
-  {key:"reports",icon:"📈",label:"Reports"}
+  {key:"reports",icon:"📈",label:"Reports"},
+  {key:"mysubscriptions",icon:"💳",label:"My Subscriptions"}
 ];
 
 function getNavForRole(role){
   const r=(role||"").toLowerCase().trim();
   if(r==="subadmin"||r==="sub_admin"||r==="sub-admin")
-    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","interviews","reports"].includes(n.key));
+    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","interviews","reports","mysubscriptions"].includes(n.key));
   // if(r==="manager")
   //   return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
   // if(r==="employee")
@@ -1300,9 +1304,42 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const [active,setActive]=useState("dashboard");
   const [modal,setModal]=useState(null);
   const [showProfile,setShowProfile]=useState(false);
+  const [profileDropdownOpen,setProfileDropdownOpen]=useState(false);
+  const [accountAuthOpen,setAccountAuthOpen]=useState(false);
+  const [accountAuthTab,setAccountAuthTab]=useState("register");
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [companyLogo,setCompanyLogo]=useState(user?.logoUrl?user.logoUrl:(fixedLogo||null));
+  const [accounts,setAccounts]=useState([]);
   useEffect(()=>{setCompanyLogo(user?.logoUrl?user.logoUrl:(fixedLogo||null));},[user,fixedLogo]);
+
+  // Load saved accounts from localStorage
+  useEffect(()=>{
+    try{
+      const savedAccounts=JSON.parse(localStorage.getItem("accounts")||"[]");
+      setAccounts(savedAccounts);
+    }catch(e){setAccounts([]);}
+  },[user]);
+
+  // Switch to a different account
+  const switchAccount=(account)=>{
+    localStorage.setItem("user",JSON.stringify(account));
+    setUser(account);
+    setProfileDropdownOpen(false);
+    window.location.reload();
+  };
+
+  // Close dropdown on outside click
+  useEffect(()=>{
+    if(!profileDropdownOpen) return;
+    const onDown=(e)=>{
+      const t=e.target;
+      if(t?.closest?.('[data-profile-anchor="true"]')) return;
+      if(t?.closest?.('[data-profile-menu="true"]')) return;
+      setProfileDropdownOpen(false);
+    };
+    document.addEventListener("mousedown",onDown);
+    return ()=>document.removeEventListener("mousedown",onDown);
+  },[profileDropdownOpen]);
 
   const [clients,setClients]=useState([]);
   const [nc,setNc]=useState({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});
@@ -1331,12 +1368,22 @@ export default function Dashboard({setUser,user,fixedLogo}){
   useEffect(()=>{fetchClients();fetchEmployees();fetchProjects();fetchManagers();},[]);
 
   const handleLogout=()=>{localStorage.removeItem("user");setUser(null);};
+  const handleAuthSetUser=(userData)=>{
+    setAccountAuthOpen(false);
+    setProfileDropdownOpen(false);
+    setShowProfile(false);
+    setUser(userData);
+  };
   const onLogoChange=async(logo)=>{setCompanyLogo(logo||fixedLogo);const updatedUser={...user,logoUrl:logo||""};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);try{await axios.post(BASE_URL + "/api/auth/save-logo",{userId:user._id||user.id,logoUrl:logo||""});}catch(e){console.log(e);}};
 
   const fetchClients=async()=>{try{const res=await axios.get(BASE_URL + "/api/clients");setClients(res.data);}catch(e){console.log(e);}};
   const fetchEmployees=async()=>{try{const res=await axios.get(BASE_URL + "/api/employees");setEmployees(res.data);}catch(e){console.log(e);}};
   const fetchProjects=async()=>{try{const res=await axios.get(BASE_URL + "/api/projects");setProjects(res.data);}catch(e){console.log(e);}};
   const fetchManagers=async()=>{try{const res=await axios.get(BASE_URL + "/api/managers");setManagers(res.data);}catch(e){console.log(e);}};
+
+  const createNew = () => {
+    window.location.href = "/project-proposal?new=true";
+  };
 
   const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,password:nc.password,status:nc.status};const res=await axios.post(BASE_URL + "/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.message||err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
 
@@ -1410,7 +1457,7 @@ const companyNameStr = "M Business";
             <div style={{width:30,height:30,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff"}}>M</div>
             <span style={{fontWeight:800,fontSize:14,color:T.text}}>M Business</span>
           </div>
-          <div onClick={()=>setShowProfile(true)} style={{width:34,height:34,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:13,cursor:"pointer",overflow:"hidden"}}>
+          <div data-profile-anchor="true" onClick={(e)=>{e.stopPropagation();setProfileDropdownOpen(v=>!v);setShowProfile(false);}} style={{width:34,height:34,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:13,cursor:"pointer",overflow:"hidden"}}>
             {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:3,background:"#fff"}}/>:<span>{initials}</span>}
           </div>
         </div>
@@ -1425,10 +1472,15 @@ const companyNameStr = "M Business";
             <div className="header-actions" style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
               {validActive==="clients"&&<button onClick={()=>{setNcError({});setShowClientPass(false);setModal("client");}} style={B("#9333ea")}>+ Add Client</button>}
               {validActive==="employees"&&<button onClick={()=>{setNeError({});setModal("employee");}} style={B("#7c3aed")}>+ Add Employee</button>}
-              {validActive==="projects"&&<button onClick={()=>{setNpError({});setModal("project");}} style={B("#a855f7")}>+ New Project</button>}
+              {validActive==="projects"&&(
+                <>
+                  <button onClick={()=>{setNpError({});setModal("project");}} style={B("#a855f7")}>+ New Project</button>
+                </>
+              )}
+           
               {validActive==="managers"&&<button onClick={()=>{setNmError({});setShowMgrPass(false);setModal("manager");}} style={B("#f59e0b")}>+ Add Manager</button>}
              
-              <div onClick={()=>setShowProfile(true)} className="mob-topbar-hide" style={{background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,padding:"6px 12px",display:"flex",alignItems:"center",gap:8,cursor:"pointer",boxShadow:"0 2px 10px rgba(147,51,234,0.08)",flexShrink:0}}>
+              <div data-profile-anchor="true" onClick={(e)=>{e.stopPropagation();setProfileDropdownOpen(v=>!v);setShowProfile(false);}} className="mob-topbar-hide" style={{background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,padding:"6px 12px",display:"flex",alignItems:"center",gap:8,cursor:"pointer",boxShadow:"0 2px 10px rgba(147,51,234,0.08)",flexShrink:0}}>
                 <div style={{width:30,height:30,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:12,overflow:"hidden",flexShrink:0}}>
                   {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:3,background:"#fff"}} onError={()=>setCompanyLogo(null)}/>:<span>{initials}</span>}
                 </div>
@@ -1468,16 +1520,201 @@ const companyNameStr = "M Business";
 
           {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
           {validActive==="quotations"&&<QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
-          {validActive==="proposals"&&<ProjectProposalCreator clients={clients} projects={projects} companyLogo={companyLogo}/>}
+          {validActive==="proposals" && (
+            user?.role === "admin" ? 
+            <AdminProposalManagement /> : 
+            <ProjectProposalCreator clients={clients} projects={projects} companyLogo={companyLogo}/>
+          )}
           {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers}/>}
           {validActive==="tasks"&&<TaskPage projects={projects} employees={employees}/>}
           {validActive==="calendar"&&<CalendarPage projects={projects} clients={clients}/>}
          {validActive==="accounts"&&<AccountsPage ExpensesPage={ExpensesPage}/>}
           {validActive==="interviews"&&<InterviewPage companyId={companyId} companyName={companyNameStr}/>}
           {validActive==="documents" && <SubAdminDocumentsPage employees={employees} />}
+          {validActive==="mysubscriptions"&&<MySubscriptions user={user}/>}
           {validActive==="reports"&&<ReportsPage clients={clients} projects={projects} employees={employees} managers={managers}/>}
         </div>
       </div>
+
+      {profileDropdownOpen && (
+        <div
+          data-profile-menu="true"
+          style={{
+            position: "fixed",
+            top: 72,
+            right: 16,
+            zIndex: 10050,
+            background: "#fff",
+            border: "1px solid #e2e8f0",
+            borderRadius: 12,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+            overflow: "hidden",
+            minWidth: 220,
+            maxWidth: 280,
+          }}
+        >
+          {/* Current Account Header */}
+          <div style={{padding:"12px 14px",borderBottom:"1px solid #f1f5f9",background:"linear-gradient(135deg,#f5f3ff,#faf5ff)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:14,overflow:"hidden"}}>
+                {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:3,background:"#fff"}}/>:<span>{initials}</span>}
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13,fontWeight:700,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{displayName}</div>
+                <div style={{fontSize:11,color:"#7c3aed",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user?.email}</div>
+              </div>
+              <span style={{fontSize:12}}>✓</span>
+            </div>
+          </div>
+
+          {/* Other Saved Accounts */}
+          {accounts.length>1 && (
+            <div style={{maxHeight:180,overflowY:"auto"}}>
+              {accounts.filter(a=>a.email!==user?.email).map((account,idx)=>{
+                const accName=account?.name||account?.email?.split("@")[0]||"User";
+                const accInitials=accName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+                return(
+                  <button
+                    key={account.email||idx}
+                    onClick={()=>switchAccount(account)}
+                    style={{
+                      width:"100%",
+                      background:"none",
+                      border:"none",
+                      padding:"10px 14px",
+                      cursor:"pointer",
+                      fontSize:13,
+                      fontWeight:600,
+                      fontFamily:"inherit",
+                      color:T.text,
+                      display:"flex",
+                      alignItems:"center",
+                      gap:10,
+                      borderBottom:"1px solid #f8fafc",
+                      textAlign:"left",
+                    }}
+                    onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                    onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+                  >
+                    <div style={{width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700,fontSize:12,flexShrink:0}}>
+                      {account?.logoUrl?<img src={account.logoUrl} alt="" style={{width:"100%",height:"100%",objectFit:"contain",padding:2,background:"#fff"}}/>:<span>{accInitials}</span>}
+                    </div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:700,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{accName}</div>
+                      <div style={{fontSize:10,color:"#94a3b8",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{account?.email}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Menu Options */}
+          <div style={{borderTop:"1px solid #f1f5f9"}}>
+            <button
+              onClick={() => {
+                setProfileDropdownOpen(false);
+                setShowProfile(true);
+              }}
+              style={{
+                width: "100%",
+                background: "none",
+                border: "none",
+                padding: "10px 14px",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: "inherit",
+                color: T.text,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+              }}
+              onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+            >
+              <span style={{fontSize:14}}>👤</span> Profile
+            </button>
+            <button
+              onClick={() => {
+                setProfileDropdownOpen(false);
+                setAccountAuthTab("login");
+                setAccountAuthOpen(true);
+              }}
+              style={{
+                width: "100%",
+                background: "none",
+                border: "none",
+                padding: "10px 14px",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: "inherit",
+                color: T.text,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                borderTop: "1px solid #f8fafc",
+              }}
+              onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+            >
+              <span style={{fontSize:14}}>➕</span> Add account
+            </button>
+            <button
+              onClick={() => {
+                setProfileDropdownOpen(false);
+                handleLogout();
+              }}
+              style={{
+                width: "100%",
+                background: "none",
+                border: "none",
+                padding: "10px 14px",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: "inherit",
+                color: "#ef4444",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                borderTop: "1px solid #f8fafc",
+              }}
+              onMouseEnter={e=>e.currentTarget.style.background="#fef2f2"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+            >
+              <span style={{fontSize:14}}>🚪</span> Logout
+            </button>
+          </div>
+        </div>
+      )}
+
+      {accountAuthOpen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 10060 }}>
+          <button
+            onClick={() => setAccountAuthOpen(false)}
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              zIndex: 10061,
+              background: "rgba(255,255,255,0.22)",
+              border: "1.5px solid rgba(255,255,255,0.35)",
+              color: "#fff",
+              borderRadius: 10,
+              width: 36,
+              height: 36,
+              cursor: "pointer",
+              fontWeight: 900,
+              fontSize: 14,
+            }}
+          >
+            ✕
+          </button>
+          <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
+        </div>
+      )}
 
       {showProfile&&<ProfileModal user={user} setUser={setUser} onClose={()=>setShowProfile(false)} onLogout={handleLogout} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
 

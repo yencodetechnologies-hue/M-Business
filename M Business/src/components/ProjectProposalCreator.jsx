@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
+import { BASE_URL } from "../config";
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
 const uid = () => `${Date.now()}_${Math.random().toString(36).slice(2)}`;
@@ -19,7 +20,6 @@ const THEMES = [
   { name:"Teal",    p:"#0d9488", g:"linear-gradient(135deg,#134e4a,#2dd4bf)", l:"#ccfbf1", t:"#134e4a" },
   { name:"Fuchsia", p:"#a21caf", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"#fae8ff", t:"#4a044e" },
 ];
-
 // ─── COVERS ───────────────────────────────────────────────────────────────────
 const COVERS = [
   "https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=80",
@@ -30,18 +30,6 @@ const COVERS = [
   "https://images.unsplash.com/photo-1551434678-e076c223a692?w=900&q=80",
   "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=900&q=80",
   "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=900&q=80",
-];
-
-// ─── PRESENTATION TEMPLATES ───────────────────────────────────────────────────
-const PRESENTATION_TEMPLATES = [
-  { id: "proj_pres", name: "Project presentation", img: "https://images.unsplash.com/photo-1557683316-973673baf926?w=400&q=80", theme: "Cobalt" },
-  { id: "business", name: "Business Presentation", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80", theme: "Slate" },
-  { id: "company", name: "Company Profile", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&q=80", theme: "Emerald" },
-  { id: "group", name: "Group Project", img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&q=80", theme: "Teal" },
-  { id: "brand", name: "Brand Guideline", img: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80", theme: "Fuchsia" },
-  { id: "startup", name: "Startup Pitch Deck", img: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80", theme: "Violet" },
-  { id: "creative", name: "Creative Portfolio", img: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=400&q=80", theme: "Amber" },
-  { id: "finance", name: "Finance Presentation", img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80", theme: "Rose" },
 ];
 
 // ─── SLIDE FACTORY ────────────────────────────────────────────────────────────
@@ -303,7 +291,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
               </div>
             )}
             {el.type === "shape" && (
-              <div style={{width:el.width||60, height:el.height||60, background:el.background||el.color||t.p, border:el.border||"none", borderRadius:el.shape==="circle"?"50%":"4px"}} />
+              <div style={{width:el.width||60, height:el.height||60, background:el.color||t.p, borderRadius:el.shape==="circle"?"50%":"4px"}} />
             )}
             {el.type === "image" && (
               <img src={el.src} alt="" style={{width:el.width||200, height:"auto", borderRadius:4, display:"block", pointerEvents:"none"}} />
@@ -835,7 +823,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
 }
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
-export default function CanvaProposal({clients=[]}) {
+export default function CanvaProposal({clients=[], openNew=false, onOpenNewDone}) {
   const [view, setView]           = useState("list");    // list | editor
   const [proposals, setProposals] = useState([]);
   const [doc, setDoc]             = useState(null);
@@ -847,14 +835,24 @@ export default function CanvaProposal({clients=[]}) {
   const [toast, setToast]         = useState(null);
   const [rejectModal, setRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [loading, setLoading]     = useState(true);     // loading state for proposals
   const [search, setSearch]       = useState("");
   const [showResizeMenu, setShowResizeMenu] = useState(false);
   
   // Uploads State
   const [uploads, setUploads]     = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [clientsData, setClientsData] = useState(clients || []);
   const fileInputRef              = useRef();
   const canvasRef                 = useRef();
+
+  // Auto-open new proposal when triggered from Dashboard
+  useEffect(() => {
+    if (openNew && !loading) {
+      createNew();
+      if (onOpenNewDone) onOpenNewDone();
+    }
+  }, [openNew, loading]);
 
  const changeFormat = async (fmt) => {
   if (!doc) return;
@@ -867,11 +865,25 @@ export default function CanvaProposal({clients=[]}) {
   useEffect(()=>{
     fetchProposals();
     fetchUploads();
+    fetchClients();
+    if (new URLSearchParams(window.location.search).get("new") === "true") {
+      setTimeout(() => createNew(), 100);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   },[]);
+
+  const fetchClients = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/clients`);
+      setClientsData(res.data);
+    } catch (err) {
+      console.error("Error fetching clients:", err);
+    }
+  };
 
   const fetchUploads = async () => {
     try {
-      const res = await axios.get("/api/upload");
+      const res = await axios.get(`${BASE_URL}/api/upload`);
       setUploads(res.data);
     } catch (err) {
       console.error("Error fetching media:", err);
@@ -887,7 +899,7 @@ export default function CanvaProposal({clients=[]}) {
 
     setUploading(true);
     try {
-      const res = await axios.post("/api/upload", formData);
+      const res = await axios.post(`${BASE_URL}/api/upload`, formData);
       setUploads([res.data, ...uploads]);
       flash("✅ Upload successful!");
     } catch (err) {
@@ -899,19 +911,46 @@ export default function CanvaProposal({clients=[]}) {
   };
 
   const fetchProposals = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get("/api/proposals");
-      if (res.data.length > 0) setProposals(res.data);
-      else {
-        // If no proposals in DB, create the demo one (optional)
-        const d = makeDemo();
-        const saved = await axios.post("/api/proposals", d);
-        setProposals([saved.data]);
+      console.log("📡 Fetching proposals from backend...");
+      const res = await axios.get(`${BASE_URL}/api/proposals`);
+      console.log(`📋 Found ${res.data.length} proposals in backend`);
+      
+      const list = res.data || [];
+      if (list.length > 0) {
+        setProposals(list);
+        console.log("✅ Proposals loaded successfully");
+        
+        // Auto-open based on URL
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+        const viewId = params.get("view");
+        
+        if (editId) {
+          const found = list.find(p => p.id === editId || p._id === editId);
+          if (found) { setDoc(found); setPage(0); setView("editor"); }
+        } else if (viewId) {
+          const found = list.find(p => p.id === viewId || p._id === viewId);
+          if (found) { setDoc(found); setPage(0); setView("editor"); } // Note: if you want a read-only view, we can add a flag, but for now editor mode is fine.
+        }
+        
+      } else {
+        console.log("📝 No proposals found in backend, showing empty state");
+        setProposals([]);
       }
     } catch (err) {
-      console.error("Error fetching proposals:", err);
-      // Fallback for demo
-      const d = [makeDemo()]; setProposals(d);
+      console.error("❌ Error fetching proposals:", err);
+      // Only show demo proposal in development mode
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔧 Development mode: Showing demo proposal");
+        const d = [makeDemo()]; 
+        setProposals(d);
+      } else {
+        setProposals([]);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -921,13 +960,13 @@ const persist = useCallback(async (d) => {
   try {
     if (d._id) {
       // Update existing DB record
-      const res = await axios.put(`/api/proposals/${d._id}`, d);
+      const res = await axios.put(`${BASE_URL}/api/proposals/${d._id}`, d);
       setProposals(prev => prev.map(p => p._id === d._id ? res.data : p));
       setDoc(res.data);
       return res.data;                     // ← return so callers can use it
     } else {
       // First save — create in DB
-      const res = await axios.post("/api/proposals", d);
+      const res = await axios.post(`${BASE_URL}/api/proposals`, d);
       setProposals(prev => [res.data, ...prev.filter(p => p.id !== d.id)]);
       setDoc(res.data);
       return res.data;                     // ← return the DB doc (now has _id)
@@ -937,21 +976,49 @@ const persist = useCallback(async (d) => {
     flash("❌ Error saving to server", "err");
     return null;
   }
-}, []); // ← empty deps — uses functional setters, no stale closure
-  const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
+}, []); 
+// ← empty deps — uses functional setters, no stale closure
+  
+const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
   const createNew = () => {
-    const themes = THEMES.map(t=>t.name);
-    const theme  = themes[Math.floor(Math.random()*themes.length)];
-    const d = { id:pid(), title:"New Project Proposal", client:"", theme, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"ppt", slides:SLIDE_TYPES.map(t=>makeSlide(t.id,theme)) };
+    const d = { id:pid(), title:"New Project Proposal", client:"", theme:null, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"ppt", slides:SLIDE_TYPES.map(t=>makeSlide(t.id,null)) };
     setDoc(d); setPage(0); setView("editor");
   };
 
   const saveDoc = (d=doc) => { const nd={...d,updated:new Date().toISOString()}; persist(nd); setDoc(nd); flash("💾 Saved!"); };
-  const setStatus = (status,extra={}) => {
+  const setStatus = (status, extra={}) => {
+    // Basic validation for pending
+    if (status === "pending" && !doc.title.trim()) {
+      flash("❌ Please add a title before submitting");
+      return;
+    }
+
     const nd={...doc,status,...extra,updated:new Date().toISOString()};
-    persist(nd); setDoc(nd);
-    if(status==="approved"){ setConfetti(true); flash("🎉 Proposal Approved! Confetti time!"); setTimeout(()=>setConfetti(false),4000); }
-    else if(status==="pending")  flash("📤 Sent for approval!");
+    
+    // Custom set submittedAt if not already
+    if (status === "pending" && !nd.submittedAt) {
+      nd.submittedAt = new Date().toISOString();
+    }
+
+    persist(nd); 
+    setDoc(nd);
+
+    if(status==="approved"){ 
+      setConfetti(true); 
+      flash("🎉 Proposal Approved! Confetti time!"); 
+      setTimeout(()=>setConfetti(false),4000); 
+    }
+    else if(status==="pending") { 
+      flash("📤 Proposal submitted successfully!");
+      // Optionally redirect after submission
+      setTimeout(() => {
+        if (window.opener) {
+          window.close();
+        } else {
+          window.location.href = "/";
+        }
+      }, 2000);
+    }
     else if(status==="rejected") flash("❌ Proposal Rejected","err");
   };
 
@@ -1011,7 +1078,7 @@ const persist = useCallback(async (d) => {
     e.stopPropagation();
     if(!window.confirm("Delete this proposal?")) return;
     try {
-      if (dbId) await axios.delete(`/api/proposals/${dbId}`);
+      if (dbId) await axios.delete(`${BASE_URL}/api/proposals/${dbId}`);
       const d = proposals.filter(p=>p.id!==id);
       setProposals(d);
       flash("🗑 Proposal deleted");
@@ -1020,11 +1087,196 @@ const persist = useCallback(async (d) => {
       flash("❌ Error deleting from server", "err");
     }
   };
+
+  const printProposal = (proposal) => {
+    const proposalHTML = proposal.slides.map(slide => {
+      const t = THEMES.find(x=>x.name===proposal.theme)||THEMES[0];
+      
+      // Generate HTML for different slide types
+      if (slide.type === "cover") {
+        return `
+          <div style="page-break-after: always; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; position: relative; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); color: white; padding: 48px 56px;">
+            <div style="position: absolute; inset: 0; background: url('${slide.coverImage || ''}') center/cover; z-index: -2;"></div>
+            <div style="position: absolute; inset: 0; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); z-index: -1;"></div>
+            <h1 style="font-size: 48px; font-weight: 900; margin-bottom: 16px; line-height: 1.05;">${slide.title}</h1>
+            <p style="font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 28px;">${slide.subtitle}</p>
+          </div>
+        `;
+      }
+      
+      if (slide.type === "overview" || slide.type === "closing") {
+        return `
+          <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative;">
+            <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
+            <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
+            <p style="font-size: 15px; color: #4b5563; line-height: 1.9; max-width: 620px; white-space: pre-wrap;">${slide.body}</p>
+          </div>
+        `;
+      }
+      
+      if (slide.type === "objectives") {
+        return `
+          <div style="page-break-after: always; min-height: 100vh; padding: 56px; position: relative;">
+            <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
+            <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              ${slide.items.map((item, i) => `
+                <div style="display: flex; gap: 18px; align-items: flex-start; padding: 16px 22px; background: ${t.l}; border-radius: 14px; border: 1px solid ${t.p}20;">
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: ${t.g}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; flex-shrink: 0;">${i+1}</div>
+                  <div style="flex: 1; font-size: 14px; color: #1e293b; font-weight: 600; padding-top: 6px;">${item}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      if (slide.type === "proposal") {
+        return `
+          <div style="page-break-after: always; min-height: 100vh; padding: 40px 60px; background: #fff; font-size: 14px; line-height: 1.5; color: #000; position: relative;">
+            <!-- Header with Logo -->
+            <div style="text-align: center; margin-bottom: 20px;">
+              <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">architects</div>
+              <div style="display: inline-block; background: #ff0000; color: white; padding: 10px 20px; font-weight: bold; font-size: 18px; margin-bottom: 5px;">i des</div>
+              <div style="font-size: 16px; font-weight: 600;">architecture</div>
+              <div style="font-size: 16px; font-weight: 600;">interiore</div>
+              <div style="font-size: 20px; font-weight: bold; margin-top: 10px;">INTEGERATED</div>
+              <div style="font-size: 20px; font-weight: bold;">DESIGN</div>
+              <div style="font-size: 20px; font-weight: bold;">SERVICES</div>
+            </div>
+
+            <!-- Reference and Date -->
+            <div style="text-align: right; margin-bottom: 20px;">
+              <div>Ref: ${slide.refNo}</div>
+              <div>Dated: ${slide.date}</div>
+            </div>
+
+            <!-- Recipient Information -->
+            <div style="margin-bottom: 20px;">
+              <div style="font-weight: bold;">To</div>
+              <div>${slide.clientName},</div>
+              <div>${slide.clientAddress}..</div>
+            </div>
+
+            <!-- Salutation -->
+            <div style="margin-bottom: 20px;">
+              <div>Dear Sir,</div>
+            </div>
+
+            <!-- Subject -->
+            <div style="margin-bottom: 20px;">
+              <div style="font-weight: bold;">
+                Sub: Offer for Architectural consultancy & PMC(Project Management Consultancy) Service for the proposed ${slide.projectType} @ ${slide.clientAddress.replace('..', '')},CHENNAI.
+              </div>
+            </div>
+
+            <!-- Body -->
+            <div style="margin-bottom: 20px;">
+              <div>I here by express my sincere thanks for giving us the opportunity to design the proposed <span style="font-weight: bold;">${slide.projectType}</span>. In this connection we would like to inform you about the scope of our work in this regard for your kind perusal.</div>
+            </div>
+
+            <!-- Scope of Work -->
+            <div style="margin-bottom: 20px;">
+              <div style="font-weight: bold; text-decoration: underline;">1.0 SCOPE OF WORK:</div>
+              <div style="margin-left: 20px;">
+                <div>${slide.companyName} will provide services in the following stages as follows:</div>
+                ${slide.scopeOfWork.map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
+              </div>
+            </div>
+
+            <!-- Concept Stage -->
+            <div style="margin-bottom: 20px;">
+              <div style="font-weight: bold; text-decoration: underline;">2.0 CONCEPT STAGE:</div>
+              <div style="margin-left: 20px;">
+                ${slide.conceptStage.map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
+              </div>
+            </div>
+
+            <!-- Site Visits -->
+            <div style="margin-bottom: 24px;">
+              <div style="font-weight: bold; text-decoration: underline;">3.0 SITE VISITS:</div>
+              <div style="margin-left: 16px; margin-top: 8px;">
+                ${(slide.siteVisits || []).map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
+              </div>
+            </div>
+
+            <!-- Fee Structure -->
+            <div style="margin-bottom: 24px;">
+              <div style="font-weight: bold; text-decoration: underline;">5.0 FEE STRUCTURE:</div>
+              <div style="margin-left: 16px; margin-top: 8px;">
+                ${(slide.feeStructure || []).map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
+              </div>
+            </div>
+
+            <!-- Stages of Payment -->
+            <div style="margin-bottom: 32px;">
+              <div style="font-weight: bold; text-decoration: underline;">6.0 STAGES OF PAYMENT:</div>
+              <div style="margin-left: 16px; margin-top: 8px;">
+                ${(slide.stagesOfPayment || []).map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
+              </div>
+            </div>
+
+            <!-- Signatures -->
+            <div style="margin-top: 60px; display: flex; justify-content: space-between;">
+              <div style="font-weight: bold;">
+                <div>For ${slide.companyName || ""}</div>
+                <div style="margin-top: 50px;">(Authorised Signatory)</div>
+              </div>
+              <div style="font-weight: bold; text-align: center;">
+                <div style="margin-top: 50px;">(Client Signature)</div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="position: fixed; bottom: 20mm; left: 20mm; right: 20mm; text-align: center; font-size: 10px; color: #666; border-top: 2px solid #ff0000; padding-top: 8px;">
+              ${slide.companyAddress || ""}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Default slide handling
+      return `
+        <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center;">
+          <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading || 'Slide'}</h1>
+          <p style="font-size: 15px; color: #4b5563; line-height: 1.9; white-space: pre-wrap;">${slide.body || ''}</p>
+        </div>
+      `;
+    }).join("");
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${proposal.title} - Proposal</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { background: white; font-family: Arial, sans-serif; }
+            @page { size: A4; margin: 0; }
+            @media print {
+              body { margin: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          ${proposalHTML}
+          <script>
+            window.onload = () => {
+              window.print();
+              window.onafterprint = () => window.close();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
   const duplicateSlide = (i) => {
     const s = {...doc.slides[i], id:uid()};
     const slides = [...doc.slides]; slides.splice(i+1,0,s);
     setDoc({...doc,slides}); setPage(i+1);
-  };
+  }
 
   const canEdit = doc && (doc.status==="draft"||doc.status==="rejected");
   const th = doc ? (THEMES.find(x=>x.name===doc.theme)||THEMES[0]) : THEMES[0];
@@ -1035,22 +1287,26 @@ const persist = useCallback(async (d) => {
     <div style={{fontFamily:"'Outfit',sans-serif",minHeight:"100%"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');.pc{transition:all .25s ease;cursor:pointer;}.pc:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(0,0,0,0.13)!important;}.pc:hover .pci{transform:scale(1.06);}.pci{transition:transform .4s ease;}.hb:hover{opacity:.85;transform:translateY(-1px);}`}</style>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:28,flexWrap:"wrap",gap:14}}>
-<div>
-          <p style={{margin:"5px 0 0",fontSize:13,color:"#64748b"}}>{proposals.length} proposal{proposals.length!==1?"s":""} · Canva-style editor</p>
-        </div>
-        <button className="hb" onClick={createNew} style={{background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",border:"none",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8,boxShadow:"0 6px 20px rgba(124,58,237,0.35)",transition:"all .2s"}}>
-          ✨ New Proposal
-        </button>
+          <button className="hb" onClick={createNew} style={{background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",border:"none",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8,boxShadow:"0 6px 20px rgba(124,58,237,0.35)",transition:"all .2s"}}>
+            ✨ Add Proposal
+          </button>
       </div>
 
-      {proposals.length===0
-        ? <div style={{textAlign:"center",padding:"80px 20px",background:"#fff",borderRadius:22,border:"2px dashed #e2e8f0"}}>
-            <div style={{fontSize:60,marginBottom:16}}>✨</div>
-            <div style={{fontSize:20,fontWeight:800,color:"#0f172a",marginBottom:8}}>No proposals yet</div>
-            <button onClick={createNew} style={{background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",border:"none",borderRadius:12,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit",marginTop:16}}>+ Create First Proposal</button>
-          </div>
-        : <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:22}}>
-            {proposals.map(p=>{
+      {loading ? (
+        <div style={{textAlign:"center",padding:"80px 20px",background:"#fff",borderRadius:22,border:"1px solid #e2e8f0"}}>
+          <div style={{fontSize:40,marginBottom:16}}>📡</div>
+          <div style={{fontSize:18,fontWeight:700,color:"#0f172a",marginBottom:8}}>Loading Proposals...</div>
+          <div style={{fontSize:13,color:"#64748b"}}>Please wait while we fetch your proposals</div>
+        </div>
+      ) : proposals.length===0 ? (
+        <div style={{textAlign:"center",padding:"80px 20px",background:"#fff",borderRadius:22,border:"2px dashed #e2e8f0"}}>
+          <div style={{fontSize:60,marginBottom:16}}>✨</div>
+          <div style={{fontSize:20,fontWeight:800,color:"#0f172a",marginBottom:8}}>No proposals yet</div>
+          <button onClick={createNew} style={{background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",border:"none",borderRadius:12,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit",marginTop:16}}>+ Create First Proposal</button>
+        </div>
+      ) : (
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:22}}>
+          {proposals.map(p=>{
               const cover=p.slides?.find(s=>s.type==="cover");
               const t2=THEMES.find(x=>x.name===p.theme)||THEMES[0];
               return (
@@ -1068,7 +1324,8 @@ const persist = useCallback(async (d) => {
                     <div style={{fontSize:12,color:"#64748b"}}><span style={{fontWeight:700,color:"#0f172a"}}>{p.client||"No client"}</span><span style={{margin:"0 6px",color:"#e2e8f0"}}>·</span><span>{p.slides?.length||0} slides</span></div>
                     <div style={{display:"flex",gap:6,alignItems:"center"}}>
                       <span style={{fontSize:11,color:"#94a3b8"}}>{new Date(p.updated).toLocaleDateString("en-IN")}</span>
-                      <button onClick={e=>deleteProposal(p.id,p._id,e)} style={{background:"rgba(239,68,68,0.08)",border:"none",color:"#ef4444",borderRadius:6,width:26,height:26,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}}>🗑</button>
+                      <button onClick={e=>{e.stopPropagation(); printProposal(p);}} style={{background:"rgba(59,130,246,0.08)",border:"none",color:"#3b82f6",borderRadius:6,width:26,height:26,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}} title="Print Proposal">🖨️</button>
+                      <button onClick={e=>deleteProposal(p.id,p._id,e)} style={{background:"rgba(239,68,68,0.08)",border:"none",color:"#ef4444",borderRadius:6,width:26,height:26,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}} title="Delete Proposal">🗑</button>
                     </div>
                   </div>
                   {p.status==="rejected"&&p.rejectNote&&<div style={{padding:"8px 18px 12px",background:"#fff1f2",borderTop:"1px solid #fecdd3"}}><span style={{fontSize:11,color:"#9f1239",fontWeight:600}}>❌ {p.rejectNote}</span></div>}
@@ -1076,7 +1333,7 @@ const persist = useCallback(async (d) => {
               );
             })}
           </div>
-      }
+      )}
     </div>
   );
 
@@ -1112,12 +1369,20 @@ const persist = useCallback(async (d) => {
         {/* LEFT: logo + File/Resize/Editing */}
         <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
           <button onClick={()=>{saveDoc();setView("list");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:22,padding:"6px",borderRadius:8,transition:"background .15s"}} title="Home" className="topbtn">🏠</button>
+          
+          {/* 🚀 QUICK ADD PROPOSAL BUTTON */}
+          <button 
+            onClick={()=>{saveDoc(); createNew();}} 
+            style={{background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,fontWeight:800,cursor:"pointer",display:"flex",alignItems:"center",gap:6,boxShadow:"0 4px 12px rgba(124,58,237,0.25)",transition:"all 0.2s"}}
+          >
+            ✨ Add Proposal
+          </button>
+
           <button className="topbtn" style={{background:"none",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,color:"#374151",padding:"6px 10px",borderRadius:8}}>File</button>
           <div style={{position:"relative"}}>
             <button className="topbtn" onClick={()=>setShowResizeMenu(!showResizeMenu)} style={{background:showResizeMenu?"#f1f5f9":"none",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,color:"#374151",padding:"6px 10px",borderRadius:8}}>Resize</button>
             {showResizeMenu && (
               <div style={{position:"absolute",top:"100%",left:0,marginTop:4,background:"#fff",borderRadius:8,boxShadow:"0 10px 25px rgba(0,0,0,0.1)",overflow:"hidden",zIndex:1000,border:"1px solid #e5e7eb",width:180}}>
-                <button onClick={()=>changeFormat("ppt")} style={{width:"100%",padding:"10px 16px",textAlign:"left",background:"none",border:"none",fontSize:13,fontWeight:600,color:doc?.format==="ppt"?"#7d2ae8":"#374151",cursor:"pointer",display:"block"}} className="topbtn">🖥️ Presentation (16:9)</button>
                 <button onClick={()=>changeFormat("a4-portrait")} style={{width:"100%",padding:"10px 16px",textAlign:"left",background:"none",border:"none",fontSize:13,fontWeight:600,color:doc?.format==="a4-portrait"?"#7d2ae8":"#374151",cursor:"pointer",display:"block",borderTop:"1px solid #f1f5f9"}} className="topbtn">📄 A4 Portrait</button>
                 <button onClick={()=>changeFormat("a4-landscape")} style={{width:"100%",padding:"10px 16px",textAlign:"left",background:"none",border:"none",fontSize:13,fontWeight:600,color:doc?.format==="a4-landscape"?"#7d2ae8":"#374151",cursor:"pointer",display:"block",borderTop:"1px solid #f1f5f9"}} className="topbtn">🖼️ A4 Landscape</button>
               </div>
@@ -1147,13 +1412,13 @@ const persist = useCallback(async (d) => {
           <div style={{display:"flex",alignItems:"center",gap:8,background:"#f3e8ff",padding:"4px 12px",borderRadius:8,border:"1px solid #c084fc"}}>
             <span style={{fontSize:11,fontWeight:800,color:"#7c3aed"}}>FOR CLIENT:</span>
             <select 
-              value={doc.client} 
+              value={doc.client || ""} 
               onChange={e=>{const nd={...doc,client:e.target.value}; setDoc(nd); persist(nd);}}
               disabled={!canEdit}
               style={{background:"none",border:"none",fontSize:12,fontWeight:700,color:"#7c3aed",outline:"none",cursor:"pointer"}}
             >
               <option value="">-- Select Client --</option>
-              {clients.map(c=>(
+              {clientsData.map(c=>(
                 <option key={c._id} value={c.name||c.clientName}>{c.name||c.clientName}</option>
               ))}
             </select>
@@ -1168,14 +1433,225 @@ const persist = useCallback(async (d) => {
 
           {doc.status==="draft" || doc.status==="rejected" ? (
              <button onClick={()=>setStatus("pending")} style={{background:"linear-gradient(135deg,#10b981,#059669)",color:"#fff",border:"none",padding:"8px 16px",borderRadius:8,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
-               {doc.status==="rejected" ? "Resubmit Proposal" : "Submit for Approval"}
+               {doc.status==="rejected" ? "🔄 Resubmit Proposal" : "📤 Submit for Approval"}
              </button>
           ) : doc.status==="pending" ? (
-             <span style={{fontSize:13,fontWeight:800,color:"#f59e0b",padding:"0 10px"}}>Waiting for approval</span>
+             <span style={{fontSize:13,fontWeight:800,color:"#f59e0b",padding:"0 10px",display:"flex",alignItems:"center",gap:6}}>
+               ⏳ Waiting for client approval...
+             </span>
           ) : (
-             <span style={{fontSize:13,fontWeight:800,color:"#10b981",padding:"0 10px"}}>Approved!</span>
+             <span style={{fontSize:13,fontWeight:800,color:"#10b981",padding:"0 10px",display:"flex",alignItems:"center",gap:6}}>
+               ✅ Approved!
+             </span>
           )}
-          
+          {/* 🖨️ PRINT BUTTON */}
+{/* 🖨️ PRINT BUTTON - Top bar-ல இருக்கற இடத்துல replace பண்ணு */}
+<button
+  onClick={() => {
+    const proposalSlides = doc.slides.filter(
+      s => s.type === "proposal" || s.type === "proposal_page2"
+    );
+    if (proposalSlides.length === 0) {
+      flash("⚠️ No proposal pages found! Add a Proposal Page first.", "err");
+      return;
+    }
+
+    // Proposal HTML மட்டும் extract பண்ணி new window-ல print
+    const printWindow = window.open("", "_blank", "width=900,height=1200");
+    
+    const proposalHTML = proposalSlides.map(slide => {
+      if (slide.type === "proposal") {
+        return `
+          <div style="width:210mm;min-height:297mm;padding:20mm;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:#000;page-break-after:always;box-sizing:border-box;">
+            
+            <!-- Header -->
+            <div style="text-align:center;margin-bottom:20px;">
+              <div style="font-size:22px;font-weight:bold;margin-bottom:4px;">architects</div>
+              <div style="display:inline-block;background:#ff0000;color:#fff;padding:8px 18px;font-weight:bold;font-size:16px;margin-bottom:4px;">i des</div>
+              <div style="font-size:14px;font-weight:600;">architecture · interiore</div>
+              <div style="font-size:18px;font-weight:bold;margin-top:8px;">INTEGRATED DESIGN SERVICES</div>
+            </div>
+
+            <!-- Ref & Date -->
+            <div style="text-align:right;margin-bottom:16px;">
+              <div>Ref: ${slide.refNo || ""}</div>
+              <div>Dated: ${slide.date || ""}</div>
+            </div>
+
+            <!-- To -->
+            <div style="margin-bottom:16px;">
+              <div><strong>To</strong></div>
+              <div>${slide.clientName || ""},</div>
+              <div>${slide.clientAddress || ""}</div>
+            </div>
+
+            <div style="margin-bottom:16px;">Dear Sir,</div>
+
+            <!-- Subject -->
+            <div style="margin-bottom:16px;font-weight:bold;">
+              Sub: Offer for Architectural consultancy & PMC Service for the proposed 
+              ${slide.projectType || ""} @ ${slide.clientAddress || ""}, CHENNAI.
+            </div>
+
+            <!-- Body -->
+            <div style="margin-bottom:16px;">
+              I hereby express my sincere thanks for giving us the opportunity to design the proposed 
+              <strong>${slide.projectType || ""}</strong>. In this connection we would like to inform you 
+              about the scope of our work in this regard for your kind perusal.
+            </div>
+
+            <!-- Scope of Work -->
+            <div style="margin-bottom:16px;">
+              <div style="font-weight:bold;text-decoration:underline;">1.0 SCOPE OF WORK:</div>
+              <div style="margin-left:16px;margin-top:6px;">
+                <div>${slide.companyName || ""} will provide services in the following stages:</div>
+                ${(slide.scopeOfWork || []).map(item => `<div style="margin-left:16px;">• ${item}</div>`).join("")}
+              </div>
+            </div>
+
+            <!-- Concept Stage -->
+            <div style="margin-bottom:16px;">
+              <div style="font-weight:bold;text-decoration:underline;">2.0 CONCEPT/SCHEMATIC DESIGN STAGE:</div>
+              <div style="margin-left:16px;margin-top:6px;">
+                ${(slide.conceptStage || []).map(item => `<div style="margin-left:16px;">• ${item}</div>`).join("")}
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="position:fixed;bottom:20mm;left:20mm;right:20mm;text-align:center;font-size:10px;color:#666;border-top:2px solid #ff0000;padding-top:8px;">
+              ${slide.companyAddress || ""}
+            </div>
+          </div>
+        `;
+      }
+
+      if (slide.type === "proposal_page2") {
+        return `
+          <div style="width:210mm;min-height:297mm;padding:20mm;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:#000;page-break-after:always;box-sizing:border-box;">
+            
+            <!-- Mini Header -->
+            <div style="text-align:center;margin-bottom:24px;">
+              <div style="display:inline-block;background:#ff0000;color:#fff;padding:4px 10px;font-weight:bold;font-size:13px;">i des</div>
+              <div style="font-size:13px;font-weight:bold;">INTEGRATED DESIGN SERVICES</div>
+            </div>
+
+            <!-- Site Visits -->
+            <div style="margin-bottom:24px;">
+              <div style="font-weight:bold;text-decoration:underline;">3.0 SITE VISITS:</div>
+              <div style="margin-left:16px;margin-top:8px;">
+                ${(slide.siteVisits || []).map(item => `<div style="margin-left:16px;margin-bottom:4px;">• ${item}</div>`).join("")}
+              </div>
+            </div>
+
+            <!-- Fee Structure -->
+            <div style="margin-bottom:24px;">
+              <div style="font-weight:bold;text-decoration:underline;">5.0 FEE STRUCTURE:</div>
+              <div style="margin-left:16px;margin-top:8px;">
+                ${(slide.feeStructure || []).map(item => `<div style="margin-left:16px;margin-bottom:4px;">• ${item}</div>`).join("")}
+              </div>
+            </div>
+
+            <!-- Stages of Payment -->
+            <div style="margin-bottom:32px;">
+              <div style="font-weight:bold;text-decoration:underline;">6.0 STAGES OF PAYMENT:</div>
+              <div style="margin-left:16px;margin-top:8px;">
+                ${(slide.stagesOfPayment || []).map(item => `<div style="margin-left:16px;margin-bottom:4px;">• ${item}</div>`).join("")}
+              </div>
+            </div>
+
+            <!-- Signatures -->
+            <div style="margin-top:60px;display:flex;justify-content:space-between;">
+              <div style="font-weight:bold;">
+                <div>For ${slide.companyName || ""}</div>
+                <div style="margin-top:50px;">(Authorised Signatory)</div>
+              </div>
+              <div style="font-weight:bold;text-align:center;">
+                <div style="margin-top:50px;">(Client Signature)</div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="position:fixed;bottom:20mm;left:20mm;right:20mm;text-align:center;font-size:10px;color:#666;border-top:2px solid #ff0000;padding-top:8px;">
+              ${slide.companyAddress || ""}
+            </div>
+          </div>
+        `;
+      }
+      return "";
+    }).join("");
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${doc.title} - Proposal</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { background: white; font-family: Arial, sans-serif; }
+            @page { size: A4; margin: 0; }
+            @media print {
+              body { margin: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          ${proposalHTML}
+          <script>
+            window.onload = () => {
+              window.print();
+              window.onafterprint = () => window.close();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }}
+  style={{
+    background: "#fff",
+    color: "#374151",
+    border: "1.5px solid #e2e8f0",
+    padding: "8px 16px",
+    borderRadius: 8,
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+    fontFamily: "inherit",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+  }}
+>
+  🖨️ Print
+</button>
+<style>{`
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+  
+  /* ... உன் existing styles ... */
+
+  @media print {
+    /* Editor UI எல்லாம் hide */
+    body > * { display: none !important; }
+    
+    /* Proposal content மட்டும் show */
+    .proposal-content {
+      display: block !important;
+      width: 100% !important;
+      height: auto !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      page-break-after: always;
+    }
+    
+    /* Print button hide */
+    .no-print { display: none !important; }
+    
+    @page {
+      size: A4;
+      margin: 15mm;
+    }
+  }
+`}</style>
           <button onClick={()=>saveDoc()} style={{background:"#7d2ae8",color:"#fff",border:"none",padding:"8px 20px",borderRadius:8,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(125,42,232,0.2)"}}>Share/Save</button>
           
           <div style={{width:32,height:32,borderRadius:"50%",background:"#eee",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#666",border:"2px solid #fff",boxShadow:"0 0 0 1px #e2e8f0"}}>U</div>
@@ -1189,9 +1665,10 @@ const persist = useCallback(async (d) => {
         <div style={{width:72,background:"#252627",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",alignItems:"center",padding:"12px 0",gap:4,flexShrink:0}}>
           {[
             {id:"templates", icon:"🎨", label:"Design"},
-            {id:"elements", icon:"✦",  label:"Elements"},
-            {id:"text",     icon:"T",  label:"Text"},
-            {id:"uploads",  icon:"☁️", label:"Uploads"}
+            {id:"elements",  icon:"✦",  label:"Elements"},
+            {id:"text",      icon:"T",  label:"Text"},
+            {id:"brand",     icon:"👑", label:"Brand"},
+            {id:"uploads",   icon:"☁️", label:"Uploads"}
           ].map(item=>(
             <button key={item.id} onClick={()=>setLeftPanel(leftPanel===item.id?"":item.id)}
               style={{width:64,height:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:leftPanel===item.id?"rgba(255,255,255,0.1)":"none",border:"none",borderRadius:8,cursor:"pointer",transition:"background .15s",color:"#fff"}}>
@@ -1211,51 +1688,77 @@ const persist = useCallback(async (d) => {
             {/* DESIGN (Templates + Styles) */}
             {leftPanel==="templates" && <>
               <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
+                <div style={{fontSize:16,fontWeight:700,color:"#0f172a",marginBottom:12}}>Design</div>
                 <div style={{position:"relative", marginBottom:12}}>
-                   <input placeholder="Describe your ideal design"
-                    style={{width:"100%",boxSizing:"border-box",border:"1px solid #7c3aed",borderRadius:12,padding:"10px 14px 10px 40px",fontSize:13,outline:"none",fontFamily:"inherit",color:"#374151",background:"#fff"}}/>
-                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:18, opacity:0.8}}>✨</span>
-                   <span style={{position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", fontSize:16, opacity:0.6}}>🎤</span>
+                   <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search elements"
+                    style={{width:"100%",boxSizing:"border-box",border:"1px solid #e2e8f0",borderRadius:12,padding:"10px 14px 10px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#fff"}}/>
+                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:18, opacity:0.5}}>🔍</span>
+                   <span style={{position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", fontSize:18, opacity:0.5}}>🎤</span>
+                </div>
+                <div style={{display:"flex",gap:8,background:"#f1f5f9",padding:"4px",borderRadius:8}}>
+                  <button style={{flex:1,padding:"6px",background:"#fff",borderRadius:6,fontSize:13,fontWeight:600,border:"none",boxShadow:"0 2px 4px rgba(0,0,0,0.05)"}}>Templates</button>
+                  <button style={{flex:1,padding:"6px",background:"none",borderRadius:6,fontSize:13,fontWeight:600,border:"none",color:"#64748b"}}>Styles</button>
                 </div>
               </div>
-              <div style={{flex:1,overflowY:"auto",padding:"12px 16px",display:"flex",flexDirection:"column",gap:24}}>
-                
-                <div>
-                  <div style={{fontSize:14,fontWeight:800,color:"#0f172a",marginBottom:12}}>Templates</div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                    {PRESENTATION_TEMPLATES.map(t => (
-                      <div key={t.id} onClick={()=>{changeTheme(t.theme); flash(`Applied ${t.name} style✨`);}} style={{cursor:"pointer", borderRadius:8, overflow:"hidden", border:"1px solid #e2e8f0", background:"#fff"}} className="pgthumb">
-                        <img src={t.img} style={{width:"100%", height:76, objectFit:"cover", display:"block", background:"#f1f5f9"}} />
-                        <div style={{fontSize:11, padding:"6px", fontWeight:700, color:"#1e293b", textAlign:"center", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{t.name}</div>
+              <div style={{flex:1,overflowY:"auto",padding:"12px",display:"flex",flexDirection:"column",gap:12}}>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                  {[
+                    { id: "tmpl1", src: "https://images.unsplash.com/photo-1557683316-973673baf926?w=400&q=80", label: "Project presentation" },
+                    { id: "tmpl2", src: "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=400&q=80", label: "Business Presentation" },
+                    { id: "tmpl3", src: "https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=400&q=80", label: "Project Presentation" },
+                    { id: "tmpl4", src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80", label: "Company Profile" },
+                    { id: "tmpl5", src: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&q=80", label: "Brand Guideline" },
+                    { id: "tmpl6", src: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&q=80", label: "Startup Pitch Deck" },
+                    { id: "tmpl7", src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&q=80", label: "Creative Portfolio" },
+                    { id: "tmpl8", src: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&q=80", label: "Finance Presentation" }
+                  ].map(tmpl=>(
+                    <div key={tmpl.id} onClick={()=>{
+                      if(canEdit) {
+                         const s = makeSlide("cover", doc.theme);
+                         s.coverImage = tmpl.src;
+                         const slides = [...doc.slides, s];
+                         setDoc({...doc, slides}); 
+                         setPage(slides.length-1); 
+                         flash("✨ Template added!");
+                      }
+                    }}
+                      style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:8,overflow:"hidden",cursor:canEdit?"pointer":"not-allowed",transition:"all .2s",position:"relative"}} className="pgthumb">
+                      <div style={{aspectRatio:"16/9", overflow:"hidden", width:"100%"}}>
+                         <img src={tmpl.src} alt={tmpl.label} style={{width:"100%", height:"100%", objectFit:"cover"}} />
+                         <div style={{position:"absolute", inset:0, background:"rgba(0,0,0,0.3)", display:"flex", alignItems:"flex-end", padding:"8px"}}>
+                            <span style={{color:"#fff", fontSize:11, fontWeight:700, textShadow:"0 1px 2px rgba(0,0,0,0.8)"}}>{tmpl.label}</span>
+                         </div>
                       </div>
-                    ))}
-                  </div>
+                      {/* Hover Overlay */}
+                      <div style={{position:"absolute",inset:0,background:"rgba(125,42,232,0.15)",opacity:0,transition:"opacity .2s"}} onMouseEnter={e=>e.currentTarget.style.opacity=1} onMouseLeave={e=>e.currentTarget.style.opacity=0}/>
+                    </div>
+                  ))}
                 </div>
 
-                <div>
-                  <div style={{fontSize:14,fontWeight:800,color:"#0f172a",marginBottom:12}}>Slide Layouts</div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                    {SLIDE_TYPES.map(tmpl=>{
-                      const isP = doc.format === "a4-portrait" || (!doc.format && (tmpl.id === "proposal" || tmpl.id === "portrait"));
-                      const isL = doc.format === "a4-landscape" || (!doc.format && tmpl.id === "landscape");
-                      const h = isP ? 1273 : isL ? 637 : 506;
-                      const ar = isP ? "210/297" : isL ? "297/210" : "16/9";
-                      return (
-                      <div key={tmpl.id} onClick={()=>canEdit&&addSlide(tmpl.id)}
-                        style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:8,overflow:"hidden",cursor:canEdit?"pointer":"not-allowed",transition:"all .2s",position:"relative"}} className="pgthumb">
-                        <div style={{aspectRatio:ar, overflow:"hidden", width:"100%"}}>
-                          <div style={{transform:`scale(${130/900})`,transformOrigin:"top left",width:900,height:h,pointerEvents:"none"}}>
-                            <Slide slide={makeSlide(tmpl.id, doc.theme)} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview/>
-                          </div>
-                        </div>
-                        <div style={{padding:"6px 8px",fontSize:10,fontWeight:700,color:"#0f172a",background:"#fff",borderTop:"1px solid #f1f5f9",textAlign:"center"}}>
-                          {tmpl.label}
+                <div style={{fontSize:13,fontWeight:700,color:"#0f172a",margin:"12px 0 4px"}}>Layouts</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr",gap:12}}>
+                  {SLIDE_TYPES.map(tmpl=>{
+                    const isP = doc.format === "a4-portrait" || (!doc.format && (tmpl.id === "proposal" || tmpl.id === "portrait"));
+                    const isL = doc.format === "a4-landscape" || (!doc.format && tmpl.id === "landscape");
+                    const h = isP ? 1273 : isL ? 637 : 506;
+                    const ar = isP ? "210/297" : isL ? "297/210" : "16/9";
+                    
+                    return (
+                    <div key={tmpl.id} onClick={()=>canEdit&&addSlide(tmpl.id)}
+                      style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:8,overflow:"hidden",cursor:canEdit?"pointer":"not-allowed",transition:"all .2s",position:"relative"}} className="pgthumb">
+                      <div style={{aspectRatio:ar, overflow:"hidden", width:"100%"}}>
+                        <div style={{transform:`scale(${isP ? 294/900 : 294/900})`,transformOrigin:"top left",width:900,height:h,pointerEvents:"none"}}>
+                          <Slide slide={makeSlide(tmpl.id, doc.theme)} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview/>
                         </div>
                       </div>
-                    )})}
-                  </div>
+                      <div style={{padding:"8px 12px",fontSize:12,fontWeight:700,color:"#0f172a",background:"#fff",borderTop:"1px solid #f1f5f9",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <span>{tmpl.label}</span>
+                        <span style={{fontSize:10,color:"#94a3b8"}}>{tmpl.id}</span>
+                      </div>
+                      <div style={{position:"absolute",inset:0,background:"rgba(125,42,232,0.05)",opacity:0,transition:"opacity .2s"}} onMouseEnter={e=>e.currentTarget.style.opacity=1} onMouseLeave={e=>e.currentTarget.style.opacity=0}/>
+                    </div>
+                  )})}
                 </div>
-
               </div>
             </>}
 
@@ -1264,52 +1767,54 @@ const persist = useCallback(async (d) => {
               <div style={{padding:"16px", borderBottom:"1px solid #f1f5f9"}}>
                 <div style={{position:"relative"}}>
                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search elements"
-                    style={{width:"100%",boxSizing:"border-box",border:"1px solid #7c3aed",borderRadius:12,padding:"10px 14px 10px 40px",fontSize:13,outline:"none",fontFamily:"inherit",color:"#374151",background:"#fff"}}/>
-                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:16, opacity:0.5}}>➕</span>
-                   <span style={{position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", fontSize:16, opacity:0.5}}>🎤</span>
+                    style={{width:"100%",boxSizing:"border-box",border:"1px solid #e2e8f0",borderRadius:12,padding:"12px 14px 12px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#fff"}}/>
+                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:18, opacity:0.5}}>+</span>
+                   <span style={{position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", fontSize:18, opacity:0.5}}>🎤</span>
                 </div>
               </div>
 
-              <div style={{flex:1, overflowY:"auto", padding:"20px 16px", display:"flex", flexDirection:"column", gap:24}}>
-                {/* Browse categories matching Screenshot */}
-                <div>
-                  <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"20px 12px"}}>
+              <div style={{flex:1, overflowY:"auto", padding:"16px"}}>
+                  <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16}}>
                     {[
-                      {id:"shapes",     label:"Shapes",     icon:"📐", color:"#bae6fd"},
-                      {id:"graphics",   label:"Graphics",   icon:"🌻", color:"#fef08a"},
-                      {id:"photos",     label:"Photos",     icon:"🖼️", color:"#bae6fd"},
-                      {id:"videos",     label:"Videos",     icon:"▶️", color:"#fbcfe8"},
-                      {id:"3d",         label:"3D",         icon:"🧊", color:"#e9d5ff"},
-                      {id:"forms",      label:"Forms",      icon:"✅", color:"#bbf7d0"},
-                      {id:"animations", label:"Animations", icon:"😊", color:"#bbf7d0"},
-                      {id:"audio",      label:"Audio",      icon:"🎵", color:"#fecdd3"},
-                      {id:"sheets",     label:"Sheets",     icon:"📋", color:"#bfdbfe"},
-                      {id:"tables",     label:"Tables",     icon:"🧮", color:"#fed7aa"},
-                      {id:"charts",     label:"Charts",     icon:"📈", color:"#c7d2fe"},
-                      {id:"frames",     label:"Frames",     icon:"🖼️", color:"#bbf7d0"},
-                      {id:"grids",      label:"Grids",      icon:"🪟", color:"#fbcfe8"},
-                      {id:"mockups",    label:"Mockups",    icon:"👕", color:"#bae6fd"}
+                      {id:"shapes",     label:"Shapes",     icon:"🔺", color:"#e0f2fe"},
+                      {id:"graphics",   label:"Graphics",   icon:"🌻", color:"#fef3c7"},
+                      {id:"photos",     label:"Photos",     icon:"📸", color:"#dbeafe"},
+                      {id:"videos",     label:"Videos",     icon:"▶️", color:"#fae8ff"},
+                      {id:"3d",         label:"3D",         icon:"🧊", color:"#e0e7ff"},
+                      {id:"forms",      label:"Forms",      icon:"☑️", color:"#d1fae5"},
+                      {id:"animations", label:"Animations", icon:"😊", color:"#dcfce7"},
+                      {id:"audio",      label:"Audio",      icon:"🎵", color:"#ffe4e6"},
+                      {id:"sheets",     label:"Sheets",     icon:"🧾", color:"#dbeafe"},
+                      {id:"tables",     label:"Tables",     icon:"🧮", color:"#ffedd5"},
+                      {id:"charts",     label:"Charts",     icon:"📉", color:"#cffafe"},
+                      {id:"frames",     label:"Frames",     icon:"🖼️", color:"#d1fae5"},
+                      {id:"grids",      label:"Grids",      icon:"🪟", color:"#fae8ff"},
+                      {id:"mockups",    label:"Mockups",    icon:"👕", color:"#cffafe"}
                     ].map((cat)=>(
                       <div key={cat.id} onClick={()=>{
-                        if(cat.id==="shapes") addElement({type:"shape", shape:"rectangle", width:100, height:100, color:"#7c3aed"});
+                        if(cat.id==="shapes") addElement({type:"shape", shape:"circle", width:100, height:100});
                         else if(cat.id==="graphics") addElement({type:"icon", icon:"🌻", fontSize:80});
                         else if(cat.id==="photos") addElement({type:"image", src:"https://images.unsplash.com/photo-1497215842964-222b430dc094?w=400&q=80", width:200});
-                        else if(cat.id==="forms") flash("✅ Form added! (Mock)");
-                        else if(cat.id==="animations") flash("😊 Animation applied!");
-                        else if(cat.id==="tables") flash("🧮 Table added! (Mock)");
-                        else if(cat.id==="charts") addElement({type:"icon", icon:"📈", fontSize:120});
-                        else if(cat.id==="frames") addElement({type:"shape", border:"2px dashed #cbd5e1", background:"#f1f5f9", width:150, height:150});
-                        else if(cat.id==="mockups") flash("👕 Mockup element added! (Mock)");
-                        else flash(`${cat.label} clicked`);
+                        else if(cat.id==="videos") addElement({type:"icon", icon:"▶️", fontSize:80});
+                        else if(cat.id==="3d") addElement({type:"icon", icon:"🧊", fontSize:80});
+                        else if(cat.id==="forms") addElement({type:"icon", icon:"☑️", fontSize:80});
+                        else if(cat.id==="animations") addElement({type:"icon", icon:"😊", fontSize:80});
+                        else if(cat.id==="audio") addElement({type:"icon", icon:"🎵", fontSize:80});
+                        else if(cat.id==="sheets") addElement({type:"icon", icon:"🧾", fontSize:80});
+                        else if(cat.id==="tables") addElement({type:"icon", icon:"🧮", fontSize:80});
+                        else if(cat.id==="charts") addElement({type:"icon", icon:"📉", fontSize:80});
+                        else if(cat.id==="frames") addElement({type:"shape", shape:"square", width:150, height:150, border:"2px dashed #000", color:"transparent"});
+                        else if(cat.id==="grids") addElement({type:"icon", icon:"🪟", fontSize:80});
+                        else if(cat.id==="mockups") addElement({type:"icon", icon:"👕", fontSize:80});
+                        else flash(`${cat.label} collection clicked`);
                       }} style={{display:"flex", flexDirection:"column", alignItems:"center", gap:8, cursor:"pointer"}} className="sib">
-                        <div style={{width:"100%", aspectRatio:"1", background:cat.color, borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, boxShadow:"0 4px 10px rgba(0,0,0,0.05)"}}>
+                        <div style={{width:"100%", aspectRatio:"1", background:cat.color, borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, boxShadow:"0 4px 10px rgba(0,0,0,0.05)"}}>
                           {cat.icon}
                         </div>
-                        <span style={{fontSize:12, fontWeight:600, color:"#334155"}}>{cat.label}</span>
+                        <span style={{fontSize:12, fontWeight:600, color:"#475569"}}>{cat.label}</span>
                       </div>
                     ))}
                   </div>
-                </div>
               </div>
             </>}
 
@@ -1410,14 +1915,97 @@ const persist = useCallback(async (d) => {
               </div>
             </>}
             
-            {/* Fallback for others */}
-            {["brand","draw","projects","apps"].includes(leftPanel) && (
-              <div style={{padding:40,textAlign:"center",color:"#94a3b8"}}>
-                <div style={{fontSize:40,marginBottom:16}}>🚧</div>
-                <div style={{fontSize:14,fontWeight:600}}>{leftPanel.toUpperCase()}</div>
-                <p style={{fontSize:12}}>This feature is coming soon to the Canva-style editor.</p>
+            {/* BRAND */}
+            {leftPanel==="brand" && <>
+              <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
+                <div style={{fontSize:16,fontWeight:700,color:"#0f172a",marginBottom:16}}>Brand Kit</div>
+                <button style={{width:"100%",background:"#7d2ae8",color:"#fff",border:"none",borderRadius:8,padding:"12px",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(125,42,232,0.2)"}}>Set up your Brand Kit 👑</button>
               </div>
-            )}
+              <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:24}}>
+                <div>
+                  <div style={{fontSize:13,fontWeight:700,color:"#0f172a",marginBottom:12}}>Brand Colors</div>
+                  <div style={{display:"flex",gap:8}}>
+                    {["#7c3aed","#10b981","#f59e0b","#ef4444","#3b82f6"].map(c=><div key={c} style={{width:40,height:40,borderRadius:"50%",background:c,cursor:"pointer",border:"2px solid transparent"}} onClick={()=>addElement({type:"shape", shape:"circle", width:100, height:100, color:c})}/>)}
+                    <div style={{width:40,height:40,borderRadius:"50%",background:"#f1f5f9",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",border:"2px dashed #cbd5e1",color:"#64748b"}}>+</div>
+                  </div>
+                </div>
+                <div>
+                  <div style={{fontSize:13,fontWeight:700,color:"#0f172a",marginBottom:12}}>Brand Fonts</div>
+                  <div style={{background:"#f8fafc",border:"1px solid #e2e8f0",padding:"16px",borderRadius:8,textAlign:"center"}}>
+                    <div style={{fontSize:24,fontWeight:800,marginBottom:8,fontFamily:"'Outfit',sans-serif"}}>Heading Font</div>
+                    <div style={{fontSize:16,fontWeight:500,color:"#475569"}}>Body Font</div>
+                  </div>
+                </div>
+              </div>
+            </>}
+
+            {/* TOOLS */}
+            {leftPanel==="tools" && <>
+              <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
+                <div style={{fontSize:16,fontWeight:700,color:"#0f172a",marginBottom:16}}>Magic Studio ✨</div>
+              </div>
+              <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:16}}>
+                {[
+                  {icon:"🪄", title:"Magic Switch", desc:"Resize and translate designs"},
+                  {icon:"✂️", title:"Background Remover", desc:"Remove image backgrounds in 1 click"},
+                  {icon:"🧹", title:"Magic Eraser", desc:"Brush over objects to remove them"},
+                  {icon:"🖌️", title:"Magic Morph", desc:"Transform words with prompts"}
+                ].map(tool=>(
+                  <div key={tool.title} onClick={()=>flash(`Opening ${tool.title}...`)} style={{display:"flex",gap:12,padding:"16px",background:"linear-gradient(to right, #f8fafc, #fff)",border:"1px solid #e2e8f0",borderRadius:12,cursor:"pointer",alignItems:"center"}} className="hb">
+                    <div style={{fontSize:24}}>{tool.icon}</div>
+                    <div>
+                      <div style={{fontSize:14,fontWeight:700,color:"#0f172a"}}>{tool.title}</div>
+                      <div style={{fontSize:11,color:"#64748b",marginTop:2}}>{tool.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>}
+
+            {/* PROJECTS */}
+            {leftPanel==="projects" && <>
+              <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
+                <div style={{fontSize:16,fontWeight:700,color:"#0f172a",marginBottom:16}}>Projects</div>
+                <div style={{position:"relative"}}>
+                  <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14}}>🔍</span>
+                  <input placeholder="Search your designs" style={{width:"100%",boxSizing:"border-box",border:"1px solid #e2e8f0",borderRadius:8,padding:"10px 14px 10px 36px",fontSize:14,outline:"none",fontFamily:"inherit",background:"#f8fafc"}}/>
+                </div>
+              </div>
+              <div style={{flex:1,overflowY:"auto",padding:"16px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                {proposals.map(p => (
+                  <div key={p._id||p.id} onClick={()=>flash("Can't open another project while editing")} style={{cursor:"pointer",borderRadius:8,border:"1px solid #e2e8f0",overflow:"hidden",background:"#fff"}} className="pgthumb">
+                    <div style={{height:70,background:THEMES.find(t=>t.name===p.theme)?.g||"#e2e8f0",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{color:"#fff",fontSize:20}}>📄</span></div>
+                    <div style={{padding:"8px",fontSize:11,fontWeight:600,color:"#1e293b",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.title}</div>
+                  </div>
+                ))}
+              </div>
+            </>}
+
+            {/* APPS */}
+            {leftPanel==="apps" && <>
+              <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
+                <div style={{fontSize:16,fontWeight:700,color:"#0f172a",marginBottom:16}}>Apps & Integrations</div>
+                <div style={{position:"relative"}}>
+                  <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14}}>🔍</span>
+                  <input placeholder="Search apps" style={{width:"100%",boxSizing:"border-box",border:"1px solid #e2e8f0",borderRadius:8,padding:"10px 14px 10px 36px",fontSize:14,outline:"none",fontFamily:"inherit",background:"#f8fafc"}}/>
+                </div>
+              </div>
+              <div style={{flex:1,overflowY:"auto",padding:"16px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                {[
+                  {icon:"📶", name:"QR Code"},
+                  {icon:"🤖", name:"DALL·E"},
+                  {icon:"📊", name:"Charts"},
+                  {icon:"📁", name:"Google Drive"},
+                  {icon:"▶️", name:"YouTube"},
+                  {icon:"🎤", name:"AI Voice"}
+                ].map(app=>(
+                  <div key={app.name} onClick={()=>flash(`${app.name} app connected!`)} style={{background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:8,padding:"16px 8px",textAlign:"center",cursor:"pointer"}} className="sib">
+                    <div style={{fontSize:28,marginBottom:8}}>{app.icon}</div>
+                    <div style={{fontSize:12,fontWeight:600,color:"#0f172a"}}>{app.name}</div>
+                  </div>
+                ))}
+              </div>
+            </>}
           </div>
         )}
 

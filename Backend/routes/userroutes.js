@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/UserModels");
+const Subscription = require("../models/SubscriptionModel");
+const PaymentHistory = require("../models/PaymentHistoryModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -81,6 +83,37 @@ router.post("/login", async (req, res) => {
 
   } catch (err) {
     console.log(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// Get user subscription
+router.get("/:userId/subscription", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const subscription = await Subscription.findOne({
+      userId: userId,
+      status: { $in: ["active", "pending"] }
+    }).sort({ createdAt: -1 });
+
+    if (!subscription) {
+      return res.json({ hasSubscription: false });
+    }
+
+    res.json({ hasSubscription: true, subscription });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// Get user payment history
+router.get("/:userId/payments", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const payments = await PaymentHistory.find({ userId })
+      .sort({ paymentDate: -1 });
+    res.json(payments);
+  } catch (err) {
     res.status(500).json({ msg: "Server error" });
   }
 });

@@ -31,11 +31,17 @@ router.post("/login", async (req, res) => {
     }
 
     if (!user) {
-      const employee = await Employee.findOne({ email });
+      const employee = await Employee.findOne({ email: email.toLowerCase().trim() });
       console.log("Employee collection result:", employee ? `Found: ${employee.name}` : "Not found");
       console.log("Employee password hash:", employee?.password);
 
       if (employee) {
+        // Check if password exists and is hashed
+        if (!employee.password || employee.password.length < 10) {
+          console.log("Employee password not set or not hashed");
+          return res.status(400).json({ msg: "Invalid email or password" });
+        }
+
         const isMatch = await bcrypt.compare(password, employee.password);
         console.log("Password match:", isMatch);
 
@@ -50,6 +56,7 @@ router.post("/login", async (req, res) => {
             role:       "employee",   // ← lowercase directly
             department: employee.department || "",
             salary:     employee.salary     || "",
+            companyId:  employee.companyId  || "",
             status:     employee.status,
             logoUrl:    "",
           },
@@ -73,6 +80,7 @@ router.post("/login", async (req, res) => {
         email:   user.email,
         phone:   user.phone   || "",
         role:    role,
+        companyId: user.companyId || user._id.toString(),
         logoUrl: user.logoUrl || "",
       },
     });

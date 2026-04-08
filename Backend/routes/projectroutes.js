@@ -1,5 +1,5 @@
 const express = require("express");
-const router  = express.Router();
+const router = express.Router();
 const mongoose = require("mongoose");
 const Project = require("../models/ProjectModel");
 
@@ -33,9 +33,9 @@ router.post("/add", async (req, res) => {
     // Check database connection
     if (mongoose.connection.readyState !== 1) {
       console.error("Database not connected! ReadyState:", mongoose.connection.readyState);
-      return res.status(500).json({ 
-        msg: "Database not connected", 
-        error: "Server is not connected to the database" 
+      return res.status(500).json({
+        msg: "Database not connected",
+        error: "Server is not connected to the database"
       });
     }
 
@@ -49,26 +49,26 @@ router.post("/add", async (req, res) => {
       assignedTo, manager,
     } = req.body;
 
-    if (!name)   return res.status(400).json({ msg: "Project name required" });
+    if (!name) return res.status(400).json({ msg: "Project name required" });
     if (!client) return res.status(400).json({ msg: "Client required" });
 
     console.log("Creating new Project instance...");
     const project = new Project({
       name,
       client,
-      purpose:        purpose        || "",
-      description:    description    || "",
-      start:          start          || "",
-      end:            end            || "",
-      deadline:       deadline       || end || "",
-      budget:         budget         || "",
-      team:           team           || "",
-      status:         status         || "Pending",
-      progress:       Number(progress)       || 0,
-      tasks:          Number(tasks)          || 0,
+      purpose: purpose || "",
+      description: description || "",
+      start: start || "",
+      end: end || "",
+      deadline: deadline || end || "",
+      budget: budget || "",
+      team: team || "",
+      status: status || "Pending",
+      progress: Number(progress) || 0,
+      tasks: Number(tasks) || 0,
       completedTasks: Number(completedTasks) || 0,
-      assignedTo:     Array.isArray(assignedTo) ? assignedTo : [],
-      manager:        manager        || "",
+      assignedTo: Array.isArray(assignedTo) ? assignedTo : [],
+      manager: manager || "",
     });
 
     console.log("Attempting to save project...");
@@ -80,27 +80,27 @@ router.post("/add", async (req, res) => {
     console.error("❌ ADD PROJECT ERROR:", err.name, "|", err.message);
     console.error("Full error object:", err);
     console.error("Stack trace:", err.stack);
-    
+
     // Handle validation errors specifically
     if (err.name === 'ValidationError') {
       const validationErrors = Object.values(err.errors).map(e => e.message);
-      return res.status(400).json({ 
-        msg: "Validation failed", 
+      return res.status(400).json({
+        msg: "Validation failed",
         errors: validationErrors,
-        error: err.message 
+        error: err.message
       });
     }
-    
+
     // Handle duplicate key errors
     if (err.code === 11000) {
-      return res.status(400).json({ 
-        msg: "Duplicate entry", 
-        error: "A project with this information already exists" 
+      return res.status(400).json({
+        msg: "Duplicate entry",
+        error: "A project with this information already exists"
       });
     }
-    
-    res.status(500).json({ 
-      msg: "Server error", 
+
+    res.status(500).json({
+      msg: "Server error",
       error: err.message,
       type: err.name
     });
@@ -113,9 +113,9 @@ router.put("/:id", async (req, res) => {
     // Check database connection
     if (mongoose.connection.readyState !== 1) {
       console.error("Database not connected! ReadyState:", mongoose.connection.readyState);
-      return res.status(500).json({ 
-        msg: "Database not connected", 
-        error: "Server is not connected to the database" 
+      return res.status(500).json({
+        msg: "Database not connected",
+        error: "Server is not connected to the database"
       });
     }
 

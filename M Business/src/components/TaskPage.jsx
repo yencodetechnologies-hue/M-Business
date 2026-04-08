@@ -650,76 +650,194 @@ function PriorityPicker({anchor,currentValue,onSelect,onClose}){
 /* ══════════════════════════════════════════════════════════
    PERSON PICKER
 ══════════════════════════════════════════════════════════ */
+// REPLACE the PersonPicker function in your TaskPage component with this updated version:
+
 function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee }) {
   const [search, setSearch] = useState("");
   const inputRef = useRef();
   useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
-  const filtered = employees.filter(e => !search || e.toLowerCase().includes(search.toLowerCase()));
+
+  // Build list from employees prop
+  const empList = (employees || [])
+    .map(e => typeof e === 'object' && e !== null ? (e.name || e.employeeName || "") : (e || ""))
+    .filter(e => typeof e === 'string' && e.trim() !== "");
+
+  // Filter by search
+  const filtered = empList.filter(e => !search || e.toLowerCase().includes(search.toLowerCase()));
+
+  // Check if typed search is a new name (not in existing list)
+  const isNewName = search.trim() !== "" && !empList.some(e => e.toLowerCase() === search.toLowerCase().trim());
+
+  const handleSelect = (name) => {
+    onSelect(name);
+    onClose();
+  };
+
   return (
     <DD anchor={anchor} onClose={onClose} w={320}>
-      <div style={{ padding:"12px 12px 4px" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:6, border:`1px solid #0073ea`, borderRadius:6, padding:"8px 12px", background:"#fff" }}>
-          <span style={{ fontSize:14, color:P.muted }}>🔍</span>
-          <input ref={inputRef} value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search names, roles or teams"
-            style={{ border:"none", outline:"none", background:"transparent", fontSize:13, color:P.text, fontFamily:"inherit", flex:1 }}/>
-          <span style={{ fontSize:14, color:P.muted, cursor: "pointer", border: "1px solid #94a3b8", borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10 }}>i</span>
+      <div style={{ padding: "12px 12px 4px" }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 6,
+          border: `1px solid #0073ea`, borderRadius: 6,
+          padding: "8px 12px", background: "#fff"
+        }}>
+          <span style={{ fontSize: 14, color: P.muted }}>🔍</span>
+          <input
+            ref={inputRef}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search or type a name..."
+            onKeyDown={e => {
+              if (e.key === "Enter" && search.trim()) {
+                handleSelect(search.trim());
+              }
+            }}
+            style={{
+              border: "none", outline: "none", background: "transparent",
+              fontSize: 13, color: P.text, fontFamily: "inherit", flex: 1
+            }}
+          />
+          {search && (
+            <span
+              onClick={() => setSearch("")}
+              style={{ color: P.muted, cursor: "pointer", fontSize: 14 }}
+            >✕</span>
+          )}
         </div>
       </div>
-      
-      <div style={{ padding:"12px 14px 4px", fontSize:13, color:P.muted }}>Suggested people</div>
-      
-      <div style={{ maxHeight:200, overflowY:"auto", padding: "0 8px" }}>
-        {filtered.length===0
-          ? <div style={{ padding:"10px 12px", fontSize:12, color:P.muted, textAlign:"center" }}>No people found</div>
-          : filtered.map(emp => {
-              const isActive = currentAssignee===emp;
-              return (
-                <div key={emp} onClick={()=>{onSelect(emp);onClose();}}
-                  style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 6px", borderRadius:6, cursor:"pointer", background:isActive?"#e8f4fd":"transparent" }}
-                  onMouseEnter={e=>e.currentTarget.style.background="#f0f2f5"}
-                  onMouseLeave={e=>e.currentTarget.style.background=isActive?"#e8f4fd":"transparent"}>
-                  <div style={{ width:30, height:30, borderRadius:"50%", background:getAvatarColor(emp), display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:700, flexShrink:0 }}>
-                    {emp.slice(0,2).toUpperCase()}
-                  </div>
-                  <span style={{ fontSize:14, color:P.text, flex:1, fontWeight:isActive?500:400 }}>{emp}</span>
+
+      {/* Add new person option when typing an unrecognized name */}
+      {isNewName && (
+        <div
+          onClick={() => handleSelect(search.trim())}
+          style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "10px 14px", cursor: "pointer",
+            background: "#f0fdf4", borderBottom: `1px solid ${P.border}`,
+            margin: "4px 8px", borderRadius: 8
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = "#dcfce7"}
+          onMouseLeave={e => e.currentTarget.style.background = "#f0fdf4"}
+        >
+          <div style={{
+            width: 30, height: 30, borderRadius: "50%",
+            background: getAvatarColor(search.trim()),
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0
+          }}>
+            {search.trim().slice(0, 2).toUpperCase()}
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#166534" }}>
+              Assign "{search.trim()}"
+            </div>
+            <div style={{ fontSize: 11, color: "#4ade80" }}>Press Enter or click to assign</div>
+          </div>
+        </div>
+      )}
+
+      {empList.length > 0 && (
+        <div style={{ padding: "8px 14px 4px", fontSize: 13, color: P.muted }}>
+          {search ? "Matching people" : "Suggested people"}
+        </div>
+      )}
+
+      <div style={{ maxHeight: 200, overflowY: "auto", padding: "0 8px" }}>
+        {filtered.length === 0 && !isNewName ? (
+          <div style={{ padding: "10px 12px", fontSize: 12, color: P.muted, textAlign: "center" }}>
+            {empList.length === 0
+              ? "Type a name above to assign someone"
+              : "No people found"}
+          </div>
+        ) : (
+          filtered.map(emp => {
+            const isActive = currentAssignee === emp;
+            return (
+              <div
+                key={emp}
+                onClick={() => handleSelect(emp)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  padding: "8px 6px", borderRadius: 6, cursor: "pointer",
+                  background: isActive ? "#e8f4fd" : "transparent"
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "#f0f2f5"}
+                onMouseLeave={e => e.currentTarget.style.background = isActive ? "#e8f4fd" : "transparent"}
+              >
+                <div style={{
+                  width: 30, height: 30, borderRadius: "50%",
+                  background: getAvatarColor(emp),
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0
+                }}>
+                  {emp.slice(0, 2).toUpperCase()}
                 </div>
-              );
-            })
-        }
+                <span style={{
+                  fontSize: 14, color: P.text, flex: 1,
+                  fontWeight: isActive ? 500 : 400
+                }}>{emp}</span>
+                {isActive && <span style={{ color: "#0073ea", fontSize: 13 }}>✓</span>}
+              </div>
+            );
+          })
+        )}
       </div>
 
-      <div style={{ padding: "8px 14px 12px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
-           onMouseEnter={e=>e.currentTarget.style.background="#f0f2f5"}
-           onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+      <div
+        style={{ padding: "8px 14px 12px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
+        onMouseEnter={e => e.currentTarget.style.background = "#f0f2f5"}
+        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+      >
         <div style={{ display: "flex", alignItems: "center" }}>
           <span style={{ fontSize: 16 }}>👤</span>
           <span style={{ fontSize: 10, position: 'relative', top: '2px', left: '-2px', fontWeight: 800 }}>+</span>
         </div>
         <span style={{ fontSize: 14, color: P.text }}>Invite a new member by email</span>
       </div>
-      
-      {currentAssignee && (
-        <div onClick={()=>{onSelect("");onClose();}}
-          style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 14px", cursor:"pointer" }}
-          onMouseEnter={e=>e.currentTarget.style.background="#fee2e2"}
-          onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-          <div style={{ width:24, height:24, borderRadius:"50%", border:`1px dashed #e2445c`, display:"flex", alignItems:"center", justifyContent:"center", color:"#e2445c", fontSize:12 }}>✕</div>
-          <span style={{ fontSize:13, color:"#e2445c", fontWeight:500 }}>Unassign</span>
+
+      <div style={{
+        margin: "0 10px 8px", background: "#dbeafe", borderRadius: 8,
+        padding: "10px 14px", display: "flex", alignItems: "center",
+        justifyContent: "space-between", gap: 8
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 16 }}>🔔</span>
+          <span style={{ fontSize: 13, color: P.text }}>Assignees will be notified</span>
         </div>
-      )}
-      
-      <div style={{ margin:"8px 10px 10px", background:"#dbeafe", borderRadius:8, padding:"12px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <span style={{ fontSize:16 }}>🔔</span>
-          <span style={{ fontSize:13, color:P.text }}>Assignees will be notified</span>
-        </div>
-        <button style={{ fontSize:12, color:P.text, background:"transparent", border:"1px solid #94a3b8", borderRadius:4, padding:"4px 12px", cursor:"pointer", fontFamily:"inherit" }}>Mute</button>
+        <button style={{
+          fontSize: 12, color: P.text, background: "transparent",
+          border: "1px solid #94a3b8", borderRadius: 4, padding: "4px 12px",
+          cursor: "pointer", fontFamily: "inherit"
+        }}>Mute</button>
       </div>
 
+      {currentAssignee && (
+        <div
+          onClick={() => { onSelect(""); onClose(); }}
+          style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer" }}
+          onMouseEnter={e => e.currentTarget.style.background = "#fee2e2"}
+          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+        >
+          <div style={{
+            width: 24, height: 24, borderRadius: "50%",
+            border: `1px dashed #e2445c`, display: "flex",
+            alignItems: "center", justifyContent: "center",
+            color: "#e2445c", fontSize: 12
+          }}>✕</div>
+          <span style={{ fontSize: 13, color: "#e2445c", fontWeight: 500 }}>Unassign</span>
+        </div>
+      )}
+
       <div style={{ borderTop: `1px solid ${P.border}` }}>
-        <div style={{ padding: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", borderBottomLeftRadius: 10, borderBottomRightRadius: 10 }}
-             onMouseEnter={e=>e.currentTarget.style.background="#f0f2f5"}
-             onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+        <div
+          style={{
+            padding: "12px", display: "flex", alignItems: "center",
+            justifyContent: "center", gap: 8, cursor: "pointer",
+            borderBottomLeftRadius: 10, borderBottomRightRadius: 10
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = "#f0f2f5"}
+          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+        >
           <span style={{ fontSize: 16 }}>✨</span>
           <span style={{ fontSize: 14, color: P.text }}>Auto-assign people</span>
         </div>
@@ -727,6 +845,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee })
     </DD>
   );
 }
+
 
 /* ══════════════════════════════════════════════════════════
    TOOLBAR BUTTON

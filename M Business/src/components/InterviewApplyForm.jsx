@@ -266,8 +266,7 @@ export default function InterviewApplyForm() {
             Application Submitted!
           </h2>
           <p style={{ color: "#7c3aed", fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>
-            உங்கள் application successfully submit ஆகிவிட்டது.<br />
-            HR team review பண்ணி contact பண்ணுவாங்க. நன்றி! 🙏
+           Thank You🙏
           </p>
           <div style={{ background: "#f5f3ff", borderRadius: 12, padding: "12px 16px", border: "1px solid #ede9fe", fontSize: 13, color: "#7c3aed" }}>
             <strong>{form.name}</strong> · {role} · {companyName}
@@ -301,21 +300,21 @@ export default function InterviewApplyForm() {
           {/* Name */}
           <div className="fade-up d1">
             <label style={sty.label}>Full Name <span style={{ color: "#ef4444" }}>*</span></label>
-            <input {...inp("name", "text", "உங்கள் பேர் / Your full name")} />
+            <input {...inp("name", "text", "Your full name")} />
             {errors.name && <p style={sty.err}>{errors.name}</p>}
           </div>
 
           {/* Email */}
           <div className="fade-up d2">
             <label style={sty.label}>Email Address <span style={{ color: "#ef4444" }}>*</span></label>
-            <input {...inp("email", "email", "example@gmail.com")} />
+            <input {...inp("email", "email", "email.com")} />
             {errors.email && <p style={sty.err}>{errors.email}</p>}
           </div>
 
           {/* Mobile */}
           <div className="fade-up d3">
             <label style={sty.label}>Mobile Number <span style={{ color: "#ef4444" }}>*</span></label>
-            <input {...inp("mobile", "tel", "+91 9876543210")} />
+            <input {...inp("mobile", "tel", "")} />
             {errors.mobile && <p style={sty.err}>{errors.mobile}</p>}
           </div>
 

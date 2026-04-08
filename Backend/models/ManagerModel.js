@@ -8,7 +8,8 @@ const managerSchema = new mongoose.Schema({
   role:          { type: String, default: "Manager" },
   address:       { type: String, default: "" },
   password:      { type: String, default: "" },
-  status:        { type: String, enum: ["Active","Inactive"], default: "Active" }
+  status:        { type: String, enum: ["Active","Inactive"], default: "Active" },
+  companyId: { type: String, default: "" },
 
 }, { timestamps: true });
 

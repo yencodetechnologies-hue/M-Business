@@ -6,7 +6,8 @@ const Employee = require("../models/EmployeeModel");
 // GET all employees
 router.get("/", async (req, res) => {
   try {
-    const employees = await Employee.find().sort({ createdAt: -1 });
+    const filter = req.companyId ? { companyId: req.companyId } : {};
+    const employees = await Employee.find(filter).sort({ createdAt: -1 });
     res.json(employees);
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
@@ -41,6 +42,7 @@ router.post("/add", async (req, res) => {
       salary:     salary     || "",
       status:     status     || "Active",
       password:   hashedPassword,
+      companyId:  req.companyId || "",
     });
 
     await employee.save();

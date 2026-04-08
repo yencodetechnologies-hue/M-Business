@@ -16,6 +16,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { SubAdminDocumentsPage } from "./EmployeeProfilePanel";
 import { DOC_TYPES } from "./EmployeeProfilePanel";
 import AuthPage from "./AuthPage";
+import MySubscriptions from "./MySubscriptions";
 
 
 const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"#9333ea",bg:"#f5f3ff",card:"#FFFFFF",text:"#1e0a3c",muted:"#7c3aed",border:"#ede9fe"};
@@ -36,13 +37,14 @@ const NAV=[
   {key:"calendar",icon:"📅",label:"Calendar"},
   {key:"accounts",icon:"👤",label:"Accounts"},
   {key:"interviews",icon:"🎯",label:"Interviews"},
-  {key:"reports",icon:"📈",label:"Reports"}
+  {key:"reports",icon:"📈",label:"Reports"},
+  {key:"mysubscriptions",icon:"💳",label:"My Subscriptions"}
 ];
 
 function getNavForRole(role){
   const r=(role||"").toLowerCase().trim();
   if(r==="subadmin"||r==="sub_admin"||r==="sub-admin")
-    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","interviews","reports"].includes(n.key));
+    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","interviews","reports","mysubscriptions"].includes(n.key));
   // if(r==="manager")
   //   return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
   // if(r==="employee")
@@ -1529,6 +1531,7 @@ const companyNameStr = "M Business";
          {validActive==="accounts"&&<AccountsPage ExpensesPage={ExpensesPage}/>}
           {validActive==="interviews"&&<InterviewPage companyId={companyId} companyName={companyNameStr}/>}
           {validActive==="documents" && <SubAdminDocumentsPage employees={employees} />}
+          {validActive==="mysubscriptions"&&<MySubscriptions user={user}/>}
           {validActive==="reports"&&<ReportsPage clients={clients} projects={projects} employees={employees} managers={managers}/>}
         </div>
       </div>

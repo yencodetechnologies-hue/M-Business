@@ -1,8 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
-export default function AuthPage({ setUser }) {
-  const [tab, setTab] = useState("login");
+export default function AuthPage({ setUser, initialTab = "login" }) {
+  const normalizedInitialTab = initialTab === "register" ? "register" : "login";
+  const [tab, setTab] = useState(normalizedInitialTab);
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -285,16 +286,6 @@ const handleLogin = async () => {
                       <button type="button" onClick={()=>setShowConfirm(!showConfirm)} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", color:"rgba(255,255,255,0.45)", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>{showConfirm?"HIDE":"SHOW"}</button>
                     </div>
                     {regErr.confirm && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {regErr.confirm}</div>}
-                  </div>
-                </div>
-                <div style={{ marginBottom:18 }}>
-                  <label style={lStyle}>Role</label>
-                  <div className="role-btns" style={{ display:"flex", gap:8 }}>
-                    {[["Admin","🛡️"],["Manager","👔"],["Employee","👤"],["Client","🤝"]].map(([r,ic])=>(
-                      <button key={r} onClick={()=>setRegData(p=>({...p,role:r}))} style={{ flex:1, padding:"9px 6px", border:`1.5px solid ${regData.role===r?"rgba(255,255,255,0.45)":"rgba(255,255,255,0.14)"}`, borderRadius:9, fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", background: regData.role===r?"rgba(255,255,255,0.16)":"rgba(255,255,255,0.04)", color: regData.role===r?"#fff":"rgba(255,255,255,0.38)", transition:"all 0.2s" }}>
-                        {ic} {r}
-                      </button>
-                    ))}
                   </div>
                 </div>
                 <button onClick={handleRegister} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)" }}>

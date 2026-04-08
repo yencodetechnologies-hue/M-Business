@@ -1516,6 +1516,120 @@ const companyNameStr = "M Business";
         </div>
       </div>
 
+      {profileDropdownOpen && (
+        <div
+          data-profile-menu="true"
+          style={{
+            position: "fixed",
+            top: 72,
+            right: 16,
+            zIndex: 10050,
+            background: "#fff",
+            border: "1px solid #e2e8f0",
+            borderRadius: 12,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+            overflow: "hidden",
+            minWidth: 190,
+          }}
+        >
+          <button
+            onClick={() => {
+              setProfileDropdownOpen(false);
+              setShowProfile(true);
+            }}
+            style={{
+              width: "100%",
+              background: "none",
+              border: "none",
+              padding: "10px 14px",
+              cursor: "pointer",
+              fontSize: 13,
+              fontWeight: 700,
+              fontFamily: "inherit",
+              color: T.text,
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            👤 Profile
+          </button>
+          <button
+            onClick={() => {
+              setProfileDropdownOpen(false);
+              setAccountAuthTab("register");
+              setAccountAuthOpen(true);
+            }}
+            style={{
+              width: "100%",
+              background: "none",
+              border: "none",
+              padding: "10px 14px",
+              cursor: "pointer",
+              fontSize: 13,
+              fontWeight: 700,
+              fontFamily: "inherit",
+              color: T.text,
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              borderTop: "1px solid #f1f5f9",
+            }}
+          >
+            ➕ Add account
+          </button>
+          <button
+            onClick={() => {
+              setProfileDropdownOpen(false);
+              handleLogout();
+            }}
+            style={{
+              width: "100%",
+              background: "none",
+              border: "none",
+              padding: "10px 14px",
+              cursor: "pointer",
+              fontSize: 13,
+              fontWeight: 700,
+              fontFamily: "inherit",
+              color: "#ef4444",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              borderTop: "1px solid #f1f5f9",
+            }}
+          >
+            🚪 Logout
+          </button>
+        </div>
+      )}
+
+      {accountAuthOpen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 10060 }}>
+          <button
+            onClick={() => setAccountAuthOpen(false)}
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              zIndex: 10061,
+              background: "rgba(255,255,255,0.22)",
+              border: "1.5px solid rgba(255,255,255,0.35)",
+              color: "#fff",
+              borderRadius: 10,
+              width: 36,
+              height: 36,
+              cursor: "pointer",
+              fontWeight: 900,
+              fontSize: 14,
+            }}
+          >
+            ✕
+          </button>
+          <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
+        </div>
+      )}
+
       {showProfile&&<ProfileModal user={user} setUser={setUser} onClose={()=>setShowProfile(false)} onLogout={handleLogout} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
 
       {/* ── Add Client Modal ── */}

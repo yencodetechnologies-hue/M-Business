@@ -13,6 +13,7 @@ import ReportsPage        from "./components/ReportsPage";
 import QuotationCreator   from "./components/QuotationCreator";
 import InterviewApplyForm from "./components/InterviewApplyForm";
 import CanvasPage         from "./components/CanvasPage";
+import ProjectProposalCreator from "./components/ProjectProposalCreator";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -46,6 +47,16 @@ export default function App() {
         role: (userData.role || "").toLowerCase().trim(),
       };
       localStorage.setItem("user", JSON.stringify(normalized));
+      
+      // Save to accounts list for multi-account support
+      try {
+        let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
+        const idx = accs.findIndex(a => a.email === normalized.email);
+        if (idx !== -1) accs[idx] = normalized;
+        else accs.push(normalized);
+        localStorage.setItem("accounts", JSON.stringify(accs));
+      } catch (e) {}
+
       setUser(normalized);
     } else {
       localStorage.removeItem("user");
@@ -80,6 +91,7 @@ const getRootPage = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         <Route path="/" element={getRootPage()} />
+        <Route path="/add-account" element={<AuthPage setUser={(u) => { handleSetUser(u); window.location.href="/"; }} initialTab="register" />} />
 
         <Route
           path="/employeedashboard"
@@ -97,6 +109,7 @@ const getRootPage = () => {
         <Route path="/expenses"          element={<ExpensesPage />} />
         <Route path="/reports"           element={<ReportsPage />} />
         <Route path="/quotation-creator" element={<QuotationCreator />} />
+        <Route path="/project-proposal" element={<ProjectProposalCreator />} />
         <Route path="/interview-apply/:companySlug" element={<InterviewApplyForm />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

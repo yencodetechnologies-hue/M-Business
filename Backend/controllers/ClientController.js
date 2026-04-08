@@ -28,6 +28,7 @@ exports.addClient = async (req, res) => {
       address,
       password: hashedPassword,  
       role: "client",           
+      companyId: req.companyId || "",
     });
 
     await newClient.save();

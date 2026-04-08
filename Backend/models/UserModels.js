@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   phone:    { type: String, default: "" },
   role:     { type: String, default: "user" },
   logoUrl:  { type: String, default: "" },  
+  companyId: { type: String, default: "" },
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);

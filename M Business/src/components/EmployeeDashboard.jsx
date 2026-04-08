@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { EmployeeProfilePanel, DOC_TYPES } from "./EmployeeProfilePanel";
+import AuthPage from "./AuthPage";
 
 const BASE = "/api/employee-dashboard";
 
@@ -17,11 +18,14 @@ const sc = (s) => ({
 }[(s||"").toLowerCase()]||"#6366f1");
 
 const NAV = [
-  { key:"dashboard",  icon:"⌂", label:"Dashboard"   },
-  { key:"projects",   icon:"◈", label:"My Projects"  },
-  { key:"tasks",      icon:"◉", label:"My Tasks"     },
-  { key:"attendance", icon:"◷", label:"Attendance"   },
-  { key:"salary",     icon:"◆", label:"Salary Slip"  },
+  { key:"dashboard", icon:"⌂", label:"Dashboard" },
+  { key:"projects",  icon:"◈", label:"My Projects" },
+  { key:"proposals", icon:"📄", label:"Proposals" },   // ← ADD THIS
+  { key:"tasks",     icon:"◉", label:"Active Tasks" },
+  { key:"payments",  icon:"◆", label:"Payments" },
+  { key:"calendar",  icon:"◷", label:"Calendar" },
+  { key:"reports",   icon:"▦", label:"Reports" },
+  { key:"settings",  icon:"◌", label:"Settings" },
 ];
 
 const SEED_PROJECTS = [
@@ -1125,8 +1129,57 @@ export default function EmployeeDashboard({ user, setUser }) {
   // To trigger profile panel to open from Dashboard's "Upload" button
   const [profileOpen, setProfileOpen] = useState(false);
 
+  // ── NEW: Multi-account dropdown state ──
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [accounts, setAccounts] = useState([]);
+  const [accountAuthOpen, setAccountAuthOpen] = useState(false);
+
   const resolvedUser = user || (() => { try { return JSON.parse(localStorage.getItem("user")); } catch { return null; } })();
   const empName = resolvedUser?.name || "";
+
+  // Load saved accounts from localStorage
+  useEffect(()=>{
+    try{
+      const savedAccounts=JSON.parse(localStorage.getItem("accounts")||"[]");
+      setAccounts(savedAccounts);
+    }catch(e){setAccounts([]);}
+  },[resolvedUser]);
+
+  // Close dropdown on outside click
+  useEffect(()=>{
+    if(!profileDropdownOpen) return;
+    const onDown=(e)=>{
+      const t=e.target;
+      if(t?.closest?.('[data-profile-anchor="true"]')) return;
+      if(t?.closest?.('[data-profile-menu="true"]')) return;
+      setProfileDropdownOpen(false);
+    };
+    document.addEventListener("mousedown",onDown);
+    return ()=>document.removeEventListener("mousedown",onDown);
+  },[profileDropdownOpen]);
+
+  // Switch to a different account
+  const switchAccount=(account)=>{
+    localStorage.setItem("user",JSON.stringify(account));
+    if(setUser) setUser(account);
+    else window.location.reload();
+    setProfileDropdownOpen(false);
+  };
+
+  const handleAuthSetUser = (userData) => {
+    setAccountAuthOpen(false);
+    setProfileDropdownOpen(false);
+    // Save to accounts list
+    try {
+      let accs = JSON.parse(localStorage.getItem("accounts") || "[]");
+      const idx = accs.findIndex(a => a.email === userData.email);
+      if (idx !== -1) accs[idx] = userData;
+      else accs.push(userData);
+      localStorage.setItem("accounts", JSON.stringify(accs));
+    } catch (e) {}
+    if(setUser) setUser(userData);
+    else window.location.reload();
+  };
 
   const notify = useCallback((msg, type="success") => {
     setToast(msg); setToastType(type);
@@ -1184,7 +1237,7 @@ useEffect(()=>{
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
         <div className="emp-mob-bar" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background:"#fff", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
           <button onClick={()=>setSidebarOpen(true)} style={{ background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#6366f1" }}>☰</button>
-          
+
           {/* Notifications */}
           <div style={{ position:"relative", display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ position:"relative" }}>
@@ -1194,9 +1247,78 @@ useEffect(()=>{
               </button>
             </div>
           </div>
-          
-          <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12 }}>{(empName||"E").slice(0,2).toUpperCase()}</div>
+
+          {/* Profile Avatar with Dropdown */}
+          <div data-profile-anchor="true" onClick={(e)=>{e.stopPropagation();setProfileDropdownOpen(v=>!v);}} style={{ position:"relative" }}>
+            <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12, cursor:"pointer" }}>{(empName||"E").slice(0,2).toUpperCase()}</div>
+          </div>
         </div>
+
+        {/* Profile Dropdown */}
+        {profileDropdownOpen && (
+          <div data-profile-menu="true" style={{ position:"fixed", top:56, right:16, zIndex:1000, background:"#fff", border:"1px solid #e2e8f0", borderRadius:12, boxShadow:"0 20px 60px rgba(0,0,0,0.12)", overflow:"hidden", minWidth:220, maxWidth:280 }}>
+            {/* Current Account Header */}
+            <div style={{ padding:"12px 14px", borderBottom:"1px solid #f1f5f9", background:"linear-gradient(135deg,#f5f3ff,#faf5ff)" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:14 }}>
+                  {(empName||"E").slice(0,2).toUpperCase()}
+                </div>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#1e0a3c", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{resolvedUser?.name||"Employee"}</div>
+                  <div style={{ fontSize:11, color:"#6366f1", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{resolvedUser?.email}</div>
+                </div>
+                <span style={{ fontSize:12 }}>✓</span>
+              </div>
+            </div>
+
+            {/* Other Saved Accounts */}
+            {accounts.length>1 && (
+              <div style={{ maxHeight:180, overflowY:"auto" }}>
+                {accounts.filter(a=>a.email!==resolvedUser?.email).map((account,idx)=>{
+                  const accName=account?.name||account?.email?.split("@")[0]||"User";
+                  const accInitials=accName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+                  return(
+                    <button key={account.email||idx} onClick={()=>switchAccount(account)}
+                      style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:600, fontFamily:"inherit", color:"#1e0a3c", display:"flex", alignItems:"center", gap:10, borderBottom:"1px solid #f8fafc", textAlign:"left" }}
+                      onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                      onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+                    >
+                      <div style={{ width:32, height:32, borderRadius:8, background:"linear-gradient(135deg,#8b5cf6,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:12, flexShrink:0 }}>
+                        {account?.logoUrl?<img src={account.logoUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"contain", padding:2, background:"#fff" }}/>:<span>{accInitials}</span>}
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:12, fontWeight:700, color:"#1e0a3c", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{accName}</div>
+                        <div style={{ fontSize:10, color:"#94a3b8", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{account?.email}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Menu Options */}
+            <div style={{ borderTop:"1px solid #f1f5f9" }}>
+              <button onClick={()=>{setProfileDropdownOpen(false);setProfileOpen(true);}} style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", color:"#1e0a3c", display:"flex", alignItems:"center", gap:10 }}
+                onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+              >
+                <span style={{ fontSize:14 }}>👤</span> Profile
+              </button>
+              <button onClick={()=>{setProfileDropdownOpen(false);setAccountAuthOpen(true);}} style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", color:"#1e0a3c", display:"flex", alignItems:"center", gap:10, borderTop:"1px solid #f8fafc" }}
+                onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+              >
+                <span style={{ fontSize:14 }}>➕</span> Add account
+              </button>
+              <button onClick={()=>{setProfileDropdownOpen(false);handleLogout();}} style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", color:"#ef4444", display:"flex", alignItems:"center", gap:10, borderTop:"1px solid #f8fafc" }}
+                onMouseEnter={e=>e.currentTarget.style.background="#fef2f2"}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+              >
+                <span style={{ fontSize:14 }}>🚪</span> Logout
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="main-pad" style={{ flex:1, padding:"24px 28px", overflowY:"auto" }}>
           {page==="dashboard"  && (
@@ -1229,6 +1351,14 @@ useEffect(()=>{
       />
 
       <Toast msg={toast} type={toastType}/>
+
+      {/* Add Account Auth Modal */}
+      {accountAuthOpen && (
+        <div style={{ position:"fixed", inset:0, zIndex:10060 }}>
+          <button onClick={()=>setAccountAuthOpen(false)} style={{ position:"absolute", top:16, right:16, zIndex:10061, background:"rgba(255,255,255,0.22)", border:"1.5px solid rgba(255,255,255,0.35)", color:"#fff", borderRadius:10, width:36, height:36, cursor:"pointer", fontWeight:900, fontSize:14 }}>✕</button>
+          <AuthPage setUser={handleAuthSetUser} initialTab="login" />
+        </div>
+      )}
     </div>
   );
 }

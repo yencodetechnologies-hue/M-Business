@@ -33,7 +33,8 @@ router.get("/my-projects/:clientName", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const clients = await Client.find().sort({ createdAt: -1 });
+    const filter = req.companyId ? { companyId: req.companyId } : {};
+    const clients = await Client.find(filter).sort({ createdAt: -1 });
     res.json(clients);
   } catch (err) {
     res.status(500).json({ msg: "Server error" });

@@ -1307,7 +1307,24 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const [accountAuthTab,setAccountAuthTab]=useState("register");
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [companyLogo,setCompanyLogo]=useState(user?.logoUrl?user.logoUrl:(fixedLogo||null));
+  const [accounts,setAccounts]=useState([]);
   useEffect(()=>{setCompanyLogo(user?.logoUrl?user.logoUrl:(fixedLogo||null));},[user,fixedLogo]);
+
+  // Load saved accounts from localStorage
+  useEffect(()=>{
+    try{
+      const savedAccounts=JSON.parse(localStorage.getItem("accounts")||"[]");
+      setAccounts(savedAccounts);
+    }catch(e){setAccounts([]);}
+  },[user]);
+
+  // Switch to a different account
+  const switchAccount=(account)=>{
+    localStorage.setItem("user",JSON.stringify(account));
+    setUser(account);
+    setProfileDropdownOpen(false);
+    window.location.reload();
+  };
 
   // Close dropdown on outside click
   useEffect(()=>{
@@ -1529,78 +1546,144 @@ const companyNameStr = "M Business";
             borderRadius: 12,
             boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
             overflow: "hidden",
-            minWidth: 190,
+            minWidth: 220,
+            maxWidth: 280,
           }}
         >
-          <button
-            onClick={() => {
-              setProfileDropdownOpen(false);
-              setShowProfile(true);
-            }}
-            style={{
-              width: "100%",
-              background: "none",
-              border: "none",
-              padding: "10px 14px",
-              cursor: "pointer",
-              fontSize: 13,
-              fontWeight: 700,
-              fontFamily: "inherit",
-              color: T.text,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            👤 Profile
-          </button>
-          <button
-            onClick={() => {
-              setProfileDropdownOpen(false);
-              setAccountAuthTab("register");
-              setAccountAuthOpen(true);
-            }}
-            style={{
-              width: "100%",
-              background: "none",
-              border: "none",
-              padding: "10px 14px",
-              cursor: "pointer",
-              fontSize: 13,
-              fontWeight: 700,
-              fontFamily: "inherit",
-              color: T.text,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              borderTop: "1px solid #f1f5f9",
-            }}
-          >
-            ➕ Add account
-          </button>
-          <button
-            onClick={() => {
-              setProfileDropdownOpen(false);
-              handleLogout();
-            }}
-            style={{
-              width: "100%",
-              background: "none",
-              border: "none",
-              padding: "10px 14px",
-              cursor: "pointer",
-              fontSize: 13,
-              fontWeight: 700,
-              fontFamily: "inherit",
-              color: "#ef4444",
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              borderTop: "1px solid #f1f5f9",
-            }}
-          >
-            🚪 Logout
-          </button>
+          {/* Current Account Header */}
+          <div style={{padding:"12px 14px",borderBottom:"1px solid #f1f5f9",background:"linear-gradient(135deg,#f5f3ff,#faf5ff)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:14,overflow:"hidden"}}>
+                {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:3,background:"#fff"}}/>:<span>{initials}</span>}
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13,fontWeight:700,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{displayName}</div>
+                <div style={{fontSize:11,color:"#7c3aed",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user?.email}</div>
+              </div>
+              <span style={{fontSize:12}}>✓</span>
+            </div>
+          </div>
+
+          {/* Other Saved Accounts */}
+          {accounts.length>1 && (
+            <div style={{maxHeight:180,overflowY:"auto"}}>
+              {accounts.filter(a=>a.email!==user?.email).map((account,idx)=>{
+                const accName=account?.name||account?.email?.split("@")[0]||"User";
+                const accInitials=accName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+                return(
+                  <button
+                    key={account.email||idx}
+                    onClick={()=>switchAccount(account)}
+                    style={{
+                      width:"100%",
+                      background:"none",
+                      border:"none",
+                      padding:"10px 14px",
+                      cursor:"pointer",
+                      fontSize:13,
+                      fontWeight:600,
+                      fontFamily:"inherit",
+                      color:T.text,
+                      display:"flex",
+                      alignItems:"center",
+                      gap:10,
+                      borderBottom:"1px solid #f8fafc",
+                      textAlign:"left",
+                    }}
+                    onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                    onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+                  >
+                    <div style={{width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700,fontSize:12,flexShrink:0}}>
+                      {account?.logoUrl?<img src={account.logoUrl} alt="" style={{width:"100%",height:"100%",objectFit:"contain",padding:2,background:"#fff"}}/>:<span>{accInitials}</span>}
+                    </div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:700,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{accName}</div>
+                      <div style={{fontSize:10,color:"#94a3b8",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{account?.email}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Menu Options */}
+          <div style={{borderTop:"1px solid #f1f5f9"}}>
+            <button
+              onClick={() => {
+                setProfileDropdownOpen(false);
+                setShowProfile(true);
+              }}
+              style={{
+                width: "100%",
+                background: "none",
+                border: "none",
+                padding: "10px 14px",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: "inherit",
+                color: T.text,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+              }}
+              onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+            >
+              <span style={{fontSize:14}}>👤</span> Profile
+            </button>
+            <button
+              onClick={() => {
+                setProfileDropdownOpen(false);
+                setAccountAuthTab("login");
+                setAccountAuthOpen(true);
+              }}
+              style={{
+                width: "100%",
+                background: "none",
+                border: "none",
+                padding: "10px 14px",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: "inherit",
+                color: T.text,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                borderTop: "1px solid #f8fafc",
+              }}
+              onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+            >
+              <span style={{fontSize:14}}>➕</span> Add account
+            </button>
+            <button
+              onClick={() => {
+                setProfileDropdownOpen(false);
+                handleLogout();
+              }}
+              style={{
+                width: "100%",
+                background: "none",
+                border: "none",
+                padding: "10px 14px",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: "inherit",
+                color: "#ef4444",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                borderTop: "1px solid #f8fafc",
+              }}
+              onMouseEnter={e=>e.currentTarget.style.background="#fef2f2"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+            >
+              <span style={{fontSize:14}}>🚪</span> Logout
+            </button>
+          </div>
         </div>
       )}
 

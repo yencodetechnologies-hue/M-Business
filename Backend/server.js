@@ -31,6 +31,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.use((req, res, next) => {
+  req.companyId = req.headers['x-company-id'] || "";
+  next();
+});
+
 const authRoutes = require("./routes/authroutes");
 const clientRoutes = require("./routes/clientroutes");
 const employeeRoutes = require("./routes/employeeroutes");
@@ -74,7 +79,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/employee-dashboard", employeeDashRoutes);
 app.use("/api/quotations", QuotationRoutes);
 app.use("/api/proposals", ProposalRoutes);
-app.use("/uploads", express.static("uploads"));
+app.use("/upload", express.static("uploads"));
 
 app.get("/", (req, res) => {
   res.send("Server is running!");

@@ -291,7 +291,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
               </div>
             )}
             {el.type === "shape" && (
-              <div style={{width:el.width||60, height:el.height||60, background:el.color||t.p, borderRadius:el.shape==="circle"?"50%":"4px"}} />
+              <div style={{width:el.width||60, height:el.height||60, background:el.color||t.p, borderRadius: el.borderRadius !== undefined ? el.borderRadius + 'px' : (el.shape==="circle"?"50%":"4px")}} />
             )}
             {el.type === "image" && (
               <img src={el.src} alt="" style={{width:el.width||200, height:"auto", borderRadius:4, display:"block", pointerEvents:"none"}} />
@@ -981,7 +981,7 @@ const persist = useCallback(async (d) => {
   
 const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
   const createNew = () => {
-    const d = { id:pid(), title:"New Project Proposal", client:"", theme:null, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"ppt", slides:SLIDE_TYPES.map(t=>makeSlide(t.id,null)) };
+    const d = { id:pid(), title:"New Project Proposal", client:"", theme:null, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"a4-portrait", slides:[makeSlide("blank",null)] };
     setDoc(d); setPage(0); setView("editor");
   };
 
@@ -1089,8 +1089,31 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
   };
 
   const printProposal = (proposal) => {
+    const getElementsHTML = (elements) => {
+      if (!elements || elements.length === 0) return '';
+      return `
+        <div style="position:absolute; inset:0; pointer-events:none; z-index:20;">
+          ${elements.map(el => {
+            let content = '';
+            if (el.type === "text") {
+              content = `<div style="font-size:${el.fontSize}px; font-weight:${el.fontWeight}; color:${el.color||'#000'}; white-space:nowrap;">${el.val || ''}</div>`;
+            } else if (el.type === "shape") {
+               const br = el.borderRadius !== undefined ? el.borderRadius + 'px' : (el.shape === 'circle' ? '50%' : '4px');
+               content = `<div style="width:${el.width||60}px; height:${el.height||60}px; background:${el.color||'#7c3aed'}; border-radius:${br};"></div>`;
+            } else if (el.type === "image") {
+               content = `<img src="${el.src}" style="width:${el.width||200}px; height:${el.height||'auto'}; object-fit:contain; pointer-events:none;" />`;
+            } else if (el.type === "icon") {
+               content = `<div style="font-size:${el.fontSize||40}px; display:flex; align-items:center; justify-content:center;">${el.icon}</div>`;
+            }
+            return `<div style="position:absolute; left:${el.x}px; top:${el.y}px;">${content}</div>`;
+          }).join('')}
+        </div>
+      `;
+    };
+
     const proposalHTML = proposal.slides.map(slide => {
       const t = THEMES.find(x=>x.name===proposal.theme)||THEMES[0];
+      const elementsHTML = getElementsHTML(slide.elements);
       
       // Generate HTML for different slide types
       if (slide.type === "cover") {
@@ -1100,6 +1123,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             <div style="position: absolute; inset: 0; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); z-index: -1;"></div>
             <h1 style="font-size: 48px; font-weight: 900; margin-bottom: 16px; line-height: 1.05;">${slide.title}</h1>
             <p style="font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 28px;">${slide.subtitle}</p>
+            ${elementsHTML}
           </div>
         `;
       }
@@ -1110,6 +1134,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
             <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
             <p style="font-size: 15px; color: #4b5563; line-height: 1.9; max-width: 620px; white-space: pre-wrap;">${slide.body}</p>
+            ${elementsHTML}
           </div>
         `;
       }
@@ -1127,6 +1152,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                 </div>
               `).join('')}
             </div>
+            ${elementsHTML}
           </div>
         `;
       }
@@ -1231,15 +1257,17 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             <div style="position: fixed; bottom: 20mm; left: 20mm; right: 20mm; text-align: center; font-size: 10px; color: #666; border-top: 2px solid #ff0000; padding-top: 8px;">
               ${slide.companyAddress || ""}
             </div>
+            ${elementsHTML}
           </div>
         `;
       }
       
       // Default slide handling
       return `
-        <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center;">
+        <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative;">
           <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading || 'Slide'}</h1>
           <p style="font-size: 15px; color: #4b5563; line-height: 1.9; white-space: pre-wrap;">${slide.body || ''}</p>
+          ${elementsHTML}
         </div>
       `;
     }).join("");
@@ -1295,7 +1323,6 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
       {loading ? (
         <div style={{textAlign:"center",padding:"80px 20px",background:"#fff",borderRadius:22,border:"1px solid #e2e8f0"}}>
           <div style={{fontSize:40,marginBottom:16}}>📡</div>
-          <div style={{fontSize:18,fontWeight:700,color:"#0f172a",marginBottom:8}}>Loading Proposals...</div>
           <div style={{fontSize:13,color:"#64748b"}}>Please wait while we fetch your proposals</div>
         </div>
       ) : proposals.length===0 ? (
@@ -1445,168 +1472,8 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
              </span>
           )}
           {/* 🖨️ PRINT BUTTON */}
-{/* 🖨️ PRINT BUTTON - Top bar-ல இருக்கற இடத்துல replace பண்ணு */}
-<button
-  onClick={() => {
-    const proposalSlides = doc.slides.filter(
-      s => s.type === "proposal" || s.type === "proposal_page2"
-    );
-    if (proposalSlides.length === 0) {
-      flash("⚠️ No proposal pages found! Add a Proposal Page first.", "err");
-      return;
-    }
-
-    // Proposal HTML மட்டும் extract பண்ணி new window-ல print
-    const printWindow = window.open("", "_blank", "width=900,height=1200");
-    
-    const proposalHTML = proposalSlides.map(slide => {
-      if (slide.type === "proposal") {
-        return `
-          <div style="width:210mm;min-height:297mm;padding:20mm;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:#000;page-break-after:always;box-sizing:border-box;">
-            
-            <!-- Header -->
-            <div style="text-align:center;margin-bottom:20px;">
-              <div style="font-size:22px;font-weight:bold;margin-bottom:4px;">architects</div>
-              <div style="display:inline-block;background:#ff0000;color:#fff;padding:8px 18px;font-weight:bold;font-size:16px;margin-bottom:4px;">i des</div>
-              <div style="font-size:14px;font-weight:600;">architecture · interiore</div>
-              <div style="font-size:18px;font-weight:bold;margin-top:8px;">INTEGRATED DESIGN SERVICES</div>
-            </div>
-
-            <!-- Ref & Date -->
-            <div style="text-align:right;margin-bottom:16px;">
-              <div>Ref: ${slide.refNo || ""}</div>
-              <div>Dated: ${slide.date || ""}</div>
-            </div>
-
-            <!-- To -->
-            <div style="margin-bottom:16px;">
-              <div><strong>To</strong></div>
-              <div>${slide.clientName || ""},</div>
-              <div>${slide.clientAddress || ""}</div>
-            </div>
-
-            <div style="margin-bottom:16px;">Dear Sir,</div>
-
-            <!-- Subject -->
-            <div style="margin-bottom:16px;font-weight:bold;">
-              Sub: Offer for Architectural consultancy & PMC Service for the proposed 
-              ${slide.projectType || ""} @ ${slide.clientAddress || ""}, CHENNAI.
-            </div>
-
-            <!-- Body -->
-            <div style="margin-bottom:16px;">
-              I hereby express my sincere thanks for giving us the opportunity to design the proposed 
-              <strong>${slide.projectType || ""}</strong>. In this connection we would like to inform you 
-              about the scope of our work in this regard for your kind perusal.
-            </div>
-
-            <!-- Scope of Work -->
-            <div style="margin-bottom:16px;">
-              <div style="font-weight:bold;text-decoration:underline;">1.0 SCOPE OF WORK:</div>
-              <div style="margin-left:16px;margin-top:6px;">
-                <div>${slide.companyName || ""} will provide services in the following stages:</div>
-                ${(slide.scopeOfWork || []).map(item => `<div style="margin-left:16px;">• ${item}</div>`).join("")}
-              </div>
-            </div>
-
-            <!-- Concept Stage -->
-            <div style="margin-bottom:16px;">
-              <div style="font-weight:bold;text-decoration:underline;">2.0 CONCEPT/SCHEMATIC DESIGN STAGE:</div>
-              <div style="margin-left:16px;margin-top:6px;">
-                ${(slide.conceptStage || []).map(item => `<div style="margin-left:16px;">• ${item}</div>`).join("")}
-              </div>
-            </div>
-
-            <!-- Footer -->
-            <div style="position:fixed;bottom:20mm;left:20mm;right:20mm;text-align:center;font-size:10px;color:#666;border-top:2px solid #ff0000;padding-top:8px;">
-              ${slide.companyAddress || ""}
-            </div>
-          </div>
-        `;
-      }
-
-      if (slide.type === "proposal_page2") {
-        return `
-          <div style="width:210mm;min-height:297mm;padding:20mm;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:#000;page-break-after:always;box-sizing:border-box;">
-            
-            <!-- Mini Header -->
-            <div style="text-align:center;margin-bottom:24px;">
-              <div style="display:inline-block;background:#ff0000;color:#fff;padding:4px 10px;font-weight:bold;font-size:13px;">i des</div>
-              <div style="font-size:13px;font-weight:bold;">INTEGRATED DESIGN SERVICES</div>
-            </div>
-
-            <!-- Site Visits -->
-            <div style="margin-bottom:24px;">
-              <div style="font-weight:bold;text-decoration:underline;">3.0 SITE VISITS:</div>
-              <div style="margin-left:16px;margin-top:8px;">
-                ${(slide.siteVisits || []).map(item => `<div style="margin-left:16px;margin-bottom:4px;">• ${item}</div>`).join("")}
-              </div>
-            </div>
-
-            <!-- Fee Structure -->
-            <div style="margin-bottom:24px;">
-              <div style="font-weight:bold;text-decoration:underline;">5.0 FEE STRUCTURE:</div>
-              <div style="margin-left:16px;margin-top:8px;">
-                ${(slide.feeStructure || []).map(item => `<div style="margin-left:16px;margin-bottom:4px;">• ${item}</div>`).join("")}
-              </div>
-            </div>
-
-            <!-- Stages of Payment -->
-            <div style="margin-bottom:32px;">
-              <div style="font-weight:bold;text-decoration:underline;">6.0 STAGES OF PAYMENT:</div>
-              <div style="margin-left:16px;margin-top:8px;">
-                ${(slide.stagesOfPayment || []).map(item => `<div style="margin-left:16px;margin-bottom:4px;">• ${item}</div>`).join("")}
-              </div>
-            </div>
-
-            <!-- Signatures -->
-            <div style="margin-top:60px;display:flex;justify-content:space-between;">
-              <div style="font-weight:bold;">
-                <div>For ${slide.companyName || ""}</div>
-                <div style="margin-top:50px;">(Authorised Signatory)</div>
-              </div>
-              <div style="font-weight:bold;text-align:center;">
-                <div style="margin-top:50px;">(Client Signature)</div>
-              </div>
-            </div>
-
-            <!-- Footer -->
-            <div style="position:fixed;bottom:20mm;left:20mm;right:20mm;text-align:center;font-size:10px;color:#666;border-top:2px solid #ff0000;padding-top:8px;">
-              ${slide.companyAddress || ""}
-            </div>
-          </div>
-        `;
-      }
-      return "";
-    }).join("");
-
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${doc.title} - Proposal</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { background: white; font-family: Arial, sans-serif; }
-            @page { size: A4; margin: 0; }
-            @media print {
-              body { margin: 0; }
-            }
-          </style>
-        </head>
-        <body>
-          ${proposalHTML}
-          <script>
-            window.onload = () => {
-              window.print();
-              window.onafterprint = () => window.close();
-            };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  }}
+{/* 🖨️ PRINT BUTTON - Replaced inline print and directly reusing the proper printProposal function */}
+<button onClick={() => printProposal(doc)}
   style={{
     background: "#fff",
     color: "#374151",
@@ -1624,34 +1491,6 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
 >
   🖨️ Print
 </button>
-<style>{`
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
-  
-  /* ... உன் existing styles ... */
-
-  @media print {
-    /* Editor UI எல்லாம் hide */
-    body > * { display: none !important; }
-    
-    /* Proposal content மட்டும் show */
-    .proposal-content {
-      display: block !important;
-      width: 100% !important;
-      height: auto !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      page-break-after: always;
-    }
-    
-    /* Print button hide */
-    .no-print { display: none !important; }
-    
-    @page {
-      size: A4;
-      margin: 15mm;
-    }
-  }
-`}</style>
           <button onClick={()=>saveDoc()} style={{background:"#7d2ae8",color:"#fff",border:"none",padding:"8px 20px",borderRadius:8,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(125,42,232,0.2)"}}>Share/Save</button>
           
           <div style={{width:32,height:32,borderRadius:"50%",background:"#eee",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#666",border:"2px solid #fff",boxShadow:"0 0 0 1px #e2e8f0"}}>U</div>
@@ -1667,7 +1506,6 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             {id:"templates", icon:"🎨", label:"Design"},
             {id:"elements",  icon:"✦",  label:"Elements"},
             {id:"text",      icon:"T",  label:"Text"},
-            {id:"brand",     icon:"👑", label:"Brand"},
             {id:"uploads",   icon:"☁️", label:"Uploads"}
           ].map(item=>(
             <button key={item.id} onClick={()=>setLeftPanel(leftPanel===item.id?"":item.id)}
@@ -1773,48 +1611,45 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                 </div>
               </div>
 
-              <div style={{flex:1, overflowY:"auto", padding:"16px"}}>
-                  <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16}}>
-                    {[
-                      {id:"shapes",     label:"Shapes",     icon:"🔺", color:"#e0f2fe"},
-                      {id:"graphics",   label:"Graphics",   icon:"🌻", color:"#fef3c7"},
-                      {id:"photos",     label:"Photos",     icon:"📸", color:"#dbeafe"},
-                      {id:"videos",     label:"Videos",     icon:"▶️", color:"#fae8ff"},
-                      {id:"3d",         label:"3D",         icon:"🧊", color:"#e0e7ff"},
-                      {id:"forms",      label:"Forms",      icon:"☑️", color:"#d1fae5"},
-                      {id:"animations", label:"Animations", icon:"😊", color:"#dcfce7"},
-                      {id:"audio",      label:"Audio",      icon:"🎵", color:"#ffe4e6"},
-                      {id:"sheets",     label:"Sheets",     icon:"🧾", color:"#dbeafe"},
-                      {id:"tables",     label:"Tables",     icon:"🧮", color:"#ffedd5"},
-                      {id:"charts",     label:"Charts",     icon:"📉", color:"#cffafe"},
-                      {id:"frames",     label:"Frames",     icon:"🖼️", color:"#d1fae5"},
-                      {id:"grids",      label:"Grids",      icon:"🪟", color:"#fae8ff"},
-                      {id:"mockups",    label:"Mockups",    icon:"👕", color:"#cffafe"}
-                    ].map((cat)=>(
-                      <div key={cat.id} onClick={()=>{
-                        if(cat.id==="shapes") addElement({type:"shape", shape:"circle", width:100, height:100});
-                        else if(cat.id==="graphics") addElement({type:"icon", icon:"🌻", fontSize:80});
-                        else if(cat.id==="photos") addElement({type:"image", src:"https://images.unsplash.com/photo-1497215842964-222b430dc094?w=400&q=80", width:200});
-                        else if(cat.id==="videos") addElement({type:"icon", icon:"▶️", fontSize:80});
-                        else if(cat.id==="3d") addElement({type:"icon", icon:"🧊", fontSize:80});
-                        else if(cat.id==="forms") addElement({type:"icon", icon:"☑️", fontSize:80});
-                        else if(cat.id==="animations") addElement({type:"icon", icon:"😊", fontSize:80});
-                        else if(cat.id==="audio") addElement({type:"icon", icon:"🎵", fontSize:80});
-                        else if(cat.id==="sheets") addElement({type:"icon", icon:"🧾", fontSize:80});
-                        else if(cat.id==="tables") addElement({type:"icon", icon:"🧮", fontSize:80});
-                        else if(cat.id==="charts") addElement({type:"icon", icon:"📉", fontSize:80});
-                        else if(cat.id==="frames") addElement({type:"shape", shape:"square", width:150, height:150, border:"2px dashed #000", color:"transparent"});
-                        else if(cat.id==="grids") addElement({type:"icon", icon:"🪟", fontSize:80});
-                        else if(cat.id==="mockups") addElement({type:"icon", icon:"👕", fontSize:80});
-                        else flash(`${cat.label} collection clicked`);
-                      }} style={{display:"flex", flexDirection:"column", alignItems:"center", gap:8, cursor:"pointer"}} className="sib">
-                        <div style={{width:"100%", aspectRatio:"1", background:cat.color, borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, boxShadow:"0 4px 10px rgba(0,0,0,0.05)"}}>
-                          {cat.icon}
-                        </div>
-                        <span style={{fontSize:12, fontWeight:600, color:"#475569"}}>{cat.label}</span>
-                      </div>
-                    ))}
+              <div style={{flex:1, overflowY:"auto", padding:"16px", display: "flex", flexDirection: "column", gap: 20}}>
+                
+                {/* Shapes */}
+                <div>
+                  <div style={{fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 12}}>Shapes</div>
+                  <div style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10}}>
+                    <div onClick={() => addElement({type:"shape", shape:"circle", width:100, height:100, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:"50%", cursor:"pointer", transition:"all .2s"}} className="sib"/>
+                    <div onClick={() => addElement({type:"shape", shape:"rectangle", width:120, height:100, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:4, cursor:"pointer", transition:"all .2s"}} className="sib"/>
+                    <div onClick={() => addElement({type:"shape", shape:"rounded-rectangle", width:120, height:100, borderRadius: 20, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:20, cursor:"pointer", transition:"all .2s"}} className="sib"/>
+                    <div onClick={() => addElement({type:"shape", shape:"square", width:100, height:100, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:0, cursor:"pointer", transition:"all .2s"}} className="sib"/>
                   </div>
+                </div>
+
+                {/* Photos */}
+                <div>
+                   <div style={{fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 12}}>Photos</div>
+                   <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10}}>
+                     {[
+                       "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80",
+                       "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80",
+                       "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&q=80",
+                       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80"
+                     ].map((url, i) => (
+                       <img key={i} src={url} alt="" onClick={() => addElement({type:"image", src:url, width:250})} style={{width: "100%", borderRadius: 6, cursor: "pointer", transition:"transform .1s"}} className="pgthumb"/>
+                     ))}
+                   </div>
+                </div>
+
+                {/* Graphics */}
+                <div>
+                   <div style={{fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 12}}>Graphics</div>
+                   <div style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10}}>
+                     {["⭐", "❤️", "👍", "🔥", "🚀", "💡", "🎯", "📈"].map((emoji, i) => (
+                       <div key={i} onClick={() => addElement({type:"icon", icon:emoji, fontSize:80})} style={{fontSize: 30, textAlign: "center", cursor: "pointer", background: "#f1f5f9", borderRadius: 8, padding: 8, transition:"all .2s"}} className="sib">
+                         {emoji}
+                       </div>
+                     ))}
+                   </div>
+                </div>
               </div>
             </>}
 
@@ -1946,7 +1781,6 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               </div>
               <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:16}}>
                 {[
-                  {icon:"🪄", title:"Magic Switch", desc:"Resize and translate designs"},
                   {icon:"✂️", title:"Background Remover", desc:"Remove image backgrounds in 1 click"},
                   {icon:"🧹", title:"Magic Eraser", desc:"Brush over objects to remove them"},
                   {icon:"🖌️", title:"Magic Morph", desc:"Transform words with prompts"}

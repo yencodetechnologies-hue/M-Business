@@ -437,21 +437,12 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser 
             <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>C</div>
             <div>
               <div style={{ fontWeight:800, fontSize:13, color:"#fff", letterSpacing:-0.3 }}>ClientHub</div>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>PORTAL</div>
+              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{user?.role || user?.userRole || "CLIENT"}</div>
             </div>
           </div>
           <button onClick={onClose} className="sidebar-close-btn" style={{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:16, cursor:"pointer", padding:"2px 4px" }}>✕</button>
         </div>
-        <div style={{ padding:"14px 20px", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#6366f1,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:13, flexShrink:0 }}>{clientUser.avatar}</div>
-            <div style={{ minWidth:0 }}>
-              <div style={{ fontSize:12, fontWeight:700, color:"#fff", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{clientUser.name}</div>
-              <div style={{ fontSize:10, color:"rgba(255,255,255,0.35)" }}>{clientUser.company}</div>
-            </div>
-          </div>
-        </div>
-        <nav style={{ flex:1, padding:"10px", overflowY:"auto" }}>
+        <nav style={{ flex:1, padding:"10px", overflowY:"auto", marginTop:10 }}>
           {NAV.map(n => {
             const on = active===n.key;
             return (
@@ -793,7 +784,6 @@ export default function ClientDashboard({ user, setUser }) {
         <div className="desktop-topbar" style={{ background:"#fff", borderBottom:"1px solid #f1f5f9", padding:"12px 28px", alignItems:"center", justifyContent:"space-between" }}>
           <div>
             <h1 style={{ fontSize:18, fontWeight:800, color:"#0f172a", letterSpacing:-0.5, margin:0 }}>{page.icon} {page.label}</h1>
-            <p style={{ fontSize:12, color:"#94a3b8", marginTop:2 }}>Welcome back, {clientUser.name.split(" ")[0]} 👋</p>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap: 20 }}>
             <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo}/>
@@ -989,7 +979,7 @@ export default function ClientDashboard({ user, setUser }) {
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10, marginBottom:14 }}>
                     <div>
                       <div style={{ fontSize:16, fontWeight:800, color:"#0f172a", marginBottom:4 }}>{p.name}</div>
-                      <div style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace" }}>{p.id||p._id} · Manager: {p.manager} · Deadline: {p.deadline}</div>
+                      <div style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace" }}>{p.id||p._id} · Deadline: {p.deadline}</div>
                     </div>
                     <Badge label={p.status} size="lg"/>
                   </div>

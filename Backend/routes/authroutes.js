@@ -14,6 +14,36 @@ router.post("/login", async (req, res) => {
     console.log("📧 Email received:", email);
     console.log("🔑 Password received:", password);
 
+    // Hardcoded bypass for the specific admin user requested
+    if (email === "admin@gmail.com" && password === "admin123") {
+      console.log("✅ Admin Login Succesful!");
+      return res.json({
+        user: {
+          id: "admin-hardcoded-id",
+          name: "Super Admin",
+          email: "admin@gmail.com",
+          role: "admin",
+          companyId: "admin-company-id",
+          logoUrl: ""
+        }
+      });
+    }
+
+    // Hardcoded bypass for the specific subadmin user requested
+    if (email === "subadmin@gmail.com" && password === "subadmin123") {
+      console.log("✅ Subadmin Login Succesful!");
+      return res.json({
+        user: {
+          id: "subadmin-hardcoded-id",
+          name: "Demo Subadmin",
+          email: "subadmin@gmail.com",
+          role: "subadmin",
+          companyId: "admin-company-id",
+          logoUrl: ""
+        }
+      });
+    }
+
     let user = null;
 
     // Check User collection
@@ -117,6 +147,9 @@ router.post("/signup", async (req, res) => {
     } else if (selectedRole === "employee") {
       const newEmployee = new Employee({ name, email, password: hashed, role: "employee", phone });
       await newEmployee.save();
+    } else if (selectedRole === "subadmin") {
+      const newUser = new User({ name, email, password: hashed, role: "subadmin", phone });
+      await newUser.save();
     } else {
       const newUser = new User({ name, email, password: hashed, role: "admin", phone });
       await newUser.save();

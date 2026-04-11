@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 import AuthPage           from "./components/AuthPage";
-import Dashboard          from "./components/Dashboard";
+import Dashboard          from "./components/SubAdminDashboard";
+import AdminDashboard     from "./components/AdminDashboard";
 import ClientDashboard    from "./components/ClientDashboard";
 import EmployeeDashboard  from "./components/EmployeeDashboard";
+
 import InvoiceViewer      from "./components/InvoiceViewer";
 import TasksPage          from "./components/TaskPage";
 import CalendarPage       from "./components/CalendarPage";
@@ -79,6 +81,16 @@ const getRootPage = () => {
   if (role === "employee") {
     console.log("✅ Routing to EmployeeDashboard");
     return <EmployeeDashboard user={user} setUser={handleSetUser} />;
+  }
+
+  if (role === "admin") {
+    console.log("👑 Routing to AdminDashboard");
+    return <AdminDashboard user={user} setUser={handleSetUser} />;
+  }
+
+  if (role === "subadmin") {
+    console.log("🛡️ Routing to Main Dashboard (Subadmin logic)");
+    return <Dashboard user={user} setUser={handleSetUser} />;
   }
 
   if (role === "client")

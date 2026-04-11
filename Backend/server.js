@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
-
+const subscriptionCron = require("./jobs/subscriptionCron");
 const app = express();
 // Allow localhost with any port for local development
 const isLocalhost = (origin) => origin && origin.startsWith('http://localhost') || origin?.startsWith('http://127.0.0.1');
@@ -56,6 +56,8 @@ const interviewRoutes = require("./routes/interviewroutes");
 const userRoutes = require("./routes/userroutes");
 const ProposalRoutes = require("./routes/proposalroutes");
 const subscriptionRoutes = require("./routes/subscriptionroutes");
+const subadminRoutes = require("./routes/subadminroutes");
+const packageRoutes = require("./routes/packageroutes");
 
 // Static files (local resume storage)
 const path = require("path");
@@ -67,6 +69,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/managers", managerRoutes);
+app.use("/api/subadmins", subadminRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/project-status", projectStatusRoutes);
 app.use("/api/tasks", TaskPage);
@@ -81,6 +84,7 @@ app.use("/api/employee-dashboard", employeeDashRoutes);
 app.use("/api/quotations", QuotationRoutes);
 app.use("/api/proposals", ProposalRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/packages", packageRoutes);
 app.use("/upload", express.static("uploads"));
 
 app.get("/", (req, res) => {
@@ -99,6 +103,7 @@ mongoose.connect(process.env.MONGO_URI)
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
+    subscriptionCron();
   })
   .catch(err => {
     console.error("❌ MongoDB Connection Error:", err);

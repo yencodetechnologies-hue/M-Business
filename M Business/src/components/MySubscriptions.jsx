@@ -126,25 +126,22 @@ export default function MySubscriptions({ user }) {
   const fetchSubscriptionData = async () => {
     try {
       setLoading(true);
-      
-      // Fetch subscription
-      const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${userId}`);
+
+      // Fetch subscription from user endpoint
+      const subRes = await axios.get(`${BASE_URL}/api/users/${userId}/subscription`);
       if (subRes.data.hasSubscription) {
         setSubscription(subRes.data.subscription);
       }
-      
-      // Fetch payment history
-      const payRes = await axios.get(`${BASE_URL}/api/subscriptions/payments/${userId}`);
-      setPayments(payRes.data || []);
-      
-      // Fetch invoices
-      const invRes = await axios.get(`${BASE_URL}/api/subscriptions/invoices/${userId}`);
-      setInvoices(invRes.data || []);
-      
-      // Fetch quotations
-      const quoRes = await axios.get(`${BASE_URL}/api/subscriptions/quotations/${userId}`);
-      setQuotations(quoRes.data || []);
-      
+
+      // Fetch payment history from user endpoint
+      const payRes = await axios.get(`${BASE_URL}/api/users/${userId}/payments`);
+      const allPayments = payRes.data || [];
+      setPayments(allPayments);
+
+      // Filter invoices and quotations from payments
+      setInvoices(allPayments.filter(p => p.invoiceNo));
+      setQuotations(allPayments.filter(p => p.quotationNo));
+
     } catch (err) {
       setError("Failed to load subscription data");
       console.error(err);
@@ -274,7 +271,7 @@ export default function MySubscriptions({ user }) {
         </div>
 
         <div style={{
-          background: subscription.isFullyPaid 
+          background: subscription.isFullyPaid
             ? "linear-gradient(135deg, #22C55E, #16a34a)"
             : "linear-gradient(135deg, #F59E0B, #d97706)",
           borderRadius: 14,
@@ -293,7 +290,7 @@ export default function MySubscriptions({ user }) {
         </div>
 
         <div style={{
-          background: subscription.status === "active" 
+          background: subscription.status === "active"
             ? "linear-gradient(135deg, #3b82f6, #2563eb)"
             : "linear-gradient(135deg, #6b7280, #4b5563)",
           borderRadius: 14,
@@ -391,10 +388,10 @@ export default function MySubscriptions({ user }) {
                   <span style={{ fontSize: 13, color: T.text, fontWeight: 500 }}>{feature}</span>
                 </div>
               )) || (
-                <div style={{ color: T.muted, fontSize: 13, padding: 20, textAlign: "center" }}>
-                  No features listed for this plan
-                </div>
-              )}
+                  <div style={{ color: T.muted, fontSize: 13, padding: 20, textAlign: "center" }}>
+                    No features listed for this plan
+                  </div>
+                )}
             </div>
           </Card>
 
@@ -657,7 +654,7 @@ export default function MySubscriptions({ user }) {
               <InfoRow label="Payment Method" value={viewPayment.paymentMethod} icon="💳" />
               {viewPayment.invoiceNo && <InfoRow label="Invoice Number" value={viewPayment.invoiceNo} icon="🧾" />}
               {viewPayment.quotationNo && <InfoRow label="Quotation Number" value={viewPayment.quotationNo} icon="📄" />}
-              
+
               <div style={{ marginTop: 20, padding: 16, background: "#faf5ff", borderRadius: 12 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: T.muted, marginBottom: 8, textTransform: "uppercase" }}>
                   Provider Information

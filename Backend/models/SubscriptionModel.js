@@ -4,36 +4,49 @@ const subscriptionSchema = new mongoose.Schema({
   userId: { type: String, required: true, index: true },
   userEmail: { type: String, required: true },
   userName: { type: String },
-  
+
   // Current Plan Details
   planName: { type: String, required: true, enum: ["Free", "Starter", "Professional", "Enterprise"] },
   planPrice: { type: Number, default: 0 },
   billingCycle: { type: String, enum: ["monthly", "yearly"], default: "monthly" },
-  
+
   // Subscription Status
-  status: { type: String, enum: ["active", "inactive", "cancelled", "expired", "pending"], default: "pending" },
+  status: { type: String, enum: ["active", "inactive", "cancelled", "expired", "pending", "grace_period", "hidden"], default: "pending" },
   isFullyPaid: { type: Boolean, default: false },
-  
+
   // Dates
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date },
   nextBillingDate: { type: Date },
-  
+  expiredAt: { type: Date }, // When subscription actually expired
+  hiddenAt: { type: Date }, // When subscription was hidden (60 days after expiry)
+
+  // Reminder tracking
+  reminderSent: { type: Boolean, default: false },
+  reminderSentAt: { type: Date },
+  expiryNotificationSent: { type: Boolean, default: false },
+
   // Features included in plan
   features: [{ type: String }],
-  
+
   // Payment provider info
   paymentMethod: { type: String, enum: ["card", "upi", "netbanking", "cash", "other"], default: "other" },
-  
+
   // M Business as provider
   providerCompany: { type: String, default: "M Business" },
   providerEmail: { type: String, default: "billing@mbusiness.com" },
   providerPhone: { type: String, default: "+91-XXXXXXXXXX" },
-  
+
   // Invoice/Quotation references
   invoiceRefs: [{ type: String }], // Invoice numbers
   quotationRefs: [{ type: String }], // Quotation numbers
-  
+
+  // Tenant Linkage
+  companyId: { type: String, index: true },
+
+  // Subadmin visibility control
+  showInDashboard: { type: Boolean, default: true },
+
   // Metadata
   notes: { type: String },
   createdAt: { type: Date, default: Date.now },

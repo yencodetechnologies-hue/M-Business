@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { EmployeeProfilePanel, DOC_TYPES } from "./EmployeeProfilePanel";
 import AuthPage from "./AuthPage";
+import { BASE_URL } from "../config";
 
 const BASE = "/api/employee-dashboard";
 
@@ -191,21 +192,12 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user }) {
             <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>M</div>
             <div>
               <div style={{ fontWeight:800, fontSize:13, color:"#fff" }}>M Business</div>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>EMPLOYEE</div>
+              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{user?.role || user?.userRole || "EMPLOYEE"}</div>
             </div>
           </div>
           <button onClick={onClose} className="emp-sb-close" style={{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:16, cursor:"pointer" }}>✕</button>
         </div>
-        <div style={{ padding:"14px 20px", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#6366f1,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:13 }}>{initials}</div>
-            <div>
-              <div style={{ fontSize:12, fontWeight:700, color:"#fff", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:120 }}>{user?.name||"Employee"}</div>
-              <div style={{ fontSize:10, color:"rgba(255,255,255,0.35)" }}>{user?.department||"Employee"}</div>
-            </div>
-          </div>
-        </div>
-        <nav style={{ flex:1, padding:"10px", overflowY:"auto" }}>
+        <nav style={{ flex:1, padding:"10px", marginTop:10 }}>
           {NAV.map(n=>{
             const on=active===n.key;
             return (
@@ -335,7 +327,7 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage, doc
       {/* Welcome row */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
         <div>
-          <h1 style={{ fontSize:22, fontWeight:800, color:"#0f172a", margin:0 }}>Welcome back, {name.split(" ")[0]} 👋</h1>
+          <h1 style={{ fontSize:22, fontWeight:800, color:"#0f172a", margin:0 }}>Dashboard</h1>
           <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Here's your work summary for today</p>
         </div>
         {!todayAtt ? (
@@ -1123,6 +1115,9 @@ export default function EmployeeDashboard({ user, setUser }) {
   const [salary,      setSalary]      = useState(SEED_SALARY);
   const [toast,       setToast]       = useState("");
   const [toastType,   setToastType]   = useState("success");
+  const [subscription, setSubscription] = useState(null);
+  const [subLoading,   setSubLoading]   = useState(true);
+  const [subscriptionNotification, setSubscriptionNotification] = useState(null);
 
   // ── NEW: doc status state (shared between panel & dashboard) ──
   const [docStatus,   setDocStatus]   = useState({});
@@ -1204,7 +1199,47 @@ useEffect(()=>{
   axios.get(`${BASE}/tasks/${enc}`).then(r=>{ if(r.data?.length) setTasks(r.data); }).catch(()=>{});
   axios.get(`${BASE}/attendance/${enc}`).then(r=>{ if(r.data) setAttendance(r.data); }).catch(()=>{});
   axios.get(`${BASE}/salary/${enc}`).then(r=>{ if(r.data?.length) setSalary(r.data); }).catch(()=>{});
+  fetchSubscription();
 }, [empName]);
+
+const fetchSubscription = async () => {
+    try {
+      setSubLoading(true);
+      // For employees, we check the company's subscription using the employee-status endpoint
+      const companyId = resolvedUser?.companyId;
+      if (!companyId) return;
+      const res = await axios.get(`${BASE_URL}/api/subscriptions/employee-status/${companyId}`);
+      if (res.data.hasSubscription) {
+        setSubscription(res.data.subscription);
+        // Store notification for display
+        if (res.data.notification) {
+          setSubscriptionNotification(res.data.notification);
+        }
+      }
+    } catch (err) {
+      console.error("Employee subscription fetch failed", err);
+    } finally {
+      setSubLoading(false);
+    }
+  };
+
+  const getSubStatus = () => {
+    if (!subscription) return { blocked: false, alert: false };
+
+    // Handle new status fields from API
+    if (subscription.isHidden) return { blocked: true, alert: false, hidden: true };
+    if (subscription.inGracePeriod) return { blocked: false, alert: true, expired: true, daysSinceExpiry: Math.abs(subscription.daysUntilExpiry) };
+
+    const end = new Date(subscription.endDate);
+    const now = new Date();
+    const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < -60) return { blocked: true, alert: false };
+    if (diffDays <= 10 && diffDays > 0) return { blocked: false, alert: true, days: diffDays };
+    return { blocked: false, alert: false };
+  };
+
+  const subStatus = getSubStatus();
 
   // Called by EmployeeProfilePanel whenever a doc is uploaded/deleted
   const handleDocStatusChange = useCallback((statusMap) => {
@@ -1213,6 +1248,77 @@ useEffect(()=>{
 
   return (
     <div style={{ display:"flex", minHeight:"100vh", background:"#f8fafc", fontFamily:"'DM Sans','Segoe UI',sans-serif" }}>
+
+      {/* Expiry Blocking Overlay */}
+      {subStatus.blocked && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.95)", backdropFilter:"blur(12px)", zIndex:10000, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+          <div style={{ background:"#fff", borderRadius:24, padding:40, maxWidth:450, textAlign:"center", boxShadow:"0 32px 64px rgba(0,0,0,0.5)" }}>
+            <div style={{ fontSize:64, marginBottom:20 }}>🛑</div>
+            <h2 style={{ fontSize:24, fontWeight:900, color:"#0f172a", marginBottom:12 }}>Access Restricted</h2>
+            <p style={{ fontSize:15, color:"#64748b", lineHeight:1.6, marginBottom:24 }}>
+              Your company's subscription package has expired and the grace period has ended. Dashboard access is now restricted.
+            </p>
+            <div style={{ background:"#fef2f2", color:"#ef4444", padding:"12px 16px", borderRadius:12, fontWeight:700, fontSize:14 }}>
+              Contact your administrator to renew the plan.
+            </div>
+            <button onClick={handleLogout} style={{ marginTop:20, background:"none", border:"none", color:"#6366f1", fontWeight:700, cursor:"pointer", fontSize:13 }}>Logout and Exit</button>
+          </div>
+        </div>
+      )}
+
+      {/* Subscription Notification Banner - shows renewal/expiry messages */}
+      {subscriptionNotification && (
+        <div style={{ position:"fixed", top:12, left:"50%", transform:"translateX(-50%)", zIndex:9991, width:"100%", maxWidth:700, padding:"0 16px" }}>
+          <div style={{
+            background: subscriptionNotification.type === "renewal"
+              ? "linear-gradient(135deg, #f59e0b, #d97706)"
+              : subscriptionNotification.type === "expired"
+              ? "linear-gradient(135deg, #ef4444, #dc2626)"
+              : "linear-gradient(135deg, #6b7280, #4b5563)",
+            color:"#fff",
+            borderRadius:14,
+            padding:"14px 24px",
+            display:"flex",
+            alignItems:"center",
+            justifyContent:"center",
+            gap:12,
+            boxShadow:"0 12px 32px rgba(0,0,0,0.2)"
+          }}>
+             <span style={{ fontSize:22 }}>
+               {subscriptionNotification.type === "renewal" ? "⏰" : subscriptionNotification.type === "expired" ? "⚠️" : "🚫"}
+             </span>
+             <div style={{ fontSize:14, fontWeight:700, textAlign:"center" }}>
+               {subscriptionNotification.message}
+             </div>
+             {subscriptionNotification.type === "renewal" && subscriptionNotification.daysLeft <= 10 && (
+               <span style={{
+                 background:"rgba(255,255,255,0.2)",
+                 padding:"4px 12px",
+                 borderRadius:20,
+                 fontSize:12,
+                 fontWeight:800
+               }}>
+                 {subscriptionNotification.daysLeft} days left
+               </span>
+             )}
+          </div>
+        </div>
+      )}
+
+      {/* Legacy Renewal Alert Banner (fallback) */}
+      {!subscriptionNotification && subStatus.alert && (
+        <div style={{ position:"fixed", top:12, left:"50%", transform:"translateX(-50%)", zIndex:9991, width:"100%", maxWidth:600, padding:"0 16px" }}>
+          <div style={{ background:"linear-gradient(135deg, #f59e0b, #d97706)", color:"#fff", borderRadius:14, padding:"12px 20px", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 12px 32px rgba(245,158,11,0.3)" }}>
+             <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+               <span style={{ fontSize:20 }}>⚠️</span>
+               <div style={{ fontSize:13, fontWeight:700 }}>
+                 Please renew your package! Subscription expires in {subStatus.days} days.
+               </div>
+             </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
         * { box-sizing:border-box; margin:0; padding:0; }

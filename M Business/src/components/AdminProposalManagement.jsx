@@ -15,8 +15,32 @@ const THEMES = [
 
 const printProposal = (proposal) => {
   if (!proposal || !proposal.slides) return;
+  
+  const getElementsHTML = (elements) => {
+    if (!elements || elements.length === 0) return '';
+    return `
+      <div style="position:absolute; inset:0; pointer-events:none; z-index:20;">
+        ${elements.map(el => {
+          let content = '';
+          if (el.type === "text") {
+            content = `<div style="font-size:${el.fontSize}px; font-weight:${el.fontWeight}; color:${el.color||'#000'}; white-space:nowrap;">${el.val || ''}</div>`;
+          } else if (el.type === "shape") {
+             const br = el.borderRadius !== undefined ? el.borderRadius + 'px' : (el.shape === 'circle' ? '50%' : '4px');
+             content = `<div style="width:${el.width||60}px; height:${el.height||60}px; background:${el.color||'#7c3aed'}; border-radius:${br};"></div>`;
+          } else if (el.type === "image") {
+             content = `<img src="${el.src}" style="width:${el.width||200}px; height:${el.height||'auto'}; object-fit:contain; pointer-events:none;" />`;
+          } else if (el.type === "icon") {
+             content = `<div style="font-size:${el.fontSize||40}px; display:flex; align-items:center; justify-content:center;">${el.icon}</div>`;
+          }
+          return `<div style="position:absolute; left:${el.x}px; top:${el.y}px;">${content}</div>`;
+        }).join('')}
+      </div>
+    `;
+  };
+
   const proposalHTML = proposal.slides.map(slide => {
       const t = THEMES.find(x=>x.name===proposal.theme)||THEMES[0];
+      const elementsHTML = getElementsHTML(slide.elements);
       
       // Generate HTML for different slide types
       if (slide.type === "cover") {
@@ -26,6 +50,7 @@ const printProposal = (proposal) => {
             <div style="position: absolute; inset: 0; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); z-index: -1;"></div>
             <h1 style="font-size: 48px; font-weight: 900; margin-bottom: 16px; line-height: 1.05;">${slide.title}</h1>
             <p style="font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 28px;">${slide.subtitle}</p>
+            ${elementsHTML}
           </div>
         `;
       }
@@ -36,6 +61,7 @@ const printProposal = (proposal) => {
             <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
             <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
             <p style="font-size: 15px; color: #4b5563; line-height: 1.9; max-width: 620px; white-space: pre-wrap;">${slide.body}</p>
+            ${elementsHTML}
           </div>
         `;
       }
@@ -46,13 +72,14 @@ const printProposal = (proposal) => {
             <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
             <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
             <div style="display: flex; flex-direction: column; gap: 14px;">
-              \${slide.items.map((item, i) => \`
-                <div style="display: flex; gap: 18px; align-items: flex-start; padding: 16px 22px; background: \${t.l}; border-radius: 14px; border: 1px solid \${t.p}20;">
-                  <div style="width: 36px; height: 36px; border-radius: 50%; background: \${t.g}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; flex-shrink: 0;">\${i+1}</div>
-                  <div style="flex: 1; font-size: 14px; color: #1e293b; font-weight: 600; padding-top: 6px;">\${item}</div>
+              ${slide.items.map((item, i) => `
+                <div style="display: flex; gap: 18px; align-items: flex-start; padding: 16px 22px; background: ${t.l}; border-radius: 14px; border: 1px solid ${t.p}20;">
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: ${t.g}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; flex-shrink: 0;">${i+1}</div>
+                  <div style="flex: 1; font-size: 14px; color: #1e293b; font-weight: 600; padding-top: 6px;">${item}</div>
                 </div>
-              \`).join('')}
+              `).join('')}
             </div>
+            ${elementsHTML}
           </div>
         `;
       }
@@ -99,35 +126,35 @@ const printProposal = (proposal) => {
               <div style="font-weight: bold; text-decoration: underline;">1.0 SCOPE OF WORK:</div>
               <div style="margin-left: 20px;">
                 <div>${slide.companyName} will provide services in the following stages as follows:</div>
-                \${slide.scopeOfWork.map(item => \`<div style="margin-left: 16px; margin-bottom: 4px;">• \${item}</div>\`).join('')}
+                ${slide.scopeOfWork.map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
               </div>
             </div>
 
             <div style="margin-bottom: 20px;">
               <div style="font-weight: bold; text-decoration: underline;">2.0 CONCEPT STAGE:</div>
               <div style="margin-left: 20px;">
-                \${slide.conceptStage.map(item => \`<div style="margin-left: 16px; margin-bottom: 4px;">• \${item}</div>\`).join('')}
+                ${slide.conceptStage.map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
               </div>
             </div>
 
             <div style="margin-bottom: 24px;">
               <div style="font-weight: bold; text-decoration: underline;">3.0 SITE VISITS:</div>
               <div style="margin-left: 16px; margin-top: 8px;">
-                \${(slide.siteVisits || []).map(item => \`<div style="margin-left: 16px; margin-bottom: 4px;">• \${item}</div>\`).join('')}
+                ${(slide.siteVisits || []).map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
               </div>
             </div>
 
             <div style="margin-bottom: 24px;">
               <div style="font-weight: bold; text-decoration: underline;">5.0 FEE STRUCTURE:</div>
               <div style="margin-left: 16px; margin-top: 8px;">
-                \${(slide.feeStructure || []).map(item => \`<div style="margin-left: 16px; margin-bottom: 4px;">• \${item}</div>\`).join('')}
+                ${(slide.feeStructure || []).map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
               </div>
             </div>
 
             <div style="margin-bottom: 32px;">
               <div style="font-weight: bold; text-decoration: underline;">6.0 STAGES OF PAYMENT:</div>
               <div style="margin-left: 16px; margin-top: 8px;">
-                \${(slide.stagesOfPayment || []).map(item => \`<div style="margin-left: 16px; margin-bottom: 4px;">• \${item}</div>\`).join('')}
+                ${(slide.stagesOfPayment || []).map(item => `<div style="margin-left: 16px; margin-bottom: 4px;">• ${item}</div>`).join('')}
               </div>
             </div>
 
@@ -144,15 +171,17 @@ const printProposal = (proposal) => {
             <div style="position: fixed; bottom: 20mm; left: 20mm; right: 20mm; text-align: center; font-size: 10px; color: #666; border-top: 2px solid #ff0000; padding-top: 8px;">
               ${slide.companyAddress || ""}
             </div>
+            ${elementsHTML}
           </div>
         `;
       }
       
       // Default slide handling
       return `
-        <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center;">
+        <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative;">
           <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading || 'Slide'}</h1>
           <p style="font-size: 15px; color: #4b5563; line-height: 1.9; white-space: pre-wrap;">${slide.body || ''}</p>
+          ${elementsHTML}
         </div>
       `;
     }).join("");
@@ -166,7 +195,7 @@ const printProposal = (proposal) => {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>\${proposal.title} - Proposal</title>
+          <title>${proposal.title} - Proposal</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { background: white; font-family: Arial, sans-serif; }
@@ -177,7 +206,7 @@ const printProposal = (proposal) => {
           </style>
         </head>
         <body>
-          \${proposalHTML}
+          ${proposalHTML}
           <script>
             window.onload = () => {
               window.print();

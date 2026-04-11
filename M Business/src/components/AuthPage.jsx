@@ -12,7 +12,7 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginErr, setLoginErr] = useState({});
-  const [regData, setRegData] = useState({ name: "", email: "", phone: "", password: "", confirm: "", role: "Admin" });
+  const [regData, setRegData] = useState({ name: "", email: "", phone: "", password: "", confirm: "", role: "Subadmin", companyName: "", companyType: "IT", employeeCount: "0-10" });
   const [regErr, setRegErr] = useState({});
 const handleLogin = async () => {
   const errs = {};
@@ -63,15 +63,24 @@ const handleLogin = async () => {
 
     console.log("Sending data:", regData); // 🔥 debug
 
-    const res = await axios.post(
-      `${BASE_URL}/api/auth/signup`,
-      {
+    const payload = {
         name: regData.name,
         email: regData.email,
         password: regData.password,
         role: regData.role,
         phone: regData.phone,
-      },
+      };
+
+      // Add company details for Subadmin registration
+      if (regData.role === "Subadmin") {
+        payload.companyName = regData.companyName;
+        payload.companyType = regData.companyType;
+        payload.employeeCount = regData.employeeCount;
+      }
+
+    const res = await axios.post(
+      `${BASE_URL}/api/auth/signup`,
+      payload,
       {
         timeout: 15000  // ⏱️ important (15 sec)
       }
@@ -80,7 +89,16 @@ const handleLogin = async () => {
     console.log("Response:", res.data); // 🔥 debug
 
     setSuccess("Account created successfully!");
-    setTab("login");
+    
+    // Auto-login after successful registration
+    const userData = res.data.user;
+    if (userData) {
+      const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+      localStorage.setItem("user", JSON.stringify(userWithLogo));
+      setUser(userWithLogo);
+    } else {
+      setTab("login");
+    }
 
   } catch (e) {
     console.log("ERROR:", e); // 🔥 debug
@@ -204,7 +222,7 @@ const handleLogin = async () => {
                 {tab==="login" ? "WELCOME BACK" : "CREATE YOUR ACCOUNT"}
               </div>
               <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>
-                {tab==="login" ? "Sign in to continue to your dashboard." : "Fill in the details below to get started."}
+                {tab==="login" ? "" : "Fill in the details below to get started."}
               </div>
             </div>
 
@@ -278,6 +296,54 @@ const handleLogin = async () => {
                     </div>
                     {regErr.password && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {regErr.password}</div>}
                   </div>
+                  {/* Role Selection - Client registration disabled, only Subadmin allowed */}
+                  <div style={{ gridColumn:"1/-1", marginBottom:13 }}>
+
+                    <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+                      
+                    </div>
+                    
+                  </div>
+
+                  {/* Company Fields - Only for Subadmin */}
+                  {regData.role === "Subadmin" && (
+                    <>
+                      <div style={{ gridColumn:"1/-1", marginBottom:13 }}>
+                        <label style={lStyle}>Company Name</label>
+                        <div style={{ position:"relative" }}>
+                          <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>🏢</span>
+                          <input value={regData.companyName} onChange={e=>setRegData(p=>({...p,companyName:e.target.value}))} placeholder="Your company name" style={{ ...iStyle(regErr.companyName), paddingLeft:38 }}/>
+                        </div>
+                      </div>
+                      <div style={{ marginBottom:13 }}>
+                        <label style={lStyle}>Company Type</label>
+                        <select
+                          value={regData.companyType}
+                          onChange={e=>setRegData(p=>({...p,companyType:e.target.value}))}
+                          style={{ ...iStyle(false), paddingLeft:12, cursor:"pointer" }}
+                        >
+                          <option value="IT" style={{background:"#1e0a3c",color:"#fff"}}>IT</option>
+                          <option value="Software" style={{background:"#1e0a3c",color:"#fff"}}>Software</option>
+                          <option value="Services" style={{background:"#1e0a3c",color:"#fff"}}>Services</option>
+                          <option value="Consulting" style={{background:"#1e0a3c",color:"#fff"}}>Consulting</option>
+                          <option value="Other" style={{background:"#1e0a3c",color:"#fff"}}>Other</option>
+                        </select>
+                      </div>
+                      <div style={{ marginBottom:13 }}>
+                        <label style={lStyle}>No. of Employees</label>
+                        <select
+                          value={regData.employeeCount}
+                          onChange={e=>setRegData(p=>({...p,employeeCount:e.target.value}))}
+                          style={{ ...iStyle(false), paddingLeft:12, cursor:"pointer" }}
+                        >
+                          {["0-10","11-50","51-100","100+"].map(ec => (
+                            <option key={ec} value={ec} style={{background:"#1e0a3c",color:"#fff"}}>{ec}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  )}
+
                   <div style={{ gridColumn:"1/-1", marginBottom:13 }}>
                     <label style={lStyle}>Confirm Password</label>
                     <div style={{ position:"relative" }}>

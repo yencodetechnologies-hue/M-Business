@@ -1,0 +1,994 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { BASE_URL } from "../config";
+import InvoiceCreator from "./InvoiceCreator";
+import AccountsPage, { ExpensesPage } from "./AccountsPage";
+import TaskPage from "./TaskPage";
+import CalendarPage from "./CalendarPage";
+import ReportsPage from "./ReportsPage";
+import QuotationCreator from "./QuotationCreator";
+import ProjectProposalCreator from "./ProjectProposalCreator";
+import AdminProposalManagement from "./AdminProposalManagement";
+
+const sc = (s) => ({
+  Active: "#22C55E",
+  Inactive: "#EF4444",
+  Pending: "#F59E0B",
+}[s] || "#6366f1");
+
+function Badge({ label }) {
+  const c = sc(label);
+  return (
+    <span style={{ background:`${c}18`, color:c, border:`1px solid ${c}30`, padding:"2px 10px", borderRadius:20, fontSize:11, fontWeight:700, whiteSpace:"nowrap" }}>
+      {label}
+    </span>
+  );
+}
+
+const NAV = [
+  { key: "dashboard", icon: "🏠", label: "Dashboard" },
+  { key: "clients", icon: "👥", label: "Clients" },
+  { key: "subadmins", icon: "🛡️", label: "Subadmins" },
+  { key: "employees", icon: "👨‍💼", label: "Employees" },
+  { key: "managers", icon: "🧑‍💼", label: "Managers" },
+  { key: "projects", icon: "📁", label: "Projects" },
+  { key: "quotations", icon: "📋", label: "Quotations" },
+  { key: "proposals", icon: "🎨", label: "Project Proposals" },
+  { key: "invoices", icon: "🧾", label: "Invoices" },
+  { key: "tracking", icon: "📊", label: "Project Status" },
+  { key: "tasks", icon: "✅", label: "Tasks" },
+  { key: "calendar", icon: "📆", label: "Calendar" },
+  { key: "accounts", icon: "👤", label: "Accounts" },
+  { key: "interviews", icon: "🎯", label: "Interviews" },
+  { key: "reports", icon: "📈", label: "Reports" },
+  { key: "subscriptions", icon: "💳", label: "Subscriptions" },
+  { key: "packages", icon: "📦", label: "Packages" },
+  { key: "payments", icon: "💰", label: "Payments" }
+];
+
+export default function AdminDashboard({ user, setUser }) {
+  const [active, setActive] = useState("dashboard");
+  const [subadmins, setSubadmins] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [managers, setManagers] = useState([]);
+  const [quotations, setQuotations] = useState([]);
+
+  useEffect(() => {
+    fetchSubadmins();
+    fetchClients();
+    fetchProjects();
+    fetchSubscriptions();
+    fetchEmployees();
+    fetchManagers();
+    fetchQuotations();
+  }, []);
+
+  const fetchSubadmins = async () => {
+    try {
+      // In case we don't have a subadmin route, we can fetch all users and filter
+      const res = await axios.get(BASE_URL + "/api/subadmins").catch(async () => {
+         // Fallback to fetch from users auth logic or something similar if needed
+         return { data: [] };
+      });
+      setSubadmins(res.data);
+    } catch(e) { console.error(e); }
+  };
+  const fetchClients = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/clients");
+      setClients(res.data);
+    } catch(e) { console.error(e); }
+  };
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/projects");
+      setProjects(res.data);
+    } catch(e) { console.error(e); }
+  };
+  const fetchSubscriptions = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/subscriptions/all");
+      setSubscriptions(res.data);
+    } catch(e) { console.error(e); }
+  };
+  const fetchEmployees = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/employees");
+      setEmployees(res.data);
+    } catch(e) { console.error(e); }
+  };
+  const fetchManagers = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/managers");
+      setManagers(res.data);
+    } catch(e) { console.error(e); }
+  };
+  const fetchQuotations = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/quotations");
+      setQuotations(res.data);
+    } catch(e) { console.error(e); }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+  };
+
+  const initials = (user?.name || "Admin").substring(0, 2).toUpperCase();
+
+  return (
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+      {/* SIDEBAR */}
+      <div style={{ width: 240, background: "#0f172a", color: "#fff", display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "24px 20px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 34, height: 34, background: "linear-gradient(135deg,#3b82f6,#2dd4bf)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900 }}>M</div>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 14 }}>M Business</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: 1.5 }}>ADMIN DASHBOARD</div>
+          </div>
+        </div>
+
+        <nav style={{ flex: 1, padding: "20px 14px", overflowY: "auto" }}>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1, marginBottom: 12, paddingLeft: 8 }}>MENU</div>
+          {NAV.map(n => {
+            const on = active === n.key;
+            return (
+              <button key={n.key} onClick={() => setActive(n.key)}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: on ? "rgba(59,130,246,0.15)" : "transparent", border: "none", borderRadius: 10, color: on ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight: on ? 700 : 500, fontSize: 13, cursor: "pointer", marginBottom: 4, transition: "all 0.2s", textAlign: "left", fontFamily: "inherit" }}>
+                <span style={{ fontSize: 16 }}>{n.icon}</span>
+                <span style={{ flex: 1 }}>{n.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <div style={{ padding: "16px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+          <button onClick={handleLogout} style={{ width: "100%", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "10px", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>🚪 Logout</button>
+        </div>
+      </div>
+
+      {/* CONTENT */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ padding: "20px 30px", background: "#fff", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0f172a" }}>
+              {NAV.find(n => n.key === active)?.label}
+            </h2>
+            <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>Admin Control Panel</div>
+          </div>
+        </div>
+
+        <div style={{ flex: 1, padding: 30, overflowY: "auto" }}>
+          {active === "dashboard" && <OverviewPage subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} />}
+          {active === "clients" && <ClientsPage clients={clients} setClients={setClients} />}
+          {active === "subadmins" && <SubadminsList subadmins={subadmins} refresh={fetchSubadmins} />}
+          {active === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
+          {active === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
+          {active === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
+          {active === "quotations" && <QuotationCreator clients={clients} projects={projects} />}
+          {active === "proposals" && <AdminProposalManagement />}
+          {active === "invoices" && <InvoiceCreator clients={clients} projects={projects} />}
+          {active === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
+          {active === "tasks" && <TaskPage projects={projects} employees={employees} />}
+          {active === "calendar" && <CalendarPage projects={projects} clients={clients} />}
+          {active === "accounts" && <AccountsPage ExpensesPage={ExpensesPage} />}
+          {active === "interviews" && <InterviewPage />}
+          {active === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
+          {active === "subscriptions" && <SubscriptionsPage subscriptions={subscriptions} />}
+          {active === "packages" && <PackagesPage />}
+          {active === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Dashboard Overview ──
+function OverviewPage({ subadmins, clients, employees, managers, projects }) {
+  const stats = [
+    { label: "Total Clients", value: clients.length, color: "#9333ea" },
+    { label: "Employees", value: employees.length, color: "#7c3aed" },
+    { label: "Managers", value: managers.length, color: "#f59e0b" },
+    { label: "Projects", value: projects.length, color: "#a855f7" },
+    { label: "Subadmins", value: subadmins.length, color: "#3b82f6" },
+    { label: "Active Packages", value: "4", color: "#10b981" },
+  ];
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
+      {stats.map(s => (
+        <div key={s.label} style={{ background: "#fff", borderRadius: 16, padding: 20, boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>{s.label}</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: s.color, marginTop: 8 }}>{s.value}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Subadmins List ──
+function SubadminsList({ subadmins, refresh }) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [companyModalOpen, setCompanyModalOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [companyData, setCompanyData] = useState(null);
+  const [companyLoading, setCompanyLoading] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", companyName: "", companyType: "IT", employeeCount: "0-10" });
+  const [loading, setLoading] = useState(false);
+
+  const handleViewCompany = async (companyName) => {
+    if (!companyName || companyName === "—") return;
+    setSelectedCompany(companyName);
+    setCompanyModalOpen(true);
+    setCompanyLoading(true);
+    try {
+      const res = await axios.get(`${BASE_URL}/api/subadmins/company/${encodeURIComponent(companyName)}`);
+      setCompanyData(res.data);
+    } catch (e) {
+      alert("Failed to fetch company details: " + (e.response?.data?.msg || e.message));
+    } finally {
+      setCompanyLoading(false);
+    }
+  };
+
+  const handleCreate = async () => {
+    if(!form.name || !form.email || !form.password) return alert("Name, email and password required.");
+    setLoading(true);
+    try {
+      await axios.post(`${BASE_URL}/api/subadmins`, { ...form, role: "subadmin" });
+      setModalOpen(false);
+      setForm({ name: "", email: "", password: "", phone: "", companyName: "", companyType: "IT", employeeCount: "0-10" });
+      refresh();
+    } catch(e) {
+      alert("Failed to create subadmin: " + (e.response?.data?.msg || e.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Registered Subadmins ({subadmins.length})</h3>
+        <button onClick={() => setModalOpen(true)} style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Subadmin</button>
+      </div>
+      
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <thead>
+          <tr style={{ background: "#f8fafc" }}>
+            {["Name", "Email", "Phone", "Company", "Type", "Employees", "Status", "Joined", "Actions"].map(h => (
+              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {subadmins.map((s, i) => (
+            <tr key={s._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+              <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{s.name}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{s.email}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{s.phone || "—"}</td>
+              <td style={{ padding: "14px 16px" }}>
+                <span
+                  onClick={() => handleViewCompany(s.companyName || s.company)}
+                  style={{
+                    color: (s.companyName || s.company) ? "#3b82f6" : "#94a3b8",
+                    fontWeight: 600,
+                    cursor: (s.companyName || s.company) ? "pointer" : "default",
+                    textDecoration: (s.companyName || s.company) ? "underline" : "none"
+                  }}
+                >
+                  {s.companyName || s.company || "—"}
+                </span>
+              </td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{s.companyType || "IT"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{s.employeeCount || "0-10"}</td>
+              <td style={{ padding: "14px 16px" }}><Badge label={s.status || "Active"} /></td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#ef4444", cursor: "pointer", fontWeight: 600 }} onClick={async () => {
+                if(window.confirm("Delete this subadmin?")) {
+                  await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`);
+                  refresh();
+                }
+              }}>Delete</td>
+            </tr>
+          ))}
+          {subadmins.length === 0 && <tr><td colSpan={9} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No subadmins found</td></tr>}
+        </tbody>
+      </table>
+
+      {companyModalOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+          <div style={{ background: "#fff", padding: 24, borderRadius: 16, width: 900, maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#0f172a" }}>
+                {selectedCompany} - Company Details
+              </h3>
+              <button onClick={() => setCompanyModalOpen(false)} style={{ background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#64748b" }}>×</button>
+            </div>
+
+            {companyLoading ? (
+              <div style={{ textAlign: "center", padding: 40, color: "#64748b" }}>Loading...</div>
+            ) : companyData ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                {/* Summary Cards */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+                  <div style={{ background: "#eff6ff", padding: 16, borderRadius: 12, border: "1px solid #dbeafe" }}>
+                    <div style={{ fontSize: 12, color: "#64748b", marginBottom: 4 }}>Employees</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: "#3b82f6" }}>{companyData.employees?.length || 0}</div>
+                  </div>
+                  <div style={{ background: "#f0fdf4", padding: 16, borderRadius: 12, border: "1px solid #bbf7d0" }}>
+                    <div style={{ fontSize: 12, color: "#64748b", marginBottom: 4 }}>Managers</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: "#22c55e" }}>{companyData.managers?.length || 0}</div>
+                  </div>
+                  <div style={{ background: "#fef3c7", padding: 16, borderRadius: 12, border: "1px solid #fde68a" }}>
+                    <div style={{ fontSize: 12, color: "#64748b", marginBottom: 4 }}>Clients</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: "#f59e0b" }}>{companyData.clients?.length || 0}</div>
+                  </div>
+                  <div style={{ background: "#f3e8ff", padding: 16, borderRadius: 12, border: "1px solid #d8b4fe" }}>
+                    <div style={{ fontSize: 12, color: "#64748b", marginBottom: 4 }}>Quotations</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: "#a855f7" }}>{companyData.quotations?.length || 0}</div>
+                  </div>
+                </div>
+
+                {/* Employees Section */}
+                {companyData.employees?.length > 0 && (
+                  <div>
+                    <h4 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 20 }}>👥</span> Employees
+                    </h4>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc" }}>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Name</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Email</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Department</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {companyData.employees.map((emp, i) => (
+                          <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                            <td style={{ padding: "10px 12px" }}>{emp.name}</td>
+                            <td style={{ padding: "10px 12px", color: "#64748b" }}>{emp.email}</td>
+                            <td style={{ padding: "10px 12px" }}>{emp.department || "—"}</td>
+                            <td style={{ padding: "10px 12px" }}><Badge label={emp.status || "Active"} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Managers Section */}
+                {companyData.managers?.length > 0 && (
+                  <div>
+                    <h4 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 20 }}>🎯</span> Managers
+                    </h4>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc" }}>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Name</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Email</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Department</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {companyData.managers.map((mgr, i) => (
+                          <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                            <td style={{ padding: "10px 12px" }}>{mgr.managerName}</td>
+                            <td style={{ padding: "10px 12px", color: "#64748b" }}>{mgr.email}</td>
+                            <td style={{ padding: "10px 12px" }}>{mgr.department || "—"}</td>
+                            <td style={{ padding: "10px 12px" }}><Badge label={mgr.status || "Active"} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Clients Section */}
+                {companyData.clients?.length > 0 && (
+                  <div>
+                    <h4 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 20 }}>🤝</span> Clients
+                    </h4>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc" }}>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Client Name</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Email</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Phone</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {companyData.clients.map((client, i) => (
+                          <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                            <td style={{ padding: "10px 12px" }}>{client.clientName}</td>
+                            <td style={{ padding: "10px 12px", color: "#64748b" }}>{client.email}</td>
+                            <td style={{ padding: "10px 12px" }}>{client.phone || "—"}</td>
+                            <td style={{ padding: "10px 12px" }}><Badge label={client.status || "Active"} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Quotations Section */}
+                {companyData.quotations?.length > 0 && (
+                  <div>
+                    <h4 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: "#0f172a", display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 20 }}>📄</span> Quotations
+                    </h4>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc" }}>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Quote #</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Status</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Items</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: "#64748b" }}>Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {companyData.quotations.map((quote, i) => (
+                          <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                            <td style={{ padding: "10px 12px" }}>{quote.qt?.quoteNumber || `QT-${i + 1}`}</td>
+                            <td style={{ padding: "10px 12px" }}><Badge label={quote.status || "draft"} /></td>
+                            <td style={{ padding: "10px 12px" }}>{quote.items?.length || 0} items</td>
+                            <td style={{ padding: "10px 12px", color: "#64748b" }}>
+                              {quote.createdAt ? new Date(quote.createdAt).toLocaleDateString() : "—"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* No Data Message */}
+                {!companyData.employees?.length && !companyData.managers?.length && !companyData.clients?.length && !companyData.quotations?.length && (
+                  <div style={{ textAlign: "center", padding: 40, color: "#64748b" }}>
+                    No data found for this company.
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {modalOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+          <div style={{ background: "#fff", padding: 24, borderRadius: 16, width: 450, maxHeight: "90vh", overflowY: "auto" }}>
+            <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 700 }}>Create New Subadmin</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <input placeholder="Name *" value={form.name} onChange={e=>setForm({...form, name: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+              <input placeholder="Email *" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+              <input placeholder="Password *" type="password" value={form.password} onChange={e=>setForm({...form, password: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+              <input placeholder="Phone" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <input placeholder="Company Name" value={form.companyName} onChange={e=>setForm({...form, companyName: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+                <select value={form.companyType} onChange={e=>setForm({...form, companyType: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }}>
+                  <option value="IT">IT</option>
+                  <option value="Software">Software</option>
+                  <option value="Services">Services</option>
+                  <option value="Consulting">Consulting</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <select value={form.employeeCount} onChange={e=>setForm({...form, employeeCount: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }}>
+                {["0-10","11-50","51-100","100+"].map(ec => <option key={ec} value={ec}>{ec} Employees</option>)}
+              </select>
+
+              <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                <button onClick={() => setModalOpen(false)} style={{ flex: 1, padding: "10px", background: "#f1f5f9", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+                <button onClick={handleCreate} disabled={loading} style={{ flex: 1, padding: "10px", background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", opacity: loading ? 0.7 : 1 }}>{loading ? "Creating..." : "Create"}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Subscriptions Page ──
+function SubscriptionsPage({ subscriptions }) {
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const filtered = subscriptions.filter(sub => {
+    const matchesSearch = (sub.userName || "").toLowerCase().includes(search.toLowerCase()) ||
+                         (sub.userEmail || "").toLowerCase().includes(search.toLowerCase()) ||
+                         (sub.planName || "").toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === "all" || sub.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const statusColors = {
+    active: "#22C55E",
+    pending: "#F59E0B",
+    expired: "#EF4444",
+    cancelled: "#64748B"
+  };
+
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>
+          All Subscriptions ({subscriptions.length})
+        </h3>
+        <div style={{ display: "flex", gap: 12 }}>
+          <input
+            placeholder="Search user, email or plan..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13, minWidth: 220 }}
+          />
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13 }}
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="expired">Expired</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
+
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <thead>
+          <tr style={{ background: "#f8fafc" }}>
+            {["User Name", "Email", "Plan", "Price", "Billing", "Status", "Start Date", "End Date", "Provider"].map(h => (
+              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((sub, i) => (
+            <tr key={sub._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+              <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{sub.userName || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{sub.userEmail || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#3b82f6", fontWeight: 600 }}>{sub.planName || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#0f172a", fontWeight: 700 }}>₹{sub.planPrice || 0}</td>
+              <td style={{ padding: "14px 16px", color: "#475569", textTransform: "capitalize" }}>{sub.billingCycle || "—"}</td>
+              <td style={{ padding: "14px 16px" }}>
+                <span style={{
+                  background: `${statusColors[sub.status] || "#64748B"}18`,
+                  color: statusColors[sub.status] || "#64748B",
+                  border: `1px solid ${statusColors[sub.status] || "#64748B"}30`,
+                  padding: "2px 10px",
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: "capitalize"
+                }}>
+                  {sub.status || "—"}
+                </span>
+              </td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>
+                {sub.startDate ? new Date(sub.startDate).toLocaleDateString() : "—"}
+              </td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>
+                {sub.endDate ? new Date(sub.endDate).toLocaleDateString() : "—"}
+              </td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{sub.providerCompany || "—"}</td>
+            </tr>
+          ))}
+          {filtered.length === 0 && (
+            <tr>
+              <td colSpan={9} style={{ padding: 40, textAlign: "center", color: "#94a3b8" }}>
+                {subscriptions.length === 0 ? "No subscriptions found" : "No matching subscriptions"}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Packages Page ──
+function PackagesPage() {
+  const [billing, setBilling] = useState("monthly"); // monthly | annual
+
+  const packages = [
+    {
+      id: "trial",
+      icon: "⚓",
+      title: "TRIAL",
+      desc: "Built for standard usage — simple data management and trial access.",
+      price: { monthly: "Free", annual: "Free" },
+      period: "/ 60 days",
+      btnText: "Get Started",
+      btnPrimary: false,
+      featuresTitle: "Trial includes:",
+      features: [
+        "Single business manage",
+        "Dropdown support",
+        "1 Manager",
+        "3 Client manage"
+      ]
+    },
+    {
+      id: "monthly",
+      icon: "🎖️",
+      title: "MONTHLY",
+      desc: "Built for growing operations — smart automation for scaling teams.",
+      price: { monthly: "₹999", annual: "₹4,999" },
+      period: billing === "monthly" ? "/ 90 days" : "/ 6 months", 
+      btnText: "Choose Monthly",
+      btnPrimary: true,
+      featuresTitle: "Everything in Trial, plus:",
+      features: [
+        "1 Manager",
+        "3 Client manage",
+        "Unlimited features",
+        "Priority support"
+      ]
+    },
+    {
+      id: "yearly",
+      icon: "📦",
+      title: "YEARLY",
+      desc: "Built for your most complex operations — maximum usage limits.",
+      price: { monthly: "₹1,999", annual: "₹9,999" },
+      period: "/ year",
+      btnText: "Choose Yearly",
+      btnPrimary: false,
+      featuresTitle: "Everything in Monthly, plus:",
+      features: [
+        "Unlimited Managers",
+        "Unlimited Clients management",
+        "24/7 Enterprise Support",
+        "Custom Branding"
+      ]
+    }
+  ];
+
+  return (
+    <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+      {/* Toggle */}
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 40 }}>
+        <span style={{ fontSize: 15, fontWeight: 700, color: billing === "monthly" ? "#0f172a" : "#64748b", transition: "0.2s" }}>Monthly</span>
+        <div 
+          onClick={() => setBilling(b => b === "monthly" ? "annual" : "monthly")}
+          style={{ width: 50, height: 26, background: "#e2e8f0", borderRadius: 30, position: "relative", cursor: "pointer" }}
+        >
+          <div style={{ width: 20, height: 20, background: "#0ea5e9", borderRadius: "50%", position: "absolute", top: 3, left: billing === "monthly" ? 3 : 27, transition: "left 0.3s cubic-bezier(0.4,0,0.2,1)" }} />
+        </div>
+        <span style={{ fontSize: 15, fontWeight: 700, color: billing === "annual" ? "#0f172a" : "#64748b", transition: "0.2s" }}>Annual</span>
+      </div>
+
+      {/* Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", background: "#fff", borderRadius: 24, boxShadow: "0 10px 40px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid #f1f5f9" }}>
+        {packages.map((p, idx) => (
+          <div key={p.id} style={{ padding: 32, borderRight: idx !== 2 ? "1px solid #f1f5f9" : "none", display: "flex", flexDirection: "column" }}>
+            <div style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #e0f2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, marginBottom: 20 }}>
+              {p.icon}
+            </div>
+            
+            <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 1 }}>{p.title}</h3>
+            <p style={{ margin: "0 0 32px", fontSize: 13, color: "#64748b", lineHeight: 1.6, minHeight: 60 }}>{p.desc}</p>
+            
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>Pricing</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 32 }}>
+              <span style={{ fontSize: 32, fontWeight: 800, color: "#0f172a" }}>{billing === "monthly" ? p.price.monthly : p.price.annual}</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "#64748b" }}>{p.period}</span>
+            </div>
+
+            <button style={{ width: "100%", padding: 14, borderRadius: 12, background: p.btnPrimary ? "#0ea5e9" : "#fff", color: p.btnPrimary ? "#fff" : "#0f172a", border: p.btnPrimary ? "none" : "2px solid #f1f5f9", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "0.2s", marginBottom: 32 }}>
+              {p.btnText}
+            </button>
+
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginBottom: 16 }}>{p.featuresTitle}</div>
+              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 12 }}>
+                {p.features.map((f, i) => (
+                  <li key={i} style={{ fontSize: 13, color: "#475569", display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <span style={{ color: "#3b82f6", fontWeight: 900, fontSize: 10, marginTop: 2 }}>✓</span>
+                    <span style={{ lineHeight: 1.4 }}>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Clients Page ──
+function ClientsPage({ clients, setClients }) {
+  const [search, setSearch] = useState("");
+  const filtered = clients.filter(c =>
+    (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (c.email || "").toLowerCase().includes(search.toLowerCase()) ||
+    (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>All Clients ({filtered.length})</h3>
+        <input
+          placeholder="Search clients..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13, minWidth: 200 }}
+        />
+      </div>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <thead>
+          <tr style={{ background: "#f8fafc" }}>
+            {["Name", "Company", "Email", "Phone", "Status", "Joined"].map(h => (
+              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((c, i) => (
+            <tr key={c._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+              <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{c.clientName || c.name || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{c.companyName || c.company || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{c.email || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{c.phone || "—"}</td>
+              <td style={{ padding: "14px 16px" }}><Badge label={c.status || "Active"} /></td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
+            </tr>
+          ))}
+          {filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No clients found</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Employees Page ──
+function EmployeesPage({ employees, setEmployees }) {
+  const [search, setSearch] = useState("");
+  const filtered = employees.filter(e =>
+    (e.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (e.email || "").toLowerCase().includes(search.toLowerCase()) ||
+    (e.role || "").toLowerCase().includes(search.toLowerCase()) ||
+    (e.department || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>All Employees ({filtered.length})</h3>
+        <input
+          placeholder="Search employees..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13, minWidth: 200 }}
+        />
+      </div>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <thead>
+          <tr style={{ background: "#f8fafc" }}>
+            {["Name", "Email", "Role", "Department", "Status", "Joined"].map(h => (
+              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((e, i) => (
+            <tr key={e._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+              <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{e.name || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{e.email || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{e.role || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{e.department || "—"}</td>
+              <td style={{ padding: "14px 16px" }}><Badge label={e.status || "Active"} /></td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>{e.createdAt ? new Date(e.createdAt).toLocaleDateString() : "—"}</td>
+            </tr>
+          ))}
+          {filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No employees found</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Managers Page ──
+function ManagersPage({ managers, setManagers }) {
+  const [search, setSearch] = useState("");
+  const filtered = managers.filter(m =>
+    (m.managerName || m.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (m.email || "").toLowerCase().includes(search.toLowerCase()) ||
+    (m.department || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>All Managers ({filtered.length})</h3>
+        <input
+          placeholder="Search managers..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13, minWidth: 200 }}
+        />
+      </div>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <thead>
+          <tr style={{ background: "#f8fafc" }}>
+            {["Name", "Email", "Department", "Role", "Status", "Joined"].map(h => (
+              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((m, i) => (
+            <tr key={m._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+              <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{m.managerName || m.name || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{m.email || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{m.department || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{m.role || "Manager"}</td>
+              <td style={{ padding: "14px 16px" }}><Badge label={m.status || "Active"} /></td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>{m.createdAt ? new Date(m.createdAt).toLocaleDateString() : "—"}</td>
+            </tr>
+          ))}
+          {filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No managers found</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Projects Page ──
+function ProjectsPage({ projects, setProjects, clients, employees }) {
+  const [search, setSearch] = useState("");
+  const filtered = projects.filter(p =>
+    (p.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (p.client || "").toLowerCase().includes(search.toLowerCase()) ||
+    (p.status || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>All Projects ({filtered.length})</h3>
+        <input
+          placeholder="Search projects..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13, minWidth: 200 }}
+        />
+      </div>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <thead>
+          <tr style={{ background: "#f8fafc" }}>
+            {["Project Name", "Client", "Status", "Start Date", "End Date", "Budget"].map(h => (
+              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((p, i) => (
+            <tr key={p._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+              <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{p.name || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{p.client || "—"}</td>
+              <td style={{ padding: "14px 16px" }}><Badge label={p.status || "Pending"} /></td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>{p.start ? new Date(p.start).toLocaleDateString() : "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>{p.end ? new Date(p.end).toLocaleDateString() : "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{p.budget ? `₹${p.budget}` : "—"}</td>
+            </tr>
+          ))}
+          {filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No projects found</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Project Status Page ──
+function ProjectStatusPage({ clients, employees, managers }) {
+  const [tracking] = useState([
+    { id: "PRJ001", name: "Website Redesign", client: "TechNova Pvt Ltd", deadline: "2024-05-30", progress: 65, status: "In Progress" },
+    { id: "PRJ002", name: "Mobile App Dev", client: "Bloom Creatives", deadline: "2024-08-15", progress: 15, status: "Pending" },
+    { id: "PRJ003", name: "ERP Integration", client: "Infra Solutions", deadline: "2024-04-30", progress: 100, status: "Completed" }
+  ]);
+
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+      <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Project Status Tracking</h3>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <thead>
+          <tr style={{ background: "#f8fafc" }}>
+            {["Project ID", "Name", "Client", "Deadline", "Progress", "Status"].map(h => (
+              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {tracking.map((t, i) => (
+            <tr key={t.id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+              <td style={{ padding: "14px 16px", fontFamily: "monospace", color: "#64748b" }}>{t.id}</td>
+              <td style={{ padding: "14px 16px", fontWeight: 600, color: "#0f172a" }}>{t.name}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{t.client}</td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>{t.deadline}</td>
+              <td style={{ padding: "14px 16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ flex: 1, background: "#e2e8f0", borderRadius: 4, height: 6 }}>
+                    <div style={{ width: `${t.progress}%`, background: t.progress === 100 ? "#22C55E" : "#3b82f6", borderRadius: 4, height: "100%" }} />
+                  </div>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>{t.progress}%</span>
+                </div>
+              </td>
+              <td style={{ padding: "14px 16px" }}><Badge label={t.status} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Interview Page ──
+function InterviewPage() {
+  const [candidates] = useState([
+    { id: 1, name: "John Doe", role: "Developer", status: "pending", email: "john@example.com" },
+    { id: 2, name: "Jane Smith", role: "Designer", status: "hired", email: "jane@example.com" },
+    { id: 3, name: "Bob Wilson", role: "Manager", status: "rejected", email: "bob@example.com" }
+  ]);
+  const [filter, setFilter] = useState("all");
+
+  const filtered = candidates.filter(c => filter === "all" || c.status === filter);
+  const counts = { total: candidates.length, pending: candidates.filter(c => c.status === "pending").length, hired: candidates.filter(c => c.status === "hired").length, rejected: candidates.filter(c => c.status === "rejected").length };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
+        {[{ t: "Total", v: counts.total, c: "#3b82f6" }, { t: "Pending", v: counts.pending, c: "#f59e0b" }, { t: "Hired", v: counts.hired, c: "#22C55E" }, { t: "Rejected", v: counts.rejected, c: "#EF4444" }].map(({ t, v, c }) => (
+          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: 16, boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0", textAlign: "center" }}>
+            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 4 }}>{t}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+          {["all", "pending", "hired", "rejected"].map(f => (
+            <button key={f} onClick={() => setFilter(f)} style={{ padding: "6px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "1px solid", borderColor: filter === f ? "#3b82f6" : "#e2e8f0", background: filter === f ? "#eff6ff" : "#fff", color: filter === f ? "#3b82f6" : "#64748b" }}>
+              {f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+        </div>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: "#f8fafc" }}>
+              {["Name", "Role", "Email", "Status"].map(h => (
+                <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((c, i) => (
+              <tr key={c.id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{c.name}</td>
+                <td style={{ padding: "14px 16px", color: "#475569" }}>{c.role}</td>
+                <td style={{ padding: "14px 16px", color: "#475569" }}>{c.email}</td>
+                <td style={{ padding: "14px 16px" }}><Badge label={c.status} /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

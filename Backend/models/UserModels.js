@@ -6,8 +6,10 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone:    { type: String, default: "" },
   role:     { type: String, default: "user" },
-  logoUrl:  { type: String, default: "" },  
+  logoUrl:  { type: String, default: "" },
   companyId: { type: String, default: "" },
+  mySubscriptions: { type: Boolean, default: false },
+  numberOfSubscriptions: { type: Number, default: 0 },
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);

@@ -3,19 +3,19 @@ const router = express.Router();
 const Subscription = require("../models/SubscriptionModel");
 const PaymentHistory = require("../models/PaymentHistoryModel");
 
-// Get current subscription for a user
-router.get("/current/:userId", async (req, res) => {
+// Get current subscription for a user or company
+router.get("/current/:id", async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { id } = req.params;
     const subscription = await Subscription.findOne({ 
-      userId: userId,
-      status: { $in: ["active", "pending"] }
+      $or: [{ userId: id }, { companyId: id }],
+      status: { $in: ["active", "pending", "expired"] }
     }).sort({ createdAt: -1 });
     
     if (!subscription) {
       return res.json({ 
         hasSubscription: false,
-        message: "No active subscription found" 
+        message: "No subscription found" 
       });
     }
     
@@ -236,6 +236,7 @@ router.post("/seed/:userId", async (req, res) => {
     
     const subscription = new Subscription({
       userId,
+      companyId: userId, // Assuming userId is companyId for subadmins
       userEmail: email,
       userName: name,
       planName: "Professional",
@@ -324,6 +325,112 @@ router.post("/seed/:userId", async (req, res) => {
       message: "Sample subscription data seeded successfully",
       subscription,
       payments: [payment1, payment2]
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get subscription status for employee dashboard
+router.get("/employee-status/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const now = new Date();
+
+    const subscription = await Subscription.findOne({
+      $or: [{ userId }, { companyId: userId }],
+      status: { $in: ["active", "expired", "grace_period", "hidden"] }
+    }).sort({ createdAt: -1 });
+
+    if (!subscription) {
+      return res.json({
+        hasSubscription: false,
+        message: "No subscription found"
+      });
+    }
+
+    const daysUntilExpiry = subscription.endDate
+      ? Math.ceil((new Date(subscription.endDate) - now) / (1000 * 60 * 60 * 24))
+      : null;
+
+    const inGracePeriod = subscription.status === "expired" || subscription.status === "grace_period";
+    const isHidden = subscription.status === "hidden";
+
+    res.json({
+      hasSubscription: subscription.status === "active" || inGracePeriod,
+      subscription: {
+        planName: subscription.planName,
+        status: subscription.status,
+        endDate: subscription.endDate,
+        daysUntilExpiry,
+        inGracePeriod,
+        isHidden,
+        reminderSent: subscription.reminderSent,
+        reminderSentAt: subscription.reminderSentAt
+      },
+      notification: subscription.reminderSent && daysUntilExpiry <= 10 && daysUntilExpiry > 0
+        ? {
+            type: "renewal",
+            message: `Your ${subscription.planName} subscription expires in ${daysUntilExpiry} days. Please renew soon.`,
+            daysLeft: daysUntilExpiry
+          }
+        : inGracePeriod
+        ? {
+            type: "expired",
+            message: `Your ${subscription.planName} subscription has expired. Please contact your administrator to renew.`,
+            daysSinceExpiry: Math.abs(daysUntilExpiry)
+          }
+        : isHidden
+        ? {
+            type: "hidden",
+            message: "Your subscription has expired and is no longer accessible. Please contact your administrator."
+          }
+        : null
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Toggle mysubscriptions visibility for subadmin
+router.put("/toggle-visibility/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { showSubscriptions } = req.body;
+
+    await Subscription.updateMany(
+      { $or: [{ userId }, { companyId: userId }] },
+      { showInDashboard: showSubscriptions }
+    );
+
+    res.json({
+      success: true,
+      showSubscriptions,
+      message: `Subscriptions ${showSubscriptions ? 'visible' : 'hidden'} in dashboard`
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get subscription count for subadmin (when showSubscriptions is false)
+router.get("/count/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const count = await Subscription.countDocuments({
+      $or: [{ userId }, { companyId: userId }]
+    });
+
+    const activeCount = await Subscription.countDocuments({
+      $or: [{ userId }, { companyId: userId }],
+      status: "active"
+    });
+
+    res.json({
+      total: count,
+      active: activeCount,
+      expired: count - activeCount
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

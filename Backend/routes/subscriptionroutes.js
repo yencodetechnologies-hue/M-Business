@@ -353,18 +353,28 @@ router.get("/employee-status/:userId", async (req, res) => {
       ? Math.ceil((new Date(subscription.endDate) - now) / (1000 * 60 * 60 * 24))
       : null;
 
+    const daysSinceExpiry = daysUntilExpiry < 0 ? Math.abs(daysUntilExpiry) : 0;
     const inGracePeriod = subscription.status === "expired" || subscription.status === "grace_period";
     const isHidden = subscription.status === "hidden";
+    
+    // 60-day restriction: hide subscription details if expired for more than 60 days
+    const shouldHideSubscription = daysSinceExpiry > 60;
+    
+    if (shouldHideSubscription && subscription.status !== "hidden") {
+      await Subscription.findByIdAndUpdate(subscription._id, {
+        status: "hidden"
+      });
+    }
 
     res.json({
       hasSubscription: subscription.status === "active" || inGracePeriod,
-      subscription: {
+      subscription: shouldHideSubscription ? null : {
         planName: subscription.planName,
         status: subscription.status,
         endDate: subscription.endDate,
         daysUntilExpiry,
         inGracePeriod,
-        isHidden,
+        isHidden: shouldHideSubscription || isHidden,
         reminderSent: subscription.reminderSent,
         reminderSentAt: subscription.reminderSentAt
       },
@@ -374,13 +384,13 @@ router.get("/employee-status/:userId", async (req, res) => {
             message: `Your ${subscription.planName} subscription expires in ${daysUntilExpiry} days. Please renew soon.`,
             daysLeft: daysUntilExpiry
           }
-        : inGracePeriod
+        : inGracePeriod && daysSinceExpiry <= 60
         ? {
             type: "expired",
             message: `Your ${subscription.planName} subscription has expired. Please contact your administrator to renew.`,
-            daysSinceExpiry: Math.abs(daysUntilExpiry)
+            daysSinceExpiry
           }
-        : isHidden
+        : shouldHideSubscription || isHidden
         ? {
             type: "hidden",
             message: "Your subscription has expired and is no longer accessible. Please contact your administrator."

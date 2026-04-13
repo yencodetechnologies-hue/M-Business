@@ -283,6 +283,177 @@ function Search({ value, onChange, placeholder }) {
   );
 }
 
+function ClientDropdown({ clients, value, onChange, error }) {
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const filtered = clients.filter(c => 
+    (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase())
+  );
+  const selected = clients.find(c => (c.clientName || c.name) === value);
+  
+  return (
+    <div style={{ position: "relative" }}>
+      <div onClick={() => setOpen(!open)} style={{
+        width: "100%",
+        border: `1.5px solid ${error ? "#EF4444" : open ? "#9333ea" : "#ede9fe"}`,
+        borderRadius: 10,
+        padding: "10px 36px 10px 14px",
+        fontSize: 13,
+        color: value ? T.text : "#a78bfa",
+        background: "#faf5ff",
+        cursor: "pointer",
+        userSelect: "none",
+        boxSizing: "border-box",
+        position: "relative",
+        minHeight: 42
+      }}>
+        {value ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg,#9333ea,#c084fc)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#fff",
+              fontSize: 10,
+              fontWeight: 700,
+              flexShrink: 0
+            }}>
+              {value[0].toUpperCase()}
+            </div>
+            <span>{value}</span>
+            {selected?.companyName && (
+              <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>
+            )}
+          </div>
+        ) : "-- Select Client --"}
+        <span style={{
+          position: "absolute",
+          right: 12,
+          top: "50%",
+          transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`,
+          fontSize: 10,
+          color: "#a78bfa",
+          transition: "0.2s"
+        }}>▼</span>
+      </div>
+      {open && (
+        <div style={{
+          position: "absolute",
+          top: "calc(100% + 4px)",
+          left: 0,
+          right: 0,
+          background: "#fff",
+          border: "1.5px solid #ede9fe",
+          borderRadius: 12,
+          boxShadow: "0 8px 32px rgba(147,51,234,0.15)",
+          zIndex: 999,
+          overflow: "hidden"
+        }}>
+          <div style={{ padding: "10px 10px 6px" }}>
+            <div style={{ position: "relative" }}>
+              <span style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: 12
+              }}>🔍</span>
+              <input
+                autoFocus
+                placeholder="Search client..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onClick={e => e.stopPropagation()}
+                style={{
+                  width: "100%",
+                  padding: "7px 10px 7px 30px",
+                  border: "1.5px solid #ede9fe",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  background: "#faf5ff",
+                  outline: "none",
+                  fontFamily: "inherit",
+                  boxSizing: "border-box"
+                }}
+              />
+            </div>
+          </div>
+          <div style={{ maxHeight: 180, overflowY: "auto" }}>
+            {filtered.length === 0 ? (
+              <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>
+                No clients found
+              </div>
+            ) : (
+              filtered.map((c, i) => {
+                const name = c.clientName || c.name || "";
+                const company = c.companyName || c.company || "";
+                const isSel = value === name;
+                return (
+                  <div
+                    key={i}
+                    onClick={() => {
+                      onChange(name);
+                      setOpen(false);
+                      setSearch("");
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      padding: "10px 14px",
+                      cursor: "pointer",
+                      background: isSel ? "#f3e8ff" : "transparent",
+                      borderBottom: "1px solid #f5f3ff"
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"}
+                    onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}
+                  >
+                    <div style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: "50%",
+                      background: "linear-gradient(135deg,#9333ea,#c084fc)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#fff",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      flexShrink: 0
+                    }}>
+                      {name[0]?.toUpperCase() || "?"}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>
+                      {company && (
+                        <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}</div>
+                      )}
+                    </div>
+                    {isSel && <span style={{ fontSize: 14, color: "#9333ea" }}>✓</span>}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+      {open && <div style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 998
+      }} onClick={() => {
+        setOpen(false);
+        setSearch("");
+      }} />}
+    </div>
+  );
+}
+
 function Mdl({ title, onClose, children, maxWidth = 820 }) {
   return (
     <div style={{
@@ -341,14 +512,30 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
 
 export default function AdminProposalManagement() {
   const [proposals, setProposals] = useState([]);
+  const [clients, setClients] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedProposal, setSelectedProposal] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedClient, setSelectedClient] = useState("");
+  const [proposalTitle, setProposalTitle] = useState("");
+  const [creatingProposal, setCreatingProposal] = useState(false);
 
   useEffect(() => {
     fetchProposals();
+    fetchClients();
   }, []);
+
+  const fetchClients = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/clients`);
+      setClients(response.data || []);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+      setClients([]);
+    }
+  };
 
   const fetchProposals = async () => {
     try {
@@ -364,7 +551,43 @@ export default function AdminProposalManagement() {
   };
 
   const createNewProposal = () => {
-    window.location.href = "/project-proposal?new=true";
+    setShowCreateModal(true);
+    setSelectedClient("");
+    setProposalTitle("");
+  };
+
+  const handleCreateProposal = async () => {
+    if (!selectedClient || !proposalTitle.trim()) {
+      alert("Please select a client and enter a proposal title");
+      return;
+    }
+
+    try {
+      setCreatingProposal(true);
+      const newProposal = {
+        id: `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random()*9000)+1000)}`,
+        title: proposalTitle.trim(),
+        client: selectedClient,
+        status: "draft",
+        theme: "Violet",
+        format: "ppt",
+        slides: []
+      };
+
+      const response = await axios.post(`${BASE_URL}/api/proposals`, newProposal);
+      setProposals(prev => [response.data, ...prev]);
+      setShowCreateModal(false);
+      setSelectedClient("");
+      setProposalTitle("");
+      
+      // Redirect to proposal editor
+      window.location.href = `/project-proposal?edit=${response.data.id}`;
+    } catch (error) {
+      console.error("Error creating proposal:", error);
+      alert("Failed to create proposal. Please try again.");
+    } finally {
+      setCreatingProposal(false);
+    }
   };
 
   const handleApprove = async (proposalId) => {
@@ -981,6 +1204,105 @@ export default function AdminProposalManagement() {
                 }}
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </Mdl>
+      )}
+
+      {/* Create Proposal Modal */}
+      {showCreateModal && (
+        <Mdl
+          title="Create New Proposal"
+          onClose={() => setShowCreateModal(false)}
+          maxWidth={500}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div>
+              <label style={{
+                display: "block",
+                fontSize: 11,
+                color: "#7c3aed",
+                fontWeight: 700,
+                letterSpacing: 0.5,
+                marginBottom: 5
+              }}>
+                CLIENT *
+              </label>
+              <ClientDropdown
+                clients={clients}
+                value={selectedClient}
+                onChange={setSelectedClient}
+              />
+            </div>
+            
+            <div>
+              <label style={{
+                display: "block",
+                fontSize: 11,
+                color: "#7c3aed",
+                fontWeight: 700,
+                letterSpacing: 0.5,
+                marginBottom: 5
+              }}>
+                PROPOSAL TITLE *
+              </label>
+              <input
+                type="text"
+                value={proposalTitle}
+                onChange={e => setProposalTitle(e.target.value)}
+                placeholder="Enter proposal title..."
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  border: "1.5px solid #ede9fe",
+                  borderRadius: 10,
+                  fontSize: 13,
+                  color: T.text,
+                  background: "#faf5ff",
+                  outline: "none",
+                  fontFamily: "inherit",
+                  boxSizing: "border-box"
+                }}
+              />
+            </div>
+
+            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  background: "#f5f3ff",
+                  border: "1px solid #ede9fe",
+                  color: T.text,
+                  borderRadius: 10,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontFamily: "inherit"
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateProposal}
+                disabled={creatingProposal}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  background: "linear-gradient(135deg,#7c3aed,#a855f7)",
+                  border: "none",
+                  borderRadius: 10,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#fff",
+                  cursor: creatingProposal ? "not-allowed" : "pointer",
+                  fontFamily: "inherit",
+                  opacity: creatingProposal ? 0.7 : 1
+                }}
+              >
+                {creatingProposal ? "Creating..." : "Create & Edit Proposal"}
               </button>
             </div>
           </div>

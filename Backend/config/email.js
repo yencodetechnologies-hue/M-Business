@@ -63,4 +63,51 @@ const sendExpiryNotification = async (userEmail, userName, planName) => {
   return await sendEmail(userEmail, `Your ${planName} Subscription Has Expired`, html);
 };
 
-module.exports = { sendEmail, sendRenewalReminder, sendExpiryNotification };
+const sendOTPEmail = async (userEmail, otp, purpose = 'verification') => {
+  const purposeText = {
+    verification: 'verify your email address',
+    password_reset: 'reset your password',
+    login: 'complete your login'
+  }[purpose] || 'verify your account';
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+        <h2 style="color: white; margin: 0;">M Business</h2>
+      </div>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
+        <h3 style="color: #1f2937; margin-top: 0;">Your OTP Code</h3>
+        <p style="color: #4b5563;">Hello,</p>
+        <p style="color: #4b5563;">Use the following OTP code to ${purposeText}. This code will expire in 10 minutes.</p>
+        <div style="background: #f5f3ff; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+          <span style="font-size: 32px; font-weight: bold; color: #9333ea; letter-spacing: 8px;">${otp}</span>
+        </div>
+        <p style="color: #6b7280; font-size: 14px;">If you didn't request this code, please ignore this email.</p>
+        <p style="color: #6b7280; font-size: 12px; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+          This is an automated email from M Business. Please do not reply.
+        </p>
+      </div>
+    </div>
+  `;
+  return await sendEmail(userEmail, `Your M Business OTP Code - ${purpose.replace('_', ' ').toUpperCase()}`, html);
+};
+
+// Simple utility function to send quick emails
+const sendQuickEmail = async (to, subject, message) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%); padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
+        <h2 style="color: white; margin: 0;">M Business</h2>
+      </div>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
+        <p style="color: #1f2937;">${message}</p>
+        <p style="color: #6b7280; font-size: 12px; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+          This is an automated email from M Business. Please do not reply.
+        </p>
+      </div>
+    </div>
+  `;
+  return await sendEmail(to, subject, html);
+};
+
+module.exports = { sendEmail, sendRenewalReminder, sendExpiryNotification, sendOTPEmail, sendQuickEmail };

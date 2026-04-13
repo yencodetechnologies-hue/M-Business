@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import PaymentProcessor from "./PaymentProcessor";
+import PaymentDashboard from "./PaymentDashboard";
 
 const T = {
   primary: "#3b0764",
@@ -127,14 +129,14 @@ export default function MySubscriptions({ user }) {
     try {
       setLoading(true);
 
-      // Fetch subscription from user endpoint
-      const subRes = await axios.get(`${BASE_URL}/api/users/${userId}/subscription`);
+      // Fetch subscription from subscription endpoint
+      const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${userId}`);
       if (subRes.data.hasSubscription) {
         setSubscription(subRes.data.subscription);
       }
 
-      // Fetch payment history from user endpoint
-      const payRes = await axios.get(`${BASE_URL}/api/users/${userId}/payments`);
+      // Fetch payment history
+      const payRes = await axios.get(`${BASE_URL}/api/subscriptions/payments/${userId}`);
       const allPayments = payRes.data || [];
       setPayments(allPayments);
 
@@ -329,10 +331,11 @@ export default function MySubscriptions({ user }) {
       {/* Tabs */}
       <div style={{ display: "flex", gap: 8, borderBottom: "2px solid #ede9fe", paddingBottom: 2 }}>
         {[
-          { key: "overview", label: "Overview", icon: "📋" },
-          { key: "payments", label: "Payment History", icon: "💰" },
-          { key: "invoices", label: "Invoices", icon: "🧾" },
-          { key: "quotations", label: "Quotations", icon: "📄" }
+          { key: "overview", label: "Overview", icon: "" },
+          { key: "payments", label: "Payment History", icon: "" },
+          { key: "upgrade", label: "Upgrade/Extend", icon: "" },
+          { key: "invoices", label: "Invoices", icon: "" },
+          { key: "quotations", label: "Quotations", icon: "" }
         ].map(tab => (
           <button
             key={tab.key}
@@ -532,8 +535,18 @@ export default function MySubscriptions({ user }) {
         </Card>
       )}
 
+      {activeTab === "upgrade" && (
+        <Card title="Upgrade or Extend Subscription" icon="        ">
+          <PaymentDashboard 
+            userId={userId} 
+            userEmail={userEmail} 
+            userName={user?.name || user?.clientName || "User"}
+          />
+        </Card>
+      )}
+
       {activeTab === "quotations" && (
-        <Card title={`Quotations (${quotations.length})`} icon="📄">
+        <Card title={`Quotations (${quotations.length})`} icon="        ">
           {quotations.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
               <div style={{ fontSize: 32, marginBottom: 12 }}>📋</div>

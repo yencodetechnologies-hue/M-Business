@@ -47,7 +47,7 @@ const NAV = [
 function getNavForRole(role) {
   const r = (role || "").toLowerCase().trim();
   if (r === "subadmin" || r === "sub_admin" || r === "sub-admin")
-    return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "interviews", "reports", "mysubscriptions"].includes(n.key));
+    return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "interviews", "reports", "mysubscriptions", "packages", "payments"].includes(n.key));
   // if(r==="manager")
   //   return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
   // if(r==="employee")
@@ -1697,7 +1697,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [active, setActive] = useState("dashboard");
   const [modal, setModal] = useState(null);
   const [subscription, setSubscription] = useState(null);
-  const [subLoading, setSubLoading] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [accountAuthOpen, setAccountAuthOpen] = useState(false);
@@ -1772,8 +1771,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
 
   const [quotations, setQuotations] = useState([]);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [subLoading, setSubLoading] = useState(true);
 
-  useEffect(() => { fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); }, []);
+  useEffect(() => { fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); }, []);
 
   const fetchSubscription = async () => {
     try {
@@ -1788,6 +1789,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       console.error("Subscription fetch failed", err);
     } finally {
       setSubLoading(false);
+    }
+  };
+
+  const fetchPaymentHistory = async () => {
+    try {
+      const id = user?._id || user?.id;
+      if (!id) return;
+      const res = await axios.get(`${BASE_URL}/api/subscriptions/payments/${id}`);
+      setPaymentHistory(res.data || []);
+    } catch (err) {
+      console.error("Payment history fetch failed", err);
     }
   };
 
@@ -1985,6 +1997,116 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {/* ── Dashboard ── */}
           {validActive === "dashboard" && <>
+            {/* Subscription Status Alert */}
+            {subStatus.alert && (
+              <div style={{ 
+                background: "linear-gradient(135deg,#fef3c7,#fde68a)", 
+                border: "2px solid #f59e0b", 
+                borderRadius: 12, 
+                padding: "16px 20px", 
+                marginBottom: 18, 
+                display: "flex", 
+                alignItems: "center", 
+                gap: 12 
+              }}>
+                <div style={{ fontSize: 24 }}>⚠️</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#92400e", marginBottom: 4 }}>
+                    Subscription Renewal Required
+                  </div>
+                  <div style={{ fontSize: 13, color: "#78350f" }}>
+                    Your {subscription?.planName} subscription expires in {subStatus.days} days. Please renew your subscription to continue using all features.
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setActive("mysubscriptions")}
+                  style={{
+                    background: "linear-gradient(135deg,#f59e0b,#d97706)",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "8px 16px",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontFamily: "inherit"
+                  }}
+                >
+                  Renew Now
+                </button>
+              </div>
+            )}
+
+            {/* Company Info & Subscription Card */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 18 }}>
+              <SC title="Company Information">
+                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe" }}>
+                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
+                    {user?.companyName?.[0]?.toUpperCase() || "C"}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: T.text, marginBottom: 2 }}>
+                      {user?.companyName || "Company Name"}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#7c3aed" }}>
+                      {user?.companyType || "Company Type"} • {user?.employeeCount || "0"} Employees
+                    </div>
+                  </div>
+                </div>
+                <InfoRow icon="📧" label="Email" value={user?.email} />
+                <InfoRow icon="📱" label="Phone" value={user?.phone} />
+              </SC>
+
+              <SC title="Current Subscription">
+                {subLoading ? (
+                  <div style={{ textAlign: "center", padding: 40, color: "#a78bfa" }}>Loading subscription...</div>
+                ) : subscription ? (
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: 14, border: "1px solid #bbf7d0", marginBottom: 12 }}>
+                      <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
+                        💳
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: "#166534", marginBottom: 2 }}>
+                          {subscription.planName} Plan
+                        </div>
+                        <div style={{ fontSize: 13, color: "#15803d", fontWeight: 600 }}>
+                          ₹{subscription.planPrice?.toLocaleString() || "0"}/{subscription.billingCycle}
+                        </div>
+                      </div>
+                      <Badge label={subscription.status === "active" ? "Fully Paid" : "Pending"} />
+                    </div>
+                    <InfoRow icon="📅" label="Start Date" value={new Date(subscription.startDate).toLocaleDateString()} />
+                    <InfoRow icon="⏰" label="End Date" value={new Date(subscription.endDate).toLocaleDateString()} />
+                    <InfoRow icon="🔄" label="Next Billing" value={new Date(subscription.nextBillingDate).toLocaleDateString()} />
+                    <InfoRow icon="✅" label="Payment Status" value={subscription.isFullyPaid ? "Fully Paid" : "Pending"} />
+                  </div>
+                ) : (
+                  <div style={{ textAlign: "center", padding: 40, color: "#a78bfa" }}>
+                    <div style={{ fontSize: 24, marginBottom: 8 }}>💳</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>No Active Subscription</div>
+                    <div style={{ fontSize: 12, color: "#7c3aed", marginBottom: 12 }}>Choose a plan to get started</div>
+                    <button 
+                      onClick={() => setActive("packages")}
+                      style={{
+                        background: "linear-gradient(135deg,#9333ea,#a855f7)",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "8px 16px",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: "#fff",
+                        cursor: "pointer",
+                        fontFamily: "inherit"
+                      }}
+                    >
+                      View Plans
+                    </button>
+                  </div>
+                )}
+              </SC>
+            </div>
+
             <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 18 }}>
               {[{ t: "Total Clients", v: clients.length, i: "👥", c: "#9333ea" }, { t: "Employees", v: employees.length, i: "👨‍💼", c: "#7c3aed" }, { t: "Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Projects", v: projects.length, i: "📁", c: "#a855f7" }, { t: "Invoices", v: INVOICES.length, i: "🧾", c: "#22C55E" }].map(({ t, v, i, c }) => (
                 <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", position: "relative", overflow: "hidden" }}>
@@ -1997,7 +2119,45 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
             <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14, marginBottom: 14 }}>
               <SC title="Recent Projects"><div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 300 }}><thead><tr style={{ background: "#faf5ff" }}>{["Project", "Client", "Status"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "#a78bfa", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe" }}>{c.toUpperCase()}</th>)}</tr></thead><tbody>{projects.slice(0, 5).map((p, i) => <tr key={i} style={{ borderBottom: "1px solid #f5f3ff" }}><td style={{ padding: "9px 10px", fontWeight: 600, color: T.text }}>{p.name}</td><td style={{ padding: "9px 10px", color: "#a78bfa" }}>{p.client}</td><td style={{ padding: "9px 10px" }}><Badge label={p.status} /></td></tr>)}</tbody></table></div></SC>
-              <SC title="Recent Activity">{[{ icon: "👤", text: "New client added", time: "2m ago", c: "#9333ea" }, { icon: "👨‍💼", text: "Employee joined", time: "30m ago", c: "#7c3aed" }, { icon: "🧾", text: "Invoice created", time: "1h ago", c: "#22C55E" }, { icon: "📁", text: "Project updated", time: "3h ago", c: "#a855f7" }, { icon: "✅", text: "ERP completed", time: "2d ago", c: "#F59E0B" }].map((a, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: i < 4 ? "1px solid #f5f3ff" : "none" }}><div style={{ width: 28, height: 28, borderRadius: 8, background: `${a.c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{a.icon}</div><div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 12, fontWeight: 600, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.text}</div><div style={{ fontSize: 11, color: "#a78bfa" }}>{a.time}</div></div></div>))}</SC>
+              <SC title="Payment History">
+                {paymentHistory.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: 30, color: "#a78bfa" }}>
+                    <div style={{ fontSize: 24, marginBottom: 8 }}>💳</div>
+                    <div style={{ fontSize: 12, fontWeight: 600 }}>No payment history</div>
+                  </div>
+                ) : (
+                  <div style={{ maxHeight: 200, overflowY: "auto" }}>
+                    {paymentHistory.slice(0, 5).map((payment, i) => (
+                      <div key={i} style={{ 
+                        display: "flex", 
+                        justifyContent: "space-between", 
+                        alignItems: "center", 
+                        padding: "8px 0", 
+                        borderBottom: i < 4 ? "1px solid #f5f3ff" : "none" 
+                      }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: T.text, marginBottom: 2 }}>
+                            {payment.description || payment.type}
+                          </div>
+                          <div style={{ fontSize: 11, color: "#a78bfa" }}>
+                            {payment.invoiceNo && `INV: ${payment.invoiceNo}`}
+                            {payment.quotationNo && ` • QUO: ${payment.quotationNo}`}
+                          </div>
+                          <div style={{ fontSize: 10, color: "#a78bfa" }}>
+                            {new Date(payment.paymentDate).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#22c55e" }}>
+                            ₹{payment.amount?.toLocaleString() || "0"}
+                          </div>
+                          <Badge label={payment.status || "completed"} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SC>
             </div>
             <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <SC title="Project Progress">{TRACKING_SEED.map(t => (<div key={t.id} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{t.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: sc(t.status) }}>{t.pct}%</span></div><div style={{ background: "#ede9fe", borderRadius: 6, height: 6 }}><div style={{ width: `${t.pct}%`, background: t.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%" }} /></div><div style={{ fontSize: 11, color: "#a78bfa", marginTop: 2 }}>{t.client}</div></div>))}</SC>
@@ -2400,4 +2560,3 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     </div>
   );
 }
-

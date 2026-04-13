@@ -4,7 +4,7 @@ export const BASE_URL = "https://m-business-r2vd.onrender.com";
 // Global interceptor for Multi-Tenant Architecture
 axios.interceptors.request.use((config) => {
   const savedUser = localStorage.getItem("user");
-  if (savedUser) 
+  if (savedUser) {
     try {
       const parsed = JSON.parse(savedUser);
       // Admin's companyId is their own ID. Employees use companyId.

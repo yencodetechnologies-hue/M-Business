@@ -1,5 +1,5 @@
 import axios from "axios";
-export const BASE_URL = "http://localhost:5000";
+export const BASE_URL = "https://m-business-r2vd.onrender.com";
 
 // Global interceptor for Multi-Tenant Architecture
 axios.interceptors.request.use((config) => {

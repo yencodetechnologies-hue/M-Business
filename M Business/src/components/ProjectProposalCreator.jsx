@@ -1315,6 +1315,10 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
     <div style={{fontFamily:"'Outfit',sans-serif",minHeight:"100%"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');.pc{transition:all .25s ease;cursor:pointer;}.pc:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(0,0,0,0.13)!important;}.pc:hover .pci{transform:scale(1.06);}.pci{transition:transform .4s ease;}.hb:hover{opacity:.85;transform:translateY(-1px);}`}</style>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:28,flexWrap:"wrap",gap:14}}>
+          <div>
+            <h1 style={{margin:0,fontSize:24,fontWeight:800,color:"#0f172a"}}>Project Proposals</h1>
+            <p style={{margin:0,fontSize:14,color:"#64748b",marginTop:4}}>Manage and create your project proposals</p>
+          </div>
           <button className="hb" onClick={createNew} style={{background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",border:"none",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8,boxShadow:"0 6px 20px rgba(124,58,237,0.35)",transition:"all .2s"}}>
             ✨ Add Proposal
           </button>
@@ -1323,7 +1327,6 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
       {loading ? (
         <div style={{textAlign:"center",padding:"80px 20px",background:"#fff",borderRadius:22,border:"1px solid #e2e8f0"}}>
           <div style={{fontSize:40,marginBottom:16}}>📡</div>
-          <div style={{fontSize:13,color:"#64748b"}}>Please wait while we fetch your proposals</div>
         </div>
       ) : proposals.length===0 ? (
         <div style={{textAlign:"center",padding:"80px 20px",background:"#fff",borderRadius:22,border:"2px dashed #e2e8f0"}}>

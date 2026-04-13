@@ -1,6 +1,7 @@
 const express = require("express");
 const router  = express.Router();
 const Manager = require("../models/ManagerModel");
+const { addManager } = require("../controllers/ManagerController");
 
 // GET all managers
 router.get("/", async (req, res) => {
@@ -14,38 +15,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST add manager
-router.post("/add", async (req, res) => {
-  try {
-    const {
-      managerName, email, phone,
-      department, role, address, password, status
-    } = req.body;
-
-    if (!managerName || !email) {
-      return res.status(400).json({ msg: "Name and Email required" });
-    }
-
-    const manager = new Manager({
-      managerName,
-      email,
-      phone:      phone      || "",
-      department: department || "",
-      role:       role       || "Manager",
-      address:    address    || "",
-      password:   password   || "",
-      status:     status     || "Active",
-      companyId:  req.companyId || "",
-    });
-
-    await manager.save();
-    res.status(201).json({ message: "Manager added successfully", manager });
-  } catch (err) {
-    if (err.code === 11000) {
-      return res.status(400).json({ msg: "Email already exists" });
-    }
-    res.status(500).json({ msg: "Server error" });
-  }
-});
+router.post("/add", addManager);
 
 // PUT update manager
 router.put("/:id", async (req, res) => {

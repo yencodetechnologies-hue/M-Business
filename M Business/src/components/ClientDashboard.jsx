@@ -437,7 +437,7 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser 
             <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>C</div>
             <div>
               <div style={{ fontWeight:800, fontSize:13, color:"#fff", letterSpacing:-0.3 }}>ClientHub</div>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{user?.role || user?.userRole || "CLIENT"}</div>
+              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{clientUser?.role || clientUser?.userRole || "CLIENT"}</div>
             </div>
           </div>
           <button onClick={onClose} className="sidebar-close-btn" style={{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:16, cursor:"pointer", padding:"2px 4px" }}>✕</button>

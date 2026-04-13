@@ -5,22 +5,25 @@ require("dotenv").config();
 const subscriptionCron = require("./jobs/subscriptionCron");
 const app = express();
 // Allow localhost with any port for local development
-const isLocalhost = (origin) => origin && origin.startsWith('http://localhost') || origin?.startsWith('http://127.0.0.1');
+const isLocalhost = (origin) =>
+  origin && (
+    origin.startsWith('http://localhost') ||
+    origin.startsWith('http://127.0.0.1') ||
+        origin.startsWith('http://192.168.')
+    
+  );
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
-    // Allow any localhost/127.0.0.1 origin for development
+
     if (isLocalhost(origin)) return callback(null, true);
-    
-    // Allow specific deployed origins
+
     const allowedOrigins = [
       "https://m-business-tau.vercel.app",
       "https://m-business-r2vd.onrender.com"
     ];
-    
+
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -58,6 +61,8 @@ const ProposalRoutes = require("./routes/proposalroutes");
 const subscriptionRoutes = require("./routes/subscriptionroutes");
 const subadminRoutes = require("./routes/subadminroutes");
 const packageRoutes = require("./routes/packageroutes");
+const emailRoutes = require("./routes/emailroutes");
+const paymentRoutes = require("./routes/paymentroutes");
 
 // Static files (local resume storage)
 const path = require("path");
@@ -85,10 +90,25 @@ app.use("/api/quotations", QuotationRoutes);
 app.use("/api/proposals", ProposalRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/packages", packageRoutes);
+app.use("/api/emails", emailRoutes);
+app.use("/api/payments", paymentRoutes);
 app.use("/upload", express.static("uploads"));
 
 app.get("/", (req, res) => {
   res.send("Server is running!");
+});
+
+// Test email endpoint
+const { sendEmail } = require("./config/email");
+app.get("/test-email", async (req, res) => {
+  console.log("SMTP Config:", {
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    user: process.env.SMTP_USER ? "Set" : "Not set",
+    pass: process.env.SMTP_PASS ? "Set" : "Not set"
+  });
+  const result = await sendEmail(process.env.SMTP_USER, "Test Email", "<h1>Test</h1>");
+  res.json(result);
 });
 
 // -------------------- DATABASE CONNECTION & SERVER START --------------------

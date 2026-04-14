@@ -4,6 +4,11 @@ const packageSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
   icon: { type: String, default: "📦" },
+  type: { type: String, enum: ["free", "paid"], required: true },
+  no_of_days: { type: Number, required: true },
+  price: { type: Number, required: true },
+  
+  // Keep existing fields for backward compatibility
   monthlyPrice: { type: String, default: "0" },
   quarterlyPrice: { type: String, default: "0" },
   halfYearlyPrice: { type: String, default: "0" },

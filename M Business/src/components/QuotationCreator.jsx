@@ -28,6 +28,7 @@ function StatusBadge({ status }) {
     approved: { bg: "#dcfce7", color: "#16a34a", label: "✅ Approved" },
     rejected: { bg: "#fee2e2", color: "#dc2626", label: "❌ Rejected" },
     expired:  { bg: "#fef3c7", color: "#d97706", label: "⏰ Expired" },
+    converted: { bg: "#e0e7ff", color: "#4338ca", label: "📄 Invoiced" },
   };
   const s = map[(status || "draft").toLowerCase()] || map.draft;
   return <span style={{ background: s.bg, color: s.color, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{s.label}</span>;
@@ -266,8 +267,8 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
                 <div onClick={(e) => e.stopPropagation()}>
                   <select value={entry.status} onChange={(e) => handleStatusChange(entry, e.target.value)}
                     style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "5px 8px", fontSize: 12, fontWeight: 600, color: "#374151", background: "#fff", cursor: "pointer", fontFamily: "inherit", width: "100%" }}>
-                    {["draft","sent","approved","rejected","expired"].map((s) => (
-                      <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                    {["draft","sent","approved","rejected","expired","converted"].map((s) => (
+                      <option key={s} value={s}>{s === "converted" ? "Invoiced" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
                     ))}
                   </select>
                 </div>
@@ -277,6 +278,9 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
                       style={{ padding: "5px 10px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#fff", fontFamily: "inherit", whiteSpace: "nowrap" }}>
                       {convertingId === entry.id ? "…" : "→ Invoice"}
                     </button>
+                  )}
+                  {entry.status === "converted" && (
+                    <span style={{ fontSize: 10, fontWeight: 800, color: "#6366f1", padding: "5px 10px", background: "#eef2ff", borderRadius: 7 }}>✓ Invoiced</span>
                   )}
                   <button onClick={() => loadEntry(entry)}
                     style={{ padding: "5px 10px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#059669", fontFamily: "inherit" }}>✏️</button>

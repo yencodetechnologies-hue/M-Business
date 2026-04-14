@@ -6,7 +6,8 @@ const Project = require("../models/ProjectModel");
 // GET all projects
 router.get("/", async (req, res) => {
   try {
-    const projects = await Project.find().sort({ createdAt: -1 });
+    const companyId = req.companyId || "NONE";
+    const projects = await Project.find({ companyId }).sort({ createdAt: -1 });
     res.json(projects);
   } catch (err) {
     console.error("GET projects error:", err.message);
@@ -17,8 +18,10 @@ router.get("/", async (req, res) => {
 // GET projects by client name
 router.get("/by-client/:clientName", async (req, res) => {
   try {
+    const companyId = req.companyId || "NONE";
     const projects = await Project.find({
-      client: req.params.clientName
+      client: req.params.clientName,
+      companyId
     }).sort({ createdAt: -1 });
     res.json(projects);
   } catch (err) {
@@ -69,6 +72,7 @@ router.post("/add", async (req, res) => {
       completedTasks: Number(completedTasks) || 0,
       assignedTo: Array.isArray(assignedTo) ? assignedTo : [],
       manager: manager || "",
+      companyId: req.companyId || "",
     });
 
     console.log("Attempting to save project...");
@@ -125,12 +129,13 @@ router.put("/:id", async (req, res) => {
       updateData.assignedTo = [updateData.assignedTo];
     }
 
-    const project = await Project.findByIdAndUpdate(
-      req.params.id,
+    const companyId = req.companyId || "NONE";
+    const project = await Project.findOneAndUpdate(
+      { _id: req.params.id, companyId },
       { $set: updateData },
       { new: true }
     );
-    if (!project) return res.status(404).json({ msg: "Project not found" });
+    if (!project) return res.status(404).json({ msg: "Project not found or unauthorized" });
     res.json({ project });
   } catch (err) {
     console.error("PUT project error:", err.message);
@@ -141,7 +146,9 @@ router.put("/:id", async (req, res) => {
 // DELETE project
 router.delete("/:id", async (req, res) => {
   try {
-    await Project.findByIdAndDelete(req.params.id);
+    const companyId = req.companyId || "NONE";
+    const project = await Project.findOneAndDelete({ _id: req.params.id, companyId });
+    if (!project) return res.status(404).json({ msg: "Project not found or unauthorized" });
     res.json({ msg: "Project deleted" });
   } catch (err) {
     console.error("DELETE project error:", err.message);

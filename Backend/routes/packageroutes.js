@@ -13,15 +13,29 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET packages for specific subadmin
+router.get("/subadmin/:subadminId", async (req, res) => {
+  try {
+    const packages = await Package.find().sort({ createdAt: 1 });
+    res.json(packages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error fetching packages for subadmin" });
+  }
+});
+
 // CREATE a package
 router.post("/", async (req, res) => {
   try {
-    const { title, description, icon, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, planDuration, businessLimit, managerLimit, clientLimit } = req.body;
+    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, planDuration, businessLimit, managerLimit, clientLimit } = req.body;
     
     const newPackage = new Package({
       title,
       description,
       icon,
+      type,
+      no_of_days,
+      price,
       monthlyPrice,
       quarterlyPrice,
       halfYearlyPrice,
@@ -45,13 +59,13 @@ router.post("/", async (req, res) => {
 // UPDATE a package
 router.put("/:id", async (req, res) => {
   try {
-    const { title, description, icon, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, status, planDuration, businessLimit, managerLimit, clientLimit } = req.body;
+    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, status, planDuration, businessLimit, managerLimit, clientLimit } = req.body;
     
     const updatedFeatures = Array.isArray(features) ? features : (features ? features.split(",").map(f => f.trim()) : []);
 
     const updatedPackage = await Package.findByIdAndUpdate(
       req.params.id,
-      { title, description, icon, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features: updatedFeatures, status, planDuration, businessLimit, managerLimit, clientLimit, updatedAt: Date.now() },
+      { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features: updatedFeatures, status, planDuration, businessLimit, managerLimit, clientLimit, updatedAt: Date.now() },
       { new: true }
     );
     

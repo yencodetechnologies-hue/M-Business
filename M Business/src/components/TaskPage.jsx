@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
+import { BASE_URL } from "../config";
 
-const API = "https://m-business-r2vd.onrender.com/api";
+const API = `${BASE_URL}/api`;
 
 const P = {
   accent:  "#9333ea",
@@ -21,8 +22,9 @@ const STATUS_CFG = {
   "In Review":     { bg:"#9333ea", fg:"#fff" },
   "Not Started":   { bg:"#c4c4c4", fg:"#555" },
   "On Hold":       { bg:"#7c3aed", fg:"#fff" },
+  "Manual":        { bg:"#64748b", fg:"#fff" },
 };
-const STATUS_LIST = ["Not Started","Working on it","In Review","Stuck","Done","On Hold"];
+const STATUS_LIST = ["Not Started","Working on it","In Review","Stuck","Done","On Hold","Manual"];
 const GRP_COLORS  = ["#e2445c","#0073ea","#fdab3d","#9333ea","#00c875","#a25ddc","#7c3aed","#ff642e","#00d4c8"];
 
 const AVATAR_COLORS = [
@@ -124,7 +126,7 @@ function ChartView({ groups }) {
       <div style={{ display:"flex", gap:20, flexWrap:"wrap" }}>
 
         {/* Status Bar Chart */}
-        <div style={{ flex:1, minWidth:280, background:"#fff", borderRadius:14, border:`1px solid ${P.border}`, padding:22, boxShadow:"0 2px 12px rgba(124,58,237,0.07)" }}>
+        <div style={{ flex:1, minWidth:280, background:"#fff", borderRadius:14, border:"1px solid " + P.border, padding:22, boxShadow:"0 2px 12px rgba(124,58,237,0.07)" }}>
           <div style={{ fontSize:14, fontWeight:800, color:P.text, marginBottom:3 }}>📊 Status Distribution</div>
           <div style={{ fontSize:12, color:P.muted, marginBottom:18 }}>Tasks by current status</div>
           {statusData.length === 0
@@ -133,7 +135,7 @@ function ChartView({ groups }) {
               <div key={item.label} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
                 <div style={{ width:120, fontSize:11, color:P.text, fontWeight:600, flexShrink:0, textAlign:"right" }}>{item.label}</div>
                 <div style={{ flex:1, height:26, background:P.light, borderRadius:6, overflow:"hidden" }}>
-                  <div style={{ width:`${(item.count/maxStatus)*100}%`, height:"100%", background:item.color, borderRadius:6, display:"flex", alignItems:"center", paddingLeft:8, transition:"width .6s ease", minWidth:item.count>0?26:0 }}>
+                  <div style={{ width:((item.count/maxStatus)*100) + "%", height:"100%", background:item.color, borderRadius:6, display:"flex", alignItems:"center", paddingLeft:8, transition:"width .6s ease", minWidth:item.count>0?26:0 }}>
                     <span style={{ fontSize:11, fontWeight:700, color:"#fff" }}>{item.count}</span>
                   </div>
                 </div>
@@ -143,7 +145,7 @@ function ChartView({ groups }) {
         </div>
 
         {/* Donut */}
-        <div style={{ flex:1, minWidth:220, background:"#fff", borderRadius:14, border:`1px solid ${P.border}`, padding:22, boxShadow:"0 2px 12px rgba(124,58,237,0.07)" }}>
+        <div style={{ flex:1, minWidth:220, background:"#fff", borderRadius:14, border:"1px solid " + P.border, padding:22, boxShadow:"0 2px 12px rgba(124,58,237,0.07)" }}>
           <div style={{ fontSize:14, fontWeight:800, color:P.text, marginBottom:3 }}>🍩 Overview</div>
           <div style={{ fontSize:12, color:P.muted, marginBottom:16 }}>{total} total tasks</div>
           <div style={{ display:"flex", gap:16, alignItems:"center" }}>
@@ -152,9 +154,9 @@ function ChartView({ groups }) {
               {segs.map((s,i) => (
                 <circle key={i} cx={cx} cy={cy} r={donutR} fill="none"
                   stroke={s.color} strokeWidth={20}
-                  strokeDasharray={`${s.dash} ${circ}`}
+                  strokeDasharray={s.dash + " " + circ}
                   strokeDashoffset={-s.offset}
-                  transform={`rotate(-90 ${cx} ${cy})`}/>
+                  transform={"rotate(-90 " + cx + " " + cy + ")"}/>
               ))}
               <text x={cx} y={cy-5} textAnchor="middle" fontSize={22} fontWeight={800} fill={P.text}>{total}</text>
               <text x={cx} y={cy+14} textAnchor="middle" fontSize={11} fill={P.muted}>tasks</text>
@@ -1057,7 +1059,7 @@ function SidekickPanel({ onClose, groups }) {
    SHARE MODAL
 ══════════════════════════════════════════════════════════ */
 function ShareModal({ onClose }) {
-  const shareLink="https://view.monday.com/5027193961-38429d1a11fd6ec34553f19fa74ae00b";
+  const shareLink = `${window.location.origin}/share/board/${Math.random().toString(36).substring(7)}`;
   const [copied,setCopied]=useState(false);
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.35)",zIndex:9000,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"inherit"}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
@@ -1345,6 +1347,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
   const statusRef=useRef(); const dotsRef=useRef(); const personRef=useRef(); const priorityRef=useRef();
   const [spOpen,setSpOpen]=useState(false); const [ppOpen,setPpOpen]=useState(false);
   const [dotsOpen,setDotsOpen]=useState(false); const [personOpen,setPersonOpen]=useState(false);
+  const [isCustomEditing, setIsCustomEditing] = useState(false);
   const [hovered,setHovered]=useState(false);
   const id=task._id||task.id;
   const sc=STATUS_CFG[task.status]||STATUS_CFG["Not Started"];
@@ -1355,30 +1358,227 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
   const bg=selected?"rgba(147,51,234,0.06)":hovered?P.hover:"#fff";
 
   return(
-    <div className="trow" style={{display:"flex",alignItems:"stretch",borderBottom:`1px solid ${P.border}`,minWidth:"max-content",background:bg}} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}>
+    <div className="trow" style={{display:"flex",alignItems:"stretch",borderBottom:"1px solid " + P.border,minWidth:"max-content",background:bg}} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}>
       {/* checkbox */}
-      <div style={{width:COL_W.checkbox,flexShrink:0,position:"sticky",left:0,zIndex:10,background:bg,borderRight:`1px solid ${P.border}`,display:"flex",alignItems:"center",justifyContent:"center",transition:"background .1s"}}>
-        <div onClick={()=>onCheck(id)} style={{width:15,height:15,borderRadius:4,cursor:"pointer",border:task.checked?"none":`1.5px solid ${P.muted}`,background:task.checked?P.accent:"transparent",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700}}>{task.checked&&"✓"}</div>
+      <div style={{width:COL_W.checkbox,flexShrink:0,position:"sticky",left:0,zIndex:10,background:bg,borderRight:"1px solid " + P.border,display:"flex",alignItems:"center",justifyContent:"center",transition:"background .1s"}}>
+        <div onClick={()=>onCheck(id)} style={{width:15,height:15,borderRadius:4,cursor:"pointer",border:task.checked?"none":"1.5px solid " + P.muted,background:task.checked?P.accent:"transparent",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700}}>{task.checked&&"✓"}</div>
       </div>
       {/* task name */}
       <div style={{width:COL_W.task,flexShrink:0,position:"sticky",left:COL_W.checkbox,zIndex:10,background:bg,boxShadow:hovered?"2px 0 8px rgba(0,0,0,0.07)":"2px 0 4px rgba(0,0,0,0.04)",display:"flex",alignItems:"center",gap:4,padding:"0 6px 0 0",transition:"background .1s"}}>
         <div style={{position:"absolute",left:0,top:0,bottom:0,width:3,background:groupColor,flexShrink:0}}/>
-        <input key={task.title} defaultValue={task.title} onBlur={e=>{const v=e.target.value.trim();if(v&&v!==task.title)onField(id,"title",v);}} style={{background:"transparent",border:"none",outline:"none",fontSize:13,color:P.text,fontFamily:"inherit",width:"100%",padding:"9px 4px 9px 10px",textDecoration:task.checked?"line-through":"none",opacity:task.checked?.5:1,fontWeight:500,cursor:"pointer"}} onFocus={e=>{e.target.style.background="#fff";e.target.style.boxShadow=`0 0 0 2px ${P.accent}33`;e.target.style.borderRadius="4px";}} onBlurCapture={e=>{e.target.style.background="transparent";e.target.style.boxShadow="none";}}/>
+        <input key={task.title} defaultValue={task.title} onBlur={e=>{const v=e.target.value.trim();if(v&&v!==task.title)onField(id,"title",v);}} style={{background:"transparent",border:"none",outline:"none",fontSize:13,color:P.text,fontFamily:"inherit",width:"100%",padding:"9px 4px 9px 10px",textDecoration:task.checked?"line-through":"none",opacity:task.checked?.5:1,fontWeight:500,cursor:"pointer"}} onFocus={e=>{e.target.style.background="#fff";e.target.style.boxShadow="0 0 0 2px " + P.accent + "33";e.target.style.borderRadius="4px";}} onBlurCapture={e=>{e.target.style.background="transparent";e.target.style.boxShadow="none";}}/>
         <button className="openBtn" onClick={e=>{e.stopPropagation();onOpen(task);}} style={{opacity:0,background:"#e8f4fd",border:"1px solid #c3d9f0",borderRadius:6,cursor:"pointer",width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"#0073ea",flexShrink:0,transition:"opacity .15s",fontWeight:700}}>↗</button>
       </div>
       {/* person */}
-      {!hcSet.has('person')&&(<div ref={personRef} onClick={()=>setPersonOpen(v=>!v)} style={{width:COL_W.person,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",borderRight:`1px solid ${P.border}`,padding:"0 8px",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background=P.light} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>{task.assignTo&&task.assignTo!=="Unassigned"?<div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:26,height:26,borderRadius:"50%",background:getAvatarColor(task.assignTo),display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,flexShrink:0}}>{task.assignTo.slice(0,2).toUpperCase()}</div><span style={{fontSize:12,color:P.mid,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:95}}>{task.assignTo}</span></div>:<div style={{width:26,height:26,borderRadius:"50%",border:`1.5px dashed ${P.muted}`,display:"flex",alignItems:"center",justifyContent:"center",color:P.muted,fontSize:16}}>+</div>}</div>)}
+      {!hcSet.has('person')&&(
+        <div 
+          ref={personRef} 
+          onClick={()=>setPersonOpen(v=>!v)} 
+          style={{
+            width:COL_W.person,
+            flexShrink:0,
+            display:"flex",
+            alignItems:"center",
+            justifyContent:"center",
+            borderRight:"1px solid " + P.border,
+            padding:"0 8px",
+            cursor:"pointer"
+          }} 
+          onMouseEnter={e=>e.currentTarget.style.background=P.light} 
+          onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+        >
+          {task.assignTo && task.assignTo !== "Unassigned" ? (
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{
+                width:26,
+                height:26,
+                borderRadius:"50%",
+                background:getAvatarColor(task.assignTo),
+                display:"flex",
+                alignItems:"center",
+                justifyContent:"center",
+                color:"#fff",
+                fontSize:9,
+                fontWeight:700,
+                flexShrink:0
+              }}>
+                {task.assignTo.slice(0,2).toUpperCase()}
+              </div>
+              <span style={{
+                fontSize:12,
+                color:P.mid,
+                overflow:"hidden",
+                textOverflow:"ellipsis",
+                whiteSpace:"nowrap",
+                maxWidth:95
+              }}>
+                {task.assignTo}
+              </span>
+            </div>
+          ) : (
+            <div style={{
+              width:26,
+              height:26,
+              borderRadius:"50%",
+              border:"1.5px dashed " + P.muted,
+              display:"flex",
+              alignItems:"center",
+              justifyContent:"center",
+              color:P.muted,
+              fontSize:16
+            }}>+</div>
+          )}
+        </div>
+      )}
       {personOpen&&<PersonPicker anchor={personRef} onSelect={v=>onField(id,"assignTo",v)} onClose={()=>setPersonOpen(false)} employees={employees} currentAssignee={task.assignTo&&task.assignTo!=="Unassigned"?task.assignTo:""}/>}
       {/* status */}
-      {!hcSet.has('status')&&(<div style={{width:COL_W.status,flexShrink:0,display:"flex",alignItems:"stretch",borderRight:`1px solid ${P.border}`}}><div ref={statusRef} onClick={()=>setSpOpen(v=>!v)} style={{flex:1,background:sc.bg,color:sc.fg,fontSize:12,fontWeight:700,textAlign:"center",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}} onMouseEnter={e=>e.currentTarget.style.opacity=".8"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>{task.status}</div>{spOpen&&<StatusPicker anchor={statusRef} onSelect={v=>{onStatus(id,v);setSpOpen(false);}} onClose={()=>setSpOpen(false)}/>}</div>)}
+      {!hcSet.has('status')&&(
+        <div style={{width:COL_W.status,flexShrink:0,display:"flex",alignItems:"stretch",borderRight:"1px solid " + P.border}}>
+          <div 
+            ref={statusRef} 
+            onClick={() => { if(!isCustomEditing) setSpOpen(v=>!v); }}
+            style={{
+              flex:1,
+              background:sc.bg,
+              color:sc.fg,
+              display:"flex",
+              alignItems:"stretch",
+              transition: "background 0.2s",
+              cursor: isCustomEditing ? "text" : "pointer"
+            }} 
+          >
+            {isCustomEditing ? (
+              <input 
+                autoFocus
+                defaultValue=""
+                placeholder="Type status..." 
+                onBlur={e => {
+                  const v = e.target.value.trim();
+                  if(v && v !== task.status) onStatus(id, v);
+                  setIsCustomEditing(false);
+                }}
+                onKeyDown={e => {
+                  if (e.key === "Enter") e.target.blur();
+                  if (e.key === "Escape") setIsCustomEditing(false);
+                }}
+                style={{
+                  flex:1, background:"transparent", border:"none", outline:"none",
+                  fontSize:11, fontWeight:800, color:"inherit", textAlign:"center",
+                  width:"100%", padding:"0 4px", fontFamily: "inherit"
+                }}
+              />
+            ) : (
+              <div style={{
+                flex:1, display:"flex", alignItems:"center", justifyContent:"center",
+                fontSize:11, fontWeight:800, padding: "0 4px", userSelect:"none"
+              }}>
+                {task.status}
+              </div>
+            )}
+            {!isCustomEditing && (
+              <div 
+                style={{
+                  width:18,
+                  display:"flex",
+                  alignItems:"center",
+                  justifyContent:"center",
+                  background:"rgba(0,0,0,0.1)",
+                  fontSize:10,
+                  flexShrink:0
+                }}
+              >
+                ▾
+              </div>
+            )}
+          </div>
+          {spOpen&&<StatusPicker anchor={statusRef} onSelect={v=>{
+            if(v === "Manual") {
+              setIsCustomEditing(true);
+            } else {
+              onStatus(id,v);
+            }
+            setSpOpen(false);
+          }} onClose={()=>setSpOpen(false)}/>}
+        </div>
+      )}
+
       {/* date */}
-      {!hcSet.has('date')&&(<div style={{width:COL_W.date,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",borderRight:`1px solid ${P.border}`,padding:"0 6px"}}><input type="date" key={task.date} defaultValue={task.date||""} onChange={e=>onField(id,"date",e.target.value)} style={{border:"none",outline:"none",fontSize:12,color:P.muted,fontFamily:"inherit",background:"transparent",cursor:"pointer",width:"100%",textAlign:"center"}}/></div>)}
-      {/* priority — click opens PriorityPicker */}
-      {!hcSet.has('priority_col')&&(<div style={{width:COL_W.status,flexShrink:0,display:"flex",alignItems:"stretch",borderRight:`1px solid ${P.border}`}}><div ref={priorityRef} onClick={()=>setPpOpen(v=>!v)} style={{flex:1,background:pc.bg,color:pc.fg,fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}} onMouseEnter={e=>e.currentTarget.style.opacity=".85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>{priorityVal}</div>{ppOpen&&<PriorityPicker anchor={priorityRef} currentValue={priorityVal} onSelect={v=>{onPriority(id,v);setPpOpen(false);}} onClose={()=>setPpOpen(false)}/>}</div>)}
+      {!hcSet.has('date')&&(
+        <div style={{
+          width:COL_W.date,
+          flexShrink:0,
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
+          borderRight:"1px solid " + P.border,
+          padding:"0 6px"
+        }}>
+          <input 
+            type="date" 
+            key={task.date || "date-" + id} 
+            defaultValue={task.date||""} 
+            onChange={e=>onField(id,"date",e.target.value)} 
+            style={{
+              border:"none",
+              outline:"none",
+              fontSize:12,
+              color:P.muted,
+              fontFamily:"inherit",
+              background:"transparent",
+              cursor:"pointer",
+              width:"100%",
+              textAlign:"center"
+            }}
+          />
+        </div>
+      )}
+      {/* priority - click opens PriorityPicker */}
+      {!hcSet.has('priority_col')&&(
+        <div style={{width:COL_W.status,flexShrink:0,display:"flex",alignItems:"stretch",borderRight:"1px solid " + P.border}}>
+          <div 
+            ref={priorityRef} 
+            onClick={()=>setPpOpen(v=>!v)} 
+            style={{
+              flex:1,
+              background:pc.bg,
+              color:pc.fg,
+              fontSize:12,
+              fontWeight:700,
+              cursor:"pointer",
+              display:"flex",
+              alignItems:"center",
+              justifyContent:"center"
+            }} 
+            onMouseEnter={e=>e.currentTarget.style.opacity=".85"} 
+            onMouseLeave={e=>e.currentTarget.style.opacity="1"}
+          >
+            {priorityVal}
+          </div>
+          {ppOpen&&<PriorityPicker anchor={priorityRef} currentValue={priorityVal} onSelect={v=>{onPriority(id,v);setPpOpen(false);}} onClose={()=>setPpOpen(false)}/>}
+        </div>
+      )}
       {/* extra cols */}
-      {cols.map(col=>(<div key={col.id} style={{width:extraColWidth(col.type),flexShrink:0,borderRight:`1px solid ${P.border}`,display:"flex",alignItems:"stretch",overflow:"hidden"}}><Cell col={col} value={(task.extraData||{})[col.id]} onChange={val=>onExtraField(id,col.id,val)}/></div>))}
+      {cols.map(col=>(
+        <div 
+          key={col.id} 
+          style={{
+            width:extraColWidth(col.type),
+            flexShrink:0,
+            borderRight:"1px solid " + P.border,
+            display:"flex",
+            alignItems:"stretch",
+            overflow:"hidden"
+          }}
+        >
+          <Cell 
+            col={col} 
+            value={(task.extraData||{})[col.id]} 
+            onChange={val=>onExtraField(id,col.id,val)}
+          />
+        </div>
+      ))}
       {/* + col placeholder */}
-      <div style={{width:COL_W.addcol,flexShrink:0,borderRight:`1px solid ${P.border}`}}/>
+      <div style={{width:COL_W.addcol,flexShrink:0,borderRight:"1px solid " + P.border}}/>
       {/* dots */}
       <div style={{width:COL_W.dots,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
         <button 
@@ -1523,6 +1723,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                 <div style={{width:COL_W.task,flexShrink:0,position:"sticky",left:COL_W.checkbox,zIndex:20,background:P.light,borderRight:`1px solid ${P.border}`,boxShadow:"2px 0 4px rgba(0,0,0,0.04)",fontSize:11,color:P.muted,padding:"7px 10px",fontWeight:700,letterSpacing:0.3,display:"flex",alignItems:"center"}}>Task</div>
                 {!hcSet.has('person')&&<div style={{width:COL_W.person,flexShrink:0,fontSize:11,color:P.muted,padding:"7px 10px",fontWeight:700,borderRight:`1px solid ${P.border}`,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center"}}>Owner</div>}
                 {!hcSet.has('status')&&<div style={{width:COL_W.status,flexShrink:0,fontSize:11,color:P.muted,padding:"7px 10px",fontWeight:700,borderRight:`1px solid ${P.border}`,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>Status <span style={{fontSize:9,opacity:0.5}}>ⓘ</span></div>}
+
                 {!hcSet.has('date')&&<div style={{width:COL_W.date,flexShrink:0,fontSize:11,color:P.muted,padding:"7px 10px",fontWeight:700,borderRight:`1px solid ${P.border}`,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>Due date <span style={{fontSize:9,opacity:0.5}}>ⓘ</span></div>}
                 {!hcSet.has('priority_col')&&<div style={{width:COL_W.status,flexShrink:0,fontSize:11,color:P.muted,padding:"7px 10px",fontWeight:700,borderRight:`1px solid ${P.border}`,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>Priority <span style={{fontSize:9,opacity:0.5}}>ⓘ</span></div>}
                 {visibleExtraCols.map((col,ci)=>(

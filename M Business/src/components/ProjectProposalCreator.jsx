@@ -519,19 +519,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
           </button>
         )}
         
-        {/* Header with Logo */}
-      <div style={{textAlign:"center",marginBottom:"20px"}}>
-        <div style={{fontSize:"24px",fontWeight:"bold",marginBottom:"5px"}}>architects</div>
-        <div style={{display:"inline-block",background:"#ff0000",color:"#white",padding:"10px 20px",fontWeight:"bold",fontSize:"18px",marginBottom:"5px"}}>
-          i des
-        </div>
-        <div style={{fontSize:"16px",fontWeight:"600"}}>architecture</div>
-        <div style={{fontSize:"16px",fontWeight:"600"}}>interiore</div>
-        <div style={{fontSize:"20px",fontWeight:"bold",marginTop:"10px"}}>INTEGERATED</div>
-        <div style={{fontSize:"20px",fontWeight:"bold"}}>DESIGN</div>
-        <div style={{fontSize:"20px",fontWeight:"bold"}}>SERVICES</div>
-      </div>
-
+        
       {/* Reference and Date */}
       <div style={{textAlign:"right",marginBottom:"20px"}}>
         <div><Txt val={`Ref: ${slide.refNo}`} onCh={v=>upd({refNo:v.replace('Ref: ', '')})}/></div>
@@ -981,45 +969,64 @@ const persist = useCallback(async (d) => {
   
 const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
   const createNew = () => {
-    const d = { id:pid(), title:"New Project Proposal", client:"", theme:null, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"a4-portrait", slides:[makeSlide("blank",null)] };
+    const d = { id:pid(), title:"New Project Proposal", client:"", theme:null, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"a4-portrait", slides:[makeSlide("proposal",null)] };
     setDoc(d); setPage(0); setView("editor");
   };
 
   const saveDoc = (d=doc) => { const nd={...d,updated:new Date().toISOString()}; persist(nd); setDoc(nd); flash("💾 Saved!"); };
-  const setStatus = (status, extra={}) => {
-    // Basic validation for pending
-    if (status === "pending" && !doc.title.trim()) {
-      flash("❌ Please add a title before submitting");
+  const setStatus = async (status, extra={}) => {
+    if (status === "pending") {
+      if (!doc.title.trim()) {
+        flash("❌ Please add a title before submitting");
+        return;
+      }
+      if (!window.confirm("Are you sure you want to submit this proposal to the client? You won't be able to edit it until the client responds.")) return;
+      
+      try {
+        const res = await axios.put(`${BASE_URL}/api/proposals/${doc._id}/submit`);
+        setDoc(res.data);
+        setProposals(prev => prev.map(p => p._id === doc._id ? res.data : p));
+        flash("📤 Proposal submitted successfully!");
+        setTimeout(() => setView("list"), 1500);
+      } catch (err) {
+        console.error("Error submitting proposal:", err);
+        flash("❌ Error submitting to server", "err");
+      }
       return;
     }
 
-    const nd={...doc,status,...extra,updated:new Date().toISOString()};
-    
-    // Custom set submittedAt if not already
-    if (status === "pending" && !nd.submittedAt) {
-      nd.submittedAt = new Date().toISOString();
+    if (status === "approved") {
+      try {
+        const res = await axios.put(`${BASE_URL}/api/proposals/${doc._id}/approve`);
+        setDoc(res.data);
+        setProposals(prev => prev.map(p => p._id === doc._id ? res.data : p));
+        setConfetti(true);
+        flash("🎉 Proposal Approved!");
+        setTimeout(() => setConfetti(false), 4000);
+      } catch (err) {
+        console.error("Error approving proposal:", err);
+        flash("❌ Error approving", "err");
+      }
+      return;
     }
 
-    persist(nd); 
+    if (status === "rejected") {
+      try {
+        const res = await axios.put(`${BASE_URL}/api/proposals/${doc._id}/reject`, extra);
+        setDoc(res.data);
+        setProposals(prev => prev.map(p => p._id === doc._id ? res.data : p));
+        flash("❌ Proposal Rejected", "err");
+      } catch (err) {
+        console.error("Error rejecting proposal:", err);
+        flash("❌ Error rejecting", "err");
+      }
+      return;
+    }
+
+    // Default update for other statuses (e.g. draft)
+    const nd = { ...doc, status, ...extra, updated: new Date().toISOString() };
+    persist(nd);
     setDoc(nd);
-
-    if(status==="approved"){ 
-      setConfetti(true); 
-      flash("🎉 Proposal Approved! Confetti time!"); 
-      setTimeout(()=>setConfetti(false),4000); 
-    }
-    else if(status==="pending") { 
-      flash("📤 Proposal submitted successfully!");
-      // Optionally redirect after submission
-      setTimeout(() => {
-        if (window.opener) {
-          window.close();
-        } else {
-          window.location.href = "/";
-        }
-      }, 2000);
-    }
-    else if(status==="rejected") flash("❌ Proposal Rejected","err");
   };
 
   const updateSlide = (s) => {
@@ -1027,8 +1034,9 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
     setDoc({...doc,slides});
   };
   const updateElement = (elId, patch) => {
+    if (!doc.slides || !doc.slides[page]) return;
     const s = doc.slides[page];
-    const elements = s.elements.map(e=>e.id===elId?{...e,...patch}:e);
+    const elements = (s.elements || []).map(e=>e.id===elId?{...e,...patch}:e);
     updateSlide({...s,elements});
   };
   const addElement = (element) => {
@@ -1161,14 +1169,10 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         return `
           <div style="page-break-after: always; min-height: 100vh; padding: 40px 60px; background: #fff; font-size: 14px; line-height: 1.5; color: #000; position: relative;">
             <!-- Header with Logo -->
-            <div style="text-align: center; margin-bottom: 20px;">
-              <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">architects</div>
-              <div style="display: inline-block; background: #ff0000; color: white; padding: 10px 20px; font-weight: bold; font-size: 18px; margin-bottom: 5px;">i des</div>
-              <div style="font-size: 16px; font-weight: 600;">architecture</div>
-              <div style="font-size: 16px; font-weight: 600;">interiore</div>
-              <div style="font-size: 20px; font-weight: bold; margin-top: 10px;">INTEGERATED</div>
-              <div style="font-size: 20px; font-weight: bold;">DESIGN</div>
-              <div style="font-size: 20px; font-weight: bold;">SERVICES</div>
+            <div style="text-align: center; margin-bottom: 25px;">
+              <div style="font-size: 26px; font-weight: 800; color: #ff0000; letter-spacing: 2px; margin-bottom: 5px; text-transform: uppercase;">${slide.companyName || "IDES ARCHITECTS"}</div>
+              <div style="display: inline-block; background: #ff0000; color: white; padding: 6px 18px; font-weight: 900; font-size: 20px; border-radius: 4px; margin-bottom: 8px;">i des</div>
+              <div style="font-size: 14px; font-weight: 700; color: #444; letter-spacing: 1px;">ARCHITECTURE • INTERIORS • DESIGN SERVICES</div>
             </div>
 
             <!-- Reference and Date -->
@@ -1384,7 +1388,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             <div style={{fontSize:22,fontWeight:900,color:"#0f172a",marginBottom:6}}>❌ Reject Proposal</div>
             <div style={{fontSize:13,color:"#64748b",marginBottom:20}}>Give feedback so the author can revise and resubmit.</div>
             <textarea value={rejectReason} onChange={e=>setRejectReason(e.target.value)} placeholder="e.g. Please revise the budget section and update timeline..."
-              style={{width:"100%",height:100,borderRadius:12,border:"1.5px solid #e2e8f0",padding:"12px 16px",fontSize:14,fontFamily:"inherit",outline:"none",boxSizing:"border-box",resize:"none",color:"#0f172a"}}/>
+              style={{width:"100%",height:120,borderRadius:12,border:"2px solid #e2e8f0",padding:"14px 18px",fontSize:15,fontFamily:"inherit",outline:"none",boxSizing:"border-box",resize:"vertical",color:"#0f172a",transition:"border-color 0.2s",minHeight:100}}/>
             <div style={{display:"flex",gap:10,marginTop:20,justifyContent:"flex-end"}}>
               <button onClick={()=>{setRejectModal(false);setRejectReason("");}} style={{background:"#f1f5f9",border:"none",borderRadius:10,padding:"10px 22px",fontSize:14,fontWeight:600,cursor:"pointer",color:"#475569",fontFamily:"inherit"}}>Cancel</button>
               <button onClick={()=>{setStatus("rejected",{rejectNote:rejectReason||"Please review and resubmit."});setRejectModal(false);setRejectReason("");}} style={{background:"linear-gradient(135deg,#9f1239,#ef4444)",color:"#fff",border:"none",borderRadius:10,padding:"10px 22px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Confirm Reject</button>
@@ -1853,25 +1857,41 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           {/* Slide canvas */}
           <div style={{
             width:900*(zoom/100 + 0.4), minWidth:900*0.4,
-            aspectRatio: doc.format === "a4-portrait" ? "210/297" : doc.format === "a4-landscape" ? "297/210" : doc.format === "ppt" ? "16/9" : (doc.slides[page]?.type === "proposal" ? "210/297" : doc.slides[page]?.type === "portrait" ? "210/297" : doc.slides[page]?.type === "landscape" ? "297/210" : "16/9"),
+            aspectRatio: doc.format === "a4-portrait" ? "210/297" : doc.format === "a4-landscape" ? "297/210" : doc.format === "ppt" ? "16/9" : (doc.slides?.[page]?.type === "proposal" ? "210/297" : doc.slides?.[page]?.type === "portrait" ? "210/297" : doc.slides?.[page]?.type === "landscape" ? "297/210" : "16/9"),
             boxShadow:"0 12px 48px rgba(0,0,0,0.1)",borderRadius:2,overflow:"hidden",flexShrink:0,background:"#fff",transition:"width .2s ease-out"
           }}>
             <div style={{
               transform:`scale(${zoom/100 + 0.4})`, transformOrigin:"top left", width:900,
-              height: doc.format === "a4-portrait" ? 1273 : doc.format === "a4-landscape" ? 637 : doc.format === "ppt" ? 506 : (doc.slides[page]?.type === "proposal" ? 1273 : doc.slides[page]?.type === "portrait" ? 1273 : doc.slides[page]?.type === "landscape" ? 637 : 506)
+              height: doc.format === "a4-portrait" ? 1273 : doc.format === "a4-landscape" ? 637 : doc.format === "ppt" ? 506 : (doc.slides?.[page]?.type === "proposal" ? 1273 : doc.slides?.[page]?.type === "portrait" ? 1273 : doc.slides?.[page]?.type === "landscape" ? 637 : 506)
             }}>
-              <Slide 
-                slide={doc.slides[page]} 
-                theme={doc.theme} 
-                docFormat={doc.format}
-                editing={canEdit} 
-                onChange={updateSlide}
-                selectedId={selectedElementId}
-                onSelectElement={setSelectedElementId}
-                onUpdateElement={updateElement}
-                onDelete={deleteElement}
-                canvasRef={canvasRef}
-              />
+              {doc.slides && doc.slides[page] ? (
+                <Slide 
+                  slide={doc.slides[page]} 
+                  theme={doc.theme} 
+                  docFormat={doc.format}
+                  editing={canEdit} 
+                  onChange={updateSlide}
+                  selectedId={selectedElementId}
+                  onSelectElement={setSelectedElementId}
+                  onUpdateElement={updateElement}
+                  onDelete={deleteElement}
+                  canvasRef={canvasRef}
+                />
+              ) : (
+                <div style={{ 
+                  width: 900, 
+                  height: 506, 
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "center", 
+                  background: "#f8fafc",
+                  color: "#64748b",
+                  fontSize: 14,
+                  fontWeight: 500
+                }}>
+                  Loading slide...
+                </div>
+              )}
             </div>
           </div>
 
@@ -1879,8 +1899,8 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           <div style={{position:"absolute",bottom:24,right:24,display:"flex",alignItems:"center",gap:12,background:"#fff",padding:"8px 16px",borderRadius:12,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",zIndex:100}}>
             <div style={{display:"flex",alignItems:"center",gap:8,borderRight:"1px solid #e5e7eb",paddingRight:12}}>
               <button onClick={()=>setPage(Math.max(0,page-1))} disabled={page===0} style={{background:"none",border:"none",cursor:page===0?"not-allowed":"pointer",color:page===0?"#cbd5e1":"#475569",fontSize:12}}>◀</button>
-              <span style={{fontSize:12,fontWeight:700,color:"#1e293b",minWidth:30,textAlign:"center"}}>{page+1} / {doc.slides.length}</span>
-              <button onClick={()=>setPage(Math.min(doc.slides.length-1,page+1))} disabled={page===doc.slides.length-1} style={{background:"none",border:"none",cursor:page===doc.slides.length-1?"not-allowed":"pointer",color:page===doc.slides.length-1?"#cbd5e1":"#475569",fontSize:12}}>▶</button>
+              <span style={{fontSize:12,fontWeight:700,color:"#1e293b",minWidth:30,textAlign:"center"}}>{page+1} / {doc.slides?.length || 0}</span>
+              <button onClick={()=>setPage(Math.min((doc.slides?.length || 1)-1,page+1))} disabled={page===(doc.slides?.length || 1)-1} style={{background:"none",border:"none",cursor:page===(doc.slides?.length || 1)-1?"not-allowed":"pointer",color:page===(doc.slides?.length || 1)-1?"#cbd5e1":"#475569",fontSize:12}}>▶</button>
             </div>
             
             <div style={{display:"flex",alignItems:"center",gap:12}}>

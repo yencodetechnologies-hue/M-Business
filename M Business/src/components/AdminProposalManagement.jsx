@@ -590,29 +590,6 @@ export default function AdminProposalManagement() {
     }
   };
 
-  const handleApprove = async (proposalId) => {
-    try {
-      await axios.put(`${BASE_URL}/api/proposals/${proposalId}/approve`);
-      setProposals(prev => 
-        prev.map(p => p._id === proposalId ? { ...p, status: "approved" } : p)
-      );
-    } catch (error) {
-      console.error("Error approving proposal:", error);
-    }
-  };
-
-  const handleReject = async (proposalId, note) => {
-    try {
-      await axios.put(`${BASE_URL}/api/proposals/${proposalId}/reject`, { rejectNote: note });
-      setProposals(prev => 
-        prev.map(p => p._id === proposalId ? { ...p, status: "rejected", rejectNote: note } : p)
-      );
-      setSelectedProposal(null);
-    } catch (error) {
-      console.error("Error rejecting proposal:", error);
-    }
-  };
-
   const handleSubmitForApproval = async (proposalId) => {
     try {
       await axios.put(`${BASE_URL}/api/proposals/${proposalId}/submit`);
@@ -707,7 +684,7 @@ export default function AdminProposalManagement() {
           <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: T.text }}>
             All Proposals ({filtered.length})
           </h3>
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "80px", alignItems: "center" }}>
             <Search value={search} onChange={setSearch} placeholder="Search proposals..." />
             <button 
               onClick={createNewProposal}
@@ -867,57 +844,6 @@ export default function AdminProposalManagement() {
                           🗑 Delete
                         </button>
 
-                        {proposal.status === "pending" && (
-                          <>
-                            <button
-                              onClick={() => {
-                                const newDoc = { ...proposal, status: "approved", updated: new Date().toISOString() };
-                                axios.put(`${BASE_URL}/api/proposals/${proposal._id || proposal.id}`, newDoc)
-                                  .then(res => setProposals(proposals.map(p => p.id === proposal.id ? res.data : p)))
-                                  .catch(err => console.error(err));
-                              }}
-                              style={{
-                                background: "rgba(16,185,129,0.1)",
-                                border: "1px solid rgba(16,185,129,0.3)",
-                                borderRadius: 7,
-                                padding: "5px 10px",
-                                fontSize: 12,
-                                color: "#10b981",
-                                cursor: "pointer",
-                                fontWeight: 600,
-                                fontFamily: "inherit",
-                                whiteSpace: "nowrap"
-                              }}
-                            >
-                              ✅ Approve
-                            </button>
-                            <button
-                              onClick={() => {
-                                const reason = window.prompt("Reason for rejection:");
-                                if (reason === null) return;
-                                const newDoc = { ...proposal, status: "rejected", rejectNote: reason || "Needs revision", updated: new Date().toISOString() };
-                                axios.put(`${BASE_URL}/api/proposals/${proposal._id || proposal.id}`, newDoc)
-                                  .then(res => setProposals(proposals.map(p => p.id === proposal.id ? res.data : p)))
-                                  .catch(err => console.error(err));
-                              }}
-                              style={{
-                                background: "rgba(239,68,68,0.1)",
-                                border: "1px solid rgba(239,68,68,0.3)",
-                                borderRadius: 7,
-                                padding: "5px 10px",
-                                fontSize: 12,
-                                color: "#ef4444",
-                                cursor: "pointer",
-                                fontWeight: 600,
-                                fontFamily: "inherit",
-                                whiteSpace: "nowrap"
-                              }}
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        
                         {(proposal.status === "rejected" || proposal.status === "draft") && (
                           <button
                             onClick={() => window.location.href = `/project-proposal?edit=${proposal.id || proposal._id}`}
@@ -1070,48 +996,6 @@ export default function AdminProposalManagement() {
               </button>
             )}
 
-            {/* Approve/Reject - only for pending */}
-            {selectedProposal.status === "pending" && (
-              <>
-                <button
-                  onClick={() => handleApprove(selectedProposal._id)}
-                  style={{
-                    background: "linear-gradient(135deg,#22c55e,#16a34a)",
-                    border: "none",
-                    borderRadius: 10,
-                    padding: "10px 20px",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontFamily: "inherit"
-                  }}
-                >
-                  ✅ Approve
-                </button>
-                <button
-                  onClick={() => {
-                    const note = prompt("Enter rejection reason:");
-                    if (note) {
-                      handleReject(selectedProposal._id, note);
-                    }
-                  }}
-                  style={{
-                    background: "linear-gradient(135deg,#ef4444,#dc2626)",
-                    border: "none",
-                    borderRadius: 10,
-                    padding: "10px 20px",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontFamily: "inherit"
-                  }}
-                >
-                  ❌ Reject
-                </button>
-              </>
-            )}
             <button
               onClick={() => setSelectedProposal(null)}
               style={{

@@ -3,7 +3,8 @@ const Task  = require("../models/TaskModels");
 
 exports.getAllGroups = async (req, res) => {
   try {
-    const groups = await Group.find({ isDeleted: false }).sort({ order: 1, createdAt: 1 });
+    const filter = { isDeleted: false, companyId: req.companyId || "NONE" };
+    const groups = await Group.find(filter).sort({ order: 1, createdAt: 1 });
     res.json(groups);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -16,7 +17,8 @@ exports.createGroup = async (req, res) => {
     if (!label || !label.trim())
       return res.status(400).json({ message: "Label is required" });
 
-    const last  = await Group.findOne({ isDeleted: false }).sort({ order: -1 });
+    const companyId = req.companyId || "";
+    const last  = await Group.findOne({ isDeleted: false, companyId }).sort({ order: -1 });
     const order = last ? last.order + 1 : 0;
 
     const group = await Group.create({
@@ -24,6 +26,7 @@ exports.createGroup = async (req, res) => {
       color: color || "#7c3aed",
       open:  open !== undefined ? open : true,
       order,
+      companyId: req.companyId || "",
     });
     res.status(201).json(group);
   } catch (err) {

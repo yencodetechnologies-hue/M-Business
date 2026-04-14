@@ -51,10 +51,10 @@ function getNavForRole(role) {
   const r = (role || "").toLowerCase().trim();
   if (r === "subadmin" || r === "sub_admin" || r === "sub-admin")
     return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "interviews", "reports", "mysubscriptions", "packages", "payments", "vendors", "rolePermissions"].includes(n.key));
-  // if(r==="manager")
-  //   return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
-  // if(r==="employee")
-  //   return NAV.filter(n=>["dashboard","tasks","calendar"].includes(n.key));
+  if (r === "manager")
+    return NAV.filter(n => ["dashboard", "employees", "projects", "tracking", "tasks", "calendar", "interviews", "reports", "vendors"].includes(n.key));
+  if (r === "employee")
+    return NAV.filter(n => ["dashboard", "tasks", "calendar"].includes(n.key));
   return NAV;
 }
 
@@ -1257,7 +1257,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
 
 function ProjectStatusPage({ clients, employees, managers }) {
   const EMPTY = { projectId: "", name: "", client: "", manager: "", employee: "", deadline: "", status: "In Progress", progress: 0, notes: "" };
-  const [trackList, setTrackList] = useState(TRACKING_SEED);
+  const [trackList, setTrackList] = useState([]);
   const [tsFilter, setTsFilter] = useState("All");
   const [tsSearch, setTsSearch] = useState("");
   const [tsModal, setTsModal] = useState(null);
@@ -1275,8 +1275,8 @@ function ProjectStatusPage({ clients, employees, managers }) {
   const tsStats = [{ t: "Total", v: trackList.length, i: "📁", c: "#9333ea" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "⚡", c: "#7c3aed" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "✅", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "🕐", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "⏸️", c: "#a855f7" }];
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
   const openEdit = (p) => { setTsForm({ projectId: p.projectId || p.id || "", name: p.name || "", client: p.client || "", manager: p.manager || "", employee: p.employee || "", deadline: p.deadline || "", status: p.status || "In Progress", progress: p.progress || p.pct || 0, notes: p.notes || p.note || "" }); setTsErr({}); setTsEditId(p._id || p.id); setTsModal("edit"); };
-  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Client required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0–100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`https://m-business-r2vd.onrender.com/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "✅ Project added!" : "✅ Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("✅ Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
-  const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`https://m-business-r2vd.onrender.com/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast("🗑️ Deleted!"); };
+  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Client required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0–100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "✅ Project added!" : "✅ Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("✅ Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
+  const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast("🗑️ Deleted!"); };
   const B2 = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -1596,24 +1596,29 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 // ═══════════════════════════════════════════════════════════
 // SIDEBAR
 // ═══════════════════════════════════════════════════════════
-function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems }) {
+function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange }) {
   const items = navItems || NAV;
   const displayName = user?.name || user?.email?.split("@")[0] || "Admin";
   const initials = displayName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const roleDisplay = (user?.role || "ADMIN").toUpperCase();
+  const companyName = user?.companyName || "Your Company";
+  const logoRef = useRef();
+  
   return (
     <>
       {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998, display: "block" }} className="mob-overlay" />}
       <div style={{ width: 225, background: "linear-gradient(180deg,#1e0a3c 0%,#2d1057 60%,#1e0a3c 100%)", color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, flexShrink: 0, overflow: "hidden", boxShadow: "4px 0 24px rgba(0,0,0,0.25)", transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }} className="sidebar">
         <div style={{ padding: "18px 16px 14px", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "relative", zIndex: 1, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, background: user?.logoUrl ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 17, color: "#fff", boxShadow: "0 4px 14px rgba(147,51,234,0.5)", overflow: "hidden" }}>
-              {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 4 }} /> : "M"}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {companyLogo && (
+                <div style={{ width: 32, height: 32, borderRadius: 6, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                  <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2 }} />
+                </div>
+              )}
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 700 }}>{roleDisplay}</div>
             </div>
-            <div>
-              <div style={{ fontWeight: 800, fontSize: 14, color: "#fff" }}>{user?.companyName || user?.name || ""}</div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: 1.5, marginTop: 1 }}>{roleDisplay}</div>
-            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 600, textAlign: "center" }}>{companyName}</div>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 18, cursor: "pointer", padding: "2px 6px", lineHeight: 1 }} className="sidebar-close">✕</button>
         </div>
@@ -1632,7 +1637,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems })
 // ═══════════════════════════════════════════════════════════
 // PACKAGES PAGE
 // ═══════════════════════════════════════════════════════════
-function PackagesPage({ packages }) {
+function PackagesPage({ packages, onViewPackage, onEditPackage }) {
   const [billing, setBilling] = useState("monthly"); // monthly | quarterly | halfYearly | annual
 
   const displayedPackages = packages.length > 0 ? packages : [
@@ -1674,6 +1679,14 @@ function PackagesPage({ packages }) {
 
   return (
     <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+      {/* Package Count Header */}
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <h2 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 800, color: "#0f172a" }}>Packages</h2>
+        <p style={{ margin: 0, fontSize: 14, color: "#64748b" }}>
+          Total Packages: <strong style={{ color: "#9333ea" }}>{packages.length}</strong>
+        </p>
+      </div>
+
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 40, flexWrap: "wrap" }}>
         {[
           { key: "monthly", label: "Monthly" },
@@ -1717,9 +1730,51 @@ function PackagesPage({ packages }) {
               <span style={{ fontSize: 14, fontWeight: 600, color: "#64748b" }}>{p.period || getPeriod(billing)}</span>
             </div>
 
-            <button style={{ width: "100%", padding: 14, borderRadius: 12, background: p.btnPrimary ? "#0ea5e9" : (idx === 1 ? "#0ea5e9" : "#fff"), color: p.btnPrimary ? "#fff" : (idx === 1 ? "#fff" : "#0f172a"), border: (p.btnPrimary || idx === 1) ? "none" : "2px solid #f1f5f9", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "0.2s", marginBottom: 32 }}>
+            <button style={{ width: "100%", padding: 14, borderRadius: 12, background: p.btnPrimary ? "#0ea5e9" : (idx === 1 ? "#0ea5e9" : "#fff"), color: p.btnPrimary ? "#fff" : (idx === 1 ? "#fff" : "#0f172a"), border: (p.btnPrimary || idx === 1) ? "none" : "2px solid #f1f5f9", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "0.2s", marginBottom: 16 }}>
               {p.buttonName || p.btnText}
             </button>
+
+            {/* View/Edit Buttons */}
+            {(onViewPackage || onEditPackage) && (
+              <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+                {onViewPackage && (
+                  <button
+                    onClick={() => onViewPackage(p)}
+                    style={{
+                      flex: 1,
+                      padding: "8px 12px",
+                      borderRadius: 8,
+                      background: "#f5f3ff",
+                      border: "1.5px solid #ede9fe",
+                      color: "#9333ea",
+                      fontWeight: 600,
+                      fontSize: 12,
+                      cursor: "pointer"
+                    }}
+                  >
+                    👁 View
+                  </button>
+                )}
+                {onEditPackage && (
+                  <button
+                    onClick={() => onEditPackage(p)}
+                    style={{
+                      flex: 1,
+                      padding: "8px 12px",
+                      borderRadius: 8,
+                      background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
+                      border: "none",
+                      color: "#fff",
+                      fontWeight: 600,
+                      fontSize: 12,
+                      cursor: "pointer"
+                    }}
+                  >
+                    ✏️ Edit
+                  </button>
+                )}
+              </div>
+            )}
 
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginBottom: 16 }}>{p.featuresTitle || "Features included:"}</div>
@@ -1783,7 +1838,10 @@ function VendorsPage({ vendors, setVendors }) {
     if (Object.keys(errs).length) { setEditErr(errs); return; }
     try {
       setSaving(true);
-      const res = await axios.put(`${BASE_URL}/api/vendors/${editVendor._id}`, editForm);
+      const payload = { ...editForm };
+      if (!payload.date) delete payload.date;
+      if (!payload.dateOfPurchase) delete payload.dateOfPurchase;
+      const res = await axios.put(`${BASE_URL}/api/vendors/${editVendor._id}`, payload);
       setVendors(prev => prev.map(v => v._id === editVendor._id ? { ...v, ...res.data } : v));
       setEditVendor(null);
       showToast("✅ Vendor updated!");
@@ -1896,7 +1954,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
   const [accounts, setAccounts] = useState([]);
+  const headerLogoRef = useRef();
+  
   useEffect(() => { setCompanyLogo(user?.logoUrl ? user.logoUrl : (fixedLogo || null)); }, [user, fixedLogo]);
+  
+  const handleHeaderLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onLogoChange?.(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Load saved accounts from localStorage
   useEffect(() => {
@@ -1958,9 +2029,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [showSubPass, setShowSubPass] = useState(false);
 
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "" });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
   const [pkgError, setPkgError] = useState({});
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
+
+  // Package view/edit state
+  const [viewPackage, setViewPackage] = useState(null);
+  const [editPackage, setEditPackage] = useState(null);
+  const [editPkgForm, setEditPkgForm] = useState({});
 
   const [quotations, setQuotations] = useState([]);
   const [vendors, setVendors] = useState([]);
@@ -1971,7 +2047,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [nvError, setNvError] = useState({});
   const [vendorSaveLoading, setVendorSaveLoading] = useState(false);
 
-  useEffect(() => { fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); }, []);
+  const hasFetched = useRef(false);
+  useEffect(() => { 
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); 
+  }, []);
 
   const fetchSubscription = async () => {
     try {
@@ -2031,7 +2112,86 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); } catch (e) { console.log(e); } };
   const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
   const fetchSubadmins = async () => { try { const res = await axios.get(BASE_URL + "/api/subadmins"); setSubadmins(res.data); } catch (e) { console.log(e); } };
-  const fetchPackages = async () => { try { const res = await axios.get(BASE_URL + "/api/packages"); setPackages(res.data); } catch (e) { console.log(e); } };
+  const fetchPackages = async () => { 
+    try { 
+      // Get packages assigned to this subadmin
+      const subadminId = user?._id || user?.id;
+      if (subadminId) {
+        const res = await axios.get(`${BASE_URL}/api/packages/subadmin/${subadminId}`);
+        setPackages(res.data);
+      } else {
+        // Fallback to all packages if no subadmin ID
+        const res = await axios.get(BASE_URL + "/api/packages");
+        setPackages(res.data);
+      }
+    } catch (e) { 
+      console.log(e); 
+    } 
+  };
+
+  // Re-fetch packages when navigating to Packages tab to show admin-added packages
+  useEffect(() => {
+    if (active === "packages") {
+      fetchPackages();
+    }
+  }, [active]);
+
+  // Package view/edit handlers
+  const handleViewPackage = (pkg) => {
+    setViewPackage(pkg);
+  };
+
+  const handleEditPackage = (pkg) => {
+    setEditPackage(pkg);
+    setEditPkgForm({
+      title: pkg.title || "",
+      description: pkg.description || "",
+      icon: pkg.icon || "📦",
+      type: pkg.type || "paid",
+      price: pkg.price || "",
+      noOfDays: pkg.no_of_days || pkg.noOfDays || "",
+      planDuration: pkg.planDuration || "Monthly",
+      businessLimit: pkg.businessLimit || "Single business manage",
+      managerLimit: pkg.managerLimit || "1 Manager",
+      clientLimit: pkg.clientLimit || "3 Client manage",
+      status: pkg.status || "Active"
+    });
+  };
+
+  const savePackageEdit = async () => {
+    if (!editPackage) return;
+    try {
+      setPkgSaveLoading(true);
+      const packageData = {
+        title: editPkgForm.title,
+        description: editPkgForm.description,
+        icon: editPkgForm.icon,
+        type: editPkgForm.type,
+        price: parseFloat(editPkgForm.price) || 0,
+        no_of_days: parseInt(editPkgForm.noOfDays) || 30,
+        planDuration: editPkgForm.planDuration,
+        businessLimit: editPkgForm.businessLimit,
+        managerLimit: editPkgForm.managerLimit,
+        clientLimit: editPkgForm.clientLimit,
+        status: editPkgForm.status,
+        monthlyPrice: editPkgForm.type === "free" ? "Free" : editPkgForm.price,
+        quarterlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 3 * 0.9).toString(),
+        halfYearlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 6 * 0.85).toString(),
+        annualPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 12 * 0.8).toString(),
+        features: `${editPkgForm.planDuration} Plan\n${editPkgForm.businessLimit}\n${editPkgForm.managerLimit}\n${editPkgForm.clientLimit}`
+      };
+      const res = await axios.put(`${BASE_URL}/api/packages/${editPackage._id}`, packageData);
+      setPackages(prev => prev.map(p => p._id === editPackage._id ? res.data : p));
+      setEditPackage(null);
+      toast.success("Package updated successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update package");
+    } finally {
+      setPkgSaveLoading(false);
+    }
+  };
+
   const fetchQuotations = async () => { try { const res = await axios.get(BASE_URL + "/api/quotations"); setQuotations(res.data); } catch (e) { console.log(e); } };
   const fetchVendors = async () => { 
     try { 
@@ -2118,17 +2278,43 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const addPackage = async () => {
     const errors = {};
     if (!npkg.title.trim()) errors.title = "Title is required";
+    if (!npkg.description.trim()) errors.description = "Description is required";
     if (Object.keys(errors).length > 0) { setPkgError(errors); return; }
     try {
       setPkgSaveLoading(true);
-      const res = await axios.post(BASE_URL + "/api/packages", npkg);
+      
+      // Format data for backend API
+      const packageData = {
+        title: npkg.title,
+        description: npkg.description,
+        icon: npkg.icon || "📦",
+        type: npkg.type || "paid",
+        no_of_days: parseInt(npkg.noOfDays) || 30,
+        price: parseFloat(npkg.price) || 0,
+        monthlyPrice: npkg.monthlyPrice || "0",
+        quarterlyPrice: npkg.quarterlyPrice || "0",
+        halfYearlyPrice: npkg.halfYearlyPrice || "0",
+        annualPrice: npkg.annualPrice || "0",
+        buttonName: npkg.buttonName || "Get Started",
+        features: npkg.features ? npkg.features.split(',').map(f => f.trim()).filter(f => f) : [],
+        planDuration: npkg.planDuration || "Monthly",
+        businessLimit: npkg.businessLimit || "Single business manage",
+        managerLimit: npkg.managerLimit || "1 Manager",
+        clientLimit: npkg.clientLimit || "3 Client manage",
+        status: "Active",
+        targetRole: "subadmin",
+        assignedSubadmins: [] // Subadmin creates package for themselves
+      };
+      
+      const res = await axios.post(BASE_URL + "/api/packages", packageData);
       setPackages(prev => [...prev, res.data]);
-      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "" });
+      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
       setPkgError({});
       setModal(null);
       toast.success("✅ Package added!");
     } catch (err) {
-      toast.error("❌ Failed to add package");
+      console.error("Add package error:", err);
+      toast.error("❌ Failed to add package: " + (err.response?.data?.msg || err.message));
     } finally { setPkgSaveLoading(false); }
   };
 
@@ -2141,7 +2327,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (Object.keys(errors).length > 0) { setNvError(errors); return; }
     try {
       setVendorSaveLoading(true);
-      const res = await axios.post(BASE_URL + "/api/vendors", nv);
+      const resolvedCompanyId = user?.companyId || user?.company || user?._id || user?.id || "default";
+      const amt = parseFloat(nv.amountTaxGst) || 0;
+      const payload = {
+        vendorName: nv.vendorName,
+        vendorProduct: nv.vendorProduct,
+        amount: amt,
+        tax: amt,
+        gst: amt,
+        paidAmount: parseFloat(nv.paidAmount) || 0,
+        productDescription: nv.productDescription,
+        modeOfPayment: nv.modeOfPayment,
+        companyId: resolvedCompanyId
+      };
+      if (nv.date) payload.date = nv.date;
+      if (nv.dateOfPurchase) payload.dateOfPurchase = nv.dateOfPurchase;
+      const res = await axios.post(BASE_URL + "/api/vendors", payload);
       setVendors(prev => [res.data, ...prev]);
       setNv({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
       setNvError({});
@@ -2153,10 +2354,25 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } finally { setVendorSaveLoading(false); }
   };
 
-  const navItems = getNavForRole(user?.role);
-  const validActive = navItems.find(n => n.key === active) ? active : navItems[0]?.key || "dashboard";
-  const page = navItems.find(n => n.key === validActive) || navItems[0];
-  useEffect(() => { if (validActive !== active) setActive(validActive); }, [user?.role]);
+  const subStatus = getSubStatus();
+  
+  let enforceMySubscriptions = false;
+  if (!subLoading && user?.email !== "admin@gmail.com") {
+    if (!subscription || subStatus.blocked) {
+      enforceMySubscriptions = true;
+    }
+  }
+
+  const rawNavItems = getNavForRole(user?.role);
+  const navItems = enforceMySubscriptions 
+    ? rawNavItems.filter(n => n.key === "mysubscriptions" || n.key === "dashboard") 
+    : rawNavItems;
+
+  const validActive = enforceMySubscriptions 
+    ? "mysubscriptions" 
+    : (navItems.find(n => n.key === active) ? active : navItems[0]?.key || "dashboard");
+
+  useEffect(() => { if (!enforceMySubscriptions && validActive !== active) setActive(validActive); }, [user?.role, enforceMySubscriptions, validActive]);
 
   const displayName = user?.name || user?.email?.split("@")[0] || "Admin";
   const initials = displayName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
@@ -2177,22 +2393,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
       `}</style>
 
-      <Sidebar user={user} active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} navItems={navItems} />
+      <Sidebar user={user} active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={() => setSidebarOpen(false)} navItems={navItems} companyLogo={companyLogo} onLogoChange={onLogoChange} />
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         {/* Mobile Topbar */}
         <div className="mob-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid #ede9fe", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(147,51,234,0.07)" }}>
           <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#7c3aed", padding: "2px 6px", lineHeight: 1 }}>☰</button>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 30, height: 30, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 14, color: "#fff", overflow: "hidden" }}>
-              {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3 }} /> : "M"}
-            </div>
-            <span style={{ fontWeight: 800, fontSize: 14, color: T.text }}>{companyNameStr}</span>
+          <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", fontWeight: 800, fontSize: 15, color: T.text }}>
+            {page?.label}
           </div>
           {user?.email !== "admin@gmail.com" && (
-            <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ width: 34, height: 34, background: "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", overflow: "hidden" }}>
-              {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} /> : <span>{initials}</span>}
-            </div>
+            <>
+              <input type="file" ref={headerLogoRef} onChange={handleHeaderLogoUpload} accept="image/*" style={{ display: "none" }} />
+              <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ width: 34, height: 34, background: "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", overflow: "hidden", position: "relative" }}>
+                <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }} title="Click to upload logo">
+                  {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} /> : <span>{initials}</span>}
+                </div>
+              </div>
+            </>
           )}
         </div>
 
@@ -2201,7 +2419,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
             <div>
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: T.text }}>{page?.icon} {page?.label}</h1>
-              <p style={{ margin: "3px 0 0", color: "#a78bfa", fontSize: 12 }}>{companyNameStr} Management Suite · {user?.role || "Admin"}</p>
+              <p style={{ margin: "3px 0 0", color: "#a78bfa", fontSize: 12 }}>Management Suite · {user?.role || "Admin"}</p>
             </div>
             <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
               {validActive === "clients" && <button onClick={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} style={B("#9333ea")}>+ Add Client</button>}
@@ -2214,12 +2432,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               {validActive === "managers" && <button onClick={() => { setNmError({}); setShowMgrPass(false); setModal("manager"); }} style={B("#f59e0b")}>+ Add Manager</button>}
               {validActive === "subadmins" && <button onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }} style={B("#3b82f6")}>+ Add Subadmin</button>}
-              {validActive === "packages" && <button onClick={() => { setPkgError({}); setModal("package_add"); }} style={B("#0ea5e9")}>+ Add Package</button>}
+
               {validActive === "vendors" && <button onClick={() => { setNvError({}); setModal("vendor_add"); }} style={B("#9333ea")}>+ Add Vendor</button>}
 
               {user?.email !== "admin@gmail.com" && (
                 <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", boxShadow: "0 2px 10px rgba(147,51,234,0.08)", flexShrink: 0 }}>
-                  <div style={{ width: 30, height: 30, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, overflow: "hidden", flexShrink: 0 }}>
+                  <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: 30, height: 30, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, overflow: "hidden", flexShrink: 0, cursor: "pointer" }} title="Click to upload logo">
                     {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} onError={() => setCompanyLogo(null)} /> : <span>{initials}</span>}
                   </div>
                   <span style={{ fontSize: 13, fontWeight: 600, color: T.text, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
@@ -2275,15 +2493,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 18 }}>
               <SC title="Company Information">
                 <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe" }}>
-                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0, overflow: "hidden" }}>
-                    {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 4 }} /> : (user?.companyName?.[0]?.toUpperCase() || "C")}
+                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0, overflow: "hidden", border: companyLogo ? "2px solid #ede9fe" : "none" }}>
+                    {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3 }} /> : initials}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 17, fontWeight: 800, color: T.text, marginBottom: 2 }}>
-                      {user?.companyName || user?.name || "My Company"}
+                      {user?.name || "Admin"}
                     </div>
                     <div style={{ fontSize: 12, color: "#7c3aed" }}>
-                      {user?.companyType || "Company Type"} • {user?.employeeCount || "0"} Employees
+                      {user?.role || "Sub Admin"} Account
                     </div>
                   </div>
                 </div>
@@ -2408,11 +2626,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange} />}
           {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange} />}
-          {validActive === "proposals" && (
-            user?.role === "admin" ?
-              <AdminProposalManagement /> :
-              <ProjectProposalCreator clients={clients} projects={projects} companyLogo={companyLogo} />
-          )}
+          {validActive === "proposals" && <AdminProposalManagement />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} />}
           {validActive === "calendar" && <CalendarPage projects={projects} clients={clients} />}
@@ -2421,7 +2635,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
-          {validActive === "packages" && <PackagesPage packages={packages} />}
+          {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} />}
           {validActive === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}
           {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
           {validActive === "rolePermissions" && <RolePermissionDashboard />}
@@ -2809,6 +3023,87 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("#9333ea"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor →"}</button>
         </div>
       </Mdl>}
+
+      {/* ── View Package Modal ── */}
+      {viewPackage && (
+        <Mdl title={`Package Details: ${viewPackage.title}`} onClose={() => setViewPackage(null)} maxWidth={500}>
+          <div style={{ padding: "10px 0" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
+                {viewPackage.icon || "📦"}
+              </div>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: T.text }}>{viewPackage.title}</div>
+                <div style={{ fontSize: 13, color: "#7c3aed" }}>{viewPackage.type === "free" ? "Free Package" : "Paid Package"}</div>
+              </div>
+            </div>
+
+            <InfoRow icon="📄" label="Description" value={viewPackage.description} />
+            <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
+            <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `₹${viewPackage.price || 0}`} />
+            <InfoRow icon="🗓️" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
+            <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || "Single business manage"} />
+            <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || "1 Manager"} />
+            <InfoRow icon="👥" label="Client" value={viewPackage.clientLimit || "3 Client manage"} />
+            <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
+
+            {viewPackage.features && viewPackage.features.length > 0 && (
+              <div style={{ marginTop: 20 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#7c3aed", marginBottom: 10 }}>FEATURES</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {(Array.isArray(viewPackage.features) ? viewPackage.features : viewPackage.features.split('\\n')).map((f, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
+                      <span style={{ color: "#22c55e" }}>✓</span> {f}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+            <button onClick={() => setViewPackage(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Close</button>
+          </div>
+        </Mdl>
+      )}
+
+      {/* ── Edit Package Modal ── */}
+      {editPackage && (
+        <Mdl title={`Edit Package: ${editPackage.title}`} onClose={() => setEditPackage(null)} maxWidth={700}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+            <Fld label="Package Title *" value={editPkgForm.title} onChange={v => setEditPkgForm({ ...editPkgForm, title: v })} />
+            <Fld label="Icon (Emoji)" value={editPkgForm.icon} onChange={v => setEditPkgForm({ ...editPkgForm, icon: v })} />
+            <Fld label="Type" value={editPkgForm.type} onChange={v => setEditPkgForm({ ...editPkgForm, type: v })} options={["free", "paid"]} />
+            <Fld label="Price" value={editPkgForm.price} onChange={v => setEditPkgForm({ ...editPkgForm, price: v })} disabled={editPkgForm.type === "free"} />
+            <Fld label="Number of Days *" value={editPkgForm.noOfDays} onChange={v => setEditPkgForm({ ...editPkgForm, noOfDays: v })} />
+            <Fld label="Status" value={editPkgForm.status} onChange={v => setEditPkgForm({ ...editPkgForm, status: v })} options={["Active", "Inactive"]} />
+          </div>
+
+          <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
+            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PACKAGE LIMITS</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+              <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
+              <Fld label="Business Limit" value={editPkgForm.businessLimit} onChange={v => setEditPkgForm({ ...editPkgForm, businessLimit: v })} options={["Single business manage", "Multiple business manage", "Unlimited business manage"]} />
+              <Fld label="Manager Limit" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} options={["1 Manager", "2 Managers", "3 Managers", "5 Managers", "Unlimited Managers"]} />
+              <Fld label="Client Limit" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} options={["3 Client manage", "5 Client manage", "10 Client manage", "Unlimited Client manage"]} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>DESCRIPTION</label>
+            <textarea
+              value={editPkgForm.description}
+              onChange={e => setEditPkgForm({ ...editPkgForm, description: e.target.value })}
+              style={{ width: "100%", height: 80, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "#faf5ff", outline: "none", fontFamily: "inherit", resize: "none" }}
+              placeholder="Package description..."
+            />
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+            <button onClick={() => setEditPackage(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+            <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("#0ea5e9"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
+          </div>
+        </Mdl>
+      )}
     </div>
   );
 }

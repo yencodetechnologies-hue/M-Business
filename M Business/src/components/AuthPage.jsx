@@ -148,9 +148,9 @@ const handleLogin = async () => {
         @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(22px)} }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-        .auth-layout { display: flex; width: 100%; min-height: 100vh; }
-        .auth-left { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 60px 56px; position: relative; z-index: 1; }
-        .auth-right { width: 460px; display: flex; align-items: center; justify-content: center; padding: 40px 36px; position: relative; z-index: 2; flex-shrink: 0; }
+        .auth-layout { display: flex; width: 100%; min-height: 100vh; justify-content: center; align-items: center; }
+        .auth-left { display: none; }
+        .auth-right { width: 480px; display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; z-index: 2; flex-shrink: 0; }
         .auth-card { width: 100%; background: rgba(255,255,255,0.07); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.16); border-radius: 22px; padding: 36px 32px; box-shadow: 0 32px 80px rgba(0,0,0,0.4); animation: fadeUp 0.5s ease; }
         .reg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
 
@@ -180,31 +180,13 @@ const handleLogin = async () => {
 
       <div className="auth-layout">
         {/* LEFT */}
-        <div className="auth-left">
-          <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:48 }}>
-            <div style={{ width:48, height:48, background:"rgba(255,255,255,0.14)", backdropFilter:"blur(10px)", border:"1.5px solid rgba(255,255,255,0.22)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:900, fontSize:22, color:"#fff" }}>M</div>
-            <span style={{ fontSize:20, fontWeight:800, color:"#fff", letterSpacing:-0.3 }}>M Business</span>
-          </div>
-          <h1 style={{ margin:"0 0 18px", fontSize:"clamp(28px,3.5vw,50px)", fontWeight:900, color:"#fff", lineHeight:1.15, letterSpacing:-1 }}>
-            We Are The Best<br/>
-            <span style={{ color:"rgba(216,180,254,0.88)" }}>In Business</span>
-          </h1>
-          <p style={{ margin:"0 0 44px", fontSize:14, color:"rgba(255,255,255,0.5)", lineHeight:1.8, maxWidth:360 }}>
-            Elevate your workspace efficiency with M Business Suite. Designed with simplicity, security, and speed in mind — perfectly aligned for growing businesses.
-          </p>
-          <div className="auth-stats" style={{ display:"flex", gap:28 }}>
-            {[["500+","Clients"],["99%","Uptime"],["50+","Features"]].map(([n,l])=>(
-              <div key={l}>
-                <div style={{ fontSize:24, fontWeight:900, color:"#fff", letterSpacing:-0.5 }}>{n}</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, marginTop:2 }}>{l}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* RIGHT */}
+        {/* Center Card Container */}
         <div className="auth-right">
           <div className="auth-card">
+            <div style={{ textAlign: "center", marginBottom: 30 }}>
+              <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: 0 }}>Business Suite</h1>
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 5 }}>Manage your workspace efficiently</p>
+            </div>
             {/* Tab */}
             <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:10, padding:4, marginBottom:26, border:"1px solid rgba(255,255,255,0.1)" }}>
               {[["login","Login"],["register","Register"]].map(([k,l])=>(

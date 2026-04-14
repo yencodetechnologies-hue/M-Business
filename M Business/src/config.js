@@ -1,7 +1,5 @@
 import axios from "axios";
-export const BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "http://localhost:5000" 
-  : "https://m-business-r2vd.onrender.com";
+export const BASE_URL = "http://localhost:5000"; // Force localhost for vendor testing
 
 // Global interceptor for Multi-Tenant Architecture
 axios.interceptors.request.use((config) => {

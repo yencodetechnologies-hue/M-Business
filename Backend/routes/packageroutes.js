@@ -13,10 +13,18 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET packages for specific subadmin
+// GET packages for specific subadmin (assigned packages + general packages)
 router.get("/subadmin/:subadminId", async (req, res) => {
   try {
-    const packages = await Package.find().sort({ createdAt: 1 });
+    const { subadminId } = req.params;
+    // Find packages assigned to this subadmin OR general packages (no specific assignment)
+    const packages = await Package.find({
+      $or: [
+        { assignedSubadmins: { $in: [subadminId] } },
+        { assignedSubadmins: { $exists: false } },
+        { assignedSubadmins: { $size: 0 } }
+      ]
+    }).sort({ createdAt: 1 });
     res.json(packages);
   } catch (err) {
     console.error(err);
@@ -27,25 +35,28 @@ router.get("/subadmin/:subadminId", async (req, res) => {
 // CREATE a package
 router.post("/", async (req, res) => {
   try {
-    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, planDuration, businessLimit, managerLimit, clientLimit } = req.body;
-    
+    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, planDuration, businessLimit, managerLimit, clientLimit, status, targetRole, assignedSubadmins } = req.body;
+
     const newPackage = new Package({
       title,
       description,
-      icon,
-      type,
-      no_of_days,
-      price,
-      monthlyPrice,
-      quarterlyPrice,
-      halfYearlyPrice,
-      annualPrice,
-      buttonName,
-      planDuration,
-      businessLimit,
-      managerLimit,
-      clientLimit,
-      features: Array.isArray(features) ? features : (features ? features.split(",").map(f => f.trim()) : [])
+      icon: icon || "📦",
+      type: type || "paid",
+      no_of_days: no_of_days || 30,
+      price: price || 0,
+      monthlyPrice: monthlyPrice || "0",
+      quarterlyPrice: quarterlyPrice || "0",
+      halfYearlyPrice: halfYearlyPrice || "0",
+      annualPrice: annualPrice || "0",
+      buttonName: buttonName || "Get Started",
+      planDuration: planDuration || "Monthly",
+      businessLimit: businessLimit || "Single business manage",
+      managerLimit: managerLimit || "1 Manager",
+      clientLimit: clientLimit || "3 Client manage",
+      status: status || "Active",
+      targetRole: targetRole || "subadmin",
+      assignedSubadmins: assignedSubadmins || [],
+      features: Array.isArray(features) ? features : (features ? features.split(/\r?\n/).map(f => f.trim()).filter(f => f) : [])
     });
 
     await newPackage.save();
@@ -59,16 +70,42 @@ router.post("/", async (req, res) => {
 // UPDATE a package
 router.put("/:id", async (req, res) => {
   try {
-    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, status, planDuration, businessLimit, managerLimit, clientLimit } = req.body;
-    
-    const updatedFeatures = Array.isArray(features) ? features : (features ? features.split(",").map(f => f.trim()) : []);
+    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, status, planDuration, businessLimit, managerLimit, clientLimit, targetRole, assignedSubadmins } = req.body;
+
+    const updatedFeatures = Array.isArray(features) ? features : (features ? features.split(/\r?\n/).map(f => f.trim()).filter(f => f) : []);
+
+    const updateData = {
+      title,
+      description,
+      icon,
+      type,
+      no_of_days,
+      price,
+      monthlyPrice,
+      quarterlyPrice,
+      halfYearlyPrice,
+      annualPrice,
+      buttonName,
+      features: updatedFeatures,
+      status,
+      planDuration,
+      businessLimit,
+      managerLimit,
+      clientLimit,
+      targetRole,
+      assignedSubadmins,
+      updatedAt: Date.now()
+    };
+
+    // Remove undefined fields
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
 
     const updatedPackage = await Package.findByIdAndUpdate(
       req.params.id,
-      { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features: updatedFeatures, status, planDuration, businessLimit, managerLimit, clientLimit, updatedAt: Date.now() },
+      updateData,
       { new: true }
     );
-    
+
     res.json(updatedPackage);
   } catch (err) {
     console.error(err);

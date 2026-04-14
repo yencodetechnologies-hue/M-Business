@@ -29,15 +29,6 @@ function Badge({ label }) {
 const NAV = [
   { key: "dashboard", icon: "🏠", label: "Dashboard" },
   { key: "subadmins", icon: "🛡️", label: "Subadmins" },
-  { key: "projects", icon: "📁", label: "Projects" },
-  { key: "quotations", icon: "📋", label: "Quotations" },
-  { key: "proposals", icon: "🎨", label: "Project Proposals" },
-  { key: "invoices", icon: "🧾", label: "Invoices" },
-  { key: "tracking", icon: "📊", label: "Project Status" },
-  { key: "tasks", icon: "✅", label: "Tasks" },
-  { key: "calendar", icon: "📆", label: "Calendar" },
-  { key: "accounts", icon: "👤", label: "Accounts" },
-  { key: "interviews", icon: "🎯", label: "Interviews" },
   { key: "reports", icon: "📈", label: "Reports" },
   { key: "subscriptions", icon: "💳", label: "Subscriptions" },
   { key: "packages", icon: "📦", label: "Packages" },
@@ -54,7 +45,7 @@ export default function AdminDashboard({ user, setUser }) {
   const [managers, setManagers] = useState([]);
   const [quotations, setQuotations] = useState([]);
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "??", isFree: false, price: "", noOfDays: "" });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "", isFree: false, price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", assignedSubadmins: [] });
   const [pkgError, setPkgError] = useState({});
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
   const [modal, setModal] = useState(null);
@@ -127,26 +118,42 @@ export default function AdminDashboard({ user, setUser }) {
     const errors = {};
     if (!npkg.title.trim()) errors.title = "Title required";
     if (!npkg.description.trim()) errors.description = "Description required";
-    if (!npkg.price.trim()) errors.price = "Price required";
-    if (!npkg.noOfDays.trim()) errors.noOfDays = "Days required";
+    if (!npkg.isFree && !npkg.price) errors.price = "Price required for paid packages";
+    if (!npkg.noOfDays) errors.noOfDays = "Number of days required";
     if (Object.keys(errors).length > 0) { setPkgError(errors); return; }
     try {
       setPkgSaveLoading(true);
       const packageData = {
-        ...npkg,
+        title: npkg.title,
+        description: npkg.description,
+        icon: npkg.icon || "",
+        type: npkg.isFree ? "free" : "paid",
+        no_of_days: parseInt(npkg.noOfDays) || 30,
+        price: npkg.isFree ? 0 : parseFloat(npkg.price) || 0,
         monthlyPrice: npkg.isFree ? "Free" : npkg.price,
-        quarterlyPrice: npkg.isFree ? "Free" : npkg.price,
-        halfYearlyPrice: npkg.isFree ? "Free" : npkg.price,
-        annualPrice: npkg.isFree ? "Free" : npkg.price,
+        quarterlyPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 3 * 0.9).toString(),
+        halfYearlyPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 6 * 0.85).toString(),
+        annualPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 12 * 0.8).toString(),
         buttonName: "Get Started",
-        features: "Basic features included"
+        features: `${npkg.planDuration} Plan\n${npkg.businessLimit}\n${npkg.managerLimit}\n${npkg.clientLimit}`,
+        planDuration: npkg.planDuration,
+        businessLimit: npkg.businessLimit,
+        managerLimit: npkg.managerLimit,
+        clientLimit: npkg.clientLimit,
+        targetRole: "subadmin",
+        assignedSubadmins: npkg.assignedSubadmins || []
       };
       const res = await axios.post(BASE_URL + "/api/packages", packageData);
       setPackages(prev => [...prev, res.data]);
-      setNpkg({ title: "", description: "", icon: "??", isFree: false, price: "", noOfDays: "" });
+      setNpkg({ title: "", description: "", icon: "", isFree: false, price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", assignedSubadmins: [] });
       setPkgError({});
       setModal(null);
-    } catch(e) { console.error(e); } finally { setPkgSaveLoading(false); }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create package");
+    } finally {
+      setPkgSaveLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -220,7 +227,7 @@ export default function AdminDashboard({ user, setUser }) {
         <div style={{ flex: 1, padding: 30, overflowY: "auto" }}>
           {active === "dashboard" && <OverviewPage subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} />}
           {active === "clients" && <ClientsPage clients={clients} setClients={setClients} />}
-          {active === "subadmins" && <SubadminsList subadmins={subadmins} refresh={fetchSubadmins} />}
+          {active === "subadmins" && <SubadminsList subadmins={subadmins} refresh={fetchSubadmins} packages={packages} />}
           {active === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
@@ -405,11 +412,69 @@ export default function AdminDashboard({ user, setUser }) {
                     fontSize: 14,
                     outline: "none"
                   }}
-                  placeholder="30"
+                  placeholder="e.g., 30, 60, 90, 365"
                 />
                 {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{pkgError.noOfDays}</div>}
               </div>
 
+              {/* Assign to Subadmins */}
+              <div style={{ marginTop: 16 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
+                  Assign to Subadmins (Optional - leave empty for all)
+                </label>
+                <select
+                  multiple
+                  value={npkg.assignedSubadmins || []}
+                  onChange={e => {
+                    const selected = Array.from(e.target.selectedOptions, opt => opt.value);
+                    setNpkg({ ...npkg, assignedSubadmins: selected });
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    border: "1.5px solid #e5e7eb",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    outline: "none",
+                    background: "#fff",
+                    cursor: "pointer",
+                    minHeight: "80px"
+                  }}
+                >
+                  {subadmins.map(sub => (
+                    <option key={sub._id} value={sub._id}>
+                      {sub.name} ({sub.email})
+                    </option>
+                  ))}
+                </select>
+                <p style={{ fontSize: 11, color: "#6b7280", marginTop: 4 }}>
+                  Hold Ctrl/Cmd to select multiple subadmins
+                </p>
+              </div>
+
+              <div style={{ marginTop: 16 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Plan Duration *</label>
+                <select
+                  value={npkg.planDuration}
+                  onChange={e => setNpkg({ ...npkg, planDuration: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    border: "1.5px solid #e5e7eb",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    outline: "none",
+                    background: "#fff",
+                    cursor: "pointer"
+                  }}
+                >
+                  <option value="Monthly">Monthly</option>
+                  <option value="90 Days">90 Days</option>
+                  <option value="Yearly">Yearly</option>
+                </select>
+              </div>
+
+              
               <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
                 <button
                   onClick={() => setModal(null)}
@@ -478,7 +543,7 @@ function OverviewPage({ subadmins, clients, employees, managers, projects, packa
 }
 
 // ── Subadmins List ──
-function SubadminsList({ subadmins, refresh }) {
+function SubadminsList({ subadmins, refresh, packages }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
@@ -486,6 +551,61 @@ function SubadminsList({ subadmins, refresh }) {
   const [companyLoading, setCompanyLoading] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", companyName: "", companyType: "IT", employeeCount: "0-10" });
   const [loading, setLoading] = useState(false);
+
+  // Assign Package Modal State
+  const [assignModalOpen, setAssignModalOpen] = useState(false);
+  const [selectedSubadmin, setSelectedSubadmin] = useState(null);
+  const [selectedPackage, setSelectedPackage] = useState("");
+  const [billingCycle, setBillingCycle] = useState("monthly");
+  const [durationDays, setDurationDays] = useState(30);
+  const [assignLoading, setAssignLoading] = useState(false);
+  const [subadminPackages, setSubadminPackages] = useState({});
+
+  // Fetch subadmin's packages
+  const fetchSubadminPackages = async (subadminId) => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/subscriptions/subadmin/${subadminId}`);
+      setSubadminPackages(prev => ({ ...prev, [subadminId]: res.data.subscriptions || [] }));
+    } catch (e) {
+      console.error("Failed to fetch subadmin packages:", e);
+    }
+  };
+
+  const openAssignModal = (subadmin) => {
+    setSelectedSubadmin(subadmin);
+    setSelectedPackage("");
+    setBillingCycle("monthly");
+    setDurationDays(30);
+    setAssignModalOpen(true);
+  };
+
+  const handleAssignPackage = async () => {
+    if (!selectedPackage) return alert("Please select a package");
+    const pkg = packages.find(p => p._id === selectedPackage);
+    if (!pkg) return alert("Package not found");
+
+    setAssignLoading(true);
+    try {
+      await axios.post(`${BASE_URL}/api/subscriptions/assign-to-subadmin`, {
+        subadminId: selectedSubadmin._id,
+        subadminEmail: selectedSubadmin.email,
+        subadminName: selectedSubadmin.name,
+        packageId: pkg._id,
+        packageTitle: pkg.title,
+        planPrice: pkg.price,
+        billingCycle,
+        durationDays
+      });
+      alert(`Package "${pkg.title}" assigned to ${selectedSubadmin.name} successfully!`);
+      setAssignModalOpen(false);
+      // Refresh packages for this subadmin
+      fetchSubadminPackages(selectedSubadmin._id);
+    } catch (e) {
+      alert("Failed to assign package: " + (e.response?.data?.error || e.message));
+    } finally {
+      setAssignLoading(false);
+    }
+  };
 
   const handleViewCompany = async (companyName) => {
     if (!companyName || companyName === "—") return;
@@ -555,12 +675,45 @@ function SubadminsList({ subadmins, refresh }) {
               <td style={{ padding: "14px 16px", color: "#475569" }}>{s.employeeCount || "0-10"}</td>
               <td style={{ padding: "14px 16px" }}><Badge label={s.status || "Active"} /></td>
               <td style={{ padding: "14px 16px", color: "#64748b" }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}</td>
-              <td style={{ padding: "14px 16px", color: "#ef4444", cursor: "pointer", fontWeight: 600 }} onClick={async () => {
-                if(window.confirm("Delete this subadmin?")) {
-                  await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`);
-                  refresh();
-                }
-              }}>Delete</td>
+              <td style={{ padding: "14px 16px" }}>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button
+                    onClick={() => openAssignModal(s)}
+                    style={{
+                      background: "linear-gradient(135deg,#9333ea,#c084fc)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 6,
+                      padding: "6px 12px",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: "pointer"
+                    }}
+                  >
+                    📦 Assign Package
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if(window.confirm("Delete this subadmin?")) {
+                        await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`);
+                        refresh();
+                      }
+                    }}
+                    style={{
+                      background: "#fee2e2",
+                      color: "#ef4444",
+                      border: "none",
+                      borderRadius: 6,
+                      padding: "6px 12px",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: "pointer"
+                    }}
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </td>
             </tr>
           ))}
           {subadmins.length === 0 && <tr><td colSpan={9} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No subadmins found</td></tr>}
@@ -764,6 +917,111 @@ function SubadminsList({ subadmins, refresh }) {
           </div>
         </div>
       )}
+
+      {/* Assign Package Modal */}
+      {assignModalOpen && selectedSubadmin && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+          <div style={{ background: "#fff", padding: 28, borderRadius: 20, width: 480, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#0f172a" }}>📦 Assign Package</h3>
+                <p style={{ margin: "4px 0 0", fontSize: 14, color: "#64748b" }}>to {selectedSubadmin.name}</p>
+              </div>
+              <button onClick={() => setAssignModalOpen(false)} style={{ background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#64748b" }}>×</button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* Package Selection */}
+              <div>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 6 }}>Select Package *</label>
+                <select
+                  value={selectedPackage}
+                  onChange={e => setSelectedPackage(e.target.value)}
+                  style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid #e5e7eb", fontSize: 14, background: "#f9fafb" }}
+                >
+                  <option value="">-- Choose a package --</option>
+                  {packages.map(pkg => (
+                    <option key={pkg._id} value={pkg._id}>
+                      {pkg.title} - ₹{pkg.price} ({pkg.no_of_days} days)
+                    </option>
+                  ))}
+                </select>
+                {packages.length === 0 && (
+                  <p style={{ margin: "8px 0 0", fontSize: 12, color: "#ef4444" }}>No packages available. Please create packages first.</p>
+                )}
+              </div>
+
+              {/* Billing Cycle */}
+              <div>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 6 }}>Billing Cycle</label>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  {["monthly", "quarterly", "halfYearly", "annual"].map(cycle => (
+                    <label key={cycle} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", padding: "8px 12px", background: billingCycle === cycle ? "#ede9fe" : "#f3f4f6", borderRadius: 8, border: billingCycle === cycle ? "2px solid #9333ea" : "2px solid transparent" }}>
+                      <input
+                        type="radio"
+                        name="billingCycle"
+                        value={cycle}
+                        checked={billingCycle === cycle}
+                        onChange={() => setBillingCycle(cycle)}
+                        style={{ cursor: "pointer" }}
+                      />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: billingCycle === cycle ? "#9333ea" : "#374151", textTransform: "capitalize" }}>
+                        {cycle === "halfYearly" ? "Half-Yearly" : cycle}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Duration Days */}
+              <div>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 6 }}>Duration (Days) *</label>
+                <input
+                  type="number"
+                  value={durationDays}
+                  onChange={e => setDurationDays(parseInt(e.target.value) || 30)}
+                  min={1}
+                  max={3650}
+                  style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid #e5e7eb", fontSize: 14, background: "#f9fafb" }}
+                />
+                <p style={{ margin: "6px 0 0", fontSize: 12, color: "#6b7280" }}>Subscription will expire after {durationDays} days from today.</p>
+              </div>
+
+              {/* Summary */}
+              {selectedPackage && (
+                <div style={{ background: "linear-gradient(135deg,#f3e8ff,#faf5ff)", padding: 16, borderRadius: 12, border: "1px solid #d8b4fe" }}>
+                  <h4 style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 700, color: "#7c3aed" }}>Assignment Summary</h4>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 13 }}>
+                    <div><span style={{ color: "#6b7280" }}>Subadmin:</span> <strong style={{ color: "#0f172a" }}>{selectedSubadmin.name}</strong></div>
+                    <div><span style={{ color: "#6b7280" }}>Package:</span> <strong style={{ color: "#0f172a" }}>{packages.find(p => p._id === selectedPackage)?.title || "—"}</strong></div>
+                    <div><span style={{ color: "#6b7280" }}>Price:</span> <strong style={{ color: "#0f172a" }}>₹{packages.find(p => p._id === selectedPackage)?.price || "0"}</strong></div>
+                    <div><span style={{ color: "#6b7280" }}>Duration:</span> <strong style={{ color: "#0f172a" }}>{durationDays} days</strong></div>
+                    <div><span style={{ color: "#6b7280" }}>Start Date:</span> <strong style={{ color: "#0f172a" }}>{new Date().toLocaleDateString()}</strong></div>
+                    <div><span style={{ color: "#6b7280" }}>End Date:</span> <strong style={{ color: "#0f172a" }}>{new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toLocaleDateString()}</strong></div>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+                <button
+                  onClick={() => setAssignModalOpen(false)}
+                  style={{ flex: 1, padding: "12px", background: "#f3f4f6", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer", color: "#374151" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAssignPackage}
+                  disabled={!selectedPackage || assignLoading}
+                  style={{ flex: 2, padding: "12px", background: "linear-gradient(135deg,#9333ea,#c084fc)", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, cursor: !selectedPackage || assignLoading ? "not-allowed" : "pointer", opacity: !selectedPackage || assignLoading ? 0.6 : 1 }}
+                >
+                  {assignLoading ? "Assigning..." : "📦 Assign Package"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -875,7 +1133,7 @@ function PackagesPage({ packages }) {
     const displayedPackages = (packages && packages.length > 0) ? packages : [
     {
       id: "trial",
-      icon: "??",
+      icon: "🆓",
       title: "TRIAL",
       description: "Built for standard usage simple data management and trial access.",
       monthlyPrice: "Free",
@@ -888,7 +1146,7 @@ function PackagesPage({ packages }) {
     },
     {
       id: "monthly",
-      icon: "??",
+      icon: "📅",
       title: "MONTHLY", 
       description: "Built for growing operations smart automation for scaling teams.",
       monthlyPrice: "999",
@@ -901,7 +1159,7 @@ function PackagesPage({ packages }) {
     },
     {
       id: "yearly",
-      icon: "??",
+      icon: "⭐",
       title: "YEARLY",
       description: "Built for your most complex operations maximum usage limits.",
       monthlyPrice: "1,999",
@@ -916,6 +1174,14 @@ function PackagesPage({ packages }) {
 
   return (
     <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+      {/* Subadmin Packages Header */}
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <h2 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 800, color: "#0f172a" }}>Packages</h2>
+        <p style={{ margin: 0, fontSize: 14, color: "#64748b" }}>
+          Manage packages available for subadmins • Total: <strong style={{ color: "#9333ea" }}>{packages.length}</strong> packages
+        </p>
+      </div>
+
       {/* Toggle */}
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 40 }}>
         {["monthly", "quarterly", "halfYearly", "annual"].map((cycle, idx) => (
@@ -942,10 +1208,14 @@ function PackagesPage({ packages }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 40 }}>
         {displayedPackages && displayedPackages.map((p, idx) => (
           <div key={p.id || idx} style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 10px 40px rgba(0,0,0,0.04)", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", position: "relative" }}>
+            {/* For Subadmins Badge */}
+            <div style={{ position: "absolute", top: 16, right: 16, background: "linear-gradient(135deg,#9333ea,#c084fc)", color: "#fff", padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+              👤 For Subadmins
+            </div>
             <div style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #e0f2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, marginBottom: 20 }}>
               {p.icon || "???"}
             </div>
-            
+
             <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 1 }}>{p.title || "Package"}</h3>
             <p style={{ margin: "0 0 32px", fontSize: 13, color: "#64748b", lineHeight: 1.6, minHeight: 60 }}>{p.description || "Package description"}</p>
             

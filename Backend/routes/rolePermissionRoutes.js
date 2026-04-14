@@ -45,14 +45,22 @@ router.post("/seed", async (req, res) => {
     {
       role: "manager",
       permissions: {
-        dashboard: true, projects: true, tracking: true, tasks: true, calendar: true,
+        dashboard: true, employees: true, projects: true, tracking: true, tasks: true, calendar: true,
         interviews: true, reports: true, vendors: true
       }
     },
     {
       role: "employee",
       permissions: {
-        dashboard: true, tasks: true, calendar: true
+        dashboard: true, projects: true, proposals: true, tasks: true, 
+        payments: true, calendar: true, reports: true
+      }
+    },
+    {
+      role: "client",
+      permissions: {
+        dashboard: true, projects: true, proposals: true, tasks: true, 
+        payments: true, calendar: true, reports: true
       }
     }
   ];

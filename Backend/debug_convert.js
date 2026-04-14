@@ -3,7 +3,8 @@ const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 const Quotation = require("./models/QuotationModel");
 const Invoice = require("./models/InvoiceModels");
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 async function debug() {
   await mongoose.connect(process.env.MONGO_URI);

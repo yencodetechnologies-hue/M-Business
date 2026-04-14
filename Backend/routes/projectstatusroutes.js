@@ -16,6 +16,7 @@ const ProjectStatusSchema = new mongoose.Schema({
   },
   progress:  { type: Number, min: 0, max: 100, default: 0 },
   notes:     { type: String, default: "" },
+  companyId: { type: String, default: "" },
 }, { timestamps: true });
 
 ProjectStatusSchema.pre("save", async function() {
@@ -31,7 +32,8 @@ const ProjectStatus = mongoose.models.ProjectStatus ||
 // GET all
 router.get("/", async (req, res) => {
   try {
-    const data = await ProjectStatus.find().sort({ createdAt: -1 });
+    const filter = req.companyId ? { companyId: req.companyId } : {};
+    const data = await ProjectStatus.find(filter).sort({ createdAt: -1 });
     res.json(data);
   } catch(e) {
     console.error("❌ GET error:", e.message);
@@ -44,7 +46,7 @@ router.post("/", async (req, res) => {
   try {
     console.log("📥 POST body:", req.body); // ← debug
 
-    const { projectId,name,client,manager,employee,deadline,status,progress,notes } = req.body;
+    const { projectId,name,client,manager,employee,deadline,status,progress,notes,companyId } = req.body;
 
     if (!name?.trim())   return res.status(400).json({ msg: "name is required" });
     if (!client?.trim()) return res.status(400).json({ msg: "client is required" });
@@ -60,6 +62,7 @@ router.post("/", async (req, res) => {
       status: status || "Pending",
       progress: Math.min(100, Math.max(0, Number(progress) || 0)),
       notes: notes || "",
+      companyId: companyId || req.companyId || "",
     });
 
     await doc.save();

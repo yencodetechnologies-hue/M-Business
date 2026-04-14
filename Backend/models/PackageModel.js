@@ -23,6 +23,11 @@ const packageSchema = new mongoose.Schema({
   clientLimit: { type: String, default: "3 Client manage" },
   
   status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+  targetRole: { type: String, enum: ["subadmin", "client", "employee", "manager", "all"], default: "subadmin" },
+  
+  // Assigned subadmins (for specific subadmin assignment)
+  assignedSubadmins: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subadmin" }],
+  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }, { timestamps: true });

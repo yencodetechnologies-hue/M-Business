@@ -266,16 +266,17 @@ router.post("/seed/:userId", async (req, res) => {
     await subscription.save();
     
     // Create sample payment history
+    const timestamp = Date.now();
     const payment1 = new PaymentHistory({
       userId,
       userEmail: email,
       subscriptionId: subscription._id,
-      paymentId: "PAY-001",
+      paymentId: `PAY-${timestamp}-001`,
       amount: 2999,
       currency: "INR",
       type: "subscription",
-      invoiceNo: "INV-SUB-001",
-      quotationNo: "QUO-SUB-001",
+      invoiceNo: `INV-SUB-${timestamp}-001`,
+      quotationNo: `QUO-SUB-${timestamp}-001`,
       description: "Professional Plan - Monthly Subscription",
       status: "completed",
       paymentMethod: "card",
@@ -299,11 +300,11 @@ router.post("/seed/:userId", async (req, res) => {
     const payment2 = new PaymentHistory({
       userId,
       userEmail: email,
-      paymentId: "PAY-000",
+      paymentId: `PAY-${timestamp}-000`,
       amount: 1999,
       currency: "INR",
       type: "subscription",
-      invoiceNo: "INV-SUB-000",
+      invoiceNo: `INV-SUB-${timestamp}-000`,
       description: "Starter Plan - Monthly Subscription",
       status: "completed",
       paymentMethod: "upi",
@@ -441,6 +442,78 @@ router.get("/count/:userId", async (req, res) => {
       total: count,
       active: activeCount,
       expired: count - activeCount
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============ ADMIN ASSIGN PACKAGE TO SUBADMIN ============
+
+// Get all packages assigned to subadmins
+router.get("/subadmin-packages", async (req, res) => {
+  try {
+    const subscriptions = await Subscription.find({ 
+      planName: { $in: ["Starter", "Professional", "Enterprise", "Custom"] }
+    }).sort({ createdAt: -1 });
+    res.json(subscriptions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Assign a package to a subadmin
+router.post("/assign-to-subadmin", async (req, res) => {
+  try {
+    const { subadminId, subadminEmail, subadminName, packageId, packageTitle, planPrice, billingCycle, durationDays, notes } = req.body;
+
+    // Calculate end date based on duration
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + (durationDays || 30));
+
+    // Create subscription for subadmin
+    const subscription = new Subscription({
+      userId: subadminId,
+      userEmail: subadminEmail,
+      userName: subadminName,
+      planName: packageTitle || "Custom",
+      planPrice: planPrice || 0,
+      billingCycle: billingCycle || "monthly",
+      status: "active",
+      isFullyPaid: true,
+      startDate,
+      endDate,
+      nextBillingDate: endDate,
+      features: ["Subadmin Package"],
+      paymentMethod: "other",
+      notes: notes || `Package assigned by admin`
+    });
+
+    await subscription.save();
+
+    res.status(201).json({
+      success: true,
+      message: `Package assigned to ${subadminName} successfully`,
+      subscription
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get subadmin's assigned packages
+router.get("/subadmin/:subadminId", async (req, res) => {
+  try {
+    const { subadminId } = req.params;
+    const subscriptions = await Subscription.find({ 
+      userId: subadminId,
+      status: { $in: ["active", "pending", "expired"] }
+    }).sort({ createdAt: -1 });
+    
+    res.json({
+      hasSubscription: subscriptions.length > 0,
+      subscriptions
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

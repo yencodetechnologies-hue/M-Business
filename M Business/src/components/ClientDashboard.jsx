@@ -362,9 +362,16 @@ function ProfileDropdown({ user, onLogout }) {
   useEffect(() => {
     try {
       const accs = JSON.parse(localStorage.getItem("accounts") || "[]");
-      setAccounts(accs);
+      // For clients, only show their own account, not other users' accounts
+      const isClient = user?.role === 'client' || user?.userRole === 'client';
+      if (isClient) {
+        const currentEmail = user?.email;
+        setAccounts(accs.filter(acc => acc.email === currentEmail));
+      } else {
+        setAccounts(accs);
+      }
     } catch(e){}
-  }, [open]);
+  }, [open, user]);
 
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
@@ -428,7 +435,7 @@ function ProfileDropdown({ user, onLogout }) {
 }
 
 // ── Sidebar ───────────────────────────────────────────────────
-function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser }) {
+function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser, navItems }) {
   return (
     <>
       {open && <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)", zIndex:998 }}/>}
@@ -444,7 +451,7 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser 
           <button onClick={onClose} className="sidebar-close-btn" style={{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:16, cursor:"pointer", padding:"2px 4px" }}>✕</button>
         </div>
         <nav style={{ flex:1, padding:"10px", overflowY:"auto", marginTop:10 }}>
-          {NAV.map(n => {
+          {(navItems || NAV).map(n => {
             const on = active===n.key;
             return (
               <button key={n.key} onClick={()=>{ setActive(n.key); onClose(); }}
@@ -693,8 +700,26 @@ export default function ClientDashboard({ user, setUser }) {
   };
 
   const [proposals,     setProposals]     = useState([]);
+  const [permissions,   setPermissions]   = useState({});
 
   // ── API calls ─────────────────────────────────────────────
+  useEffect(() => {
+    // Fetch client permissions
+    axios.get(`${BASE_URL}/api/role-permissions`)
+      .then(res => {
+        const clientPerms = res.data.find(r => r.role === 'client');
+        if (clientPerms) setPermissions(clientPerms.permissions || {});
+      })
+      .catch(() => {});
+  }, []);
+
+  // Filter NAV based on permissions (show all if permissions not loaded yet)
+  const filteredNav = NAV.filter(item => {
+    if (item.key === 'dashboard' || item.key === 'settings') return true; // Always show
+    if (Object.keys(permissions).length === 0) return true; // Show all until permissions load
+    return permissions[item.key] === true;
+  });
+
   useEffect(() => {
     // Load proposals from backend
     console.log("User object:", user);
@@ -750,7 +775,7 @@ export default function ClientDashboard({ user, setUser }) {
   const markAllRead  = ()   => setNotifications(prev=>prev.map(n=>({...n,read:true})));
   const navigateTo   = (pg) => setActive(pg);
   const unread       = notifications.filter(n=>!n.read).length;
-  const page         = NAV.find(n=>n.key===active) || { icon:"⌂", label:"Dashboard" };
+  const page         = filteredNav.find(n=>n.key===active) || { icon:"⌂", label:"Dashboard" };
 
   // Live payment totals
   const parseAmt = (s) => parseFloat((s||"0").replace(/[^0-9.]/g,"")) || 0;
@@ -790,7 +815,7 @@ export default function ClientDashboard({ user, setUser }) {
         }
       `}</style>
 
-      <SidebarClient active={active} setActive={setActive} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={handleLogout} clientUser={clientUser}/>
+      <SidebarClient active={active} setActive={setActive} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={handleLogout} clientUser={clientUser} navItems={filteredNav}/>
 
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
 
@@ -982,21 +1007,7 @@ export default function ClientDashboard({ user, setUser }) {
                           <strong style={{ display:"block", marginBottom:4 }}>❌ Rejected for revision:</strong>
                           {p.rejectNote}
                           <div style={{ marginTop:12, display:"flex", gap:8 }}>
-                            <button
-                              onClick={() => window.open(`/project-proposal?edit=${p.id || p._id}`, "_blank")}
-                              style={{
-                                background:"#ef4444",
-                                color:"#fff",
-                                border:"none",
-                                borderRadius:6,
-                                padding:"8px 12px",
-                                fontSize:11,
-                                fontWeight:700,
-                                cursor:"pointer"
-                              }}
-                            >
-                              Edit Proposal
-                            </button>
+                            
                             <button
                               onClick={() => {
                                 const updatedProposal = {...p, status:"pending", updated:new Date().toISOString()};
@@ -1070,22 +1081,6 @@ export default function ClientDashboard({ user, setUser }) {
                 <div style={{ fontSize:13, color:"#64748b" }}>
                   {proposals.length} proposal{proposals.length !== 1 ? "s" : ""} found
                 </div>
-                <button 
-                  onClick={() => window.open("/project-proposal", "_blank")}
-                  style={{ 
-                    background:"linear-gradient(135deg,#6366f1,#8b5cf6)", 
-                    color:"#fff", 
-                    border:"none", 
-                    borderRadius:9, 
-                    padding:"8px 16px", 
-                    fontSize:12, 
-                    fontWeight:700, 
-                    cursor:"pointer", 
-                    fontFamily:"inherit" 
-                  }}
-                >
-                  ➕ Create New Proposal
-                </button>
               </div>
               
               {proposals.length === 0 ? (
@@ -1145,7 +1140,6 @@ export default function ClientDashboard({ user, setUser }) {
                           axios.put(`${BASE_URL}/api/proposals/${p._id}/approve`)
                             .then(res => {
                               setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                              flash("🎉 Proposal Approved!");
                             })
                             .catch(err => console.error("Error approving proposal:", err));
                         }} style={{ flex:1, background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Approve</button>
@@ -1156,7 +1150,7 @@ export default function ClientDashboard({ user, setUser }) {
                           axios.put(`${BASE_URL}/api/proposals/${p._id}/reject`, { rejectNote: reason || "Needs revision" })
                             .then(res => {
                               setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                              flash("❌ Proposal Rejected");
+                              alert("❌ Proposal Rejected");
                             })
                             .catch(err => console.error("Error rejecting proposal:", err));
                         }} style={{ flex:1, background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Reject</button>
@@ -1175,63 +1169,13 @@ export default function ClientDashboard({ user, setUser }) {
                         <div style={{ fontSize:12, color:"#9f1239", fontWeight:600 }}>❌ Proposal Rejected</div>
                         <div style={{ fontSize:11, color:"#991b1b", marginTop:2 }}>Reason: {p.rejectNote || "Needs revision"}</div>
                         <div style={{ marginTop:12, display:"flex", gap:8 }}>
-                          <button
-                            onClick={() => window.open(`/project-proposal?edit=${p.id || p._id}`, "_blank")}
-                            style={{
-                              background:"#ef4444",
-                              color:"#fff",
-                              border:"none",
-                              borderRadius:6,
-                              padding:"8px 12px",
-                              fontSize:11,
-                              fontWeight:700,
-                              cursor:"pointer"
-                            }}
-                          >
-                            Edit Proposal
-                          </button>
-                          <button
-                            onClick={() => {
-                              axios.put(`${BASE_URL}/api/proposals/${p._id}/submit`)
-                                .then(res => {
-                                  setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                                  flash("📤 Proposal resubmitted!");
-                                })
-                                .catch(err => console.error("Error resubmitting proposal:", err));
-                            }}
-                            style={{
-                              background:"#f59e0b",
-                              color:"#fff",
-                              border:"none",
-                              borderRadius:6,
-                              padding:"8px 12px",
-                              fontSize:11,
-                              fontWeight:700,
-                              cursor:"pointer"
-                            }}
-                          >
-                            Resubmit for Approval
-                          </button>
+                        
                         </div>
                       </div>
                     )}
                     
                     <div style={{ marginTop:12, display:"flex", gap:8 }}>
-                      <button 
-                        onClick={() => window.open(`/project-proposal?edit=${p.id}`, "_blank")}
-                        style={{ 
-                          background:"none", 
-                          border:"1px solid #e2e8f0", 
-                          borderRadius:6, 
-                          padding:"6px 12px", 
-                          fontSize:11, 
-                          color:"#64748b", 
-                          cursor:"pointer", 
-                          fontFamily:"inherit" 
-                        }}
-                      >
-                        Edit Proposal
-                      </button>
+                      
                       <button 
                         onClick={() => window.open(`/project-proposal?view=${p.id}`, "_blank")}
                         style={{ 

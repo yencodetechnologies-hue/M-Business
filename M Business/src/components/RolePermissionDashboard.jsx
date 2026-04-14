@@ -34,14 +34,10 @@ const RolePermissionDashboard = () => {
     try {
       setLoading(true);
       const res = await axios.get(`${BASE_URL}/api/role-permissions`);
-      if (res.data.length === 0) {
-        // Seed if empty
-        await axios.post(`${BASE_URL}/api/role-permissions/seed`);
-        const reFetch = await axios.get(`${BASE_URL}/api/role-permissions`);
-        setRoles(reFetch.data);
-      } else {
-        setRoles(res.data);
-      }
+      // Always seed to ensure client role exists (in case it was added later)
+      await axios.post(`${BASE_URL}/api/role-permissions/seed`);
+      const reFetch = await axios.get(`${BASE_URL}/api/role-permissions`);
+      setRoles(reFetch.data.filter(r => r.role !== 'subadmin' && r.role !== 'manager'));
     } catch (err) {
       toast.error("Failed to fetch roles");
     } finally {

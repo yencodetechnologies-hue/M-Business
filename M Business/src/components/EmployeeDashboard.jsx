@@ -181,7 +181,7 @@ const inputStyle = {
   fontSize:13, color:"#0f172a", background:"#f8fafc", outline:"none", fontFamily:"inherit",
 };
 
-function Sidebar({ active, setActive, open, onClose, onLogout, user }) {
+function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems }) {
   const initials=(user?.name||"E").slice(0,2).toUpperCase();
   return (
     <>
@@ -198,7 +198,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user }) {
           <button onClick={onClose} className="emp-sb-close" style={{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:16, cursor:"pointer" }}>✕</button>
         </div>
         <nav style={{ flex:1, padding:"10px", marginTop:10 }}>
-          {NAV.map(n=>{
+          {(navItems || NAV).map(n=>{
             const on=active===n.key;
             return (
               <button key={n.key} onClick={()=>{ setActive(n.key); onClose(); }}
@@ -1129,6 +1129,25 @@ export default function EmployeeDashboard({ user, setUser }) {
   const [accounts, setAccounts] = useState([]);
   const [accountAuthOpen, setAccountAuthOpen] = useState(false);
 
+  // ── Role Permissions ──
+  const [permissions, setPermissions] = useState({});
+
+  useEffect(() => {
+    axios.get(`${BASE_URL}/api/role-permissions`)
+      .then(res => {
+        const empPerms = res.data.find(r => r.role === 'employee');
+        if (empPerms) setPermissions(empPerms.permissions || {});
+      })
+      .catch(() => {});
+  }, []);
+
+  // Filter NAV based on permissions (show all if permissions not loaded yet)
+  const filteredNav = NAV.filter(item => {
+    if (item.key === 'dashboard' || item.key === 'settings') return true;
+    if (Object.keys(permissions).length === 0) return true; // Show all until permissions load
+    return permissions[item.key] === true;
+  });
+
   const resolvedUser = user || (() => { try { return JSON.parse(localStorage.getItem("user")); } catch { return null; } })();
   const empName = resolvedUser?.name || "";
 
@@ -1338,7 +1357,7 @@ const fetchSubscription = async () => {
         @media print{.emp-sidebar,.emp-mob-bar,.emp-sb-spacer{display:none!important;}}
       `}</style>
 
-      <Sidebar active={page} setActive={setPage} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={handleLogout} user={resolvedUser}/>
+      <Sidebar active={page} setActive={setPage} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={handleLogout} user={resolvedUser} navItems={filteredNav}/>
 
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
         <div className="emp-mob-bar" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background:"#fff", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>

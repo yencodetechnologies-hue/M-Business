@@ -735,18 +735,30 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
         @media print {
           @page { 
             size: A4 landscape; 
-            margin: 20mm; 
+            margin: 15mm; 
           }
           body { 
             margin: 0; 
-            background: white !important; 
+            background: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           .landscape-content {
             width: 100% !important;
-            height: auto !important;
+            height: 100% !important;
+            min-height: 0 !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             overflow: visible !important;
+            aspect-ratio: auto !important;
+            padding: 20px !important;
+            font-size: 12pt !important;
+            page-break-inside: avoid !important;
+          }
+          .landscape-content * {
+            max-width: 100% !important;
+            overflow-wrap: break-word !important;
+            word-wrap: break-word !important;
           }
           .no-print { 
             display: none !important; 
@@ -826,6 +838,7 @@ export default function CanvaProposal({clients=[], openNew=false, onOpenNewDone}
   const [loading, setLoading]     = useState(true);     // loading state for proposals
   const [search, setSearch]       = useState("");
   const [showResizeMenu, setShowResizeMenu] = useState(false);
+  const [isViewMode, setIsViewMode] = useState(false);  // true when ?view= is in URL (client view)
   
   // Uploads State
   const [uploads, setUploads]     = useState([]);
@@ -917,10 +930,15 @@ export default function CanvaProposal({clients=[], openNew=false, onOpenNewDone}
         
         if (editId) {
           const found = list.find(p => p.id === editId || p._id === editId);
-          if (found) { setDoc(found); setPage(0); setView("editor"); }
+          if (found) { setDoc(found); setPage(0); setView("editor"); setIsViewMode(false); }
         } else if (viewId) {
           const found = list.find(p => p.id === viewId || p._id === viewId);
-          if (found) { setDoc(found); setPage(0); setView("editor"); } // Note: if you want a read-only view, we can add a flag, but for now editor mode is fine.
+          if (found) { 
+            setDoc(found); 
+            setPage(0); 
+            setView("editor"); 
+            setIsViewMode(true);  // Client view mode - hide editing UI
+          }
         }
         
       } else {
@@ -1316,53 +1334,114 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
 
   // ══ LIST VIEW ══════════════════════════════════════════════════════════════
   if(view==="list") return (
-    <div style={{fontFamily:"'Outfit',sans-serif",minHeight:"100%"}}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');.pc{transition:all .25s ease;cursor:pointer;}.pc:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(0,0,0,0.13)!important;}.pc:hover .pci{transform:scale(1.06);}.pci{transition:transform .4s ease;}.hb:hover{opacity:.85;transform:translateY(-1px);}`}</style>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:28,flexWrap:"wrap",gap:14}}>
-          <div>
-            <h1 style={{margin:0,fontSize:24,fontWeight:800,color:"#0f172a"}}>Project Proposals</h1>
-            <p style={{margin:0,fontSize:14,color:"#64748b",marginTop:4}}>Manage and create your project proposals</p>
+    <div style={{fontFamily:"'Outfit',sans-serif",minHeight:"100%",background:"#f8fafc",padding:"24px"}}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');.pc{transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);cursor:pointer;}.pc:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 25px 60px rgba(0,0,0,0.15)!important;}.pc:hover .pci{transform:scale(1.08);}.pci{transition:transform .5s cubic-bezier(0.4, 0, 0.2, 1);}.hb:hover{opacity:.9;transform:translateY(-2px) scale(1.05);}.hb:active{transform:translateY(0) scale(0.98);}@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}.fade-in{animation:fadeIn 0.6s ease-out;}`}</style>
+      
+      {/* Header Section */}
+      <div style={{background:"linear-gradient(135deg,#667eea 0%,#764ba2 100%)",borderRadius:"24px",padding:"32px",marginBottom:"32px",boxShadow:"0 20px 40px rgba(102,126,234,0.2)",position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",top:"0",right:"0",width:"200px",height:"200px",background:"rgba(255,255,255,0.1)",borderRadius:"50%",transform:"translate(50px,-50px)"}}/>
+        <div style={{position:"absolute",bottom:"0",left:"0",width:"150px",height:"150px",background:"rgba(255,255,255,0.08)",borderRadius:"50%",transform:"translate(-30px,30px)"}}/>
+        
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",position:"relative",zIndex:1,flexWrap:"wrap",gap:20}}>
+          <div style={{flex:1,minWidth:"250px"}}>
+            <h1 style={{margin:0,fontSize:32,fontWeight:900,color:"#fff",marginBottom:8,textShadow:"0 2px 4px rgba(0,0,0,0.1)"}}>Project Proposals</h1>
+            <p style={{margin:0,fontSize:16,color:"rgba(255,255,255,0.9)",fontWeight:500}}>Create, manage and track your professional proposals</p>
+            <div style={{display:"flex",gap:16,marginTop:16}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,color:"rgba(255,255,255,0.8)",fontSize:14}}>
+                <div style={{width:"8px",height:"8px",background:"#10b981",borderRadius:"50%"}}/>
+                <span>{proposals.length} Total</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:8,color:"rgba(255,255,255,0.8)",fontSize:14}}>
+                <div style={{width:"8px",height:"8px",backgroundColor:"#f59e0b",borderRadius:"50%"}}/>
+                <span>{proposals.filter(p=>p.status==="pending").length} Pending</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:8,color:"rgba(255,255,255,0.8)",fontSize:14}}>
+                <div style={{width:"8px",height:"8px",background:"#10b981",borderRadius:"50%"}}/>
+                <span>{proposals.filter(p=>p.status==="approved").length} Approved</span>
+              </div>
+            </div>
           </div>
-          <button className="hb" onClick={createNew} style={{background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",border:"none",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8,boxShadow:"0 6px 20px rgba(124,58,237,0.35)",transition:"all .2s"}}>
-            ✨ Add Proposal
+          <button className="hb" onClick={createNew} style={{background:"rgba(255,255,255,0.2)",backdropFilter:"blur(10px)",color:"#fff",border:"2px solid rgba(255,255,255,0.3)",borderRadius:16,padding:"16px 32px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:12,boxShadow:"0 8px 32px rgba(0,0,0,0.1)",transition:"all .3s",minWidth:"180px",justifyContent:"center"}}>
+            <span style={{fontSize:20}}>✨</span>
+            <span>Add Proposal</span>
           </button>
+        </div>
       </div>
 
       {loading ? (
-        <div style={{textAlign:"center",padding:"80px 20px",background:"#fff",borderRadius:22,border:"1px solid #e2e8f0"}}>
-          <div style={{fontSize:40,marginBottom:16}}>📡</div>
+        <div style={{textAlign:"center",padding:"100px 20px",background:"#fff",borderRadius:24,border:"1px solid #e2e8f0",boxShadow:"0 10px 30px rgba(0,0,0,0.05)"}}>
+          <div style={{fontSize:50,marginBottom:20,animation:"pulse 2s infinite"}}>📡</div>
+          <div style={{fontSize:18,fontWeight:600,color:"#64748b",marginBottom:8}}>Loading your proposals...</div>
+          <div style={{fontSize:14,color:"#94a3b8"}}>This will only take a moment</div>
         </div>
       ) : proposals.length===0 ? (
-        <div style={{textAlign:"center",padding:"80px 20px",background:"#fff",borderRadius:22,border:"2px dashed #e2e8f0"}}>
-          <div style={{fontSize:60,marginBottom:16}}>✨</div>
-          <div style={{fontSize:20,fontWeight:800,color:"#0f172a",marginBottom:8}}>No proposals yet</div>
-          <button onClick={createNew} style={{background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",border:"none",borderRadius:12,padding:"12px 28px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit",marginTop:16}}>+ Create First Proposal</button>
+        <div style={{textAlign:"center",padding:"100px 40px",background:"#fff",borderRadius:24,border:"2px dashed #e2e8f0",boxShadow:"0 10px 30px rgba(0,0,0,0.05)"}}>
+          <div style={{fontSize:80,marginBottom:24,background:"linear-gradient(135deg,#667eea,#764ba2)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>✨</div>
+          <div style={{fontSize:24,fontWeight:800,color:"#0f172a",marginBottom:12}}>No proposals yet</div>
+          <div style={{fontSize:16,color:"#64748b",marginBottom:24,maxWidth:"400px",marginLeft:"auto",marginRight:"auto"}}>Start by creating your first professional proposal. It's quick and easy!</div>
+          <button onClick={createNew} style={{background:"linear-gradient(135deg,#667eea,#764ba2)",color:"#fff",border:"none",borderRadius:16,padding:"16px 32px",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 8px 24px rgba(102,126,234,0.3)",transition:"all .3s",display:"inline-flex",alignItems:"center",gap:10}}>
+            <span>🚀</span>
+            <span>Create Your First Proposal</span>
+          </button>
         </div>
       ) : (
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:22}}>
-          {proposals.map(p=>{
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(340px,1fr))",gap:24}}>
+          {proposals.map((p, index) => {
               const cover=p.slides?.find(s=>s.type==="cover");
               const t2=THEMES.find(x=>x.name===p.theme)||THEMES[0];
               return (
-                <div key={p.id} className="pc" onClick={()=>openDoc(p)} style={{background:"#fff",borderRadius:20,border:"1px solid #e2e8f0",overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
-                  <div style={{height:180,overflow:"hidden",position:"relative"}}>
-                    {cover?.coverImage ? <img src={cover.coverImage} className="pci" alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : <div style={{width:"100%",height:"100%",background:t2.g}}/>}
-                    <div style={{position:"absolute",inset:0,background:"linear-gradient(to top,rgba(0,0,0,0.72),rgba(0,0,0,0.08))"}}/>
-                    <div style={{position:"absolute",bottom:14,left:18,right:14}}>
-                      <div style={{fontSize:10,color:"rgba(255,255,255,0.5)",fontWeight:700,letterSpacing:1,marginBottom:3}}>{p.id}</div>
-                      <div style={{fontSize:17,fontWeight:800,color:"#fff",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.title}</div>
-                    </div>
-                    <div style={{position:"absolute",top:10,right:10}}><Badge status={p.status}/></div>
+                <div key={p.id} className="pc fade-in" onClick={()=>openDoc(p)} style={{background:"#fff",borderRadius:20,border:"1px solid #e2e8f0",overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,0.08)",position:"relative",animationDelay:`${index * 0.1}s`}}>
+                  {/* Status Badge */}
+                  <div style={{position:"absolute",top:16,right:16,zIndex:10}}>
+                    <Badge status={p.status}/>
                   </div>
-                  <div style={{padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <div style={{fontSize:12,color:"#64748b"}}><span style={{fontWeight:700,color:"#0f172a"}}>{p.client||"No client"}</span><span style={{margin:"0 6px",color:"#e2e8f0"}}>·</span><span>{p.slides?.length||0} slides</span></div>
-                    <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                      <span style={{fontSize:11,color:"#94a3b8"}}>{new Date(p.updated).toLocaleDateString("en-IN")}</span>
-                      <button onClick={e=>{e.stopPropagation(); printProposal(p);}} style={{background:"rgba(59,130,246,0.08)",border:"none",color:"#3b82f6",borderRadius:6,width:26,height:26,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}} title="Print Proposal">🖨️</button>
-                      <button onClick={e=>deleteProposal(p.id,p._id,e)} style={{background:"rgba(239,68,68,0.08)",border:"none",color:"#ef4444",borderRadius:6,width:26,height:26,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}} title="Delete Proposal">🗑</button>
+                  
+                  {/* Cover Image */}
+                  <div style={{height:200,overflow:"hidden",position:"relative"}}>
+                    {cover?.coverImage ? <img src={cover.coverImage} className="pci" alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : <div style={{width:"100%",height:"100%",background:`linear-gradient(135deg,${t2.p},${t2.g})`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                      <span style={{fontSize:48,opacity:0.3}}>📄</span>
+                    </div>}
+                    <div style={{position:"absolute",inset:0,background:"linear-gradient(to top,rgba(0,0,0,0.8),rgba(0,0,0,0.2))"}}/>
+                    <div style={{position:"absolute",bottom:20,left:20,right:20}}>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,0.7)",fontWeight:700,letterSpacing:1,marginBottom:6,textTransform:"uppercase"}}>{p.id}</div>
+                      <div style={{fontSize:20,fontWeight:900,color:"#fff",lineHeight:1.2,marginBottom:4}}>{p.title}</div>
+                      <div style={{fontSize:13,color:"rgba(255,255,255,0.8)",fontWeight:500}}>{p.client||"No client assigned"}</div>
                     </div>
                   </div>
-                  {p.status==="rejected"&&p.rejectNote&&<div style={{padding:"8px 18px 12px",background:"#fff1f2",borderTop:"1px solid #fecdd3"}}><span style={{fontSize:11,color:"#9f1239",fontWeight:600}}>❌ {p.rejectNote}</span></div>}
+                  
+                  {/* Content */}
+                  <div style={{padding:"20px"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8}}>
+                        <div style={{background:"#f1f5f9",padding:"6px 12px",borderRadius:8,fontSize:12,fontWeight:600,color:"#475569"}}>
+                          📊 {p.slides?.length||0} slides
+                        </div>
+                        <div style={{background:t2.l,padding:"6px 12px",borderRadius:8,fontSize:12,fontWeight:600,color:t2.t}}>
+                          🎨 {t2.name}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:16,borderTop:"1px solid #f1f5f9"}}>
+                      <div style={{fontSize:12,color:"#94a3b8",fontWeight:500}}>
+                        {new Date(p.updated).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
+                      <div style={{display:"flex",gap:8}}>
+                        <button onClick={e=>{e.stopPropagation(); printProposal(p);}} style={{background:"#eff6ff",border:"none",color:"#3b82f6",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}} title="Print Proposal">🖨️</button>
+                        <button onClick={e=>deleteProposal(p.id,p._id,e)} style={{background:"#fef2f2",border:"none",color:"#ef4444",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}} title="Delete Proposal">🗑️</button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Rejection Note */}
+                  {p.status==="rejected"&&p.rejectNote&&(
+                    <div style={{padding:"12px 20px",background:"#fef2f2",borderTop:"1px solid #fecaca"}}>
+                      <span style={{fontSize:12,color:"#991b1b",fontWeight:600,display:"flex",alignItems:"center",gap:6}}>
+                        <span>❌</span>
+                        <span>{p.rejectNote}</span>
+                      </span>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -1397,8 +1476,55 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         </div>
       )}
 
+      {/* ╔══ GLOBAL PRINT STYLES ══╗ */}
+      <style>{`
+        @media print {
+          /* Hide all UI chrome when printing */
+          .no-print,
+          .topbar,
+          .icon-sidebar,
+          .left-panel,
+          .bottom-strip,
+          .zoom-controls,
+          .page-navigation,
+          .slide-thumbnails,
+          button[class*="no-print"],
+          button[title*="Print"],
+          div[class*="no-print"] {
+            display: none !important;
+          }
+          
+          /* Ensure proposal content is visible and fills page */
+          .proposal-content,
+          .canvas-area,
+          .slide-container {
+            width: 100% !important;
+            height: auto !important;
+            box-shadow: none !important;
+            border: none !important;
+            background: white !important;
+          }
+          
+          /* Page breaks for multi-page proposals */
+          .slide-page {
+            page-break-after: always;
+            break-after: page;
+          }
+          .slide-page:last-child {
+            page-break-after: auto;
+            break-after: auto;
+          }
+          
+          /* Ensure proper margins */
+          @page {
+            size: A4;
+            margin: 15mm;
+          }
+        }
+      `}</style>
+
       {/* ╔══ TOP BAR (Canva style) ══╗ */}
-      <div style={{height:56,background:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",borderBottom:"1px solid #e5e7eb",flexShrink:0,gap:12,zIndex:50}}>
+      <div className={`topbar ${isViewMode ? 'no-print' : ''}`} style={{height:56,background:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",borderBottom:"1px solid #e5e7eb",flexShrink:0,gap:12,zIndex:50}}>
         
         {/* LEFT: logo + File/Resize/Editing */}
         <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
@@ -1508,7 +1634,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
       <div style={{display:"flex",flex:1,overflow:"hidden"}}>
 
         {/* ── ICON SIDEBAR (Canva left icon rail) ── */}
-        <div style={{width:72,background:"#252627",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",alignItems:"center",padding:"12px 0",gap:4,flexShrink:0}}>
+        <div className={`icon-sidebar ${isViewMode ? 'no-print' : ''}`} style={{width:72,background:"#252627",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",alignItems:"center",padding:"12px 0",gap:4,flexShrink:0}}>
           {[
             {id:"templates", icon:"🎨", label:"Design"},
             {id:"elements",  icon:"✦",  label:"Elements"},
@@ -1527,8 +1653,8 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           </button>
         </div>
         {/* ── LEFT CONTENT PANEL ── */}
-        {leftPanel && (
-          <div style={{width:320,background:"#fff",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",flexShrink:0,overflow:"hidden"}}>
+        {leftPanel && !isViewMode && (
+          <div className="left-panel" style={{width:320,background:"#fff",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",flexShrink:0,overflow:"hidden"}}>
 
             {/* DESIGN (Templates + Styles) */}
             {leftPanel==="templates" && <>
@@ -1869,12 +1995,12 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                   slide={doc.slides[page]} 
                   theme={doc.theme} 
                   docFormat={doc.format}
-                  editing={canEdit} 
-                  onChange={updateSlide}
-                  selectedId={selectedElementId}
-                  onSelectElement={setSelectedElementId}
-                  onUpdateElement={updateElement}
-                  onDelete={deleteElement}
+                  editing={canEdit && !isViewMode}
+                  onChange={isViewMode ? () => {} : updateSlide}
+                  selectedId={isViewMode ? null : selectedElementId}
+                  onSelectElement={isViewMode ? () => {} : setSelectedElementId}
+                  onUpdateElement={isViewMode ? () => {} : updateElement}
+                  onDelete={isViewMode ? () => {} : deleteElement}
                   canvasRef={canvasRef}
                 />
               ) : (
@@ -1896,7 +2022,8 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           </div>
 
           {/* BOTTOM-RIGHT CONTROLS (Canva Style) */}
-          <div style={{position:"absolute",bottom:24,right:24,display:"flex",alignItems:"center",gap:12,background:"#fff",padding:"8px 16px",borderRadius:12,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",zIndex:100}}>
+          {!isViewMode && (
+          <div className="zoom-controls no-print" style={{position:"absolute",bottom:24,right:24,display:"flex",alignItems:"center",gap:12,background:"#fff",padding:"8px 16px",borderRadius:12,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",zIndex:100}}>
             <div style={{display:"flex",alignItems:"center",gap:8,borderRight:"1px solid #e5e7eb",paddingRight:12}}>
               <button onClick={()=>setPage(Math.max(0,page-1))} disabled={page===0} style={{background:"none",border:"none",cursor:page===0?"not-allowed":"pointer",color:page===0?"#cbd5e1":"#475569",fontSize:12}}>◀</button>
               <span style={{fontSize:12,fontWeight:700,color:"#1e293b",minWidth:30,textAlign:"center"}}>{page+1} / {doc.slides?.length || 0}</span>
@@ -1910,11 +2037,13 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               <button style={{background:"none",border:"none",cursor:"pointer",fontSize:13}}>?</button>
             </div>
           </div>
+          )}
         </div>
       </div>
 
       {/* ╔══ BOTTOM PAGE STRIP (Canva style) ══╗ */}
-      <div style={{height:100,background:"#fff",borderTop:"1px solid #e5e7eb",display:"flex",alignItems:"center",padding:"0 20px",gap:16,overflowX:"auto",flexShrink:0}}>
+      {!isViewMode && (
+      <div className="bottom-strip" style={{height:100,background:"#fff",borderTop:"1px solid #e5e7eb",display:"flex",alignItems:"center",padding:"0 20px",gap:16,overflowX:"auto",flexShrink:0}}>
         {doc.slides.map((s,i)=>{
           const isP = doc.format === "a4-portrait" || (!doc.format && (s.type === "proposal" || s.type === "portrait"));
           const isL = doc.format === "a4-landscape" || (!doc.format && s.type === "landscape");
@@ -1935,6 +2064,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           <span>+</span>
         </button>
       </div>
+      )}
     </div>
   );
 }

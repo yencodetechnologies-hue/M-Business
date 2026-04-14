@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import axios from "axios";
+import { BASE_URL } from "../config";
 
 const GST_RATES = [0, 5, 12, 18, 28];
 const DEFAULT_LOGO_URL = "https://res.cloudinary.com/dvbzhmysy/image/upload/v1773851516/mbusiness/logos/okhahqag5ttqwfvhfphw.png";
@@ -134,9 +136,8 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   const fetchList = async () => {
     setListLoading(true);
     try {
-      const res  = await fetch("https://m-business-r2vd.onrender.com/api/invoices");
-      const data = await res.json();
-      if (data.success && Array.isArray(data.invoices)) setInvoiceList(data.invoices);
+      const res  = await axios.get(`${BASE_URL}/api/invoices`);
+      if (res.data.success && Array.isArray(res.data.invoices)) setInvoiceList(res.data.invoices);
       else setInvoiceList(loadAllDrafts());
     } catch { setInvoiceList(loadAllDrafts()); }
     finally { setListLoading(false); }
@@ -189,16 +190,13 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   // ── API save ────────────────────────────────────────────────
   const apiSave = async (status = "draft") => {
     try {
-      const method = editingId ? "PUT" : "POST";
-      const url    = editingId
-        ? `https://m-business-r2vd.onrender.com/api/invoices/${editingId}`
-          : "https://m-business-r2vd.onrender.com/api/invoices";
-      const res  = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inv, items, status }),
-      });
-      return await res.json();
+      if (editingId) {
+        const res = await axios.put(`${BASE_URL}/api/invoices/${editingId}`, { inv, items, status });
+        return res.data;
+      } else {
+        const res = await axios.post(`${BASE_URL}/api/invoices`, { inv, items, status });
+        return res.data;
+      }
     } catch {
       return { success: false };
     }
@@ -232,7 +230,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   const handleDelete = async (entry) => {
     const id = entry.id;
     // Try backend
-    try { await fetch(`https://m-business-r2vd.onrender.com/api/invoices/${id}`, { method: "DELETE" }); } catch {}
+    try { await axios.delete(`${BASE_URL}/api/invoices/${id}`); } catch {}
     // Remove locally
     deleteDraftLocal(entry.invoiceNo);
     setInvoiceList(prev => prev.filter(e => (e.id || e.invoiceNo) !== (id || entry.invoiceNo)));
@@ -245,23 +243,18 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     const id = entry.id;
     setStatusUpdating(id);
     try {
-      await fetch(`https://m-business-r2vd.onrender.com/api/invoices/${id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      await axios.patch(`${BASE_URL}/api/invoices/${id}/status`, { status: newStatus });
     } catch {}
     // update local list
     setInvoiceList(prev => prev.map(e =>
       (e.id || e.invoiceNo) === (id || entry.invoiceNo) ? { ...e, status: newStatus } : e
     ));
     // update localStorage
-    const drafts = loadAllDrafts().map(d =>
-      d.id === entry.invoiceNo ? { ...d, status: newStatus } : d
-    );
-    localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+    const drafts = loadAllDrafts();
+    const idx = drafts.findIndex(d => (d.id || d.invoiceNo) === (id || entry.invoiceNo));
+    if (idx >= 0) { drafts[idx].status = newStatus; localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts)); }
     setStatusUpdating(null);
-    showToast(`✅ Status → ${newStatus}`);
+    showToast(`✅ Status updated to ${newStatus}`);
   };
 
   // ── QR ──────────────────────────────────────────────────────

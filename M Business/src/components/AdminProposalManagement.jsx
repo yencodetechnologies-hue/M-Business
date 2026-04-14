@@ -517,6 +517,8 @@ export default function AdminProposalManagement() {
   const [loading, setLoading] = useState(true);
   const [selectedProposal, setSelectedProposal] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [rejectTarget, setRejectTarget] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState("");
   const [proposalTitle, setProposalTitle] = useState("");
@@ -525,6 +527,20 @@ export default function AdminProposalManagement() {
   useEffect(() => {
     fetchProposals();
     fetchClients();
+
+    // Auto-refresh proposals every 5 seconds
+    const interval = setInterval(() => {
+      fetchProposals();
+    }, 5000);
+
+    // Refresh when window gets focus
+    const onFocus = () => fetchProposals();
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   const fetchClients = async () => {
@@ -608,6 +624,25 @@ export default function AdminProposalManagement() {
       setDeleteTarget(null);
     } catch (error) {
       console.error("Error deleting proposal:", error);
+    }
+  };
+
+  const handleApprove = async (proposalId) => {
+    try {
+      await axios.put(`${BASE_URL}/api/proposals/${proposalId}/approve`);
+      setProposals(prev => prev.map(p => p._id === proposalId ? { ...p, status: "approved" } : p));
+    } catch (error) {
+      console.error("Error approving proposal:", error);
+    }
+  };
+
+  const handleReject = async (proposalId, reason) => {
+    try {
+      await axios.put(`${BASE_URL}/api/proposals/${proposalId}/reject`, { rejectNote: reason });
+      setProposals(prev => prev.map(p => p._id === proposalId ? { ...p, status: "rejected", rejectNote: reason } : p));
+      setRejectTarget(null);
+    } catch (error) {
+      console.error("Error rejecting proposal:", error);
     }
   };
 
@@ -825,24 +860,12 @@ export default function AdminProposalManagement() {
                         >
                           🖨️ Print
                         </button>
-                        
-                        <button
-                          onClick={() => setDeleteTarget(proposal)}
-                          style={{
-                            background: "#fee2e2",
-                            border: "1px solid #fecaca",
-                            borderRadius: 7,
-                            padding: "5px 10px",
-                            fontSize: 12,
-                            color: "#ef4444",
-                            cursor: "pointer",
-                            fontWeight: 600,
-                            fontFamily: "inherit",
-                            whiteSpace: "nowrap"
-                          }}
-                        >
-                          🗑 Delete
-                        </button>
+
+                        {proposal.status === "pending" && (
+                          <>
+                           
+                          </>
+                        )}
 
                         {(proposal.status === "rejected" || proposal.status === "draft") && (
                           <button
@@ -860,7 +883,7 @@ export default function AdminProposalManagement() {
                               whiteSpace: "nowrap"
                             }}
                           >
-                            Edit
+                            ✏️ Edit
                           </button>
                         )}
 
@@ -880,7 +903,7 @@ export default function AdminProposalManagement() {
                               whiteSpace: "nowrap"
                             }}
                           >
-                            Submit for Approval
+                            📤 Submit
                           </button>
                         )}
                       </div>
@@ -1090,6 +1113,110 @@ export default function AdminProposalManagement() {
                 Delete
               </button>
             </div>
+          </div>
+        </Mdl>
+      )}
+
+      {/* Reject Modal */}
+      {rejectTarget && (
+        <Mdl
+          title="Reject Proposal"
+          onClose={() => setRejectTarget(null)}
+          maxWidth={500}
+        >
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <div style={{
+              width: 52,
+              height: 52,
+              borderRadius: "50%",
+              background: "#fee2e2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 22,
+              margin: "0 auto 14px"
+            }}>
+              ❌
+            </div>
+            <h3 style={{
+              textAlign: "center",
+              margin: "0 0 8px",
+              fontSize: 16,
+              fontWeight: 800,
+              color: T.text
+            }}>
+              Reject Proposal
+            </h3>
+            <p style={{
+              textAlign: "center",
+              color: "#6b7280",
+              fontSize: 13,
+              margin: "0 0 22px"
+            }}>
+              Are you sure you want to reject "{rejectTarget.title || 'this proposal'}"?
+            </p>
+          </div>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{
+              display: "block",
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#7c3aed",
+              marginBottom: 8
+            }}>
+              Rejection Reason (optional):
+            </label>
+            <textarea
+              value={rejectReason}
+              onChange={e => setRejectReason(e.target.value)}
+              placeholder="Enter reason for rejection..."
+              style={{
+                width: "100%",
+                minHeight: 80,
+                padding: "10px 14px",
+                border: "1.5px solid #ede9fe",
+                borderRadius: 10,
+                fontSize: 13,
+                fontFamily: "inherit",
+                resize: "vertical"
+              }}
+            />
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button
+              onClick={() => setRejectTarget(null)}
+              style={{
+                flex: 1,
+                padding: "10px",
+                background: "#f5f3ff",
+                border: "1px solid #ede9fe",
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: 600,
+                color: T.text,
+                cursor: "pointer",
+                fontFamily: "inherit"
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => handleReject(rejectTarget._id, rejectReason)}
+              style={{
+                flex: 1,
+                padding: "10px",
+                background: "linear-gradient(135deg,#ef4444,#dc2626)",
+                border: "none",
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: 700,
+                color: "#fff",
+                cursor: "pointer",
+                fontFamily: "inherit"
+              }}
+            >
+              Reject
+            </button>
           </div>
         </Mdl>
       )}

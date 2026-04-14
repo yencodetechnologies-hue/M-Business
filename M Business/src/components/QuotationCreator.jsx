@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { BASE_URL } from "../config";
+import axios from "axios";
 
 const GST_RATES = [0, 5, 12, 18, 28];
 const DEFAULT_LOGO_URL = "https://res.cloudinary.com/dvbzhmysy/image/upload/v1773851516/mbusiness/logos/okhahqag5ttqwfvhfphw.png";
@@ -84,11 +85,13 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
   const fetchList = async () => {
     setListLoading(true);
     try {
-      const res  = await fetch(`${BASE_URL}/api/quotations`);
-      const data = await res.json();
-      if (data.success && Array.isArray(data.quotations)) setQtList(data.quotations);
+      const response = await axios.get(`${BASE_URL}/api/quotations`);
+      if (response.data.success && Array.isArray(response.data.quotations)) setQtList(response.data.quotations);
       else setQtList(loadLocal());
-    } catch { setQtList(loadLocal()); }
+    } catch (error) {
+      console.error('Fetch quotations error:', error);
+      setQtList(loadLocal());
+    }
     finally { setListLoading(false); }
   };
 
@@ -117,11 +120,11 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     if (!validate()) return;
     setSaving("draft");
     try {
-      await fetch(`${BASE_URL}/api/quotations`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qt, items, status: "draft" }),
-      });
-    } catch {}
+      const response = await axios.post(`${BASE_URL}/api/quotations`, { qt, items, status: "draft" });
+      console.log('Quotation saved successfully:', response.data);
+    } catch (error) {
+      console.error('Save quotation error:', error);
+    }
     saveLocal(qt, items);
     setSaving(false);
     setDraftSaved(true);
@@ -132,11 +135,11 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     if (!validate()) return;
     setSaving("preview");
     try {
-      await fetch(`${BASE_URL}/api/quotations`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qt, items, status: "draft" }),
-      });
-    } catch {}
+      const response = await axios.post(`${BASE_URL}/api/quotations`, { qt, items, status: "draft" });
+      console.log('Quotation saved for preview:', response.data);
+    } catch (error) {
+      console.error('Save quotation preview error:', error);
+    }
     saveLocal(qt, items);
     setSaving(false);
     setStep("preview");
@@ -159,26 +162,27 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     if (!window.confirm(`Convert "${entry.quoteNo}" to Invoice?`)) return;
     setConvertingId(entry.id);
     try {
-      const res  = await fetch(`${BASE_URL}/api/quotations/${entry.id}/convert`, { method: "POST" });
-      const data = await res.json();
-      if (data.success) {
-        alert(`✅ Invoice ${data.invoiceNo} created!`);
+      const response = await axios.post(`${BASE_URL}/api/quotations/${entry.id}/convert`);
+      if (response.data.success) {
+        alert(`✅ Invoice ${response.data.invoiceNo} created!`);
         fetchList();
-        if (onConvertToInvoice) onConvertToInvoice(data.invoice);
-      } else alert("Convert failed: " + data.msg);
-    } catch { alert("Backend offline — conversion failed."); }
+        if (onConvertToInvoice) onConvertToInvoice(response.data.invoice);
+      } else alert("Convert failed: " + response.data.msg);
+    } catch (error) {
+      console.error('Convert quotation error:', error);
+      alert("Backend offline — conversion failed.");
+    }
     setConvertingId(null);
   };
 
   const handleStatusChange = async (entry, newStatus) => {
     try {
-      await fetch(`${BASE_URL}/api/quotations/${entry.id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-      });
+      await axios.patch(`${BASE_URL}/api/quotations/${entry.id}/status`, { status: newStatus });
       fetchList();
-    } catch { alert("Status update failed"); }
+    } catch (error) {
+      console.error('Status update error:', error);
+      alert("Status update failed");
+    }
   };
 
   const inp = (err) => ({

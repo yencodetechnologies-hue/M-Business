@@ -13,8 +13,13 @@ router.get('/test', (req, res) => {
   res.json({ message: 'Vendor routes are working!' });
 });
 
+// Root test route
+router.get('/', (req, res) => {
+  console.log('GET /api/vendors called');
+  vendorController.getVendors(req, res);
+});
+
 router.post('/', vendorController.createVendor);
-router.get('/', vendorController.getVendors);
 router.put('/:id', vendorController.updateVendor);
 router.delete('/:id', vendorController.deleteVendor);
 

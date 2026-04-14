@@ -44,12 +44,22 @@ router.post("/", async (req, res) => {
 router.put("/:dbId", async (req, res) => {
   try {
     const companyId = req.companyId || "NONE";
+    
+    // Find existing proposal first
+    const existing = await Proposal.findOne({ _id: req.params.dbId, companyId });
+    if (!existing) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
+    
+    // If proposal was approved or rejected, reset to pending on edit (client needs to re-approve)
+    const updateData = { ...req.body };
+    if (existing.status === "approved" || existing.status === "rejected") {
+      updateData.status = "pending";
+    }
+    
     const saved = await Proposal.findOneAndUpdate(
       { _id: req.params.dbId, companyId },
-      { $set: req.body },
+      { $set: updateData },
       { new: true }
     );
-    if (!saved) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
     res.json(saved);
   } catch (err) {
     res.status(500).json({ msg: "Error updating proposal", error: err.message });

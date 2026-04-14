@@ -6,7 +6,8 @@ const Invoice = require("../models/InvoiceModels");
 // ── GET all invoices ─────────────────────────────────────────────────────────
 router.get("/", async (req, res) => {
   try {
-    const invoices = await Invoice.find().sort({ createdAt: -1 }).lean();
+    const filter = req.companyId ? { companyId: req.companyId } : {};
+    const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
     const normalised = invoices.map((doc) => {
       const subtotal = (doc.items || []).reduce(
@@ -99,6 +100,7 @@ router.post("/", async (req, res) => {
       gstAmt,
       total,
       status: "draft",
+      companyId: req.companyId || "",
     };
 
     // Upsert — same invoiceNo won't create duplicate

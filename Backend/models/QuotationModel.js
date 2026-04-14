@@ -7,9 +7,10 @@ const QuotationSchema = new mongoose.Schema(
     items:  { type: Array,  required: true, default: [] },
     status: {
       type: String,
-      enum: ["draft","sent","approved","rejected","expired"],
+      enum: ["draft","sent","approved","rejected","expired","converted"],
       default: "draft",
     },
+    companyId: { type: String, default: "" },
   },
   { timestamps: true }
 );

@@ -7,6 +7,7 @@ const groupSchema = new mongoose.Schema(
     open:      { type: Boolean, default: true },
     order:     { type: Number, default: 0 },
     isDeleted: { type: Boolean, default: false },
+    companyId: { type: String, default: "" },
   },
   { timestamps: true }
 );

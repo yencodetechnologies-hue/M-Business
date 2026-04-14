@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
 // CREATE a subadmin
 router.post("/", async (req, res) => {
   try {
-    const { name, email, password, phone, status } = req.body;
+    const { name, email, password, phone, status, companyName } = req.body;
     
     // Check if email exists in User
     const existingUser = await User.findOne({ email });
@@ -37,6 +37,7 @@ router.post("/", async (req, res) => {
       password: hashedPassword,
       phone: phone || "",
       role: "subadmin",
+      companyName: companyName || "",
     });
 
     // We can also store status if we add it to the UserModel schema.
@@ -56,11 +57,11 @@ router.post("/", async (req, res) => {
 // UPDATE a subadmin
 router.put("/:id", async (req, res) => {
   try {
-    const { name, email, phone, status } = req.body;
+    const { name, email, phone, status, companyName } = req.body;
     
     const updatedSubadmin = await User.findByIdAndUpdate(
       req.params.id,
-      { name, email, phone }, // status might not be in User schema, but let's pass it
+      { name, email, phone, companyName }, // status might not be in User schema, but let's pass it
       { new: true }
     );
     

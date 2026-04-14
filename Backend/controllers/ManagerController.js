@@ -27,7 +27,8 @@ exports.addManager = async (req, res) => {
       role,
       address,
       password,
-      status: status || "Active"
+      status: status || "Active",
+      companyId: req.companyId || "",
     });
 
     await manager.save();

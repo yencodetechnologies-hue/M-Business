@@ -130,6 +130,7 @@ router.get("/", async (req, res) => {
     const { search = "", status = "", experience = "", page = 1, limit = 20 } = req.query;
 
     const query = {};
+    if (req.companyId) query.companyId = req.companyId;
     if (status)     query.status     = status;
     if (experience) query.experience = experience;
     if (search) {
@@ -161,11 +162,12 @@ router.get("/", async (req, res) => {
 //    Admin: dashboard counts
 router.get("/stats", async (req, res) => {
   try {
+    const filter = req.companyId ? { companyId: req.companyId } : {};
     const [total, pending, hired, rejected] = await Promise.all([
-      Interview.countDocuments(),
-      Interview.countDocuments({ status: "Pending"  }),
-      Interview.countDocuments({ status: "Hired"    }),
-      Interview.countDocuments({ status: "Rejected" }),
+      Interview.countDocuments(filter),
+      Interview.countDocuments({ ...filter, status: "Pending"  }),
+      Interview.countDocuments({ ...filter, status: "Hired"    }),
+      Interview.countDocuments({ ...filter, status: "Rejected" }),
     ]);
     res.json({ total, pending, hired, rejected });
   } catch (err) {

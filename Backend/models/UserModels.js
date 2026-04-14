@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   role:     { type: String, default: "user" },
   logoUrl:  { type: String, default: "" },
   companyId: { type: String, default: "" },
+  companyName: { type: String, default: "" },
   mySubscriptions: { type: Boolean, default: false },
   numberOfSubscriptions: { type: Number, default: 0 },
 }, { timestamps: true });

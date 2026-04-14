@@ -8,6 +8,7 @@ const itemSchema = new mongoose.Schema({
 
 const invoiceSchema = new mongoose.Schema({
   invoiceNo:      { type: String, required: true, unique: true },
+  quotationId:    { type: String },
   orderNo:        String,
   date:           String,
   dueDate:        String,
@@ -25,6 +26,7 @@ const invoiceSchema = new mongoose.Schema({
   gstAmt:         Number,
   total:          Number,
   status:         { type: String, enum: ["draft", "sent", "paid"], default: "draft" },
+  companyId:      { type: String, default: "" },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Invoice", invoiceSchema);

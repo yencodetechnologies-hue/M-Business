@@ -7,7 +7,8 @@ const Invoice   = require("../models/InvoiceModels");
 // ── GET all ──────────────────────────────────────────────────────────────────
 router.get("/", async (req, res) => {
   try {
-    const docs = await Quotation.find().sort({ createdAt: -1 }).lean();
+    const companyId = req.companyId || "NONE";
+    const docs = await Quotation.find({ companyId }).sort({ createdAt: -1 }).lean();
     const quotations = docs.map((doc) => {
       const qt = doc.qt || {};
       const items = doc.items || [];
@@ -48,7 +49,7 @@ router.post("/", async (req, res) => {
       await existing.save();
       return res.json({ success: true, quotation: existing });
     }
-    const doc = new Quotation({ qt, items, status: status || "draft" });
+    const doc = new Quotation({ qt, items, status: status || "draft", companyId: req.companyId || "" });
     await doc.save();
     return res.json({ success: true, quotation: doc });
   } catch (err) {
@@ -61,10 +62,16 @@ router.post("/", async (req, res) => {
 router.patch("/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
-    const allowed = ["draft","sent","approved","rejected","expired"];
+    const allowed = ["draft","sent","approved","rejected","expired","converted"];
     if (!allowed.includes(status)) return res.status(400).json({ success: false, msg: "Invalid status" });
-    const doc = await Quotation.findByIdAndUpdate(req.params.id, { status }, { new: true });
-    if (!doc) return res.status(404).json({ success: false, msg: "Not found" });
+    
+    const companyId = req.companyId || "NONE";
+    const doc = await Quotation.findOneAndUpdate(
+      { _id: req.params.id, companyId },
+      { status },
+      { new: true }
+    );
+    if (!doc) return res.status(404).json({ success: false, msg: "Not found or unauthorized" });
     return res.json({ success: true, quotation: doc });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message });
@@ -87,15 +94,27 @@ router.post("/:id/convert", async (req, res) => {
     const gstAmt   = subtotal * ((parseFloat(qt.gstRate)||0) / 100);
     const total    = subtotal + gstAmt;
 
-    // Check duplicate
-    const existing = await Invoice.findOne({ invoiceNo });
-    if (existing) return res.status(400).json({ success: false, msg: "Invoice already exists for this quotation" });
+    // 1. Check if an invoice was ALREADY created for this specific Quotation
+    const existingForThis = await Invoice.findOne({ quotationId: req.params.id });
+    if (existingForThis) {
+      await Quotation.findByIdAndUpdate(req.params.id, { status: "converted" });
+      return res.json({ success: true, message: "Already converted", invoiceNo: existingForThis.invoiceNo, invoice: existingForThis });
+    }
+
+    // 2. Check if the generated Invoice number is used, and resolve collisions by adding a suffix
+    let finalInvoiceNo = (qt.quoteNo || "QT").replace(/^QT/, "INV");
+    let count = 0;
+    while (await Invoice.findOne({ invoiceNo: finalInvoiceNo })) {
+      count++;
+      finalInvoiceNo = `${(qt.quoteNo || "QT").replace(/^QT/, "INV")}-${count}`;
+    }
 
     const today = new Date().toISOString().split("T")[0];
     const due   = new Date(Date.now() + 30*86400000).toISOString().split("T")[0];
 
     const invoice = new Invoice({
-      invoiceNo,
+      invoiceNo:      finalInvoiceNo,
+      quotationId:    req.params.id,
       orderNo:        qt.refNo        || "",
       date:           today,
       dueDate:        due,
@@ -111,11 +130,12 @@ router.post("/:id/convert", async (req, res) => {
       items: items.map((i) => ({ description: i.description, quantity: parseFloat(i.quantity)||0, rate: parseFloat(i.rate)||0 })),
       subtotal, gstAmt, total,
       status: "draft",
+      companyId: qtDoc.companyId || req.companyId || "",
     });
     await invoice.save();
 
     // Mark quotation as converted
-    await Quotation.findByIdAndUpdate(req.params.id, { status: "approved" });
+    await Quotation.findByIdAndUpdate(req.params.id, { status: "converted" });
 
     return res.json({ success: true, invoiceNo, invoice });
   } catch (err) {
@@ -127,7 +147,9 @@ router.post("/:id/convert", async (req, res) => {
 // ── DELETE ─────────────────────────────────────────────────────────────────────
 router.delete("/:id", async (req, res) => {
   try {
-    await Quotation.findByIdAndDelete(req.params.id);
+    const companyId = req.companyId || "NONE";
+    const doc = await Quotation.findOneAndDelete({ _id: req.params.id, companyId });
+    if (!doc) return res.status(404).json({ success: false, msg: "Not found or unauthorized" });
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message });

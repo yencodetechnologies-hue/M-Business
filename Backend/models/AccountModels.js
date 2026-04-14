@@ -36,6 +36,7 @@ const ExpenseSchema = new mongoose.Schema(
       enum: ["Pending", "Approved", "Rejected"],
       default: "Pending",
     },
+    companyId: { type: String, default: "" },
   },
   { timestamps: true }
 );

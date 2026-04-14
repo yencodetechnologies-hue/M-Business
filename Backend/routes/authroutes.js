@@ -112,6 +112,7 @@ router.post("/login", async (req, res) => {
         role:    role,
         companyId: user.companyId || user._id.toString(),
         logoUrl: user.logoUrl || "",
+        companyName: user.companyName || "",
       },
     });
 
@@ -123,7 +124,7 @@ router.post("/login", async (req, res) => {
 // ── POST /api/auth/signup ───────────────────────────────────────────────────
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password, role, phone } = req.body;
+    const { name, email, password, role, phone, companyName } = req.body;
 
     // Ensure email is unique across all collections
     const existUser = await User.findOne({ email });
@@ -148,7 +149,7 @@ router.post("/signup", async (req, res) => {
       const newEmployee = new Employee({ name, email, password: hashed, role: "employee", phone });
       await newEmployee.save();
     } else if (selectedRole === "subadmin") {
-      const newUser = new User({ name, email, password: hashed, role: "subadmin", phone });
+      const newUser = new User({ name, email, password: hashed, role: "subadmin", phone, companyName: companyName || "" });
       await newUser.save();
     } else {
       const newUser = new User({ name, email, password: hashed, role: "admin", phone });

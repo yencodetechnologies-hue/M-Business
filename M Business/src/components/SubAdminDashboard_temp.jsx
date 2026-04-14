@@ -10,7 +10,6 @@ import ReportsPage from "./ReportsPage";
 import QuotationCreator from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
 import AdminProposalManagement from "./AdminProposalManagement";
-import RolePermissionDashboard from "./RolePermissionDashboard";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { QRCodeSVG } from "qrcode.react";
@@ -19,38 +18,54 @@ import { DOC_TYPES } from "./EmployeeProfilePanel";
 import AuthPage from "./AuthPage";
 import MySubscriptions from "./MySubscriptions";
 
+// Theme
+const T = {
+  primary: "#0f172a",
+  accent: "#6366f1",
+  accent2: "#8b5cf6",
+  success: "#10b981",
+  warning: "#f59e0b",
+  danger: "#ef4444",
+  bg: "#f8fafc",
+  card: "#ffffff",
+  text: "#0f172a",
+  muted: "#64748b",
+  border: "#e2e8f0",
+  sidebar: "#0f172a"
+};
 
-const T = { primary: "#3b0764", sidebar: "#1e0a3c", accent: "#9333ea", bg: "#f5f3ff", card: "#FFFFFF", text: "#1e0a3c", muted: "#7c3aed", border: "#ede9fe" };
-const TRACKING_SEED = [{ id: "PRJ001", name: "Website Redesign", client: "TechNova Pvt Ltd", deadline: "2024-05-30", pct: 65, status: "In Progress", note: "Design done, dev ongoing" }, { id: "PRJ002", name: "Mobile App Dev", client: "Bloom Creatives", deadline: "2024-08-15", pct: 15, status: "Pending", note: "Requirements gathering" }, { id: "PRJ003", name: "ERP Integration", client: "Infra Solutions", deadline: "2024-04-30", pct: 100, status: "Completed", note: "Signed off by client" }];
-const INVOICES = [{ id: "INV001", client: "TechNova Pvt Ltd", project: "Website Redesign", date: "2024-04-01", due: "2024-04-30", total: "₹1,47,500", status: "Paid" }, { id: "INV002", client: "Infra Solutions", project: "ERP Integration", date: "2024-05-01", due: "2024-05-15", total: "₹4,24,800", status: "Overdue" }, { id: "INV003", client: "Bloom Creatives", project: "Mobile App Dev", date: "2024-05-10", due: "2024-06-10", total: "₹1,18,000", status: "Pending" }];
+const TRACKING_SEED = [
+  { id: "PRJ001", name: "Website Redesign", client: "TechNova Pvt Ltd", deadline: "2024-05-30", pct: 65, status: "In Progress", note: "Design done, dev ongoing" },
+  { id: "PRJ002", name: "Mobile App Dev", client: "Bloom Creatives", deadline: "2024-08-15", pct: 15, status: "Pending", note: "Requirements gathering" },
+  { id: "PRJ003", name: "ERP Integration", client: "Infra Solutions", deadline: "2024-04-30", pct: 100, status: "Completed", note: "Signed off by client" }
+];
 
 const NAV = [
-  { key: "dashboard", icon: "🏠", label: "Dashboard" },
-  { key: "clients", icon: "👥", label: "Clients" },
-  { key: "subadmins", icon: "🛡️", label: "Subadmins" },
-  { key: "employees", icon: "👨‍💼", label: "Employees" },
-  { key: "managers", icon: "🧑‍💼", label: "Managers" },
-  { key: "projects", icon: "📁", label: "Projects" },
-  { key: "quotations", icon: "📋", label: "Quotations" },
-  { key: "proposals", icon: "🎨", label: "Project Proposals" },
-  { key: "invoices", icon: "🧾", label: "Invoices" },
-  { key: "tracking", icon: "📊", label: "Project Status" },
-  { key: "tasks", icon: "✅", label: "Tasks" },
-  { key: "calendar", icon: "📅", label: "Calendar" },
-  { key: "accounts", icon: "👤", label: "Accounts" },
-  { key: "interviews", icon: "🎯", label: "Interviews" },
-  { key: "reports", icon: "📈", label: "Reports" },
-  { key: "mysubscriptions", icon: "💳", label: "My Subscriptions" },
-  { key: "packages", icon: "📦", label: "Packages" },
-  { key: "payments", icon: "💰", label: "Payments" },
-  { key: "vendors", icon: "🏬", label: "Vendors" },
-  { key: "rolePermissions", icon: "🛡️", label: "Role Permissions" }
+  { key: "dashboard", icon: "", label: "Dashboard" },
+  { key: "clients", icon: "", label: "Clients" },
+  { key: "subadmins", icon: "", label: "Subadmins" },
+  { key: "employees", icon: "", label: "Employees" },
+  { key: "managers", icon: "", label: "Managers" },
+  { key: "vendors", icon: "", label: "Vendors" },
+  { key: "projects", icon: "", label: "Projects" },
+  { key: "quotations", icon: "", label: "Quotations" },
+  { key: "proposals", icon: "", label: "Project Proposals" },
+  { key: "invoices", icon: "", label: "Invoices" },
+  { key: "tracking", icon: "", label: "Project Status" },
+  { key: "tasks", icon: "", label: "Tasks" },
+  { key: "calendar", icon: "", label: "Calendar" },
+  { key: "accounts", icon: "", label: "Accounts" },
+  { key: "interviews", icon: "", label: "Interviews" },
+  { key: "reports", icon: "", label: "Reports" },
+  { key: "mysubscriptions", icon: "", label: "My Subscriptions" },
+  { key: "packages", icon: "", label: "Packages" },
+  { key: "payments", icon: "", label: "Payments" }
 ];
 
 function getNavForRole(role) {
   const r = (role || "").toLowerCase().trim();
   if (r === "subadmin" || r === "sub_admin" || r === "sub-admin")
-    return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "interviews", "reports", "mysubscriptions", "packages", "payments", "vendors", "rolePermissions"].includes(n.key));
+    return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "vendors", "proposals", "invoices", "tracking", "calendar", "accounts", "interviews", "reports", "mysubscriptions", "packages", "payments"].includes(n.key));
   // if(r==="manager")
   //   return NAV.filter(n=>["dashboard","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
   // if(r==="employee")
@@ -68,9 +83,9 @@ function SC({ title, children, action }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
         <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: T.text }}>{title}</h3>
         {action}
-      </div>
+            )}
       {children}
-    </div>
+          )}
   );
 }
 
@@ -80,7 +95,7 @@ function Search({ value, onChange, placeholder }) {
       <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span>
       <input type="text" placeholder={placeholder || "Search..."} value={value} onChange={e => onChange(e.target.value)}
         style={{ width: "100%", padding: "10px 14px 10px 40px", border: "1.5px solid #ede9fe", borderRadius: 10, fontSize: 13, color: T.text, background: "#faf5ff", outline: "none", fontFamily: "inherit" }} />
-    </div>
+          )}
   );
 }
 
@@ -91,10 +106,10 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
         <div style={{ padding: "16px 22px", borderBottom: "1px solid #ede9fe", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>✕</button>
-        </div>
-        <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>{children}</div>
-      </div>
-    </div>
+              )}
+        <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>{children}      )}
+            )}
+          )}
   );
 }
 
@@ -105,8 +120,8 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
       <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
       {options ? <select value={value} onChange={e => onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o => <option key={o}>{o}</option>)}</select>
         : <input type={type} value={value} onChange={e => onChange(e.target.value)} style={s} placeholder={placeholder || ""} disabled={disabled} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
-    </div>
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}      )}}
+          )}
   );
 }
 
@@ -116,15 +131,15 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
       <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "#fee2e2" : "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
           {danger ? "🗑️" : "✅"}
-        </div>
+              )}
         <h3 style={{ textAlign: "center", margin: "0 0 8px", fontSize: 16, fontWeight: 800, color: T.text }}>{title}</h3>
         <p style={{ textAlign: "center", color: "#6b7280", fontSize: 13, margin: "0 0 22px" }}>{message}</p>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onCancel} style={{ flex: 1, padding: "10px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 10, fontSize: 13, fontWeight: 600, color: T.text, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
           <button onClick={onConfirm} style={{ flex: 1, padding: "10px", background: danger ? "linear-gradient(135deg,#EF4444,#dc2626)" : "linear-gradient(135deg,#22C55E,#16a34a)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>{confirmLabel}</button>
-        </div>
-      </div>
-    </div>
+              )}
+            )}
+          )}
   );
 }
 
@@ -135,7 +150,7 @@ function ActionBtns({ onView, onEdit, onDelete }) {
       {onView && <button onClick={onView} title="View" style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#6366f1", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>👁 View</button>}
       <button onClick={onEdit} title="Edit" style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#9333ea", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>✏️ Edit</button>
       <button onClick={onDelete} title="Delete" style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>🗑 Delete</button>
-    </div>
+          )}
   );
 }
 
@@ -143,9 +158,9 @@ function InfoRow({ icon, label, value }) {
   if (!value) return null;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#faf5ff", borderRadius: 9, border: "1px solid #ede9fe", marginBottom: 7 }}>
-      <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(147,51,234,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{icon}</div>
-      <div><div style={{ fontSize: 10, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{label}</div><div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c", marginTop: 1 }}>{value}</div></div>
-    </div>
+      <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(147,51,234,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{icon}      )}
+      <div><div style={{ fontSize: 10, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{label}      )}<div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c", marginTop: 1 }}>{value}      )}      )}
+          )}
   );
 }
 
@@ -157,21 +172,21 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   return (
     <div style={{ position: "relative" }}>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "#9333ea" : "#ede9fe"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "#faf5ff", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}      )}<span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>}      )}) : "-- Select Client --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#a78bfa", transition: "0.2s" }}>▼</span>
-      </div>
+            )}
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 12, boxShadow: "0 8px 32px rgba(147,51,234,0.15)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid #ede9fe", borderRadius: 8, fontSize: 12, background: "#faf5ff", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#f3e8ff,#faf5ff)", borderBottom: "2px solid #ede9fe" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "#9333ea" }}>Add New Client</div></div></div>}
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid #ede9fe", borderRadius: 8, fontSize: 12, background: "#faf5ff", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />      )}      )}
+          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#f3e8ff,#faf5ff)", borderBottom: "2px solid #ede9fe" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+      )}<div><div style={{ fontSize: 13, fontWeight: 700, color: "#9333ea" }}>Add New Client      )}      )}      )}}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No clients found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f3e8ff" : "transparent", borderBottom: "1px solid #f5f3ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "#9333ea" }}>✓</span>}</div>); })}
-          </div>
-        </div>
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No clients found      )}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f3e8ff" : "transparent", borderBottom: "1px solid #f5f3ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}      )}<div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}      )}{company && <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}      )}}      )}{isSel && <span style={{ fontSize: 14, color: "#9333ea" }}>✓</span>}      )}); })}
+                )}
+              )}
       )}
       {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
-    </div>
+          )}
   );
 }
 
@@ -239,16 +254,16 @@ function ClientsPage({ clients, setClients, onAddClient }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}      )}}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[{ t: "Total Clients", v: clients.length, i: "👥", c: "#9333ea" }, { t: "Active", v: clients.filter(c => c.status === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: clients.filter(c => c.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
-            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
-          </div>
+            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}      )}
+            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}      )}<div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}      )}      )}
+                )}
         ))}
-      </div>
+            )}
 
       <SC title={`All Clients (${filtered.length})`}>
         <Search value={search} onChange={setSearch} placeholder="Search by name, email, company..." />
@@ -266,9 +281,9 @@ function ClientsPage({ clients, setClients, onAddClient }) {
                     <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`CLT${String(i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.clientName || c.name || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.clientName || c.name || "?")[0].toUpperCase()}      )}
                         <span style={{ fontWeight: 700, color: T.text }}>{c.clientName || c.name || "—"}</span>
-                      </div>
+                            )}
                     </td>
                     <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{c.companyName || c.company || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{c.email || "—"}</td>
@@ -286,20 +301,20 @@ function ClientsPage({ clients, setClients, onAddClient }) {
                 ))}
             </tbody>
           </table>
-        </div>
+              )}
       </SC>
 
-      {/* View Modal */}
+      {/* Modals */}
       {viewClient && (
         <Mdl title="Client Profile" onClose={() => setViewClient(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewClient.clientName || viewClient.name || "?")[0].toUpperCase()}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewClient.clientName || viewClient.name || "?")[0].toUpperCase()}      )}
             <div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewClient.clientName || viewClient.name}</div>
-              <div style={{ fontSize: 13, color: "#9333ea", marginTop: 2 }}>{viewClient.companyName || viewClient.company || "—"}</div>
-            </div>
-            <div style={{ marginLeft: "auto" }}><Badge label={viewClient.status || "Active"} /></div>
-          </div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewClient.clientName || viewClient.name}      )}
+              <div style={{ fontSize: 13, color: "#9333ea", marginTop: 2 }}>{viewClient.companyName || viewClient.company || "—"}      )}
+                  )}
+            <div style={{ marginLeft: "auto" }}><Badge label={viewClient.status || "Active"} />      )}
+                )}
           <InfoRow icon="📧" label="Email" value={viewClient.email} />
           <InfoRow icon="📱" label="Phone" value={viewClient.phone} />
           <InfoRow icon="📍" label="Address" value={viewClient.address} />
@@ -307,7 +322,7 @@ function ClientsPage({ clients, setClients, onAddClient }) {
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️ Edit</button>
             <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🗑 Delete</button>
-          </div>
+                )}
         </Mdl>
       )}
 
@@ -320,17 +335,17 @@ function ClientsPage({ clients, setClients, onAddClient }) {
             <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
             <Fld label="Phone" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
-          </div>
+                )}
           <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditClient(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
             <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
-          </div>
+                )}
         </Mdl>
       )}
 
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
-    </div>
+          )}
   );
 }
 
@@ -406,16 +421,16 @@ function EmployeesPage({ employees, setEmployees }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}      )}}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[{ t: "Total", v: employees.length, i: "👨‍💼", c: "#7c3aed" }, { t: "Active", v: employees.filter(e => e.status === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: employees.filter(e => e.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
-            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
-          </div>
+            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}      )}
+            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}      )}<div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}      )}      )}
+                )}
         ))}
-      </div>
+            )}
 
       <SC title={`All Employees (${filtered.length})`}>
         <Search value={search} onChange={setSearch} placeholder="Search by name, email, role..." />
@@ -433,9 +448,9 @@ function EmployeesPage({ employees, setEmployees }) {
                     <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`EMP${String(i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(e.name || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(e.name || "?")[0].toUpperCase()}      )}
                         <span style={{ fontWeight: 700, color: T.text }}>{e.name || "—"}</span>
-                      </div>
+                            )}
                     </td>
                     <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{e.email || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{e.phone || "—"}</td>
@@ -454,19 +469,19 @@ function EmployeesPage({ employees, setEmployees }) {
                 ))}
             </tbody>
           </table>
-        </div>
+              )}
       </SC>
 
       {viewEmp && (
         <Mdl title="Employee Profile" onClose={() => setViewEmp(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewEmp.name || "?")[0].toUpperCase()}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewEmp.name || "?")[0].toUpperCase()}      )}
             <div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewEmp.name}</div>
-              <div style={{ fontSize: 13, color: "#9333ea", marginTop: 2 }}>{viewEmp.role || "Employee"}</div>
-            </div>
-            <div style={{ marginLeft: "auto" }}><Badge label={viewEmp.status || "Active"} /></div>
-          </div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewEmp.name}      )}
+              <div style={{ fontSize: 13, color: "#9333ea", marginTop: 2 }}>{viewEmp.role || "Employee"}      )}
+                  )}
+            <div style={{ marginLeft: "auto" }}><Badge label={viewEmp.status || "Active"} />      )}
+                )}
           <InfoRow icon="📧" label="Email" value={viewEmp.email} />
           <InfoRow icon="📱" label="Phone" value={viewEmp.phone} />
           <InfoRow icon="🏢" label="Department" value={viewEmp.department} />
@@ -477,7 +492,7 @@ function EmployeesPage({ employees, setEmployees }) {
             <div style={{ fontSize: 12, fontWeight: 800, color: "#1e0a3c", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
               📂 Documents
               {empDocsLoading && <span style={{ fontSize: 10, color: "#a78bfa" }}>Loading...</span>}
-            </div>
+                  )}
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {DOC_TYPES.map(dt => {
                 const doc = empDocs[dt.key];
@@ -487,19 +502,19 @@ function EmployeesPage({ employees, setEmployees }) {
                   <div key={dt.key} style={{ border: `1.5px solid ${hasDoc ? dt.color + "35" : "#f1f5f9"}`, borderRadius: 12, overflow: "hidden", background: hasDoc ? `${dt.color}04` : "#f8fafc" }}>
                     <div style={{ padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 16 }}>{dt.icon}</span>
-                      <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: "#1e0a3c" }}>{dt.label}</div>
+                      <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: "#1e0a3c" }}>{dt.label}      )}
                       {hasDoc
                         ? <span style={{ background: `${dt.color}15`, border: `1px solid ${dt.color}30`, borderRadius: 20, padding: "2px 10px", fontSize: 10, fontWeight: 700, color: dt.color }}>✓ Uploaded</span>
                         : <span style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 20, padding: "2px 10px", fontSize: 10, fontWeight: 700, color: "#ef4444" }}>✗ Missing</span>}
-                    </div>
+                          )}
                     {hasDoc && (
                       <div style={{ padding: "0 12px 10px" }}>
                         {isImg(doc.url)
                           ? <img src={doc.url} alt={dt.label} style={{ width: "100%", maxHeight: 120, objectFit: "contain", borderRadius: 8, border: "1px solid #f1f5f9", background: "#fff" }} />
                           : <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#fff", borderRadius: 8, border: "1px solid #f1f5f9" }}>
                             <span style={{ fontSize: 20 }}>📄</span>
-                            <div style={{ fontSize: 11, fontWeight: 600, color: "#1e0a3c" }}>{doc.fileName || `${dt.label}.pdf`}</div>
-                          </div>}
+                            <div style={{ fontSize: 11, fontWeight: 600, color: "#1e0a3c" }}>{doc.fileName || `${dt.label}.pdf`}      )}
+                                )}}
                         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                           <button onClick={() => window.open(doc.url, "_blank")}
                             style={{ flex: 1, padding: "6px 10px", background: `${dt.color}10`, border: `1px solid ${dt.color}30`, borderRadius: 7, fontSize: 11, fontWeight: 700, color: dt.color, cursor: "pointer", fontFamily: "inherit" }}>
@@ -508,18 +523,18 @@ function EmployeesPage({ employees, setEmployees }) {
                           <a href={doc.url} downloadstyle={{ flex: 1, padding: "6px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             ⬇ Download
                           </a>
-                        </div>
-                      </div>
+                              )}
+                            )}
                     )}
-                  </div>
+                        )}
                 );
               })}
-            </div>
-          </div>
+                  )}
+                )}
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => { setViewEmp(null); openEdit(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️ Edit</button>
             <button onClick={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🗑 Delete</button>
-          </div>
+                )}
         </Mdl>
       )}
 
@@ -533,16 +548,16 @@ function EmployeesPage({ employees, setEmployees }) {
             <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
             <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
-          </div>
+                )}
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditEmp(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
             <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
-          </div>
+                )}
         </Mdl>
       )}
 
       {deleteTarget && <ConfirmModal title="Delete Employee" message={`Delete "${deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
-    </div>
+          )}
   );
 }
 
@@ -609,16 +624,16 @@ function ManagersPage({ managers, setManagers }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}      )}}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[{ t: "Total Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
-            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
-          </div>
+            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}      )}
+            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}      )}<div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}      )}      )}
+                )}
         ))}
-      </div>
+            )}
 
       <SC title={`All Managers (${filtered.length})`}>
         <Search value={search} onChange={setSearch} placeholder="Search by name, email, department..." />
@@ -636,9 +651,9 @@ function ManagersPage({ managers, setManagers }) {
                     <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`MGR${String(i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(m.managerName || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(m.managerName || "?")[0].toUpperCase()}      )}
                         <span style={{ fontWeight: 700, color: T.text }}>{m.managerName || "—"}</span>
-                      </div>
+                            )}
                     </td>
                     <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.email || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.phone || "—"}</td>
@@ -653,19 +668,19 @@ function ManagersPage({ managers, setManagers }) {
                 ))}
             </tbody>
           </table>
-        </div>
+              )}
       </SC>
 
       {viewMgr && (
         <Mdl title="Manager Profile" onClose={() => setViewMgr(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#fffbeb,#fef3c7)", borderRadius: 14, border: "1px solid #fde68a", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(m => m[0].toUpperCase())(viewMgr.managerName || "M")}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(m => m[0].toUpperCase())(viewMgr.managerName || "M")}      )}
             <div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewMgr.managerName}</div>
-              <div style={{ fontSize: 13, color: "#f59e0b", marginTop: 2 }}>{viewMgr.role || "Manager"}</div>
-            </div>
-            <div style={{ marginLeft: "auto" }}><Badge label={viewMgr.status || "Active"} /></div>
-          </div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewMgr.managerName}      )}
+              <div style={{ fontSize: 13, color: "#f59e0b", marginTop: 2 }}>{viewMgr.role || "Manager"}      )}
+                  )}
+            <div style={{ marginLeft: "auto" }}><Badge label={viewMgr.status || "Active"} />      )}
+                )}
           <InfoRow icon="📧" label="Email" value={viewMgr.email} />
           <InfoRow icon="📱" label="Phone" value={viewMgr.phone} />
           <InfoRow icon="🏢" label="Department" value={viewMgr.department} />
@@ -675,7 +690,7 @@ function ManagersPage({ managers, setManagers }) {
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => { setViewMgr(null); openEdit(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️ Edit</button>
             <button onClick={() => { setViewMgr(null); setDeleteTarget(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🗑 Delete</button>
-          </div>
+                )}
         </Mdl>
       )}
 
@@ -688,17 +703,205 @@ function ManagersPage({ managers, setManagers }) {
             <Fld label="Role" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} />
             <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
-          </div>
+                )}
           <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditMgr(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
             <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
-          </div>
+                )}
         </Mdl>
       )}
 
       {deleteTarget && <ConfirmModal title="Delete Manager" message={`Delete "${deleteTarget.managerName}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
-    </div>
+          )}
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// VENDORS PAGE
+// ═══════════════════════════════════════════════════════════
+function VendorsPage({ vendors, setVendors, onAddVendor }) {
+  const [search, setSearch] = useState("");
+  const [viewVendor, setViewVendor] = useState(null);
+  const [editVendor, setEditVendor] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [editErr, setEditErr] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState("");
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
+
+  const filtered = vendors.filter(v =>
+    (v.vendorName || v.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (v.productName || "").toLowerCase().includes(search.toLowerCase()) ||
+    (v.email || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  const openEdit = (v) => {
+    setEditForm({
+      vendorName: v.vendorName || v.name || "",
+      productName: v.productName || "",
+      amount: v.amount || "",
+      tax: v.tax || "",
+      gst: v.gst || "",
+      date: v.date || "",
+      paidAmount: v.paidAmount || "",
+      productDescription: v.productDescription || "",
+      dateOfPurchase: v.dateOfPurchase || "",
+      modeOfPayment: v.modeOfPayment || "",
+      email: v.email || "",
+      phone: v.phone || "",
+      status: v.status || "Active",
+    });
+    setEditErr({});
+    setEditVendor(v);
+  };
+
+  const saveEdit = async () => {
+    const errs = {};
+    if (!editForm.vendorName.trim()) errs.vendorName = "Vendor name required";
+    if (!editForm.productName.trim()) errs.productName = "Product name required";
+    if (!editForm.amount.trim()) errs.amount = "Amount required";
+    if (Object.keys(errs).length) { setEditErr(errs); return; }
+    try {
+      setSaving(true);
+      const res = await axios.put(`${BASE_URL}/api/vendors/${editVendor._id}`, editForm);
+      setVendors(prev => prev.map(v => v._id === editVendor._id ? { ...v, ...(res.data.vendor || editForm) } : v));
+      setEditVendor(null);
+      showToast("?? Vendor updated!");
+    } catch (err) {
+      // fallback local update
+      setVendors(prev => prev.map(v => v._id === editVendor._id ? { ...v, ...editForm } : v));
+      setEditVendor(null);
+      showToast("?? Updated locally!");
+    } finally { setSaving(false); }
+  };
+
+  const doDelete = async () => {
+    try {
+      await axios.delete(`${BASE_URL}/api/vendors/${deleteTarget._id}`);
+    } catch { }
+    setVendors(prev => prev.filter(v => v._id !== deleteTarget._id));
+    setDeleteTarget(null);
+    showToast("?? Vendor deleted!");
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}      )}}
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
+        {[{ t: "Total Vendors", v: vendors.length, i: "??", c: "#f59e0b" }, { t: "Active", v: vendors.filter(v => v.status === "Active").length, i: "??", c: "#22C55E" }, { t: "Inactive", v: vendors.filter(v => v.status === "Inactive").length, i: "??", c: "#EF4444" }].map(({ t, v, i, c }) => (
+          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}      )}
+            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}      )}<div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}      )}      )}
+                )}
+        ))}
+            )}
+
+      <SC title={`All Vendors (${filtered.length})`}>
+        <Search value={search} onChange={setSearch} placeholder="Search by vendor name, product, email..." />
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 900 }}>
+            <thead><tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+              {["#", "Vendor Name", "Product Name", "Amount", "Tax", "GST", "Date", "Paid Amount", "Payment Mode", "Status", "Actions"].map(c => (
+                <th key={c} style={{ padding: "10px 14px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{c.toUpperCase()}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {filtered.length === 0 ? <tr><td colSpan={11} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No vendors found</td></tr>
+                : filtered.map((v, i) => (
+                  <tr key={v._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`VDR${String(i + 1).padStart(3, "0")}`}</td>
+                    <td style={{ padding: "12px 14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(v.vendorName || v.name || "?")[0].toUpperCase()}      )}
+                        <span style={{ fontWeight: 700, color: T.text }}>{v.vendorName || v.name || "â"}</span>
+                            )}
+                    </td>
+                    <td style={{ padding: "12px 14px", color: "#7c3aed", fontWeight: 600 }}>{v.productName || "â"}</td>
+                    <td style={{ padding: "12px 14px", color: "#22C55E", fontSize: 12, fontWeight: 600 }}>â{v.amount || "0"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{v.tax || "0"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{v.gst || "0"}</td>
+                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 12 }}>{v.date || "â"}</td>
+                    <td style={{ padding: "12px 14px", color: "#22C55E", fontSize: 12, fontWeight: 600 }}>â{v.paidAmount || "0"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{v.modeOfPayment || "â"}</td>
+                    <td style={{ padding: "12px 14px" }}><Badge label={v.status || "Active"} /></td>
+                    <td style={{ padding: "12px 14px" }}>
+                      <ActionBtns
+                        onView={() => setViewVendor(v)}
+                        onEdit={() => openEdit(v)}
+                        onDelete={() => setDeleteTarget(v)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+              )}
+      </SC>
+
+      {/* View Modal */}
+      {viewVendor && (
+        <Mdl title="Vendor Details" onClose={() => setViewVendor(null)} maxWidth={600}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#fef3c7,#fde68a)", borderRadius: 14, border: "1px solid #f59e0b", marginBottom: 18 }}>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewVendor.vendorName || viewVendor.name || "?")[0].toUpperCase()}      )}
+            <div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewVendor.vendorName || viewVendor.name}      )}
+              <div style={{ fontSize: 13, color: "#f59e0b", marginTop: 2 }}>{viewVendor.productName || "â"}      )}
+                  )}
+            <div style={{ marginLeft: "auto" }}><Badge label={viewVendor.status || "Active"} />      )}
+                )}
+          
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+            <InfoRow icon="???" label="Amount" value={`â${viewVendor.amount || "0"}`} />
+            <InfoRow icon="???" label="Tax" value={viewVendor.tax || "0"} />
+            <InfoRow icon="???" label="GST" value={viewVendor.gst || "0"} />
+            <InfoRow icon="???" label="Paid Amount" value={`â${viewVendor.paidAmount || "0"}`} />
+            <InfoRow icon="???" label="Date" value={viewVendor.date || "â"} />
+            <InfoRow icon="???" label="Date of Purchase" value={viewVendor.dateOfPurchase || "â"} />
+                )}
+          
+          <InfoRow icon="???" label="Mode of Payment" value={viewVendor.modeOfPayment} />
+          <InfoRow icon="???" label="Product Description" value={viewVendor.productDescription} />
+          <InfoRow icon="???" label="Email" value={viewVendor.email} />
+          <InfoRow icon="???" label="Phone" value={viewVendor.phone} />
+          
+          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+            <button onClick={() => { setViewVendor(null); openEdit(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>â ï¸ Edit</button>
+            <button onClick={() => { setViewVendor(null); setDeleteTarget(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>?? Delete</button>
+                )}
+        </Mdl>
+      )}
+
+      {/* Edit Modal */}
+      {editVendor && (
+        <Mdl title="Edit Vendor" onClose={() => setEditVendor(null)}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+            <Fld label="Vendor Name *" value={editForm.vendorName} onChange={v => { setEditForm(p => ({ ...p, vendorName: v })); setEditErr(p => ({ ...p, vendorName: "" })); }} error={editErr.vendorName} />
+            <Fld label="Product Name *" value={editForm.productName} onChange={v => { setEditForm(p => ({ ...p, productName: v })); setEditErr(p => ({ ...p, productName: "" })); }} error={editErr.productName} />
+            <Fld label="Amount *" value={editForm.amount} onChange={v => { setEditForm(p => ({ ...p, amount: v })); setEditErr(p => ({ ...p, amount: "" })); }} type="number" error={editErr.amount} />
+            <Fld label="Tax" value={editForm.tax} onChange={v => setEditForm(p => ({ ...p, tax: v }))} type="number" />
+            <Fld label="GST" value={editForm.gst} onChange={v => setEditForm(p => ({ ...p, gst: v }))} type="number" />
+            <Fld label="Paid Amount" value={editForm.paidAmount} onChange={v => setEditForm(p => ({ ...p, paidAmount: v }))} type="number" />
+            <Fld label="Date" value={editForm.date} onChange={v => setEditForm(p => ({ ...p, date: v }))} type="date" />
+            <Fld label="Date of Purchase" value={editForm.dateOfPurchase} onChange={v => setEditForm(p => ({ ...p, dateOfPurchase: v }))} type="date" />
+            <Fld label="Mode of Payment" value={editForm.modeOfPayment} onChange={v => setEditForm(p => ({ ...p, modeOfPayment: v }))} options={["Cash", "Bank Transfer", "Cheque", "UPI", "Credit Card", "Debit Card", "Other"]} />
+            <Fld label="Email" value={editForm.email} onChange={v => setEditForm(p => ({ ...p, email: v }))} type="email" />
+            <Fld label="Phone" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
+            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
+                )}
+          <Fld label="Product Description" value={editForm.productDescription} onChange={v => setEditForm(p => ({ ...p, productDescription: v }))} />
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
+            <button onClick={() => setEditVendor(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ¦" : "Save Changes â"}</button>
+                )}
+        </Mdl>
+      )}
+
+      {deleteTarget && <ConfirmModal title="Delete Vendor" message={`Are you sure you want to delete "${deleteTarget.vendorName || deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
+          )}
   );
 }
 
@@ -796,16 +999,16 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toastMsg && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toastMsg}</div>}
+      {toastMsg && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toastMsg}      )}}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[{ t: "Total Subadmins", v: subadmins.length, i: "🛡️", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
-            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
-          </div>
+            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}      )}
+            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}      )}<div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}      )}      )}
+                )}
         ))}
-      </div>
+            )}
 
       <SC title={`All Subadmins (${filtered.length})`}>
         <Search value={search} onChange={setSearch} placeholder="Search by name, email, company..." />
@@ -823,9 +1026,9 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                     <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`SUB${String(i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(s.name || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(s.name || "?")[0].toUpperCase()}      )}
                         <span style={{ fontWeight: 700, color: T.text }}>{s.name || "—"}</span>
-                      </div>
+                            )}
                     </td>
                     <td style={{ padding: "12px 14px", color: "#7c3aed", fontSize: 12, fontWeight: 600 }}>{s.companyName || s.company || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.email || "—"}</td>
@@ -840,7 +1043,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                 ))}
             </tbody>
           </table>
-        </div>
+              )}
       </SC>
 
       {viewSub && (() => {
@@ -849,13 +1052,13 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
         <Mdl title="Subadmin Profile" onClose={() => setViewSub(null)} maxWidth={720}>
           {/* Header Section */}
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#eff6ff,#dbeafe)", borderRadius: 14, border: "1px solid #bfdbfe", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(s => s[0].toUpperCase())(viewSub.name || "S")}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(s => s[0].toUpperCase())(viewSub.name || "S")}      )}
             <div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewSub.name}</div>
-              <div style={{ fontSize: 13, color: "#3b82f6", marginTop: 2 }}>{viewSub.companyName || viewSub.company || "Subadmin"}</div>
-            </div>
-            <div style={{ marginLeft: "auto" }}><Badge label={viewSub.status || "Active"} /></div>
-          </div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewSub.name}      )}
+              <div style={{ fontSize: 13, color: "#3b82f6", marginTop: 2 }}>{viewSub.companyName || viewSub.company || "Subadmin"}      )}
+                  )}
+            <div style={{ marginLeft: "auto" }}><Badge label={viewSub.status || "Active"} />      )}
+                )}
 
           {/* Basic Info */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12, marginBottom: 20 }}>
@@ -865,23 +1068,23 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
             <InfoRow icon="📧" label="Email" value={viewSub.email} />
             <InfoRow icon="📱" label="Phone" value={viewSub.phone} />
             <InfoRow icon="📅" label="Joined" value={viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleDateString() : "—"} />
-          </div>
+                )}
 
           {/* Stats Cards */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
             <div style={{ background: "#f0f9ff", borderRadius: 12, padding: 14, border: "1px solid #bae6fd", textAlign: "center" }}>
-              <div style={{ fontSize: 11, color: "#0284c7", fontWeight: 700, marginBottom: 4 }}>QUOTATIONS</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#0ea5e9" }}>{relatedQuotations.length}</div>
-            </div>
+              <div style={{ fontSize: 11, color: "#0284c7", fontWeight: 700, marginBottom: 4 }}>QUOTATIONS      )}
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#0ea5e9" }}>{relatedQuotations.length}      )}
+                  )}
             <div style={{ background: "#f5f3ff", borderRadius: 12, padding: 14, border: "1px solid #ddd6fe", textAlign: "center" }}>
-              <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4 }}>EMPLOYEES</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#9333ea" }}>{relatedEmployees.length}</div>
-            </div>
+              <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4 }}>EMPLOYEES      )}
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#9333ea" }}>{relatedEmployees.length}      )}
+                  )}
             <div style={{ background: "#fff7ed", borderRadius: 12, padding: 14, border: "1px solid #fed7aa", textAlign: "center" }}>
-              <div style={{ fontSize: 11, color: "#c2410c", fontWeight: 700, marginBottom: 4 }}>MANAGERS</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#f59e0b" }}>{relatedManagers.length}</div>
-            </div>
-          </div>
+              <div style={{ fontSize: 11, color: "#c2410c", fontWeight: 700, marginBottom: 4 }}>MANAGERS      )}
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#f59e0b" }}>{relatedManagers.length}      )}
+                  )}
+                )}
 
           {/* Quotations Section */}
           {relatedQuotations.length > 0 && (
@@ -893,14 +1096,14 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                 {relatedQuotations.map((q, idx) => (
                   <div key={idx} style={{ padding: "10px 14px", borderBottom: "1px solid #e0f2fe", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{q.quotationNumber || q.quoteNumber || `Quote #${idx + 1}`}</div>
-                      <div style={{ fontSize: 11, color: "#64748b" }}>{q.client || q.clientName || "—"}</div>
-                    </div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#0ea5e9" }}>{q.amount || q.total || "—"}</div>
-                  </div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{q.quotationNumber || q.quoteNumber || `Quote #${idx + 1}`}      )}
+                      <div style={{ fontSize: 11, color: "#64748b" }}>{q.client || q.clientName || "—"}      )}
+                          )}
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#0ea5e9" }}>{q.amount || q.total || "—"}      )}
+                        )}
                 ))}
-              </div>
-            </div>
+                    )}
+                  )}
           )}
 
           {/* Employees Section */}
@@ -913,17 +1116,17 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                 {relatedEmployees.map((e, idx) => (
                   <div key={idx} style={{ padding: "10px 14px", borderBottom: "1px solid #f3e8ff", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(e.name || "?")[0].toUpperCase()}</div>
+                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(e.name || "?")[0].toUpperCase()}      )}
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{e.name}</div>
-                        <div style={{ fontSize: 11, color: "#64748b" }}>{e.role || e.department || "—"}</div>
-                      </div>
-                    </div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{e.name}      )}
+                        <div style={{ fontSize: 11, color: "#64748b" }}>{e.role || e.department || "—"}      )}
+                            )}
+                          )}
                     <Badge label={e.status || "Active"} />
-                  </div>
+                        )}
                 ))}
-              </div>
-            </div>
+                    )}
+                  )}
           )}
 
           {/* Managers Section */}
@@ -936,23 +1139,23 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                 {relatedManagers.map((m, idx) => (
                   <div key={idx} style={{ padding: "10px 14px", borderBottom: "1px solid #fed7aa", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(m.managerName || m.name || "?")[0].toUpperCase()}</div>
+                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(m.managerName || m.name || "?")[0].toUpperCase()}      )}
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{m.managerName || m.name}</div>
-                        <div style={{ fontSize: 11, color: "#64748b" }}>{m.department || "—"}</div>
-                      </div>
-                    </div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{m.managerName || m.name}      )}
+                        <div style={{ fontSize: 11, color: "#64748b" }}>{m.department || "—"}      )}
+                            )}
+                          )}
                     <Badge label={m.status || "Active"} />
-                  </div>
+                        )}
                 ))}
-              </div>
-            </div>
+                    )}
+                  )}
           )}
 
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => { setViewSub(null); openEdit(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️ Edit</button>
             <button onClick={() => { setViewSub(null); setDeleteTarget(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🗑 Delete</button>
-          </div>
+                )}
         </Mdl>
         );
       })()}
@@ -964,16 +1167,16 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
             <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
             <Fld label="Phone" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
-          </div>
+                )}
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditSub(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
             <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
-          </div>
+                )}
         </Mdl>
       )}
 
       {deleteTarget && <ConfirmModal title="Delete Subadmin" message={`Delete "${deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
-    </div>
+          )}
   );
 }
 
@@ -1038,16 +1241,16 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}      )}}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
         {[{ t: "Total", v: projects.length, i: "📁", c: "#a855f7" }, { t: "Active", v: projects.filter(p => p.status === "In Progress").length, i: "⚡", c: "#9333ea" }, { t: "Completed", v: projects.filter(p => p.status === "Completed").length, i: "✅", c: "#22C55E" }, { t: "Pending", v: projects.filter(p => p.status === "Pending").length, i: "⏳", c: "#F59E0B" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
-            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
-          </div>
+            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}      )}
+            <div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}      )}<div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}      )}      )}
+                )}
         ))}
-      </div>
+            )}
 
       <SC title={`All Projects (${filtered.length})`}>
         <Search value={search} onChange={setSearch} placeholder="Search by project name, client..." />
@@ -1074,12 +1277,12 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
                           ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                             {assignedEmployees.slice(0, 2).map((emp, idx) => (
                               <div key={idx} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <div style={{ width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#a78bfa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
+                                <div style={{ width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#a78bfa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}      )}
                                 <span style={{ color: "#6366f1", fontWeight: 600, fontSize: 11 }}>{emp}</span>
-                              </div>
+                                    )}
                             ))}
-                            {assignedEmployees.length > 2 && <div style={{ fontSize: 10, color: "#a78bfa", fontStyle: "italic" }}>+{assignedEmployees.length - 2} more</div>}
-                          </div>
+                            {assignedEmployees.length > 2 && <div style={{ fontSize: 10, color: "#a78bfa", fontStyle: "italic" }}>+{assignedEmployees.length - 2} more      )}}
+                                )}
                           : <button onClick={() => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#6366f1", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
                       })()}
                     </td>
@@ -1090,18 +1293,18 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
                 ))}
             </tbody>
           </table>
-        </div>
+              )}
       </SC>
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={550}>
           <div style={{ padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe", marginBottom: 18 }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 6 }}>{viewProj.name}</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 6 }}>{viewProj.name}      )}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
               <Badge label={viewProj.status || "Pending"} />
               {viewProj.client && <span style={{ fontSize: 12, color: "#9333ea", fontWeight: 600 }}>👥 {viewProj.client}</span>}
-            </div>
-          </div>
+                  )}
+                )}
           <InfoRow icon="💰" label="Budget" value={viewProj.budget} />
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGNED EMPLOYEES</label>
@@ -1111,14 +1314,14 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
                 ? <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {assignedEmployees.map((emp, idx) => (
                     <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                      <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#a78bfa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
+                      <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#a78bfa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}      )}
                       <span style={{ color: "#1e0a3c", fontWeight: 600, fontSize: 12 }}>{emp}</span>
-                    </div>
+                          )}
                   ))}
-                </div>
-                : <div style={{ color: "#a78bfa", fontSize: 13, fontStyle: "italic" }}>No employees assigned</div>
+                      )}
+                : <div style={{ color: "#a78bfa", fontSize: 13, fontStyle: "italic" }}>No employees assigned      )}
             })()}
-          </div>
+                )}
           <InfoRow icon="📅" label="Start Date" value={viewProj.start} />
           <InfoRow icon="🏁" label="End Date" value={viewProj.end} />
           <InfoRow icon="🎯" label="Purpose" value={viewProj.purpose} />
@@ -1128,7 +1331,7 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
             <button onClick={() => { setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️ Edit</button>
             <button onClick={() => { setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#6366f1,#8b5cf6)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>👤 Assign</button>
             <button onClick={() => { setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🗑 Delete</button>
-          </div>
+                )}
         </Mdl>
       )}
 
@@ -1139,19 +1342,19 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
             <div style={{ marginBottom: 14 }}>
               <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label>
               <ClientDropdown clients={clients} value={editForm.client} onChange={v => { setEditForm(p => ({ ...p, client: v })); setEditErr(p => ({ ...p, client: "" })); }} error={editErr.client} />
-              {editErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {editErr.client}</div>}
-            </div>
+              {editErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {editErr.client}      )}}
+                  )}
             <Fld label="Purpose" value={editForm.purpose} onChange={v => setEditForm(p => ({ ...p, purpose: v }))} />
             <Fld label="Budget" value={editForm.budget} onChange={v => setEditForm(p => ({ ...p, budget: v }))} />
             <Fld label="Start Date" value={editForm.start} type="date" onChange={v => setEditForm(p => ({ ...p, start: v }))} />
             <Fld label="End Date" value={editForm.end} type="date" onChange={v => setEditForm(p => ({ ...p, end: v }))} />
             <Fld label="Team Members" value={editForm.team} onChange={v => setEditForm(p => ({ ...p, team: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "In Progress", "Completed", "On Hold"]} />
-          </div>
+                )}
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES</label>
             <div style={{ border: "1.5px solid #ede9fe", borderRadius: 10, padding: "12px", background: "#faf5ff", maxHeight: 200, overflowY: "auto" }}>
-              {employees.length === 0 ? <div style={{ color: "#a78bfa", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
+              {employees.length === 0 ? <div style={{ color: "#a78bfa", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available      )}
                 : employees.map(e => (
                   <div key={e._id || e.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid #f5f3ff" }}>
                     <input type="checkbox"
@@ -1171,16 +1374,16 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
                       <span>{e.name}</span>
                       {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
                     </label>
-                  </div>
+                        )}
                 ))}
-            </div>
-            {editForm.assignedTo && editForm.assignedTo.length > 0 && <div style={{ marginTop: 6, fontSize: 11, color: "#9333ea", fontWeight: 600 }}>{editForm.assignedTo.length} employee(s) selected</div>}
-          </div>
+                  )}
+            {editForm.assignedTo && editForm.assignedTo.length > 0 && <div style={{ marginTop: 6, fontSize: 11, color: "#9333ea", fontWeight: 600 }}>{editForm.assignedTo.length} employee(s) selected      )}}
+                )}
           <Fld label="Description" value={editForm.description} onChange={v => setEditForm(p => ({ ...p, description: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditProj(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
             <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#a855f7,#9333ea)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
-          </div>
+                )}
         </Mdl>
       )}
 
@@ -1189,7 +1392,7 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
           <div style={{ marginBottom: 18 }}>
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 8 }}>SELECT EMPLOYEES TO ASSIGN</label>
             <div style={{ border: "1.5px solid #ede9fe", borderRadius: 10, padding: "12px", background: "#faf5ff", maxHeight: 200, overflowY: "auto" }}>
-              {employees.length === 0 ? <div style={{ color: "#a78bfa", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
+              {employees.length === 0 ? <div style={{ color: "#a78bfa", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available      )}
                 : employees.map(e => (
                   <div key={e._id || e.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid #f5f3ff" }}>
                     <input type="checkbox"
@@ -1209,20 +1412,20 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
                       <span>{e.name}</span>
                       {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
                     </label>
-                  </div>
+                        )}
                 ))}
-            </div>
-            {assignTo && assignTo.length > 0 && <div style={{ marginTop: 8, fontSize: 11, color: "#9333ea", fontWeight: 600 }}>{assignTo.length} employee(s) will be assigned</div>}
-          </div>
+                  )}
+            {assignTo && assignTo.length > 0 && <div style={{ marginTop: 8, fontSize: 11, color: "#9333ea", fontWeight: 600 }}>{assignTo.length} employee(s) will be assigned      )}}
+                )}
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button onClick={() => setAssignModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
             <button onClick={doAssign} style={{ background: "linear-gradient(135deg,#6366f1,#8b5cf6)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment →</button>
-          </div>
+                )}
         </Mdl>
       )}
 
       {deleteTarget && <ConfirmModal title="Delete Project" message={`Delete "${deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
-    </div>
+          )}
   );
 }
 
@@ -1239,19 +1442,19 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "#9333ea" : "#ede9fe"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "#faf5ff", cursor: "pointer", position: "relative", userSelect: "none", minHeight: 42, boxSizing: "border-box" }}>
         {value || placeholder || "-- Select --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#a78bfa", transition: "0.2s" }}>▼</span>
-      </div>
+            )}
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 12, boxShadow: "0 8px 32px rgba(147,51,234,0.15)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "8px 10px" }}><input autoFocus placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px", border: "1.5px solid #ede9fe", borderRadius: 8, fontSize: 12, background: "#faf5ff", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div>
+          <div style={{ padding: "8px 10px" }}><input autoFocus placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px", border: "1.5px solid #ede9fe", borderRadius: 8, fontSize: 12, background: "#faf5ff", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />      )}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No results</div>
-              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f3e8ff" : "transparent", borderBottom: "1px solid #f5f3ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "#9333ea" }}>✓</span>}</div>); })}
-          </div>
-        </div>
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No results      )}
+              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f3e8ff" : "transparent", borderBottom: "1px solid #f5f3ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}      )}<span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "#9333ea" }}>✓</span>}      )}); })}
+                )}
+              )}
       )}
       {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
-    </div>
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}      )}}
+          )}
   );
 }
 
@@ -1280,17 +1483,17 @@ function ProjectStatusPage({ clients, employees, managers }) {
   const B2 = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {tsToast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{tsToast}</div>}
+      {tsToast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{tsToast}      )}}
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12 }}>
-        {tsStats.map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", position: "relative", overflow: "hidden" }}><div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>))}
-      </div>
+        {tsStats.map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", position: "relative", overflow: "hidden" }}><div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}      )}<div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}      )}<div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}      )}      )}))}
+            )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid #ede9fe", borderRadius: 10, fontSize: 13, background: "#faf5ff", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
+          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid #ede9fe", borderRadius: 10, fontSize: 13, background: "#faf5ff", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} />      )}
           {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "#9333ea" : "#ede9fe", background: tsFilter === f ? "rgba(147,51,234,0.1)" : "#fff", color: tsFilter === f ? "#9333ea" : "#a78bfa" }}>{f}</button>))}
-        </div>
+              )}
         <button onClick={openAdd} style={B2("#9333ea")}>+ Add Project Status</button>
-      </div>
+            )}
       <SC title={`Project Status (${displayed.length})`}>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 900 }}>
@@ -1300,41 +1503,41 @@ function ProjectStatusPage({ clients, employees, managers }) {
                 : displayed.map((p, i) => (<tr key={p._id || p.id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                   <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 11, color: "#a78bfa" }}>{p.projectId || p.id || `PRJ${String(i + 1).padStart(3, "0")}`}</td>
                   <td style={{ padding: "11px 12px", fontWeight: 700, color: T.text }}>{p.name}</td>
-                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "—"}</span></div></td>
+                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}      )}<span style={{ color: T.text, fontSize: 12 }}>{p.client || "—"}</span>      )}</td>
                   <td style={{ padding: "11px 12px", color: "#7c3aed", fontSize: 12 }}>{p.manager || "—"}</td>
                   <td style={{ padding: "11px 12px", color: "#7c3aed", fontSize: 12 }}>{p.employee || "—"}</td>
                   <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 12, color: "#a78bfa", whiteSpace: "nowrap" }}>{p.deadline || "—"}</td>
                   <td style={{ padding: "11px 12px" }}><Badge label={p.status} /></td>
-                  <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "#ede9fe", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%" }} /></div><span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span></div></td>
+                  <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "#ede9fe", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%" }} />      )}<span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span>      )}</td>
                   <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "#a78bfa", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `📝 ${p.notes || p.note}` : "—"}</span></td>
                   <td style={{ padding: "11px 12px" }}><ActionBtns onEdit={() => openEdit(p)} onDelete={() => deleteTs(p._id || p.id)} /></td>
                 </tr>))}
             </tbody>
           </table>
-        </div>
+              )}
       </SC>
       {tsModal && (<Mdl title={tsModal === "add" ? "Add Project Status" : "Edit Project Status"} onClose={() => setTsModal(null)}>
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
           <Fld label="Project ID" value={tsForm.projectId || "Auto-generated"} onChange={v => setTsForm({ ...tsForm, projectId: v })} placeholder="Auto-generated (PRJ001)" disabled={tsModal === "add"} />
           <Fld label="Project Name *" value={tsForm.name} onChange={v => { setTsForm({ ...tsForm, name: v }); setTsErr(p => ({ ...p, name: "" })); }} error={tsErr.name} />
-          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {tsErr.client}</div>}</div>
+          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {tsErr.client}      )}}      )}
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
           <SearchDropdown label="Employee" items={employeeNames} displayKey="name" value={tsForm.employee} onChange={v => setTsForm({ ...tsForm, employee: v })} placeholder="-- Select Employee --" />
           <Fld label="Deadline *" value={tsForm.deadline} type="date" onChange={v => { setTsForm({ ...tsForm, deadline: v }); setTsErr(p => ({ ...p, deadline: "" })); }} error={tsErr.deadline} />
           <Fld label="Status" value={tsForm.status} onChange={v => setTsForm({ ...tsForm, status: v })} options={["In Progress", "Pending", "Completed", "On Hold"]} />
           <Fld label="Progress (0–100)" value={String(tsForm.progress)} type="number" onChange={v => { setTsForm({ ...tsForm, progress: v }); setTsErr(p => ({ ...p, progress: "" })); }} error={tsErr.progress} placeholder="e.g. 65" />
-        </div>
+              )}
         <Fld label="Notes" value={tsForm.notes} onChange={v => setTsForm({ ...tsForm, notes: v })} placeholder="Brief update…" />
         <div style={{ background: "#faf5ff", borderRadius: 12, padding: "12px 16px", border: "1px solid #ede9fe", marginBottom: 14 }}>
-          <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 8 }}>PROGRESS PREVIEW</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "#ede9fe", borderRadius: 6, height: 8 }}><div style={{ width: `${Math.min(100, Math.max(0, Number(tsForm.progress) || 0))}%`, background: "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%", transition: "width 0.3s" }} /></div><span style={{ fontSize: 13, fontWeight: 800, color: "#9333ea", width: 36, textAlign: "right" }}>{Math.min(100, Math.max(0, Number(tsForm.progress) || 0))}%</span></div>
-        </div>
+          <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 8 }}>PROGRESS PREVIEW      )}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "#ede9fe", borderRadius: 6, height: 8 }}><div style={{ width: `${Math.min(100, Math.max(0, Number(tsForm.progress) || 0))}%`, background: "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%", transition: "width 0.3s" }} />      )}<span style={{ fontSize: 13, fontWeight: 800, color: "#9333ea", width: 36, textAlign: "right" }}>{Math.min(100, Math.max(0, Number(tsForm.progress) || 0))}%</span>      )}
+              )}
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
           <button onClick={() => setTsModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
           <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("#9333ea"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Saving…" : tsModal === "add" ? "Save Project →" : "Update Project →"}</button>
-        </div>
+              )}
       </Mdl>)}
-    </div>
+          )}
   );
 }
 
@@ -1387,25 +1590,25 @@ function InterviewPage({ companyId, companyName }) {
   const sC = (s = "pending") => sColor[s.toLowerCase()] || "#a855f7";
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}      )}}
       <div style={{ background: "linear-gradient(135deg,#1e0a3c,#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.25)" }}>
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(147,51,234,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
-        <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "#c084fc", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(147,51,234,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗      )}
+        <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link      )}<div style={{ fontSize: 12, color: "#c084fc", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}      )}      )}
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
           <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(147,51,234,0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(147,51,234,0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#c084fc", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
           <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>👁 Preview Form</button>
-        </div>
-      </div>
+              )}
+            )}
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        {[{ t: "Total", v: counts.total, i: "🎯", c: "#9333ea" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✅", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
-      </div>
+        {[{ t: "Total", v: counts.total, i: "🎯", c: "#9333ea" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✅", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}      )}<div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}      )}<div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}      )}      )}))}
+            )}
       <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(147,51,234,0.08)", border: "1px solid #ede9fe" }}>
         <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "#1e0a3c" }}>All Candidates ({displayed.length})</h3>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid #ede9fe", borderRadius: 10, fontSize: 13, background: "#faf5ff", outline: "none", fontFamily: "inherit", color: "#1e0a3c", boxSizing: "border-box" }} /></div>
+          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid #ede9fe", borderRadius: 10, fontSize: 13, background: "#faf5ff", outline: "none", fontFamily: "inherit", color: "#1e0a3c", boxSizing: "border-box" }} />      )}
           {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "#9333ea" : sC(f)) : "#ede9fe", background: filter === f ? `${f === "all" ? "#9333ea" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "#9333ea" : sC(f)) : "#a78bfa", transition: "all 0.15s" }}>{f === "all" ? "🎯 All" : f === "pending" ? "⏳ Pending" : f === "hired" ? "✅ Hired" : "❌ Rejected"}</button>))}
-        </div>
-        {loading ? (<div style={{ textAlign: "center", padding: 50, color: "#a78bfa" }}>Loading candidates...</div>) : displayed.length === 0 ? (<div style={{ textAlign: "center", padding: "50px 20px", color: "#a78bfa" }}><div style={{ fontSize: 48, marginBottom: 12 }}>📭</div><div style={{ fontSize: 15, fontWeight: 700, color: "#1e0a3c", marginBottom: 6 }}>{candidates.length === 0 ? "No applications yet" : "No results found"}</div></div>) : (
+              )}
+        {loading ? (<div style={{ textAlign: "center", padding: 50, color: "#a78bfa" }}>Loading candidates...      )}) : displayed.length === 0 ? (<div style={{ textAlign: "center", padding: "50px 20px", color: "#a78bfa" }}><div style={{ fontSize: 48, marginBottom: 12 }}>📭      )}<div style={{ fontSize: 15, fontWeight: 700, color: "#1e0a3c", marginBottom: 6 }}>{candidates.length === 0 ? "No applications yet" : "No results found"}      )}      )}) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 950 }}>
               <thead><tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>{["#", "Candidate", "Contact", "Experience", "Role", "Interviewer", "Date", "Status", "Resume", "Actions"].map(h => (<th key={h} style={{ padding: "10px 12px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 10, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>))}</tr></thead>
@@ -1415,43 +1618,43 @@ function InterviewPage({ companyId, companyName }) {
                   const finalResumeUrl = resumeUrl; return (
                     <tr key={c._id || c.id || i} style={{ borderBottom: "1px solid #f3f0ff", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "12px 12px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{String(i + 1).padStart(3, "0")}</td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "#1e0a3c" }}>{c.name || "—"}</span></div></td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "#7c3aed" }}>{c.email || "—"}</div><div style={{ fontSize: 11, color: "#a78bfa", marginTop: 2 }}>{c.mobile || ""}</div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}      )}<span style={{ fontWeight: 700, color: "#1e0a3c" }}>{c.name || "—"}</span>      )}</td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "#7c3aed" }}>{c.email || "—"}      )}<div style={{ fontSize: 11, color: "#a78bfa", marginTop: 2 }}>{c.mobile || ""}      )}</td>
                       <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>🎓 Fresher</span> : <span style={{ background: "rgba(147,51,234,0.12)", color: "#9333ea", border: "1px solid rgba(147,51,234,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>💼 {c.years || "?"}yrs</span>}</td>
                       <td style={{ padding: "12px 12px", fontWeight: 600, color: "#1e0a3c", fontSize: 12 }}>{c.role || "—"}</td>
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "#7c3aed" }}>{c.interviewerName || <span style={{ color: "#ddd" }}>—</span>}</td>
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "#a78bfa", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
                       <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">⏳ Pending</option><option value="hired">✅ Hired</option><option value="rejected">❌ Rejected</option></select></td>
                       <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#9333ea", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄 View</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#7c3aed", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>🗑</button></div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#7c3aed", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>🗑</button>      )}</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-          </div>
+                )}
         )}
-      </div>
+            )}
       {viewModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
             <div style={{ padding: "16px 22px", borderBottom: "1px solid #ede9fe", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", flexShrink: 0 }}>
               <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e0a3c" }}>👤 Candidate Profile</h2>
               <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>✕</button>
-            </div>
+                  )}
             <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe", marginBottom: 18 }}>
                 <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
                   {(viewModal.name || "?")[0].toUpperCase()}
-                </div>
+                      )}
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 17, fontWeight: 800, color: "#1e0a3c" }}>{viewModal.name}</div>
-                  <div style={{ fontSize: 13, color: "#9333ea", fontWeight: 600, marginTop: 2 }}>{viewModal.role || "—"}</div>
-                </div>
+                  <div style={{ fontSize: 17, fontWeight: 800, color: "#1e0a3c" }}>{viewModal.name}      )}
+                  <div style={{ fontSize: 13, color: "#9333ea", fontWeight: 600, marginTop: 2 }}>{viewModal.role || "—"}      )}
+                      )}
                 <span style={{ background: `${sC(viewModal.status || "pending")}18`, color: sC(viewModal.status || "pending"), border: `1px solid ${sC(viewModal.status || "pending")}33`, padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
                   {(viewModal.status || "pending") === "pending" ? "⏳ Pending" : (viewModal.status || "") === "hired" ? "✅ Hired" : "❌ Rejected"}
                 </span>
-              </div>
+                    )}
 
               {viewModal._resolvedResumeUrl && (
                 <div style={{ marginBottom: 20 }}>
@@ -1473,40 +1676,40 @@ function InterviewPage({ companyId, companyName }) {
                       <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#9333ea", color: "#fff", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
                         🔗 Open in New Tab
                       </a>
-                    </div>
-                  </div>
-                </div>
+                          )}
+                        )}
+                      )}
               )}
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12 }}>
                 <div style={{ padding: 12, background: "#f5f3ff", borderRadius: 10, border: "1px solid #ede9fe" }}>
-                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📧 Email</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{viewModal.email || "—"}</div>
-                </div>
+                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📧 Email      )}
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{viewModal.email || "—"}      )}
+                      )}
                 <div style={{ padding: 12, background: "#f5f3ff", borderRadius: 10, border: "1px solid #ede9fe" }}>
-                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📱 Mobile</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{viewModal.mobile || "—"}</div>
-                </div>
+                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📱 Mobile      )}
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{viewModal.mobile || "—"}      )}
+                      )}
                 <div style={{ padding: 12, background: "#f5f3ff", borderRadius: 10, border: "1px solid #ede9fe" }}>
-                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>💼 Experience</div>
+                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>💼 Experience      )}
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>
                     {(viewModal.experience || "").toLowerCase() === "fresher" ? "🎓 Fresher" : `💼 ${viewModal.years || "?"} years`}
-                  </div>
-                </div>
+                        )}
+                      )}
                 <div style={{ padding: 12, background: "#f5f3ff", borderRadius: 10, border: "1px solid #ede9fe" }}>
-                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📅 Applied Date</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{fmt(viewModal.date || viewModal.createdAt)}</div>
-                </div>
+                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📅 Applied Date      )}
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{fmt(viewModal.date || viewModal.createdAt)}      )}
+                      )}
                 <div style={{ padding: 12, background: "#f5f3ff", borderRadius: 10, border: "1px solid #ede9fe" }}>
-                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>👨‍💼 Interviewer</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{viewModal.interviewerName || "—"}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                  <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>👨‍💼 Interviewer      )}
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{viewModal.interviewerName || "—"}      )}
+                      )}
+                    )}
+                  )}
+                )}
+              )}
       )}
-    </div>
+          )}
   );
 }
 
@@ -1515,81 +1718,40 @@ function InterviewPage({ companyId, companyName }) {
 // ═══════════════════════════════════════════════════════════
 function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoChange }) {
   const logoRef = useRef();
-  const [editingComp, setEditingComp] = useState(false);
-  const [compName, setCompName] = useState(user?.companyName || "");
   const displayName = user?.name || user?.email?.split("@")[0] || "Admin";
   const initials = displayName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-
-  const saveCompName = async () => {
-    try {
-      await axios.put(`${BASE_URL}/api/subadmins/${user.id || user._id}`, { companyName: compName });
-      const updated = { ...user, companyName: compName };
-      localStorage.setItem("user", JSON.stringify(updated));
-      setUser(updated);
-      setEditingComp(false);
-    } catch (err) { alert("Failed to save company name"); }
-  };
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
       <div style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 420, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(147,51,234,0.3)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
         <div style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7,#c084fc)", padding: "28px 28px 22px", textAlign: "center", flexShrink: 0 }}>
           <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>✕</button>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 8, margin: "0 auto 12px", position: "relative", width: "fit-content" }}>
-            <div style={{ width: 72, height: 72, borderRadius: 16, background: "rgba(255,255,255,0.22)", border: "3px solid rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-              {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 5, background: "#fff" }} /> : <span style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{initials}</span>}
-            </div>
-            <button 
-              onClick={() => logoRef.current.click()} 
-              style={{ padding: "6px", background: "rgba(255,255,255,0.9)", border: "none", borderRadius: 8, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}
-              title="Upload Logo"
-            >
-              📷
-            </button>
-          </div>
+          <div style={{ width: 72, height: 72, borderRadius: 16, background: "rgba(255,255,255,0.22)", border: "3px solid rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", overflow: "hidden" }}>
+            {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 5, background: "#fff" }} /> : <span style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{initials}</span>}
+                )}
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>{displayName}</h2>
           <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{user?.email || "—"}</p>
           <span style={{ display: "inline-block", marginTop: 8, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.28)", borderRadius: 100, padding: "3px 12px", fontSize: 10, fontWeight: 700, color: "#fff", letterSpacing: 1, textTransform: "uppercase" }}>{user?.role || "user"}</span>
-        </div>
+              )}
         <div style={{ padding: "18px 24px", overflowY: "auto", flex: 1 }}>
           {[{ icon: "👤", label: "Full Name", value: displayName }, { icon: "📧", label: "Email", value: user?.email || "—" }, { icon: "📱", label: "Phone", value: user?.phone || "—" }, { icon: "🎭", label: "Role", value: user?.role || "user" }, { icon: "🔑", label: "User ID", value: (user?.id || user?._id) ? `#${String(user?.id || user?._id).slice(-8).toUpperCase()}` : "—" }].map(({ icon, label, value }) => (
             <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#faf5ff", borderRadius: 9, border: "1px solid #ede9fe", marginBottom: 7 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(147,51,234,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{icon}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 10, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{label}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c", marginTop: 1 }}>{value}</div>
-              </div>
-            </div>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(147,51,234,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{icon}      )}
+              <div><div style={{ fontSize: 10, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{label}      )}<div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c", marginTop: 1 }}>{value}      )}      )}
+                  )}
           ))}
-
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#fdf4ff", borderRadius: 9, border: "1px solid #fae8ff", marginBottom: 7 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(168,85,247,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>🏢</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 10, color: "#9333ea", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>Company Name</div>
-              {editingComp ? (
-                <div style={{ display: "flex", gap: 5, marginTop: 4 }}>
-                  <input value={compName} onChange={e => setCompName(e.target.value)} style={{ flex: 1, padding: "5px 8px", fontSize: 12, border: "1.5px solid #ede9fe", borderRadius: 6, outline: "none" }} />
-                  <button onClick={saveCompName} style={{ background: "#22c55e", border: "none", color: "#fff", padding: "2px 8px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Save</button>
-                </div>
-              ) : (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{user?.companyName || "Not Set"}</div>
-                  <button onClick={() => setEditingComp(true)} style={{ background: "none", border: "none", color: "#9333ea", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: "2px 4px" }}>Edit</button>
-                </div>
               )}
-            </div>
-          </div>
-        </div>
         <div style={{ padding: "12px 24px 18px", borderTop: "1px solid #ede9fe", flexShrink: 0 }}>
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "#1e0a3c", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+            <button onClick={() => logoRef.current.click()} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>📷 Upload Logo</button>
             <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🚪 Logout</button>
-          </div>
-        </div>
+                )}
+              )}
         <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }}
           onChange={async (e) => { const file = e.target.files[0]; if (!file) return; const formData = new FormData(); formData.append("file", file); try { const cloudRes = await axios.post(BASE_URL + "/api/upload/logo", formData); const uploadedUrl = cloudRes.data.logoUrl; await axios.post(BASE_URL + "/api/auth/save-logo", { userId: user.id || user._id, logoUrl: uploadedUrl }); const updatedUser = { ...user, logoUrl: uploadedUrl }; localStorage.setItem("user", JSON.stringify(updatedUser)); setUser(updatedUser); onLogoChange(uploadedUrl); } catch (err) { console.error(err); alert("Upload failed!"); } }}
         />
-      </div>
-    </div>
+            )}
+          )}
   );
 }
 
@@ -1607,349 +1769,318 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems })
       <div style={{ width: 225, background: "linear-gradient(180deg,#1e0a3c 0%,#2d1057 60%,#1e0a3c 100%)", color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, flexShrink: 0, overflow: "hidden", boxShadow: "4px 0 24px rgba(0,0,0,0.25)", transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }} className="sidebar">
         <div style={{ padding: "18px 16px 14px", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "relative", zIndex: 1, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, background: user?.logoUrl ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 17, color: "#fff", boxShadow: "0 4px 14px rgba(147,51,234,0.5)", overflow: "hidden" }}>
-              {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 4 }} /> : "M"}
-            </div>
-            <div>
-              <div style={{ fontWeight: 800, fontSize: 14, color: "#fff" }}>{user?.companyName || user?.name || ""}</div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: 1.5, marginTop: 1 }}>{roleDisplay}</div>
-            </div>
-          </div>
+            <div style={{ width: 36, height: 36, background: "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 17, color: "#fff", boxShadow: "0 4px 14px rgba(147,51,234,0.5)" }}>M      )}
+            <div><div style={{ fontWeight: 800, fontSize: 14, color: "#fff" }}>M Business      )}<div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: 1.5, marginTop: 1 }}>{roleDisplay}      )}      )}
+                )}
           <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 18, cursor: "pointer", padding: "2px 6px", lineHeight: 1 }} className="sidebar-close">✕</button>
-        </div>
+              )}
         <nav style={{ flex: 1, minHeight: 0, padding: "10px 8px", overflowY: "auto", position: "relative", zIndex: 1 }}>
           {items.map(n => { const on = active === n.key; return (<button key={n.key} onClick={() => { setActive(n.key); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "9px 12px", background: on ? "linear-gradient(90deg,rgba(147,51,234,0.35),rgba(168,85,247,0.15))" : "transparent", border: on ? "1px solid rgba(168,85,247,0.35)" : "1px solid transparent", borderRadius: 11, color: on ? "#e9d5ff" : "rgba(255,255,255,0.45)", fontWeight: on ? 700 : 400, fontSize: 12.5, cursor: "pointer", marginBottom: 2, textAlign: "left", fontFamily: "inherit" }}><span style={{ fontSize: 15 }}>{n.icon}</span><span style={{ flex: 1 }}>{n.label}</span>{on && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#c084fc", flexShrink: 0 }} />}</button>); })}
         </nav>
         <div style={{ padding: "10px 14px 14px", borderTop: "1px solid rgba(255,255,255,0.07)", position: "relative", zIndex: 1, flexShrink: 0 }}>
           <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 11, color: "#fca5a5", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>🚪 Logout</button>
-        </div>
-      </div>
+              )}
+            )}
       <div className="sidebar-spacer" style={{ width: 225, flexShrink: 0 }} />
     </>
   );
 }
 
-// ═══════════════════════════════════════════════════════════
-// PACKAGES PAGE
-// ═══════════════════════════════════════════════════════════
-function PackagesPage({ packages }) {
+function PackagesPage({ packages, onRefreshPackages, onAddPackage, user }) {
   const [billing, setBilling] = useState("monthly"); // monthly | quarterly | halfYearly | annual
-
-  const displayedPackages = packages.length > 0 ? packages : [
-    {
-      id: "trial",
-      icon: "⚓",
-      title: "TRIAL",
-      desc: "Built for standard usage — simple data management and trial access.",
-      monthlyPrice: "Free",
-      quarterlyPrice: "Free",
-      halfYearlyPrice: "Free",
-      annualPrice: "Free",
-      period: "/ 60 days",
-      buttonName: "Get Started",
-      btnPrimary: false,
-      featuresTitle: "Trial includes:",
-      features: [
-        "Single business manage",
-        "Dropdown feature",
-        "1 Manager",
-        "3 Client manage"
-      ]
-    }
-  ];
-
-  const getPrice = (p) => {
-    if (billing === "monthly") return p.monthlyPrice;
-    if (billing === "quarterly") return p.quarterlyPrice;
-    if (billing === "halfYearly") return p.halfYearlyPrice;
-    return p.annualPrice;
-  };
-
-  const getPeriod = (billing) => {
-    if (billing === "monthly") return "/ month";
-    if (billing === "quarterly") return "/ quarter";
-    if (billing === "halfYearly") return "/ 6 months";
-    return "/ year";
-  };
-
-  return (
-    <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 40, flexWrap: "wrap" }}>
-        {[
-          { key: "monthly", label: "Monthly" },
-          { key: "quarterly", label: "Quarterly" },
-          { key: "halfYearly", label: "6 Months" },
-          { key: "annual", label: "Annual" }
-        ].map(b => (
-          <button
-            key={b.key}
-            onClick={() => setBilling(b.key)}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 20,
-              border: billing === b.key ? "none" : "1.5px solid #ede9fe",
-              background: billing === b.key ? "linear-gradient(135deg,#0ea5e9,#0284c7)" : "#fff",
-              color: billing === b.key ? "#fff" : "#64748b",
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: "pointer",
-              transition: "0.2s"
-            }}
-          >
-            {b.label}
-          </button>
-        ))}
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 40 }}>
-        {displayedPackages.map((p, idx) => (
-          <div key={p.id || idx} style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 10px 40px rgba(0,0,0,0.04)", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", position: "relative" }}>
-            <div style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #e0f2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, marginBottom: 20 }}>
-              {p.icon || "📦"}
-            </div>
-            
-            <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 1 }}>{p.title}</h3>
-            <p style={{ margin: "0 0 32px", fontSize: 13, color: "#64748b", lineHeight: 1.6, minHeight: 60 }}>{p.description || p.desc}</p>
-            
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>Pricing</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 32 }}>
-              <span style={{ fontSize: 32, fontWeight: 800, color: "#0f172a" }}>{getPrice(p)}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#64748b" }}>{p.period || getPeriod(billing)}</span>
-            </div>
-
-            <button style={{ width: "100%", padding: 14, borderRadius: 12, background: p.btnPrimary ? "#0ea5e9" : (idx === 1 ? "#0ea5e9" : "#fff"), color: p.btnPrimary ? "#fff" : (idx === 1 ? "#fff" : "#0f172a"), border: (p.btnPrimary || idx === 1) ? "none" : "2px solid #f1f5f9", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "0.2s", marginBottom: 32 }}>
-              {p.buttonName || p.btnText}
-            </button>
-
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginBottom: 16 }}>{p.featuresTitle || "Features included:"}</div>
-              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 12 }}>
-                {(p.features || []).map((f, i) => (
-                  <li key={i} style={{ fontSize: 13, color: "#475569", display: "flex", alignItems: "flex-start", gap: 10 }}>
-                    <span style={{ color: "#3b82f6", fontWeight: 900, fontSize: 10, marginTop: 2 }}>✓</span>
-                    <span style={{ lineHeight: 1.4 }}>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════
-// VENDORS PAGE
-// ═══════════════════════════════════════════════════════════
-function VendorsPage({ vendors, setVendors }) {
-  const [search, setSearch] = useState("");
-  const [viewVendor, setViewVendor] = useState(null);
-  const [editVendor, setEditVendor] = useState(null);
-  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [editPackage, setEditPackage] = useState(null);
   const [editForm, setEditForm] = useState({});
-  const [editErr, setEditErr] = useState({});
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
-  const filtered = vendors.filter(v =>
-    (v.vendorName || "").toLowerCase().includes(search.toLowerCase()) ||
-    (v.vendorProduct || "").toLowerCase().includes(search.toLowerCase())
-  );
+  try {
+    const displayedPackages = (packages && packages.length > 0) ? packages : [
+      {
+        id: "trial",
+        icon: "⚓",
+        title: "TRIAL",
+        desc: "Built for standard usage — simple data management and trial access.",
+        monthlyPrice: "Free",
+        quarterlyPrice: "Free",
+        halfYearlyPrice: "Free",
+        annualPrice: "Free",
+        period: "/ 60 days",
+        buttonName: "Get Started",
+        btnPrimary: false,
+        featuresTitle: "Trial includes:",
+        features: [
+          "Single business manage",
+          "Dropdown feature",
+          "1 Manager",
+          "3 Client manage"
+        ],
+        type: "Free",
+        price: 0
+      }
+    ];
 
-  const openEdit = (v) => {
-    setEditForm({
-      vendorName: v.vendorName || "",
-      vendorProduct: v.vendorProduct || "",
-      amountTaxGst: v.amountTaxGst || "",
-      date: v.date ? new Date(v.date).toISOString().split('T')[0] : "",
-      paidAmount: v.paidAmount || "",
-      productDescription: v.productDescription || "",
-      dateOfPurchase: v.dateOfPurchase ? new Date(v.dateOfPurchase).toISOString().split('T')[0] : "",
-      modeOfPayment: v.modeOfPayment || "Cash",
-    });
-    setEditErr({});
-    setEditVendor(v);
-  };
+    const getPrice = (p) => {
+      if (billing === "monthly") return p.monthlyPrice;
+      if (billing === "quarterly") return p.quarterlyPrice;
+      if (billing === "halfYearly") return p.halfYearlyPrice;
+      return p.annualPrice;
+    };
 
-  const saveEdit = async () => {
-    const errs = {};
-    if (!editForm.vendorName?.trim?.()) errs.vendorName = "Name required";
-    if (!editForm.vendorProduct?.trim?.()) errs.vendorProduct = "Product required";
-    if (!editForm.amountTaxGst || editForm.amountTaxGst <= 0) errs.amountTaxGst = "GST Amount required";
-    if (!editForm.paidAmount || editForm.paidAmount <= 0) errs.paidAmount = "Paid Amount required";
-    if (Object.keys(errs).length) { setEditErr(errs); return; }
-    try {
+    const getPeriod = (billing) => {
+      if (billing === "monthly") return "/ month";
+      if (billing === "quarterly") return "/ quarter";
+      if (billing === "halfYearly") return "/ 6 months";
+      return "/ year";
+    };
+
+    const openEdit = (p) => {
+      setEditPackage(p);
+      setEditForm({ ...p });
+    };
+
+    const saveEdit = async () => {
+      if (saving) return;
       setSaving(true);
-      const res = await axios.put(`${BASE_URL}/api/vendors/${editVendor._id}`, editForm);
-      setVendors(prev => prev.map(v => v._id === editVendor._id ? { ...v, ...res.data } : v));
-      setEditVendor(null);
-      showToast("✅ Vendor updated!");
-    } catch (err) {
-      showToast("❌ Update failed!");
-    } finally { setSaving(false); }
-  };
+      try {
+        const updatedPackage = { ...editForm };
+        const res = await axios.put(`${BASE_URL}/api/packages/${updatedPackage.id}`, updatedPackage);
+        const updatedPackages = displayedPackages.map((p) => p.id === updatedPackage.id ? updatedPackage : p);
+        setPackages(updatedPackages);
+        showToast("Package updated successfully!");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to update package!");
+      } finally {
+        setSaving(false);
+        setEditPackage(null);
+        setEditForm({});
+      }
+    };
 
-  const doDelete = async () => {
-    try {
-      await axios.delete(`${BASE_URL}/api/vendors/${deleteTarget._id}`);
-      setVendors(prev => prev.filter(v => v._id !== deleteTarget._id));
-      setDeleteTarget(null);
-      showToast("🗑️ Vendor deleted!");
-    } catch {
-       showToast("❌ Delete failed!");
-    }
-  };
+    const deletePackage = async () => {
+      if (saving) return;
+      setSaving(true);
+      try {
+        const res = await axios.delete(`${BASE_URL}/api/packages/${deleteTarget.id}`);
+        const updatedPackages = displayedPackages.filter((p) => p.id !== deleteTarget.id);
+        setPackages(updatedPackages);
+        showToast("Package deleted successfully!");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to delete package!");
+      } finally {
+        setSaving(false);
+        setDeleteTarget(null);
+      }
+    };
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+    return (
+      <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap" }}>
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#1e0a3c" }}>Packages ({packages?.length || 0})</h2>
+          <div style={{ display: "flex", gap: 10 }}>
+            {user?.role === "admin" && (
+              <button 
+                onClick={onAddPackage} 
+                style={{ 
+                  padding: "8px 16px", 
+                  borderRadius: 10, 
+                  background: "linear-gradient(135deg,#22c55e,#16a34a)", 
+                  color: "#fff", 
+                  border: "none", 
+                  fontSize: 13, 
+                  fontWeight: 700, 
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6
+                }}
+              >
+                <span>+</span>
+                <span>Add Package</span>
+              </button>
+            )}
+            <button 
+              onClick={onRefreshPackages} 
+              style={{ 
+                padding: "8px 16px", 
+                borderRadius: 10, 
+                background: "linear-gradient(135deg,#9333ea,#a855f7)", 
+                color: "#fff", 
+                border: "none", 
+                fontSize: 13, 
+                fontWeight: 700, 
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 6
+              }}
+            >
+              <span>Refresh</span>
+            </button>
+                )}
+              )}
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 40, flexWrap: "wrap" }}>
+          {[
+            { key: "monthly", label: "Monthly" },
+            { key: "quarterly", label: "Quarterly" },
+            { key: "halfYearly", label: "6 Months" },
+            { key: "annual", label: "Annual" }
+          ].map(b => (
+            <button
+              key={b.key}
+              onClick={() => setBilling(b.key)}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 20,
+                border: billing === b.key ? "none" : "1.5px solid #ede9fe",
+                background: billing === b.key ? "linear-gradient(135deg,#0ea5e9,#0284c7)" : "#fff",
+                color: billing === b.key ? "#fff" : "#64748b",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "0.2s"
+              }}
+            >
+              {b.label}
+            </button>
+          ))}
+              )}
 
-      <SC title={`All Vendors (${filtered.length})`}>
-        <Search value={search} onChange={setSearch} placeholder="Search by name, product..." />
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 800 }}>
-            <thead><tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
-              {["Vendor Name", "Product", "Amount (Tax/GST)", "Paid Amount", "Mode", "Purchase Date", "Actions"].map(c => (
-                <th key={c} style={{ padding: "10px 14px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{c.toUpperCase()}</th>
-              ))}
-            </tr></thead>
+        <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: "#f8fafc" }}>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>Icon</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>Title</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>Description</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>Type</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>Price</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>Duration</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>Features</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>Actions</th>
+              </tr>
+            </thead>
             <tbody>
-              {filtered.length === 0 ? <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No vendors found</td></tr>
-                : filtered.map((v, i) => (
-                  <tr key={v._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{v.vendorName}</td>
-                    <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{v.vendorProduct}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280" }}>₹{v.amountTaxGst}</td>
-                    <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight:600 }}>₹{v.paidAmount}</td>
-                    <td style={{ padding: "12px 14px" }}><Badge label={v.modeOfPayment} /></td>
-                    <td style={{ padding: "12px 14px", color: "#a78bfa" }}>{v.dateOfPurchase ? new Date(v.dateOfPurchase).toLocaleDateString() : "—"}</td>
-                    <td style={{ padding: "12px 14px" }}>
-                       <ActionBtns onView={() => setViewVendor(v)} onEdit={() => openEdit(v)} onDelete={() => setDeleteTarget(v)} />
-                    </td>
-                  </tr>
-                ))}
+              {displayedPackages.map((p, idx) => (
+                <tr key={p.id || idx} style={{ borderBottom: "1px solid #f1f5f9" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  <td style={{ padding: "14px 16px", fontSize: 20, textAlign: "center" }}>
+                    {p.icon || "???"}
+                  </td>
+                  <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a", textTransform: "uppercase" }}>
+                    {p.title || "Package"}
+                  </td>
+                  <td style={{ padding: "14px 16px", color: "#475569", maxWidth: 200 }}>
+                    <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={p.description || p.desc}>
+                      {p.description || p.desc || "No description"}
+                          )}
+                  </td>
+                  <td style={{ padding: "14px 16px", color: "#64748b" }}>
+                    {p.type || "Free"}
+                  </td>
+                  <td style={{ padding: "14px 16px", color: "#64748b" }}>
+                    {p.price || 0}
+                  </td>
+                  <td style={{ padding: "14px 16px", color: "#64748b" }}>
+                    {p.noOfDays || "30"} days
+                  </td>
+                  <td style={{ padding: "14px 16px", maxWidth: 250 }}>
+                    <div style={{ fontSize: 12, color: "#475569" }}>
+                      {Array.isArray(p.features) ? p.features.slice(0, 2).map((f, i) => (
+                        <div key={i} style={{ marginBottom: 2 }}>
+                          <span style={{ color: "#3b82f6", marginRight: 4 }}>?</span>
+                          {f && f.trim() ? f.trim() : "Feature"}
+                              )}
+                      )) : String(p.features || "No features").split('\n').slice(0, 2).map((f, i) => (
+                        <div key={i} style={{ marginBottom: 2 }}>
+                          <span style={{ color: "#3b82f6", marginRight: 4 }}>?</span>
+                          {f && f.trim() ? f.trim() : "Feature"}
+                              )}
+                      ))}
+                      {(Array.isArray(p.features) ? p.features : String(p.features || "").split('\n')).length > 2 && (
+                        <div style={{ color: "#a78bfa", fontSize: 11 }}>+{(Array.isArray(p.features) ? p.features : String(p.features || "").split('\n')).length - 2} more...      )}
+                      )}
+                          )}
+                  </td>
+                  <td style={{ padding: "14px 16px" }}>
+                    <ActionBtns
+                      onEdit={() => openEdit(p)}
+                      onDelete={() => setDeleteTarget(p)}
+                    />
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
-        </div>
-      </SC>
+              )}
+            )}
 
-      {/* View Modal */}
-      {viewVendor && (
-        <Mdl title="Vendor Details" onClose={() => setViewVendor(null)} maxWidth={500}>
-           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewVendor.vendorName || "?")[0].toUpperCase()}</div>
-            <div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewVendor.vendorName}</div>
-              <div style={{ fontSize: 13, color: "#9333ea", marginTop: 2 }}>{viewVendor.vendorProduct}</div>
-            </div>
-          </div>
-          <InfoRow icon="💰" label="Total Amount (Tax/GST)" value={`₹${viewVendor.amountTaxGst}`} />
-          <InfoRow icon="💸" label="Paid Amount" value={`₹${viewVendor.paidAmount}`} />
-          <InfoRow icon="💳" label="Mode of Payment" value={viewVendor.modeOfPayment} />
-          <InfoRow icon="📅" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
-          <InfoRow icon="📝" label="Description" value={viewVendor.productDescription} />
-          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewVendor(null); openEdit(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️ Edit</button>
-            <button onClick={() => { setViewVendor(null); setDeleteTarget(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🗑 Delete</button>
-          </div>
+      {/* Edit Package Modal */}
+      {editPackage && (
+        <Mdl title="Edit Package" onClose={() => setEditPackage(null)} maxWidth={700}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+            <Fld label="Package Title *" value={editForm.title} onChange={v => setEditForm({ ...editForm, title: v })} />
+            <Fld label="Icon (Emoji)" value={editForm.icon} onChange={v => setEditForm({ ...editForm, icon: v })} placeholder="e.g. 📦" />
+            <Fld label="Type" value={editForm.type} onChange={v => setEditForm({ ...editForm, type: v })} options={["free", "paid"]} />
+            <Fld label="Price" value={editForm.price} onChange={v => setEditForm({ ...editForm, price: v })} type="number" />
+            <Fld label="Duration (Days)" value={editForm.no_of_days} onChange={v => setEditForm({ ...editForm, no_of_days: v })} type="number" />
+                )}
+          <Fld label="Description" value={editForm.description} onChange={v => setEditForm({ ...editForm, description: v })} />
+          
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
+            <textarea 
+              value={Array.isArray(editForm.features) ? editForm.features.join(", ") : editForm.features} 
+              onChange={e => setEditForm({ ...editForm, features: e.target.value })}
+              style={{ width: "100%", height: 80, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "#faf5ff", outline: "none", fontFamily: "inherit", resize: "none" }}
+              placeholder="e.g. Unlimited Clients, Premium Support, Custom Branding"
+            />
+                )}
+
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+            <button onClick={() => setEditPackage(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{ ...B("#0ea5e9"), opacity: saving ? 0.7 : 1 }}>{saving ? "Saving..." : "Save Changes →"}</button>
+                )}
         </Mdl>
       )}
 
-      {/* Edit Modal */}
-      {editVendor && (
-        <Mdl title="Edit Vendor" onClose={() => setEditVendor(null)}>
-           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-            <Fld label="Vendor Name *" value={editForm.vendorName} onChange={v => setEditForm(p => ({ ...p, vendorName: v }))} error={editErr.vendorName} />
-            <Fld label="Product Name *" value={editForm.vendorProduct} onChange={v => setEditForm(p => ({ ...p, vendorProduct: v }))} error={editErr.vendorProduct} />
-            <Fld label="Amount (Tax/GST) *" value={editForm.amountTaxGst} type="number" onChange={v => setEditForm(p => ({ ...p, amountTaxGst: v }))} />
-            <Fld label="Paid Amount *" value={editForm.paidAmount} type="number" onChange={v => setEditForm(p => ({ ...p, paidAmount: v }))} />
-            <Fld label="Date of Purchase" value={editForm.dateOfPurchase} type="date" onChange={v => setEditForm(p => ({ ...p, dateOfPurchase: v }))} />
-            <Fld label="Mode of Payment" value={editForm.modeOfPayment} onChange={v => setEditForm(p => ({ ...p, modeOfPayment: v }))} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
-          </div>
-          <Fld label="Product Description" value={editForm.productDescription} onChange={v => setEditForm(p => ({ ...p, productDescription: v }))} />
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
-            <button onClick={() => setEditVendor(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes"}</button>
-          </div>
-        </Mdl>
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <ConfirmModal 
+          title="Delete Package" 
+          message={`Are you sure you want to delete "${deleteTarget.title}"? This cannot be undone.`} 
+          onConfirm={deletePackage} 
+          onCancel={() => setDeleteTarget(null)} 
+        />
+            )}
+
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+        <button onClick={() => setEditPackage(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+        <button onClick={saveEdit} disabled={saving} style={{ ...B("#0ea5e9"), opacity: saving ? 0.7 : 1 }}>{saving ? "Saving..." : "Save Changes →"}</button>
+            )}
+    </Mdl>
+  )}
+
+  {/* Delete Confirmation Modal */}
+  {deleteTarget && (
+    <ConfirmModal 
+      title="Delete Package" 
+      message={`Are you sure you want to delete "${deleteTarget.title}"? This cannot be undone.`} 
+      onConfirm={deletePackage} 
+      onCancel={() => setDeleteTarget(null)} 
+    />
+  )}
+
+  {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}      )}}
       )}
 
-      {deleteTarget && <ConfirmModal title="Delete Vendor" message={`Are you sure you want to delete "${deleteTarget.vendorName}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════
-// MAIN DASHBOARD
-// ═══════════════════════════════════════════════════════════
-export default function Dashboard({ setUser, user, fixedLogo }) {
-  const [active, setActive] = useState("dashboard");
-  const [modal, setModal] = useState(null);
-  const [subscription, setSubscription] = useState(null);
-  const [showProfile, setShowProfile] = useState(false);
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [accountAuthOpen, setAccountAuthOpen] = useState(false);
-  const [accountAuthTab, setAccountAuthTab] = useState("register");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
-  const [accounts, setAccounts] = useState([]);
-  useEffect(() => { setCompanyLogo(user?.logoUrl ? user.logoUrl : (fixedLogo || null)); }, [user, fixedLogo]);
-
-  // Load saved accounts from localStorage
-  useEffect(() => {
-    try {
-      const savedAccounts = JSON.parse(localStorage.getItem("accounts") || "[]");
-      setAccounts(savedAccounts);
-    } catch (e) { setAccounts([]); }
-  }, [user]);
-
-  // Switch to a different account
-  const switchAccount = (account) => {
-    localStorage.setItem("user", JSON.stringify(account));
-    setUser(account);
-    setProfileDropdownOpen(false);
-    window.location.reload();
-  };
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    if (!profileDropdownOpen) return;
-    const onDown = (e) => {
-      const t = e.target;
-      if (t?.closest?.('[data-profile-anchor="true"]')) return;
-      if (t?.closest?.('[data-profile-menu="true"]')) return;
-      setProfileDropdownOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [profileDropdownOpen]);
-
-  const [clients, setClients] = useState([]);
-  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client" });
-  const [ncError, setNcError] = useState({});
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [showClientPass, setShowClientPass] = useState(false);
-
-  const [employees, setEmployees] = useState([]);
-  const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Active", password: "" });
-  const [showEmpPass, setShowEmpPass] = useState(false);
-  const [neError, setNeError] = useState({});
-  const [empSaveLoading, setEmpSaveLoading] = useState(false);
-
-  const [projects, setProjects] = useState([]);
-  const [projLoading, setProjLoading] = useState(false);
-  const [np, setNp] = useState({ name: "", client: "", purpose: "", description: "", start: "", end: "", budget: "", team: "", status: "Pending", assignedTo: [] });
-  const [npError, setNpError] = useState({});
-  const [projSaveLoading, setProjSaveLoading] = useState(false);
-
-  const [managers, setManagers] = useState([]);
-  const [nm, setNm] = useState({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
-  const [nmError, setNmError] = useState({});
-  const [mgrSaveLoading, setMgrSaveLoading] = useState(false);
-  const [showMgrPass, setShowMgrPass] = useState(false);
+  const [vendors, setVendors] = useState([]);
+  const [nv, setNv] = useState({ vendorName: "", productName: "", amount: "", tax: "", gst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "", email: "", phone: "", status: "Active" });
+  const [nvError, setNvError] = useState({});
+  const [vendorSaveLoading, setVendorSaveLoading] = useState(false);
 
   const [subadmins, setSubadmins] = useState([]);
   const [ns, setNs] = useState({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10" });
@@ -1958,20 +2089,25 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [showSubPass, setShowSubPass] = useState(false);
 
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "" });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "??", isFree: false, price: "", noOfDays: "" });
   const [pkgError, setPkgError] = useState({});
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
 
   const [quotations, setQuotations] = useState([]);
-  const [vendors, setVendors] = useState([]);
+  const [invoices, setInvoices] = useState([]);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [subLoading, setSubLoading] = useState(true);
 
-  const [nv, setNv] = useState({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
-  const [nvError, setNvError] = useState({});
-  const [vendorSaveLoading, setVendorSaveLoading] = useState(false);
+  useEffect(() => { fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchVendors(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchInvoices(); fetchPaymentHistory(); }, []);
 
-  useEffect(() => { fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); }, []);
+  // Auto-refresh packages every 30 seconds to get real-time updates from admin
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchPackages();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchSubscription = async () => {
     try {
@@ -2030,22 +2166,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
   const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); } catch (e) { console.log(e); } };
   const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
+  const fetchVendors = async () => { try { const res = await axios.get(BASE_URL + "/api/vendors"); setVendors(res.data); } catch (e) { console.log(e); } };
   const fetchSubadmins = async () => { try { const res = await axios.get(BASE_URL + "/api/subadmins"); setSubadmins(res.data); } catch (e) { console.log(e); } };
   const fetchPackages = async () => { try { const res = await axios.get(BASE_URL + "/api/packages"); setPackages(res.data); } catch (e) { console.log(e); } };
   const fetchQuotations = async () => { try { const res = await axios.get(BASE_URL + "/api/quotations"); setQuotations(res.data); } catch (e) { console.log(e); } };
-  const fetchVendors = async () => { 
-    try { 
-      console.log('Fetching vendors from:', BASE_URL + "/api/vendors");
-      const res = await axios.get(BASE_URL + "/api/vendors"); 
-      console.log('Vendors response:', res.data);
-      setVendors(res.data || []); 
-    } catch (e) { 
-      console.error('Fetch vendors error:', e); 
-      console.error('Error status:', e.response?.status);
-      console.error('Error data:', e.response?.data);
-      setVendors([]); // Set empty array on error to prevent crashes
-    } 
-  };
+  const fetchInvoices = async () => { try { const res = await axios.get(BASE_URL + "/api/invoices"); setInvoices(res.data.invoices || []); } catch (e) { console.log(e); } };
 
   const createNew = () => {
     window.location.href = "/project-proposal?new=true";
@@ -2117,40 +2242,31 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const addPackage = async () => {
     const errors = {};
-    if (!npkg.title.trim()) errors.title = "Title is required";
+    if (!npkg.title.trim()) errors.title = "Title required";
+    if (!npkg.description.trim()) errors.description = "Description required";
+    if (!npkg.price.trim()) errors.price = "Price required";
+    if (!npkg.noOfDays.trim()) errors.noOfDays = "Days required";
     if (Object.keys(errors).length > 0) { setPkgError(errors); return; }
     try {
       setPkgSaveLoading(true);
-      const res = await axios.post(BASE_URL + "/api/packages", npkg);
+      const packageData = {
+        ...npkg,
+        monthlyPrice: npkg.isFree ? "Free" : npkg.price,
+        quarterlyPrice: npkg.isFree ? "Free" : npkg.price,
+        halfYearlyPrice: npkg.isFree ? "Free" : npkg.price,
+        annualPrice: npkg.isFree ? "Free" : npkg.price,
+        buttonName: "Get Started",
+        features: "Basic features included"
+      };
+      const res = await axios.post(BASE_URL + "/api/packages", packageData);
       setPackages(prev => [...prev, res.data]);
-      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "" });
+      setNpkg({ title: "", description: "", icon: "", isFree: false, price: "", noOfDays: "" });
       setPkgError({});
       setModal(null);
       toast.success("✅ Package added!");
     } catch (err) {
       toast.error("❌ Failed to add package");
     } finally { setPkgSaveLoading(false); }
-  };
-
-  const addVendor = async () => {
-    const errors = {};
-    if (!nv.vendorName?.trim?.()) errors.vendorName = "Vendor Name is required";
-    if (!nv.vendorProduct?.trim?.()) errors.vendorProduct = "Product Name is required";
-    if (!nv.amountTaxGst || nv.amountTaxGst <= 0) errors.amountTaxGst = "GST Amount is required";
-    if (!nv.paidAmount || nv.paidAmount <= 0) errors.paidAmount = "Paid Amount is required";
-    if (Object.keys(errors).length > 0) { setNvError(errors); return; }
-    try {
-      setVendorSaveLoading(true);
-      const res = await axios.post(BASE_URL + "/api/vendors", nv);
-      setVendors(prev => [res.data, ...prev]);
-      setNv({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
-      setNvError({});
-      setModal(null);
-      toast.success("✅ Vendor Added Successfully!");
-    } catch (err) {
-      console.error('Add vendor error:', err);
-      toast.error("❌ Failed to add vendor: " + (err.response?.data?.message || err.message));
-    } finally { setVendorSaveLoading(false); }
   };
 
   const navItems = getNavForRole(user?.role);
@@ -2163,7 +2279,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const B = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
 
   const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
-  const companyNameStr = user?.companyName || user?.name || "";
+  const companyNameStr = "M Business";
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "linear-gradient(135deg,#f5f3ff 0%,#faf5ff 50%,#f3e8ff 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
@@ -2184,25 +2300,23 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div className="mob-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid #ede9fe", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(147,51,234,0.07)" }}>
           <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#7c3aed", padding: "2px 6px", lineHeight: 1 }}>☰</button>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 30, height: 30, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 14, color: "#fff", overflow: "hidden" }}>
-              {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3 }} /> : "M"}
-            </div>
-            <span style={{ fontWeight: 800, fontSize: 14, color: T.text }}>{companyNameStr}</span>
-          </div>
+            <div style={{ width: 30, height: 30, background: "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 14, color: "#fff" }}>M      )}
+            <span style={{ fontWeight: 800, fontSize: 14, color: T.text }}>M Business</span>
+                )}
           {user?.email !== "admin@gmail.com" && (
             <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ width: 34, height: 34, background: "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", overflow: "hidden" }}>
               {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} /> : <span>{initials}</span>}
-            </div>
+                  )}
           )}
-        </div>
+              )}
 
         <div className="main-content" style={{ flex: 1, padding: "22px 24px", overflowY: "auto" }}>
           {/* Page Header */}
           <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
             <div>
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: T.text }}>{page?.icon} {page?.label}</h1>
-              <p style={{ margin: "3px 0 0", color: "#a78bfa", fontSize: 12 }}>{companyNameStr} Management Suite · {user?.role || "Admin"}</p>
-            </div>
+              <p style={{ margin: "3px 0 0", color: "#a78bfa", fontSize: 12 }}>M Business Management Suite · {user?.role || "Admin"}</p>
+                  )}
             <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
               {validActive === "clients" && <button onClick={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} style={B("#9333ea")}>+ Add Client</button>}
               {validActive === "employees" && <button onClick={() => { setNeError({}); setModal("employee"); }} style={B("#7c3aed")}>+ Add Employee</button>}
@@ -2214,20 +2328,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               {validActive === "managers" && <button onClick={() => { setNmError({}); setShowMgrPass(false); setModal("manager"); }} style={B("#f59e0b")}>+ Add Manager</button>}
               {validActive === "subadmins" && <button onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }} style={B("#3b82f6")}>+ Add Subadmin</button>}
-              {validActive === "packages" && <button onClick={() => { setPkgError({}); setModal("package_add"); }} style={B("#0ea5e9")}>+ Add Package</button>}
-              {validActive === "vendors" && <button onClick={() => { setNvError({}); setModal("vendor_add"); }} style={B("#9333ea")}>+ Add Vendor</button>}
+              {validActive === "packages" && user?.role === "admin" && <button onClick={() => { setPkgError({}); setModal("package_add"); }} style={B("#22c55e")}>+ Add Package</button>}
 
               {user?.email !== "admin@gmail.com" && (
                 <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", boxShadow: "0 2px 10px rgba(147,51,234,0.08)", flexShrink: 0 }}>
-                  <div style={{ width: 30, height: 30, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, overflow: "hidden", flexShrink: 0 }}>
+                  <div style={{ width: 30, height: 30, background: "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, overflow: "hidden", flexShrink: 0 }}>
                     {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} onError={() => setCompanyLogo(null)} /> : <span>{initials}</span>}
-                  </div>
+                        )}
                   <span style={{ fontSize: 13, fontWeight: 600, color: T.text, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
                   <span style={{ fontSize: 10, color: "#a78bfa" }}>▾</span>
-                </div>
+                      )}
               )}
-            </div>
-          </div>
+                  )}
+                )}
 
           {/* ── Dashboard ── */}
           {validActive === "dashboard" && <>
@@ -2243,15 +2356,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 alignItems: "center", 
                 gap: 12 
               }}>
-                <div style={{ fontSize: 24 }}>⚠️</div>
+                <div style={{ fontSize: 24 }}>⚠️      )}
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "#92400e", marginBottom: 4 }}>
                     Subscription Renewal Required
-                  </div>
+                        )}
                   <div style={{ fontSize: 13, color: "#78350f" }}>
                     Your {subscription?.planName} subscription expires in {subStatus.days} days. Please renew your subscription to continue using all features.
-                  </div>
-                </div>
+                        )}
+                      )}
                 <button 
                   onClick={() => setActive("mysubscriptions")}
                   style={{
@@ -2268,58 +2381,58 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 >
                   Renew Now
                 </button>
-              </div>
+                    )}
             )}
 
             {/* Company Info & Subscription Card */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 18 }}>
               <SC title="Company Information">
                 <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe" }}>
-                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0, overflow: "hidden" }}>
-                    {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 4 }} /> : (user?.companyName?.[0]?.toUpperCase() || "C")}
-                  </div>
+                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
+                    {user?.companyName?.[0]?.toUpperCase() || "C"}
+                        )}
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 17, fontWeight: 800, color: T.text, marginBottom: 2 }}>
-                      {user?.companyName || user?.name || "My Company"}
-                    </div>
+                      {user?.companyName || "Company Name"}
+                          )}
                     <div style={{ fontSize: 12, color: "#7c3aed" }}>
                       {user?.companyType || "Company Type"} • {user?.employeeCount || "0"} Employees
-                    </div>
-                  </div>
-                </div>
+                          )}
+                        )}
+                      )}
                 <InfoRow icon="📧" label="Email" value={user?.email} />
                 <InfoRow icon="📱" label="Phone" value={user?.phone} />
               </SC>
 
               <SC title="Current Subscription">
                 {subLoading ? (
-                  <div style={{ textAlign: "center", padding: 40, color: "#a78bfa" }}>Loading subscription...</div>
+                  <div style={{ textAlign: "center", padding: 40, color: "#a78bfa" }}>Loading subscription...      )}
                 ) : subscription ? (
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: 14, border: "1px solid #bbf7d0", marginBottom: 12 }}>
                       <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
                         💳
-                      </div>
+                            )}
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: 16, fontWeight: 800, color: "#166534", marginBottom: 2 }}>
                           {subscription.planName} Plan
-                        </div>
+                              )}
                         <div style={{ fontSize: 13, color: "#15803d", fontWeight: 600 }}>
                           ₹{subscription.planPrice?.toLocaleString() || "0"}/{subscription.billingCycle}
-                        </div>
-                      </div>
+                              )}
+                            )}
                       <Badge label={subscription.status === "active" ? "Fully Paid" : "Pending"} />
-                    </div>
+                          )}
                     <InfoRow icon="📅" label="Start Date" value={new Date(subscription.startDate).toLocaleDateString()} />
                     <InfoRow icon="⏰" label="End Date" value={new Date(subscription.endDate).toLocaleDateString()} />
                     <InfoRow icon="🔄" label="Next Billing" value={new Date(subscription.nextBillingDate).toLocaleDateString()} />
                     <InfoRow icon="✅" label="Payment Status" value={subscription.isFullyPaid ? "Fully Paid" : "Pending"} />
-                  </div>
+                        )}
                 ) : (
                   <div style={{ textAlign: "center", padding: 40, color: "#a78bfa" }}>
-                    <div style={{ fontSize: 24, marginBottom: 8 }}>💳</div>
-                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>No Active Subscription</div>
-                    <div style={{ fontSize: 12, color: "#7c3aed", marginBottom: 12 }}>Choose a plan to get started</div>
+                    <div style={{ fontSize: 24, marginBottom: 8 }}>💳      )}
+                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>No Active Subscription      )}
+                    <div style={{ fontSize: 12, color: "#7c3aed", marginBottom: 12 }}>Choose a plan to get started      )}
                     <button 
                       onClick={() => setActive("packages")}
                       style={{
@@ -2336,29 +2449,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     >
                       View Plans
                     </button>
-                  </div>
+                        )}
                 )}
               </SC>
-            </div>
+                  )}
 
             <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 18 }}>
-              {[{ t: "Total Clients", v: clients.length, i: "👥", c: "#9333ea" }, { t: "Employees", v: employees.length, i: "👨‍💼", c: "#7c3aed" }, { t: "Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Projects", v: projects.length, i: "📁", c: "#a855f7" }, { t: "Invoices", v: INVOICES.length, i: "🧾", c: "#22C55E" }].map(({ t, v, i, c }) => (
+              {[{ t: "Total Clients", v: clients.length, i: "👥", c: "#9333ea" }, { t: "Employees", v: employees.length, i: "👨‍💼", c: "#7c3aed" }, { t: "Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Projects", v: projects.length, i: "📁", c: "#a855f7" }, { t: "Invoices", v: invoices.length, i: "🧾", c: "#22C55E" }].map(({ t, v, i, c }) => (
                 <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", position: "relative", overflow: "hidden" }}>
                   <div style={{ position: "absolute", top: -12, right: -12, width: 60, height: 60, borderRadius: "50%", background: `radial-gradient(circle,${c}22,transparent)` }} />
-                  <div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div>
-                  <div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div>
-                  <div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div>
-                </div>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}      )}
+                  <div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}      )}
+                  <div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}      )}
+                      )}
               ))}
-            </div>
+                  )}
             <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14, marginBottom: 14 }}>
-              <SC title="Recent Projects"><div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 300 }}><thead><tr style={{ background: "#faf5ff" }}>{["Project", "Client", "Status"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "#a78bfa", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe" }}>{c.toUpperCase()}</th>)}</tr></thead><tbody>{projects.slice(0, 5).map((p, i) => <tr key={i} style={{ borderBottom: "1px solid #f5f3ff" }}><td style={{ padding: "9px 10px", fontWeight: 600, color: T.text }}>{p.name}</td><td style={{ padding: "9px 10px", color: "#a78bfa" }}>{p.client}</td><td style={{ padding: "9px 10px" }}><Badge label={p.status} /></td></tr>)}</tbody></table></div></SC>
+              <SC title="Recent Projects"><div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 300 }}><thead><tr style={{ background: "#faf5ff" }}>{["Project", "Client", "Status"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "#a78bfa", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe" }}>{c.toUpperCase()}</th>)}</tr></thead><tbody>{projects.slice(0, 5).map((p, i) => <tr key={i} style={{ borderBottom: "1px solid #f5f3ff" }}><td style={{ padding: "9px 10px", fontWeight: 600, color: T.text }}>{p.name}</td><td style={{ padding: "9px 10px", color: "#a78bfa" }}>{p.client}</td><td style={{ padding: "9px 10px" }}><Badge label={p.status} /></td></tr>)}</tbody></table>      )}</SC>
               <SC title="Payment History">
                 {paymentHistory.length === 0 ? (
                   <div style={{ textAlign: "center", padding: 30, color: "#a78bfa" }}>
-                    <div style={{ fontSize: 24, marginBottom: 8 }}>💳</div>
-                    <div style={{ fontSize: 12, fontWeight: 600 }}>No payment history</div>
-                  </div>
+                    <div style={{ fontSize: 24, marginBottom: 8 }}>💳      )}
+                    <div style={{ fontSize: 12, fontWeight: 600 }}>No payment history      )}
+                        )}
                 ) : (
                   <div style={{ maxHeight: 200, overflowY: "auto" }}>
                     {paymentHistory.slice(0, 5).map((payment, i) => (
@@ -2372,31 +2485,31 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontSize: 12, fontWeight: 600, color: T.text, marginBottom: 2 }}>
                             {payment.description || payment.type}
-                          </div>
+                                )}
                           <div style={{ fontSize: 11, color: "#a78bfa" }}>
                             {payment.invoiceNo && `INV: ${payment.invoiceNo}`}
                             {payment.quotationNo && ` • QUO: ${payment.quotationNo}`}
-                          </div>
+                                )}
                           <div style={{ fontSize: 10, color: "#a78bfa" }}>
                             {new Date(payment.paymentDate).toLocaleDateString()}
-                          </div>
-                        </div>
+                                )}
+                              )}
                         <div style={{ textAlign: "right" }}>
                           <div style={{ fontSize: 12, fontWeight: 700, color: "#22c55e" }}>
                             ₹{payment.amount?.toLocaleString() || "0"}
-                          </div>
+                                )}
                           <Badge label={payment.status || "completed"} />
-                        </div>
-                      </div>
+                              )}
+                            )}
                     ))}
-                  </div>
+                        )}
                 )}
               </SC>
-            </div>
+                  )}
             <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              <SC title="Project Progress">{TRACKING_SEED.map(t => (<div key={t.id} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{t.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: sc(t.status) }}>{t.pct}%</span></div><div style={{ background: "#ede9fe", borderRadius: 6, height: 6 }}><div style={{ width: `${t.pct}%`, background: t.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%" }} /></div><div style={{ fontSize: 11, color: "#a78bfa", marginTop: 2 }}>{t.client}</div></div>))}</SC>
-              <SC title="Invoice Status">{INVOICES.map(inv => (<div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #f5f3ff" }}><div><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{inv.id} · {inv.client}</div><div style={{ fontSize: 11, color: "#a78bfa" }}>Due: {inv.due}</div></div><div style={{ textAlign: "right" }}><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 3 }}>{inv.total}</div><Badge label={inv.status} /></div></div>))}</SC>
-            </div>
+              <SC title="Project Progress">{TRACKING_SEED.map(t => (<div key={t.id} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{t.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: sc(t.status) }}>{t.pct}%</span>      )}<div style={{ background: "#ede9fe", borderRadius: 6, height: 6 }}><div style={{ width: `${t.pct}%`, background: t.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%" }} />      )}<div style={{ fontSize: 11, color: "#a78bfa", marginTop: 2 }}>{t.client}      )}      )}))}</SC>
+              <SC title="Invoice Status">{invoices.slice(0, 5).map(inv => (<div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #f5f3ff" }}><div><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{inv.invoiceNo} · {inv.client}      )}<div style={{ fontSize: 11, color: "#a78bfa" }}>Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : "No due date"}      )}      )}<div style={{ textAlign: "right" }}><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 3 }}>¥{inv.total?.toLocaleString() || "0"}      )}<Badge label={inv.status || "draft"} />      )}      )}))}</SC>
+                  )}
           </>}
 
           {/* ── Pages using new components ── */}
@@ -2408,11 +2521,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange} />}
           {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange} />}
-          {validActive === "proposals" && (
-            user?.role === "admin" ?
-              <AdminProposalManagement /> :
-              <ProjectProposalCreator clients={clients} projects={projects} companyLogo={companyLogo} />
-          )}
+          {validActive === "proposals" && <AdminProposalManagement />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} />}
           {validActive === "calendar" && <CalendarPage projects={projects} clients={clients} />}
@@ -2421,12 +2530,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
-          {validActive === "packages" && <PackagesPage packages={packages} />}
+          {validActive === "packages" && <PackagesPage packages={packages} onRefreshPackages={fetchPackages} onAddPackage={() => setModal("package_add")} user={user} />}
           {validActive === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}
-          {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
-          {validActive === "rolePermissions" && <RolePermissionDashboard />}
-        </div>
-      </div>
+              )}
+            )}
 
       {profileDropdownOpen && (
         <div
@@ -2450,14 +2557,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14, overflow: "hidden" }}>
                 {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} /> : <span>{initials}</span>}
-              </div>
+                    )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
-                <div style={{ fontSize: 11, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
-              </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}      )}
+                <div style={{ fontSize: 11, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}      )}
+                    )}
               <span style={{ fontSize: 12 }}>✓</span>
-            </div>
-          </div>
+                  )}
+                )}
 
           {/* Other Saved Accounts */}
           {accounts.length > 1 && (
@@ -2490,15 +2597,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   >
                     <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,#6366f1,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
                       {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{accInitials}</span>}
-                    </div>
+                          )}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accName}</div>
-                      <div style={{ fontSize: 10, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}</div>
-                    </div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accName}      )}
+                      <div style={{ fontSize: 10, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}      )}
+                          )}
                   </button>
                 );
               })}
-            </div>
+                  )}
           )}
 
           {/* Menu Options */}
@@ -2578,8 +2685,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             >
               <span style={{ fontSize: 14 }}>🚪</span> Logout
             </button>
-          </div>
-        </div>
+                )}
+              )}
       )}
 
       {accountAuthOpen && (
@@ -2605,7 +2712,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             ✕
           </button>
           <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
-        </div>
+              )}
       )}
 
       {showProfile && <ProfileModal user={user} setUser={setUser} onClose={() => setShowProfile(false)} onLogout={handleLogout} companyLogo={companyLogo} onLogoChange={onLogoChange} />}
@@ -2618,20 +2725,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Email" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: "" })); }} type="email" error={ncError.email} />
           <Fld label="Phone Number" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
           <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={["Active", "Inactive"]} />
-        </div>
+              )}
         <Fld label="Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} />
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
           <div style={{ position: "relative" }}>
             <input type={showClientPass ? "text" : "password"} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })} style={{ width: "100%", border: `1.5px solid ${ncError.password ? "#EF4444" : "#ede9fe"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", boxSizing: "border-box", outline: "none" }} placeholder="Set client password" />
             <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#a78bfa", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showClientPass ? "HIDE" : "SHOW"}</button>
-          </div>
-          {ncError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {ncError.password}</div>}
-        </div>
+                )}
+          {ncError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {ncError.password}      )}}
+              )}
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
           <button onClick={addClient} disabled={saveLoading} style={{ ...B("#9333ea"), opacity: saveLoading ? 0.7 : 1 }}>{saveLoading ? "Saving..." : "Save Client →"}</button>
-        </div>
+              )}
       </Mdl>}
 
       {/* ── Add Employee Modal ── */}
@@ -2644,19 +2751,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
           <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
           <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Active", "Inactive"]} />
-        </div>
+              )}
         <div style={{ marginBottom: 14, marginTop: 4 }}>
           <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
           <div style={{ position: "relative" }}>
             <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "#ede9fe"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
             <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#a78bfa", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
-          </div>
-          {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {neError.password}</div>}
-        </div>
+                )}
+          {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {neError.password}      )}}
+              )}
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
           <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("#7c3aed"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Save Employee →"}</button>
-        </div>
+              )}
       </Mdl>}
 
       {/* ── Add Project Modal ── */}
@@ -2666,19 +2773,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CLIENT NAME *</label>
             <ClientDropdown clients={clients} value={np.client} onChange={v => setNp({ ...np, client: v })} error={npError.client} onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }} />
-            {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}
-          </div>
+            {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}      )}}
+                )}
           <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
           <Fld label="Budget" value={np.budget} onChange={v => setNp({ ...np, budget: v })} />
           <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
           <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
           <Fld label="Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
           <Fld label="Status" value={np.status} onChange={v => setNp({ ...np, status: v })} options={["Pending", "In Progress", "Completed", "On Hold"]} />
-        </div>
+              )}
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "#a78bfa", fontWeight: 400 }}>(select multiple)</span></label>
           <div style={{ border: "1.5px solid #ede9fe", borderRadius: 10, padding: "12px", background: "#faf5ff", maxHeight: 200, overflowY: "auto" }}>
-            {employees.length === 0 ? <div style={{ color: "#a78bfa", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
+            {employees.length === 0 ? <div style={{ color: "#a78bfa", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available      )}
               : employees.map(e => (
                 <div key={e._id || e.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid #f5f3ff" }}>
                   <input type="checkbox"
@@ -2697,16 +2804,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <span>{e.name}</span>
                     {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
                   </label>
-                </div>
+                      )}
               ))}
-          </div>
-          {np.assignedTo.length > 0 && <div style={{ marginTop: 6, fontSize: 11, color: "#9333ea", fontWeight: 600 }}>{np.assignedTo.length} employee(s) selected</div>}
-        </div>
+                )}
+          {np.assignedTo.length > 0 && <div style={{ marginTop: 6, fontSize: 11, color: "#9333ea", fontWeight: 600 }}>{np.assignedTo.length} employee(s) selected      )}}
+              )}
         <Fld label="Description" value={np.description} onChange={v => setNp({ ...np, description: v })} />
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
           <button onClick={addProject} disabled={projSaveLoading} style={{ ...B("#a855f7"), opacity: projSaveLoading ? 0.7 : 1 }}>{projSaveLoading ? "Saving..." : "Save Project →"}</button>
-        </div>
+              )}
       </Mdl>}
 
       {/* ── Add Manager Modal ── */}
@@ -2718,20 +2825,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Role" value={nm.role} onChange={v => setNm({ ...nm, role: v })} />
           <Fld label="Department" value={nm.department} onChange={v => setNm({ ...nm, department: v })} />
           <Fld label="Status" value={nm.status} onChange={v => setNm({ ...nm, status: v })} options={["Active", "Inactive"]} />
-        </div>
+              )}
         <Fld label="Address" value={nm.address} onChange={v => setNm({ ...nm, address: v })} />
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
           <div style={{ position: "relative" }}>
             <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "#ede9fe"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
             <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#a78bfa", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
-          </div>
-          {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nmError.password}</div>}
-        </div>
+                )}
+          {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nmError.password}      )}}
+              )}
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
           <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("#f59e0b"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager →"}</button>
-        </div>
+              )}
       </Mdl>}
 
       {/* ── Add Subadmin Modal ── */}
@@ -2744,19 +2851,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Company Name" value={ns.companyName} onChange={v => setNs({ ...ns, companyName: v })} placeholder="Company name" />
           <Fld label="Company Type" value={ns.companyType} onChange={v => setNs({ ...ns, companyType: v })} options={["IT", "Software", "Services", "Consulting", "Other"]} />
           <Fld label="No. of Employees" value={ns.employeeCount} onChange={v => setNs({ ...ns, employeeCount: v })} options={["0-10", "11-50", "51-100", "100+"]} />
-        </div>
+              )}
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
           <div style={{ position: "relative" }}>
             <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "#ede9fe"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
             <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#a78bfa", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
-          </div>
-          {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nsError.password}</div>}
-        </div>
+                )}
+          {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nsError.password}      )}}
+              )}
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
           <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("#3b82f6"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin →"}</button>
-        </div>
+              )}
       </Mdl>}
 
       {/* ── Add Package Modal ── */}
@@ -2766,17 +2873,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
           <Fld label="Button Name" value={npkg.buttonName} onChange={v => setNpkg({ ...npkg, buttonName: v })} placeholder="e.g. Get Started" />
           <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
-        </div>
+              )}
 
         <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
-          <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
+          <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS      )}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
             <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. ₹999" />
             <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. ₹2,499" />
             <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. ₹4,499" />
             <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. ₹7,999" />
-          </div>
-        </div>
+                )}
+              )}
 
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
@@ -2786,29 +2893,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             style={{ width: "100%", height: 80, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "#faf5ff", outline: "none", fontFamily: "inherit", resize: "none" }}
             placeholder="e.g. Unlimited Clients, Premium Support, Custom Branding"
           />
-        </div>
+              )}
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <button onClick={() => setModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
           <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("#0ea5e9"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package →"}</button>
-        </div>
+              )}
       </Mdl>}
-
-      {modal === "vendor_add" && <Mdl title="Add New Vendor" onClose={() => setModal(null)}>
-        <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-          <Fld label="Vendor Name *" value={nv.vendorName} onChange={v => { setNv({ ...nv, vendorName: v }); setNvError(p => ({ ...p, vendorName: "" })); }} error={nvError.vendorName} />
-          <Fld label="Product Name *" value={nv.vendorProduct} onChange={v => { setNv({ ...nv, vendorProduct: v }); setNvError(p => ({ ...p, vendorProduct: "" })); }} error={nvError.vendorProduct} />
-          <Fld label="Amount (Tax/GST) *" value={nv.amountTaxGst} type="number" onChange={v => setNv({ ...nv, amountTaxGst: v })} />
-          <Fld label="Paid Amount *" value={nv.paidAmount} type="number" onChange={v => setNv({ ...nv, paidAmount: v })} />
-          <Fld label="Date of Purchase" value={nv.dateOfPurchase} type="date" onChange={v => setNv({ ...nv, dateOfPurchase: v })} />
-          <Fld label="Mode of Payment" value={nv.modeOfPayment} onChange={v => setNv({ ...nv, modeOfPayment: v })} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
-        </div>
-        <Fld label="Product Description" value={nv.productDescription} onChange={v => setNv({ ...nv, productDescription: v })} />
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-          <button onClick={() => setModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("#9333ea"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor →"}</button>
-        </div>
-      </Mdl>}
-    </div>
+          )}
   );
 }

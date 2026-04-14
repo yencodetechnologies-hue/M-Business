@@ -63,6 +63,8 @@ const subadminRoutes = require("./routes/subadminroutes");
 const packageRoutes = require("./routes/packageroutes");
 const emailRoutes = require("./routes/emailroutes");
 const paymentRoutes = require("./routes/paymentroutes");
+const vendorRoutes = require("./routes/vendorRoutes");
+const rolePermissionRoutes = require("./routes/rolePermissionRoutes");
 
 // Static files (local resume storage)
 const path = require("path");
@@ -92,10 +94,30 @@ app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/packages", packageRoutes);
 app.use("/api/emails", emailRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/vendors", vendorRoutes);
+app.use("/api/role-permissions", rolePermissionRoutes);
 app.use("/upload", express.static("uploads"));
 
 app.get("/", (req, res) => {
   res.send("Server is running!");
+});
+
+// Debug vendor route
+app.get("/debug-vendors", (req, res) => {
+  try {
+    const vendorRoutes = require('./routes/vendorRoutes');
+    res.json({ 
+      message: "Vendor routes loaded successfully",
+      routes: [
+        "POST /api/vendors - Create vendor",
+        "GET /api/vendors - Get all vendors", 
+        "PUT /api/vendors/:id - Update vendor",
+        "DELETE /api/vendors/:id - Delete vendor"
+      ]
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Test email endpoint

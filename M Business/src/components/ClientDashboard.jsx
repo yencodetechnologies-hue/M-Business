@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import React from "react";
 import axios from "axios";
+import { BASE_URL } from "../config";
 
 // ── Theme ──────────────────────────────────────────────────────
 const T = {
@@ -696,16 +697,39 @@ export default function ClientDashboard({ user, setUser }) {
   // ── API calls ─────────────────────────────────────────────
   useEffect(() => {
     // Load proposals from backend
-    const currentClientName = (user?.name || user?.clientName || "").trim();
-    if (currentClientName) {
-      axios.get(`/api/proposals/client/${encodeURIComponent(currentClientName)}`)
+    console.log("User object:", user);
+    const currentClientName = (user?.name || user?.clientName || user?.companyName || user?.client || "").trim();
+    console.log("Current client name:", currentClientName);
+    
+    // Show available client names from proposals for debugging
+    if (user) {
+      axios.get(`${BASE_URL}/api/proposals`)
         .then(res => {
-          // Filter viewable statuses for client (show drafts for immediate visibility during testing)
-          const viewable = res.data.filter(p => ["draft", "pending", "approved", "rejected"].includes(p.status));
-          setProposals(viewable);
-          console.log(`Loaded ${viewable.length} proposals from backend for ${currentClientName}`);
+          const clientNames = [...new Set(res.data.map(p => p.client).filter(Boolean))];
+          console.log("Available client names in proposals:", clientNames);
         })
-        .catch(err => console.error("Error loading proposals from backend:", err));
+        .catch(err => console.error("Error fetching client names:", err));
+    }
+    if (currentClientName) {
+      // Load all proposals and filter by client name on frontend
+      axios.get(`${BASE_URL}/api/proposals`)
+        .then(res => {
+          console.log("All proposals API response:", res.data);
+          // Filter by client name (exact match or normalized match)
+          const clientProposals = res.data.filter(p => 
+            p.client && currentClientName && 
+            p.client.toLowerCase() === currentClientName.toLowerCase() &&
+            ["draft", "pending", "approved", "rejected"].includes(p.status)
+          );
+          setProposals(clientProposals);
+          console.log(`Loaded ${clientProposals.length} proposals for client ${currentClientName}`);
+        })
+        .catch(err => {
+          console.error("Error loading proposals from backend:", err);
+          setProposals([]);
+        });
+    } else {
+      console.log("No client name found in user object");
     }
 
     if (!user?.name) return;
@@ -932,20 +956,22 @@ export default function ClientDashboard({ user, setUser }) {
                         <div style={{ marginTop:16, display:"flex", gap:10, paddingTop:16, borderTop:"1px solid #f1f5f9" }}>
                           <button onClick={()=>{
                             const updatedProposal = {...p, status:"approved", updated:new Date().toISOString()};
-                            axios.put(`/api/proposals/${p._id}`, updatedProposal)
+                            axios.put(`${BASE_URL}/api/proposals/${p._id}/approve`, { status: "approved" })
                               .then(res => {
                                 setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
+                                flash("🎉 Proposal Approved!");
                               })
                               .catch(err => console.error("Error approving proposal:", err));
-                          }} style={{ flex:1, background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>✅ Approve Proposal</button>
+                          }} style={{ flex:1, background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>✅ Approve</button>
 
                           <button onClick={()=>{
                             const reason = window.prompt("Reason for rejection:");
                             if(reason===null) return;
                             const updatedProposal = {...p, status:"rejected", rejectNote:reason||"Needs revision", updated:new Date().toISOString()};
-                            axios.put(`/api/proposals/${p._id}`, updatedProposal)
+                            axios.put(`${BASE_URL}/api/proposals/${p._id}/reject`, { rejectNote: reason || "Needs revision" })
                               .then(res => {
                                 setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
+                                flash("❌ Proposal Rejected");
                               })
                               .catch(err => console.error("Error rejecting proposal:", err));
                           }} style={{ flex:1, background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>❌ Reject & Apply Changes</button>
@@ -955,6 +981,46 @@ export default function ClientDashboard({ user, setUser }) {
                         <div style={{ marginTop:16, padding:12, background:"#fef2f2", borderRadius:8, color:"#9f1239", fontSize:12 }}>
                           <strong style={{ display:"block", marginBottom:4 }}>❌ Rejected for revision:</strong>
                           {p.rejectNote}
+                          <div style={{ marginTop:12, display:"flex", gap:8 }}>
+                            <button
+                              onClick={() => window.open(`/project-proposal?edit=${p.id || p._id}`, "_blank")}
+                              style={{
+                                background:"#ef4444",
+                                color:"#fff",
+                                border:"none",
+                                borderRadius:6,
+                                padding:"8px 12px",
+                                fontSize:11,
+                                fontWeight:700,
+                                cursor:"pointer"
+                              }}
+                            >
+                              Edit Proposal
+                            </button>
+                            <button
+                              onClick={() => {
+                                const updatedProposal = {...p, status:"pending", updated:new Date().toISOString()};
+                                axios.put(`${BASE_URL}/api/proposals/${p._id}/submit`)
+                                  .then(res => {
+                                    setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
+                                    flash("📤 Proposal resubmitted!");
+                                  })
+                                  .catch(err => console.error("Error resubmitting proposal:", err));
+                              }}
+                              style={{
+                                background:"#f59e0b",
+                                color:"#fff",
+                                border:"none",
+                                borderRadius:6,
+                                padding:"8px 12px",
+                                fontSize:11,
+                                fontWeight:700,
+                                cursor:"pointer"
+                              }}
+                            >
+                              Resubmit for Approval
+                            </button>
+                          </div>
                         </div>
                       )}
                       {p.status==="approved" && (
@@ -1076,24 +1142,24 @@ export default function ClientDashboard({ user, setUser }) {
                     {p.status === "pending" && (
                       <div style={{ marginTop:16, display:"flex", gap:10, paddingTop:16, borderTop:"1px solid #f1f5f9" }}>
                         <button onClick={()=>{
-                          const updatedProposal = {...p, status:"approved", updated:new Date().toISOString()};
-                          axios.put(`/api/proposals/${p._id}`, updatedProposal)
+                          axios.put(`${BASE_URL}/api/proposals/${p._id}/approve`)
                             .then(res => {
                               setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
+                              flash("🎉 Proposal Approved!");
                             })
                             .catch(err => console.error("Error approving proposal:", err));
-                        }} style={{ flex:1, background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Approve Proposal</button>
+                        }} style={{ flex:1, background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Approve</button>
                         
                         <button onClick={()=>{
                           const reason = window.prompt("Reason for rejection:");
                           if(reason===null) return;
-                          const updatedProposal = {...p, status:"rejected", rejectNote:reason||"Needs revision", updated:new Date().toISOString()};
-                          axios.put(`/api/proposals/${p._id}`, updatedProposal)
+                          axios.put(`${BASE_URL}/api/proposals/${p._id}/reject`, { rejectNote: reason || "Needs revision" })
                             .then(res => {
                               setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
+                              flash("❌ Proposal Rejected");
                             })
                             .catch(err => console.error("Error rejecting proposal:", err));
-                        }} style={{ flex:1, background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Reject & Apply Changes</button>
+                        }} style={{ flex:1, background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Reject</button>
                       </div>
                     )}
                     
@@ -1108,6 +1174,45 @@ export default function ClientDashboard({ user, setUser }) {
                       <div style={{ marginTop:16, padding:"12px", background:"#fef2f2", borderRadius:8, border:"1px solid #fca5a5" }}>
                         <div style={{ fontSize:12, color:"#9f1239", fontWeight:600 }}>❌ Proposal Rejected</div>
                         <div style={{ fontSize:11, color:"#991b1b", marginTop:2 }}>Reason: {p.rejectNote || "Needs revision"}</div>
+                        <div style={{ marginTop:12, display:"flex", gap:8 }}>
+                          <button
+                            onClick={() => window.open(`/project-proposal?edit=${p.id || p._id}`, "_blank")}
+                            style={{
+                              background:"#ef4444",
+                              color:"#fff",
+                              border:"none",
+                              borderRadius:6,
+                              padding:"8px 12px",
+                              fontSize:11,
+                              fontWeight:700,
+                              cursor:"pointer"
+                            }}
+                          >
+                            Edit Proposal
+                          </button>
+                          <button
+                            onClick={() => {
+                              axios.put(`${BASE_URL}/api/proposals/${p._id}/submit`)
+                                .then(res => {
+                                  setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
+                                  flash("📤 Proposal resubmitted!");
+                                })
+                                .catch(err => console.error("Error resubmitting proposal:", err));
+                            }}
+                            style={{
+                              background:"#f59e0b",
+                              color:"#fff",
+                              border:"none",
+                              borderRadius:6,
+                              padding:"8px 12px",
+                              fontSize:11,
+                              fontWeight:700,
+                              cursor:"pointer"
+                            }}
+                          >
+                            Resubmit for Approval
+                          </button>
+                        </div>
                       </div>
                     )}
                     

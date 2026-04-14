@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import React from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import InvoiceCreator from "./InvoiceCreator";
@@ -27,10 +28,7 @@ function Badge({ label }) {
 
 const NAV = [
   { key: "dashboard", icon: "🏠", label: "Dashboard" },
-  { key: "clients", icon: "👥", label: "Clients" },
   { key: "subadmins", icon: "🛡️", label: "Subadmins" },
-  { key: "employees", icon: "👨‍💼", label: "Employees" },
-  { key: "managers", icon: "🧑‍💼", label: "Managers" },
   { key: "projects", icon: "📁", label: "Projects" },
   { key: "quotations", icon: "📋", label: "Quotations" },
   { key: "proposals", icon: "🎨", label: "Project Proposals" },
@@ -55,6 +53,11 @@ export default function AdminDashboard({ user, setUser }) {
   const [employees, setEmployees] = useState([]);
   const [managers, setManagers] = useState([]);
   const [quotations, setQuotations] = useState([]);
+  const [packages, setPackages] = useState([]);
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "??", isFree: false, price: "", noOfDays: "" });
+  const [pkgError, setPkgError] = useState({});
+  const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
+  const [modal, setModal] = useState(null);
 
   useEffect(() => {
     fetchSubadmins();
@@ -64,6 +67,7 @@ export default function AdminDashboard({ user, setUser }) {
     fetchEmployees();
     fetchManagers();
     fetchQuotations();
+    fetchPackages();
   }, []);
 
   const fetchSubadmins = async () => {
@@ -111,6 +115,38 @@ export default function AdminDashboard({ user, setUser }) {
       const res = await axios.get(BASE_URL + "/api/quotations");
       setQuotations(res.data);
     } catch(e) { console.error(e); }
+  };
+  const fetchPackages = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/packages");
+      setPackages(res.data);
+    } catch(e) { console.error(e); }
+  };
+
+  const createPackage = async () => {
+    const errors = {};
+    if (!npkg.title.trim()) errors.title = "Title required";
+    if (!npkg.description.trim()) errors.description = "Description required";
+    if (!npkg.price.trim()) errors.price = "Price required";
+    if (!npkg.noOfDays.trim()) errors.noOfDays = "Days required";
+    if (Object.keys(errors).length > 0) { setPkgError(errors); return; }
+    try {
+      setPkgSaveLoading(true);
+      const packageData = {
+        ...npkg,
+        monthlyPrice: npkg.isFree ? "Free" : npkg.price,
+        quarterlyPrice: npkg.isFree ? "Free" : npkg.price,
+        halfYearlyPrice: npkg.isFree ? "Free" : npkg.price,
+        annualPrice: npkg.isFree ? "Free" : npkg.price,
+        buttonName: "Get Started",
+        features: "Basic features included"
+      };
+      const res = await axios.post(BASE_URL + "/api/packages", packageData);
+      setPackages(prev => [...prev, res.data]);
+      setNpkg({ title: "", description: "", icon: "??", isFree: false, price: "", noOfDays: "" });
+      setPkgError({});
+      setModal(null);
+    } catch(e) { console.error(e); } finally { setPkgSaveLoading(false); }
   };
 
   const handleLogout = () => {
@@ -160,10 +196,29 @@ export default function AdminDashboard({ user, setUser }) {
             </h2>
             <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>Admin Control Panel</div>
           </div>
+          {active === "packages" && (
+            <button 
+              onClick={() => { setPkgError({}); setModal("package_add"); }}
+              style={{
+                background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
+                color: "#fff",
+                border: "none",
+                borderRadius: 10,
+                padding: "10px 20px",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                boxShadow: "0 4px 12px rgba(14,165,233,0.25)"
+              }}
+            >
+              + Add Package
+            </button>
+          )}
         </div>
 
         <div style={{ flex: 1, padding: 30, overflowY: "auto" }}>
-          {active === "dashboard" && <OverviewPage subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} />}
+          {active === "dashboard" && <OverviewPage subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} />}
           {active === "clients" && <ClientsPage clients={clients} setClients={setClients} />}
           {active === "subadmins" && <SubadminsList subadmins={subadmins} refresh={fetchSubadmins} />}
           {active === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
@@ -179,23 +234,235 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "interviews" && <InterviewPage />}
           {active === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
           {active === "subscriptions" && <SubscriptionsPage subscriptions={subscriptions} />}
-          {active === "packages" && <PackagesPage />}
+          {active === "packages" && <PackagesPage packages={packages} />}
           {active === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}
         </div>
       </div>
+
+      {/* Package Creation Modal */}
+      {modal === "package_add" && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.5)",
+          backdropFilter: "blur(4px)",
+          zIndex: 1000,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 16
+        }}>
+          <div style={{
+            background: "#fff",
+            borderRadius: 20,
+            width: "100%",
+            maxWidth: 600,
+            maxHeight: "90vh",
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            boxShadow: "0 32px 80px rgba(0,0,0,0.25)"
+          }}>
+            <div style={{
+              padding: "20px 24px",
+              borderBottom: "1px solid #e2e8f0",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Add New Package</h2>
+              <button
+                onClick={() => setModal(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                  color: "#64748b",
+                  padding: 4
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ padding: "24px", overflowY: "auto" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Package Title *</label>
+                  <input
+                    type="text"
+                    value={npkg.title}
+                    onChange={e => setNpkg({ ...npkg, title: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      border: pkgError.title ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb",
+                      borderRadius: 8,
+                      fontSize: 14,
+                      outline: "none"
+                    }}
+                    placeholder="e.g., Basic Plan"
+                  />
+                  {pkgError.title && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{pkgError.title}</div>}
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Icon</label>
+                  <input
+                    type="text"
+                    value={npkg.icon}
+                    onChange={e => setNpkg({ ...npkg, icon: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      border: "1.5px solid #e5e7eb",
+                      borderRadius: 8,
+                      fontSize: 14,
+                      outline: "none"
+                    }}
+                    placeholder="??"
+                  />
+                </div>
+              </div>
+              
+              <div style={{ marginTop: 16 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Description *</label>
+                <textarea
+                  value={npkg.description}
+                  onChange={e => setNpkg({ ...npkg, description: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    border: pkgError.description ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    outline: "none",
+                    minHeight: 80,
+                    resize: "vertical"
+                  }}
+                  placeholder="Describe the package features and benefits..."
+                />
+                {pkgError.description && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{pkgError.description}</div>}
+              </div>
+
+              <div style={{ marginTop: 16 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Package Type *</label>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                    <input
+                      type="radio"
+                      name="packageType"
+                      checked={npkg.isFree}
+                      onChange={() => setNpkg({ ...npkg, isFree: true, price: "Free" })}
+                      style={{ cursor: "pointer" }}
+                    />
+                    <span style={{ fontSize: 14, color: "#374151" }}>Free</span>
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                    <input
+                      type="radio"
+                      name="packageType"
+                      checked={!npkg.isFree}
+                      onChange={() => setNpkg({ ...npkg, isFree: false })}
+                      style={{ cursor: "pointer" }}
+                    />
+                    <span style={{ fontSize: 14, color: "#374151" }}>Paid</span>
+                  </label>
+                </div>
+              </div>
+
+              {!npkg.isFree && (
+                <div style={{ marginTop: 16 }}>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Price *</label>
+                  <input
+                    type="text"
+                    value={npkg.price}
+                    onChange={e => setNpkg({ ...npkg, price: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      border: pkgError.price ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb",
+                      borderRadius: 8,
+                      fontSize: 14,
+                      outline: "none"
+                    }}
+                    placeholder="999"
+                  />
+                  {pkgError.price && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{pkgError.price}</div>}
+                </div>
+              )}
+
+              <div style={{ marginTop: 16 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Number of Days *</label>
+                <input
+                  type="text"
+                  value={npkg.noOfDays}
+                  onChange={e => setNpkg({ ...npkg, noOfDays: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    border: pkgError.noOfDays ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    outline: "none"
+                  }}
+                  placeholder="30"
+                />
+                {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{pkgError.noOfDays}</div>}
+              </div>
+
+              <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+                <button
+                  onClick={() => setModal(null)}
+                  style={{
+                    flex: 1,
+                    padding: "12px",
+                    background: "#f8fafc",
+                    border: "1.5px solid #e5e7eb",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: "#374151",
+                    cursor: "pointer"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={createPackage}
+                  disabled={pkgSaveLoading}
+                  style={{
+                    flex: 1,
+                    padding: "12px",
+                    background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
+                    border: "none",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: "#fff",
+                    cursor: pkgSaveLoading ? "not-allowed" : "pointer",
+                    opacity: pkgSaveLoading ? 0.7 : 1
+                  }}
+                >
+                  {pkgSaveLoading ? "Creating..." : "Create Package"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // ── Dashboard Overview ──
-function OverviewPage({ subadmins, clients, employees, managers, projects }) {
+function OverviewPage({ subadmins, clients, employees, managers, projects, packages }) {
   const stats = [
     { label: "Total Clients", value: clients.length, color: "#9333ea" },
     { label: "Employees", value: employees.length, color: "#7c3aed" },
     { label: "Managers", value: managers.length, color: "#f59e0b" },
     { label: "Projects", value: projects.length, color: "#a855f7" },
     { label: "Subadmins", value: subadmins.length, color: "#3b82f6" },
-    { label: "Active Packages", value: "4", color: "#10b981" },
+    { label: "Active Packages", value: packages.length, color: "#10b981" },
   ];
 
   return (
@@ -600,61 +867,50 @@ function SubscriptionsPage({ subscriptions }) {
   );
 }
 
-// ── Packages Page ──
-function PackagesPage() {
-  const [billing, setBilling] = useState("monthly"); // monthly | annual
+// Packages Page
+function PackagesPage({ packages }) {
+  const [billing, setBilling] = useState("monthly"); // monthly | quarterly | halfYearly | annual
 
-  const packages = [
+  try {
+    const displayedPackages = (packages && packages.length > 0) ? packages : [
     {
       id: "trial",
-      icon: "⚓",
+      icon: "??",
       title: "TRIAL",
-      desc: "Built for standard usage — simple data management and trial access.",
-      price: { monthly: "Free", annual: "Free" },
-      period: "/ 60 days",
-      btnText: "Get Started",
-      btnPrimary: false,
-      featuresTitle: "Trial includes:",
-      features: [
-        "Single business manage",
-        "Dropdown support",
-        "1 Manager",
-        "3 Client manage"
-      ]
+      description: "Built for standard usage simple data management and trial access.",
+      monthlyPrice: "Free",
+      quarterlyPrice: "Free", 
+      halfYearlyPrice: "Free",
+      annualPrice: "Free",
+      buttonName: "Get Started",
+      features: "Single business manage\nDropdown support\n1 Manager\n3 Client manage",
+      noOfDays: "60"
     },
     {
       id: "monthly",
-      icon: "🎖️",
-      title: "MONTHLY",
-      desc: "Built for growing operations — smart automation for scaling teams.",
-      price: { monthly: "₹999", annual: "₹4,999" },
-      period: billing === "monthly" ? "/ 90 days" : "/ 6 months", 
-      btnText: "Choose Monthly",
-      btnPrimary: true,
-      featuresTitle: "Everything in Trial, plus:",
-      features: [
-        "1 Manager",
-        "3 Client manage",
-        "Unlimited features",
-        "Priority support"
-      ]
+      icon: "??",
+      title: "MONTHLY", 
+      description: "Built for growing operations smart automation for scaling teams.",
+      monthlyPrice: "999",
+      quarterlyPrice: "2,499",
+      halfYearlyPrice: "4,999", 
+      annualPrice: "9,999",
+      buttonName: "Choose Monthly",
+      features: "1 Manager\n3 Client manage\nUnlimited features\nPriority support",
+      noOfDays: "90"
     },
     {
       id: "yearly",
-      icon: "📦",
+      icon: "??",
       title: "YEARLY",
-      desc: "Built for your most complex operations — maximum usage limits.",
-      price: { monthly: "₹1,999", annual: "₹9,999" },
-      period: "/ year",
-      btnText: "Choose Yearly",
-      btnPrimary: false,
-      featuresTitle: "Everything in Monthly, plus:",
-      features: [
-        "Unlimited Managers",
-        "Unlimited Clients management",
-        "24/7 Enterprise Support",
-        "Custom Branding"
-      ]
+      description: "Built for your most complex operations maximum usage limits.",
+      monthlyPrice: "1,999",
+      quarterlyPrice: "4,999",
+      halfYearlyPrice: "9,999",
+      annualPrice: "19,999", 
+      buttonName: "Choose Yearly",
+      features: "Unlimited Managers\nUnlimited Clients management\n24/7 Enterprise Support\nCustom Branding",
+      noOfDays: "365"
     }
   ];
 
@@ -662,44 +918,61 @@ function PackagesPage() {
     <div style={{ maxWidth: 1000, margin: "0 auto" }}>
       {/* Toggle */}
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 40 }}>
-        <span style={{ fontSize: 15, fontWeight: 700, color: billing === "monthly" ? "#0f172a" : "#64748b", transition: "0.2s" }}>Monthly</span>
-        <div 
-          onClick={() => setBilling(b => b === "monthly" ? "annual" : "monthly")}
-          style={{ width: 50, height: 26, background: "#e2e8f0", borderRadius: 30, position: "relative", cursor: "pointer" }}
-        >
-          <div style={{ width: 20, height: 20, background: "#0ea5e9", borderRadius: "50%", position: "absolute", top: 3, left: billing === "monthly" ? 3 : 27, transition: "left 0.3s cubic-bezier(0.4,0,0.2,1)" }} />
-        </div>
-        <span style={{ fontSize: 15, fontWeight: 700, color: billing === "annual" ? "#0f172a" : "#64748b", transition: "0.2s" }}>Annual</span>
+        {["monthly", "quarterly", "halfYearly", "annual"].map((cycle, idx) => (
+          <React.Fragment key={cycle}>
+            <span 
+              onClick={() => setBilling(cycle)}
+              style={{ 
+                fontSize: 15, 
+                fontWeight: 700, 
+                color: billing === cycle ? "#0f172a" : "#64748b", 
+                cursor: "pointer",
+                transition: "0.2s",
+                textTransform: "capitalize"
+              }}
+            >
+              {cycle === "halfYearly" ? "Half-Yearly" : cycle}
+            </span>
+            {idx < 3 && <span style={{ color: "#cbd5e1" }}>·</span>}
+          </React.Fragment>
+        ))}
       </div>
 
       {/* Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", background: "#fff", borderRadius: 24, boxShadow: "0 10px 40px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid #f1f5f9" }}>
-        {packages.map((p, idx) => (
-          <div key={p.id} style={{ padding: 32, borderRight: idx !== 2 ? "1px solid #f1f5f9" : "none", display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 40 }}>
+        {displayedPackages && displayedPackages.map((p, idx) => (
+          <div key={p.id || idx} style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 10px 40px rgba(0,0,0,0.04)", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", position: "relative" }}>
             <div style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #e0f2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, marginBottom: 20 }}>
-              {p.icon}
+              {p.icon || "???"}
             </div>
             
-            <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 1 }}>{p.title}</h3>
-            <p style={{ margin: "0 0 32px", fontSize: 13, color: "#64748b", lineHeight: 1.6, minHeight: 60 }}>{p.desc}</p>
+            <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 1 }}>{p.title || "Package"}</h3>
+            <p style={{ margin: "0 0 32px", fontSize: 13, color: "#64748b", lineHeight: 1.6, minHeight: 60 }}>{p.description || "Package description"}</p>
             
             <div style={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>Pricing</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 32 }}>
-              <span style={{ fontSize: 32, fontWeight: 800, color: "#0f172a" }}>{billing === "monthly" ? p.price.monthly : p.price.annual}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#64748b" }}>{p.period}</span>
+              <span style={{ fontSize: 32, fontWeight: 800, color: "#0f172a" }}>
+                {billing === "monthly" && (p.monthlyPrice || "0")}
+                {billing === "quarterly" && (p.quarterlyPrice || "0")}
+                {billing === "halfYearly" && (p.halfYearlyPrice || "0")}
+                {billing === "annual" && (p.annualPrice || "0")}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "#64748b" }}>
+                / {p.noOfDays || "30"} days
+              </span>
             </div>
 
-            <button style={{ width: "100%", padding: 14, borderRadius: 12, background: p.btnPrimary ? "#0ea5e9" : "#fff", color: p.btnPrimary ? "#fff" : "#0f172a", border: p.btnPrimary ? "none" : "2px solid #f1f5f9", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "0.2s", marginBottom: 32 }}>
-              {p.btnText}
+            <button style={{ width: "100%", padding: 14, borderRadius: 12, background: "#0ea5e9", color: "#fff", border: "none", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "0.2s", marginBottom: 32 }}>
+              {p.buttonName || "Get Started"}
             </button>
 
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginBottom: 16 }}>{p.featuresTitle}</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginBottom: 16 }}>Features:</div>
               <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 12 }}>
-                {p.features.map((f, i) => (
+                {String(p.features || "No features listed").split('\n').map((f, i) => (
                   <li key={i} style={{ fontSize: 13, color: "#475569", display: "flex", alignItems: "flex-start", gap: 10 }}>
-                    <span style={{ color: "#3b82f6", fontWeight: 900, fontSize: 10, marginTop: 2 }}>✓</span>
-                    <span style={{ lineHeight: 1.4 }}>{f}</span>
+                    <span style={{ color: "#3b82f6", fontWeight: 900, fontSize: 10, marginTop: 2 }}>?</span>
+                    <span style={{ lineHeight: 1.4 }}>{f && f.trim() ? f.trim() : "Feature"}</span>
                   </li>
                 ))}
               </ul>
@@ -709,6 +982,16 @@ function PackagesPage() {
       </div>
     </div>
   );
+  } catch (error) {
+    console.error("PackagesPage error:", error);
+    return (
+      <div style={{ padding: 40, textAlign: "center", color: "#64748b" }}>
+        <div style={{ fontSize: 24, marginBottom: 16 }}>???</div>
+        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Unable to load packages</div>
+        <div style={{ fontSize: 14 }}>Please try refreshing the page</div>
+      </div>
+    );
+  }
 }
 
 // ── Clients Page ──

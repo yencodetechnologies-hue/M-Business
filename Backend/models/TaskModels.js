@@ -7,7 +7,6 @@ const taskSchema = new mongoose.Schema(
     notes:         { type: String, default: "" },
     status: {
       type: String,
-      enum: ["Not Started","Working on it","In Review","Done","Stuck","On Hold"],
       default: "Not Started",
     },
     priority: {
@@ -16,6 +15,7 @@ const taskSchema = new mongoose.Schema(
       default: "🟡 Medium",
     },
     assignTo:      { type: String, default: "Unassigned" },
+    type:          { type: String, default: "" },
     date:          { type: String, default: "" },
     time:          { type: String, default: "" },
     estimatedTime: { type: String, default: "" },
@@ -24,6 +24,7 @@ const taskSchema = new mongoose.Schema(
     projectId:     { type: mongoose.Schema.Types.ObjectId, ref: "Project", default: null },
     isDeleted:     { type: Boolean, default: false },
     order:         { type: Number, default: 0 },
+    companyId:     { type: String, default: "" },
   },
   { timestamps: true }
 );

@@ -6,7 +6,8 @@ const Expense = require("../models/AccountModels");
 // GET all expenses
 router.get("/", async (req, res) => {
   try {
-    const expenses = await Expense.find().sort({ createdAt: -1 });
+    const filter = req.companyId ? { companyId: req.companyId } : {};
+    const expenses = await Expense.find(filter).sort({ createdAt: -1 });
     res.json(expenses);
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
@@ -16,7 +17,7 @@ router.get("/", async (req, res) => {
 // POST create expense
 router.post("/", async (req, res) => {
   try {
-    const expense = new Expense(req.body);
+    const expense = new Expense({ ...req.body, companyId: req.companyId || "" });
     await expense.save();
     res.status(201).json(expense);
   } catch (err) {

@@ -984,7 +984,7 @@ export default function ClientDashboard({ user, setUser }) {
                             axios.put(`${BASE_URL}/api/proposals/${p._id}/approve`, { status: "approved" })
                               .then(res => {
                                 setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                                flash("🎉 Proposal Approved!");
+                                alert("🎉 Proposal Approved!");
                               })
                               .catch(err => console.error("Error approving proposal:", err));
                           }} style={{ flex:1, background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>✅ Approve</button>
@@ -996,7 +996,7 @@ export default function ClientDashboard({ user, setUser }) {
                             axios.put(`${BASE_URL}/api/proposals/${p._id}/reject`, { rejectNote: reason || "Needs revision" })
                               .then(res => {
                                 setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                                flash("❌ Proposal Rejected");
+                                alert("❌ Proposal Rejected");
                               })
                               .catch(err => console.error("Error rejecting proposal:", err));
                           }} style={{ flex:1, background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>❌ Reject & Apply Changes</button>
@@ -1014,7 +1014,7 @@ export default function ClientDashboard({ user, setUser }) {
                                 axios.put(`${BASE_URL}/api/proposals/${p._id}/submit`)
                                   .then(res => {
                                     setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                                    flash("📤 Proposal resubmitted!");
+                                    alert("📤 Proposal resubmitted!");
                                   })
                                   .catch(err => console.error("Error resubmitting proposal:", err));
                               }}

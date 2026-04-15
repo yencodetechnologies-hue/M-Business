@@ -57,4 +57,18 @@ const subscriptionSchema = new mongoose.Schema({
 subscriptionSchema.index({ userId: 1, status: 1 });
 subscriptionSchema.index({ userEmail: 1 });
 
+// Virtual field to calculate days left
+subscriptionSchema.virtual("daysLeft").get(function() {
+  if (!this.endDate) return 0;
+  const end = new Date(this.endDate);
+  const today = new Date();
+  const diffTime = end - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays > 0 ? diffDays : 0;
+});
+
+// Include virtuals when converting to JSON/Object
+subscriptionSchema.set("toJSON", { virtuals: true });
+subscriptionSchema.set("toObject", { virtuals: true });
+
 module.exports = mongoose.model("Subscription", subscriptionSchema);

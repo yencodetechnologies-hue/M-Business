@@ -64,7 +64,7 @@ const PaymentProcessor = ({
 
   const initializeRazorpay = (order) => {
     const options = {
-      key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_XXXXXXXXXXXX', // Test key
+key: process.env.REACT_APP_RAZORPAY_KEY_ID, // Test key
       amount: order.amount,
       currency: order.currency,
       name: 'M Business',

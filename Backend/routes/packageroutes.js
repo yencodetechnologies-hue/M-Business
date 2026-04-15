@@ -13,17 +13,13 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET packages for specific subadmin (assigned packages + general packages)
+// GET packages for specific subadmin (only assigned packages)
 router.get("/subadmin/:subadminId", async (req, res) => {
   try {
     const { subadminId } = req.params;
-    // Find packages assigned to this subadmin OR general packages (no specific assignment)
+    // Find packages ONLY assigned to this specific subadmin
     const packages = await Package.find({
-      $or: [
-        { assignedSubadmins: { $in: [subadminId] } },
-        { assignedSubadmins: { $exists: false } },
-        { assignedSubadmins: { $size: 0 } }
-      ]
+      assignedSubadmins: { $in: [subadminId] }
     }).sort({ createdAt: 1 });
     res.json(packages);
   } catch (err) {

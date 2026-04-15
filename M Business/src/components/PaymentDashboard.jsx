@@ -3,6 +3,31 @@ import PaymentProcessor from './PaymentProcessor';
 import PaymentHistory from './PaymentHistory';
 import axios from 'axios';
 
+const planIcons = {
+  starter: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+    </svg>
+  ),
+  professional: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="12" cy="8" r="6"/><path d="M8 14l-4 7h16l-4-7"/>
+    </svg>
+  ),
+  enterprise: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="2" y="7" width="20" height="14" rx="2"/>
+      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+    </svg>
+  )
+};
+
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3B6D11" strokeWidth="2" style={{flexShrink: 0}}>
+    <polyline points="2,8 6,12 14,4"/>
+  </svg>
+);
+
 const PaymentDashboard = ({ userId, userEmail, userName }) => {
   const [activeTab, setActiveTab] = useState('process');
   const [subscription, setSubscription] = useState(null);
@@ -15,6 +40,7 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
       name: 'Starter',
       price: 1999,
       duration: 'monthly',
+      description: 'Built for small teams — simple invoicing and basic client management.',
       features: [
         'Up to 10 Clients',
         'Up to 5 Projects',
@@ -28,6 +54,8 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
       name: 'Professional',
       price: 2999,
       duration: 'monthly',
+      description: 'Built for growing teams — advanced workflows and unlimited projects.',
+      popular: true,
       features: [
         'Unlimited Clients',
         'Unlimited Projects',
@@ -40,8 +68,9 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
     {
       id: 'enterprise',
       name: 'Enterprise',
-      price: 5999,
+      price: null,
       duration: 'monthly',
+      description: 'Built for large businesses — maximum scalability and dedicated support.',
       features: [
         'Everything in Professional',
         'Multi-User Access',
@@ -73,9 +102,7 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
 
   const fetchPaymentStats = async () => {
     try {
-      const response = await axios.get('/api/payments/stats', {
-        params: { userId }
-      });
+      const response = await axios.get('/api/payments/stats', { params: { userId } });
       setPaymentStats(response.data);
     } catch (err) {
       console.error('Payment stats error:', err);
@@ -93,7 +120,7 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
   };
 
   const getRecommendedPlan = () => {
-    if (!subscription) return plans[1]; // Professional as default
+    if (!subscription) return plans[1];
     return plans.find(plan => plan.name === subscription.planName) || plans[1];
   };
 
@@ -139,22 +166,16 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
             <div className="subscription-details">
               <div className="plan-info">
                 <h4>{subscription.planName}</h4>
-                <p>
-                  INR {subscription.planPrice.toLocaleString('en-IN')}/{subscription.billingCycle}
-                </p>
+                <p>INR {subscription.planPrice.toLocaleString('en-IN')}/{subscription.billingCycle}</p>
               </div>
               <div className="subscription-meta">
                 <div className="meta-item">
                   <span className="label">Valid Until:</span>
-                  <span className="value">
-                    {new Date(subscription.endDate).toLocaleDateString('en-IN')}
-                  </span>
+                  <span className="value">{new Date(subscription.endDate).toLocaleDateString('en-IN')}</span>
                 </div>
                 <div className="meta-item">
                   <span className="label">Days Remaining:</span>
-                  <span className="value days-remaining">
-                    {getDaysUntilExpiry() || 'Expired'}
-                  </span>
+                  <span className="value days-remaining">{getDaysUntilExpiry() || 'Expired'}</span>
                 </div>
               </div>
             </div>
@@ -163,24 +184,15 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
       )}
 
       <div className="payment-tabs">
-        <button
-          className={`tab-btn ${activeTab === 'process' ? 'active' : ''}`}
-          onClick={() => setActiveTab('process')}
-        >
+        <button className={`tab-btn ${activeTab === 'process' ? 'active' : ''}`} onClick={() => setActiveTab('process')}>
           <span className="tab-icon">credit-card</span>
           Make Payment
         </button>
-        <button
-          className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => setActiveTab('history')}
-        >
+        <button className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
           <span className="tab-icon">clock-history</span>
           Payment History
         </button>
-        <button
-          className={`tab-btn ${activeTab === 'plans' ? 'active' : ''}`}
-          onClick={() => setActiveTab('plans')}
-        >
+        <button className={`tab-btn ${activeTab === 'plans' ? 'active' : ''}`} onClick={() => setActiveTab('plans')}>
           <span className="tab-icon">package</span>
           Subscription Plans
         </button>
@@ -194,12 +206,7 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
                 <h3>You have an active subscription!</h3>
                 <p>Your current {subscription.planName} plan is active until {new Date(subscription.endDate).toLocaleDateString('en-IN')}</p>
                 <p>Want to upgrade? Check out our subscription plans.</p>
-                <button
-                  className="btn-primary"
-                  onClick={() => setActiveTab('plans')}
-                >
-                  View Plans
-                </button>
+                <button className="btn-primary" onClick={() => setActiveTab('plans')}>View Plans</button>
               </div>
             ) : (
               <PaymentProcessor
@@ -227,35 +234,59 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
             <h3>Choose Your Plan</h3>
             <div className="plans-grid">
               {plans.map((plan) => (
-                <div 
-                  key={plan.id} 
-                  className={`plan-card ${isPlanActive(plan.name) ? 'active' : ''}`}
+                <div
+                  key={plan.id}
+                  className={`plan-card ${isPlanActive(plan.name) ? 'active' : ''} ${plan.popular ? 'featured' : ''}`}
                 >
-                  <div className="plan-header">
-                    <h4>{plan.name}</h4>
-                    <div className="plan-price">
-                      <span className="price-amount">
-                        INR {plan.price.toLocaleString('en-IN')}
-                      </span>
-                      <span className="price-duration">/{plan.duration}</span>
-                    </div>
+                  {/* Icon */}
+                  <div className="plan-icon-circle">
+                    {planIcons[plan.id]}
                   </div>
-                  <div className="plan-features">
-                    <ul>
-                      {plan.features.map((feature, index) => (
-                        <li key={index}>
-                          <span className="feature-icon">check</span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
+
+                  {/* Popular badge */}
+                  {plan.popular && (
+                    <span className="popular-badge">Most popular</span>
+                  )}
+
+                  {/* Name & Description */}
+                  <h4 className="plan-name">{plan.name}</h4>
+                  <p className="plan-description">{plan.description}</p>
+
+                  {/* Price */}
+                  <div className="plan-pricing">
+                    {plan.price ? (
+                      <>
+                        <span className="price-label">Per user</span>
+                        <div className="plan-price">
+                          <span className="price-amount">
+                            INR {plan.price.toLocaleString('en-IN')}
+                          </span>
+                          <span className="price-duration">/{plan.duration}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="price-label">Contact us for</span>
+                        <div className="custom-price">Custom Pricing</div>
+                      </>
+                    )}
                   </div>
+
+                  {/* Features */}
+                  <ul className="plan-features-list">
+                    {plan.features.map((feature, index) => (
+                      <li key={index}>
+                        <CheckIcon />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Action */}
                   <div className="plan-action">
                     {isPlanActive(plan.name) ? (
-                      <button className="btn-secondary" disabled>
-                        Current Plan
-                      </button>
-                    ) : (
+                      <button className="btn-secondary" disabled>Current Plan</button>
+                    ) : plan.price ? (
                       <PaymentProcessor
                         amount={plan.price}
                         planName={plan.name}
@@ -266,6 +297,10 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
                         onFailure={handlePaymentFailure}
                         description={`${plan.name} - ${plan.duration} subscription`}
                       />
+                    ) : (
+                      <button className="btn-primary" onClick={() => window.location.href = 'mailto:support@mbusiness.com'}>
+                        Contact Us
+                      </button>
                     )}
                   </div>
                 </div>
@@ -285,15 +320,11 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
             </div>
             <div className="summary-item">
               <span className="summary-label">Total Spent:</span>
-              <span className="summary-value">
-                INR {paymentStats.total?.totalRevenue?.toLocaleString('en-IN') || 0}
-              </span>
+              <span className="summary-value">INR {paymentStats.total?.totalRevenue?.toLocaleString('en-IN') || 0}</span>
             </div>
             <div className="summary-item">
               <span className="summary-label">Average Payment:</span>
-              <span className="summary-value">
-                INR {paymentStats.total?.avgAmount?.toFixed(0) || 0}
-              </span>
+              <span className="summary-value">INR {paymentStats.total?.avgAmount?.toFixed(0) || 0}</span>
             </div>
           </div>
         </div>

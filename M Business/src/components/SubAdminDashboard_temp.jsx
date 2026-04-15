@@ -2851,19 +2851,18 @@ function PackagesPage({ packages, onRefreshPackages, onAddPackage, user }) {
           <Fld label="Company Name" value={ns.companyName} onChange={v => setNs({ ...ns, companyName: v })} placeholder="Company name" />
           <Fld label="Company Type" value={ns.companyType} onChange={v => setNs({ ...ns, companyType: v })} options={["IT", "Software", "Services", "Consulting", "Other"]} />
           <Fld label="No. of Employees" value={ns.employeeCount} onChange={v => setNs({ ...ns, employeeCount: v })} options={["0-10", "11-50", "51-100", "100+"]} />
-              )}
+        </div>
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
           <div style={{ position: "relative" }}>
             <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "#ede9fe"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
             <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#a78bfa", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
-                )}
-          {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nsError.password}      )}}
-              )}
+          </div>
+          {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nsError.password}</div>}
+        </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
           <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("#3b82f6"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin →"}</button>
-              )}
       </Mdl>}
 
       {/* ── Add Package Modal ── */}
@@ -2873,17 +2872,16 @@ function PackagesPage({ packages, onRefreshPackages, onAddPackage, user }) {
           <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
           <Fld label="Button Name" value={npkg.buttonName} onChange={v => setNpkg({ ...npkg, buttonName: v })} placeholder="e.g. Get Started" />
           <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
-              )}
 
         <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
-          <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS      )}
+          <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
             <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. ₹999" />
             <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. ₹2,499" />
             <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. ₹4,499" />
             <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. ₹7,999" />
-                )}
-              )}
+          </div>
+        </div>
 
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
@@ -2893,13 +2891,12 @@ function PackagesPage({ packages, onRefreshPackages, onAddPackage, user }) {
             style={{ width: "100%", height: 80, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "#faf5ff", outline: "none", fontFamily: "inherit", resize: "none" }}
             placeholder="e.g. Unlimited Clients, Premium Support, Custom Branding"
           />
-              )}
+        </div>
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <button onClick={() => setModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
           <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("#0ea5e9"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package →"}</button>
-              )}
+        </div>
       </Mdl>}
-          )}
   );
 }

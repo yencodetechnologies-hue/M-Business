@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import CanvasProposalEditor from "./CanvasProposalEditor";
 
 const THEMES = [
   { name:"Violet",  p:"#7c3aed", g:"linear-gradient(135deg,#7c3aed,#a855f7)", l:"#ede9fe", t:"#4c1d95" },
@@ -523,6 +524,8 @@ export default function AdminProposalManagement() {
   const [selectedClient, setSelectedClient] = useState("");
   const [proposalTitle, setProposalTitle] = useState("");
   const [creatingProposal, setCreatingProposal] = useState(false);
+  const [showCanvasEditor, setShowCanvasEditor] = useState(false);
+  const [editingProposalId, setEditingProposalId] = useState(null);
 
   useEffect(() => {
     fetchProposals();
@@ -567,9 +570,7 @@ export default function AdminProposalManagement() {
   };
 
   const createNewProposal = () => {
-    setShowCreateModal(true);
-    setSelectedClient("");
-    setProposalTitle("");
+    openCanvasEditor();
   };
 
   const handleCreateProposal = async () => {
@@ -646,6 +647,17 @@ export default function AdminProposalManagement() {
     }
   };
 
+  const openCanvasEditor = (proposalId = null) => {
+    setEditingProposalId(proposalId);
+    setShowCanvasEditor(true);
+  };
+
+  const closeCanvasEditor = () => {
+    setShowCanvasEditor(false);
+    setEditingProposalId(null);
+    fetchProposals(); // Refresh proposals after closing editor
+  };
+
   const filtered = proposals.filter(p =>
     (p.title || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.client || "").toLowerCase().includes(search.toLowerCase()) ||
@@ -719,29 +731,32 @@ export default function AdminProposalManagement() {
           <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: T.text }}>
             All Proposals ({filtered.length})
           </h3>
-          <div style={{ display: "flex", gap: "80px", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
             <Search value={search} onChange={setSearch} placeholder="Search proposals..." />
-            <button 
-              onClick={createNewProposal}
-              style={{
-                background:"linear-gradient(135deg,#7c3aed,#a855f7)",
-                color:"#fff",
-                border:"none",
-                borderRadius:10,
-                padding:"10px 16px",
-                fontSize:13,
-                fontWeight:700,
-                cursor:"pointer",
-                fontFamily:"inherit",
-                display:"flex",
-                alignItems:"center",
-                gap:8,
-                boxShadow:"0 4px 12px rgba(124,58,237,0.25)",
-                transition:"all .2s"
-              }}
-            >
-              ✨ Add Proposal
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button 
+                onClick={createNewProposal}
+                style={{
+                  background:"linear-gradient(135deg,#7c3aed,#a855f7)",
+                  color:"#fff",
+                  border:"none",
+                  borderRadius:10,
+                  padding:"10px 16px",
+                  fontSize:13,
+                  fontWeight:700,
+                  cursor:"pointer",
+                  fontFamily:"inherit",
+                  display:"flex",
+                  alignItems:"center",
+                  gap:8,
+                  boxShadow:"0 4px 12px rgba(124,58,237,0.25)",
+                  transition:"all .2s"
+                }}
+              >
+                ✨ Add Proposal
+              </button>
+             
+            </div>
           </div>
         </div>
 
@@ -887,6 +902,26 @@ export default function AdminProposalManagement() {
                           </button>
                         )}
 
+                        {(proposal.status === "rejected" || proposal.status === "draft") && (
+                          <button
+                            onClick={() => openCanvasEditor(proposal._id)}
+                            style={{
+                              background: "rgba(124,58,237,0.1)",
+                              border: "1px solid rgba(124,58,237,0.3)",
+                              borderRadius: 7,
+                              padding: "5px 10px",
+                              fontSize: 12,
+                              color: "#7c3aed",
+                              cursor: "pointer",
+                              fontWeight: 600,
+                              fontFamily: "inherit",
+                              whiteSpace: "nowrap"
+                            }}
+                          >
+                            🎨 Canvas
+                          </button>
+                        )}
+
                         {proposal.status === "draft" && (
                           <button
                             onClick={() => handleSubmitForApproval(proposal._id)}
@@ -904,6 +939,26 @@ export default function AdminProposalManagement() {
                             }}
                           >
                             📤 Submit
+                          </button>
+                        )}
+
+                        {proposal.status === "rejected" && (
+                          <button
+                            onClick={() => handleSubmitForApproval(proposal._id)}
+                            style={{
+                              background: "rgba(16,185,129,0.1)",
+                              border: "1px solid rgba(16,185,129,0.3)",
+                              borderRadius: 7,
+                              padding: "5px 10px",
+                              fontSize: 12,
+                              color: "#10b981",
+                              cursor: "pointer",
+                              fontWeight: 600,
+                              fontFamily: "inherit",
+                              whiteSpace: "nowrap"
+                            }}
+                          >
+                            🔄 Resubmit
                           </button>
                         )}
                       </div>
@@ -1016,6 +1071,26 @@ export default function AdminProposalManagement() {
                 }}
               >
                 ✏️ Edit Proposal
+              </button>
+            )}
+
+            {/* Resubmit for Approval - for rejected proposals (after client rejection, admin edits and resubmits) */}
+            {selectedProposal.status === "rejected" && (
+              <button
+                onClick={() => handleSubmitForApproval(selectedProposal._id)}
+                style={{
+                  background: "linear-gradient(135deg,#7c3aed,#a855f7)",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "10px 20px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontFamily: "inherit"
+                }}
+              >
+                🔄 Resubmit for Approval
               </button>
             )}
 
@@ -1318,6 +1393,69 @@ export default function AdminProposalManagement() {
             </div>
           </div>
         </Mdl>
+      )}
+
+      {/* Canvas Proposal Editor Modal */}
+      {showCanvasEditor && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(15, 23, 42, 0.8)",
+          backdropFilter: "blur(4px)",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "20px"
+        }}>
+          <div style={{
+            background: "#fff",
+            borderRadius: 20,
+            width: "100%",
+            maxWidth: "1400px",
+            height: "90vh",
+            overflow: "hidden",
+            boxShadow: "0 32px 80px rgba(147,51,234,0.25)",
+            display: "flex",
+            flexDirection: "column"
+          }}>
+            <div style={{
+              padding: "12px 20px",
+              borderBottom: "1px solid #ede9fe",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              background: "linear-gradient(90deg,#f5f3ff,#faf5ff)"
+            }}>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: T.text }}>
+                {editingProposalId ? "Edit Proposal" : "Create New Proposal"}
+              </h2>
+              <button
+                onClick={closeCanvasEditor}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                  color: "#7c3aed",
+                  padding: "4px 8px"
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ flex: 1, overflow: "hidden" }}>
+              <CanvasProposalEditor
+                proposalId={editingProposalId}
+                onClose={closeCanvasEditor}
+                onSave={(savedProposal) => {
+                  // Refresh proposals list after save
+                  fetchProposals();
+                }}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

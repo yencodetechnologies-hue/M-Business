@@ -677,21 +677,7 @@ function SubadminsList({ subadmins, refresh, packages }) {
               <td style={{ padding: "14px 16px", color: "#64748b" }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}</td>
               <td style={{ padding: "14px 16px" }}>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button
-                    onClick={() => openAssignModal(s)}
-                    style={{
-                      background: "linear-gradient(135deg,#9333ea,#c084fc)",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 6,
-                      padding: "6px 12px",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      cursor: "pointer"
-                    }}
-                  >
-                    📦 Assign Package
-                  </button>
+                
                   <button
                     onClick={async () => {
                       if(window.confirm("Delete this subadmin?")) {
@@ -1127,136 +1113,221 @@ function SubscriptionsPage({ subscriptions }) {
 
 // Packages Page
 function PackagesPage({ packages }) {
-  const [billing, setBilling] = useState("monthly"); // monthly | quarterly | halfYearly | annual
-
   try {
-    const displayedPackages = (packages && packages.length > 0) ? packages : [
-    {
-      id: "trial",
-      icon: "🆓",
-      title: "TRIAL",
-      description: "Built for standard usage simple data management and trial access.",
-      monthlyPrice: "Free",
-      quarterlyPrice: "Free", 
-      halfYearlyPrice: "Free",
-      annualPrice: "Free",
-      buttonName: "Get Started",
-      features: "Single business manage\nDropdown support\n1 Manager\n3 Client manage",
-      noOfDays: "60"
-    },
-    {
-      id: "monthly",
-      icon: "📅",
-      title: "MONTHLY", 
-      description: "Built for growing operations smart automation for scaling teams.",
-      monthlyPrice: "999",
-      quarterlyPrice: "2,499",
-      halfYearlyPrice: "4,999", 
-      annualPrice: "9,999",
-      buttonName: "Choose Monthly",
-      features: "1 Manager\n3 Client manage\nUnlimited features\nPriority support",
-      noOfDays: "90"
-    },
-    {
-      id: "yearly",
-      icon: "⭐",
-      title: "YEARLY",
-      description: "Built for your most complex operations maximum usage limits.",
-      monthlyPrice: "1,999",
-      quarterlyPrice: "4,999",
-      halfYearlyPrice: "9,999",
-      annualPrice: "19,999", 
-      buttonName: "Choose Yearly",
-      features: "Unlimited Managers\nUnlimited Clients management\n24/7 Enterprise Support\nCustom Branding",
-      noOfDays: "365"
-    }
-  ];
+    // Default packages matching the design: CORE, PRO, ENTERPRISE
+    const defaultPackages = [
+      {
+        id: "core",
+        icon: "⚓",
+        title: "CORE",
+        description: "Built for standard field operations — simple data collection and digital forms for small teams.",
+        price: "$24",
+        currency: "USD",
+        period: "/month",
+        perSeat: "Per seat",
+        buttonName: "Get Started",
+        btnPrimary: false,
+        featuresTitle: "Core includes:",
+        features: ["Single business manage", "Dropdown feature", "1 Manager", "3 Client manage"]
+      },
+      {
+        id: "pro",
+        icon: "🏅",
+        title: "PRO",
+        description: "Built for growing field operations — smart automation and advanced workflows for scaling teams with multiple use cases.",
+        price: "$36",
+        currency: "USD",
+        period: "/month",
+        perSeat: "Per seat",
+        buttonName: "Try for Free",
+        btnPrimary: true,
+        featuresTitle: "Everything in Core, plus:",
+        features: ["Unlimited Managers", "Unlimited features", "Priority support", "Advanced workflows"]
+      },
+      {
+        id: "enterprise",
+        icon: "🏢",
+        title: "ENTERPRISE",
+        description: "Built for your most complex field operations — maximum usage limits and enterprise scalability across the entire business.",
+        price: "Custom Pricing",
+        currency: "",
+        period: "",
+        perSeat: "Contact us for",
+        buttonName: "Contact Us",
+        btnPrimary: false,
+        featuresTitle: "Everything in Pro, plus:",
+        features: ["24/7 Enterprise Support", "Custom Branding", "API Access", "Dedicated Manager"]
+      }
+    ];
 
-  return (
-    <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-      {/* Subadmin Packages Header */}
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <h2 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 800, color: "#0f172a" }}>Packages</h2>
-        <p style={{ margin: 0, fontSize: 14, color: "#64748b" }}>
-          Manage packages available for subadmins • Total: <strong style={{ color: "#9333ea" }}>{packages.length}</strong> packages
-        </p>
+    const displayedPackages = (packages && packages.length > 0) ? packages : defaultPackages;
+
+    return (
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
+        {/* Cards Grid - 3 columns like the design */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0, marginBottom: 40, background: "#f8fafc", borderRadius: 16, overflow: "hidden" }}>
+          {displayedPackages.map((p, idx) => {
+            const isPro = p.id === "pro" || p.title === "PRO";
+            const features = Array.isArray(p.features) ? p.features : (p.features || "").split('\n').filter(f => f.trim());
+            return (
+              <div key={p.id || idx} style={{ 
+                background: "#fff", 
+                padding: "40px 32px", 
+                display: "flex", 
+                flexDirection: "column",
+                borderRight: idx < 2 ? "1px solid #e2e8f0" : "none"
+              }}>
+                {/* Icon */}
+                <div style={{ 
+                  width: 48, 
+                  height: 48, 
+                  borderRadius: "50%", 
+                  border: "2px solid #e0f2fe", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "center", 
+                  fontSize: 22, 
+                  marginBottom: 20,
+                  color: "#0ea5e9"
+                }}>
+                  {p.icon || "📦"}
+                </div>
+                
+                {/* Title */}
+                <h3 style={{ 
+                  margin: "0 0 16px", 
+                  fontSize: 20, 
+                  fontWeight: 700, 
+                  color: "#1e293b", 
+                  textTransform: "uppercase", 
+                  letterSpacing: 0.5 
+                }}>
+                  {p.title}
+                </h3>
+                
+                {/* Description */}
+                <p style={{ 
+                  margin: "0 0 32px", 
+                  fontSize: 14, 
+                  color: "#64748b", 
+                  lineHeight: 1.6, 
+                  minHeight: 70 
+                }}>
+                  {p.description}
+                </p>
+                
+                {/* Per seat label */}
+                <div style={{ 
+                  fontSize: 13, 
+                  fontWeight: 500, 
+                  color: "#94a3b8", 
+                  marginBottom: 8,
+                  textTransform: "lowercase"
+                }}>
+                  {p.perSeat || "Per seat"}
+                </div>
+                
+                {/* Price */}
+                <div style={{ 
+                  display: "flex", 
+                  alignItems: "baseline", 
+                  gap: 6, 
+                  marginBottom: 24 
+                }}>
+                  <span style={{ 
+                    fontSize: 36, 
+                    fontWeight: 700, 
+                    color: "#0f172a" 
+                  }}>
+                    {p.price || p.monthlyPrice}
+                  </span>
+                  {p.currency && (
+                    <span style={{ 
+                      fontSize: 16, 
+                      fontWeight: 600, 
+                      color: "#64748b" 
+                    }}>
+                      {p.currency}
+                    </span>
+                  )}
+                  {p.period && (
+                    <span style={{ 
+                      fontSize: 14, 
+                      fontWeight: 500, 
+                      color: "#94a3b8" 
+                    }}>
+                      {p.period}
+                    </span>
+                  )}
+                </div>
+
+                {/* Button */}
+                <button style={{ 
+                  width: "100%", 
+                  padding: "14px 24px", 
+                  borderRadius: 10, 
+                  background: isPro ? "#0284c7" : "#fff", 
+                  color: isPro ? "#fff" : "#0f172a", 
+                  border: isPro ? "none" : "2px solid #e2e8f0", 
+                  fontWeight: 600, 
+                  fontSize: 14, 
+                  cursor: "pointer", 
+                  transition: "all 0.2s",
+                  marginBottom: 32,
+                  boxShadow: isPro ? "0 4px 14px rgba(2, 132, 199, 0.3)" : "none"
+                }}>
+                  {p.buttonName || "Get Started"}
+                </button>
+
+                {/* Features */}
+                <div style={{ flex: 1 }}>
+                  <div style={{ 
+                    fontSize: 13, 
+                    fontWeight: 600, 
+                    color: "#0f172a", 
+                    marginBottom: 16 
+                  }}>
+                    {p.featuresTitle || "Features:"}
+                  </div>
+                  <ul style={{ 
+                    margin: 0, 
+                    padding: 0, 
+                    listStyle: "none", 
+                    display: "flex", 
+                    flexDirection: "column", 
+                    gap: 12 
+                  }}>
+                    {features.map((f, i) => (
+                      <li key={i} style={{ 
+                        fontSize: 13, 
+                        color: "#475569", 
+                        display: "flex", 
+                        alignItems: "flex-start", 
+                        gap: 10,
+                        lineHeight: 1.4
+                      }}>
+                        <span style={{ 
+                          color: "#0ea5e9", 
+                          fontWeight: 700, 
+                          fontSize: 12,
+                          marginTop: 1
+                        }}>•</span>
+                        <span>{f && f.trim ? f.trim() : f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-
-      {/* Toggle */}
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 40 }}>
-        {["monthly", "quarterly", "halfYearly", "annual"].map((cycle, idx) => (
-          <React.Fragment key={cycle}>
-            <span 
-              onClick={() => setBilling(cycle)}
-              style={{ 
-                fontSize: 15, 
-                fontWeight: 700, 
-                color: billing === cycle ? "#0f172a" : "#64748b", 
-                cursor: "pointer",
-                transition: "0.2s",
-                textTransform: "capitalize"
-              }}
-            >
-              {cycle === "halfYearly" ? "Half-Yearly" : cycle}
-            </span>
-            {idx < 3 && <span style={{ color: "#cbd5e1" }}>·</span>}
-          </React.Fragment>
-        ))}
-      </div>
-
-      {/* Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 40 }}>
-        {displayedPackages && displayedPackages.map((p, idx) => (
-          <div key={p.id || idx} style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 10px 40px rgba(0,0,0,0.04)", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", position: "relative" }}>
-            {/* For Subadmins Badge */}
-            <div style={{ position: "absolute", top: 16, right: 16, background: "linear-gradient(135deg,#9333ea,#c084fc)", color: "#fff", padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-              👤 For Subadmins
-            </div>
-            <div style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #e0f2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, marginBottom: 20 }}>
-              {p.icon || "???"}
-            </div>
-
-            <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 1 }}>{p.title || "Package"}</h3>
-            <p style={{ margin: "0 0 32px", fontSize: 13, color: "#64748b", lineHeight: 1.6, minHeight: 60 }}>{p.description || "Package description"}</p>
-            
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>Pricing</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 32 }}>
-              <span style={{ fontSize: 32, fontWeight: 800, color: "#0f172a" }}>
-                {billing === "monthly" && (p.monthlyPrice || "0")}
-                {billing === "quarterly" && (p.quarterlyPrice || "0")}
-                {billing === "halfYearly" && (p.halfYearlyPrice || "0")}
-                {billing === "annual" && (p.annualPrice || "0")}
-              </span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#64748b" }}>
-                / {p.noOfDays || "30"} days
-              </span>
-            </div>
-
-            <button style={{ width: "100%", padding: 14, borderRadius: 12, background: "#0ea5e9", color: "#fff", border: "none", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "0.2s", marginBottom: 32 }}>
-              {p.buttonName || "Get Started"}
-            </button>
-
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginBottom: 16 }}>Features:</div>
-              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 12 }}>
-                {String(p.features || "No features listed").split('\n').map((f, i) => (
-                  <li key={i} style={{ fontSize: 13, color: "#475569", display: "flex", alignItems: "flex-start", gap: 10 }}>
-                    <span style={{ color: "#3b82f6", fontWeight: 900, fontSize: 10, marginTop: 2 }}>?</span>
-                    <span style={{ lineHeight: 1.4 }}>{f && f.trim() ? f.trim() : "Feature"}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+    );
   } catch (error) {
     console.error("PackagesPage error:", error);
     return (
       <div style={{ padding: 40, textAlign: "center", color: "#64748b" }}>
-        <div style={{ fontSize: 24, marginBottom: 16 }}>???</div>
+        <div style={{ fontSize: 24, marginBottom: 16 }}>⚠️</div>
         <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Unable to load packages</div>
         <div style={{ fontSize: 14 }}>Please try refreshing the page</div>
       </div>

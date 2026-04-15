@@ -1,18 +1,26 @@
 const PaymentHistory = require("../models/PaymentHistoryModel");
 const Subscription = require("../models/SubscriptionModel");
 const crypto = require('crypto');
+const Razorpay = require('razorpay');
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 class PaymentController {
-  // Create payment order (Razorpay integration)
+
   static async createPaymentOrder(req, res) {
     try {
       const { amount, currency = "INR", receipt, notes } = req.body;
-      
-      // Generate order ID
-      const orderId = `ORDER-${Date.now()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
-      
-      // For now, create a pending payment record
-      // In production, integrate with Razorpay API here
+
+      const razorpayOrder = await razorpay.orders.create({
+        amount: amount * 100,
+        currency,
+        receipt: receipt || `receipt_${Date.now()}`,
+        notes
+      });
+
       const payment = new PaymentHistory({
         userId: req.user?.id || req.body.userId,
         userEmail: req.body.userEmail,
@@ -21,24 +29,17 @@ class PaymentController {
         type: req.body.type || "subscription",
         description: req.body.description,
         status: "pending",
-        paymentId: orderId,
-        receiptUrl: null,
+        paymentId: razorpayOrder.id,
         planName: req.body.planName,
         planDuration: req.body.planDuration,
-        notes: notes || JSON.stringify({ orderId })
+        notes: JSON.stringify({ orderId: razorpayOrder.id })
       });
-      
+
       await payment.save();
-      
+
       res.status(201).json({
         success: true,
-        order: {
-          id: orderId,
-          amount: amount * 100, // Razorpay expects amount in paise
-          currency,
-          receipt,
-          notes
-        },
+        order: razorpayOrder,
         payment
       });
     } catch (error) {
@@ -46,7 +47,6 @@ class PaymentController {
     }
   }
 
-  // Verify payment signature (Razorpay webhook)
   static async verifyPayment(req, res) {
     try {
       const {
@@ -56,18 +56,17 @@ class PaymentController {
         paymentId
       } = req.body;
 
-      // In production, verify signature with Razorpay
-      // const generatedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      //   .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      //   .digest('hex');
-      
-      // if (generatedSignature !== razorpay_signature) {
-      //   return res.status(400).json({ error: "Invalid signature" });
-      // }
+      const generatedSignature = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest('hex');
 
-      // Update payment status
+      if (generatedSignature !== razorpay_signature) {
+        return res.status(400).json({ error: "Invalid signature" });
+      }
+
       const payment = await PaymentHistory.findOneAndUpdate(
-        { paymentId: paymentId },
+        { paymentId: razorpay_order_id },
         {
           status: "completed",
           paymentMethod: req.body.paymentMethod || "card",
@@ -82,7 +81,6 @@ class PaymentController {
         return res.status(404).json({ error: "Payment not found" });
       }
 
-      // Update subscription if this is a subscription payment
       if (payment.type === "subscription" && payment.subscriptionId) {
         await Subscription.findByIdAndUpdate(payment.subscriptionId, {
           status: "active",
@@ -101,7 +99,6 @@ class PaymentController {
     }
   }
 
-  // Handle payment failure
   static async handlePaymentFailure(req, res) {
     try {
       const { paymentId, reason, errorCode } = req.body;
@@ -130,7 +127,6 @@ class PaymentController {
     }
   }
 
-  // Process refund
   static async processRefund(req, res) {
     try {
       const { paymentId, refundAmount, reason } = req.body;
@@ -144,7 +140,6 @@ class PaymentController {
         return res.status(400).json({ error: "Can only refund completed payments" });
       }
 
-      // Create refund record
       const refund = new PaymentHistory({
         userId: payment.userId,
         userEmail: payment.userEmail,
@@ -170,7 +165,6 @@ class PaymentController {
 
       await refund.save();
 
-      // Update original payment
       payment.status = "refunded";
       await payment.save();
 
@@ -184,11 +178,10 @@ class PaymentController {
     }
   }
 
-  // Get payment statistics
   static async getPaymentStats(req, res) {
     try {
       const { userId, startDate, endDate } = req.query;
-      
+
       const matchQuery = {};
       if (userId) matchQuery.userId = userId;
       if (startDate || endDate) {
@@ -230,13 +223,12 @@ class PaymentController {
     }
   }
 
-  // Get payment methods summary
   static async getPaymentMethods(req, res) {
     try {
       const { userId } = req.query;
-      
+
       const matchQuery = userId ? { userId } : {};
-      
+
       const methods = await PaymentHistory.aggregate([
         { $match: matchQuery },
         {

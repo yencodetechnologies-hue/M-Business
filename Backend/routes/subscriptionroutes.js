@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Subscription = require("../models/SubscriptionModel");
 const PaymentHistory = require("../models/PaymentHistoryModel");
+const { sendQuickEmail } = require("../config/email");
 
 // Get current subscription for a user or company
 router.get("/current/:id", async (req, res) => {
@@ -321,6 +322,17 @@ router.post("/seed/:userId", async (req, res) => {
     
     await payment2.save();
     
+    // 🔥 SEND EMAIL NOTIFICATION IMMEDIATELY
+    try {
+      await sendQuickEmail(
+        email, 
+        "Welcome to M Business Professional Plan!", 
+        `Hi ${name},<br><br>Thank you for subscribing to our Professional Plan! Your subscription is now active until ${endDate.toLocaleDateString("en-IN")}.<br><br>You can now access your full dashboard and all premium features.<br><br>Best regards,<br>M Business Team`
+      );
+    } catch (mailErr) {
+      console.log("Welcome email failed, but subscription created:", mailErr);
+    }
+
     res.json({
       success: true,
       message: "Sample subscription data seeded successfully",

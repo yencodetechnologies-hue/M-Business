@@ -45,6 +45,7 @@ const NAV = [
   { key: "payments", icon: "💰", label: "Payments" },
   { key: "vendors", icon: "🏬", label: "Vendors" },
   { key: "rolePermissions", icon: "🛡️", label: "Role Permissions" }
+
 ];
 
 function getNavForRole(role) {
@@ -1638,157 +1639,268 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 // PACKAGES PAGE
 // ═══════════════════════════════════════════════════════════
 function PackagesPage({ packages, onViewPackage, onEditPackage }) {
-  const [billing, setBilling] = useState("monthly"); // monthly | quarterly | halfYearly | annual
-
-  const displayedPackages = packages.length > 0 ? packages : [
+  // Default packages matching the design: CORE, PRO, ENTERPRISE
+  const defaultPackages = [
     {
-      id: "trial",
+      id: "core",
       icon: "⚓",
-      title: "TRIAL",
-      desc: "Built for standard usage — simple data management and trial access.",
-      monthlyPrice: "Free",
-      quarterlyPrice: "Free",
-      halfYearlyPrice: "Free",
-      annualPrice: "Free",
-      period: "/ 60 days",
+      title: "CORE",
+      desc: "Built for standard field operations — simple data collection and digital forms for small teams.",
+      price: "$24",
+      currency: "USD",
+      period: "/month",
+      perSeat: "Per seat",
       buttonName: "Get Started",
       btnPrimary: false,
-      featuresTitle: "Trial includes:",
+      featuresTitle: "Core includes:",
       features: [
         "Single business manage",
         "Dropdown feature",
         "1 Manager",
         "3 Client manage"
       ]
+    },
+    {
+      id: "pro",
+      icon: "🏅",
+      title: "PRO",
+      desc: "Built for growing field operations — smart automation and advanced workflows for scaling teams with multiple use cases.",
+      price: "$36",
+      currency: "USD",
+      period: "/month",
+      perSeat: "Per seat",
+      buttonName: "Try for Free",
+      btnPrimary: true,
+      featuresTitle: "Everything in Core, plus:",
+      features: [
+        "Unlimited Managers",
+        "Unlimited features",
+        "Priority support",
+        "Advanced workflows"
+      ]
+    },
+    {
+      id: "enterprise",
+      icon: "🏢",
+      title: "ENTERPRISE",
+      desc: "Built for your most complex field operations — maximum usage limits and enterprise scalability across the entire business.",
+      price: "Custom Pricing",
+      currency: "",
+      period: "",
+      perSeat: "Contact us for",
+      buttonName: "Contact Us",
+      btnPrimary: false,
+      featuresTitle: "Everything in Pro, plus:",
+      features: [
+        "24/7 Enterprise Support",
+        "Custom Branding",
+        "API Access",
+        "Dedicated Manager"
+      ]
     }
   ];
 
-  const getPrice = (p) => {
-    if (billing === "monthly") return p.monthlyPrice;
-    if (billing === "quarterly") return p.quarterlyPrice;
-    if (billing === "halfYearly") return p.halfYearlyPrice;
-    return p.annualPrice;
-  };
-
-  const getPeriod = (billing) => {
-    if (billing === "monthly") return "/ month";
-    if (billing === "quarterly") return "/ quarter";
-    if (billing === "halfYearly") return "/ 6 months";
-    return "/ year";
-  };
+  const displayedPackages = packages.length > 0 ? packages : defaultPackages;
 
   return (
-    <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-      {/* Package Count Header */}
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <h2 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 800, color: "#0f172a" }}>Packages</h2>
-        <p style={{ margin: 0, fontSize: 14, color: "#64748b" }}>
-          Total Packages: <strong style={{ color: "#9333ea" }}>{packages.length}</strong>
-        </p>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 40, flexWrap: "wrap" }}>
-        {[
-          { key: "monthly", label: "Monthly" },
-          { key: "quarterly", label: "Quarterly" },
-          { key: "halfYearly", label: "6 Months" },
-          { key: "annual", label: "Annual" }
-        ].map(b => (
-          <button
-            key={b.key}
-            onClick={() => setBilling(b.key)}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 20,
-              border: billing === b.key ? "none" : "1.5px solid #ede9fe",
-              background: billing === b.key ? "linear-gradient(135deg,#0ea5e9,#0284c7)" : "#fff",
-              color: billing === b.key ? "#fff" : "#64748b",
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: "pointer",
-              transition: "0.2s"
-            }}
-          >
-            {b.label}
-          </button>
-        ))}
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 40 }}>
-        {displayedPackages.map((p, idx) => (
-          <div key={p.id || idx} style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 10px 40px rgba(0,0,0,0.04)", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", position: "relative" }}>
-            <div style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #e0f2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, marginBottom: 20 }}>
-              {p.icon || "📦"}
-            </div>
-            
-            <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#0f172a", textTransform: "uppercase", letterSpacing: 1 }}>{p.title}</h3>
-            <p style={{ margin: "0 0 32px", fontSize: 13, color: "#64748b", lineHeight: 1.6, minHeight: 60 }}>{p.description || p.desc}</p>
-            
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>Pricing</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 32 }}>
-              <span style={{ fontSize: 32, fontWeight: 800, color: "#0f172a" }}>{getPrice(p)}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#64748b" }}>{p.period || getPeriod(billing)}</span>
-            </div>
-
-            <button style={{ width: "100%", padding: 14, borderRadius: 12, background: p.btnPrimary ? "#0ea5e9" : (idx === 1 ? "#0ea5e9" : "#fff"), color: p.btnPrimary ? "#fff" : (idx === 1 ? "#fff" : "#0f172a"), border: (p.btnPrimary || idx === 1) ? "none" : "2px solid #f1f5f9", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "0.2s", marginBottom: 16 }}>
-              {p.buttonName || p.btnText}
-            </button>
-
-            {/* View/Edit Buttons */}
-            {(onViewPackage || onEditPackage) && (
-              <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-                {onViewPackage && (
-                  <button
-                    onClick={() => onViewPackage(p)}
-                    style={{
-                      flex: 1,
-                      padding: "8px 12px",
-                      borderRadius: 8,
-                      background: "#f5f3ff",
-                      border: "1.5px solid #ede9fe",
-                      color: "#9333ea",
-                      fontWeight: 600,
-                      fontSize: 12,
-                      cursor: "pointer"
-                    }}
-                  >
-                    👁 View
-                  </button>
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
+      {/* Cards Grid - 3 columns like the design */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0, marginBottom: 40, background: "#f8fafc", borderRadius: 16, overflow: "hidden" }}>
+        {displayedPackages.map((p, idx) => {
+          const isPro = p.id === "pro" || p.title === "PRO";
+          return (
+            <div key={p.id || idx} style={{ 
+              background: "#fff", 
+              padding: "40px 32px", 
+              display: "flex", 
+              flexDirection: "column",
+              borderRight: idx < 2 ? "1px solid #e2e8f0" : "none"
+            }}>
+              {/* Icon */}
+              <div style={{ 
+                width: 48, 
+                height: 48, 
+                borderRadius: "50%", 
+                border: "2px solid #e0f2fe", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center", 
+                fontSize: 22, 
+                marginBottom: 20,
+                color: "#0ea5e9"
+              }}>
+                {p.icon || "📦"}
+              </div>
+              
+              {/* Title */}
+              <h3 style={{ 
+                margin: "0 0 16px", 
+                fontSize: 20, 
+                fontWeight: 700, 
+                color: "#1e293b", 
+                textTransform: "uppercase", 
+                letterSpacing: 0.5 
+              }}>
+                {p.title}
+              </h3>
+              
+              {/* Description */}
+              <p style={{ 
+                margin: "0 0 32px", 
+                fontSize: 14, 
+                color: "#64748b", 
+                lineHeight: 1.6, 
+                minHeight: 70 
+              }}>
+                {p.description || p.desc}
+              </p>
+              
+              {/* Per seat label */}
+              <div style={{ 
+                fontSize: 13, 
+                fontWeight: 500, 
+                color: "#94a3b8", 
+                marginBottom: 8,
+                textTransform: "lowercase"
+              }}>
+                {p.perSeat || "Per seat"}
+              </div>
+              
+              {/* Price */}
+              <div style={{ 
+                display: "flex", 
+                alignItems: "baseline", 
+                gap: 6, 
+                marginBottom: 24 
+              }}>
+                <span style={{ 
+                  fontSize: 36, 
+                  fontWeight: 700, 
+                  color: "#0f172a" 
+                }}>
+                  {p.price}
+                </span>
+                {p.currency && (
+                  <span style={{ 
+                    fontSize: 16, 
+                    fontWeight: 600, 
+                    color: "#64748b" 
+                  }}>
+                    {p.currency}
+                  </span>
                 )}
-                {onEditPackage && (
-                  <button
-                    onClick={() => onEditPackage(p)}
-                    style={{
-                      flex: 1,
-                      padding: "8px 12px",
-                      borderRadius: 8,
-                      background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
-                      border: "none",
-                      color: "#fff",
-                      fontWeight: 600,
-                      fontSize: 12,
-                      cursor: "pointer"
-                    }}
-                  >
-                    ✏️ Edit
-                  </button>
+                {p.period && (
+                  <span style={{ 
+                    fontSize: 14, 
+                    fontWeight: 500, 
+                    color: "#94a3b8" 
+                  }}>
+                    {p.period}
+                  </span>
                 )}
               </div>
-            )}
 
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginBottom: 16 }}>{p.featuresTitle || "Features included:"}</div>
-              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 12 }}>
-                {(p.features || []).map((f, i) => (
-                  <li key={i} style={{ fontSize: 13, color: "#475569", display: "flex", alignItems: "flex-start", gap: 10 }}>
-                    <span style={{ color: "#3b82f6", fontWeight: 900, fontSize: 10, marginTop: 2 }}>✓</span>
-                    <span style={{ lineHeight: 1.4 }}>{f}</span>
-                  </li>
-                ))}
-              </ul>
+              {/* Button */}
+              <button style={{ 
+                width: "100%", 
+                padding: "14px 24px", 
+                borderRadius: 10, 
+                background: isPro ? "#0284c7" : "#fff", 
+                color: isPro ? "#fff" : "#0f172a", 
+                border: isPro ? "none" : "2px solid #e2e8f0", 
+                fontWeight: 600, 
+                fontSize: 14, 
+                cursor: "pointer", 
+                transition: "all 0.2s",
+                marginBottom: 32,
+                boxShadow: isPro ? "0 4px 14px rgba(2, 132, 199, 0.3)" : "none"
+              }}>
+                {p.buttonName || "Get Started"}
+              </button>
+
+              {/* View/Edit Buttons for Admin */}
+              {(onViewPackage || onEditPackage) && (
+                <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+                  {onViewPackage && (
+                    <button
+                      onClick={() => onViewPackage(p)}
+                      style={{
+                        flex: 1,
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        background: "#f1f5f9",
+                        border: "1.5px solid #e2e8f0",
+                        color: "#475569",
+                        fontWeight: 600,
+                        fontSize: 12,
+                        cursor: "pointer"
+                      }}
+                    >
+                      View
+                    </button>
+                  )}
+                  {onEditPackage && (
+                    <button
+                      onClick={() => onEditPackage(p)}
+                      style={{
+                        flex: 1,
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        background: "#0284c7",
+                        border: "none",
+                        color: "#fff",
+                        fontWeight: 600,
+                        fontSize: 12,
+                        cursor: "pointer"
+                      }}
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Features */}
+              <div style={{ flex: 1 }}>
+                <div style={{ 
+                  fontSize: 13, 
+                  fontWeight: 600, 
+                  color: "#0f172a", 
+                  marginBottom: 16 
+                }}>
+                  {p.featuresTitle || "Features:"}
+                </div>
+                <ul style={{ 
+                  margin: 0, 
+                  padding: 0, 
+                  listStyle: "none", 
+                  display: "flex", 
+                  flexDirection: "column", 
+                  gap: 12 
+                }}>
+                  {(p.features || []).map((f, i) => (
+                    <li key={i} style={{ 
+                      fontSize: 13, 
+                      color: "#475569", 
+                      display: "flex", 
+                      alignItems: "flex-start", 
+                      gap: 10,
+                      lineHeight: 1.4
+                    }}>
+                      <span style={{ 
+                        color: "#0ea5e9", 
+                        fontWeight: 700, 
+                        fontSize: 12,
+                        marginTop: 1
+                      }}>•</span>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -1833,8 +1945,8 @@ function VendorsPage({ vendors, setVendors }) {
     const errs = {};
     if (!editForm.vendorName?.trim?.()) errs.vendorName = "Name required";
     if (!editForm.vendorProduct?.trim?.()) errs.vendorProduct = "Product required";
-    if (!editForm.amountTaxGst || editForm.amountTaxGst <= 0) errs.amountTaxGst = "GST Amount required";
-    if (!editForm.paidAmount || editForm.paidAmount <= 0) errs.paidAmount = "Paid Amount required";
+    if (!editForm.amountTaxGst || editForm.amountTaxGst <= 0) errs.amountTaxGst = "Required";
+    if (!editForm.paidAmount || editForm.paidAmount <= 0) errs.paidAmount = "Required";
     if (Object.keys(errs).length) { setEditErr(errs); return; }
     try {
       setSaving(true);
@@ -1870,7 +1982,7 @@ function VendorsPage({ vendors, setVendors }) {
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 800 }}>
             <thead><tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
-              {["Vendor Name", "Product", "Amount (Tax/GST)", "Paid Amount", "Mode", "Purchase Date", "Actions"].map(c => (
+              {["Vendor Name", "Product", "Required Amount", "Paid Amount", "Mode", "Purchase Date", "Actions"].map(c => (
                 <th key={c} style={{ padding: "10px 14px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{c.toUpperCase()}</th>
               ))}
             </tr></thead>
@@ -1904,7 +2016,7 @@ function VendorsPage({ vendors, setVendors }) {
               <div style={{ fontSize: 13, color: "#9333ea", marginTop: 2 }}>{viewVendor.vendorProduct}</div>
             </div>
           </div>
-          <InfoRow icon="💰" label="Total Amount (Tax/GST)" value={`₹${viewVendor.amountTaxGst}`} />
+          <InfoRow icon="💰" label="Required Amount" value={`₹${viewVendor.amountTaxGst}`} />
           <InfoRow icon="💸" label="Paid Amount" value={`₹${viewVendor.paidAmount}`} />
           <InfoRow icon="💳" label="Mode of Payment" value={viewVendor.modeOfPayment} />
           <InfoRow icon="📅" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
@@ -1922,7 +2034,7 @@ function VendorsPage({ vendors, setVendors }) {
            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
             <Fld label="Vendor Name *" value={editForm.vendorName} onChange={v => setEditForm(p => ({ ...p, vendorName: v }))} error={editErr.vendorName} />
             <Fld label="Product Name *" value={editForm.vendorProduct} onChange={v => setEditForm(p => ({ ...p, vendorProduct: v }))} error={editErr.vendorProduct} />
-            <Fld label="Amount (Tax/GST) *" value={editForm.amountTaxGst} type="number" onChange={v => setEditForm(p => ({ ...p, amountTaxGst: v }))} />
+            <Fld label="Required Amount *" value={editForm.amountTaxGst} type="number" onChange={v => setEditForm(p => ({ ...p, amountTaxGst: v }))} />
             <Fld label="Paid Amount *" value={editForm.paidAmount} type="number" onChange={v => setEditForm(p => ({ ...p, paidAmount: v }))} />
             <Fld label="Date of Purchase" value={editForm.dateOfPurchase} type="date" onChange={v => setEditForm(p => ({ ...p, dateOfPurchase: v }))} />
             <Fld label="Mode of Payment" value={editForm.modeOfPayment} onChange={v => setEditForm(p => ({ ...p, modeOfPayment: v }))} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
@@ -2082,18 +2194,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const getSubStatus = () => {
-    if (!subscription) return { blocked: false, alert: false };
+    if (!subscription) return { blocked: true, alert: false, status: "none" };
+    
     const end = new Date(subscription.endDate);
     const now = new Date();
     const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+    const isExpired = subscription.status === "expired" || diffDays <= 0;
     
-    // 60 days after package ended -> mudinja yarukum show aaga koodathu
-    if (diffDays < -60) return { blocked: true, alert: false };
+    // If status is hidden or explicitly expired, or it's past the end date
+    if (subscription.status === "hidden" || isExpired) {
+      return { blocked: true, alert: false, status: subscription.status, days: diffDays };
+    }
     
     // 10 days before renewal -> plz renew your...
-    if (diffDays <= 10 && diffDays > 0) return { blocked: false, alert: true, days: diffDays };
+    if (diffDays <= 10 && diffDays > 0) {
+      return { blocked: false, alert: true, days: diffDays, status: "active" };
+    }
     
-    return { blocked: false, alert: false };
+    return { blocked: false, alert: false, status: "active" };
   };
 
   const subStatus = getSubStatus();
@@ -2137,11 +2255,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   }, [active]);
 
   // Package view/edit handlers
-  const handleViewPackage = (pkg) => {
-    setViewPackage(pkg);
-  };
+const handleViewPackage = (pkg) => {
+setViewPackage(pkg);
+};
 
-  const handleEditPackage = (pkg) => {
+const handleEditPackage = (pkg) => {
     setEditPackage(pkg);
     setEditPkgForm({
       title: pkg.title || "",
@@ -2157,7 +2275,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       status: pkg.status || "Active"
     });
   };
-
   const savePackageEdit = async () => {
     if (!editPackage) return;
     try {
@@ -2322,8 +2439,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const errors = {};
     if (!nv.vendorName?.trim?.()) errors.vendorName = "Vendor Name is required";
     if (!nv.vendorProduct?.trim?.()) errors.vendorProduct = "Product Name is required";
-    if (!nv.amountTaxGst || nv.amountTaxGst <= 0) errors.amountTaxGst = "GST Amount is required";
-    if (!nv.paidAmount || nv.paidAmount <= 0) errors.paidAmount = "Paid Amount is required";
+    if (!nv.amountTaxGst || nv.amountTaxGst <= 0) errors.amountTaxGst = "Required";
+    if (!nv.paidAmount || nv.paidAmount <= 0) errors.paidAmount = "Required";
     if (Object.keys(errors).length > 0) { setNvError(errors); return; }
     try {
       setVendorSaveLoading(true);
@@ -2354,23 +2471,27 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } finally { setVendorSaveLoading(false); }
   };
 
-  const subStatus = getSubStatus();
-  
+
   let enforceMySubscriptions = false;
+  // Admin bypasses all subscription checks
   if (!subLoading && user?.email !== "admin@gmail.com") {
-    if (!subscription || subStatus.blocked) {
+    // If blocked (expired or no sub)
+    if (subStatus.blocked) {
       enforceMySubscriptions = true;
     }
   }
 
   const rawNavItems = getNavForRole(user?.role);
+  // When restricted, ONLY show My Subscriptions and Dashboard
   const navItems = enforceMySubscriptions 
-    ? rawNavItems.filter(n => n.key === "mysubscriptions" || n.key === "dashboard") 
+    ? rawNavItems.filter(n => ["mysubscriptions", "dashboard"].includes(n.key)) 
     : rawNavItems;
 
   const validActive = enforceMySubscriptions 
-    ? "mysubscriptions" 
+    ? "mysubscriptions"
     : (navItems.find(n => n.key === active) ? active : navItems[0]?.key || "dashboard");
+
+  const page = navItems.find(n => n.key === validActive) || navItems[0];
 
   useEffect(() => { if (!enforceMySubscriptions && validActive !== active) setActive(validActive); }, [user?.role, enforceMySubscriptions, validActive]);
 
@@ -2449,8 +2570,71 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {/* ── Dashboard ── */}
           {validActive === "dashboard" && <>
-            {/* Subscription Status Alert */}
-            {subStatus.alert && (
+            {/* Subscription Status Alert (Blocking) */}
+            {subStatus.blocked && (
+              <div style={{ 
+                background: "linear-gradient(135deg,#fee2e2,#fecaca)", 
+                border: "2px solid #ef4444", 
+                borderRadius: 16, 
+                padding: "24px", 
+                marginBottom: 24, 
+                display: "flex", 
+                flexDirection: "column",
+                alignItems: "center", 
+                textAlign: "center",
+                gap: 16,
+                boxShadow: "0 10px 30px rgba(239,68,68,0.15)"
+              }}>
+                <div style={{ fontSize: 48 }}>🚫</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: "#991b1b", marginBottom: 8 }}>
+                    Subscription Expired
+                  </div>
+                  <div style={{ fontSize: 14, color: "#7f1d1d", maxWidth: 500, margin: "0 auto", lineHeight: 1.6 }}>
+                    Your access to premium features has been restricted because your subscription is no longer active. 
+                    Please renew your plan to unlock all management tools and continue your business operations.
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <button 
+                    onClick={() => setActive("mysubscriptions")}
+                    style={{
+                      background: "linear-gradient(135deg,#ef4444,#dc2626)",
+                      border: "none",
+                      borderRadius: 10,
+                      padding: "12px 24px",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: "#fff",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      boxShadow: "0 4px 12px rgba(239,68,68,0.3)"
+                    }}
+                  >
+                    🚀 Renew Subscription
+                  </button>
+                  <button 
+                    onClick={() => window.open("mailto:support@mbusiness.com")}
+                    style={{
+                      background: "#fff",
+                      border: "1.5px solid #ef4444",
+                      borderRadius: 10,
+                      padding: "12px 24px",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: "#ef4444",
+                      cursor: "pointer",
+                      fontFamily: "inherit"
+                    }}
+                  >
+                    📞 Contact Support
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Subscription Status Alert (Warning only) */}
+            {subStatus.alert && !subStatus.blocked && (
               <div style={{ 
                 background: "linear-gradient(135deg,#fef3c7,#fde68a)", 
                 border: "2px solid #f59e0b", 
@@ -2467,7 +2651,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     Subscription Renewal Required
                   </div>
                   <div style={{ fontSize: 13, color: "#78350f" }}>
-                    Your {subscription?.planName} subscription expires in {subStatus.days} days. Please renew your subscription to continue using all features.
+                    Your {subscription?.planName} subscription expires in {subStatus.days} days. Please renew soon.
                   </div>
                 </div>
                 <button 
@@ -3012,7 +3196,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
           <Fld label="Vendor Name *" value={nv.vendorName} onChange={v => { setNv({ ...nv, vendorName: v }); setNvError(p => ({ ...p, vendorName: "" })); }} error={nvError.vendorName} />
           <Fld label="Product Name *" value={nv.vendorProduct} onChange={v => { setNv({ ...nv, vendorProduct: v }); setNvError(p => ({ ...p, vendorProduct: "" })); }} error={nvError.vendorProduct} />
-          <Fld label="Amount (Tax/GST) *" value={nv.amountTaxGst} type="number" onChange={v => setNv({ ...nv, amountTaxGst: v })} />
+          <Fld label="Required Amount *" value={nv.amountTaxGst} type="number" onChange={v => setNv({ ...nv, amountTaxGst: v })} />
           <Fld label="Paid Amount *" value={nv.paidAmount} type="number" onChange={v => setNv({ ...nv, paidAmount: v })} />
           <Fld label="Date of Purchase" value={nv.dateOfPurchase} type="date" onChange={v => setNv({ ...nv, dateOfPurchase: v })} />
           <Fld label="Mode of Payment" value={nv.modeOfPayment} onChange={v => setNv({ ...nv, modeOfPayment: v })} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />

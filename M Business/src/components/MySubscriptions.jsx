@@ -176,6 +176,15 @@ export default function MySubscriptions({ user }) {
     });
   };
 
+  const getDaysLeft = (endDate) => {
+    if (!endDate) return null;
+    const end = new Date(endDate);
+    const today = new Date();
+    const diffTime = end - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  };
+
   const formatCurrency = (amount, currency = "INR") => {
     if (amount === undefined || amount === null) return "—";
     return new Intl.NumberFormat("en-IN", {
@@ -212,43 +221,117 @@ export default function MySubscriptions({ user }) {
 
   // No subscription state
   if (!subscription) {
+    const plans = [
+      {
+        name: "Starter",
+        price: "999",
+        features: ["5 Projects", "10 Invoices", "Basic Reports", "Email Support"],
+        color: "#6366f1",
+        icon: "🌱"
+      },
+      {
+        name: "Professional",
+        price: "2999",
+        features: ["Unlimited Projects", "Unlimited Invoices", "Advanced Reports", "Priority Support", "Team Management"],
+        color: "#9333ea",
+        icon: "🚀",
+        popular: true
+      },
+      {
+        name: "Enterprise",
+        price: "Custom",
+        features: ["Custom Branding", "API Access", "Dedicated Manager", "White-label Solution"],
+        color: "#1e0a3c",
+        icon: "🏢"
+      }
+    ];
+
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <Card title="My Subscriptions" icon="💳">
-          <div style={{ textAlign: "center", padding: 40 }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>📭</div>
-            <h3 style={{ margin: "0 0 8px", color: T.text, fontSize: 18 }}>No Active Subscription</h3>
-            <p style={{ margin: "0 0 20px", color: T.muted, fontSize: 13 }}>
-              You don't have any active subscription yet. Contact M Business to get started.
-            </p>
-            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 24, padding: "20px 0" }}>
+        <div style={{ textAlign: "center", marginBottom: 10 }}>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: T.text, margin: "0 0 8px" }}>Choose Your Plan</h2>
+          <p style={{ color: T.muted, fontSize: 14 }}>Select the best plan for your business growth</p>
+        </div>
+
+        <div style={{ 
+          display: "grid", 
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", 
+          gap: 20 
+        }}>
+          {plans.map((p, i) => (
+            <div key={i} style={{
+              background: "#fff",
+              borderRadius: 20,
+              padding: 30,
+              border: p.popular ? `2px solid ${T.accent}` : "1.5px solid #ede9fe",
+              position: "relative",
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: p.popular ? "0 20px 40px rgba(147,51,234,0.12)" : "0 4px 20px rgba(0,0,0,0.03)",
+              transition: "transform 0.3s",
+              cursor: "pointer"
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-8px)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+            >
+              {p.popular && (
+                <div style={{
+                  position: "absolute",
+                  top: -12,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: `linear-gradient(135deg, ${T.accent}, #a855f7)`,
+                  color: "#fff",
+                  fontSize: 10,
+                  fontWeight: 800,
+                  padding: "4px 12px",
+                  borderRadius: 20,
+                  textTransform: "uppercase",
+                  letterSpacing: 1
+                }}>Most Popular</div>
+              )}
+              <div style={{ fontSize: 32, marginBottom: 16 }}>{p.icon}</div>
+              <h3 style={{ fontSize: 20, fontWeight: 800, color: T.text, margin: "0 0 4px" }}>{p.name}</h3>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 20 }}>
+                <span style={{ fontSize: 28, fontWeight: 800, color: T.text }}>{p.price === "Custom" ? "Contact us" : `₹${p.price}`}</span>
+                {p.price !== "Custom" && <span style={{ fontSize: 13, color: T.muted }}>/ month</span>}
+              </div>
+              
+              <div style={{ flex: 1, marginBottom: 24 }}>
+                {p.features.map((f, fi) => (
+                  <div key={fi} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center", color: "#22c55e", fontSize: 10, fontWeight: 800 }}>✓</div>
+                    <span style={{ fontSize: 13, color: T.text, fontWeight: 500 }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+
               <button
                 onClick={handleSeedData}
                 style={{
-                  background: `linear-gradient(135deg, ${T.accent}, #a855f7)`,
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 10,
-                  padding: "10px 20px",
-                  fontSize: 13,
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: 12,
+                  background: p.popular ? `linear-gradient(135deg, ${T.accent}, #a855f7)` : "#f5f3ff",
+                  color: p.popular ? "#fff" : T.accent,
+                  border: p.popular ? "none" : `1.5px solid ${T.accent}`,
+                  fontSize: 14,
                   fontWeight: 700,
-                  cursor: "pointer"
+                  cursor: "pointer",
+                  transition: "0.2s"
                 }}
               >
-                🔄 Load Demo Data
+                {p.price === "Custom" ? "Contact Sales" : "Get Started"}
               </button>
             </div>
-          </div>
-        </Card>
+          ))}
+        </div>
 
-        <Card title="Contact M Business" icon="📞">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
-            <InfoRow label="Company" value="M Business Pvt Ltd" icon="🏢" />
-            <InfoRow label="Email" value="billing@mbusiness.com" icon="📧" />
-            <InfoRow label="Phone" value="+91-9876543210" icon="📱" />
-            <InfoRow label="Address" value="Chennai, Tamil Nadu, India" icon="📍" />
-          </div>
-        </Card>
+        <div style={{ textAlign: "center", padding: "20px", background: "#f5f3ff", borderRadius: 16, border: "1.5px solid #ede9fe" }}>
+          <p style={{ margin: 0, fontSize: 13, color: T.muted }}>
+            Need a custom solution or have questions? <span style={{ color: T.accent, fontWeight: 700, cursor: "pointer" }}>Chat with our billing team</span> or call us at <strong>+91 98765 43210</strong>
+          </p>
+        </div>
       </div>
     );
   }
@@ -306,7 +389,7 @@ export default function MySubscriptions({ user }) {
             {subscription.status}
           </div>
           <div style={{ fontSize: 12, opacity: 0.9, marginTop: 2 }}>
-            Valid till {formatDate(subscription.endDate)}
+            Valid till {formatDate(subscription.endDate)} • {subscription.daysLeft || getDaysLeft(subscription.endDate)} days left
           </div>
         </div>
 

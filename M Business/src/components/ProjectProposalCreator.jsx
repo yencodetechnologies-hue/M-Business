@@ -735,30 +735,18 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
         @media print {
           @page { 
             size: A4 landscape; 
-            margin: 15mm; 
+            margin: 20mm; 
           }
           body { 
             margin: 0; 
-            background: white !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+            background: white !important; 
           }
           .landscape-content {
             width: 100% !important;
-            height: 100% !important;
-            min-height: 0 !important;
+            height: auto !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             overflow: visible !important;
-            aspect-ratio: auto !important;
-            padding: 20px !important;
-            font-size: 12pt !important;
-            page-break-inside: avoid !important;
-          }
-          .landscape-content * {
-            max-width: 100% !important;
-            overflow-wrap: break-word !important;
-            word-wrap: break-word !important;
           }
           .no-print { 
             display: none !important; 
@@ -930,15 +918,10 @@ export default function CanvaProposal({clients=[], openNew=false, onOpenNewDone}
         
         if (editId) {
           const found = list.find(p => p.id === editId || p._id === editId);
-          if (found) { setDoc(found); setPage(0); setView("editor"); setIsViewMode(false); }
+          if (found) { setDoc(found); setPage(0); setView("editor"); }
         } else if (viewId) {
           const found = list.find(p => p.id === viewId || p._id === viewId);
-          if (found) { 
-            setDoc(found); 
-            setPage(0); 
-            setView("editor"); 
-            setIsViewMode(true);  // Client view mode - hide editing UI
-          }
+          if (found) { setDoc(found); setPage(0); setView("editor"); } // Note: if you want a read-only view, we can add a flag, but for now editor mode is fine.
         }
         
       } else {
@@ -1476,55 +1459,8 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         </div>
       )}
 
-      {/* ╔══ GLOBAL PRINT STYLES ══╗ */}
-      <style>{`
-        @media print {
-          /* Hide all UI chrome when printing */
-          .no-print,
-          .topbar,
-          .icon-sidebar,
-          .left-panel,
-          .bottom-strip,
-          .zoom-controls,
-          .page-navigation,
-          .slide-thumbnails,
-          button[class*="no-print"],
-          button[title*="Print"],
-          div[class*="no-print"] {
-            display: none !important;
-          }
-          
-          /* Ensure proposal content is visible and fills page */
-          .proposal-content,
-          .canvas-area,
-          .slide-container {
-            width: 100% !important;
-            height: auto !important;
-            box-shadow: none !important;
-            border: none !important;
-            background: white !important;
-          }
-          
-          /* Page breaks for multi-page proposals */
-          .slide-page {
-            page-break-after: always;
-            break-after: page;
-          }
-          .slide-page:last-child {
-            page-break-after: auto;
-            break-after: auto;
-          }
-          
-          /* Ensure proper margins */
-          @page {
-            size: A4;
-            margin: 15mm;
-          }
-        }
-      `}</style>
-
       {/* ╔══ TOP BAR (Canva style) ══╗ */}
-      <div className={`topbar ${isViewMode ? 'no-print' : ''}`} style={{height:56,background:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",borderBottom:"1px solid #e5e7eb",flexShrink:0,gap:12,zIndex:50}}>
+      <div style={{height:56,background:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",borderBottom:"1px solid #e5e7eb",flexShrink:0,gap:12,zIndex:50}}>
         
         {/* LEFT: logo + File/Resize/Editing */}
         <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
@@ -1634,41 +1570,40 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
       <div style={{display:"flex",flex:1,overflow:"hidden"}}>
 
         {/* ── ICON SIDEBAR (Canva left icon rail) ── */}
-        <div className={`icon-sidebar ${isViewMode ? 'no-print' : ''}`} style={{width:72,background:"#252627",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",alignItems:"center",padding:"12px 0",gap:4,flexShrink:0}}>
+        <div style={{width:72,background:"#f8f5ff",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",alignItems:"center",padding:"12px 0",gap:4,flexShrink:0}}>
           {[
             {id:"templates", icon:"🎨", label:"Design"},
             {id:"elements",  icon:"✦",  label:"Elements"},
             {id:"text",      icon:"T",  label:"Text"},
             {id:"uploads",   icon:"☁️", label:"Uploads"}
-          ].map(item=>(
+          ].map(item=> (
             <button key={item.id} onClick={()=>setLeftPanel(leftPanel===item.id?"":item.id)}
-              style={{width:64,height:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:leftPanel===item.id?"rgba(255,255,255,0.1)":"none",border:"none",borderRadius:8,cursor:"pointer",transition:"background .15s",color:"#fff"}}>
+              style={{width:64,height:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:leftPanel===item.id?"rgba(124,58,237,0.15)":"none",border:"none",borderRadius:8,cursor:"pointer",transition:"all .15s",color:leftPanel===item.id?"#7c3aed":"#4b5563"}}>
               <span style={{fontSize:24}}>{item.icon}</span>
-              <span style={{fontSize:9,fontWeight:500,letterSpacing:0.3,opacity:0.8}}>{item.label}</span>
+              <span style={{fontSize:9,fontWeight:600,letterSpacing:0.3,opacity:leftPanel===item.id?1:0.7}}>{item.label}</span>
             </button>
           ))}
           <div style={{flex:1}}/>
-          <button style={{width:64,height:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",borderRadius:8,cursor:"pointer",color:"rgba(255,255,255,0.7)"}}>
+          <button onClick={()=>flash("🪄 Magic features coming soon!")} style={{width:64,height:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",borderRadius:8,cursor:"pointer",color:"#6b7280"}}>
             <span style={{fontSize:24}}>🪄</span><span style={{fontSize:9,fontWeight:500}}>Magic</span>
           </button>
         </div>
         {/* ── LEFT CONTENT PANEL ── */}
-        {leftPanel && !isViewMode && (
-          <div className="left-panel" style={{width:320,background:"#fff",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",flexShrink:0,overflow:"hidden"}}>
+        {leftPanel && (
+          <div style={{width:320,background:"#fff",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",flexShrink:0,overflow:"hidden"}}>
 
             {/* DESIGN (Templates + Styles) */}
             {leftPanel==="templates" && <>
               <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
-                <div style={{fontSize:16,fontWeight:700,color:"#0f172a",marginBottom:12}}>Design</div>
-                <div style={{position:"relative", marginBottom:12}}>
+                <div style={{fontSize:18,fontWeight:800,color:"#111827",marginBottom:16}}>Design</div>
+                <div style={{position:"relative", marginBottom:16}}>
                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search elements"
-                    style={{width:"100%",boxSizing:"border-box",border:"1px solid #e2e8f0",borderRadius:12,padding:"10px 14px 10px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#fff"}}/>
-                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:18, opacity:0.5}}>🔍</span>
-                   <span style={{position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", fontSize:18, opacity:0.5}}>🎤</span>
+                    style={{width:"100%",boxSizing:"border-box",border:"1.5px solid #e5e7eb",borderRadius:12,padding:"12px 14px 12px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#f9fafc"}}/>
+                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:16, color:"#9ca3af"}}>🔍</span>
                 </div>
-                <div style={{display:"flex",gap:8,background:"#f1f5f9",padding:"4px",borderRadius:8}}>
-                  <button style={{flex:1,padding:"6px",background:"#fff",borderRadius:6,fontSize:13,fontWeight:600,border:"none",boxShadow:"0 2px 4px rgba(0,0,0,0.05)"}}>Templates</button>
-                  <button style={{flex:1,padding:"6px",background:"none",borderRadius:6,fontSize:13,fontWeight:600,border:"none",color:"#64748b"}}>Styles</button>
+                <div style={{display:"flex",gap:8,background:"#f3f4f6",padding:"4px",borderRadius:10}}>
+                  <button style={{flex:1,padding:"8px",background:"#fff",borderRadius:8,fontSize:13,fontWeight:600,border:"none",boxShadow:"0 1px 3px rgba(0,0,0,0.1)",color:"#111827"}}>Templates</button>
+                  <button style={{flex:1,padding:"8px",background:"none",borderRadius:8,fontSize:13,fontWeight:600,border:"none",color:"#6b7280"}}>Styles</button>
                 </div>
               </div>
               <div style={{flex:1,overflowY:"auto",padding:"12px",display:"flex",flexDirection:"column",gap:12}}>
@@ -1736,11 +1671,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             {/* ELEMENTS */}
             {leftPanel==="elements" && <>
               <div style={{padding:"16px", borderBottom:"1px solid #f1f5f9"}}>
+                <div style={{fontSize:18,fontWeight:800,color:"#111827",marginBottom:16}}>Elements</div>
                 <div style={{position:"relative"}}>
                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search elements"
-                    style={{width:"100%",boxSizing:"border-box",border:"1px solid #e2e8f0",borderRadius:12,padding:"12px 14px 12px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#fff"}}/>
-                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:18, opacity:0.5}}>+</span>
-                   <span style={{position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", fontSize:18, opacity:0.5}}>🎤</span>
+                    style={{width:"100%",boxSizing:"border-box",border:"1.5px solid #e5e7eb",borderRadius:12,padding:"12px 14px 12px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#f9fafc"}}/>
+                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:16, color:"#9ca3af"}}>🔍</span>
                 </div>
               </div>
 
@@ -1789,17 +1724,17 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             {/* TEXT */}
             {leftPanel==="text" && <>
               <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
-                <div style={{fontSize:16,fontWeight:700,color:"#0f172a",marginBottom:16}}>Text</div>
+                <div style={{fontSize:18,fontWeight:800,color:"#0f172a",marginBottom:16}}>Text</div>
                 <div style={{position:"relative"}}>
-                  <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,opacity:0.4}}>🔍</span>
+                  <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:"#9ca3af"}}>🔍</span>
                   <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search fonts and combinations"
-                    style={{width:"100%",boxSizing:"border-box",border:"1px solid #e2e8f0",borderRadius:8,padding:"10px 14px 10px 36px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#f8fafc"}}/>
+                    style={{width:"100%",boxSizing:"border-box",border:"1px solid #e2e8f0",borderRadius:12,padding:"10px 14px 10px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#f8fafc"}}/>
                 </div>
               </div>
-              <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:24}}>
+              <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:20}}>
                 
-                <button onClick={()=>addElement({type:"text", val:"New Text Box", fontSize:18, fontWeight:500})} style={{background:"#7d2ae8",color:"#fff",border:"none",borderRadius:8,padding:"14px",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(125,42,232,0.2)",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"transform 0.1s"}} className="hb" onMouseDown={e=>e.currentTarget.style.transform="scale(0.98)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}>
-                  Add a text box
+                <button onClick={()=>addElement({type:"text", val:"New Text Box", fontSize:18, fontWeight:500})} style={{background:"#8b5cf6",color:"#fff",border:"none",borderRadius:8,padding:"14px",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(139,92,246,0.25)",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.2s"}} className="hb" onMouseDown={e=>e.currentTarget.style.transform="scale(0.98)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}>
+                  <span style={{fontSize:18}}>T</span> Add a text box
                 </button>
 
                 <div onClick={()=>flash("🪄 Magic Write: Generating AI content...")} style={{background:"linear-gradient(135deg,#7d2ae8,#ff6b6b)",borderRadius:12,padding:"16px",color:"#fff",cursor:"pointer",boxShadow:"0 4px 12px rgba(125,42,232,0.15)",position:"relative",overflow:"hidden"}} className="hb">
@@ -1809,36 +1744,36 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                 </div>
 
                 <div>
-                  <div style={{fontSize:11,color:"#64748b",fontWeight:800,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <div style={{fontSize:11,color:"#6b7280",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                     <span>Brand Kit</span>
-                    <button style={{background:"none",border:"none",color:"#7c3aed",fontSize:10,fontWeight:700,cursor:"pointer",padding:0}}>Edit 👑</button>
+                    <button style={{background:"none",border:"none",color:"#8b5cf6",fontSize:11,fontWeight:700,cursor:"pointer",padding:0}}>Edit 👑</button>
                   </div>
-                  <button style={{width:"100%",background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:"12px",textAlign:"center",color:"#1e293b",fontSize:12,fontWeight:600,cursor:"pointer"}} className="topbtn">
+                  <button style={{width:"100%",background:"#fff",border:"1.5px dashed #d1d5db",borderRadius:8,padding:"12px",textAlign:"center",color:"#4b5563",fontSize:13,fontWeight:600,cursor:"pointer",transition:"all 0.15s"}} className="topbtn">
                     Add your brand fonts
                   </button>
                 </div>
                 
                 <div>
-                  <div style={{fontSize:11,color:"#64748b",fontWeight:800,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8}}>Default text styles</div>
-                  <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                    <button onClick={()=>addElement({type:"text", val:"Add a heading", fontSize:32, fontWeight:800})} style={{width:"100%",background:"#fff",border:"1px solid #e2e8f0",borderRadius:8,padding:"16px",textAlign:"left",cursor:"pointer",transition:"all .1s",boxShadow:"0 2px 5px rgba(0,0,0,0.02)"}} className="hb">
-                      <div style={{fontSize:24,fontWeight:900,color:"#0f172a"}}>Add a heading</div>
+                  <div style={{fontSize:11,color:"#6b7280",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8}}>Default text styles</div>
+                  <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                    <button onClick={()=>addElement({type:"text", val:"Add a heading", fontSize:32, fontWeight:800})} style={{width:"100%",background:"#fff",border:"1.5px solid #e5e7eb",borderRadius:10,padding:"16px",textAlign:"left",cursor:"pointer",transition:"all 0.15s"}} className="hb">
+                      <div style={{fontSize:24,fontWeight:800,color:"#111827"}}>Add a heading</div>
                     </button>
-                    <button onClick={()=>addElement({type:"text", val:"Add a subheading", fontSize:24, fontWeight:700})} style={{width:"100%",background:"#fff",border:"1px solid #e2e8f0",borderRadius:8,padding:"12px",textAlign:"left",cursor:"pointer",transition:"all .1s",boxShadow:"0 2px 5px rgba(0,0,0,0.02)"}} className="hb">
-                      <div style={{fontSize:18,fontWeight:700,color:"#0f172a"}}>Add a subheading</div>
+                    <button onClick={()=>addElement({type:"text", val:"Add a subheading", fontSize:24, fontWeight:700})} style={{width:"100%",background:"#fff",border:"1.5px solid #e5e7eb",borderRadius:10,padding:"14px",textAlign:"left",cursor:"pointer",transition:"all 0.15s"}} className="hb">
+                      <div style={{fontSize:18,fontWeight:700,color:"#374151"}}>Add a subheading</div>
                     </button>
-                    <button onClick={()=>addElement({type:"text", val:"Add a little bit of body text", fontSize:16, fontWeight:400})} style={{width:"100%",background:"#fff",border:"1px solid #e2e8f0",borderRadius:8,padding:"10px",textAlign:"left",cursor:"pointer",transition:"all .1s",boxShadow:"0 2px 5px rgba(0,0,0,0.02)"}} className="hb">
-                      <div style={{fontSize:14,color:"#0f172a"}}>Add a little bit of body text</div>
+                    <button onClick={()=>addElement({type:"text", val:"Add a little bit of body text", fontSize:16, fontWeight:400})} style={{width:"100%",background:"#fff",border:"1.5px solid #e5e7eb",borderRadius:10,padding:"12px",textAlign:"left",cursor:"pointer",transition:"all 0.15s"}} className="hb">
+                      <div style={{fontSize:14,color:"#4b5563"}}>Add a little bit of body text</div>
                     </button>
                   </div>
                 </div>
 
                 <div>
-                  <div style={{fontSize:11,color:"#64748b",fontWeight:800,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8}}>Dynamic text</div>
+                  <div style={{fontSize:11,color:"#6b7280",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8}}>Dynamic text</div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                    <div onClick={()=>flash("Page number placeholder added")} style={{background:"#f1f5f9",borderRadius:10,padding:"16px",textAlign:"center",cursor:"pointer",border:"1px solid transparent",transition:"all .2s"}} className="sib">
+                    <div onClick={()=>flash("Page number placeholder added")} style={{background:"#f9fafb",borderRadius:10,padding:"16px",textAlign:"center",cursor:"pointer",border:"1.5px solid #e5e7eb",transition:"all 0.15s"}} className="sib">
                        <div style={{fontSize:20,marginBottom:4}}>🔟</div>
-                       <div style={{fontSize:10,fontWeight:700}}>Page numbers</div>
+                       <div style={{fontSize:11,fontWeight:600,color:"#374151"}}>Page numbers</div>
                     </div>
                   </div>
                 </div>
@@ -1848,11 +1783,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             {/* UPLOADS */}
             {leftPanel==="uploads" && <>
               <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
-                <div style={{fontSize:16,fontWeight:700,color:"#0f172a",marginBottom:16}}>Uploads</div>
+                <div style={{fontSize:18,fontWeight:800,color:"#111827",marginBottom:16}}>Uploads</div>
                 <button 
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  style={{width:"100%",background:"#7d2ae8",color:"#fff",border:"none",borderRadius:8,padding:"12px",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(125,42,232,0.2)",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}
+                  style={{width:"100%",background:"#8b5cf6",color:"#fff",border:"none",borderRadius:8,padding:"14px",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(139,92,246,0.25)",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.2s"}}
                 >
                   {uploading ? (
                     <div style={{width:16,height:16,border:"2px solid #fff",borderTopColor:"transparent",borderRadius:"50%",animation:"spin 1s linear infinite"}} />
@@ -1995,12 +1930,12 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                   slide={doc.slides[page]} 
                   theme={doc.theme} 
                   docFormat={doc.format}
-                  editing={canEdit && !isViewMode}
-                  onChange={isViewMode ? () => {} : updateSlide}
-                  selectedId={isViewMode ? null : selectedElementId}
-                  onSelectElement={isViewMode ? () => {} : setSelectedElementId}
-                  onUpdateElement={isViewMode ? () => {} : updateElement}
-                  onDelete={isViewMode ? () => {} : deleteElement}
+                  editing={canEdit} 
+                  onChange={updateSlide}
+                  selectedId={selectedElementId}
+                  onSelectElement={setSelectedElementId}
+                  onUpdateElement={updateElement}
+                  onDelete={deleteElement}
                   canvasRef={canvasRef}
                 />
               ) : (
@@ -2022,8 +1957,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           </div>
 
           {/* BOTTOM-RIGHT CONTROLS (Canva Style) */}
-          {!isViewMode && (
-          <div className="zoom-controls no-print" style={{position:"absolute",bottom:24,right:24,display:"flex",alignItems:"center",gap:12,background:"#fff",padding:"8px 16px",borderRadius:12,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",zIndex:100}}>
+          <div style={{position:"absolute",bottom:24,right:24,display:"flex",alignItems:"center",gap:12,background:"#fff",padding:"8px 16px",borderRadius:12,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",zIndex:100}}>
             <div style={{display:"flex",alignItems:"center",gap:8,borderRight:"1px solid #e5e7eb",paddingRight:12}}>
               <button onClick={()=>setPage(Math.max(0,page-1))} disabled={page===0} style={{background:"none",border:"none",cursor:page===0?"not-allowed":"pointer",color:page===0?"#cbd5e1":"#475569",fontSize:12}}>◀</button>
               <span style={{fontSize:12,fontWeight:700,color:"#1e293b",minWidth:30,textAlign:"center"}}>{page+1} / {doc.slides?.length || 0}</span>
@@ -2037,13 +1971,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               <button style={{background:"none",border:"none",cursor:"pointer",fontSize:13}}>?</button>
             </div>
           </div>
-          )}
         </div>
       </div>
 
       {/* ╔══ BOTTOM PAGE STRIP (Canva style) ══╗ */}
-      {!isViewMode && (
-      <div className="bottom-strip" style={{height:100,background:"#fff",borderTop:"1px solid #e5e7eb",display:"flex",alignItems:"center",padding:"0 20px",gap:16,overflowX:"auto",flexShrink:0}}>
+      <div style={{height:100,background:"#fff",borderTop:"1px solid #e5e7eb",display:"flex",alignItems:"center",padding:"0 20px",gap:16,overflowX:"auto",flexShrink:0}}>
         {doc.slides.map((s,i)=>{
           const isP = doc.format === "a4-portrait" || (!doc.format && (s.type === "proposal" || s.type === "portrait"));
           const isL = doc.format === "a4-landscape" || (!doc.format && s.type === "landscape");
@@ -2064,7 +1996,6 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           <span>+</span>
         </button>
       </div>
-      )}
     </div>
   );
 }

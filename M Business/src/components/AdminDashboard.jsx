@@ -20,7 +20,7 @@ const sc = (s) => ({
 function Badge({ label }) {
   const c = sc(label);
   return (
-    <span style={{ background:`${c}18`, color:c, border:`1px solid ${c}30`, padding:"2px 10px", borderRadius:20, fontSize:11, fontWeight:700, whiteSpace:"nowrap" }}>
+    <span style={{ background: `${c}18`, color: c, border: `1px solid ${c}30`, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
       {label}
     </span>
   );
@@ -66,53 +66,53 @@ export default function AdminDashboard({ user, setUser }) {
     try {
       // In case we don't have a subadmin route, we can fetch all users and filter
       const res = await axios.get(BASE_URL + "/api/subadmins").catch(async () => {
-         // Fallback to fetch from users auth logic or something similar if needed
-         return { data: [] };
+        // Fallback to fetch from users auth logic or something similar if needed
+        return { data: [] };
       });
       setSubadmins(res.data);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   };
   const fetchClients = async () => {
     try {
       const res = await axios.get(BASE_URL + "/api/clients");
       setClients(res.data);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   };
   const fetchProjects = async () => {
     try {
       const res = await axios.get(BASE_URL + "/api/projects");
       setProjects(res.data);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   };
   const fetchSubscriptions = async () => {
     try {
       const res = await axios.get(BASE_URL + "/api/subscriptions/all");
       setSubscriptions(res.data);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   };
   const fetchEmployees = async () => {
     try {
       const res = await axios.get(BASE_URL + "/api/employees");
       setEmployees(res.data);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   };
   const fetchManagers = async () => {
     try {
       const res = await axios.get(BASE_URL + "/api/managers");
       setManagers(res.data);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   };
   const fetchQuotations = async () => {
     try {
       const res = await axios.get(BASE_URL + "/api/quotations");
       setQuotations(res.data);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   };
   const fetchPackages = async () => {
     try {
       const res = await axios.get(BASE_URL + "/api/packages");
       setPackages(res.data);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   };
 
   const createPackage = async () => {
@@ -205,7 +205,7 @@ export default function AdminDashboard({ user, setUser }) {
             <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>Admin Control Panel</div>
           </div>
           {active === "packages" && (
-            <button 
+            <button
               onClick={() => { setPkgError({}); setModal("package_add"); }}
               style={{
                 background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
@@ -331,7 +331,7 @@ export default function AdminDashboard({ user, setUser }) {
                   />
                 </div>
               </div>
-              
+
               <div style={{ marginTop: 16 }}>
                 <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Description *</label>
                 <textarea
@@ -475,7 +475,7 @@ export default function AdminDashboard({ user, setUser }) {
                 </select>
               </div>
 
-              
+
               <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
                 <button
                   onClick={() => setModal(null)}
@@ -624,14 +624,14 @@ function SubadminsList({ subadmins, refresh, packages }) {
   };
 
   const handleCreate = async () => {
-    if(!form.name || !form.email || !form.password) return alert("Name, email and password required.");
+    if (!form.name || !form.email || !form.password) return alert("Name, email and password required.");
     setLoading(true);
     try {
       await axios.post(`${BASE_URL}/api/subadmins`, { ...form, role: "subadmin" });
       setModalOpen(false);
       setForm({ name: "", email: "", password: "", phone: "", companyName: "", companyType: "IT", employeeCount: "0-10" });
       refresh();
-    } catch(e) {
+    } catch (e) {
       alert("Failed to create subadmin: " + (e.response?.data?.msg || e.message));
     } finally {
       setLoading(false);
@@ -644,7 +644,7 @@ function SubadminsList({ subadmins, refresh, packages }) {
         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Registered Subadmins ({subadmins.length})</h3>
         <button onClick={() => setModalOpen(true)} style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Subadmin</button>
       </div>
-      
+
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ background: "#f8fafc" }}>
@@ -678,10 +678,10 @@ function SubadminsList({ subadmins, refresh, packages }) {
               <td style={{ padding: "14px 16px", color: "#64748b" }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}</td>
               <td style={{ padding: "14px 16px" }}>
                 <div style={{ display: "flex", gap: 8 }}>
-                
+
                   <button
                     onClick={async () => {
-                      if(window.confirm("Delete this subadmin?")) {
+                      if (window.confirm("Delete this subadmin?")) {
                         await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`);
                         refresh();
                       }
@@ -876,14 +876,14 @@ function SubadminsList({ subadmins, refresh, packages }) {
           <div style={{ background: "#fff", padding: 24, borderRadius: 16, width: 450, maxHeight: "90vh", overflowY: "auto" }}>
             <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 700 }}>Create New Subadmin</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <input placeholder="Name *" value={form.name} onChange={e=>setForm({...form, name: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
-              <input placeholder="Email *" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
-              <input placeholder="Password *" type="password" value={form.password} onChange={e=>setForm({...form, password: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
-              <input placeholder="Phone" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+              <input placeholder="Name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+              <input placeholder="Email *" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+              <input placeholder="Password *" type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+              <input placeholder="Phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <input placeholder="Company Name" value={form.companyName} onChange={e=>setForm({...form, companyName: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
-                <select value={form.companyType} onChange={e=>setForm({...form, companyType: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }}>
+                <input placeholder="Company Name" value={form.companyName} onChange={e => setForm({ ...form, companyName: e.target.value })} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }} />
+                <select value={form.companyType} onChange={e => setForm({ ...form, companyType: e.target.value })} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }}>
                   <option value="IT">IT</option>
                   <option value="Software">Software</option>
                   <option value="Services">Services</option>
@@ -892,8 +892,8 @@ function SubadminsList({ subadmins, refresh, packages }) {
                 </select>
               </div>
 
-              <select value={form.employeeCount} onChange={e=>setForm({...form, employeeCount: e.target.value})} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }}>
-                {["0-10","11-50","51-100","100+"].map(ec => <option key={ec} value={ec}>{ec} Employees</option>)}
+              <select value={form.employeeCount} onChange={e => setForm({ ...form, employeeCount: e.target.value })} style={{ padding: "10px", borderRadius: 8, border: "1px solid #cbd5e1" }}>
+                {["0-10", "11-50", "51-100", "100+"].map(ec => <option key={ec} value={ec}>{ec} Employees</option>)}
               </select>
 
               <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
@@ -1020,8 +1020,8 @@ function SubscriptionsPage({ subscriptions }) {
 
   const filtered = subscriptions.filter(sub => {
     const matchesSearch = (sub.userName || "").toLowerCase().includes(search.toLowerCase()) ||
-                         (sub.userEmail || "").toLowerCase().includes(search.toLowerCase()) ||
-                         (sub.planName || "").toLowerCase().includes(search.toLowerCase());
+      (sub.userEmail || "").toLowerCase().includes(search.toLowerCase()) ||
+      (sub.planName || "").toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "all" || sub.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -1171,91 +1171,91 @@ function PackagesPage({ packages }) {
             const isPro = p.id === "pro" || p.title === "PRO";
             const features = Array.isArray(p.features) ? p.features : (p.features || "").split('\n').filter(f => f.trim());
             return (
-              <div key={p.id || idx} style={{ 
-                background: "#fff", 
-                padding: "40px 32px", 
-                display: "flex", 
+              <div key={p.id || idx} style={{
+                background: "#fff",
+                padding: "40px 32px",
+                display: "flex",
                 flexDirection: "column",
                 borderRight: idx < 2 ? "1px solid #e2e8f0" : "none"
               }}>
                 {/* Icon */}
-                <div style={{ 
-                  width: 48, 
-                  height: 48, 
-                  borderRadius: "50%", 
-                  border: "2px solid #e0f2fe", 
-                  display: "flex", 
-                  alignItems: "center", 
-                  justifyContent: "center", 
-                  fontSize: 22, 
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: "50%",
+                  border: "2px solid #e0f2fe",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 22,
                   marginBottom: 20,
                   color: "#0ea5e9"
                 }}>
                   {p.icon || "📦"}
                 </div>
-                
+
                 {/* Title */}
-                <h3 style={{ 
-                  margin: "0 0 16px", 
-                  fontSize: 20, 
-                  fontWeight: 700, 
-                  color: "#1e293b", 
-                  textTransform: "uppercase", 
-                  letterSpacing: 0.5 
+                <h3 style={{
+                  margin: "0 0 16px",
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: "#1e293b",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.5
                 }}>
                   {p.title}
                 </h3>
-                
+
                 {/* Description */}
-                <p style={{ 
-                  margin: "0 0 32px", 
-                  fontSize: 14, 
-                  color: "#64748b", 
-                  lineHeight: 1.6, 
-                  minHeight: 70 
+                <p style={{
+                  margin: "0 0 32px",
+                  fontSize: 14,
+                  color: "#64748b",
+                  lineHeight: 1.6,
+                  minHeight: 70
                 }}>
                   {p.description}
                 </p>
-                
+
                 {/* Per seat label */}
-                <div style={{ 
-                  fontSize: 13, 
-                  fontWeight: 500, 
-                  color: "#94a3b8", 
+                <div style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: "#94a3b8",
                   marginBottom: 8,
                   textTransform: "lowercase"
                 }}>
                   {p.perSeat || "Per seat"}
                 </div>
-                
+
                 {/* Price */}
-                <div style={{ 
-                  display: "flex", 
-                  alignItems: "baseline", 
-                  gap: 6, 
-                  marginBottom: 24 
+                <div style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 6,
+                  marginBottom: 24
                 }}>
-                  <span style={{ 
-                    fontSize: 36, 
-                    fontWeight: 700, 
-                    color: "#0f172a" 
+                  <span style={{
+                    fontSize: 36,
+                    fontWeight: 700,
+                    color: "#0f172a"
                   }}>
                     {p.price || p.monthlyPrice}
                   </span>
                   {p.currency && (
-                    <span style={{ 
-                      fontSize: 16, 
-                      fontWeight: 600, 
-                      color: "#64748b" 
+                    <span style={{
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: "#64748b"
                     }}>
                       {p.currency}
                     </span>
                   )}
                   {p.period && (
-                    <span style={{ 
-                      fontSize: 14, 
-                      fontWeight: 500, 
-                      color: "#94a3b8" 
+                    <span style={{
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: "#94a3b8"
                     }}>
                       {p.period}
                     </span>
@@ -1263,16 +1263,16 @@ function PackagesPage({ packages }) {
                 </div>
 
                 {/* Button */}
-                <button style={{ 
-                  width: "100%", 
-                  padding: "14px 24px", 
-                  borderRadius: 10, 
-                  background: isPro ? "#0284c7" : "#fff", 
-                  color: isPro ? "#fff" : "#0f172a", 
-                  border: isPro ? "none" : "2px solid #e2e8f0", 
-                  fontWeight: 600, 
-                  fontSize: 14, 
-                  cursor: "pointer", 
+                <button style={{
+                  width: "100%",
+                  padding: "14px 24px",
+                  borderRadius: 10,
+                  background: isPro ? "#0284c7" : "#fff",
+                  color: isPro ? "#fff" : "#0f172a",
+                  border: isPro ? "none" : "2px solid #e2e8f0",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  cursor: "pointer",
                   transition: "all 0.2s",
                   marginBottom: 32,
                   boxShadow: isPro ? "0 4px 14px rgba(2, 132, 199, 0.3)" : "none"
@@ -1282,34 +1282,34 @@ function PackagesPage({ packages }) {
 
                 {/* Features */}
                 <div style={{ flex: 1 }}>
-                  <div style={{ 
-                    fontSize: 13, 
-                    fontWeight: 600, 
-                    color: "#0f172a", 
-                    marginBottom: 16 
+                  <div style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    marginBottom: 16
                   }}>
                     {p.featuresTitle || "Features:"}
                   </div>
-                  <ul style={{ 
-                    margin: 0, 
-                    padding: 0, 
-                    listStyle: "none", 
-                    display: "flex", 
-                    flexDirection: "column", 
-                    gap: 12 
+                  <ul style={{
+                    margin: 0,
+                    padding: 0,
+                    listStyle: "none",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 12
                   }}>
                     {features.map((f, i) => (
-                      <li key={i} style={{ 
-                        fontSize: 13, 
-                        color: "#475569", 
-                        display: "flex", 
-                        alignItems: "flex-start", 
+                      <li key={i} style={{
+                        fontSize: 13,
+                        color: "#475569",
+                        display: "flex",
+                        alignItems: "flex-start",
                         gap: 10,
                         lineHeight: 1.4
                       }}>
-                        <span style={{ 
-                          color: "#0ea5e9", 
-                          fontWeight: 700, 
+                        <span style={{
+                          color: "#0ea5e9",
+                          fontWeight: 700,
                           fontSize: 12,
                           marginTop: 1
                         }}>•</span>

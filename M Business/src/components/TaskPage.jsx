@@ -2012,9 +2012,8 @@ export default function TaskPage({ projects = [], employees = [] }) {
             </div>
           </div>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <button onClick={()=>{setSidekick(v=>!v);setSelected(null);}} style={{display:"flex",alignItems:"center",gap:6,background:sidekick?`linear-gradient(135deg,${P.dark},${P.mid})`:"transparent",border:`1.5px solid ${sidekick?P.mid:P.border}`,borderRadius:8,padding:"6px 13px",fontSize:12,fontWeight:700,color:sidekick?"#fff":P.mid,cursor:"pointer"}}><span>✨</span> Sidekick</button>
+           
             <button onClick={()=>setShowIntegrate(true)} style={{display:"flex",alignItems:"center",gap:6,background:"transparent",border:`1.5px solid ${P.border}`,borderRadius:8,padding:"6px 13px",fontSize:12,fontWeight:600,color:P.mid,cursor:"pointer"}}><span>🔗</span> Integrate</button>
-            <button onClick={()=>setShowAutomate(true)} style={{display:"flex",alignItems:"center",gap:6,background:"transparent",border:`1.5px solid ${P.border}`,borderRadius:8,padding:"6px 13px",fontSize:12,fontWeight:600,color:P.mid,cursor:"pointer"}}><span>⚙️</span> Automate</button>
             <button onClick={()=>setShowShare(true)} style={{display:"flex",alignItems:"center",gap:6,background:"transparent",border:`1.5px solid ${P.border}`,borderRadius:8,padding:"6px 13px",fontSize:12,fontWeight:600,color:P.mid,cursor:"pointer"}}>Share</button>
             {!loading&&allTasks.length>0&&(<div style={{display:"flex",alignItems:"center",gap:7,paddingLeft:6,borderLeft:`1px solid ${P.border}`}}><div style={{width:60,height:5,borderRadius:3,background:P.border,overflow:"hidden"}}><div style={{width:`${Math.round(doneCnt/allTasks.length*100)}%`,height:"100%",background:`linear-gradient(90deg,${P.accent},#c084fc)`,borderRadius:3}}/></div><span style={{fontSize:11,color:P.muted,fontWeight:600}}>{doneCnt}/{allTasks.length}</span></div>)}
           </div>

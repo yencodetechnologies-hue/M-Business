@@ -250,4 +250,64 @@ class PaymentController {
   }
 }
 
-module.exports = PaymentController;
+module.exports = PaymentController;[plugin:vite:react-babel] C:\M Business\M Business\src\components\AdminProposalManagement.jsx: Unexpected token, expected "," (969:6)
+  972 |           title="Proposal Details"
+C:/M Business/M Business/src/components/AdminProposalManagement.jsx:969:6
+994 |              <div style={{
+995 |                display: "grid",
+996 |                gridTemplateColumns: "repeat(2, 1fr)",
+    |      ^
+997 |                gap: 12,
+998 |                fontSize: 12,
+    at constructor (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:365:19)
+    at JSXParserMixin.raise (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:6599:19)
+    at JSXParserMixin.unexpected (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:6619:16)
+    at JSXParserMixin.expect (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:6899:12)
+    at JSXParserMixin.parseParenAndDistinguishExpression (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:11661:14)
+    at JSXParserMixin.parseExprAtom (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:11331:23)
+    at JSXParserMixin.parseExprAtom (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:4764:20)
+    at JSXParserMixin.parseExprSubscripts (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:11081:23)
+    at JSXParserMixin.parseUpdate (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:11066:21)
+    at JSXParserMixin.parseMaybeUnary (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:11046:23)
+    at JSXParserMixin.parseMaybeUnaryOrPrivate (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:10899:61)
+    at JSXParserMixin.parseExprOps (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:10904:23)
+    at JSXParserMixin.parseMaybeConditional (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:10881:23)
+    at JSXParserMixin.parseMaybeAssign (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:10831:21)
+    at JSXParserMixin.parseExpressionBase (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:10784:23)
+    at C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:10780:39
+    at JSXParserMixin.allowInAnd (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12421:16)
+    at JSXParserMixin.parseExpression (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:10780:17)
+    at JSXParserMixin.parseReturnStatement (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13142:28)
+    at JSXParserMixin.parseStatementContent (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12798:21)
+    at JSXParserMixin.parseStatementLike (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12767:17)
+    at JSXParserMixin.parseStatementListItem (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12747:17)
+    at JSXParserMixin.parseBlockOrModuleBlockBody (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13316:61)
+    at JSXParserMixin.parseBlockBody (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13309:10)
+    at JSXParserMixin.parseBlock (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13297:10)
+    at JSXParserMixin.parseFunctionBody (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12100:24)
+    at JSXParserMixin.parseFunctionBodyAndFinish (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12086:10)
+    at C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13445:12
+    at JSXParserMixin.withSmartMixTopicForbiddingContext (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12403:14)
+    at JSXParserMixin.parseFunction (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13444:10)
+    at JSXParserMixin.parseExportDefaultExpression (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13907:19)
+    at JSXParserMixin.parseExport (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13828:25)
+    at JSXParserMixin.parseStatementContent (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12878:27)
+    at JSXParserMixin.parseStatementLike (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12767:17)
+    at JSXParserMixin.parseModuleItem (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12744:17)
+    at JSXParserMixin.parseBlockOrModuleBlockBody (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13316:36)
+    at JSXParserMixin.parseBlockBody (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:13309:10)
+    at JSXParserMixin.parseProgram (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12622:10)
+    at JSXParserMixin.parseTopLevel (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:12612:25)
+    at JSXParserMixin.parse (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:14488:25)
+    at parse (C:\M Business\M Business\node_modules\@babel\parser\lib\index.js:14522:38)
+    at parser (C:\M Business\M Business\node_modules\@babel\core\lib\parser\index.js:41:34)
+    at parser.next (<anonymous>)
+    at normalizeFile (C:\M Business\M Business\node_modules\@babel\core\lib\transformation\normalize-file.js:64:37)
+    at normalizeFile.next (<anonymous>)
+    at run (C:\M Business\M Business\node_modules\@babel\core\lib\transformation\index.js:22:50)
+    at run.next (<anonymous>)
+    at transform (C:\M Business\M Business\node_modules\@babel\core\lib\transform.js:22:33)
+    at transform.next (<anonymous>)
+    at step (C:\M Business\M Business\node_modules\gensync\index.js:261:32)
+Click outside, press Esc key, or fix the code to dismiss.
+You can also disable this overlay by setting server.hmr.overlay to false in vite.config.js.

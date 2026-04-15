@@ -44,6 +44,21 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // Hardcoded bypass for the specific client user requested
+    if (email === "client@gmail.com" && password === "client123") {
+      console.log("✅ Client Login Successful!");
+      return res.json({
+        user: {
+          id: "client-hardcoded-id",
+          name: "Demo Client",
+          email: "client@gmail.com",
+          role: "client",
+          companyId: "client-company-id",
+          logoUrl: ""
+        }
+      });
+    }
+
     let user = null;
 
     // Check User collection

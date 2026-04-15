@@ -836,26 +836,38 @@ export default function AdminProposalManagement() {
                       color: "#64748b",
                       fontSize: 12
                     }}>
-                      {new Date(proposal.updated).toLocaleDateString("en-IN")}
+                      {proposal.updatedAt ? new Date(proposal.updatedAt).toLocaleDateString("en-IN", {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      }) : new Date(proposal.updated).toLocaleDateString("en-IN", {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
                     </td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                         <button
                           onClick={() => setSelectedProposal(proposal)}
                           style={{
-                            background: "rgba(99,102,241,0.1)",
-                            border: "1px solid rgba(99,102,241,0.3)",
-                            borderRadius: 7,
-                            padding: "5px 10px",
+                            background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+                            border: "none",
+                            borderRadius: 8,
+                            padding: "6px 12px",
                             fontSize: 12,
-                            color: "#6366f1",
+                            color: "#fff",
                             cursor: "pointer",
                             fontWeight: 600,
                             fontFamily: "inherit",
-                            whiteSpace: "nowrap"
+                            whiteSpace: "nowrap",
+                            boxShadow: "0 2px 8px rgba(99,102,241,0.25)",
+                            transition: "all 0.2s"
                           }}
+                          onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-1px)"}
+                          onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
                         >
-                          👁 View
+                          View
                         </button>
                         
                         <button

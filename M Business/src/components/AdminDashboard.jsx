@@ -27,12 +27,13 @@ function Badge({ label }) {
 }
 
 const NAV = [
-  { key: "dashboard", icon: "🏠", label: "Dashboard" },
-  { key: "subadmins", icon: "🛡️", label: "Subadmins" },
-  { key: "reports", icon: "📈", label: "Reports" },
-  { key: "subscriptions", icon: "💳", label: "Subscriptions" },
-  { key: "packages", icon: "📦", label: "Packages" },
-  { key: "payments", icon: "💰", label: "Payments" }
+  { key: "dashboard", icon: "", label: "Dashboard" },
+  { key: "subadmins", icon: "", label: "Subadmins" },
+  { key: "proposals", icon: "", label: "Project Proposals" },
+  { key: "reports", icon: "", label: "Reports" },
+  { key: "subscriptions", icon: "", label: "Subscriptions" },
+  { key: "packages", icon: "", label: "Packages" },
+  { key: "payments", icon: "", label: "Payments" }
 ];
 
 export default function AdminDashboard({ user, setUser }) {
@@ -232,7 +233,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
           {active === "quotations" && <QuotationCreator clients={clients} projects={projects} />}
-          {active === "proposals" && <AdminProposalManagement />}
+          {active === "proposals" && <ProjectProposalCreator clients={clients} />}
           {active === "invoices" && <InvoiceCreator clients={clients} projects={projects} />}
           {active === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {active === "tasks" && <TaskPage projects={projects} employees={employees} />}

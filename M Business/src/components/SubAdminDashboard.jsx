@@ -2810,7 +2810,7 @@ const handleEditPackage = (pkg) => {
 
           {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange} />}
           {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange} />}
-          {validActive === "proposals" && <AdminProposalManagement />}
+          {validActive === "proposals" && <ProjectProposalCreator clients={clients} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} />}
           {validActive === "calendar" && <CalendarPage projects={projects} clients={clients} />}

@@ -47,6 +47,7 @@ const projectRoutes = require("./routes/projectroutes");
 const projectStatusRoutes = require("./routes/projectstatusroutes");
 const TaskPage = require("./routes/taskroutes");
 const Group = require("./routes/grouproutes");
+const integrationRoutes = require("./routes/integrationRoutes");
 const clientDashRoutes = require("./routes/clientdashboardroutes");
 const Invoices = require("./routes/invoiceroutes");
 const eventRoutes = require("./routes/eventroutes");
@@ -96,6 +97,7 @@ app.use("/api/emails", emailRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/role-permissions", rolePermissionRoutes);
+app.use("/api/integrations", integrationRoutes);
 app.use("/upload", express.static("uploads"));
 
 app.get("/", (req, res) => {
@@ -138,7 +140,13 @@ app.get("/test-email", async (req, res) => {
 const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
-mongoose.connect(process.env.MONGO_URI)
+const mongoUri = process.env.MONGO_URI;
+if (!mongoUri || typeof mongoUri !== 'string' || !mongoUri.trim()) {
+  console.error('❌ Missing or invalid MONGO_URI environment variable. Please check Backend/.env');
+  process.exit(1);
+}
+
+mongoose.connect(mongoUri)
   .then(() => {
     console.log("✅ MongoDB Connected");
     const PORT = process.env.PORT || 5000;

@@ -4,6 +4,11 @@ import PaymentHistory from './PaymentHistory';
 import axios from 'axios';
 
 const planIcons = {
+  trial: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+    </svg>
+  ),
   starter: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
@@ -35,6 +40,19 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
   const [paymentStats, setPaymentStats] = useState(null);
 
   const plans = [
+    {
+      id: 'trial',
+      name: 'Trial',
+      price: 0,
+      duration: '30 days',
+      description: 'Experience all professional features for 30 days — completely free.',
+      features: [
+        '30 Days Free Trial',
+        'Up to 5 Projects',
+        'Up to 5 Clients',
+        'Basic Email Support'
+      ]
+    },
     {
       id: 'starter',
       name: 'Starter',

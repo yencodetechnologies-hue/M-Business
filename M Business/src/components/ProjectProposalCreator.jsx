@@ -42,6 +42,7 @@ const SLIDE_TYPES = [
   { id:"team",        label:"Team",          icon:"👥", desc:"Members & roles" },
   { id:"process",     label:"Our Process",   icon:"⚙️", desc:"How we work" },
   { id:"closing",     label:"Next Steps",    icon:"🚀", desc:"Call to action" },
+  { id:"blank_first_page", label:"Blank First Page", icon:"📄", desc:"Empty first page for proposal" },
   { id:"proposal",    label:"Proposal Page 1", icon:"📄", desc:"A4 format proposal document page 1" },
   { id:"proposal_page2", label:"Proposal Page 2", icon:"📄", desc:"A4 format proposal document page 2" },
   { id:"portrait",    label:"Portrait Page", icon:"📱", desc:"Custom portrait page" },
@@ -60,51 +61,24 @@ function makeSlide(type, themeName="Violet") {
     case "budget":     return {...b, heading:"Budget Estimate", rows:[{item:"UI/UX Design",cost:"₹80,000"},{item:"Frontend Development",cost:"₹1,50,000"},{item:"Backend & APIs",cost:"₹1,20,000"},{item:"QA & Testing",cost:"₹40,000"},{item:"Deployment",cost:"₹30,000"}], total:"₹4,20,000"};
     case "team":       return {...b, heading:"Meet Our Team", members:[{name:"Arjun Sharma",role:"Project Lead",avatar:"AS"},{name:"Priya Nair",role:"UI/UX Designer",avatar:"PN"},{name:"Karthik Raj",role:"Full Stack Dev",avatar:"KR"},{name:"Meena Iyer",role:"QA Engineer",avatar:"MI"}]};
     case "process":    return {...b, heading:"Our Process", steps:[{icon:"🔍",label:"Research",desc:"Deep dive into your needs"},{icon:"✏️",label:"Design",desc:"Wireframes & prototypes"},{icon:"⚡",label:"Build",desc:"Agile development"},{icon:"🚀",label:"Launch",desc:"Deploy & support"}]};
+    case "blank_first_page": return {...b, pageTitle:"Blank First Page"};
     case "proposal":   return {...b, 
-      companyName:"IDES ARCHITECTS", 
-      clientName:"DR.KARTHIK", 
-      clientAddress:"ADYAR, CHENNAI",
-      refNo:"16/APP INT/DR.KAR",
+      companyName:"", 
+      clientName:"", 
+      clientAddress:"",
+      refNo:"",
       date:new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-'),
-      projectType:"APARTMENT INTERIORS",
-      scopeOfWork:[
-        "presentation drawings",
-        "3D rendering of design-1 option (for more than 2 option, additionally charged)",
-        "Working Drawings, Interior Design and Furnishing",
-        "Plumbing and Electrical Co-ordination Drawings",
-        "Recommended List of Tiles, Electrical Fixtures and Plumbing Fixtures and various other finishes, selection only",
-        "Coordination with Client, Contractor and Team",
-        "INTERIOR BOQ & Costing for project",
-        "Selection of specified finishing materials in the BOQ",
-        "Tiling Layout drawings",
-        "Wall cladding drawings",
-        "Selection of Materials & Finishes"
-      ],
-      conceptStage:[
-        "Identify client's requirement",
-        "Preparation of alternative conceptual layouts",
-        "Rough estimate based on floor area basis"
-      ],
-      companyAddress:"PLOT NO 84,SRINAGAR COLONY, KUMBAKONAM, PIN-612 001,MOBILE:9003075630"
+      projectType:"",
+      scopeOfWork:[],
+      conceptStage:[],
+      companyAddress:""
     };
     case "proposal_page2": return {...b,
-      companyName:"IDES ARCHITECTS",
-      siteVisits:[
-        "Two numbers of complimentary visits will be made on specific requests",
-        "Additional visits other than the above stages will be charged additionally @ Rs.2,500/- per visit"
-      ],
-      feeStructure:[
-        "Our overall professional consultancy fee for architecture services would be 8% of Estimated cost."
-      ],
-      stagesOfPayment:[
-        "10% As an Advance",
-        "15% Towards Finalization of Concept Drawings",
-        "30% Towards Preparation of 3D Models",
-        "25% Towards release of Good for Construction drawings",
-        "15% Towards material finalization & BOQ preparation",
-        "5% Towards site completion"
-      ],
-      companyAddress:"PLOT NO 84,SRINAGAR COLONY, KUMBAKONAM, PIN-612 001,MOBILE:9003075630"
+      companyName:"",
+      siteVisits:[],
+      feeStructure:[],
+      stagesOfPayment:[],
+      companyAddress:""
     };
     case "portrait":   return {...b, orientation:"portrait", heading:"Portrait Page", body:"This is a custom portrait page. Add your content here."};
     case "landscape":  return {...b, orientation:"landscape", heading:"Landscape Page", body:"This is a custom landscape page. Add your content here."};
@@ -117,11 +91,11 @@ function makeSlide(type, themeName="Violet") {
 function makeDemo() {
   const theme = "Violet";
   return {
-    id:pid(), title:"E-Commerce Platform Redesign", client:"RetailMax Pvt Ltd",
-    theme, status:"draft", format:"ppt",
+    id:pid(), title:"New Project Proposal", client:"",
+    theme, status:"draft", format:"a4-portrait",
     created:new Date().toISOString(), updated:new Date().toISOString(),
     rejectNote:"",
-    slides: SLIDE_TYPES.map(t => makeSlide(t.id, theme)),
+    slides: [makeSlide("proposal", theme)],
   };
 }
 
@@ -468,6 +442,67 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
       </div>
     {elementsOverlay}
     </div>
+  );
+
+  // BLANK FIRST PAGE - A4 Format Document
+  if(slide.type==="blank_first_page") return (
+    <>
+      <style>{`
+        @media print {
+          @page { 
+            size: A4; 
+            margin: 20mm; 
+          }
+          body { 
+            margin: 0; 
+            background: white !important; 
+          }
+          .blank-page-content {
+            width: 100% !important;
+            height: auto !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+          }
+          .no-print { 
+            display: none !important; 
+          }
+        }
+      `}</style>
+      <div className="blank-page-content" style={{...W,padding:"40px 60px",background:"#fff",fontSize:"14px",lineHeight:"1.5",color:"#000",position:"relative",minHeight:"1273px"}}>
+        {/* Print Button - Only show when not editing */}
+        {!editing && (
+          <button 
+            onClick={() => window.print()} 
+            className="no-print"
+            style={{
+              position:"absolute", 
+              top:"10px", 
+              right:"10px", 
+              background:"#007bff", 
+              color:"white", 
+              border:"none", 
+              borderRadius:"5px", 
+              padding:"8px 15px", 
+              cursor:"pointer",
+              fontSize:"12px",
+              fontWeight:"bold"
+            }}
+          >
+            🖨️ Print
+          </button>
+        )}
+        
+        {/* Empty page content */}
+        <div style={{height:"100%", display:"flex", alignItems:"center", justifyContent:"center"}}>
+          <div style={{color:"#ccc", fontSize:"16px", textAlign:"center"}}>
+            {editing ? "Empty First Page - Click to add content" : ""}
+          </div>
+        </div>
+        
+        {elementsOverlay}
+      </div>
+    </>
   );
 
   // PROPOSAL - A4 Format Document
@@ -1523,7 +1558,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
 
         {/* RIGHT: status actions + share */}
         <div style={{display:"flex",alignItems:"center",gap:12,flexShrink:0}}>
-          <button onClick={()=>flash("🪄 Magic Write: Summarizing your slides with AI...")} style={{background:"#f1f5f9",border:"none",borderRadius:8,padding:"8px 12px",fontSize:13,fontWeight:700,color:"#7d2ae8",cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>🪄 Magic Write</button>
+        
           
           <div style={{width:1,height:24,background:"#e5e7eb"}}/>
 
@@ -1580,13 +1615,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             <button key={item.id} onClick={()=>setLeftPanel(leftPanel===item.id?"":item.id)}
               style={{width:64,height:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:leftPanel===item.id?"rgba(124,58,237,0.15)":"none",border:"none",borderRadius:8,cursor:"pointer",transition:"all .15s",color:leftPanel===item.id?"#7c3aed":"#4b5563"}}>
               <span style={{fontSize:24}}>{item.icon}</span>
-              <span style={{fontSize:9,fontWeight:600,letterSpacing:0.3,opacity:leftPanel===item.id?1:0.7}}>{item.label}</span>
+              <span style={{fontSize:9,fontWeight:600,letterSpacing:0.3,opacity:leftPanel===item.id?1:0.5,textAlign:"center",color:"#6b7280"}}>
+                {item.label}
+              </span>
             </button>
           ))}
-          <div style={{flex:1}}/>
-          <button onClick={()=>flash("🪄 Magic features coming soon!")} style={{width:64,height:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",borderRadius:8,cursor:"pointer",color:"#6b7280"}}>
-            <span style={{fontSize:24}}>🪄</span><span style={{fontSize:9,fontWeight:500}}>Magic</span>
-          </button>
         </div>
         {/* ── LEFT CONTENT PANEL ── */}
         {leftPanel && (
@@ -1850,8 +1883,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:16}}>
                 {[
                   {icon:"✂️", title:"Background Remover", desc:"Remove image backgrounds in 1 click"},
-                  {icon:"🧹", title:"Magic Eraser", desc:"Brush over objects to remove them"},
-                  {icon:"🖌️", title:"Magic Morph", desc:"Transform words with prompts"}
+             
                 ].map(tool=>(
                   <div key={tool.title} onClick={()=>flash(`Opening ${tool.title}...`)} style={{display:"flex",gap:12,padding:"16px",background:"linear-gradient(to right, #f8fafc, #fff)",border:"1px solid #e2e8f0",borderRadius:12,cursor:"pointer",alignItems:"center"}} className="hb">
                     <div style={{fontSize:24}}>{tool.icon}</div>
@@ -1989,6 +2021,15 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               <Slide slide={s} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview/>
             </div>
             <div style={{position:"absolute",bottom:4,left:6,fontSize:10,fontWeight:800,color:i===page?"#7d2ae8":"#94a3b8",background:"rgba(255,255,255,0.8)",padding:"0 4px",borderRadius:4}}>{i+1}</div>
+            {canEdit && doc.slides.length > 1 && (
+              <button 
+                onClick={(e) => {e.stopPropagation(); delSlide(i);}} 
+                style={{position:"absolute",top:2,right:2,width:18,height:18,borderRadius:"50%",background:"#ef4444",border:"none",color:"#fff",fontSize:10,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}}
+                title="Delete slide"
+              >
+                ×
+              </button>
+            )}
           </div>
         )})}
         <button onClick={()=>{canEdit&&addSlide("blank");}} disabled={!canEdit}

@@ -4,7 +4,9 @@ async function test() {
     const res = await axios.post("http://localhost:5000/api/vendors", {
       vendorName: "Test",
       vendorProduct: "Test Product",
-      amountTaxGst: 100,
+      amount: 100,
+      tax: 10,
+      gst: 18,
       paidAmount: 100,
       companyId: "test_company"
     });

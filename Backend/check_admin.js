@@ -21,7 +21,7 @@ async function seedAdmin() {
     await mongoose.disconnect();
     return;
   }
-  const password = 'admin123';
+  const password = 'admin1234';
   const hashedPassword = await bcrypt.hash(password, 10);
   
   await User.create({

@@ -67,9 +67,10 @@ router.post("/seed", async (req, res) => {
 
   try {
     for (const r of defaultRoles) {
+      // Use $setOnInsert so existing permissions are NOT overwritten
       await RolePermission.findOneAndUpdate(
         { role: r.role },
-        { permissions: r.permissions },
+        { $setOnInsert: { permissions: r.permissions, companyId: "" } },
         { upsert: true, new: true }
       );
     }

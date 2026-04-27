@@ -6,9 +6,17 @@ const subscriptionSchema = new mongoose.Schema({
   userName: { type: String },
 
   // Current Plan Details
-  planName: { type: String, required: true, enum: ["Free", "Starter", "Professional", "Enterprise"] },
+  planName: { type: String, required: true, enum: ["Free", "Trial", "Starter", "Professional", "Enterprise", "Custom"] },
   planPrice: { type: Number, default: 0 },
-  billingCycle: { type: String, enum: ["monthly", "yearly"], default: "monthly" },
+  billingCycle: { type: String, enum: ["monthly", "yearly", "trial", "custom"], default: "monthly" },
+
+  // Trial
+  isTrial: { type: Boolean, default: false },
+
+  // Usage Tracking (e.g., number of employees/actions used)
+  usageLimit: { type: Number, default: 999 },
+  usageCount: { type: Number, default: 0 },
+  usageLimitAlertSent: { type: Boolean, default: false },
 
   // Subscription Status
   status: { type: String, enum: ["active", "inactive", "cancelled", "expired", "pending", "grace_period", "hidden"], default: "pending" },
@@ -18,8 +26,8 @@ const subscriptionSchema = new mongoose.Schema({
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date },
   nextBillingDate: { type: Date },
-  expiredAt: { type: Date }, // When subscription actually expired
-  hiddenAt: { type: Date }, // When subscription was hidden (60 days after expiry)
+  expiredAt: { type: Date },
+  hiddenAt: { type: Date },
 
   // Reminder tracking
   reminderSent: { type: Boolean, default: false },
@@ -35,30 +43,32 @@ const subscriptionSchema = new mongoose.Schema({
   // M Business as provider
   providerCompany: { type: String, default: "M Business" },
   providerEmail: { type: String, default: "billing@mbusiness.com" },
-  providerPhone: { type: String, default: "+91-XXXXXXXXXX" },
+  providerPhone: { type: String, default: "+91-9876543210" },
+  providerGst: { type: String, default: "GSTIN-33AABCM1234Z1Z1" },
+  providerAddress: { type: String, default: "M Business Pvt Ltd, Chennai, Tamil Nadu, India" },
 
-  // Invoice/Quotation references
-  invoiceRefs: [{ type: String }], // Invoice numbers
-  quotationRefs: [{ type: String }], // Quotation numbers
+  // Invoice/Quotation references (M Business provides these)
+  invoiceRefs: [{ type: String }],
+  quotationRefs: [{ type: String }],
 
   // Tenant Linkage
   companyId: { type: String, index: true },
 
-  // Subadmin visibility control
+  // Subadmin visibility control (controlled by admin via mySubscriptions permission)
   showInDashboard: { type: Boolean, default: true },
 
-  // Metadata
+  // Notes
   notes: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-// Index for faster queries
 subscriptionSchema.index({ userId: 1, status: 1 });
 subscriptionSchema.index({ userEmail: 1 });
+subscriptionSchema.index({ companyId: 1, status: 1 });
 
-// Virtual field to calculate days left
-subscriptionSchema.virtual("daysLeft").get(function() {
+// Virtual: days remaining
+subscriptionSchema.virtual("daysLeft").get(function () {
   if (!this.endDate) return 0;
   const end = new Date(this.endDate);
   const today = new Date();
@@ -67,7 +77,11 @@ subscriptionSchema.virtual("daysLeft").get(function() {
   return diffDays > 0 ? diffDays : 0;
 });
 
-// Include virtuals when converting to JSON/Object
+// Virtual: usage remaining
+subscriptionSchema.virtual("usageRemaining").get(function () {
+  return Math.max(0, (this.usageLimit || 999) - (this.usageCount || 0));
+});
+
 subscriptionSchema.set("toJSON", { virtuals: true });
 subscriptionSchema.set("toObject", { virtuals: true });
 

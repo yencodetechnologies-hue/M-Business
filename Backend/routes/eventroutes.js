@@ -6,7 +6,11 @@ const Event = require("../models/EventModels");
 // GET all events
 router.get("/", async (req, res) => {
   try {
-    const events = await Event.find().sort({ date: 1 });
+    const filter = {};
+    if (req.query.companyId && req.query.companyId !== "admin-company-id" && req.query.companyId !== "default") {
+      filter.companyId = req.query.companyId;
+    }
+    const events = await Event.find(filter).sort({ date: 1 });
     res.json(events);
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });

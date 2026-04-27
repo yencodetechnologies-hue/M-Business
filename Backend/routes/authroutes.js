@@ -6,6 +6,7 @@ const User     = require("../models/UserModels");   // உங்கள் existi
 const Client   = require("../models/ClientModel");  // உங்கள் existing ✅
 const Manager  = require("../models/ManagerModel"); // உங்கள் existing ✅
 const Employee = require("../models/EmployeeModel");// ← இது மட்டும் புதுசு add
+const Subscription = require("../models/SubscriptionModel");
 
 // ── POST /api/auth/login ──────────────────────────────────────────────────────
 router.post("/login", async (req, res) => {
@@ -15,7 +16,7 @@ router.post("/login", async (req, res) => {
     console.log("🔑 Password received:", password);
 
     // Hardcoded bypass for the specific admin user requested
-    if (email === "admin@gmail.com" && password === "admin123") {
+    if (email === "admin@gmail.com" && password === "admin1234") {
       console.log("✅ Admin Login Succesful!");
       return res.json({
         user: {
@@ -166,6 +167,8 @@ router.post("/signup", async (req, res) => {
     } else if (selectedRole === "subadmin") {
       const newUser = new User({ name, email, password: hashed, role: "subadmin", phone, companyName: companyName || "" });
       await newUser.save();
+      // Auto Free Trial creation removed so subadmins are forced to pick a plan
+
     } else {
       const newUser = new User({ name, email, password: hashed, role: "admin", phone });
       await newUser.save();

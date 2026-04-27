@@ -5,6 +5,7 @@ const Employee = require("../models/EmployeeModel");
 const Manager = require("../models/ManagerModel");
 const Client = require("../models/ClientModel");
 const Quotation = require("../models/QuotationModel");
+const Subscription = require("../models/SubscriptionModel");
 const bcrypt = require("bcryptjs");
 
 // GET all subadmins
@@ -46,6 +47,25 @@ router.post("/", async (req, res) => {
     // Wait, UserModel might not have status. I will add it to User schema later if needed.
 
     await newSubadmin.save();
+    
+    // Create 30 days free trial subscription
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 30);
+    
+    const newSubscription = new Subscription({
+      userId: newSubadmin._id.toString(),
+      userEmail: newSubadmin.email,
+      userName: newSubadmin.name,
+      planName: "Free",
+      planPrice: 0,
+      billingCycle: "monthly",
+      status: "active",
+      endDate: endDate,
+      features: ["30 Days Free Trial"],
+      companyId: companyName || newSubadmin._id.toString(),
+      isFullyPaid: true
+    });
+    await newSubscription.save();
     
     res.status(201).json({ msg: "Subadmin created", subadmin: newSubadmin });
   } catch (err) {

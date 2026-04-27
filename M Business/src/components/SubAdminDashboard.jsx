@@ -1602,7 +1602,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
   const displayName = user?.name || user?.email?.split("@")[0] || "Admin";
   const initials = displayName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const roleDisplay = (user?.role || "ADMIN").toUpperCase();
-  const companyName = user?.companyName || "Your Company";
+  const companyName = user?.companyName || "";
   const logoRef = useRef();
   
   return (
@@ -2472,22 +2472,29 @@ const handleEditPackage = (pkg) => {
   };
 
 
+  // ── Subscription gate: subadmins must subscribe before accessing dashboard ──
+  const roleLower = (user?.role || "").toLowerCase().trim();
+  const isSubAdmin = roleLower === "subadmin" || roleLower === "sub_admin" || roleLower === "sub-admin";
+  const isAdmin = user?.email === "admin@gmail.com";
+
+  // Enforce subscription page when:
+  // (a) subadmin and still loading subscription data (prevent flash)
+  // (b) subadmin and no active subscription (blocked)
   let enforceMySubscriptions = false;
-  // Admin bypasses all subscription checks
-  if (!subLoading && user?.email !== "admin@gmail.com") {
-    // If blocked (expired or no sub)
-    if (subStatus.blocked) {
+  if (!isAdmin && isSubAdmin) {
+    if (subLoading || (!subLoading && subStatus.blocked)) {
       enforceMySubscriptions = true;
     }
   }
 
   const rawNavItems = getNavForRole(user?.role);
-  // When restricted, ONLY show My Subscriptions and Dashboard
-  const navItems = enforceMySubscriptions 
-    ? rawNavItems.filter(n => ["mysubscriptions", "dashboard"].includes(n.key)) 
+  // When restricted, ONLY show My Subscriptions (no dashboard — must subscribe first)
+  const navItems = enforceMySubscriptions
+    ? rawNavItems.filter(n => ["mysubscriptions"].includes(n.key))
     : rawNavItems;
 
-  const validActive = enforceMySubscriptions 
+  // Always land on mysubscriptions when enforced — never show dashboard
+  const validActive = enforceMySubscriptions
     ? "mysubscriptions"
     : (navItems.find(n => n.key === active) ? active : navItems[0]?.key || "dashboard");
 
@@ -2813,11 +2820,11 @@ const handleEditPackage = (pkg) => {
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} />}
-          {validActive === "calendar" && <CalendarPage projects={projects} clients={clients} />}
+          {validActive === "calendar" && <CalendarPage projects={projects} clients={clients} companyId={companyId} />}
           {validActive === "accounts" && <AccountsPage ExpensesPage={ExpensesPage} />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
-          {validActive === "mysubscriptions" && <MySubscriptions user={user} />}
+          {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
           {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} />}
           {validActive === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}

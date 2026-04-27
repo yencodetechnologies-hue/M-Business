@@ -6,7 +6,7 @@ require("dotenv").config();
 
 async function verifyEmployee(email, password) {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/mbusiness");
+    await mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/mbusiness");
     
     const employee = await Employee.findOne({ email: email.toLowerCase().trim() });
     

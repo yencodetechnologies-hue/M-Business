@@ -2,153 +2,104 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
-const T = { primary: "#3b0764", sidebar: "#1e0a3c", accent: "#9333ea", bg: "#f5f3ff", card: "#FFFFFF", text: "#1e0a3c", muted: "#7c3aed", border: "#ede9fe" };
-
-function Badge({ label }) { 
-  const c = label === "expired" ? "#EF4444" : label === "warning" ? "#F59E0B" : "#22C55E";
-  return <span style={{ background: `${c}18`, color: c, border: `1px solid ${c}33`, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{label}</span>; 
-}
-
 export default function EmployeeSubscriptionWarning({ user }) {
-  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSubscriptionStatus = async () => {
+    const fetch = async () => {
       try {
-        const id = user?._id || user?.id;
-        if (!id) return;
-        
-        const res = await axios.get(`${BASE_URL}/api/subscriptions/employee-status/${id}`);
-        setSubscriptionStatus(res.data);
-      } catch (err) {
-        console.error("Failed to fetch subscription status:", err);
+        // Use companyId if available (for employees under a subadmin),
+        // otherwise fall back to user's own ID
+        const lookupId = user?.companyId || user?.company || user?._id || user?.id;
+        if (!lookupId) return;
+        const res = await axios.get(`${BASE_URL}/api/subscriptions/employee-status/${lookupId}`);
+        setStatus(res.data);
+      } catch (e) {
+        console.error("Subscription status fetch error:", e);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchSubscriptionStatus();
+    fetch();
   }, [user]);
 
-  if (loading) {
-    return (
-      <div style={{ 
-        background: "#f8fafc", 
-        border: "1px solid #e2e8f0", 
-        borderRadius: 12, 
-        padding: "16px 20px", 
-        marginBottom: 16 
-      }}>
-        <div style={{ textAlign: "center", color: "#64748b" }}>Loading subscription status...</div>
-      </div>
-    );
-  }
+  if (loading) return null; // silent loading — don't block the dashboard
 
-  if (!subscriptionStatus?.hasSubscription) {
+  // ── Hidden (60+ days expired) → locked message ──────────────────────────────
+  if (status?.isHidden || status?.notification?.type === "hidden") {
     return (
-      <div style={{ 
-        background: "linear-gradient(135deg,#fef2f2,#fee2e2)", 
-        border: "2px solid #fecaca", 
-        borderRadius: 12, 
-        padding: "16px 20px", 
-        marginBottom: 16,
-        display: "flex",
-        alignItems: "center",
-        gap: 12
+      <div style={{
+        background: "linear-gradient(135deg,#1e293b,#334155)",
+        border: "2px solid #475569", borderRadius: 14, padding: "18px 22px",
+        marginBottom: 18, display: "flex", alignItems: "center", gap: 14
       }}>
-        <div style={{ fontSize: 24 }}>🚫</div>
+        <div style={{ fontSize: 28 }}>🔒</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#991b1b", marginBottom: 4 }}>
-            No Active Subscription
-          </div>
-          <div style={{ fontSize: 13, color: "#7f1d1d" }}>
-            Please contact your administrator to activate a subscription.
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#f1f5f9", marginBottom: 4 }}>Access Restricted</div>
+          <div style={{ fontSize: 13, color: "#cbd5e1" }}>
+            Your company's subscription has expired. Please contact your administrator to restore access.
           </div>
         </div>
-        <Badge label="expired" />
+        <span style={{ background: "#ef444418", color: "#ef4444", border: "1px solid #ef444433", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>LOCKED</span>
       </div>
     );
   }
 
-  const { subscription, notification } = subscriptionStatus;
-
-  if (!notification) {
-    return null; // No warning needed
+  // ── No subscription ──────────────────────────────────────────────────────────
+  if (!status?.hasSubscription && status?.notification?.type !== "renewal") {
+    // Don't block employee dashboard — just show a subtle notice
+    if (status?.notification?.type === "expired") {
+      return (
+        <div style={{
+          background: "linear-gradient(135deg,#fef2f2,#fee2e2)",
+          border: "2px solid #fecaca", borderRadius: 14, padding: "16px 20px",
+          marginBottom: 16, display: "flex", alignItems: "center", gap: 12
+        }}>
+          <div style={{ fontSize: 22 }}>🚫</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#991b1b", marginBottom: 3 }}>Subscription Expired</div>
+            <div style={{ fontSize: 13, color: "#7f1d1d" }}>Contact your administrator to renew the company subscription.</div>
+          </div>
+        </div>
+      );
+    }
+    return null;
   }
 
-  const getWarningStyle = () => {
-    switch (notification.type) {
-      case "renewal":
-        return {
-          background: "linear-gradient(135deg,#fef3c7,#fde68a)",
-          border: "2px solid #f59e0b",
-          icon: "⚠️",
-          titleColor: "#92400e",
-          textColor: "#78350f"
-        };
-      case "expired":
-        return {
-          background: "linear-gradient(135deg,#fef2f2,#fee2e2)",
-          border: "2px solid #ef4444",
-          icon: "🚫",
-          titleColor: "#991b1b",
-          textColor: "#7f1d1d"
-        };
-      case "hidden":
-        return {
-          background: "linear-gradient(135deg,#1e293b,#334155)",
-          border: "2px solid #475569",
-          icon: "🔒",
-          titleColor: "#f1f5f9",
-          textColor: "#cbd5e1"
-        };
-      default:
-        return {
-          background: "#f8fafc",
-          border: "1px solid #e2e8f0",
-          icon: "ℹ️",
-          titleColor: "#1e293b",
-          textColor: "#64748b"
-        };
-    }
-  };
+  const { notification } = status || {};
+  if (!notification || notification.type === "none") return null;
 
-  const style = getWarningStyle();
-
-  return (
-    <div style={{ 
-      background: style.background, 
-      border: style.border, 
-      borderRadius: 12, 
-      padding: "16px 20px", 
-      marginBottom: 16,
-      display: "flex",
-      alignItems: "center",
-      gap: 12
-    }}>
-      <div style={{ fontSize: 24 }}>{style.icon}</div>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: style.titleColor, marginBottom: 4 }}>
-          {notification.type === "renewal" && "Subscription Renewal Required"}
-          {notification.type === "expired" && "Subscription Expired"}
-          {notification.type === "hidden" && "Access Restricted"}
-        </div>
-        <div style={{ fontSize: 13, color: style.textColor }}>
-          {notification.message}
-        </div>
-        {notification.type === "renewal" && (
-          <div style={{ fontSize: 12, color: style.textColor, marginTop: 4 }}>
-            Days remaining: {notification.daysLeft}
+  // ── 10-day renewal warning ───────────────────────────────────────────────────
+  if (notification.type === "renewal") {
+    return (
+      <div style={{
+        background: "linear-gradient(135deg,#fef3c7,#fde68a)",
+        border: "2px solid #f59e0b", borderRadius: 14, padding: "16px 22px",
+        marginBottom: 18, display: "flex", alignItems: "center", gap: 14,
+        boxShadow: "0 4px 16px rgba(245,158,11,0.15)"
+      }}>
+        <div style={{ fontSize: 28 }}>⏰</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#92400e", marginBottom: 4 }}>
+            Subscription Renewal Required
           </div>
-        )}
-        {notification.type === "expired" && (
-          <div style={{ fontSize: 12, color: style.textColor, marginTop: 4 }}>
-            Days since expiry: {notification.daysSinceExpiry}
+          <div style={{ fontSize: 13, color: "#78350f", lineHeight: 1.5 }}>
+            {notification.message}
           </div>
-        )}
+          {notification.daysLeft !== undefined && (
+            <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ background: "#fde68a", border: "1px solid #f59e0b", borderRadius: 20, padding: "2px 10px", fontSize: 12, fontWeight: 800, color: "#92400e" }}>
+                {notification.daysLeft} day{notification.daysLeft === 1 ? "" : "s"} remaining
+              </div>
+              <span style={{ fontSize: 12, color: "#78350f" }}>Please contact your administrator to renew.</span>
+            </div>
+          )}
+        </div>
+        <span style={{ background: "#f59e0b18", color: "#92400e", border: "1px solid #f59e0b33", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>WARNING</span>
       </div>
-      <Badge label={notification.type === "renewal" ? "warning" : notification.type} />
-    </div>
-  );
+    );
+  }
+
+  return null;
 }

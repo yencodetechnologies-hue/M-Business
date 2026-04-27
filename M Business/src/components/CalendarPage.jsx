@@ -11,7 +11,7 @@ const TYPES  = ["Meeting","Call","Review","Planning","Handover","Other"];
 const TC = { Meeting:"#9333ea", Call:"#7c3aed", Review:"#22C55E", Planning:"#f59e0b", Handover:"#a855f7", Other:"#6b7280" };
 const EMPTY = { name:"", project:"", client:"", date:"", start:"", end:"", notes:"", type:"Meeting" };
 
-export default function CalendarPage({ projects=[], clients=[] }) {
+export default function CalendarPage({ projects=[], clients=[], companyId }) {
   const [events,  setEvents]  = useState([]);
   const [loading, setLoading] = useState(true);
   const [search,  setSearch]  = useState("");
@@ -37,7 +37,7 @@ export default function CalendarPage({ projects=[], clients=[] }) {
   const load = async () => {
     setLoading(true);
     try {
-      const r = await axios.get(API);
+      const r = await axios.get(`${API}?companyId=${companyId || ""}`);
       setEvents(Array.isArray(r.data) ? r.data : []);
     } catch {
       setEvents([]);
@@ -74,7 +74,7 @@ export default function CalendarPage({ projects=[], clients=[] }) {
     setSaving(true);
     try {
       if (modal === "add") {
-        const r = await axios.post(API, form);
+        const r = await axios.post(API, { ...form, companyId: companyId || "" });
         setEvents(p => [r.data, ...p]);
         showToast("✅ Event added!");
       } else {

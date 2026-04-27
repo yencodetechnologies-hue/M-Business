@@ -1,5 +1,9 @@
 const Task  = require("../models/TaskModels");
 const Group = require("../models/GroupModels");
+const TaskInvitation = require("../models/TaskInvitationModel");
+const User = require("../models/UserModels");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 exports.getAllTasks = async (req, res) => {
   try {
@@ -8,9 +12,17 @@ exports.getAllTasks = async (req, res) => {
     if (req.query.groupId)  filter.groupId  = req.query.groupId;
     if (req.query.status)   filter.status   = req.query.status;
     if (req.query.assignTo) filter.assignTo = req.query.assignTo;
+    if (req.query.person) {
+      filter.$or = [
+        { assignedTo: req.query.person },
+        { "invitedMembers.email": req.query.person }
+      ];
+    }
 
     const tasks = await Task.find(filter)
       .populate("projectId", "name color")
+      .populate("assignedTo", "name email")
+      .populate("invitedMembers.invitedBy", "name email")
       .sort({ order: 1, createdAt: 1 });
     res.json(tasks);
   } catch (err) {
@@ -188,6 +200,176 @@ exports.moveTask = async (req, res) => {
 
     if (!task) return res.status(404).json({ message: "Task not found" });
     res.json(task);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.inviteMember = async (req, res) => {
+  try {
+    const { taskId, email } = req.body;
+    const companyId = req.companyId || "NONE";
+    
+    const task = await Task.findOne({ _id: taskId, isDeleted: false, companyId });
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const existingInvitation = await TaskInvitation.findOne({ 
+      task: taskId, 
+      email, 
+      status: "pending" 
+    });
+    if (existingInvitation) {
+      return res.status(400).json({ message: "Invitation already sent" });
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const invitation = await TaskInvitation.create({
+      task: taskId,
+      email,
+      invitedBy: req.user.id,
+      token
+    });
+
+    const transporter = nodemailer.createTransporter({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const inviteUrl = `${process.env.FRONTEND_URL}/invite/${token}`;
+    await transporter.sendMail({
+      to: email,
+      subject: `Task Invitation: ${task.title}`,
+      html: `
+        <h2>You've been invited to a task!</h2>
+        <p><strong>Task:</strong> ${task.title}</p>
+        <p><strong>Description:</strong> ${task.description}</p>
+        <p>Click <a href="${inviteUrl}">here</a> to accept or reject the invitation.</p>
+        <p>This invitation expires in 7 days.</p>
+      `
+    });
+
+    res.status(201).json({ message: "Invitation sent successfully", invitation });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.respondToInvitation = async (req, res) => {
+  try {
+    const { token, action } = req.body;
+    
+    const invitation = await TaskInvitation.findOne({ token });
+    if (!invitation) return res.status(404).json({ message: "Invalid invitation" });
+    
+    if (invitation.expiresAt < new Date()) {
+      return res.status(400).json({ message: "Invitation expired" });
+    }
+
+    invitation.status = action === "accept" ? "accepted" : "rejected";
+    await invitation.save();
+
+    if (action === "accept") {
+      let user = await User.findOne({ email: invitation.email });
+      
+      if (!user) {
+        user = await User.create({
+          name: invitation.email.split("@")[0],
+          email: invitation.email,
+          password: crypto.randomBytes(16).toString("hex"),
+          role: "member"
+        });
+      }
+
+      await Task.findByIdAndUpdate(
+        invitation.task,
+        { 
+          $addToSet: { assignedTo: user._id },
+          $pull: { 
+            invitedMembers: { email: invitation.email }
+          }
+        }
+      );
+    }
+
+    res.json({ message: `Invitation ${action}ed successfully` });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.autoAssignTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const companyId = req.companyId || "NONE";
+    
+    const task = await Task.findOne({ _id: taskId, isDeleted: false, companyId });
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const availableUsers = await User.find({ 
+      companyId, 
+      role: { $in: ["member", "manager"] }
+    }).sort({ createdAt: 1 });
+
+    if (availableUsers.length === 0) {
+      return res.status(400).json({ message: "No available users for assignment" });
+    }
+
+    const randomUser = availableUsers[Math.floor(Math.random() * availableUsers.length)];
+    
+    const updatedTask = await Task.findByIdAndUpdate(
+      taskId,
+      { 
+        $addToSet: { assignedTo: randomUser._id },
+        autoAssign: true
+      },
+      { new: true }
+    ).populate("assignedTo", "name email");
+
+    res.json(updatedTask);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updateIntegrations = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { integrations } = req.body;
+    const companyId = req.companyId || "NONE";
+    
+    const task = await Task.findOneAndUpdate(
+      { _id: taskId, isDeleted: false, companyId },
+      { integrations },
+      { new: true }
+    );
+
+    if (!task) return res.status(404).json({ message: "Task not found" });
+    res.json(task);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getTaskMembers = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const companyId = req.companyId || "NONE";
+    
+    const task = await Task.findOne({ _id: taskId, isDeleted: false, companyId })
+      .populate("assignedTo", "name email")
+      .populate("invitedMembers.invitedBy", "name email");
+
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const members = {
+      assigned: task.assignedTo,
+      invited: task.invitedMembers
+    };
+
+    res.json(members);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

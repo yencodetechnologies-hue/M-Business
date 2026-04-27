@@ -11,6 +11,7 @@ const EventSchema = new mongoose.Schema(
     end:     { type: String, default: "" },       // "HH:MM"
     notes:   { type: String, default: "" },
     type:    { type: String, default: "Meeting", enum: ["Meeting","Call","Review","Planning","Handover","Other"] },
+    companyId: { type: String, default: "" },
   },
   { timestamps: true }
 );

@@ -15,6 +15,14 @@ const taskSchema = new mongoose.Schema(
       default: "🟡 Medium",
     },
     assignTo:      { type: String, default: "Unassigned" },
+    assignedTo:    [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    invitedMembers: [{ 
+      email: { type: String, required: true },
+      status: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending" },
+      invitedAt: { type: Date, default: Date.now },
+      invitedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+    }],
+    autoAssign:    { type: Boolean, default: false },
     type:          { type: String, default: "" },
     date:          { type: String, default: "" },
     time:          { type: String, default: "" },
@@ -25,6 +33,13 @@ const taskSchema = new mongoose.Schema(
     isDeleted:     { type: Boolean, default: false },
     order:         { type: Number, default: 0 },
     companyId:     { type: String, default: "" },
+    integrations: {
+      gmail: { type: Boolean, default: false },
+      slack: { type: Boolean, default: false },
+      googleCalendar: { type: Boolean, default: false },
+      github: { type: Boolean, default: false },
+      zapier: { type: Boolean, default: false }
+    }
   },
   { timestamps: true }
 );

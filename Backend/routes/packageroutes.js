@@ -109,6 +109,42 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// ASSIGN a subadmin to a package (add to assignedSubadmins)
+router.post("/:id/assign-subadmin", async (req, res) => {
+  try {
+    const { subadminId } = req.body;
+    if (!subadminId) return res.status(400).json({ msg: "subadminId required" });
+    const updated = await Package.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { assignedSubadmins: subadminId } },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ msg: "Package not found" });
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error assigning subadmin" });
+  }
+});
+
+// UNASSIGN a subadmin from a package (remove from assignedSubadmins)
+router.post("/:id/unassign-subadmin", async (req, res) => {
+  try {
+    const { subadminId } = req.body;
+    if (!subadminId) return res.status(400).json({ msg: "subadminId required" });
+    const updated = await Package.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { assignedSubadmins: subadminId } },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ msg: "Package not found" });
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error unassigning subadmin" });
+  }
+});
+
 // DELETE a package
 router.delete("/:id", async (req, res) => {
   try {

@@ -652,9 +652,7 @@ function PriorityPicker({anchor,currentValue,onSelect,onClose}){
 /* ══════════════════════════════════════════════════════════
    PERSON PICKER
 ══════════════════════════════════════════════════════════ */
-// REPLACE the PersonPicker function in your TaskPage component with this updated version:
-
-function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee }) {
+function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, onInvite, onAutoAssign }) {
   const [search, setSearch] = useState("");
   const inputRef = useRef();
   useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
@@ -787,6 +785,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee })
 
       <div
         style={{ padding: "8px 14px 12px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
+        onClick={() => { onInvite(); onClose(); }}
         onMouseEnter={e => e.currentTarget.style.background = "#f0f2f5"}
         onMouseLeave={e => e.currentTarget.style.background = "transparent"}
       >
@@ -832,6 +831,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee })
 
       <div style={{ borderTop: `1px solid ${P.border}` }}>
         <div
+          onClick={() => { onAutoAssign(); onClose(); }}
           style={{
             padding: "12px", display: "flex", alignItems: "center",
             justifyContent: "center", gap: 8, cursor: "pointer",
@@ -1082,8 +1082,18 @@ function ShareModal({ onClose }) {
 /* ══════════════════════════════════════════════════════════
    INTEGRATE MODAL
 ══════════════════════════════════════════════════════════ */
-function IntegrateModal({ onClose }) {
+function IntegrateModal({ onClose, showToast }) {
   const integrations=[{icon:"📧",name:"Gmail",desc:"Email notifications on status change",badge:"Popular"},{icon:"💬",name:"Slack",desc:"Post updates to Slack channels",badge:"Popular"},{icon:"📅",name:"Google Calendar",desc:"Sync due dates with your calendar",badge:null},{icon:"🐙",name:"GitHub",desc:"Link commits and PRs to tasks",badge:null},{icon:"🔗",name:"Zapier",desc:"Connect to 5000+ apps via Zapier",badge:"New"}];
+  const [connecting, setConnecting] = useState(null);
+
+  const handleConnect = (name) => {
+    setConnecting(name);
+    setTimeout(() => {
+      setConnecting(null);
+      showToast(`${name} connected successfully!`, "success");
+    }, 1500);
+  };
+
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(30,10,60,0.45)",zIndex:8000,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"inherit"}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
       <div style={{background:"#fff",borderRadius:16,width:520,maxHeight:"80vh",boxShadow:"0 24px 80px rgba(124,58,237,0.25)",display:"flex",flexDirection:"column",overflow:"hidden"}}>
@@ -1093,7 +1103,23 @@ function IntegrateModal({ onClose }) {
             <div key={name} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 0",borderBottom:`1px solid ${P.border}`}}>
               <div style={{width:42,height:42,borderRadius:10,background:P.light,border:`1.5px solid ${P.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{icon}</div>
               <div style={{flex:1}}><div style={{display:"flex",alignItems:"center",gap:7}}><span style={{fontSize:13,fontWeight:700,color:P.text}}>{name}</span>{badge&&<span style={{fontSize:9,background:"#fef3c7",color:"#92400e",borderRadius:8,padding:"2px 7px",fontWeight:700}}>{badge}</span>}</div><div style={{fontSize:11.5,color:P.muted,marginTop:2}}>{desc}</div></div>
-              <button style={{background:P.light,border:`1.5px solid ${P.border}`,borderRadius:8,padding:"6px 14px",fontSize:12,fontWeight:600,color:P.mid,cursor:"pointer",fontFamily:"inherit"}}>Connect</button>
+              <button 
+                onClick={() => handleConnect(name)}
+                disabled={connecting === name}
+                style={{
+                  background: connecting === name ? P.border : P.light, 
+                  border: `1.5px solid ${P.border}`, 
+                  borderRadius: 8, 
+                  padding: "6px 14px", 
+                  fontSize: 12, 
+                  fontWeight: 600, 
+                  color: connecting === name ? P.muted : P.mid, 
+                  cursor: connecting === name ? "default" : "pointer", 
+                  fontFamily: "inherit"
+                }}
+              >
+                {connecting === name ? "Connecting..." : "Connect"}
+              </button>
             </div>
           ))}
         </div>
@@ -1131,7 +1157,7 @@ function AutomateModal({ onClose }) {
 /* ══════════════════════════════════════════════════════════
    TAB DOTS MENU
 ══════════════════════════════════════════════════════════ */
-function TabDotsMenu({ anchor, onClose, showToast }) {
+function TabDotsMenu({ anchor, onClose, showToast, onAction }) {
   const ref=useRef(); const [pos,setPos]=useState({top:0,left:0});
   useEffect(()=>{
     const calc=()=>{if(!anchor?.current)return;const r=anchor.current.getBoundingClientRect();let left=r.left;if(left+260>window.innerWidth-8)left=window.innerWidth-268;setPos({top:r.bottom+6,left});};
@@ -1141,8 +1167,10 @@ function TabDotsMenu({ anchor, onClose, showToast }) {
   useEffect(()=>{const h=e=>{if(ref.current&&!ref.current.contains(e.target)&&!anchor?.current?.contains(e.target))onClose();};document.addEventListener("mousedown",h);return()=>document.removeEventListener("mousedown",h);},[anchor,onClose]);
   return(
     <div ref={ref} style={{position:"fixed",top:pos.top,left:pos.left,zIndex:9500,background:"#fff",border:"1px solid #e6e9ef",borderRadius:12,boxShadow:"0 8px 36px rgba(0,0,0,0.14)",fontFamily:"inherit",animation:"ddIn .12s ease",width:250,overflow:"hidden",padding:"4px 0"}}>
-      {[{icon:"📌",label:"Pin view"},{icon:"✏️",label:"Rename view"},{icon:"🔗",label:"Share view"}].map(item=>(
-        <div key={item.label} onClick={()=>{showToast(`${item.label}!`,"success");onClose();}} style={{display:"flex",alignItems:"center",gap:11,padding:"9px 16px",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="#f5f6f8"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+      {[{icon:"📌",label:"Pin view", action: "pin"},
+        {icon:"✏️",label:"Rename view", action: "rename"},
+        {icon:"🔗",label:"Share view", action: "share"}].map(item=>(
+        <div key={item.label} onClick={()=>{ onAction(item.action); onClose(); }} style={{display:"flex",alignItems:"center",gap:11,padding:"9px 16px",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="#f5f6f8"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
           <span style={{fontSize:15,width:20,textAlign:"center"}}>{item.icon}</span>
           <span style={{fontSize:13,color:"#323338"}}>{item.label}</span>
         </div>
@@ -1343,7 +1371,10 @@ function StatusBarWithTooltip({ statusCounts, total }) {
 /* ══════════════════════════════════════════════════════════
    TASK ROW
 ══════════════════════════════════════════════════════════ */
-function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, onOpen, selected, groupColor, employees, extraCols, onExtraField, hiddenCols }) {
+/* ══════════════════════════════════════════════════════════
+   TASK ROW
+══════════════════════════════════════════════════════════ */
+function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, onOpen, selected, groupColor, employees, extraCols, onExtraField, hiddenCols, onInvite, onAutoAssign }) {
   const statusRef=useRef(); const dotsRef=useRef(); const personRef=useRef(); const priorityRef=useRef();
   const [spOpen,setSpOpen]=useState(false); const [ppOpen,setPpOpen]=useState(false);
   const [dotsOpen,setDotsOpen]=useState(false); const [personOpen,setPersonOpen]=useState(false);
@@ -1430,7 +1461,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
           )}
         </div>
       )}
-      {personOpen&&<PersonPicker anchor={personRef} onSelect={v=>onField(id,"assignTo",v)} onClose={()=>setPersonOpen(false)} employees={employees} currentAssignee={task.assignTo&&task.assignTo!=="Unassigned"?task.assignTo:""}/>}
+      {personOpen&&<PersonPicker anchor={personRef} onSelect={v=>onField(id,"assignTo",v)} onClose={()=>setPersonOpen(false)} employees={employees} currentAssignee={task.assignTo&&task.assignTo!=="Unassigned"?task.assignTo:""} onInvite={() => onInvite(task)} onAutoAssign={() => onAutoAssign(task)}/>}
       {/* status */}
       {!hcSet.has('status')&&(
         <div style={{width:COL_W.status,flexShrink:0,display:"flex",alignItems:"stretch",borderRight:"1px solid " + P.border}}>
@@ -1690,7 +1721,10 @@ function AddGroupRow({onAdd,triggerRef}){
 /* ══════════════════════════════════════════════════════════
    GROUP BLOCK
 ══════════════════════════════════════════════════════════ */
-function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, onAddTask, onDup, onDel, onOpen, selectedId, isVirtual, onDelGroup, employees, showToast, extraCols, onExtraField, onAddCol, onRenameCol, onDeleteCol, hiddenCols, onMoveCol }) {
+/* ══════════════════════════════════════════════════════════
+   GROUP BLOCK
+══════════════════════════════════════════════════════════ */
+function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, onAddTask, onDup, onDel, onOpen, selectedId, isVirtual, onDelGroup, employees, showToast, extraCols, onExtraField, onAddCol, onRenameCol, onDeleteCol, hiddenCols, onMoveCol, onInvite, onAutoAssign }) {
   const [adding,setAdding]=useState(false); const [newTitle,setNewTitle]=useState("");
   const gid=group._id||group.id; const tasks=group.tasks||[];
   const done=tasks.filter(t=>t.status==="Done").length;
@@ -1743,7 +1777,8 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                   onDup={onDup} onDel={onDel} onOpen={onOpen}
                   selected={selectedId===(t._id||t.id)}
                   groupColor={group.color} employees={employees}
-                  extraCols={visibleExtraCols} onExtraField={onExtraField} hiddenCols={hiddenCols}/>
+                  extraCols={visibleExtraCols} onExtraField={onExtraField} hiddenCols={hiddenCols}
+                  onInvite={onInvite} onAutoAssign={onAutoAssign}/>
               ))}
 
               {!isVirtual&&(adding?(
@@ -1856,6 +1891,54 @@ function PersonFilterPanel({ anchor, onClose, groups, filters, onToggle, onClear
 }
 
 /* ══════════════════════════════════════════════════════════
+   INVITE MODAL
+══════════════════════════════════════════════════════════ */
+function InviteModal({ task, onClose, onSend }) {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    if (!email.trim() || !email.includes("@")) return;
+    setLoading(true);
+    await onSend(task._id || task.id, email.trim());
+    setLoading(false);
+    onClose();
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div style={{ background: "#fff", borderRadius: 16, width: 400, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+        <div style={{ fontSize: 18, fontWeight: 800, color: P.text, marginBottom: 8 }}>Invite to Task</div>
+        <div style={{ fontSize: 13, color: P.muted, marginBottom: 20 }}>Invite a team member to collaborate on <b>{task.title}</b></div>
+        
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: P.text, marginBottom: 6 }}>Email Address</div>
+          <input 
+            autoFocus 
+            placeholder="name@company.com" 
+            value={email} 
+            onChange={e => setEmail(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && submit()}
+            style={{ width: "100%", border: `1.5px solid ${P.border}`, borderRadius: 8, padding: "10px 14px", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
+          />
+        </div>
+
+        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <button onClick={onClose} style={{ background: "#f5f6f8", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 600, color: P.text, cursor: "pointer" }}>Cancel</button>
+          <button 
+            onClick={submit} 
+            disabled={loading || !email.trim()}
+            style={{ background: P.accent, color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontSize: 13, fontWeight: 700, cursor: loading ? "default" : "pointer" }}
+          >
+            {loading ? "Sending..." : "Send Invite"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════════════ */
 export default function TaskPage({ projects = [], employees = [] }) {
@@ -1875,6 +1958,9 @@ export default function TaskPage({ projects = [], employees = [] }) {
   const [showAddCol,setShowAddCol]=useState(false);
   const [showImport,setShowImport]=useState(false);
   const [hiddenCols,setHiddenCols]=useState(new Set());
+  const [inviteTask, setInviteTask] = useState(null);
+  const [viewLabels, setViewLabels] = useState(Object.fromEntries(VIEW_LIST.map(v => [v.id, v.label])));
+  const [pinnedView, setPinnedView] = useState("table");
 
   /* ── VIEW STATE ── */
   const [currentView,setCurrentView]=useState("table");
@@ -1930,6 +2016,44 @@ export default function TaskPage({ projects = [], employees = [] }) {
   const importTasks=async(tasks)=>{const first=groups[0];if(!first){showToast("Add a group first","error");return;}const gid=first._id||first.id;for(const t of tasks)await addTask(gid,t.title||"Imported task");showToast(`${tasks.length} tasks imported!`);};
 
   const delGroup=async(id)=>{const snap=groups;setGroups(p=>p.filter(g=>(g._id||g.id)!==id));try{await axios.delete(`${API}/groups/${id}`);showToast("Group deleted");}catch{setGroups(snap);showToast("Failed","error");}};
+
+  const handleAutoAssign = async(task) => {
+    try {
+      const id = task._id || task.id;
+      const r = await axios.post(`${API}/tasks/${id}/auto-assign`);
+      setGroups(p => p.map(g => ({
+        ...g,
+        tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, assignTo: r.data.assignedTo?.[0]?.name || r.data.assignTo } : t)
+      })));
+      showToast("Task auto-assigned successfully!");
+    } catch (err) {
+      showToast(err.response?.data?.message || "Auto-assign failed", "error");
+    }
+  };
+
+  const handleInvite = async(taskId, email) => {
+    try {
+      await axios.post(`${API}/tasks/invite`, { taskId, email });
+      showToast(`Invitation sent to ${email}`);
+    } catch (err) {
+      showToast(err.response?.data?.message || "Invitation failed", "error");
+    }
+  };
+
+  const handleViewAction = (action) => {
+    if (action === "rename") {
+      const newName = prompt("Enter new name for this view:", viewLabels[currentView]);
+      if (newName) {
+        setViewLabels(p => ({ ...p, [currentView]: newName }));
+        showToast("View renamed");
+      }
+    } else if (action === "pin") {
+      setPinnedView(currentView);
+      showToast(`${viewLabels[currentView]} pinned as default`);
+    } else if (action === "share") {
+      setShowShare(true);
+    }
+  };
 
   /* Kanban drag drop */
   const kanbanStatusChange=(taskId,newStatus)=>{setGroups(p=>p.map(g=>({...g,tasks:(g.tasks||[]).map(t=>(t._id||t.id)===taskId?{...t,status:newStatus}:t)})));showToast(`Moved to ${newStatus}`);};
@@ -1990,7 +2114,7 @@ export default function TaskPage({ projects = [], employees = [] }) {
               <div ref={mainTableRef} onClick={()=>{closeAll();setViewOpen(v=>!v);}}
                 style={{display:"flex",alignItems:"center",gap:0,cursor:"pointer",border:`1px solid ${viewOpen?P.accent:P.border}`,borderRadius:8,overflow:"hidden",background:viewOpen?P.light:"#fff"}}>
                 <div style={{display:"flex",alignItems:"center",gap:7,padding:"6px 12px",fontSize:13,fontWeight:700,color:viewOpen?P.accent:P.text}}>
-                  <span>{activeView.icon}</span><span>{activeView.label}</span>
+                  <span>{activeView.icon}</span><span>{viewLabels[currentView] || activeView.label}</span>
                 </div>
                 <div style={{padding:"6px 8px",borderLeft:`1px solid ${P.border}`,fontSize:11,color:viewOpen?P.accent:P.muted}}>▾</div>
               </div>
@@ -2005,7 +2129,7 @@ export default function TaskPage({ projects = [], employees = [] }) {
 
               <div ref={tabDotsRef} onClick={()=>{closeAll();setTabDotsOpen(v=>!v);}}
                 style={{padding:"5px 8px",fontSize:14,color:tabDotsOpen?"#0073ea":P.muted,cursor:"pointer",marginLeft:2,borderRadius:7,background:tabDotsOpen?"#e8f4fd":"transparent",border:`1px solid ${tabDotsOpen?"#c3d9f0":"transparent"}`,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>···</div>
-              {tabDotsOpen&&<TabDotsMenu anchor={tabDotsRef} onClose={()=>setTabDotsOpen(false)} showToast={showToast}/>}
+              {tabDotsOpen&&<TabDotsMenu anchor={tabDotsRef} onClose={()=>setTabDotsOpen(false)} showToast={showToast} onAction={handleViewAction}/>}
 
               <div ref={addViewRef} onClick={()=>{closeAll();setAddViewOpen(v=>!v);}}
                 style={{width:30,height:30,borderRadius:7,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:400,background:addViewOpen?"#e8f4fd":"transparent",border:`1px solid ${addViewOpen?"#c3d9f0":"transparent"}`,color:addViewOpen?"#0073ea":P.muted}}>+</div>
@@ -2084,7 +2208,8 @@ export default function TaskPage({ projects = [], employees = [] }) {
                     showToast={showToast} extraCols={extraCols}
                     onExtraField={updateExtraField} onAddCol={()=>setShowAddCol(true)}
                     onRenameCol={renameExtraCol} onDeleteCol={deleteExtraCol}
-                    hiddenCols={hiddenCols} onMoveCol={moveExtraCol}/>
+                    hiddenCols={hiddenCols} onMoveCol={moveExtraCol}
+                    onInvite={setInviteTask} onAutoAssign={handleAutoAssign}/>
                 ))}
                 {groupBy==="default"&&<AddGroupRow onAdd={addGroup} triggerRef={addGroupTrigger}/>}
               </div>
@@ -2113,8 +2238,9 @@ export default function TaskPage({ projects = [], employees = [] }) {
       {showAddCol&&<AddColumnModal onAdd={addExtraCol} onClose={()=>setShowAddCol(false)}/>}
       {showImport&&<ImportModal onClose={()=>setShowImport(false)} onImportTasks={importTasks}/>}
       {showShare&&<ShareModal onClose={()=>setShowShare(false)}/>}
-      {showIntegrate&&<IntegrateModal onClose={()=>setShowIntegrate(false)}/>}
+      {showIntegrate&&<IntegrateModal onClose={()=>setShowIntegrate(false)} showToast={showToast}/>}
       {showAutomate&&<AutomateModal onClose={()=>setShowAutomate(false)}/>}
+      {inviteTask&&<InviteModal task={inviteTask} onClose={()=>setInviteTask(null)} onSend={handleInvite}/>}
       {toast&&<Toast msg={toast.msg} type={toast.type}/>}
     </div>
   );

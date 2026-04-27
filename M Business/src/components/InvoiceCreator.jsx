@@ -264,7 +264,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     cl: inv.client, proj: inv.project, gst: inv.gstRate, notes: inv.notes, terms: inv.terms,
     items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
   };
-  const qrData = `https://mbusiness.octosofttechnologies.in/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
+  const qrData = `${window.location.origin}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
   // ── Shared styles ────────────────────────────────────────────
   const inp = (err) => ({

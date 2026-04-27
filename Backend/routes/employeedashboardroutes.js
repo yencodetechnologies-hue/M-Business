@@ -113,7 +113,7 @@ try { EmployeeDoc = mongoose.model("EmployeeDoc"); } catch {
   EmployeeDoc = mongoose.model("EmployeeDoc", new mongoose.Schema({
     employeeName: { type: String, required: true },
     employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee", default: null },
-    docType: { type: String, enum: ["aadhaar", "pan", "passbook"], required: true },
+    docType: { type: String, enum: ["aadhaar", "pan", "passbook", "itr"], required: true },
     url: { type: String, required: true },
     fileName: { type: String, default: "" },
     fileSize: { type: Number, default: 0 },

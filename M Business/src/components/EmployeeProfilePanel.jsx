@@ -12,6 +12,7 @@ export const DOC_TYPES = [
   { key:"aadhaar",  label:"Aadhaar Card",   icon:"🪪", desc:"Government issued identity card", color:"#f97316", accept:"image/*,application/pdf", maxMB:5  },
   { key:"pan",      label:"PAN Card",        icon:"💳", desc:"Permanent Account Number card",   color:"#6366f1", accept:"image/*,application/pdf", maxMB:5  },
   { key:"passbook", label:"Bank Passbook",   icon:"🏦", desc:"First page of bank passbook",     color:"#10b981", accept:"image/*,application/pdf", maxMB:10 },
+  { key:"itr",      label:"ITR",             icon:"📄", desc:"Income Tax Return document",      color:"#8b5cf6", accept:"image/*,application/pdf", maxMB:10 },
 ];
 
 const fmtSize = (bytes) => {
@@ -332,7 +333,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
           <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
             <thead>
               <tr style={{ background:"#f5f3ff" }}>
-                {["Employee","Aadhaar","PAN Card","Bank Passbook","Action"].map(h => (
+                {["Employee","Aadhaar","PAN Card","Bank Passbook","ITR","Action"].map(h => (
                   <th key={h} style={{ padding:"9px 12px", textAlign:"left", fontSize:10, fontWeight:700, color:"#7c3aed", borderBottom:"2px solid #ede9fe", whiteSpace:"nowrap" }}>{h.toUpperCase()}</th>
                 ))}
               </tr>

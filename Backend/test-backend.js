@@ -1,15 +1,17 @@
 const axios = require('axios');
 
+const BASE_URL = 'https://mbusiness.octosofttechnologies.in';
+
 async function testBackend() {
   try {
     console.log('Testing backend connection...');
     
     // Test basic server health
-    const healthResponse = await axios.get('https://m-business-r2vd.onrender.com/');
+    const healthResponse = await axios.get(`${BASE_URL}/`);
     console.log('✅ Server is running:', healthResponse.data);
     
     // Test projects endpoint
-    const projectsResponse = await axios.get('https://m-business-r2vd.onrender.com/api/projects');
+    const projectsResponse = await axios.get(`${BASE_URL}/api/projects`);
     console.log('✅ Projects endpoint working, found:', projectsResponse.data.length, 'projects');
     
     // Test add project endpoint
@@ -21,7 +23,7 @@ async function testBackend() {
       description: 'This is a test project'
     };
     
-    const addResponse = await axios.post('https://m-business-r2vd.onrender.com/api/projects/add', testProject);
+    const addResponse = await axios.post(`${BASE_URL}/api/projects/add`, testProject);
     console.log('✅ Project added successfully:', addResponse.data);
     
   } catch (error) {

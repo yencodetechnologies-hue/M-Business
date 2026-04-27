@@ -47,9 +47,9 @@ export default function AdminDashboard({ user, setUser }) {
   const [quotations, setQuotations] = useState([]);
   const [packages, setPackages] = useState([]);
   const [npkg, setNpkg] = useState({ title: "", description: "", icon: "", isFree: false, price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", assignedSubadmins: [] });
-  const [pkgError, setPkgError] = useState({});
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
   const [modal, setModal] = useState(null);
+  const [invoices, setInvoices] = useState([]);
 
   useEffect(() => {
     fetchSubadmins();
@@ -60,6 +60,7 @@ export default function AdminDashboard({ user, setUser }) {
     fetchManagers();
     fetchQuotations();
     fetchPackages();
+    fetchInvoices();
   }, []);
 
   const fetchSubadmins = async () => {
@@ -112,6 +113,12 @@ export default function AdminDashboard({ user, setUser }) {
     try {
       const res = await axios.get(BASE_URL + "/api/packages");
       setPackages(res.data);
+    } catch (e) { console.error(e); }
+  };
+  const fetchInvoices = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/invoices");
+      setInvoices(res.data.invoices || []);
     } catch (e) { console.error(e); }
   };
 
@@ -226,7 +233,7 @@ export default function AdminDashboard({ user, setUser }) {
         </div>
 
         <div style={{ flex: 1, padding: 30, overflowY: "auto" }}>
-          {active === "dashboard" && <OverviewPage subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} />}
+          {active === "dashboard" && <OverviewPage subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} invoices={invoices} />}
           {active === "clients" && <ClientsPage clients={clients} setClients={setClients} />}
           {active === "subadmins" && <SubadminsList subadmins={subadmins} refresh={fetchSubadmins} packages={packages} />}
           {active === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
@@ -521,7 +528,7 @@ export default function AdminDashboard({ user, setUser }) {
 }
 
 // ── Dashboard Overview ──
-function OverviewPage({ subadmins, clients, employees, managers, projects, packages }) {
+function OverviewPage({ subadmins, clients, employees, managers, projects, packages, invoices }) {
   const stats = [
     { label: "Total Clients", value: clients.length, color: "#9333ea" },
     { label: "Employees", value: employees.length, color: "#7c3aed" },
@@ -532,13 +539,60 @@ function OverviewPage({ subadmins, clients, employees, managers, projects, packa
   ];
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
-      {stats.map(s => (
-        <div key={s.label} style={{ background: "#fff", borderRadius: 16, padding: 20, boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>{s.label}</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: s.color, marginTop: 8 }}>{s.value}</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 16 }}>
+        {stats.map(s => (
+          <div key={s.label} style={{ background: "#fff", borderRadius: 16, padding: "20px 16px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>{s.label}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: s.color, marginTop: 8 }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+          <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Project Progress</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {projects.length === 0 ? (
+              <div style={{ textAlign: "center", padding: 20, color: "#94a3b8", fontSize: 13 }}>No projects found</div>
+            ) : (
+              projects.slice(0, 5).map(p => (
+                <div key={p._id}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>{p.name}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#3b82f6" }}>{p.progress || 0}%</span>
+                  </div>
+                  <div style={{ background: "#f1f5f9", borderRadius: 4, height: 6 }}>
+                    <div style={{ width: `${p.progress || 0}%`, background: (p.progress || 0) === 100 ? "#22C55E" : "#3b82f6", borderRadius: 4, height: "100%" }} />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-      ))}
+
+        <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
+          <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Recent Invoices</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {invoices.length === 0 ? (
+              <div style={{ textAlign: "center", padding: 20, color: "#94a3b8", fontSize: 13 }}>No invoices found</div>
+            ) : (
+              invoices.slice(0, 5).map(inv => (
+                <div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 12, borderBottom: "1px solid #f1f5f9" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>{inv.invoiceNo} · {inv.client}</div>
+                    <div style={{ fontSize: 11, color: "#64748b" }}>Due: {inv.dueDate || "—"}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>₹{inv.total?.toLocaleString() || "0"}</div>
+                    <Badge label={inv.status} />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1115,53 +1169,17 @@ function SubscriptionsPage({ subscriptions }) {
 // Packages Page
 function PackagesPage({ packages }) {
   try {
-    // Default packages matching the design: CORE, PRO, ENTERPRISE
-    const defaultPackages = [
-      {
-        id: "core",
-        icon: "⚓",
-        title: "CORE",
-        description: "Built for standard field operations — simple data collection and digital forms for small teams.",
-        price: "$24",
-        currency: "USD",
-        period: "/month",
-        perSeat: "Per seat",
-        buttonName: "Get Started",
-        btnPrimary: false,
-        featuresTitle: "Core includes:",
-        features: ["Single business manage", "Dropdown feature", "1 Manager", "3 Client manage"]
-      },
-      {
-        id: "pro",
-        icon: "🏅",
-        title: "PRO",
-        description: "Built for growing field operations — smart automation and advanced workflows for scaling teams with multiple use cases.",
-        price: "$36",
-        currency: "USD",
-        period: "/month",
-        perSeat: "Per seat",
-        buttonName: "Try for Free",
-        btnPrimary: true,
-        featuresTitle: "Everything in Core, plus:",
-        features: ["Unlimited Managers", "Unlimited features", "Priority support", "Advanced workflows"]
-      },
-      {
-        id: "enterprise",
-        icon: "🏢",
-        title: "ENTERPRISE",
-        description: "Built for your most complex field operations — maximum usage limits and enterprise scalability across the entire business.",
-        price: "Custom Pricing",
-        currency: "",
-        period: "",
-        perSeat: "Contact us for",
-        buttonName: "Contact Us",
-        btnPrimary: false,
-        featuresTitle: "Everything in Pro, plus:",
-        features: ["24/7 Enterprise Support", "Custom Branding", "API Access", "Dedicated Manager"]
-      }
-    ];
+    const displayedPackages = (packages && packages.length > 0) ? packages : [];
 
-    const displayedPackages = (packages && packages.length > 0) ? packages : defaultPackages;
+    if (displayedPackages.length === 0) {
+      return (
+        <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>📦</div>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>No Packages Yet</h3>
+          <p style={{ color: "#64748b", fontSize: 14, maxWidth: 400, margin: "0 auto" }}>Create your first subscription package to start offering services to subadmins.</p>
+        </div>
+      );
+    }
 
     return (
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
@@ -1522,42 +1540,36 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
 }
 
 // ── Project Status Page ──
-function ProjectStatusPage({ clients, employees, managers }) {
-  const [tracking] = useState([
-    { id: "PRJ001", name: "Website Redesign", client: "TechNova Pvt Ltd", deadline: "2024-05-30", progress: 65, status: "In Progress" },
-    { id: "PRJ002", name: "Mobile App Dev", client: "Bloom Creatives", deadline: "2024-08-15", progress: 15, status: "Pending" },
-    { id: "PRJ003", name: "ERP Integration", client: "Infra Solutions", deadline: "2024-04-30", progress: 100, status: "Completed" }
-  ]);
-
+function ProjectStatusPage({ projects }) {
   return (
     <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
       <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Project Status Tracking</h3>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ background: "#f8fafc" }}>
-            {["Project ID", "Name", "Client", "Deadline", "Progress", "Status"].map(h => (
+            {["Project Name", "Client", "Deadline", "Progress", "Status"].map(h => (
               <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {tracking.map((t, i) => (
-            <tr key={t.id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-              <td style={{ padding: "14px 16px", fontFamily: "monospace", color: "#64748b" }}>{t.id}</td>
-              <td style={{ padding: "14px 16px", fontWeight: 600, color: "#0f172a" }}>{t.name}</td>
-              <td style={{ padding: "14px 16px", color: "#475569" }}>{t.client}</td>
-              <td style={{ padding: "14px 16px", color: "#64748b" }}>{t.deadline}</td>
+          {projects.map((p, i) => (
+            <tr key={p._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+              <td style={{ padding: "14px 16px", fontWeight: 600, color: "#0f172a" }}>{p.name}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{p.client}</td>
+              <td style={{ padding: "14px 16px", color: "#64748b" }}>{p.deadline || p.end || "—"}</td>
               <td style={{ padding: "14px 16px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ flex: 1, background: "#e2e8f0", borderRadius: 4, height: 6 }}>
-                    <div style={{ width: `${t.progress}%`, background: t.progress === 100 ? "#22C55E" : "#3b82f6", borderRadius: 4, height: "100%" }} />
+                    <div style={{ width: `${p.progress || 0}%`, background: (p.progress || 0) === 100 ? "#22C55E" : "#3b82f6", borderRadius: 4, height: "100%" }} />
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>{t.progress}%</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>{p.progress || 0}%</span>
                 </div>
               </td>
-              <td style={{ padding: "14px 16px" }}><Badge label={t.status} /></td>
+              <td style={{ padding: "14px 16px" }}><Badge label={p.status || "Pending"} /></td>
             </tr>
           ))}
+          {projects.length === 0 && <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No projects found</td></tr>}
         </tbody>
       </table>
     </div>

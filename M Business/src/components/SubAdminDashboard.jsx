@@ -2111,12 +2111,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [nv, setNv] = useState({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
   const [nvError, setNvError] = useState({});
   const [vendorSaveLoading, setVendorSaveLoading] = useState(false);
+  const [invoices, setInvoices] = useState([]);
 
   const hasFetched = useRef(false);
   useEffect(() => { 
     if (hasFetched.current) return;
     hasFetched.current = true;
-    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); 
+    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); 
   }, []);
 
   const fetchSubscription = async () => {
@@ -2132,6 +2133,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       console.error("Subscription fetch failed", err);
     } finally {
       setSubLoading(false);
+    }
+  };
+
+  const fetchInvoices = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/invoices");
+      setInvoices(res.data.invoices || []);
+    } catch (e) {
+      console.log("Fetch invoices error:", e);
+      setInvoices([]);
     }
   };
 
@@ -2676,6 +2687,19 @@ const handleEditPackage = (pkg) => {
                     <InfoRow icon="⏰" label="End Date" value={new Date(subscription.endDate).toLocaleDateString()} />
                     <InfoRow icon="🔄" label="Next Billing" value={new Date(subscription.nextBillingDate).toLocaleDateString()} />
                     <InfoRow icon="✅" label="Payment Status" value={subscription.isFullyPaid ? "Fully Paid" : "Pending"} />
+                    
+                    {subscription.features && subscription.features.length > 0 && (
+                      <div style={{ marginTop: 12, padding: "10px 14px", background: "#f8fafc", borderRadius: 10, border: "1px solid #f1f5f9" }}>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          {subscription.features.map((f, i) => (
+                            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: T.text }}>
+                              <span style={{ color: "#22c55e" }}>✓</span> {f}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div style={{ textAlign: "center", padding: 40, color: "#a78bfa" }}>
@@ -2704,7 +2728,7 @@ const handleEditPackage = (pkg) => {
             </div>
 
             <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 18 }}>
-              {[{ t: "Total Clients", v: clients.length, i: "👥", c: "#9333ea" }, { t: "Employees", v: employees.length, i: "👨‍💼", c: "#7c3aed" }, { t: "Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Projects", v: projects.length, i: "📁", c: "#a855f7" }, { t: "Invoices", v: INVOICES.length, i: "🧾", c: "#22C55E" }].map(({ t, v, i, c }) => (
+              {[{ t: "Total Clients", v: clients.length, i: "👥", c: "#9333ea" }, { t: "Employees", v: employees.length, i: "👨‍💼", c: "#7c3aed" }, { t: "Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Projects", v: projects.length, i: "📁", c: "#a855f7" }, { t: "Invoices", v: invoices.length, i: "🧾", c: "#22C55E" }].map(({ t, v, i, c }) => (
                 <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", position: "relative", overflow: "hidden" }}>
                   <div style={{ position: "absolute", top: -12, right: -12, width: 60, height: 60, borderRadius: "50%", background: `radial-gradient(circle,${c}22,transparent)` }} />
                   <div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div>
@@ -2756,8 +2780,42 @@ const handleEditPackage = (pkg) => {
               </SC>
             </div>
             <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              <SC title="Project Progress">{TRACKING_SEED.map(t => (<div key={t.id} style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{t.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: sc(t.status) }}>{t.pct}%</span></div><div style={{ background: "#ede9fe", borderRadius: 6, height: 6 }}><div style={{ width: `${t.pct}%`, background: t.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%" }} /></div><div style={{ fontSize: 11, color: "#a78bfa", marginTop: 2 }}>{t.client}</div></div>))}</SC>
-              <SC title="Invoice Status">{INVOICES.map(inv => (<div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #f5f3ff" }}><div><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{inv.id} · {inv.client}</div><div style={{ fontSize: 11, color: "#a78bfa" }}>Due: {inv.due}</div></div><div style={{ textAlign: "right" }}><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 3 }}>{inv.total}</div><Badge label={inv.status} /></div></div>))}</SC>
+              <SC title="Project Progress">
+                {projects.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: 20, color: "#a78bfa", fontSize: 12 }}>No projects yet</div>
+                ) : (
+                  projects.slice(0, 3).map(p => (
+                    <div key={p._id} style={{ marginBottom: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{p.name}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status) }}>{p.progress || 0}%</span>
+                      </div>
+                      <div style={{ background: "#ede9fe", borderRadius: 6, height: 6 }}>
+                        <div style={{ width: `${p.progress || 0}%`, background: (p.progress || 0) === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%" }} />
+                      </div>
+                      <div style={{ fontSize: 11, color: "#a78bfa", marginTop: 2 }}>{p.client}</div>
+                    </div>
+                  ))
+                )}
+              </SC>
+              <SC title="Invoice Status">
+                {invoices.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: 20, color: "#a78bfa", fontSize: 12 }}>No invoices yet</div>
+                ) : (
+                  invoices.slice(0, 3).map(inv => (
+                    <div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #f5f3ff" }}>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{inv.invoiceNo} · {inv.client}</div>
+                        <div style={{ fontSize: 11, color: "#a78bfa" }}>Due: {inv.dueDate || "—"}</div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 3 }}>₹{inv.total?.toLocaleString() || "0"}</div>
+                        <Badge label={inv.status} />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </SC>
             </div>
           </>}
 

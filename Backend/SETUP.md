@@ -75,7 +75,7 @@ If you're getting a 500 error when adding projects, check:
 You can test the add project endpoint with:
 
 ```bash
-curl -X POST https://m-business-r2vd.onrender.com/api/projects/add \
+curl -X POST https://mbusiness.octosofttechnologies.in/api/projects/add \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Test Project",

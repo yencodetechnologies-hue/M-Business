@@ -1639,68 +1639,21 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 // PACKAGES PAGE
 // ═══════════════════════════════════════════════════════════
 function PackagesPage({ packages, onViewPackage, onEditPackage }) {
-  // Default packages matching the design: CORE, PRO, ENTERPRISE
-  const defaultPackages = [
-    {
-      id: "core",
-      icon: "⚓",
-      title: "CORE",
-      desc: "Built for standard field operations — simple data collection and digital forms for small teams.",
-      price: "$24",
-      currency: "USD",
-      period: "/month",
-      perSeat: "Per seat",
-      buttonName: "Get Started",
-      btnPrimary: false,
-      featuresTitle: "Core includes:",
-      features: [
-        "Single business manage",
-        "Dropdown feature",
-        "1 Manager",
-        "3 Client manage"
-      ]
-    },
-    {
-      id: "pro",
-      icon: "🏅",
-      title: "PRO",
-      desc: "Built for growing field operations — smart automation and advanced workflows for scaling teams with multiple use cases.",
-      price: "$36",
-      currency: "USD",
-      period: "/month",
-      perSeat: "Per seat",
-      buttonName: "Try for Free",
-      btnPrimary: true,
-      featuresTitle: "Everything in Core, plus:",
-      features: [
-        "Unlimited Managers",
-        "Unlimited features",
-        "Priority support",
-        "Advanced workflows"
-      ]
-    },
-    {
-      id: "enterprise",
-      icon: "🏢",
-      title: "ENTERPRISE",
-      desc: "Built for your most complex field operations — maximum usage limits and enterprise scalability across the entire business.",
-      price: "Custom Pricing",
-      currency: "",
-      period: "",
-      perSeat: "Contact us for",
-      buttonName: "Contact Us",
-      btnPrimary: false,
-      featuresTitle: "Everything in Pro, plus:",
-      features: [
-        "24/7 Enterprise Support",
-        "Custom Branding",
-        "API Access",
-        "Dedicated Manager"
-      ]
-    }
-  ];
+  const displayedPackages = packages || [];
 
-  const displayedPackages = packages.length > 0 ? packages : defaultPackages;
+  if (displayedPackages.length === 0) {
+    return (
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
+        <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 24, border: "2px dashed #ede9fe", boxShadow: "0 4px 20px rgba(147,51,234,0.05)" }}>
+          <div style={{ fontSize: 64, marginBottom: 24 }}>📦</div>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: "#1e0a3c", marginBottom: 12 }}>No Packages Assigned</h2>
+          <p style={{ fontSize: 15, color: "#7c3aed", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>
+            You don't have any packages assigned yet. Please contact your administrator to assign packages to your dashboard.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>

@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://mbusiness.octosofttechnologies.in/api/:path*"
+      "destination": "https://mbusiness.octosofttechnologies.in//api/:path*"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "https://mbusiness.octosofttechnologies.in/uploads/:path*"
+      "destination": "https://mbusiness.octosofttechnologies.in//uploads/:path*"
     },
     {
       "source": "/(.*)",

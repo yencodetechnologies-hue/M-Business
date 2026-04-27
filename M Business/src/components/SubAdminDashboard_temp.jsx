@@ -1556,7 +1556,7 @@ function InterviewPage({ companyId, companyName }) {
   const [toast, setToast] = useState("");
   const [linkCopied, setLinkCopied] = useState(false);
   const [loading, setLoading] = useState(true);
-  const appLink = `${window.location.origin}/interview-apply/${CNAME.replace(/\s+/g, "-")}-${CID}`;
+  const appLink = `https://mbusiness.octosofttechnologies.in/interview-apply/${CNAME.replace(/\s+/g, "-")}-${CID}`;
   useEffect(() => { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); if (saved.length) { setCandidates(saved); setLoading(false); } axios.get(`${BASE_URL}/api/interviews?companyId=${CID}`).then(r => { const list = r.data?.data || (Array.isArray(r.data) ? r.data : []); if (list.length) { setCandidates(list); localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } }).catch(() => { }).finally(() => setLoading(false)); }, [CID]);
   const persist = (list) => { setCandidates(list); localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); };
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
@@ -1564,7 +1564,7 @@ function InterviewPage({ companyId, companyName }) {
   const copyLink = async () => {
     try {
       const companySlug = `${companyName}-${companyId}`.replace(/\s+/g, "-");
-      const link = `${window.location.origin}/interview-apply/${companySlug}`;
+      const link = `https://mbusiness.octosofttechnologies.in/interview-apply/${companySlug}`;
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(link);
       } else {

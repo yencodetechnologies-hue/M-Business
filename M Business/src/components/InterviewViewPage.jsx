@@ -185,7 +185,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
   const [viewResume,  setViewResume]  = useState(null);
   const [viewProfile, setViewProfile] = useState(null);
 
-  const applyLink = `${window.location.origin}/interview-apply/${companyName.replace(/\s+/g, "-")}-${companyId}`;
+  const applyLink = `https://mbusiness.octosofttechnologies.in/interview-apply/${companyName.replace(/\s+/g, "-")}-${companyId}`;
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");

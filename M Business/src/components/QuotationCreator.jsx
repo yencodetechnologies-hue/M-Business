@@ -305,7 +305,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
       cl: qt.client, proj: qt.project, gst: qt.gstRate, notes: qt.notes, terms: qt.terms,
       items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
     };
-    const qrData = `${window.location.origin}/quotation-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
+    const qrData = `https://mbusiness.octosofttechnologies.in/quotation-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
     return (
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>

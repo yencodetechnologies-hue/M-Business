@@ -1059,7 +1059,7 @@ function SidekickPanel({ onClose, groups }) {
    SHARE MODAL
 ══════════════════════════════════════════════════════════ */
 function ShareModal({ onClose }) {
-  const shareLink = `${window.location.origin}/share/board/${Math.random().toString(36).substring(7)}`;
+  const shareLink = `https://mbusiness.octosofttechnologies.in/share/board/${Math.random().toString(36).substring(7)}`;
   const [copied,setCopied]=useState(false);
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.35)",zIndex:9000,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"inherit"}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>

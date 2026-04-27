@@ -21,6 +21,7 @@ app.use(cors({
 
     const allowedOrigins = [
       "https://m-business-tau.vercel.app",
+      "https://mbusiness.octosofttechnologies.in/",
       "https://m-business-r2vd.onrender.com"
     ];
 

@@ -101,7 +101,7 @@ const handleLogin = async () => {
     }
 
   } catch (e) {
-    console.log("ERROR:", e); // 🔥 debug
+    console.log("ERROR:", e);
 
     if (e.code === "ECONNABORTED") {
       setError("Server slow (Render sleep). Please try again.");

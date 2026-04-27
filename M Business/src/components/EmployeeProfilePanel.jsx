@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 
 
-const BASE = "https://mbusiness.octosofttechnologies.in/api/employee-dashboard";
+const BASE = "https://m-business-r2vd.onrender.com/api/employee-dashboard";
 
 export const DOC_TYPES = [
   { key:"aadhaar",  label:"Aadhaar Card",   icon:"🪪", desc:"Government issued identity card", color:"#f97316", accept:"image/*,application/pdf", maxMB:5  },

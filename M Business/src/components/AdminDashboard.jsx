@@ -50,6 +50,7 @@ export default function AdminDashboard({ user, setUser }) {
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
   const [modal, setModal] = useState(null);
   const [invoices, setInvoices] = useState([]);
+  const [pkgError, setPkgError] = useState({});
 
   useEffect(() => {
     fetchSubadmins();

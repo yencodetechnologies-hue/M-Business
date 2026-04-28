@@ -14,6 +14,9 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
   const [loginErr, setLoginErr] = useState({});
   const [regData, setRegData] = useState({ name: "", email: "", phone: "", password: "", confirm: "", role: "Subadmin", companyName: "", companyType: "IT", employeeCount: "0-10" });
   const [regErr, setRegErr] = useState({});
+  
+  const [verifyEmail, setVerifyEmail] = useState("");
+  const [otp, setOtp] = useState("");
 const handleLogin = async () => {
   const errs = {};
   if (!loginData.email.trim()) errs.email = "Email is required";
@@ -36,11 +39,18 @@ const handleLogin = async () => {
     setUser(userWithLogo);
 
   } catch (e) {
-    setError(
-      e.response?.data?.msg ||
-      e.response?.data?.message ||
-      "Invalid email or password."
-    );
+    if (e.response?.data?.requiresOTP) {
+      setVerifyEmail(e.response.data.email);
+      setTab("otp");
+      setError("");
+      setSuccess("Please verify your email to continue. We have sent an OTP.");
+    } else {
+      setError(
+        e.response?.data?.msg ||
+        e.response?.data?.message ||
+        "Invalid email or password."
+      );
+    }
   } finally {
     setLoading(false);
   }
@@ -88,16 +98,22 @@ const handleLogin = async () => {
 
     console.log("Response:", res.data); // 🔥 debug
 
-    setSuccess("Account created successfully!");
-    
-    // Auto-login after successful registration
-    const userData = res.data.user;
-    if (userData) {
-      const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
-      localStorage.setItem("user", JSON.stringify(userWithLogo));
-      setUser(userWithLogo);
+    if (res.data.requiresOTP) {
+      setSuccess("OTP sent to your email!");
+      setVerifyEmail(res.data.email);
+      setTab("otp");
     } else {
-      setTab("login");
+      setSuccess("Account created successfully!");
+      
+      // Auto-login after successful registration
+      const userData = res.data.user;
+      if (userData) {
+        const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+        localStorage.setItem("user", JSON.stringify(userWithLogo));
+        setUser(userWithLogo);
+      } else {
+        setTab("login");
+      }
     }
 
   } catch (e) {
@@ -112,6 +128,31 @@ const handleLogin = async () => {
         "Registration failed."
       );
     }
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleVerifyOTP = async () => {
+  if (!otp.trim()) { setError("Please enter the OTP"); return; }
+  try {
+    setLoading(true);
+    setError("");
+    const res = await axios.post(`${BASE_URL}/api/auth/verify-otp`, {
+      email: verifyEmail,
+      otp: otp.trim()
+    });
+    setSuccess("Email verified successfully!");
+    const userData = res.data.user;
+    if (userData) {
+      const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+      localStorage.setItem("user", JSON.stringify(userWithLogo));
+      setUser(userWithLogo);
+    } else {
+      setTab("login");
+    }
+  } catch (e) {
+    setError(e.response?.data?.msg || "Invalid OTP");
   } finally {
     setLoading(false);
   }
@@ -184,10 +225,11 @@ const handleLogin = async () => {
         <div className="auth-right">
           <div className="auth-card">
             <div style={{ textAlign: "center", marginBottom: 30 }}>
-              <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: 0 }}>Business Suite</h1>
+              <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: 0 }}>Workspace Suite</h1>
               <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 5 }}>Manage your workspace efficiently</p>
             </div>
             {/* Tab */}
+            {tab !== "otp" && (
             <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:10, padding:4, marginBottom:26, border:"1px solid rgba(255,255,255,0.1)" }}>
               {[["login","Login"],["register","Register"]].map(([k,l])=>(
                 <button key={k} onClick={()=>{setTab(k);setError("");setSuccess("");setLoginErr({});setRegErr({});}}
@@ -198,13 +240,14 @@ const handleLogin = async () => {
                   }}>{l}</button>
               ))}
             </div>
+            )}
 
             <div style={{ marginBottom:22 }}>
               <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.35)", letterSpacing:2, marginBottom:4 }}>
-                {tab==="login" ? "WELCOME BACK" : "CREATE YOUR ACCOUNT"}
+                {tab==="login" ? "WELCOME BACK" : tab==="otp" ? "VERIFY EMAIL" : "CREATE YOUR ACCOUNT"}
               </div>
               <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>
-                {tab==="login" ? "" : "Fill in the details below to get started."}
+                {tab==="login" ? "" : tab==="otp" ? `Enter the 6-digit OTP sent to ${verifyEmail}` : "Fill in the details below to get started."}
               </div>
             </div>
 
@@ -238,6 +281,26 @@ const handleLogin = async () => {
                 <div style={{ textAlign:"center", marginTop:18, fontSize:12, color:"rgba(255,255,255,0.3)" }}>
                   Don't have an account?{" "}
                   <button onClick={()=>{setTab("register");setError("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.8)", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>Register here →</button>
+                </div>
+              </div>
+            )}
+
+            {/* OTP VERIFICATION */}
+            {tab==="otp" && (
+              <div>
+                <div style={{ marginBottom:22 }}>
+                  <label style={lStyle}>One-Time Password (OTP)</label>
+                  <div style={{ position:"relative" }}>
+                    <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>🔑</span>
+                    <input type="text" value={otp} onChange={e=>setOtp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleVerifyOTP()} placeholder="123456" style={{ ...iStyle(false), paddingLeft:38, letterSpacing:4, fontWeight:700 }} maxLength={6}/>
+                  </div>
+                </div>
+                <button onClick={handleVerifyOTP} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
+                  <span>{loading ? "Verifying..." : "Verify & Continue"}</span>
+                  {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
+                </button>
+                <div style={{ textAlign:"center", marginTop:18, fontSize:12, color:"rgba(255,255,255,0.3)" }}>
+                  <button onClick={()=>{setTab("login");setError("");setSuccess("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.8)", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>← Back to login</button>
                 </div>
               </div>
             )}

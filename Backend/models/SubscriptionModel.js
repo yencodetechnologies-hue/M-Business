@@ -40,14 +40,14 @@ const subscriptionSchema = new mongoose.Schema({
   // Payment provider info
   paymentMethod: { type: String, enum: ["card", "upi", "netbanking", "cash", "other"], default: "other" },
 
-  // M Business as provider
-  providerCompany: { type: String, default: "M Business" },
-  providerEmail: { type: String, default: "billing@mbusiness.com" },
+  // Business Suite as provider
+  providerCompany: { type: String, default: "Business Suite" },
+  providerEmail: { type: String, default: "billing@business-suite.com" },
   providerPhone: { type: String, default: "+91-9876543210" },
   providerGst: { type: String, default: "GSTIN-33AABCM1234Z1Z1" },
-  providerAddress: { type: String, default: "M Business Pvt Ltd, Chennai, Tamil Nadu, India" },
+  providerAddress: { type: String, default: "Business Suite Support, India" },
 
-  // Invoice/Quotation references (M Business provides these)
+  // Invoice/Quotation references (Business Suite provides these)
   invoiceRefs: [{ type: String }],
   quotationRefs: [{ type: String }],
 

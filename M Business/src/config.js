@@ -1,7 +1,7 @@
 import axios from "axios";
 export const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
   ? "http://localhost:5000"
-  : "https://mbusiness.octosofttechnologies.in";
+  : "http://mbusiness.octosofttechnologies.in";
 
 // Global interceptor for Multi-Tenant Architecture
 axios.interceptors.request.use((config) => {

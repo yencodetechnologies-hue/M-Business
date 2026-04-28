@@ -49,7 +49,7 @@ const upload = multer({
 const interviewSchema = new mongoose.Schema(
   {
     companyId:     { type: String, default: "DEFAULT" },
-    companyName:   { type: String, default: "M Business" },
+    companyName:   { type: String, default: "My Business" },
     name:          { type: String, required: true, trim: true },
     email:         { type: String, required: true, trim: true, lowercase: true },
     mobile:        { type: String, required: true, trim: true },
@@ -102,7 +102,7 @@ router.post("/apply", upload.single("resume"), async (req, res) => {
 
     const doc = await Interview.create({
       companyId:   companyId   || "DEFAULT",
-      companyName: companyName || "M Business",
+      companyName: companyName || "My Business",
       name,
       email,
       mobile,

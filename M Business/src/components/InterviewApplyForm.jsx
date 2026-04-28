@@ -8,24 +8,24 @@ import { createPortal } from "react-dom";
 import { BASE_URL as API_URL } from "../config";
 
 const ROLES = [
-  "Software Engineer","Frontend Developer","Backend Developer","Full Stack Developer",
-  "Mobile Developer","DevOps Engineer","Data Engineer","Data Scientist","ML Engineer",
-  "UI/UX Designer","Product Manager","Business Analyst","QA Engineer","Test Engineer",
-  "System Administrator","Network Engineer","Cloud Architect","Cybersecurity Analyst",
-  "HR Executive","Recruiter","Sales Executive","Marketing Manager","Content Writer",
-  "Graphic Designer","Finance Analyst","Operations Manager","Customer Support",
-  "Project Manager","Scrum Master","Technical Lead","Engineering Manager",
-  "React Developer","Node.js Developer","Python Developer","Java Developer",
-  "Android Developer","iOS Developer","Flutter Developer","Database Administrator",
+  "Software Engineer", "Frontend Developer", "Backend Developer", "Full Stack Developer",
+  "Mobile Developer", "DevOps Engineer", "Data Engineer", "Data Scientist", "ML Engineer",
+  "UI/UX Designer", "Product Manager", "Business Analyst", "QA Engineer", "Test Engineer",
+  "System Administrator", "Network Engineer", "Cloud Architect", "Cybersecurity Analyst",
+  "HR Executive", "Recruiter", "Sales Executive", "Marketing Manager", "Content Writer",
+  "Graphic Designer", "Finance Analyst", "Operations Manager", "Customer Support",
+  "Project Manager", "Scrum Master", "Technical Lead", "Engineering Manager",
+  "React Developer", "Node.js Developer", "Python Developer", "Java Developer",
+  "Android Developer", "iOS Developer", "Flutter Developer", "Database Administrator",
 ];
 
 // ── Role Dropdown Component (Portal-based — never clipped) ──
 function RoleDropdown({ role, setRole, error, setErrors }) {
   const [search, setSearch] = useState("");
-  const [open, setOpen]     = useState(false);
-  const [pos, setPos]       = useState({ top: 0, left: 0, width: 0 });
-  const triggerRef          = useRef(null);
-  const searchRef           = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
+  const triggerRef = useRef(null);
+  const searchRef = useRef(null);
 
   const filtered = search.trim() === ""
     ? ROLES
@@ -168,27 +168,27 @@ export default function InterviewApplyForm() {
 
   const parseSlug = (slug = "") => {
     const parts = slug.split("-");
-    const last  = parts[parts.length - 1] || "";
+    const last = parts[parts.length - 1] || "";
     const isMongo = /^[a-f0-9]{24}$/i.test(last);
     if (isMongo) return { companyId: last, companyName: parts.slice(0, -1).join(" ") || "M Business" };
     return { companyId: slug || "69b8fe0a6e3d6f1e056f3109", companyName: "M Business" };
   };
   const { companyId, companyName } = parseSlug(companySlug);
 
-  const [form, setForm]           = useState({ name: "", email: "", mobile: "", years: "", notes: "" });
-  const [exp, setExp]             = useState("Fresher");
-  const [role, setRole]           = useState("");
-  const [resumeFile, setResumeFile]       = useState(null);
+  const [form, setForm] = useState({ name: "", email: "", mobile: "", years: "", notes: "" });
+  const [exp, setExp] = useState("Fresher");
+  const [role, setRole] = useState("");
+  const [resumeFile, setResumeFile] = useState(null);
   const [resumePreview, setResumePreview] = useState(null);
-  const [errors, setErrors]       = useState({});
-  const [loading, setLoading]     = useState(false);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [apiError, setApiError]   = useState("");
-  const [drag, setDrag]           = useState(false);
+  const [apiError, setApiError] = useState("");
+  const [drag, setDrag] = useState(false);
   const [interviewerName, setInterviewerName] = useState("");
 
   const fileInputRef = useRef(null);
-  const dragCounter  = useRef(0);
+  const dragCounter = useRef(0);
 
   const handleFile = useCallback((file) => {
     if (!file) return;
@@ -207,18 +207,18 @@ export default function InterviewApplyForm() {
   const openFilePicker = (e) => { e.preventDefault(); e.stopPropagation(); fileInputRef.current?.click(); };
   const onDragEnter = (e) => { e.preventDefault(); dragCounter.current++; setDrag(true); };
   const onDragLeave = (e) => { e.preventDefault(); dragCounter.current--; if (dragCounter.current === 0) setDrag(false); };
-  const onDragOver  = (e) => { e.preventDefault(); };
-  const onDrop      = (e) => { e.preventDefault(); dragCounter.current = 0; setDrag(false); handleFile(e.dataTransfer.files?.[0]); };
+  const onDragOver = (e) => { e.preventDefault(); };
+  const onDrop = (e) => { e.preventDefault(); dragCounter.current = 0; setDrag(false); handleFile(e.dataTransfer.files?.[0]); };
 
   const validate = () => {
     const errs = {};
-    if (!form.name.trim())   errs.name   = "⚠️ Name is required";
-    if (!form.email.trim())  errs.email  = "⚠️ Email is required";
+    if (!form.name.trim()) errs.name = "⚠️ Name is required";
+    if (!form.email.trim()) errs.email = "⚠️ Required";
     else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = "⚠️ Invalid email";
     if (!form.mobile.trim()) errs.mobile = "⚠️ Mobile is required";
-    if (!role)               errs.role   = "⚠️ Please select a role";
+    if (!role) errs.role = "⚠️ Please select a role";
     if (exp === "Experienced" && !form.years) errs.years = "⚠️ Years required";
-    if (!resumeFile)         errs.resume = "⚠️ Resume is required";
+    if (!resumeFile) errs.resume = "⚠️ Resume is required";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -227,17 +227,17 @@ export default function InterviewApplyForm() {
     if (!validate()) return;
     setLoading(true); setApiError("");
     const data = new FormData();
-    data.append("companyId",      companyId);
-    data.append("companyName",    companyName);
-    data.append("name",           form.name.trim());
-    data.append("email",          form.email.trim());
-    data.append("mobile",         form.mobile.trim());
-    data.append("experience",     exp);
-    data.append("years",          form.years || "");
-    data.append("role",           role);
-    data.append("notes",          form.notes || "");
-    data.append("interviewerName",interviewerName || "");
-    data.append("resume",         resumeFile);
+    data.append("companyId", companyId);
+    data.append("companyName", companyName);
+    data.append("name", form.name.trim());
+    data.append("email", form.email.trim());
+    data.append("mobile", form.mobile.trim());
+    data.append("experience", exp);
+    data.append("years", form.years || "");
+    data.append("role", role);
+    data.append("notes", form.notes || "");
+    data.append("interviewerName", interviewerName || "");
+    data.append("resume", resumeFile);
     try {
       const res = await fetch(`${API_URL}/api/interviews/apply`, { method: "POST", body: data });
       if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.msg || "Submission failed"); }
@@ -266,7 +266,7 @@ export default function InterviewApplyForm() {
             Application Submitted!
           </h2>
           <p style={{ color: "#7c3aed", fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>
-           Thank You🙏
+            Thank You🙏
           </p>
           <div style={{ background: "#f5f3ff", borderRadius: 12, padding: "12px 16px", border: "1px solid #ede9fe", fontSize: 13, color: "#7c3aed" }}>
             <strong>{form.name}</strong> · {role} · {companyName}

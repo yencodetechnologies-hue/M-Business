@@ -50,7 +50,7 @@ const SLIDE_TYPES = [
   { id:"blank",       label:"Blank Page",    icon:"📄", desc:"Add custom content" },
 ];
 
-function makeSlide(type, themeName="Violet") {
+function makeSlide(type, themeName="Violet", companyName="") {
   console.log("makeSlide called with type:", type);
   const b = { id:uid(), type, theme:themeName, elements:[] };
   switch(type) {
@@ -63,7 +63,7 @@ function makeSlide(type, themeName="Violet") {
     case "process":    return {...b, heading:"Our Process", steps:[{icon:"🔍",label:"Research",desc:"Deep dive into your needs"},{icon:"✏️",label:"Design",desc:"Wireframes & prototypes"},{icon:"⚡",label:"Build",desc:"Agile development"},{icon:"🚀",label:"Launch",desc:"Deploy & support"}]};
     case "blank_first_page": return {...b, pageTitle:"Blank First Page"};
     case "proposal":   return {...b, 
-      companyName:"", 
+      companyName: companyName || "", 
       clientName:"", 
       clientAddress:"",
       refNo:"",
@@ -74,7 +74,7 @@ function makeSlide(type, themeName="Violet") {
       companyAddress:""
     };
     case "proposal_page2": return {...b,
-      companyName:"",
+      companyName: companyName || "",
       siteVisits:[],
       feeStructure:[],
       stagesOfPayment:[],
@@ -87,15 +87,14 @@ function makeSlide(type, themeName="Violet") {
     default:           return {...b, heading:"Slide", body:""};
   }
 }
-
-function makeDemo() {
-  const theme = "Violet";
+function makeInitialProposal(theme = "Violet", companyName = "") {
   return {
-    id:pid(), title:"New Project Proposal", client:"",
-    theme, status:"draft", format:"a4-portrait",
-    created:new Date().toISOString(), updated:new Date().toISOString(),
-    rejectNote:"",
-slides: [makeSlide("blank_first_page", theme)],
+    id: pid(),
+    title: "New Proposal",
+    status: "draft",
+    theme,
+    currency: "₹",
+    slides: [makeSlide("blank_first_page", theme, companyName)],
   };
 }
 
@@ -106,6 +105,12 @@ const STATUS = {
   approved: { label:"Approved",         icon:"✅",  bg:"#f0fdf4", fg:"#14532d", br:"#86efac" },
   rejected: { label:"Rejected",         icon:"❌",  bg:"#fff1f2", fg:"#9f1239", br:"#fda4af" },
 };
+
+function formatCurrency(val, symbol = "₹") {
+  const num = typeof val === "string" ? parseFloat(val.replace(/[^0-9.-]+/g, "")) || 0 : parseFloat(val) || 0;
+  const isINR = symbol === "₹";
+  return symbol + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
 function Badge({status}) {
   const s = STATUS[status]||STATUS.draft;
@@ -243,7 +248,7 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
       }}
     >
       {/* Corner Handles (Visual) */}
-      {selected && !dragging && !resizing && (
+      {selected && (
         <div onPointerDown={e => e.stopPropagation()} style={{position:"absolute", inset:-10, pointerEvents:"none"}}>
           {/* Corners */}
           <div onPointerDown={(e)=>{e.stopPropagation(); setResizing('tl');}} style={{ ...handleStyle, top:0, left:0, transform:"translate(-50%,-50%)", cursor:"nwse-resize", pointerEvents:"auto" }} />
@@ -256,29 +261,31 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
           <div onPointerDown={(e)=>{e.stopPropagation(); setResizing('l');}}  style={{ ...handleStyle, left:0, top:"50%", transform:"translate(-50%,-50%)", cursor:"ew-resize", height:24, borderRadius:6, pointerEvents:"auto" }} />
           <div onPointerDown={(e)=>{e.stopPropagation(); setResizing('r');}}  style={{ ...handleStyle, right:0, top:"50%", transform:"translate(50%,-50%)", cursor:"ew-resize", height:24, borderRadius:6, pointerEvents:"auto" }} />
           
-          {/* Toolbar Overlay (ENLARGED & PROPAGATION FIXED) */}
-          <div 
-            onPointerDown={e => e.stopPropagation()}
-            style={{ 
-              position:"absolute", 
-              top:-70, 
-              left:"50%", 
-              transform:"translateX(-50%)", 
-              background:"#fff", 
-              boxShadow:"0 12px 36px rgba(0,0,0,0.25)", 
-              borderRadius:16, 
-              display:"flex", 
-              gap:4, 
-              padding:6, 
-              zIndex:100, 
-              border:"1px solid #e5e7eb",
-              pointerEvents:"auto"
-            }}
-          >
-             <button onClick={(e)=>{e.stopPropagation(); onDelete(element.id);}} style={{ border:"none", background:"none", padding:"12px 20px", fontSize:22, cursor:"pointer", color:"#ef4444", transition:"all .2s", borderRadius:12 }} title="Delete" className="hb">🗑</button>
-             <div style={{ width:1, height:36, background:"#e5e7eb", alignSelf:"center" }} />
-             <button onClick={(e)=>{e.stopPropagation(); onUpdate({fontWeight: (element.fontWeight === 800 ? 400 : 800)});}} style={{ border:"none", background:"none", padding:"12px 20px", fontSize:20, fontWeight:800, cursor:"pointer", color:element.fontWeight===800?"#7d2ae8":"#374151", transition:"all .2s", borderRadius:12 }} title="Bold" className="hb">B</button>
-          </div>
+          {/* Toolbar Overlay (Only show when NOT dragging or resizing) */}
+          {!dragging && !resizing && (
+            <div 
+              onPointerDown={e => e.stopPropagation()}
+              style={{ 
+                position:"absolute", 
+                top:-70, 
+                left:"50%", 
+                transform:"translateX(-50%)", 
+                background:"#fff", 
+                boxShadow:"0 12px 36px rgba(0,0,0,0.25)", 
+                borderRadius:16, 
+                display:"flex", 
+                gap:4, 
+                padding:6, 
+                zIndex:100, 
+                border:"1px solid #e5e7eb",
+                pointerEvents:"auto"
+              }}
+            >
+               <button onClick={(e)=>{e.stopPropagation(); onDelete(element.id);}} style={{ border:"none", background:"none", padding:"12px 20px", fontSize:22, cursor:"pointer", color:"#ef4444", transition:"all .2s", borderRadius:12 }} title="Delete" className="hb">🗑</button>
+               <div style={{ width:1, height:36, background:"#e5e7eb", alignSelf:"center" }} />
+               <button onClick={(e)=>{e.stopPropagation(); onUpdate({fontWeight: (element.fontWeight === 800 ? 400 : 800)});}} style={{ border:"none", background:"none", padding:"12px 20px", fontSize:20, fontWeight:800, cursor:"pointer", color:element.fontWeight===800?"#7d2ae8":"#374151", transition:"all .2s", borderRadius:12 }} title="Bold" className="hb">B</button>
+            </div>
+          )}
         </div>
       )}
 
@@ -287,7 +294,7 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
   );
 }
 // ─── SLIDE RENDERER ───────────────────────────────────────────────────────────
-function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSelectElement, onUpdateElement, onDelete, preview=false, canvasRef }){
+function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSelectElement, onUpdateElement, onDelete, preview=false, canvasRef, companyLogo, companyName }){
   const t = THEMES.find(x=>x.name===tn)||THEMES[0];
   const upd = patch => onChange&&onChange({...slide,...patch});
   const fontSize = preview ? 0.22 : 1;
@@ -640,10 +647,8 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
         
         {/* Header with Logo minimized */}
       <div style={{textAlign:"center",marginBottom:"30px"}}>
-        <div style={{display:"inline-block",background:"#ff0000",color:"#white",padding:"5px 10px",fontWeight:"bold",fontSize:"14px",marginBottom:"5px"}}>
-          i des
-        </div>
-        <div style={{fontSize:"14px",fontWeight:"bold"}}>INTEGERATED DESIGN SERVICES</div>
+        {companyLogo && <img src={companyLogo} alt="logo" style={{ height: 40, marginBottom: 8, objectFit: "contain" }} />}
+        <div style={{fontSize:"18px",fontWeight:"bold", color: "#ff0000"}}>{slide.companyName || companyName}</div>
       </div>
 
       {/* Site Visits */}
@@ -804,7 +809,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
 }
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
-export default function CanvaProposal({clients=[], openNew=false, onOpenNewDone}) {
+export default function CanvaProposal({clients=[], openNew=false, onOpenNewDone, companyLogo, companyName}) {
   const [view, setView]           = useState("list");    // list | editor
   const [proposals, setProposals] = useState([]);
   const [doc, setDoc]             = useState(null);
@@ -968,11 +973,28 @@ const persist = useCallback(async (d) => {
   
 const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
   const createNew = () => {
-    const d = { id:pid(), title:"New Project Proposal", client:"", theme:null, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"a4-portrait", slides:[makeSlide("proposal",null)] };
+    const d = { id:pid(), title:"New Project Proposal", client:"", theme:null, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"a4-portrait", slides:[makeSlide("proposal",null, companyName)], currency: "₹" };
     setDoc(d); setPage(0); setView("editor");
   };
 
   const saveDoc = (d=doc) => { const nd={...d,updated:new Date().toISOString()}; persist(nd); setDoc(nd); flash("💾 Saved!"); };
+  const shareProposal = async (p = doc) => {
+    const link = `${window.location.origin}/proposal-view?id=${p._id || p.id}`;
+    const text = `Project Proposal: ${p.title}\nPrepared by ${companyName}\nView here: ${link}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: p.title, text, url: link }); } catch (err) { console.log(err); }
+    } else {
+      navigator.clipboard.writeText(text);
+      flash("📋 Link copied to clipboard!");
+    }
+  };
+
+  const shareWhatsApp = (p = doc) => {
+    const link = `${window.location.origin}/proposal-view?id=${p._id || p.id}`;
+    const text = encodeURIComponent(`Project Proposal: ${p.title}\nPrepared by ${companyName}\nView here: ${link}`);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
+
   const setStatus = async (status, extra={}) => {
     if (status === "pending") {
       if (!doc.title.trim()) {
@@ -1323,8 +1345,10 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                         {new Date(p.updated).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
                       </div>
                       <div style={{display:"flex",gap:8}}>
-                        <button onClick={e=>{e.stopPropagation(); printProposal(p);}} style={{background:"#eff6ff",border:"none",color:"#3b82f6",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}} title="Print Proposal">🖨️</button>
-                        <button onClick={e=>deleteProposal(p.id,p._id,e)} style={{background:"#fef2f2",border:"none",color:"#ef4444",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}} title="Delete Proposal">🗑️</button>
+                        <button onClick={e=>{e.stopPropagation(); shareProposal(p);}} style={{background:"#eff6ff",border:"none",color:"#3b82f6",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}} title="Share Link">🔗</button>
+                        <button onClick={e=>{e.stopPropagation(); shareWhatsApp(p);}} style={{background:"#dcfce7",border:"none",color:"#16a34a",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}} title="WhatsApp">💬</button>
+                        <button onClick={e=>{e.stopPropagation(); printProposal(p);}} style={{background:"#f1f5f9",border:"none",color:"#475569",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}} title="Print">🖨️</button>
+                        <button onClick={e=>deleteProposal(p.id,p._id,e)} style={{background:"#fef2f2",border:"none",color:"#ef4444",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}} title="Delete">🗑️</button>
                       </div>
                     </div>
                   </div>
@@ -1459,6 +1483,20 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                 ))}
               </select>
             </div>
+            <div style={{display:"flex",alignItems:"center",gap:8,background:"#f0fdf4",padding:"4px 12px",borderRadius:8,border:"1px solid #86efac"}}>
+              <span style={{fontSize:11,fontWeight:800,color:"#16a34a"}}>CURRENCY:</span>
+              <select 
+                value={doc.currency || "₹"} 
+                onChange={e=>{const nd={...doc,currency:e.target.value}; setDoc(nd); persist(nd);}}
+                disabled={!canEdit}
+                style={{background:"none",border:"none",fontSize:12,fontWeight:700,color:"#16a34a",outline:"none",cursor:"pointer"}}
+              >
+                <option value="₹">INR (₹)</option>
+                <option value="$">USD ($)</option>
+                <option value="€">EUR (€)</option>
+                <option value="£">GBP (£)</option>
+              </select>
+            </div>
           </div>
         )}
         {isViewMode && <div style={{flex:1, textAlign:"center", fontSize:16, fontWeight:800, color:"#0f172a"}}>{doc.title}</div>}
@@ -1491,7 +1529,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
     background: "#fff",
     color: "#374151",
     border: "1.5px solid #e2e8f0",
-    padding: "8px 16px",
+    padding: "8px 12px",
     borderRadius: 8,
     fontSize: 13,
     fontWeight: 700,
@@ -1502,7 +1540,43 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
     gap: 6,
   }}
 >
-  🖨️ Print
+  🖨️
+</button>
+<button onClick={() => shareProposal()}
+  style={{
+    background: "#eff6ff",
+    color: "#2563eb",
+    border: "1.5px solid #bfdbfe",
+    padding: "8px 12px",
+    borderRadius: 8,
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+    fontFamily: "inherit",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+  }}
+>
+  🔗
+</button>
+<button onClick={() => shareWhatsApp()}
+  style={{
+    background: "#dcfce7",
+    color: "#16a34a",
+    border: "1.5px solid #bbf7d0",
+    padding: "8px 12px",
+    borderRadius: 8,
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+    fontFamily: "inherit",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+  }}
+>
+  💬
 </button>
           {!isViewMode && <button onClick={()=>saveDoc()} style={{background:"#7d2ae8",color:"#fff",border:"none",padding:"8px 20px",borderRadius:8,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(125,42,232,0.2)"}}>Save</button>}
           
@@ -1598,7 +1672,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                       style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:8,overflow:"hidden",cursor:canEdit?"pointer":"not-allowed",transition:"all .2s",position:"relative"}} className="pgthumb">
                       <div style={{aspectRatio:ar, overflow:"hidden", width:"100%"}}>
                         <div style={{transform:`scale(${isP ? 294/900 : 294/900})`,transformOrigin:"top left",width:900,height:h,pointerEvents:"none"}}>
-                          <Slide slide={makeSlide(tmpl.id, doc.theme)} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview/>
+                          <Slide slide={makeSlide(tmpl.id, doc.theme)} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview companyLogo={companyLogo} companyName={companyName}/>
                         </div>
                       </div>
                       <div style={{padding:"8px 12px",fontSize:12,fontWeight:700,color:"#0f172a",background:"#fff",borderTop:"1px solid #f1f5f9",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
@@ -1906,6 +1980,8 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                       onUpdateElement={()=>{}}
                       onDelete={()=>{}}
                       canvasRef={canvasRef}
+                      companyLogo={companyLogo}
+                      companyName={companyName}
                     />
                   </div>
                 </div>
@@ -1934,6 +2010,8 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                     onUpdateElement={updateElement}
                     onDelete={deleteElement}
                     canvasRef={canvasRef}
+                    companyLogo={companyLogo}
+                    companyName={companyName}
                   />
                 ) : (
                   <div style={{ width: 900, height: 506, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", color: "#64748b", fontSize: 14, fontWeight: 500 }}>
@@ -1980,7 +2058,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             <div key={s.id} onClick={()=>setPage(i)}
               style={{height:70,width:stripWidth,flexShrink:0,borderRadius:6,overflow:"hidden",cursor:"pointer",border:`2px solid ${i===page?"#7d2ae8":"#e2e8f0"}`,position:"relative",background:"#fff",transition:"all .2s",boxShadow:i===page?"0 0 0 2px rgba(125,42,232,0.2)":"none",transform:i===page?"scale(1.05)":"scale(1)"}}>
               <div style={{transform:`scale(${stripWidth/900})`,transformOrigin:"top left",width:900,height:h,pointerEvents:"none"}}>
-                <Slide slide={s} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview/>
+                <Slide slide={s} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview companyLogo={companyLogo} companyName={companyName}/>
               </div>
               <div style={{position:"absolute",bottom:4,left:6,fontSize:10,fontWeight:800,color:i===page?"#7d2ae8":"#94a3b8",background:"rgba(255,255,255,0.8)",padding:"0 4px",borderRadius:4}}>{i+1}</div>
               {canEdit && doc.slides.length > 1 && (

@@ -9,9 +9,10 @@ const DEFAULT_LOGO_URL = "https://res.cloudinary.com/dvbzhmysy/image/upload/v177
 function generateInvoiceNo() {
   return `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 }
-function formatINR(val) {
+function formatCurrency(val, symbol = "₹") {
   const num = parseFloat(val) || 0;
-  return "₹" + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const isINR = symbol === "₹";
+  return symbol + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function formatDate(d) {
   if (!d) return "—";
@@ -266,6 +267,23 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   };
   const qrData = `${window.location.origin}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
+  const shareInvoice = async (entry) => {
+    const link = `${window.location.origin}/invoice-view?id=${entry.id || entry.invoiceNo}`;
+    const text = `Invoice ${entry.invoiceNo} from ${inv.companyName}\nTotal: ${formatCurrency(entry.total, inv.currency)}\nView here: ${link}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, url: link }); } catch (err) { console.log(err); }
+    } else {
+      navigator.clipboard.writeText(text);
+      showToast("📋 Link copied to clipboard!");
+    }
+  };
+
+  const shareWhatsApp = (entry) => {
+    const link = `${window.location.origin}/invoice-view?id=${entry.id || entry.invoiceNo}`;
+    const text = encodeURIComponent(`Invoice ${entry.invoiceNo} from ${inv.companyName}\nTotal: ${formatCurrency(entry.total, inv.currency)}\nView here: ${link}`);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
+
   // ── Shared styles ────────────────────────────────────────────
   const inp = (err) => ({
     width: "100%", border: `1.5px solid ${err ? "#ef4444" : "#e5e7eb"}`, borderRadius: 8,
@@ -326,8 +344,8 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
         {/* Summary cards */}
         <div className="inv-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
           {[
-            { label: "Total Invoiced", value: formatINR(totalAmt), color: "#4c1d95", icon: "📊" },
-            { label: "Collected",      value: formatINR(paidAmt),  color: "#16a34a", icon: "✅" },
+            { label: "Total Invoiced", value: formatCurrency(totalAmt, inv.currency), color: "#4c1d95", icon: "📊" },
+            { label: "Collected",      value: formatCurrency(paidAmt, inv.currency),  color: "#16a34a", icon: "✅" },
             { label: "Awaiting",       value: `${unpaidCnt}`,      color: "#ea580c", icon: "⏳" },
             { label: "Drafts",         value: `${draftCnt}`,       color: "#6b7280", icon: "📝" },
           ].map((c) => (
@@ -403,7 +421,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
                 {/* Amount */}
                 <div onClick={() => setViewEntry(entry)} style={{ fontSize: 15, fontWeight: 800, color: "#111827" }}>
-                  {formatINR(entry.total)}
+                  {formatCurrency(entry.total, entry.inv?.currency || inv.currency)}
                 </div>
 
                 {/* Status dropdown */}
@@ -427,31 +445,12 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                 </div>
 
                 {/* Action buttons */}
-                <div onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 5, flexWrap: "nowrap" }}>
-                  {/* View */}
-                  <button
-                    className="inv-action-btn"
-                    onClick={() => setViewEntry(entry)}
-                    title="View Invoice"
-                    style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 7, padding: "5px 9px", fontSize: 12, color: "#6366f1", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                    👁 View
-                  </button>
-                  {/* Edit */}
-                  <button
-                    className="inv-action-btn"
-                    onClick={() => loadEntry(entry)}
-                    title="Edit Invoice"
-                    style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 7, padding: "5px 9px", fontSize: 12, color: "#9333ea", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                    ✏️ Edit
-                  </button>
-                  {/* Delete */}
-                    <button
-                      className="inv-action-btn"
-                      onClick={() => setDeleteTarget(entry)}
-                      title="Delete Invoice"
-                      style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 9px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                      🗑 Delete
-                    </button>
+                <div onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 4, flexWrap: "nowrap" }}>
+                  <button onClick={() => setViewEntry(entry)} style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#374151", cursor: "pointer", fontWeight: 700 }}>👁 View</button>
+                  <button onClick={() => shareInvoice(entry)} style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#2563eb", cursor: "pointer", fontWeight: 700 }}>🔗 Share</button>
+                  <button onClick={() => shareWhatsApp(entry)} style={{ background: "#dcfce7", border: "1px solid #bbf7d0", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#16a34a", cursor: "pointer", fontWeight: 700 }}>💬 WA</button>
+                  <button onClick={() => loadEntry(entry)} style={{ background: "#f3e8ff", border: "1px solid #e9d5ff", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#7c3aed", cursor: "pointer", fontWeight: 700 }}>✏️ Edit</button>
+                  <button onClick={() => setDeleteTarget(entry)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#ef4444", cursor: "pointer", fontWeight: 700 }}>🗑</button>
                 </div>
               </div>
             );
@@ -535,8 +534,8 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                           <div key={i} style={{ padding: "10px 14px", display: "grid", gridTemplateColumns: "1fr 60px 90px 90px", gap: 8, borderTop: "1px solid #f3f0ff", alignItems: "center" }}>
                             <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{item.description || "—"}</span>
                             <span style={{ fontSize: 12, color: "#6b7280", textAlign: "center" }}>{item.quantity}</span>
-                            <span style={{ fontSize: 12, color: "#6b7280", textAlign: "right" }}>{formatINR(item.rate)}</span>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c", textAlign: "right" }}>{formatINR((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0))}</span>
+                            <span style={{ fontSize: 12, color: "#6b7280", textAlign: "right" }}>{formatCurrency(item.rate, vInv.currency || inv.currency)}</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c", textAlign: "right" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), vInv.currency || inv.currency)}</span>
                           </div>
                         ))}
                       </div>
@@ -544,7 +543,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                       {/* Totals */}
                       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 18 }}>
                         <div style={{ minWidth: 240 }}>
-                          {[["Subtotal", formatINR(vSub)], [`GST (${vInv.gstRate || 18}%)`, formatINR(vGst)]].map(([l, v]) => (
+                          {[["Subtotal", formatCurrency(vSub, vInv.currency || inv.currency)], [`GST (${vInv.gstRate || 18}%)`, formatCurrency(vGst, vInv.currency || inv.currency)]].map(([l, v]) => (
                             <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #f3f0ff" }}>
                               <span style={{ fontSize: 13, color: "#6b7280" }}>{l}</span>
                               <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
@@ -552,7 +551,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                           ))}
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,#4c1d95,#7c3aed)", borderRadius: 10, marginTop: 8 }}>
                             <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>TOTAL DUE</span>
-                            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatINR(vTot)}</span>
+                            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(vTot, vInv.currency || inv.currency)}</span>
                           </div>
                         </div>
                       </div>
@@ -625,9 +624,11 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
         {/* Toolbar */}
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => setStep("form")} style={{ padding: "10px 20px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Edit</button>
-          <button onClick={() => setStep("list")} style={{ padding: "10px 20px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>📋 All Invoices</button>
-          <button onClick={() => window.print()} style={{ padding: "10px 24px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
+          <button onClick={() => setStep("form")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Edit</button>
+          <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>📋 List</button>
+          <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗 Share</button>
+          <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WhatsApp</button>
+          <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
         <div className="invoice-paper">
@@ -693,15 +694,15 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                     <td style={{ padding: "12px 11px", color: "#a78bfa", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
                     <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{item.description || "—"}</td>
                     <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatINR(item.rate)}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#1e0a3c" }}>{formatINR((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0))}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#1e0a3c" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
               <div style={{ width: "min(280px,100%)" }}>
-                {[["Subtotal", formatINR(subtotal)], [`GST (${inv.gstRate}%)`, formatINR(gstAmt)]].map(([l, v]) => (
+                {[["Subtotal", formatCurrency(subtotal, inv.currency)], [`GST (${inv.gstRate}%)`, formatCurrency(gstAmt, inv.currency)]].map(([l, v]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f3f0ff" }}>
                     <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
@@ -709,7 +710,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                 ))}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 12, marginTop: 8 }}>
                   <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>TOTAL DUE</span>
-                  <span style={{ fontSize: 19, fontWeight: 900, color: "#fff" }}>{formatINR(total)}</span>
+                  <span style={{ fontSize: 19, fontWeight: 900, color: "#fff" }}>{formatCurrency(total, inv.currency)}</span>
                 </div>
               </div>
             </div>
@@ -826,13 +827,27 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
             <input type="date" value={inv.dueDate} onChange={(e) => upd("dueDate", e.target.value)} style={inp()} />
           </div>
           <div>
-            <label style={lbl}>Order Number <span style={{ color: "#d1d5db" }}>(optional)</span></label>
-            <input value={inv.orderNo} onChange={(e) => upd("orderNo", e.target.value)} placeholder="ORD-001" style={inp()} />
-          </div>
-          <div>
             <label style={lbl}>GST Rate</label>
             <select value={inv.gstRate} onChange={(e) => upd("gstRate", Number(e.target.value))} style={inp()}>
               {GST_RATES.map((r) => <option key={r} value={r}>{r === 0 ? "No GST (0%)" : `GST ${r}%`}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={lbl}>Currency</label>
+            <select value={inv.currency} onChange={(e) => upd("currency", e.target.value)} style={inp()}>
+              <option value="₹">INR (₹)</option>
+              <option value="$">USD ($)</option>
+              <option value="€">EUR (€)</option>
+              <option value="£">GBP (£)</option>
+              <option value="¥">JPY (¥)</option>
+            </select>
+          </div>
+          <div>
+            <label style={lbl}>Template</label>
+            <select value={inv.template} onChange={(e) => upd("template", e.target.value)} style={inp()}>
+              <option value="Modern">Modern Purple</option>
+              <option value="Classic">Classic Professional</option>
+              <option value="Minimal">Minimalist</option>
             </select>
           </div>
         </div>
@@ -907,15 +922,15 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
           <div style={{ minWidth: 220 }}>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
               <span style={{ fontSize: 13, color: "#6b7280" }}>Subtotal</span>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatINR(subtotal)}</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(subtotal, inv.currency)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
               <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({inv.gstRate}%)</span>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatINR(gstAmt)}</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(gstAmt, inv.currency)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 10, marginTop: 8 }}>
               <span style={{ fontSize: 14, fontWeight: 800, color: "#e9d5ff" }}>Total</span>
-              <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{formatINR(total)}</span>
+              <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{formatCurrency(total, inv.currency)}</span>
             </div>
           </div>
         </div>

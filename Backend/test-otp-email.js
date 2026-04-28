@@ -11,7 +11,7 @@ async function testOTPEmail() {
   console.log('SMTP Host:', process.env.SMTP_HOST || 'NOT SET');
 
   try {
-    const result = await sendOTPEmail('irinfelshiya07', testOTP, 'verification');
+    const result = await sendOTPEmail('irinfelshiya07@gmail.com', testOTP, 'verification');
 
     if (result.success) {
       console.log('\n✅ Email sent successfully!');

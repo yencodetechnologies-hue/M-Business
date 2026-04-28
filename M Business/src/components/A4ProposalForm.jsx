@@ -228,46 +228,42 @@ function ClientDropdown({ clients, value, onChange, error }) {
 
 export default function A4ProposalForm({ clients, onSave, onCancel, initialData = null }) {
   const [formData, setFormData] = useState({
-    companyName: "IDES ARCHITECTS",
+    companyName: "",
     clientName: "",
     clientAddress: "",
-    refNo: `16/APP INT/DR.KAR/${new Date().getFullYear()}`,
+    refNo: `${new Date().getFullYear()}/PROP`,
     date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-'),
     projectType: "",
     scopeOfWork: [
-      "presentation drawings",
-      "3D rendering of design-1 option (for more than 2 option, additionally charged)",
+      "Presentation drawings",
+      "3D rendering of design options",
       "Working Drawings, Interior Design and Furnishing",
       "Plumbing and Electrical Co-ordination Drawings",
-      "Recommended List of Tiles, Electrical Fixtures and Plumbing Fixtures and various other finishes, selection only",
-      "Coordination with Client, Contractor and Team",
-      "INTERIOR BOQ & Costing for project",
-      "Selection of specified finishing materials in the BOQ",
-      "Tiling Layout drawings",
-      "Wall cladding drawings",
-      "Selection of Materials & Finishes"
+      "Material selection and finishes",
+      "Coordination with Client and Contractor",
+      "BOQ & Costing for project"
     ],
     conceptStage: [
       "Identify client's requirement",
-      "Preparation of alternative conceptual layouts",
-      "Rough estimate based on floor area basis"
+      "Preparation of conceptual layouts",
+      "Rough estimate"
     ],
     siteVisits: [
-      "Two numbers of complimentary visits will be made on specific requests",
-      "Additional visits other than the above stages will be charged additionally @ Rs.2,500/- per visit"
+      "Complimentary visits as per agreement",
+      "Additional visits charged separately"
     ],
     feeStructure: [
-      "Our overall professional consultancy fee for architecture services would be 8% of Estimated cost."
+      "Consultancy fee based on project scope."
     ],
     stagesOfPayment: [
-      "10% As an Advance",
-      "15% Towards Finalization of Concept Drawings",
-      "30% Towards Preparation of 3D Models",
-      "25% Towards release of Good for Construction drawings",
-      "15% Towards material finalization & BOQ preparation",
-      "5% Towards site completion"
+      "Advance payment",
+      "Concept finalization",
+      "3D Models preparation",
+      "Construction drawings",
+      "Material finalization",
+      "Completion"
     ],
-    companyAddress: "PLOT NO 84,SRINAGAR COLONY, KUMBAKONAM, PIN-612 001,MOBILE:9003075630"
+    companyAddress: ""
   });
 
   const [errors, setErrors] = useState({});
@@ -411,13 +407,8 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
         </head>
         <body>
           <div class="header">
-            <div class="company-name">architects</div>
-            <div class="company-tag">i des</div>
-            <div style="font-size: 16px; font-weight: 600;">architecture</div>
-            <div style="font-size: 16px; font-weight: 600;">interiore</div>
-            <div style="font-size: 20px; font-weight: bold; margin-top: 10px;">INTEGERATED</div>
-            <div style="font-size: 20px; font-weight: bold;">DESIGN</div>
-            <div style="font-size: 20px; font-weight: bold;">SERVICES</div>
+            <div class="company-name">${formData.companyName}</div>
+            <div style="font-size: 14px; color: #666;">Project Proposal</div>
           </div>
 
           <div class="ref-section">

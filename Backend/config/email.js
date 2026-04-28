@@ -13,22 +13,22 @@ const transporter = nodemailer.createTransport({
 
 const mbHeader = `
   <div style="background:linear-gradient(135deg,#9333ea 0%,#7c3aed 100%);padding:28px 32px;border-radius:12px 12px 0 0;text-align:center;">
-    <h2 style="color:#fff;margin:0;font-size:22px;font-family:Arial,sans-serif;letter-spacing:1px;">M Business</h2>
-    <p style="color:#e9d5ff;margin:4px 0 0;font-size:12px;">Business Management Suite</p>
+    <h2 style="color:#fff;margin:0;font-size:22px;font-family:Arial,sans-serif;letter-spacing:1px;">Business Suite</h2>
+    <p style="color:#e9d5ff;margin:4px 0 0;font-size:12px;">Workspace Management Suite</p>
   </div>
 `;
 
 const mbFooter = `
   <p style="color:#9ca3af;font-size:12px;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:16px;font-family:Arial,sans-serif;">
-    This is an automated message from M Business. Please do not reply directly.<br/>
-    For support: <a href="mailto:support@mbusiness.com" style="color:#9333ea;">support@mbusiness.com</a>
+    This is an automated message from Business Suite. Please do not reply directly.<br/>
+    For support: <a href="mailto:support@business-suite.com" style="color:#9333ea;">support@business-suite.com</a>
   </p>
 `;
 
 const sendEmail = async (to, subject, html) => {
   try {
     const info = await transporter.sendMail({
-      from: `"M Business" <${process.env.SMTP_USER || 'noreply@mbusiness.com'}>`,
+      from: `"Business Suite" <${process.env.SMTP_USER || 'noreply@business-suite.com'}>`,
       to,
       subject,
       html
@@ -117,28 +117,38 @@ const sendUsageLimitAlert = async (userEmail, userName, planName, usageCount, us
   return await sendEmail(userEmail, `⚠️ Usage Limit Alert — ${remaining} remaining in your ${planName} plan`, html);
 };
 
-// Trial welcome email
-const sendTrialWelcome = async (userEmail, userName, endDate) => {
+// Subscription success email (Trial or Paid)
+const sendSubscriptionSuccess = async (userEmail, userName, planName, startDate, endDate, isTrial = false) => {
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
       ${mbHeader}
       <div style="background:#fff;padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
-        <h3 style="color:#16a34a;margin-top:0;">🎉 Welcome to Your 30-Day Free Trial!</h3>
+        <h3 style="color:#16a34a;margin-top:0;">🎉 Subscription Activated!</h3>
         <p style="color:#4b5563;">Hello <strong>${userName}</strong>,</p>
-        <p style="color:#4b5563;">Your <strong>30-day free trial</strong> is now active. Explore all features of M Business at no cost!</p>
+        <p style="color:#4b5563;">Your <strong>${planName}</strong> plan has been successfully activated. ${isTrial ? "Enjoy your 30-day free trial!" : "Thank you for choosing Business Suite."}</p>
         <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:20px;margin:24px 0;">
           <table style="width:100%;font-size:14px;color:#166534;">
-            <tr><td style="padding:5px 0;font-weight:600;">Trial Start</td><td>${new Date().toLocaleDateString('en-IN')}</td></tr>
-            <tr><td style="padding:5px 0;font-weight:600;">Trial End</td><td style="color:#15803d;font-weight:700;">${new Date(endDate).toLocaleDateString('en-IN')}</td></tr>
-            <tr><td style="padding:5px 0;font-weight:600;">Duration</td><td>30 Days Free</td></tr>
+            <tr><td style="padding:5px 0;font-weight:600;">Plan Name</td><td>${planName}</td></tr>
+            <tr><td style="padding:5px 0;font-weight:600;">Status</td><td><span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:700;">ACTIVE</span></td></tr>
+            <tr><td style="padding:5px 0;font-weight:600;">Start Date</td><td>${new Date(startDate).toLocaleDateString('en-IN')}</td></tr>
+            <tr><td style="padding:5px 0;font-weight:600;">Expiry Date</td><td style="color:#15803d;font-weight:700;">${new Date(endDate).toLocaleDateString('en-IN')}</td></tr>
           </table>
         </div>
-        <p style="color:#4b5563;">Make the most of your trial. You can upgrade to a paid plan anytime from your dashboard.</p>
+        <p style="color:#4b5563;">You can now access all management tools from your dashboard. If you have any questions, our support team is here to help.</p>
+        <div style="text-align:center;margin-top:28px;">
+          <a href="#" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Go to Dashboard</a>
+        </div>
         ${mbFooter}
       </div>
     </div>
   `;
-  return await sendEmail(userEmail, `🎉 Your 30-Day Free Trial is Now Active — M Business`, html);
+  const subject = isTrial ? `🎉 Your 30-Day Free Trial is Now Active — Business Suite` : `✅ Your ${planName} Subscription is Now Active!`;
+  return await sendEmail(userEmail, subject, html);
+};
+
+// Trial welcome email
+const sendTrialWelcome = async (userEmail, userName, endDate) => {
+  return await sendSubscriptionSuccess(userEmail, userName, "30-Day Free Trial", new Date(), endDate, true);
 };
 
 // OTP email
@@ -164,7 +174,7 @@ const sendOTPEmail = async (userEmail, otp, purpose = 'verification') => {
       </div>
     </div>
   `;
-  return await sendEmail(userEmail, `Your M Business OTP — ${purpose.replace('_', ' ').toUpperCase()}`, html);
+  return await sendEmail(userEmail, `Your Business Suite OTP — ${purpose.replace('_', ' ').toUpperCase()}`, html);
 };
 
 // Quick email utility
@@ -181,4 +191,4 @@ const sendQuickEmail = async (to, subject, message) => {
   return await sendEmail(to, subject, html);
 };
 
-module.exports = { sendEmail, sendRenewalReminder, sendExpiryNotification, sendUsageLimitAlert, sendTrialWelcome, sendOTPEmail, sendQuickEmail };
+module.exports = { sendEmail, sendRenewalReminder, sendExpiryNotification, sendUsageLimitAlert, sendTrialWelcome, sendOTPEmail, sendQuickEmail, sendSubscriptionSuccess };

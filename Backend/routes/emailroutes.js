@@ -59,7 +59,7 @@ router.get("/test", async (req, res) => {
     const testEmail = process.env.SMTP_USER || 'test@example.com';
     const result = await sendQuickEmail(
       testEmail, 
-      "Test Email from M Business", 
+      "Test Email from Business Suite", 
       "This is a test email to verify that the email configuration is working correctly."
     );
     

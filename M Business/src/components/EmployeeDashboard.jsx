@@ -5,6 +5,7 @@ import axios from "axios";
 import { EmployeeProfilePanel, DOC_TYPES } from "./EmployeeProfilePanel";
 import AuthPage from "./AuthPage";
 import { BASE_URL } from "../config";
+import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
 
 const BASE = "/api/employee-dashboard";
 
@@ -189,9 +190,17 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
       <div className="emp-sidebar" style={{ width:220, background:"#0f172a", color:"#fff", display:"flex", flexDirection:"column", height:"100vh", position:"fixed", top:0, left:0, zIndex:999, transform:open?"translateX(0)":"translateX(-100%)", transition:"transform 0.28s ease" }}>
         <div style={{ padding:"24px 20px 18px", borderBottom:"1px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>M</div>
+            {user?.logoUrl ? (
+              <div style={{ width:34, height:34, background:"#fff", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
+                <img src={user.logoUrl} alt="logo" style={{ width:"100%", height:"100%", objectFit:"contain", padding:2 }} />
+              </div>
+            ) : (
+              <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>
+                {(user?.companyName || user?.name || "M")[0].toUpperCase()}
+              </div>
+            )}
             <div>
-              <div style={{ fontWeight:800, fontSize:13, color:"#fff" }}>M Business</div>
+              <div style={{ fontWeight:800, fontSize:13, color:"#fff" }}>{user?.companyName || "Workspace Suite"}</div>
               <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{user?.role || user?.userRole || "EMPLOYEE"}</div>
             </div>
           </div>
@@ -1268,75 +1277,6 @@ const fetchSubscription = async () => {
   return (
     <div style={{ display:"flex", minHeight:"100vh", background:"#f8fafc", fontFamily:"'DM Sans','Segoe UI',sans-serif" }}>
 
-      {/* Expiry Blocking Overlay */}
-      {subStatus.blocked && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.95)", backdropFilter:"blur(12px)", zIndex:10000, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
-          <div style={{ background:"#fff", borderRadius:24, padding:40, maxWidth:450, textAlign:"center", boxShadow:"0 32px 64px rgba(0,0,0,0.5)" }}>
-            <div style={{ fontSize:64, marginBottom:20 }}>🛑</div>
-            <h2 style={{ fontSize:24, fontWeight:900, color:"#0f172a", marginBottom:12 }}>Access Restricted</h2>
-            <p style={{ fontSize:15, color:"#64748b", lineHeight:1.6, marginBottom:24 }}>
-              Your company's subscription package has expired and the grace period has ended. Dashboard access is now restricted.
-            </p>
-            <div style={{ background:"#fef2f2", color:"#ef4444", padding:"12px 16px", borderRadius:12, fontWeight:700, fontSize:14 }}>
-              Contact your administrator to renew the plan.
-            </div>
-            <button onClick={handleLogout} style={{ marginTop:20, background:"none", border:"none", color:"#6366f1", fontWeight:700, cursor:"pointer", fontSize:13 }}>Logout and Exit</button>
-          </div>
-        </div>
-      )}
-
-      {/* Subscription Notification Banner - shows renewal/expiry messages */}
-      {subscriptionNotification && (
-        <div style={{ position:"fixed", top:12, left:"50%", transform:"translateX(-50%)", zIndex:9991, width:"100%", maxWidth:700, padding:"0 16px" }}>
-          <div style={{
-            background: subscriptionNotification.type === "renewal"
-              ? "linear-gradient(135deg, #f59e0b, #d97706)"
-              : subscriptionNotification.type === "expired"
-              ? "linear-gradient(135deg, #ef4444, #dc2626)"
-              : "linear-gradient(135deg, #6b7280, #4b5563)",
-            color:"#fff",
-            borderRadius:14,
-            padding:"14px 24px",
-            display:"flex",
-            alignItems:"center",
-            justifyContent:"center",
-            gap:12,
-            boxShadow:"0 12px 32px rgba(0,0,0,0.2)"
-          }}>
-             <span style={{ fontSize:22 }}>
-               {subscriptionNotification.type === "renewal" ? "⏰" : subscriptionNotification.type === "expired" ? "⚠️" : "🚫"}
-             </span>
-             <div style={{ fontSize:14, fontWeight:700, textAlign:"center" }}>
-               {subscriptionNotification.message}
-             </div>
-             {subscriptionNotification.type === "renewal" && subscriptionNotification.daysLeft <= 10 && (
-               <span style={{
-                 background:"rgba(255,255,255,0.2)",
-                 padding:"4px 12px",
-                 borderRadius:20,
-                 fontSize:12,
-                 fontWeight:800
-               }}>
-                 {subscriptionNotification.daysLeft} days left
-               </span>
-             )}
-          </div>
-        </div>
-      )}
-
-      {/* Legacy Renewal Alert Banner (fallback) */}
-      {!subscriptionNotification && subStatus.alert && (
-        <div style={{ position:"fixed", top:12, left:"50%", transform:"translateX(-50%)", zIndex:9991, width:"100%", maxWidth:600, padding:"0 16px" }}>
-          <div style={{ background:"linear-gradient(135deg, #f59e0b, #d97706)", color:"#fff", borderRadius:14, padding:"12px 20px", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 12px 32px rgba(245,158,11,0.3)" }}>
-             <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-               <span style={{ fontSize:20 }}>⚠️</span>
-               <div style={{ fontSize:13, fontWeight:700 }}>
-                 Please renew your package! Subscription expires in {subStatus.days} days.
-               </div>
-             </div>
-          </div>
-        </div>
-      )}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
@@ -1446,6 +1386,7 @@ const fetchSubscription = async () => {
         )}
 
         <div className="main-pad" style={{ flex:1, padding:"24px 28px", overflowY:"auto" }}>
+          <EmployeeSubscriptionWarning user={resolvedUser} />
           {page==="dashboard"  && (
             <DashboardPage
               user={resolvedUser}

@@ -1306,10 +1306,11 @@ export default function Dashboard({setUser,user,fixedLogo}){
   useEffect(()=>{setCompanyLogo(user?.logoUrl?user.logoUrl:(fixedLogo||null));},[user,fixedLogo]);
 
   const [clients,setClients]=useState([]);
-  const [nc,setNc]=useState({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});
+  const [nc,setNc]=useState({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active",contactPersonName:"",contactPersonNo:""});
   const [ncError,setNcError]=useState({});
   const [saveLoading,setSaveLoading]=useState(false);
   const [showClientPass,setShowClientPass]=useState(false);
+  const [clientSuccessData, setClientSuccessData] = useState(null);
 
   const [employees,setEmployees]=useState([]);
   const [ne,setNe]=useState({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});
@@ -1339,7 +1340,36 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const fetchProjects=async()=>{try{const res=await axios.get(BASE_URL + "/api/projects");setProjects(res.data);}catch(e){console.log(e);}};
   const fetchManagers=async()=>{try{const res=await axios.get(BASE_URL + "/api/managers");setManagers(res.data);}catch(e){console.log(e);}};
 
-  const addClient=async()=>{const errors={};if(!nc.name.trim())errors.name="Name is required";if(!nc.email.trim())errors.email="Email is required";else if(!nc.email.endsWith("@gmail.com"))errors.email="Only @gmail.com allowed";if(!nc.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNcError(errors);return;}try{setSaveLoading(true);const payload={clientName:nc.name,companyName:nc.company,email:nc.email,phone:nc.phone,address:nc.address,password:nc.password,status:nc.status};const res=await axios.post(BASE_URL + "/api/clients/add",payload);setClients(prev=>[res.data.client,...prev]);setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});setNcError({});setModal(null);}catch(err){setNcError({email:err.response?.data?.message||err.response?.data?.msg||"Failed to save"});}finally{setSaveLoading(false);}};
+  const addClient=async()=>{
+    const errors={};
+    if(!nc.name.trim())errors.name="Name is required";
+    if(!nc.email.trim())errors.email="Email is required";
+    if(!nc.password.trim())errors.password="Password is required";
+    if(Object.keys(errors).length>0){setNcError(errors);return;}
+    try{
+      setSaveLoading(true);
+      const payload={
+        clientName:nc.name,
+        companyName:nc.company,
+        email:nc.email,
+        phone:nc.phone,
+        address:nc.address,
+        password:nc.password,
+        status:nc.status,
+        contactPersonName:nc.contactPersonName,
+        contactPersonNo:nc.contactPersonNo
+      };
+      const res=await axios.post(BASE_URL + "/api/clients/add",payload);
+      setClients(prev=>[res.data.client,...prev]);
+      setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
+      setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});
+      setNcError({});
+    }catch(err){
+      setNcError({email:err.response?.data?.message||err.response?.data?.msg||"Failed to save"});
+    }finally{
+      setSaveLoading(false);
+    }
+  };
 
   const addEmployee=async()=>{const errors={};if(!ne.name.trim())errors.name="Name is required";if(!ne.email.trim())errors.email="Email is required";if(!ne.password.trim())errors.password="Password is required";if(Object.keys(errors).length>0){setNeError(errors);return;}try{setEmpSaveLoading(true);const res=await axios.post(BASE_URL + "/api/employees/add",ne);setEmployees(prev=>[res.data.employee,...prev]);setNe({name:"",email:"",phone:"",role:"",department:"",salary:"",status:"Active",password:""});setShowEmpPass(false);setNeError({});setModal(null);}catch(err){setNeError({email:err.response?.data?.message||err.response?.data?.msg||"Failed to save"});}finally{setEmpSaveLoading(false);}};
 
@@ -1483,27 +1513,84 @@ const companyNameStr = "M Business";
       {showProfile&&<ProfileModal user={user} setUser={setUser} onClose={()=>setShowProfile(false)} onLogout={handleLogout} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
 
       {/* ── Add Client Modal ── */}
-      {modal==="client"&&<Mdl title="Add New Client" onClose={()=>setModal(null)}>
-        <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
-          <Fld label="Client Name *" value={nc.name} onChange={v=>{setNc({...nc,name:v});setNcError(p=>({...p,name:""}));}} error={ncError.name}/>
-          <Fld label="Company Name" value={nc.company} onChange={v=>setNc({...nc,company:v})}/>
-          <Fld label="Email" value={nc.email} onChange={v=>{setNc({...nc,email:v});setNcError(p=>({...p,email:""}));}} type="email" error={ncError.email}/>
-          <Fld label="Phone Number" value={nc.phone} onChange={v=>setNc({...nc,phone:v})}/>
-          <Fld label="Status" value={nc.status} onChange={v=>setNc({...nc,status:v})} options={["Active","Inactive"]}/>
-        </div>
-        <Fld label="Address" value={nc.address} onChange={v=>setNc({...nc,address:v})}/>
-        <div style={{marginBottom:14}}>
-          <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>PASSWORD *</label>
-          <div style={{position:"relative"}}>
-            <input type={showClientPass?"text":"password"} value={nc.password} onChange={e=>setNc({...nc,password:e.target.value})} style={{width:"100%",border:`1.5px solid ${ncError.password?"#EF4444":"#ede9fe"}`,borderRadius:10,padding:"10px 46px 10px 14px",fontSize:13,color:T.text,background:"#faf5ff",boxSizing:"border-box",outline:"none"}} placeholder="Set client password"/>
-            <button type="button" onClick={()=>setShowClientPass(!showClientPass)} style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"#a78bfa",fontSize:11,fontWeight:700,fontFamily:"inherit"}}>{showClientPass?"HIDE":"SHOW"}</button>
+      {modal==="client"&&<Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }}>
+        {clientSuccessData ? (
+          <div style={{ textAlign: "center", padding: "20px 10px" }}>
+            <div style={{ width: 64, height: 64, background: "#dcfce7", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, margin: "0 auto 18px" }}>✓</div>
+            <h3 style={{ fontSize: 18, color: T.text, marginBottom: 12 }}>New Client Registered!</h3>
+            <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 24, lineHeight: 1.5 }}>
+              The client account for <strong>{clientSuccessData.name}</strong> has been created. 
+              Please share these credentials with the client.
+            </p>
+            
+            <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, padding: 16, marginBottom: 24, textAlign: "left" }}>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>EMAIL / USERNAME</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{clientSuccessData.email}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>PASSWORD</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#7c3aed", fontFamily: "monospace" }}>{clientSuccessData.password}</div>
+              </div>
+            </div>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <button 
+                onClick={() => {
+                  const text = `*Client Login Credentials*\n\n*Email:* ${clientSuccessData.email}\n*Password:* ${clientSuccessData.password}\n\nLogin here: ${window.location.origin}`;
+                  navigator.clipboard.writeText(text);
+                  toast.success("📋 Credentials copied to clipboard!");
+                }}
+                style={{ width: "100%", background: "linear-gradient(135deg,#7c3aed,#9333ea)", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+              >
+                📋 Copy Credentials
+              </button>
+              
+              <button 
+                onClick={() => {
+                  const text = `*Client Login Credentials*\n\n*Email:* ${clientSuccessData.email}\n*Password:* ${clientSuccessData.password}\n\nLogin here: ${window.location.origin}`;
+                  const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                  window.open(wpUrl, "_blank");
+                }}
+                style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+              >
+                <span style={{ fontSize: 18 }}>💬</span> Share on WhatsApp
+              </button>
+
+              <button 
+                onClick={() => { setModal(null); setClientSuccessData(null); }}
+                style={{ width: "100%", background: "#fff", border: "1.5px solid #ede9fe", color: T.text, borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer" }}
+              >
+                Close
+              </button>
+            </div>
           </div>
-          {ncError.password&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {ncError.password}</div>}
-        </div>
-        <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>
-          <button onClick={()=>setModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13}}>Cancel</button>
-          <button onClick={addClient} disabled={saveLoading} style={{...B("#9333ea"),opacity:saveLoading?0.7:1}}>{saveLoading?"Saving...":"Save Client →"}</button>
-        </div>
+        ) : (
+          <>
+            <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
+              <Fld label="Client Name (Company) *" value={nc.name} onChange={v=>{setNc({...nc,name:v});setNcError(p=>({...p,name:""}));}} error={ncError.name}/>
+              <Fld label="Email *" value={nc.email} onChange={v=>{setNc({...nc,email:v});setNcError(p=>({...p,email:""}));}} type="email" error={ncError.email}/>
+              <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v=>setNc({...nc,contactPersonName:v})}/>
+              <Fld label="Contact Person No." value={nc.contactPersonNo} onChange={v=>setNc({...nc,contactPersonNo:v})}/>
+              <Fld label="Phone / Office No." value={nc.phone} onChange={v=>setNc({...nc,phone:v})}/>
+              <Fld label="Status" value={nc.status} onChange={v=>setNc({...nc,status:v})} options={["Active","Inactive"]}/>
+            </div>
+            <Fld label="Office Address" value={nc.address} onChange={v=>setNc({...nc,address:v})}/>
+            <div style={{marginBottom:14}}>
+              <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>PASSWORD *</label>
+              <div style={{position:"relative"}}>
+                <input type={showClientPass?"text":"password"} value={nc.password} onChange={e=>setNc({...nc,password:e.target.value})} style={{width:"100%",border:`1.5px solid ${ncError.password?"#EF4444":"#ede9fe"}`,borderRadius:10,padding:"10px 46px 10px 14px",fontSize:13,color:T.text,background:"#faf5ff",boxSizing:"border-box",outline:"none"}} placeholder="Set client password"/>
+                <button type="button" onClick={()=>setShowClientPass(!showClientPass)} style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"#a78bfa",fontSize:11,fontWeight:700,fontFamily:"inherit"}}>{showClientPass?"HIDE":"SHOW"}</button>
+              </div>
+              <div style={{ fontSize: 10, color: "#a78bfa", marginTop: 4 }}></div>
+              {ncError.password&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {ncError.password}</div>}
+            </div>
+            <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>
+              <button onClick={()=>setModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13}}>Cancel</button>
+              <button onClick={addClient} disabled={saveLoading} style={{...B("#9333ea"),opacity:saveLoading?0.7:1}}>{saveLoading?"Saving...":"Add Client"}</button>
+            </div>
+          </>
+        )}
       </Mdl>}
 
       {/* ── Add Employee Modal ── */}

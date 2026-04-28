@@ -11,6 +11,9 @@ const userSchema = new mongoose.Schema({
   companyName: { type: String, default: "" },
   mySubscriptions: { type: Boolean, default: false },
   numberOfSubscriptions: { type: Number, default: 0 },
+  isVerified: { type: Boolean, default: false },
+  otp: { type: String, default: "" },
+  otpExpires: { type: Date },
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);

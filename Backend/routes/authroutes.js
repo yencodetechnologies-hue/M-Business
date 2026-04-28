@@ -7,6 +7,7 @@ const Client   = require("../models/ClientModel");  // உங்கள் existi
 const Manager  = require("../models/ManagerModel"); // உங்கள் existing ✅
 const Employee = require("../models/EmployeeModel");// ← இது மட்டும் புதுசு add
 const Subscription = require("../models/SubscriptionModel");
+const { sendOTPEmail, sendTrialWelcome } = require("../config/email");
 
 // ── POST /api/auth/login ──────────────────────────────────────────────────────
 router.post("/login", async (req, res) => {
@@ -119,6 +120,21 @@ router.post("/login", async (req, res) => {
 
     const role = (user.role || "user").toLowerCase().trim();
 
+    if (role === "subadmin" && user.isVerified === false) {
+      console.log(`Resending OTP for unverified user: ${user.email}`);
+      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      user.otp = newOtp;
+      user.otpExpires = new Date(Date.now() + 10 * 60000);
+      await user.save();
+      
+      const emailRes = await sendOTPEmail(user.email, newOtp, 'verification');
+      if (!emailRes.success) {
+        return res.status(500).json({ msg: "Account exists but failed to send verification email. Please contact support." });
+      }
+
+      return res.status(400).json({ msg: "Please verify your email. A new OTP has been sent.", requiresOTP: true, email: user.email });
+    }
+
     res.json({
       user: {
         id:      user._id,
@@ -165,9 +181,22 @@ router.post("/signup", async (req, res) => {
       const newEmployee = new Employee({ name, email, password: hashed, role: "employee", phone });
       await newEmployee.save();
     } else if (selectedRole === "subadmin") {
-      const newUser = new User({ name, email, password: hashed, role: "subadmin", phone, companyName: companyName || "" });
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpires = new Date(Date.now() + 10 * 60000); // 10 minutes
+      const newUser = new User({ name, email, password: hashed, role: "subadmin", phone, companyName: companyName || "", isVerified: false, otp, otpExpires });
       await newUser.save();
       // Auto Free Trial creation removed so subadmins are forced to pick a plan
+      
+      console.log(`Sending signup OTP to ${email}: ${otp}`);
+      const emailResult = await sendOTPEmail(email, otp, 'verification');
+      
+      if (!emailResult.success) {
+        console.error("Email send failed during signup:", emailResult.error);
+        // Optionally delete the user if email fails, or just warn
+        return res.status(201).json({ msg: "Account created but failed to send OTP email. Please try logging in to resend.", requiresOTP: true, email });
+      }
+
+      return res.status(201).json({ msg: "OTP sent to your email", requiresOTP: true, email });
 
     } else {
       const newUser = new User({ name, email, password: hashed, role: "admin", phone });
@@ -177,6 +206,62 @@ router.post("/signup", async (req, res) => {
     res.status(201).json({ msg: "Account created successfully" });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// ── POST /api/auth/verify-otp ───────────────────────────────────────────────
+router.post("/verify-otp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    console.log(`Verifying OTP for: ${email}, OTP: ${otp}`);
+    
+    // Case-insensitive email search
+    const user = await User.findOne({ 
+      email: { $regex: new RegExp(`^${email}$`, 'i') }, 
+      role: { $regex: /^subadmin$/i } 
+    });
+
+    if (!user) {
+      console.log("Verification failed: User not found");
+      return res.status(400).json({ msg: "User not found" });
+    }
+
+    console.log(`User found: ${user.email}, DB OTP: ${user.otp}, Expiry: ${user.otpExpires}`);
+
+    if (user.isVerified) {
+      console.log("Verification failed: Already verified");
+      return res.status(400).json({ msg: "User is already verified" });
+    }
+    if (user.otp !== otp) {
+      console.log(`Verification failed: OTP mismatch. Received: ${otp}, Expected: ${user.otp}`);
+      return res.status(400).json({ msg: "Invalid OTP" });
+    }
+    if (user.otpExpires < new Date()) {
+      console.log("Verification failed: OTP expired");
+      return res.status(400).json({ msg: "OTP has expired" });
+    }
+
+    user.isVerified = true;
+    user.otp = "";
+    user.otpExpires = null;
+    await user.save();
+
+    res.json({
+      msg: "Email verified successfully",
+      user: {
+        id:      user._id,
+        name:    user.name || "",
+        email:   user.email,
+        phone:   user.phone   || "",
+        role:    "subadmin",
+        companyId: user.companyId || user._id.toString(),
+        logoUrl: user.logoUrl || "",
+        companyName: user.companyName || "",
+      }
+    });
+  } catch (err) {
+    console.error("Verify OTP error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });

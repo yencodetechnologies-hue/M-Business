@@ -12,6 +12,7 @@ const ClientSchema = new mongoose.Schema({
   status:          { type: String, default: "Active" },
   role:            { type: String, default: "client" }, 
   gstNumber:       { type: String, default: "" },
+  logoUrl:         { type: String, default: "" },
   companyId: { type: String, default: "" },
 }, { timestamps: true });
 

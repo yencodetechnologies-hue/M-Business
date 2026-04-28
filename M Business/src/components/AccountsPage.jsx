@@ -106,6 +106,41 @@ function RoleBadge({ label }) {
 }
 
 export default function AccountsPage() {
+  const [activeTab, setActiveTab] = useState("income"); // "income" or "expenses"
+
+  const tabStyle = (active) => ({
+    padding: "10px 24px",
+    borderRadius: "12px 12px 0 0",
+    fontSize: 14,
+    fontWeight: 700,
+    cursor: "pointer",
+    border: "none",
+    background: active ? "#fff" : "transparent",
+    color: active ? "#7c3aed" : "#a78bfa",
+    transition: "all 0.3s",
+    borderBottom: active ? "3px solid #7c3aed" : "none",
+    fontFamily: "inherit"
+  });
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 4, borderBottom: "1px solid #ede9fe", padding: "0 10px" }}>
+       
+        <button onClick={() => setActiveTab("expenses")} style={tabStyle(activeTab === "expenses")}>
+          💸 Client Expenses
+        </button>
+      </div>
+
+      <div style={{ padding: "0 4px" }}>
+        {activeTab === "income" ? <IncomePage /> : <ExpensesPage />}
+      </div>
+    </div>
+  );
+}
+
+// Internal User Accounts Page (Keeping for reference if needed elsewhere)
+function UserAccountsPage() {
   const [accounts,   setAccounts]   = useState([]);
   const [loading,    setLoading]    = useState(false);
   const [search,     setSearch]     = useState("");
@@ -397,7 +432,7 @@ const openEdit = (a) => {
 const EXPENSES_API   = `${BASE_URL}/api/expenses`;
 const CATEGORIES     = ["Food","Travel","Office","Utilities","Marketing","Salary","Miscellaneous"];
 const EXPENSE_TYPES  = ["Operational","Capital","Recurring","One-Time"];
-const PAYMENT_MODES  = ["Cash","Card","UPI","Bank Transfer","Cheque"];
+const PAYMENT_MODES  = ["GPay", "PhonePe", "NEFT", "RTGS", "Cash", "Card", "UPI", "Bank Transfer", "Cheque"];
 const EXP_STATUSES   = ["Pending","Approved","Rejected"];
 const EXP_EMPTY      = { title:"", category:"Food", expenseType:"Operational", paymentMode:"Cash", amount:"", status:"Pending" };
 
@@ -472,11 +507,11 @@ const save = async () => {
   try {
     setSaving(true);
     if (modal === "add") {
-      const res = await axios.post(ACCOUNTS_API, payload);
-      setAccounts(prev => [res.data, ...prev]);
+      const res = await axios.post(EXPENSES_API, payload);
+      setExpenses(prev => [res.data, ...prev]);
     } else {
-      const res = await axios.put(`${ACCOUNTS_API}/${editId}`, payload);
-      setAccounts(prev => prev.map(a => (a._id||a.id)===editId ? res.data : a));
+      const res = await axios.put(`${EXPENSES_API}/${editId}`, payload);
+      setExpenses(prev => prev.map(a => (a._id||a.id)===editId ? res.data : a));
     }
     showToast(modal==="add" ? "✅ Account added!" : "✅ Account updated!");
     setModal(null);
@@ -779,7 +814,7 @@ const save = async () => {
 // ════════════════════════════════════════════════════════════
 const INCOME_API     = `${BASE_URL}/api/income`;
 const INCOME_CATS    = ["Project Payment", "Advance", "Service Fee", "Maintenance", "Miscellaneous"];
-const INCOME_MODES   = ["GPay", "NEFT", "RTGS", "Cash", "Check", "Card", "UPI", "Bank Transfer"];
+const INCOME_MODES   = ["GPay", "PhonePe", "NEFT", "RTGS", "Cash", "Check", "Card", "UPI", "Bank Transfer"];
 const INCOME_STATUSES = ["Received", "Pending", "Cancelled"];
 const INC_EMPTY      = { title:"", category:"Project Payment", paymentMode:"GPay", amount:"", client:"", invoiceNo:"", transactionId:"", status:"Received" };
 
@@ -927,7 +962,7 @@ export function IncomePage() {
                       <td style={{ padding:"12px 14px" }}><span style={{ fontWeight:800, color:"#16a34a", fontSize:14 }}>₹{Number(inc.amount||0).toLocaleString()}</span></td>
                       <td style={{ padding:"12px 14px", color:"#a78bfa" }}>{inc.paymentMode}</td>
                       <td style={{ padding:"12px 14px" }}><ExpBadge label={inc.status||"Received"} colorMap={INC_STATUS_COLOR} /></td>
-                      <td style={{ padding:"12px 14px", color:"#a78bfa", fontSize:12 }}>{inc.createdAt ? new Date(inc.createdAt).toLocaleDateString() : "—"}</td>
+                      <td style={{ padding:"12px 14px", color:"#a78bfa", fontSize:12 }}>{inc.date || (inc.createdAt ? new Date(inc.createdAt).toLocaleDateString() : "—")}</td>
                       <td style={{ padding:"12px 14px" }}><div style={{ display:"flex", gap:5 }}><button onClick={()=>openEdit(inc)} style={{ background:"#f0fdf4", border:"1px solid #dcfce7", borderRadius:7, padding:"4px 10px", fontSize:12, color:"#16a34a", cursor:"pointer", fontWeight:600 }}>Edit</button><button onClick={()=>del(inc._id||inc.id)} style={{ background:"#fee2e2", border:"1px solid #fecaca", borderRadius:7, padding:"4px 10px", fontSize:12, color:"#ef4444", cursor:"pointer", fontWeight:600 }}>Del</button></div></td>
                     </tr>
                   ))}
@@ -947,6 +982,7 @@ export function IncomePage() {
             <Fld label="Payment Mode" value={form.paymentMode} onChange={v=>setForm({...form,paymentMode:v})} options={INCOME_MODES} />
             <Fld label="Invoice No" value={form.invoiceNo} onChange={v=>setForm({...form,invoiceNo:v})} placeholder="INV-001" />
             <Fld label="Transaction ID" value={form.transactionId} onChange={v=>setForm({...form,transactionId:v})} placeholder="TXN-9988" />
+            <Fld label="Payment Date" value={form.date} type="date" onChange={v=>setForm({...form,date:v})} />
             <div style={{ gridColumn:"1 / -1" }}><Fld label="Status" value={form.status} onChange={v=>setForm({...form,status:v})} options={INCOME_STATUSES} /></div>
           </div>
           {err._general && <div style={{ background:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:10, padding:"10px 14px", marginBottom:12, display:"flex", alignItems:"center", gap:8, fontSize:13, color:"#ef4444", fontWeight:600 }}><span>⚠️</span><span style={{ flex:1 }}>{err._general}</span><button onClick={()=>setErr({})} style={{ background:"none", border:"none", color:"#ef4444", cursor:"pointer", fontSize:16, lineHeight:1 }}>✕</button></div>}

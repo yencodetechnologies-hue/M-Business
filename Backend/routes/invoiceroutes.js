@@ -2,6 +2,7 @@
 const express = require("express");
 const router  = express.Router();
 const Invoice = require("../models/InvoiceModels");
+const Income = require("../models/IncomeModel");
 
 
 // ── GET all invoices ─────────────────────────────────────────────────────────
@@ -111,29 +112,43 @@ router.post("/", async (req, res) => {
     };
 
     // Upsert — same invoiceNo won't create duplicate
+    let savedInvoice;
     const existing = await Invoice.findOne({ invoiceNo: inv.invoiceNo });
 
     if (existing) {
-      await Invoice.updateOne({ _id: existing._id }, { $set: flatData });
-      const updated = await Invoice.findById(existing._id).lean();
-      return res.json({ success: true, invoice: updated });
+      // If updating, preserve existing status if not provided
+      const updateData = { ...flatData };
+      updateData.status = status || existing.status || "draft";
+      await Invoice.updateOne({ _id: existing._id }, { $set: updateData });
+      savedInvoice = await Invoice.findById(existing._id).lean();
+    } else {
+      const newInvoice = new Invoice({ ...flatData, status: status || "draft" });
+      await newInvoice.save();
+      savedInvoice = newInvoice.toObject();
     }
-
-    const newInvoice = new Invoice(flatData);
-    await newInvoice.save();
 
     // Automatic Income Tracking
     if (flatData.amountPaid > 0) {
+      const query = { invoiceNo: flatData.invoiceNo };
+      if (flatData.transactionId) query.transactionId = flatData.transactionId;
+
+      const isPartial = flatData.amountPaid < flatData.total;
+      const incomeTitle = isPartial 
+        ? `Advance/Part Payment for Invoice ${flatData.invoiceNo}` 
+        : `Full Payment for Invoice ${flatData.invoiceNo}`;
+      const incomeCategory = isPartial ? "Advance" : "Project Payment";
+
       await Income.findOneAndUpdate(
-        { invoiceNo: flatData.invoiceNo, transactionId: flatData.transactionId },
+        query,
         {
-          title: `Payment for Invoice ${flatData.invoiceNo}`,
-          category: "Project Payment",
+          title: incomeTitle,
+          category: incomeCategory,
           paymentMode: flatData.paymentMode,
           amount: flatData.amountPaid,
           client: flatData.client,
           invoiceNo: flatData.invoiceNo,
           transactionId: flatData.transactionId,
+          date: flatData.paymentDate || flatData.date, 
           status: "Received",
           companyId: flatData.companyId,
         },
@@ -141,9 +156,68 @@ router.post("/", async (req, res) => {
       );
     }
 
-    return res.json({ success: true, invoice: newInvoice });
+    return res.json({ success: true, invoice: savedInvoice });
   } catch (err) {
     console.error("POST /api/invoices error:", err);
+    return res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// ── PUT update by ID ──────────────────────────────────────────────────────────
+router.put("/:id", async (req, res) => {
+  try {
+    const { inv, items, status } = req.body;
+    if (!inv || !items) return res.status(400).json({ success: false, msg: "inv and items required" });
+
+    const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate)||0) * (parseFloat(i.quantity)||0), 0);
+    const gstRate = parseFloat(inv.gstRate) || 0;
+    const gstAmt = inv.isGstIncluded ? (subtotal - (subtotal / (1 + gstRate / 100))) : (subtotal * (gstRate / 100));
+    const total = inv.isGstIncluded ? subtotal : (subtotal + gstAmt);
+
+    const flatData = {
+      ...inv,
+      items: items.map(i => ({
+        description: i.description || "",
+        quantity: parseFloat(i.quantity) || 0,
+        rate: parseFloat(i.rate) || 0,
+      })),
+      subtotal,
+      gstAmt,
+      total,
+      status: status || "draft",
+      amountPaid: parseFloat(inv.amountPaid) || 0,
+      companyId: req.companyId || "",
+    };
+
+    const updated = await Invoice.findByIdAndUpdate(req.params.id, flatData, { new: true }).lean();
+    if (!updated) return res.status(404).json({ success: false, msg: "Invoice not found" });
+
+    // Sync Income
+    if (flatData.amountPaid > 0) {
+      const query = { invoiceNo: updated.invoiceNo };
+      if (updated.transactionId) query.transactionId = updated.transactionId;
+
+      await Income.findOneAndUpdate(
+        query,
+        {
+          title: flatData.amountPaid < total ? `Part Payment for ${updated.invoiceNo}` : `Full Payment for ${updated.invoiceNo}`,
+          category: flatData.amountPaid < total ? "Advance" : "Project Payment",
+          paymentMode: updated.paymentMode,
+          amount: flatData.amountPaid,
+          client: updated.client,
+          invoiceNo: updated.invoiceNo,
+          transactionId: updated.transactionId,
+          date: updated.paymentDate || updated.date,
+          status: "Received",
+          companyId: req.companyId || "",
+        },
+        { upsert: true }
+      );
+    }
+
+    return res.json({ success: true, invoice: updated });
+  } catch (err) {
+    console.error("PUT /api/invoices error:", err);
     return res.status(500).json({ success: false, msg: err.message });
   }
 });

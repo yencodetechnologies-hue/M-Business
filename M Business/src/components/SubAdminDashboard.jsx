@@ -38,14 +38,12 @@ const NAV = [
   { key: "tracking", icon: "📊", label: "Project Status" },
   { key: "tasks", icon: "✅", label: "Tasks" },
   { key: "calendar", icon: "📅", label: "Calendar" },
-  { key: "accounts", icon: "👤", label: "Accounts" },
 
-  { key: "expenses", icon: "💸", label: "Expenses" },
+  { key: "payments", icon: "💰", label: "Client Payments" },
+  { key: "expenses", icon: "💸", label: "Client Expenses" },
   { key: "interviews", icon: "🎯", label: "Interviews" },
   { key: "reports", icon: "📈", label: "Reports" },
-
   { key: "packages", icon: "📦", label: "Packages" },
-  { key: "payments", icon: "💰", label: "Payments" },
   { key: "vendors", icon: "🏬", label: "Vendors" },
   { key: "rolePermissions", icon: "🛡️", label: "Role Permissions" }
 ];
@@ -53,7 +51,7 @@ const NAV = [
 function getNavForRole(role) {
   const r = (role || "").toLowerCase().trim();
   if (r === "subadmin" || r === "sub_admin" || r === "sub-admin")
-    return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "income", "expenses", "interviews", "reports", "mysubscriptions", "packages", "payments", "vendors", "rolePermissions"].includes(n.key));
+    return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "payments", "expenses", "interviews", "reports", "mysubscriptions", "packages", "vendors", "rolePermissions"].includes(n.key));
   if (r === "manager")
     return NAV.filter(n => ["dashboard", "employees", "projects", "tracking", "tasks", "calendar", "interviews", "reports", "vendors"].includes(n.key));
   if (r === "employee")
@@ -181,12 +179,12 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 // ═══════════════════════════════════════════════════════════
 // CLIENTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ClientsPage({ clients, setClients, onAddClient }) {
+function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject }) {
   const [search, setSearch] = useState("");
   const [viewClient, setViewClient] = useState(null);
   const [editClient, setEditClient] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [editForm, setEditForm] = useState({});
+  const [editForm, setEditForm] = useState({ clientName: "", companyName: "", email: "", phone: "", address: "", status: "Active", gstNumber: "", logoUrl: "", contactPersonName: "", contactPersonNo: "", password: "" });
   const [editErr, setEditErr] = useState({});
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
@@ -208,6 +206,10 @@ function ClientsPage({ clients, setClients, onAddClient }) {
       address: c.address || "",
       status: c.status || "Active",
       gstNumber: c.gstNumber || "",
+      logoUrl: c.logoUrl || "",
+      contactPersonName: c.contactPersonName || "",
+      contactPersonNo: c.contactPersonNo || "",
+      password: "", // Leave blank for editing
     });
     setEditErr({});
     setEditClient(c);
@@ -270,7 +272,9 @@ function ClientsPage({ clients, setClients, onAddClient }) {
                     <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`CLT${String(i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.clientName || c.name || "?")[0].toUpperCase()}</div>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: c.logoUrl ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden", border: c.logoUrl ? "1px solid #ede9fe" : "none" }}>
+                          {c.logoUrl ? <img src={c.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : (c.clientName || c.name || "?")[0].toUpperCase()}
+                        </div>
                         <span style={{ fontWeight: 700, color: T.text }}>{c.clientName || c.name || "—"}</span>
                       </div>
                     </td>
@@ -297,7 +301,9 @@ function ClientsPage({ clients, setClients, onAddClient }) {
       {viewClient && (
         <Mdl title="Client Profile" onClose={() => setViewClient(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewClient.clientName || viewClient.name || "?")[0].toUpperCase()}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: viewClient.logoUrl ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0, overflow: "hidden", border: viewClient.logoUrl ? "1px solid #ede9fe" : "none" }}>
+              {viewClient.logoUrl ? <img src={viewClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : (viewClient.clientName || viewClient.name || "?")[0].toUpperCase()}
+            </div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewClient.clientName || viewClient.name}</div>
               <div style={{ fontSize: 13, color: "#9333ea", marginTop: 2 }}>{viewClient.companyName || viewClient.company || "—"}</div>
@@ -308,6 +314,36 @@ function ClientsPage({ clients, setClients, onAddClient }) {
           <InfoRow icon="📱" label="Phone" value={viewClient.phone} />
           <InfoRow icon="📍" label="Address" value={viewClient.address} />
           <InfoRow icon="📅" label="Joined" value={viewClient.createdAt ? new Date(viewClient.createdAt).toLocaleDateString() : "—"} />
+          
+          <div style={{ marginTop: 18 }}>
+            <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 10, textTransform: "uppercase" }}>Recent Projects</div>
+            {(() => {
+              const clientProjects = projects.filter(p => (p.client || "").toLowerCase() === (viewClient.clientName || viewClient.name || "").toLowerCase());
+              return clientProjects.length === 0 ? (
+                <div style={{ padding: "12px", background: "#f8fafc", borderRadius: 10, border: "1px solid #f1f5f9", textAlign: "center", color: "#a78bfa", fontSize: 12 }}>No projects found for this client</div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {clientProjects.slice(0, 3).map((p, idx) => (
+                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#fff", borderRadius: 10, border: "1px solid #ede9fe" }}>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{p.name}</div>
+                        <div style={{ fontSize: 11, color: "#a78bfa" }}>{p.end ? new Date(p.end).toLocaleDateString() : "No deadline"}</div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <Badge label={p.status || "Pending"} />
+                        <button 
+                          onClick={() => onViewProject && onViewProject(p)}
+                          style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#9333ea", cursor: "pointer", fontWeight: 700 }}
+                        >
+                          View →
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️ Edit</button>
             <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🗑 Delete</button>
@@ -318,15 +354,48 @@ function ClientsPage({ clients, setClients, onAddClient }) {
       {/* Edit Modal */}
       {editClient && (
         <Mdl title="Edit Client" onClose={() => setEditClient(null)}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+            <div style={{ position: "relative", width: 100, height: 100 }}>
+              <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", border: "2px dashed #d8b4fe", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                {editForm.logoUrl ? (
+                  <img src={editForm.logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                ) : (
+                  <span style={{ fontSize: 40 }}>🏢</span>
+                )}
+              </div>
+              <label style={{ position: "absolute", bottom: 0, right: 0, background: "#7c3aed", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+                <span style={{ fontSize: 16 }}>📷</span>
+                <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => setEditForm(p => ({ ...p, logoUrl: reader.result }));
+                    reader.readAsDataURL(file);
+                  }
+                }} />
+              </label>
+            </div>
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-            <Fld label="Client Name *" value={editForm.clientName} onChange={v => { setEditForm(p => ({ ...p, clientName: v })); setEditErr(p => ({ ...p, clientName: "" })); }} error={editErr.clientName} />
-            <Fld label="Company Name" value={editForm.companyName} onChange={v => setEditForm(p => ({ ...p, companyName: v }))} />
+            <Fld label="Company Name *" value={editForm.clientName} onChange={v => { setEditForm(p => ({ ...p, clientName: v })); setEditErr(p => ({ ...p, clientName: "" })); }} error={editErr.clientName} />
             <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
-            <Fld label="Phone" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
+            <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
+            <Fld label="Contact Person No." value={editForm.contactPersonNo} onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
+            <Fld label="Office No" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
             <Fld label="Company Tax/GST" value={editForm.gstNumber} onChange={v => setEditForm(p => ({ ...p, gstNumber: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
           </div>
-          <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
+          <Fld label="Company Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD</label>
+            <input 
+              type="password" 
+              value={editForm.password} 
+              onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))} 
+              style={{ width: "100%", border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", boxSizing: "border-box", outline: "none" }} 
+              placeholder="Leave blank to keep current password"
+            />
+          </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditClient(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
             <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
@@ -972,7 +1041,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, setProjects, clients, employees }) {
+function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject }) {
   const [search, setSearch] = useState("");
   const [viewProj, setViewProj] = useState(null);
   const [editProj, setEditProj] = useState(null);
@@ -983,6 +1052,13 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
   const [assignTo, setAssignTo] = useState([]);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
+  
+  useEffect(() => {
+    if (jumpProject) {
+      setViewProj(jumpProject);
+      setJumpProject(null);
+    }
+  }, [jumpProject]);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
   const filtered = projects.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()) || (p.client || "").toLowerCase().includes(search.toLowerCase()));
@@ -2002,27 +2078,33 @@ function VendorsPage({ vendors, setVendors }) {
       <SC title={`All Vendors (${filtered.length})`}>
         <Search value={search} onChange={setSearch} placeholder="Search by name, product..." />
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 800 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 900 }}>
             <thead><tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
-              {["Vendor Name", "Product", "Required Amount", "Paid Amount", "Mode", "Purchase Date", "Actions"].map(c => (
+              {["Vendor Name", "Product", "Total Amount", "Paid Amount", "Balance Due", "Mode", "Purchase Date", "Actions"].map(c => (
                 <th key={c} style={{ padding: "10px 14px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{c.toUpperCase()}</th>
               ))}
             </tr></thead>
             <tbody>
-              {filtered.length === 0 ? <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No vendors found</td></tr>
-                : filtered.map((v, i) => (
-                  <tr key={v._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{v.vendorName}</td>
-                    <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{v.vendorProduct}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280" }}>₹{v.amountTaxGst}</td>
-                    <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight:600 }}>₹{v.paidAmount}</td>
-                    <td style={{ padding: "12px 14px" }}><Badge label={v.modeOfPayment} /></td>
-                    <td style={{ padding: "12px 14px", color: "#a78bfa" }}>{v.dateOfPurchase ? new Date(v.dateOfPurchase).toLocaleDateString() : "—"}</td>
-                    <td style={{ padding: "12px 14px" }}>
-                       <ActionBtns onView={() => setViewVendor(v)} onEdit={() => openEdit(v)} onDelete={() => setDeleteTarget(v)} />
-                    </td>
-                  </tr>
-                ))}
+              {filtered.length === 0 ? <tr><td colSpan={8} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No vendors found</td></tr>
+                : filtered.map((v, i) => {
+                  const total = Number(v.amountTaxGst || 0);
+                  const paid = Number(v.paidAmount || 0);
+                  const balance = total - paid;
+                  return (
+                    <tr key={v._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{v.vendorName}</td>
+                      <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{v.vendorProduct}</td>
+                      <td style={{ padding: "12px 14px", color: "#6b7280" }}>₹{total.toLocaleString()}</td>
+                      <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>₹{paid.toLocaleString()}</td>
+                      <td style={{ padding: "12px 14px", color: balance > 0 ? "#EF4444" : "#22C55E", fontWeight: 700 }}>₹{balance.toLocaleString()}</td>
+                      <td style={{ padding: "12px 14px" }}><Badge label={v.modeOfPayment} /></td>
+                      <td style={{ padding: "12px 14px", color: "#a78bfa" }}>{v.dateOfPurchase ? new Date(v.dateOfPurchase).toLocaleDateString() : "—"}</td>
+                      <td style={{ padding: "12px 14px" }}>
+                        <ActionBtns onView={() => setViewVendor(v)} onEdit={() => openEdit(v)} onDelete={() => setDeleteTarget(v)} />
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
@@ -2038,8 +2120,9 @@ function VendorsPage({ vendors, setVendors }) {
               <div style={{ fontSize: 13, color: "#9333ea", marginTop: 2 }}>{viewVendor.vendorProduct}</div>
             </div>
           </div>
-          <InfoRow icon="💰" label="Required Amount" value={`₹${viewVendor.amountTaxGst}`} />
-          <InfoRow icon="💸" label="Paid Amount" value={`₹${viewVendor.paidAmount}`} />
+          <InfoRow icon="💰" label="Total Amount" value={`₹${(viewVendor.amountTaxGst || 0).toLocaleString()}`} />
+          <InfoRow icon="💸" label="Paid Amount" value={`₹${(viewVendor.paidAmount || 0).toLocaleString()}`} />
+          <InfoRow icon="⚖️" label="Balance Due" value={`₹${((viewVendor.amountTaxGst || 0) - (viewVendor.paidAmount || 0)).toLocaleString()}`} />
           <InfoRow icon="💳" label="Mode of Payment" value={viewVendor.modeOfPayment} />
           <InfoRow icon="📅" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
           <InfoRow icon="📝" label="Description" value={viewVendor.productDescription} />
@@ -2056,15 +2139,15 @@ function VendorsPage({ vendors, setVendors }) {
            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
             <Fld label="Vendor Name *" value={editForm.vendorName} onChange={v => setEditForm(p => ({ ...p, vendorName: v }))} error={editErr.vendorName} />
             <Fld label="Product Name *" value={editForm.vendorProduct} onChange={v => setEditForm(p => ({ ...p, vendorProduct: v }))} error={editErr.vendorProduct} />
-            <Fld label="Required Amount *" value={editForm.amountTaxGst} type="number" onChange={v => setEditForm(p => ({ ...p, amountTaxGst: v }))} />
-            <Fld label="Paid Amount *" value={editForm.paidAmount} type="number" onChange={v => setEditForm(p => ({ ...p, paidAmount: v }))} />
+            <Fld label="Total Amount *" value={editForm.amountTaxGst} type="number" onChange={v => setEditForm(p => ({ ...p, amountTaxGst: v }))} error={editErr.amountTaxGst} />
+            <Fld label="Paid Amount *" value={editForm.paidAmount} type="number" onChange={v => setEditForm(p => ({ ...p, paidAmount: v }))} error={editErr.paidAmount} />
             <Fld label="Date of Purchase" value={editForm.dateOfPurchase} type="date" onChange={v => setEditForm(p => ({ ...p, dateOfPurchase: v }))} />
             <Fld label="Mode of Payment" value={editForm.modeOfPayment} onChange={v => setEditForm(p => ({ ...p, modeOfPayment: v }))} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
           </div>
           <Fld label="Product Description" value={editForm.productDescription} onChange={v => setEditForm(p => ({ ...p, productDescription: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditVendor(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes →"}</button>
           </div>
         </Mdl>
       )}
@@ -2079,6 +2162,7 @@ function VendorsPage({ vendors, setVendors }) {
 // ═══════════════════════════════════════════════════════════
 export default function Dashboard({ setUser, user, fixedLogo }) {
   const [active, setActive] = useState("dashboard");
+  const [jumpProject, setJumpProject] = useState(null);
   const [modal, setModal] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
@@ -2133,7 +2217,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   }, [profileDropdownOpen]);
 
   const [clients, setClients] = useState([]);
-  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "" });
+  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "" });
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
@@ -2391,13 +2475,14 @@ const handleEditPackage = (pkg) => {
         role: nc.role || "client",
         contactPersonName: nc.contactPersonName,
         contactPersonNo: nc.contactPersonNo,
-        gstNumber: nc.gstNumber
+        gstNumber: nc.gstNumber,
+        logoUrl: nc.logoUrl
       };
       const res = await axios.post(BASE_URL + "/api/clients/add", payload);
       setClients(prev => [res.data.client, ...prev]);
       // Store credentials for the success screen
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
-      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client" });
+      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "" });
       setNcError({});
       // Don't close modal yet - show success screen
     } catch (err) {
@@ -2896,20 +2981,19 @@ const handleEditPackage = (pkg) => {
           </>)}
 
           {/* ── Pages using new components ── */}
-          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} />}
+          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} />}
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} />}
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-          {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} />}
-          {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} />}
+          {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
+          {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} />}
           {validActive === "calendar" && <CalendarPage projects={projects} clients={clients} companyId={companyId} />}
           {validActive === "accounts" && <AccountsPage ExpensesPage={ExpensesPage} />}
-          {validActive === "income" && <IncomePage />}
           {validActive === "expenses" && <ExpensesPage />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
@@ -3168,6 +3252,28 @@ const handleEditPackage = (pkg) => {
           </div>
         ) : (
           <>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+              <div style={{ position: "relative", width: 100, height: 100 }}>
+                <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", border: "2px dashed #d8b4fe", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                  {nc.logoUrl ? (
+                    <img src={nc.logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                  ) : (
+                    <span style={{ fontSize: 40 }}>🏢</span>
+                  )}
+                </div>
+                <label style={{ position: "absolute", bottom: 0, right: 0, background: "#7c3aed", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+                  <span style={{ fontSize: 16 }}>📷</span>
+                  <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => setNc(p => ({ ...p, logoUrl: reader.result }));
+                      reader.readAsDataURL(file);
+                    }
+                  }} />
+                </label>
+              </div>
+            </div>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
               <Fld label="Company Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: "" })); }} error={ncError.name} />
               <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: "" })); }} type="email" error={ncError.email} />

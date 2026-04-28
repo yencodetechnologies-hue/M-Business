@@ -67,6 +67,7 @@ const emailRoutes = require("./routes/emailroutes");
 const paymentRoutes = require("./routes/paymentroutes");
 const vendorRoutes = require("./routes/vendorRoutes");
 const rolePermissionRoutes = require("./routes/rolePermissionRoutes");
+const incomeRoutes = require("./routes/incomeroutes");
 
 
 // Static files (local resume storage)
@@ -88,6 +89,8 @@ app.use("/api/client-dashboard", clientDashRoutes);
 app.use("/api/invoices", Invoices);
 app.use("/api/events", eventRoutes);
 app.use("/api/accounts", accountRoutes);
+app.use("/api/expenses", accountRoutes);
+app.use("/api/income", incomeRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/employee-dashboard", employeeDashRoutes);

@@ -47,13 +47,130 @@ router.post("/", async (req, res) => {
       existing.items  = items;
       existing.status = status || existing.status;
       await existing.save();
+
+      // Automatic Income Tracking for updates
+      if (qt.amountPaid > 0) {
+        const Income = require("../models/IncomeModel");
+        const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
+        const gstRate = parseFloat(qt.gstRate) || 0;
+        const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
+
+        const query = { quoteNo: qt.quoteNo };
+        if (qt.transactionId) query.transactionId = qt.transactionId;
+
+        const isPartial = qt.amountPaid < total;
+        const incomeTitle = isPartial 
+          ? `Advance/Part Payment for Quotation ${qt.quoteNo}` 
+          : `Full Payment for Quotation ${qt.quoteNo}`;
+        
+        await Income.findOneAndUpdate(
+          query,
+          {
+            title: incomeTitle,
+            category: "Advance",
+            paymentMode: qt.paymentMode || "GPay",
+            amount: parseFloat(qt.amountPaid),
+            client: qt.client,
+            invoiceNo: qt.quoteNo,
+            transactionId: qt.transactionId || "",
+            date: qt.paymentDate || qt.date,
+            status: "Received",
+            companyId: req.companyId || "",
+          },
+          { upsert: true, new: true }
+        );
+      }
+
       return res.json({ success: true, quotation: existing });
     }
     const doc = new Quotation({ qt, items, status: status || "draft", companyId: req.companyId || "" });
     await doc.save();
+
+    // Automatic Income Tracking
+    if (qt.amountPaid > 0) {
+      const Income = require("../models/IncomeModel");
+      const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
+      const gstRate = parseFloat(qt.gstRate) || 0;
+      const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
+
+      const query = { quoteNo: qt.quoteNo };
+      if (qt.transactionId) query.transactionId = qt.transactionId;
+
+      const isPartial = qt.amountPaid < total;
+      const incomeTitle = isPartial 
+        ? `Advance/Part Payment for Quotation ${qt.quoteNo}` 
+        : `Full Payment for Quotation ${qt.quoteNo}`;
+      
+      await Income.findOneAndUpdate(
+        query,
+        {
+          title: incomeTitle,
+          category: "Advance",
+          paymentMode: qt.paymentMode || "GPay",
+          amount: parseFloat(qt.amountPaid),
+          client: qt.client,
+          invoiceNo: qt.quoteNo, // using quoteNo as reference if no invoice yet
+          transactionId: qt.transactionId || "",
+          date: qt.paymentDate || qt.date,
+          status: "Received",
+          companyId: req.companyId || "",
+        },
+        { upsert: true, new: true }
+      );
+    }
+
     return res.json({ success: true, quotation: doc });
   } catch (err) {
     console.error("POST /api/quotations error:", err);
+    return res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// ── PUT update by ID ──────────────────────────────────────────────────────────
+router.put("/:id", async (req, res) => {
+  try {
+    const { qt, items, status } = req.body;
+    if (!qt || !items) return res.status(400).json({ success: false, msg: "qt and items required" });
+
+    const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
+    const gstRate = parseFloat(qt.gstRate) || 0;
+    const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
+
+    const doc = await Quotation.findByIdAndUpdate(
+      req.params.id,
+      { qt, items, status: status || "draft" },
+      { new: true }
+    ).lean();
+
+    if (!doc) return res.status(404).json({ success: false, msg: "Quotation not found" });
+
+    // Sync Income
+    if (qt.amountPaid > 0) {
+      const Income = require("../models/IncomeModel");
+      const query = { invoiceNo: qt.quoteNo }; // using quoteNo as reference
+      if (qt.transactionId) query.transactionId = qt.transactionId;
+
+      await Income.findOneAndUpdate(
+        query,
+        {
+          title: qt.amountPaid < total ? `Part Payment for Quotation ${qt.quoteNo}` : `Full Payment for Quotation ${qt.quoteNo}`,
+          category: "Advance",
+          paymentMode: qt.paymentMode || "GPay",
+          amount: parseFloat(qt.amountPaid),
+          client: qt.client,
+          invoiceNo: qt.quoteNo,
+          transactionId: qt.transactionId || "",
+          date: qt.paymentDate || qt.date,
+          status: "Received",
+          companyId: req.companyId || "",
+        },
+        { upsert: true }
+      );
+    }
+
+    return res.json({ success: true, quotation: doc });
+  } catch (err) {
+    console.error("PUT /api/quotations error:", err);
     return res.status(500).json({ success: false, msg: err.message });
   }
 });

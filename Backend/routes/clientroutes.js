@@ -45,15 +45,26 @@ router.post("/add", addClient);
 
 router.put("/:id", async (req, res) => {
   try {
+    const updateData = { ...req.body };
+    
+    // Hash password if provided
+    if (updateData.password && updateData.password.trim() !== "") {
+      const bcrypt = require("bcryptjs");
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    } else {
+      // Don't update password if it's empty or blank
+      delete updateData.password;
+    }
+
     const client = await Client.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: updateData },
       { returnDocument: "after" }
     );
     if (!client) return res.status(404).json({ msg: "Client not found" });
     res.json({ client });
   } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ msg: "Server error", error: err.message });
   }
 });
 

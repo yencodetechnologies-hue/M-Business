@@ -89,8 +89,61 @@ function deleteDraftLocal(invoiceNo) {
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
 }
 
+const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"#9333ea",bg:"#f5f3ff",card:"#FFFFFF",text:"#1e0a3c",muted:"#7c3aed",border:"#ede9fe"};
+
+function ClientDropdown({clients,value,onChange,error,onAddClient}){
+  const [search,setSearch]=useState("");
+  const [open,setOpen]=useState(false);
+  const filtered=clients.filter(c=>(c.clientName||c.name||"").toLowerCase().includes(search.toLowerCase())||(c.companyName||c.company||"").toLowerCase().includes(search.toLowerCase()));
+  const selected=clients.find(c=>(c.clientName||c.name)===value);
+  return(
+    <div style={{position:"relative"}}>
+      <div onClick={()=>setOpen(!open)} style={{width:"100%",border:`1.5px solid ${error?"#EF4444":open?"#9333ea":"#ede9fe"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"#a78bfa",background:"#faf5ff",cursor:"pointer",userSelect:"none",boxSizing:"border-box",position:"relative",minHeight:42}}>
+        {value?(<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName&&<span style={{fontSize:11,color:"#a78bfa"}}>({selected.companyName})</span>}</div>):"-- Select Client --"}
+        <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"#a78bfa",transition:"0.2s"}}>▼</span>
+      </div>
+      {open&&(
+        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,boxShadow:"0 8px 32px rgba(147,51,234,0.15)",zIndex:999,overflow:"hidden"}}>
+          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid #ede9fe",borderRadius:8,fontSize:12,background:"#faf5ff",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
+          {onAddClient&&<div onClick={()=>{setOpen(false);setSearch("");onAddClient();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,#f3e8ff,#faf5ff)",borderBottom:"2px solid #ede9fe"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"#9333ea"}}>Add New Client</div></div></div>}
+          <div style={{maxHeight:180,overflowY:"auto"}}>
+            {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"#a78bfa",fontSize:13}}>No clients found</div>
+              :filtered.map((c,i)=>{const name=c.clientName||c.name||"";const company=c.companyName||c.company||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"#f3e8ff":"transparent",borderBottom:"1px solid #f5f3ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"#f3e8ff":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div>{company&&<div style={{fontSize:11,color:"#a78bfa"}}>{company}</div>}</div>{isSel&&<span style={{fontSize:14,color:"#9333ea"}}>✓</span>}</div>);})}
+          </div>
+        </div>
+      )}
+      {open&&<div style={{position:"fixed",inset:0,zIndex:998}} onClick={()=>{setOpen(false);setSearch("");}}/>}
+    </div>
+  );
+}
+
+function ProjectDropdown({projects,value,onChange,onAddProject,disabled}){
+  const [search,setSearch]=useState("");
+  const [open,setOpen]=useState(false);
+  const filtered=projects.filter(p=>(p.name||"").toLowerCase().includes(search.toLowerCase()));
+  return(
+    <div style={{position:"relative"}}>
+      <div onClick={()=>{if(!disabled)setOpen(!open)}} style={{width:"100%",border:`1.5px solid ${open?"#9333ea":"#ede9fe"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"#a78bfa",background:"#faf5ff",cursor:disabled?"not-allowed":"pointer",userSelect:"none",boxSizing:"border-box",position:"relative",minHeight:42,opacity:disabled?0.5:1}}>
+        {value?(<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{value[0].toUpperCase()}</div><span>{value}</span></div>):"-- Select Project --"}
+        <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"#a78bfa",transition:"0.2s"}}>▼</span>
+      </div>
+      {open&&(
+        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,boxShadow:"0 8px 32px rgba(147,51,234,0.15)",zIndex:999,overflow:"hidden"}}>
+          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid #ede9fe",borderRadius:8,fontSize:12,background:"#faf5ff",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
+          {onAddProject&&<div onClick={()=>{setOpen(false);setSearch("");onAddProject();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,#f3e8ff,#faf5ff)",borderBottom:"2px solid #ede9fe"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"#9333ea"}}>Add New Project</div></div></div>}
+          <div style={{maxHeight:180,overflowY:"auto"}}>
+            {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"#a78bfa",fontSize:13}}>No projects found</div>
+              :filtered.map((p,i)=>{const name=p.name||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"#f3e8ff":"transparent",borderBottom:"1px solid #f5f3ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"#f3e8ff":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div></div>{isSel&&<span style={{fontSize:14,color:"#9333ea"}}>✓</span>}</div>);})}
+          </div>
+        </div>
+      )}
+      {open&&<div style={{position:"fixed",inset:0,zIndex:998}} onClick={()=>{setOpen(false);setSearch("");}}/>}
+    </div>
+  );
+}
+
 // ════════════════════════════════════════════════════════════
-export default function InvoiceCreator({ clients = [], projects = [], companyLogo, companyName, onLogoChange }) {
+export default function InvoiceCreator({ clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
@@ -120,8 +173,10 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     template: "Modern",
     footerMessage: "🙏 Thank you for considering us!",
     amountPaid: 0,
+    paymentDate: today,
     paymentMode: "GPay",
-    transactionId: ""
+    transactionId: "",
+    isGstIncluded: false
   };
 
   const [inv, setInv] = useState(blank);
@@ -136,9 +191,19 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   );
 
   // totals
-  const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-  const gstAmt = subtotal * (inv.gstRate / 100);
-  const total = subtotal + gstAmt;
+  const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+  let subtotal, gstAmt, total;
+
+  if (inv.isGstIncluded) {
+    total = subtotalRaw;
+    subtotal = total / (1 + (inv.gstRate / 100));
+    gstAmt = total - subtotal;
+  } else {
+    subtotal = subtotalRaw;
+    gstAmt = subtotal * (inv.gstRate / 100);
+    total = subtotal + gstAmt;
+  }
+
   const amountPaid = parseFloat(inv.amountPaid) || 0;
   const balanceDue = total - amountPaid;
 
@@ -272,13 +337,16 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     no: inv.invoiceNo, date: inv.date, due: inv.dueDate,
     co: inv.companyName, email: inv.companyEmail, phone: inv.companyPhone, addr: inv.companyAddress,
     cl: inv.client, proj: inv.project, gst: inv.gstRate, notes: inv.notes, terms: inv.terms,
+    incGst: inv.isGstIncluded,
+    paid: inv.amountPaid,
     items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
   };
   const qrData = `${window.location.origin}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
   const shareInvoice = async (entry) => {
+    const invData = entry.inv || inv;
     const link = `${window.location.origin}/invoice-view?id=${entry.id || entry.invoiceNo}`;
-    const text = `Invoice ${entry.invoiceNo} from ${inv.companyName}\nTotal: ${formatCurrency(entry.total, inv.currency)}\nView here: ${link}`;
+    const text = `*${invData.companyName || "Company"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`;
     if (navigator.share) {
       try { await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, url: link }); } catch (err) { console.log(err); }
     } else {
@@ -288,8 +356,9 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   };
 
   const shareWhatsApp = (entry) => {
+    const invData = entry.inv || inv;
     const link = `${window.location.origin}/invoice-view?id=${entry.id || entry.invoiceNo}`;
-    const text = encodeURIComponent(`Invoice ${entry.invoiceNo} from ${inv.companyName}\nTotal: ${formatCurrency(entry.total, inv.currency)}\nView here: ${link}`);
+    const text = encodeURIComponent(`*${invData.companyName || "Company"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
@@ -848,6 +917,12 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
             <select value={inv.gstRate} onChange={(e) => upd("gstRate", Number(e.target.value))} style={inp()}>
               {GST_RATES.map((r) => <option key={r} value={r}>{r === 0 ? "No GST (0%)" : `GST ${r}%`}</option>)}
             </select>
+            <select value={inv.isGstIncluded ? "including" : "excluding"} 
+              onChange={(e) => upd("isGstIncluded", e.target.value === "including")} 
+              style={{ ...inp(), marginTop: 6, fontSize: 11, fontWeight: 700, color: "#7c3aed" }}>
+              <option value="excluding">Excluding GST</option>
+              <option value="including">Including GST</option>
+            </select>
           </div>
           <div>
             <label style={lbl}>Currency</label>
@@ -868,6 +943,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
             </select>
           </div>
         </div>
+        </div>
         {/* ── Payment Details ── */}
         <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Payment & Advance Details</div>
@@ -877,21 +953,26 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
               <input type="number" value={inv.amountPaid} onChange={(e) => upd("amountPaid", e.target.value)} placeholder="e.g. 10000" style={inp()} />
             </div>
             <div>
+              <label style={lbl}>Payment Date</label>
+              <input type="date" value={inv.paymentDate} onChange={(e) => upd("paymentDate", e.target.value)} style={inp()} />
+            </div>
+            <div>
               <label style={lbl}>Payment Mode</label>
               <select value={inv.paymentMode} onChange={(e) => upd("paymentMode", e.target.value)} style={inp()}>
-                <option value="GPay">GPay / PhonePe</option>
-                <option value="NEFT">NEFT / Bank Transfer</option>
+                <option value="GPay">GPay</option>
+                <option value="PhonePe">PhonePe</option>
+                <option value="NEFT">NEFT</option>
                 <option value="RTGS">RTGS</option>
                 <option value="Cash">Cash</option>
                 <option value="Check">Check</option>
+                <option value="Bank Transfer">Bank Transfer</option>
               </select>
             </div>
-            <div>
-              <label style={lbl}>Transaction ID / Ref</label>
-              <input value={inv.transactionId} onChange={(e) => upd("transactionId", e.target.value)} placeholder="TXN123456" style={inp()} />
-            </div>
           </div>
-        </div>
+          <div style={{ marginTop: 12 }}>
+            <label style={lbl}>Transaction ID / Ref</label>
+            <input value={inv.transactionId} onChange={(e) => upd("transactionId", e.target.value)} placeholder="TXN123456" style={inp()} />
+          </div>
 
         {/* ── Client & Project ── */}
         <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: errors.client ? "1.5px solid #fca5a5" : "1px solid #f3f4f6", marginBottom: 12 }}>
@@ -899,20 +980,17 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
           <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
               <label style={{ ...lbl, color: errors.client ? "#ef4444" : "#6b7280" }}>Client *</label>
-              <select value={inv.client}
-                onChange={(e) => { upd("client", e.target.value); upd("project", ""); setErrors((p) => { const n = { ...p }; delete n.client; return n; }); }}
-                style={inp(errors.client)}>
-                <option value="">— Select Client —</option>
-                {clients.map((c, i) => <option key={i} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
-              </select>
+              <ClientDropdown clients={clients} value={inv.client} 
+                onChange={(val) => { upd("client", val); upd("project", ""); setErrors((p) => { const n = { ...p }; delete n.client; return n; }); }}
+                error={errors.client} onAddClient={onAddClient} />
               {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>⚠ {errors.client}</div>}
             </div>
             <div>
               <label style={lbl}>Project <span style={{ color: "#d1d5db" }}>(optional)</span></label>
-              <select value={inv.project} onChange={(e) => upd("project", e.target.value)} style={{ ...inp(), opacity: !inv.client ? 0.5 : 1 }} disabled={!inv.client}>
-                <option value="">— Select Project —</option>
-                {filteredProjects.map((p, i) => <option key={i} value={p.name}>{p.name}</option>)}
-              </select>
+              <ProjectDropdown projects={filteredProjects} value={inv.project} 
+                onChange={(val) => upd("project", val)} 
+                onAddProject={onAddProject}
+                disabled={!inv.client} />
             </div>
           </div>
           {selectedClient && (
@@ -977,7 +1055,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
         </div>
 
         {/* ── Notes & Terms ── */}
-        <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 24 }}>
+        <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Notes & Terms <span style={{ color: "#d1d5db", fontWeight: 500 }}>(optional)</span></div>
           <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
@@ -989,6 +1067,29 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
               <label style={lbl}>Terms & Conditions</label>
               <textarea value={inv.terms} onChange={(e) => upd("terms", e.target.value)} rows={3}
                 style={{ ...inp(), resize: "vertical", lineHeight: 1.6 }} />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Company Details ── */}
+        <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 24 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Company Details <span style={{ color: "#d1d5db", fontWeight: 500 }}>(optional)</span></div>
+          <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div>
+              <label style={lbl}>Company Name</label>
+              <input value={inv.companyName} onChange={(e) => upd("companyName", e.target.value)} placeholder="Company Name" style={inp()} />
+            </div>
+            <div>
+              <label style={lbl}>Company Phone / Number</label>
+              <input value={inv.companyPhone} onChange={(e) => upd("companyPhone", e.target.value)} placeholder="Phone Number" style={inp()} />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={lbl}>Company Address</label>
+              <textarea value={inv.companyAddress} onChange={(e) => upd("companyAddress", e.target.value)} placeholder="Full Address" rows={2} style={{ ...inp(), resize: "vertical", lineHeight: 1.6 }} />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={lbl}>Footer Message</label>
+              <input value={inv.footerMessage} onChange={(e) => upd("footerMessage", e.target.value)} placeholder="🙏 Thank you for considering us!" style={inp()} />
             </div>
           </div>
         </div>

@@ -15,6 +15,7 @@ exports.addClient = async (req, res) => {
       address,
       password,  
       gstNumber,
+      logoUrl,
     } = req.body;
 
     if (!clientName || !email) {
@@ -35,6 +36,7 @@ exports.addClient = async (req, res) => {
       password: hashedPassword,  
       role: "client",           
       gstNumber: gstNumber || "",
+      logoUrl: logoUrl || "",
       companyId: req.companyId || "",
     });
 

@@ -28,14 +28,26 @@ export default function InvoiceViewer() {
         companyPhone: slim.phone, companyAddress: slim.addr,
         client: slim.cl, project: slim.proj,
         gstRate: slim.gst, notes: slim.notes, terms: slim.terms,
+        isGstIncluded: slim.incGst, amountPaid: slim.paid || 0,
       };
       const items = (slim.items || []).map((i, idx) => ({
         id: idx + 1, description: i.d, quantity: i.q, rate: i.r,
       }));
-      const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate)||0) * (parseFloat(i.quantity)||0), 0);
-      const gstAmt = subtotal * (inv.gstRate / 100);
-      const total = subtotal + gstAmt;
-      setData({ inv, items, subtotal, gstAmt, total });
+      const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0) * (parseFloat(i.quantity)||0), 0);
+      let subtotal, gstAmt, total;
+      
+      if (inv.isGstIncluded) {
+        total = subtotalRaw;
+        subtotal = total / (1 + (inv.gstRate / 100));
+        gstAmt = total - subtotal;
+      } else {
+        subtotal = subtotalRaw;
+        gstAmt = subtotal * (inv.gstRate / 100);
+        total = subtotal + gstAmt;
+      }
+      
+      const balanceDue = total - inv.amountPaid;
+      setData({ inv, items, subtotal, gstAmt, total, balanceDue });
     } catch (e) {
       setError("Could not read invoice data. The QR code may be invalid or expired.");
     }
@@ -104,8 +116,8 @@ export default function InvoiceViewer() {
       </div>
 
       <div style={{ background: "linear-gradient(135deg,#4c1d95,#6d28d9)", margin: "0 12px", borderRadius: "0 0 16px 16px", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#e9d5ff" }}>TOTAL DUE</span>
-        <span style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{formatINR(total)}</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#e9d5ff" }}>{data.balanceDue > 0 ? "BALANCE DUE" : "TOTAL AMOUNT"}</span>
+        <span style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{formatINR(data.balanceDue > 0 ? data.balanceDue : data.total)}</span>
       </div>
 
       <div className="inv-card" style={{ padding: "16px 18px" }}>
@@ -151,15 +163,20 @@ export default function InvoiceViewer() {
         </table>
 
         <div style={{ padding: "14px 18px 2px", borderTop: "2px solid #f3f0ff", marginTop: 4 }}>
-          {[["Subtotal", formatINR(subtotal)], [`GST (${inv.gstRate}%)`, formatINR(gstAmt)]].map(([l, v]) => (
+          {[
+            ["Subtotal", formatINR(subtotal)],
+            [`GST (${inv.gstRate}%)`, formatINR(gstAmt)],
+            ["Total", formatINR(total)],
+            ["Amount Paid", formatINR(inv.amountPaid)]
+          ].map(([l, v]) => (
             <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #f5f3ff" }}>
               <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
               <span style={{ fontSize: 12, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
             </div>
           ))}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 12, padding: "12px 14px" }}>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>TOTAL DUE</span>
-            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatINR(total)}</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>BALANCE DUE</span>
+            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatINR(data.balanceDue)}</span>
           </div>
         </div>
       </div>

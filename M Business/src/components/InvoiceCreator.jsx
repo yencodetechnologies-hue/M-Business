@@ -4,7 +4,7 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 
 const GST_RATES = [0, 5, 12, 18, 28];
-const DEFAULT_LOGO_URL = "https://res.cloudinary.com/dvbzhmysy/image/upload/v1773851516/mbusiness/logos/okhahqag5ttqwfvhfphw.png";
+const DEFAULT_LOGO_URL = "";
 
 function generateInvoiceNo() {
   return `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
@@ -26,11 +26,11 @@ function formatDateTime(ts) {
 // ── Status Badge ─────────────────────────────────────────────
 function StatusBadge({ status }) {
   const map = {
-    paid:    { bg: "#dcfce7", color: "#16a34a", label: "✅ Paid" },
-    unpaid:  { bg: "#fff7ed", color: "#ea580c", label: "⏳ Unpaid" },
+    paid: { bg: "#dcfce7", color: "#16a34a", label: "✅ Paid" },
+    unpaid: { bg: "#fff7ed", color: "#ea580c", label: "⏳ Unpaid" },
     overdue: { bg: "#fee2e2", color: "#dc2626", label: "🔴 Overdue" },
-    draft:   { bg: "#f3f4f6", color: "#6b7280", label: "📝 Draft" },
-    sent:    { bg: "#eff6ff", color: "#2563eb", label: "📤 Sent" },
+    draft: { bg: "#f3f4f6", color: "#6b7280", label: "📝 Draft" },
+    sent: { bg: "#eff6ff", color: "#2563eb", label: "📤 Sent" },
   };
   const s = map[(status || "draft").toLowerCase()] || map.draft;
   return (
@@ -90,8 +90,9 @@ function deleteDraftLocal(invoiceNo) {
 }
 
 // ════════════════════════════════════════════════════════════
-export default function InvoiceCreator({ clients = [], projects = [], companyLogo, onLogoChange }) {
+export default function InvoiceCreator({ clients = [], projects = [], companyLogo, companyName, onLogoChange }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
+  const effectiveCompanyName = companyName || "";
 
   const [step, setStep] = useState("list"); // "list" | "form" | "preview"
   const [invoiceList, setInvoiceList] = useState([]);
@@ -106,23 +107,29 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
-  const today      = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0];
   const dueDefault = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
 
   const blank = {
     invoiceNo: generateInvoiceNo(), orderNo: "", date: today, dueDate: dueDefault,
     client: "", project: "", gstRate: 18, notes: "",
     terms: "Payment due within 30 days. Thank you for your business!",
-    companyName: "M Business Suite", companyEmail: "management@mbusiness.com",
+    companyName: companyName || "", companyEmail: "",
     companyPhone: "", companyAddress: "",
+    currency: "₹",
+    template: "Modern",
+    footerMessage: "🙏 Thank you for considering us!",
+    amountPaid: 0,
+    paymentMode: "GPay",
+    transactionId: ""
   };
 
-  const [inv, setInv]     = useState(blank);
+  const [inv, setInv] = useState(blank);
   const [items, setItems] = useState([{ id: 1, description: "", quantity: 1, rate: "" }]);
   const [editingId, setEditingId] = useState(null); // backend _id if editing existing
 
   const upd = (f, v) => setInv((p) => ({ ...p, [f]: v }));
-  const selectedClient   = clients.find((c) => (c.clientName || c.name) === inv.client);
+  const selectedClient = clients.find((c) => (c.clientName || c.name) === inv.client);
   const filteredProjects = projects.filter((p) =>
     !inv.client || p.client === inv.client || p.clientName === inv.client ||
     p.clientId === selectedClient?._id
@@ -130,14 +137,16 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
   // totals
   const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-  const gstAmt   = subtotal * (inv.gstRate / 100);
-  const total    = subtotal + gstAmt;
+  const gstAmt = subtotal * (inv.gstRate / 100);
+  const total = subtotal + gstAmt;
+  const amountPaid = parseFloat(inv.amountPaid) || 0;
+  const balanceDue = total - amountPaid;
 
   // ── Fetch list ──────────────────────────────────────────────
   const fetchList = async () => {
     setListLoading(true);
     try {
-      const res  = await axios.get(`${BASE_URL}/api/invoices`);
+      const res = await axios.get(`${BASE_URL}/api/invoices`);
       if (res.data.success && Array.isArray(res.data.invoices)) setInvoiceList(res.data.invoices);
       else setInvoiceList(loadAllDrafts());
     } catch { setInvoiceList(loadAllDrafts()); }
@@ -148,9 +157,9 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   useEffect(() => { if (step === "list") fetchList(); }, [step]);
 
   // ── Items ───────────────────────────────────────────────────
-  const addItem    = () => setItems((p) => [...p, { id: Date.now(), description: "", quantity: 1, rate: "" }]);
+  const addItem = () => setItems((p) => [...p, { id: Date.now(), description: "", quantity: 1, rate: "" }]);
   const removeItem = (id) => { if (items.length > 1) setItems((p) => p.filter((i) => i.id !== id)); };
-  const updItem    = (id, f, v) => {
+  const updItem = (id, f, v) => {
     setItems((p) => p.map((i) => (i.id === id ? { ...i, [f]: v } : i)));
     setErrors((prev) => { const n = { ...prev }; delete n[`item_${id}_${f}`]; return n; });
   };
@@ -231,7 +240,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   const handleDelete = async (entry) => {
     const id = entry.id;
     // Try backend
-    try { await axios.delete(`${BASE_URL}/api/invoices/${id}`); } catch {}
+    try { await axios.delete(`${BASE_URL}/api/invoices/${id}`); } catch { }
     // Remove locally
     deleteDraftLocal(entry.invoiceNo);
     setInvoiceList(prev => prev.filter(e => (e.id || e.invoiceNo) !== (id || entry.invoiceNo)));
@@ -245,7 +254,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     setStatusUpdating(id);
     try {
       await axios.patch(`${BASE_URL}/api/invoices/${id}/status`, { status: newStatus });
-    } catch {}
+    } catch { }
     // update local list
     setInvoiceList(prev => prev.map(e =>
       (e.id || e.invoiceNo) === (id || entry.invoiceNo) ? { ...e, status: newStatus } : e
@@ -302,14 +311,14 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   if (step === "list") {
     const enriched = invoiceList.map((e) => {
       const dueDate = e.inv?.dueDate || e.dueDate;
-      const status  = e.status || (dueDate && new Date(dueDate) < new Date() ? "overdue" : "unpaid");
+      const status = e.status || (dueDate && new Date(dueDate) < new Date() ? "overdue" : "unpaid");
       return { ...e, status };
     });
 
-    const totalAmt  = enriched.reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
-    const paidAmt   = enriched.filter(e => e.status === "paid").reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
+    const totalAmt = enriched.reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
+    const paidAmt = enriched.filter(e => e.status === "paid").reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
     const unpaidCnt = enriched.filter(e => ["unpaid", "overdue"].includes(e.status)).length;
-    const draftCnt  = enriched.filter(e => e.status === "draft").length;
+    const draftCnt = enriched.filter(e => e.status === "draft").length;
 
     return (
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: 1100 }}>
@@ -345,9 +354,9 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
         <div className="inv-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
           {[
             { label: "Total Invoiced", value: formatCurrency(totalAmt, inv.currency), color: "#4c1d95", icon: "📊" },
-            { label: "Collected",      value: formatCurrency(paidAmt, inv.currency),  color: "#16a34a", icon: "✅" },
-            { label: "Awaiting",       value: `${unpaidCnt}`,      color: "#ea580c", icon: "⏳" },
-            { label: "Drafts",         value: `${draftCnt}`,       color: "#6b7280", icon: "📝" },
+            { label: "Collected", value: formatCurrency(paidAmt, inv.currency), color: "#16a34a", icon: "✅" },
+            { label: "Awaiting", value: `${unpaidCnt}`, color: "#ea580c", icon: "⏳" },
+            { label: "Drafts", value: `${draftCnt}`, color: "#6b7280", icon: "📝" },
           ].map((c) => (
             <div key={c.label} style={{ background: "#fff", borderRadius: 14, padding: "18px 18px", border: "1px solid #f3f4f6", boxShadow: "0 1px 6px rgba(0,0,0,0.06)", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${c.color}, ${c.color}88)` }} />
@@ -381,7 +390,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
             </div>
           ) : enriched.map((entry, idx) => {
             const invD = entry.inv || {};
-            const sc   = statusColor[(entry.status || "draft").toLowerCase()] || "#6b7280";
+            const sc = statusColor[(entry.status || "draft").toLowerCase()] || "#6b7280";
             const isUpdating = statusUpdating === entry.id;
 
             return (
@@ -484,24 +493,25 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
               <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>
                 {(() => {
-                  const vInv  = viewEntry.inv  || {};
+                  const vInv = viewEntry.inv || {};
                   const vItems = viewEntry.items || [];
-                  const vSub  = vItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-                  const vGst  = vSub * ((parseFloat(vInv.gstRate) || 18) / 100);
-                  const vTot  = vSub + vGst;
-                  const sc2   = statusColor[(viewEntry.status || "draft").toLowerCase()] || "#6b7280";
+                  const vSub = vItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+                  const vGst = vSub * ((parseFloat(vInv.gstRate) || 18) / 100);
+                  const vTot = vSub + vGst;
+                  const sc2 = statusColor[(viewEntry.status || "draft").toLowerCase()] || "#6b7280";
 
                   return (
                     <>
                       {/* Top info row */}
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 18 }}>
                         {[
-                          { label: "Client",    value: viewEntry.client || "—",         icon: "👥" },
-                          { label: "Project",   value: vInv.project || "—",             icon: "📁" },
-                          { label: "Invoice No",value: viewEntry.invoiceNo || "—",      icon: "🧾" },
-                          { label: "Date",      value: formatDate(vInv.date),            icon: "📅" },
-                          { label: "Due Date",  value: formatDate(vInv.dueDate),         icon: "⏰" },
-                          { label: "GST Rate",  value: `${vInv.gstRate || 18}%`,        icon: "🏦" },
+                          { label: "Client", value: viewEntry.client || "—", icon: "👥" },
+                          { label: "Project", value: vInv.project || "—", icon: "📁" },
+                          { label: "Invoice No", value: viewEntry.invoiceNo || "—", icon: "🧾" },
+                          { label: "Date", value: formatDate(vInv.date), icon: "📅" },
+                          { label: "Due Date", value: formatDate(vInv.dueDate), icon: "⏰" },
+                          { label: "GST Rate", value: `${vInv.gstRate || 18}%`, icon: "🏦" },
+                          { label: "Client GST", value: clients.find(c => (c.clientName || c.name) === (viewEntry.client || vInv.client))?.gstNumber || "—", icon: "💎" },
                         ].map(({ label, value, icon }) => (
                           <div key={label} style={{ background: "#faf5ff", borderRadius: 10, padding: "10px 12px", border: "1px solid #ede9fe" }}>
                             <div style={{ fontSize: 9, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 4, textTransform: "uppercase" }}>{icon} {label}</div>
@@ -612,7 +622,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
             body * { visibility:hidden!important; }
             .invoice-paper,.invoice-paper * { visibility:visible!important; }
             .no-print { display:none!important; }
-            .invoice-paper { position:fixed!important;top:0!important;left:0!important;width:210mm!important;height:297mm!important;max-width:210mm!important;margin:0!important;padding:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;display:flex!important;flex-direction:column!important; }
+            .invoice-paper { position:fixed!important;top:0!important;left:0!important;width:210mm!important;height:297mm!important;max-width:210mm!important;margin:0!important;padding:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;page-break-after:avoid!important; }
             .invoice-paper * { -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important; }
           }
           @media (max-width:600px) {
@@ -633,28 +643,34 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
         <div className="invoice-paper">
           {/* Header */}
-          <div style={{ background: "linear-gradient(135deg,#0f0528 0%,#2d0a6e 50%,#4c1d95 100%)", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0 }}>
-            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(167,139,250,0.15),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
+          <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
+            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(147,51,234,0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
             <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
               <div>
-                <img src={effectiveLogo} alt="logo" style={{ height: 52, borderRadius: 9, marginBottom: 12, objectFit: "contain", background: "rgba(255,255,255,0.1)", padding: 6 }} />
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>{inv.companyName}</div>
-                {inv.companyEmail   && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 3 }}>{inv.companyEmail}</div>}
-                {inv.companyPhone   && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 2 }}>{inv.companyPhone}</div>}
-                {inv.companyAddress && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 2 }}>{inv.companyAddress}</div>}
+                {effectiveLogo ? (
+                  <img src={effectiveLogo} alt="logo" style={{ height: 60, borderRadius: 10, marginBottom: 12, objectFit: "contain", background: "#fff", padding: 8, border: "1px solid #ede9fe" }} />
+                ) : (
+                  <div style={{ height: 60, width: 60, background: "#7c3aed", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                    {effectiveCompanyName[0] || "?"}
+                  </div>
+                )}
+                <div style={{ fontSize: 24, fontWeight: 900, color: "#1e0a3c", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName || effectiveCompanyName}</div>
+                {inv.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{inv.companyEmail}</div>}
+                {inv.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyPhone}</div>}
+                {inv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyAddress}</div>}
               </div>
               <div className="inv-hright" style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 36, fontWeight: 900, color: "rgba(255,255,255,0.08)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#c4b5fd" }}>{inv.invoiceNo}</div>
-                {inv.orderNo && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 3 }}>Order # {inv.orderNo}</div>}
+                <div style={{ fontSize: 36, fontWeight: 900, color: "rgba(124,58,237,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#7c3aed" }}>{inv.invoiceNo}</div>
+                {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
                 <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                    <div style={{ fontSize: 12, color: "#fff", fontWeight: 700 }}>{formatDate(inv.date)}</div>
+                    <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                    <div style={{ fontSize: 12, color: "#1e0a3c", fontWeight: 700 }}>{formatDate(inv.date)}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
-                    <div style={{ fontSize: 12, color: "#fbbf24", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
+                    <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
+                    <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
                   </div>
                 </div>
               </div>
@@ -667,8 +683,9 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
               <div style={{ fontSize: 9, color: "#a78bfa", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
               <div style={{ fontSize: 17, fontWeight: 800, color: "#1e0a3c" }}>{inv.client || "—"}</div>
               {selectedClient?.companyName && <div style={{ fontSize: 13, color: "#7c3aed", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
-              {selectedClient?.email       && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
-              {selectedClient?.phone       && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
+              {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
+              {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
+              {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: "#7c3aed", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
             </div>
             {inv.project && (
               <div style={{ padding: "20px 32px" }}>
@@ -702,15 +719,15 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
             </table>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
               <div style={{ width: "min(280px,100%)" }}>
-                {[["Subtotal", formatCurrency(subtotal, inv.currency)], [`GST (${inv.gstRate}%)`, formatCurrency(gstAmt, inv.currency)]].map(([l, v]) => (
+                {[["Subtotal", formatCurrency(subtotal, inv.currency)], [`GST (${inv.gstRate}%)`, formatCurrency(gstAmt, inv.currency)], ["Amount Paid", formatCurrency(amountPaid, inv.currency)]].map(([l, v]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f3f0ff" }}>
                     <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
                   </div>
                 ))}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 12, marginTop: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>TOTAL DUE</span>
-                  <span style={{ fontSize: 19, fontWeight: 900, color: "#fff" }}>{formatCurrency(total, inv.currency)}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
+                  <span style={{ fontSize: 19, fontWeight: 900, color: "#1e0a3c" }}>{formatCurrency(balanceDue, inv.currency)}</span>
                 </div>
               </div>
             </div>
@@ -745,8 +762,8 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
           {/* Footer */}
           <div style={{ background: "linear-gradient(135deg,#0f0528,#2d0a6e)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Generated by M Business Suite</div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#c4b5fd" }}>🙏 Thank you for your business!</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{effectiveCompanyName}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>{inv.footerMessage}</div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{inv.invoiceNo}</div>
           </div>
         </div>
@@ -851,119 +868,143 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
             </select>
           </div>
         </div>
-      </div>
-
-      {/* ── Client & Project ── */}
-      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: errors.client ? "1.5px solid #fca5a5" : "1px solid #f3f4f6", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Client & Project</div>
-        <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <div>
-            <label style={{ ...lbl, color: errors.client ? "#ef4444" : "#6b7280" }}>Client *</label>
-            <select value={inv.client}
-              onChange={(e) => { upd("client", e.target.value); upd("project", ""); setErrors((p) => { const n = { ...p }; delete n.client; return n; }); }}
-              style={inp(errors.client)}>
-              <option value="">— Select Client —</option>
-              {clients.map((c, i) => <option key={i} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
-            </select>
-            {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>⚠ {errors.client}</div>}
-          </div>
-          <div>
-            <label style={lbl}>Project <span style={{ color: "#d1d5db" }}>(optional)</span></label>
-            <select value={inv.project} onChange={(e) => upd("project", e.target.value)} style={{ ...inp(), opacity: !inv.client ? 0.5 : 1 }} disabled={!inv.client}>
-              <option value="">— Select Project —</option>
-              {filteredProjects.map((p, i) => <option key={i} value={p.name}>{p.name}</option>)}
-            </select>
+        {/* ── Payment Details ── */}
+        <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Payment & Advance Details</div>
+          <div className="f3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+            <div>
+              <label style={lbl}>Amount Paid (Advance)</label>
+              <input type="number" value={inv.amountPaid} onChange={(e) => upd("amountPaid", e.target.value)} placeholder="e.g. 10000" style={inp()} />
+            </div>
+            <div>
+              <label style={lbl}>Payment Mode</label>
+              <select value={inv.paymentMode} onChange={(e) => upd("paymentMode", e.target.value)} style={inp()}>
+                <option value="GPay">GPay / PhonePe</option>
+                <option value="NEFT">NEFT / Bank Transfer</option>
+                <option value="RTGS">RTGS</option>
+                <option value="Cash">Cash</option>
+                <option value="Check">Check</option>
+              </select>
+            </div>
+            <div>
+              <label style={lbl}>Transaction ID / Ref</label>
+              <input value={inv.transactionId} onChange={(e) => upd("transactionId", e.target.value)} placeholder="TXN123456" style={inp()} />
+            </div>
           </div>
         </div>
-        {selectedClient && (
-          <div style={{ marginTop: 10, padding: "8px 12px", background: "#f9fafb", borderRadius: 8, display: "flex", gap: 16, flexWrap: "wrap" }}>
-            {[["📧", selectedClient.email], ["📱", selectedClient.phone], ["📍", selectedClient.address]].filter(([, v]) => v).map(([icon, val], i) => (
-              <span key={i} style={{ fontSize: 12, color: "#6b7280" }}>{icon} {val}</span>
+
+        {/* ── Client & Project ── */}
+        <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: errors.client ? "1.5px solid #fca5a5" : "1px solid #f3f4f6", marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Client & Project</div>
+          <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div>
+              <label style={{ ...lbl, color: errors.client ? "#ef4444" : "#6b7280" }}>Client *</label>
+              <select value={inv.client}
+                onChange={(e) => { upd("client", e.target.value); upd("project", ""); setErrors((p) => { const n = { ...p }; delete n.client; return n; }); }}
+                style={inp(errors.client)}>
+                <option value="">— Select Client —</option>
+                {clients.map((c, i) => <option key={i} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
+              </select>
+              {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>⚠ {errors.client}</div>}
+            </div>
+            <div>
+              <label style={lbl}>Project <span style={{ color: "#d1d5db" }}>(optional)</span></label>
+              <select value={inv.project} onChange={(e) => upd("project", e.target.value)} style={{ ...inp(), opacity: !inv.client ? 0.5 : 1 }} disabled={!inv.client}>
+                <option value="">— Select Project —</option>
+                {filteredProjects.map((p, i) => <option key={i} value={p.name}>{p.name}</option>)}
+              </select>
+            </div>
+          </div>
+          {selectedClient && (
+            <div style={{ marginTop: 10, padding: "8px 12px", background: "#f9fafb", borderRadius: 8, display: "flex", gap: 16, flexWrap: "wrap" }}>
+              {[["📧", selectedClient.email], ["📱", selectedClient.phone], ["📍", selectedClient.address], ["💎", selectedClient.gstNumber]].filter(([, v]) => v).map(([icon, val], i) => (
+                <span key={i} style={{ fontSize: 12, color: "#6b7280" }}>{icon} {val}</span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Items ── */}
+        <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>Items / Services</div>
+            <button onClick={addItem} style={{ padding: "6px 14px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>+ Add Item</button>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, paddingBottom: 8, borderBottom: "1px solid #f3f4f6", marginBottom: 8 }}>
+            {["Description", "Qty", "Rate (₹)", ""].map((h, i) => (
+              <div key={i} style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>{h}</div>
             ))}
           </div>
-        )}
-      </div>
-
-      {/* ── Items ── */}
-      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>Items / Services</div>
-          <button onClick={addItem} style={{ padding: "6px 14px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>+ Add Item</button>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, paddingBottom: 8, borderBottom: "1px solid #f3f4f6", marginBottom: 8 }}>
-          {["Description", "Qty", "Rate (₹)", ""].map((h, i) => (
-            <div key={i} style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>{h}</div>
-          ))}
-        </div>
-        {items.map((item, idx) => {
-          const dErr = errors[`item_${item.id}_description`];
-          const rErr = errors[`item_${item.id}_rate`];
-          return (
-            <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, marginBottom: 8, alignItems: "flex-start" }}>
-              <div>
-                <input value={item.description} onChange={(e) => updItem(item.id, "description", e.target.value)}
-                  placeholder={`Item ${idx + 1} description`} style={{ ...inp(dErr), fontSize: 13 }} />
-                {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
+          {items.map((item, idx) => {
+            const dErr = errors[`item_${item.id}_description`];
+            const rErr = errors[`item_${item.id}_rate`];
+            return (
+              <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, marginBottom: 8, alignItems: "flex-start" }}>
+                <div>
+                  <input value={item.description} onChange={(e) => updItem(item.id, "description", e.target.value)}
+                    placeholder={`Item ${idx + 1} description`} style={{ ...inp(dErr), fontSize: 13 }} />
+                  {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
+                </div>
+                <input type="number" min="1" value={item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value)}
+                  style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
+                <div>
+                  <input type="number" min="0" value={item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value)}
+                    placeholder="0.00" style={{ ...inp(rErr), textAlign: "right", fontSize: 13 }} />
+                  {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
+                </div>
+                <button onClick={() => removeItem(item.id)} disabled={items.length === 1}
+                  style={{ width: 32, height: 42, borderRadius: 8, background: items.length === 1 ? "#f9fafb" : "#fee2e2", border: "none", cursor: items.length === 1 ? "not-allowed" : "pointer", fontSize: 13, color: items.length === 1 ? "#d1d5db" : "#ef4444" }}>✕</button>
               </div>
-              <input type="number" min="1" value={item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value)}
-                style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
-              <div>
-                <input type="number" min="0" value={item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value)}
-                  placeholder="0.00" style={{ ...inp(rErr), textAlign: "right", fontSize: 13 }} />
-                {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
+            );
+          })}
+          {/* Totals */}
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+            <div style={{ minWidth: 220 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
+                <span style={{ fontSize: 13, color: "#6b7280" }}>Subtotal</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(subtotal, inv.currency)}</span>
               </div>
-              <button onClick={() => removeItem(item.id)} disabled={items.length === 1}
-                style={{ width: 32, height: 42, borderRadius: 8, background: items.length === 1 ? "#f9fafb" : "#fee2e2", border: "none", cursor: items.length === 1 ? "not-allowed" : "pointer", fontSize: 13, color: items.length === 1 ? "#d1d5db" : "#ef4444" }}>✕</button>
-            </div>
-          );
-        })}
-        {/* Totals */}
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-          <div style={{ minWidth: 220 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
-              <span style={{ fontSize: 13, color: "#6b7280" }}>Subtotal</span>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(subtotal, inv.currency)}</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
-              <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({inv.gstRate}%)</span>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(gstAmt, inv.currency)}</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 10, marginTop: 8 }}>
-              <span style={{ fontSize: 14, fontWeight: 800, color: "#e9d5ff" }}>Total</span>
-              <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{formatCurrency(total, inv.currency)}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
+                <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({inv.gstRate}%)</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(gstAmt, inv.currency)}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 10, marginTop: 8 }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "#e9d5ff" }}>Total</span>
+                <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{formatCurrency(total, inv.currency)}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ── Notes & Terms ── */}
-      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 24 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Notes & Terms <span style={{ color: "#d1d5db", fontWeight: 500 }}>(optional)</span></div>
-        <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <div>
-            <label style={lbl}>Notes</label>
-            <textarea value={inv.notes} onChange={(e) => upd("notes", e.target.value)} placeholder="Additional notes…" rows={3}
-              style={{ ...inp(), resize: "vertical", lineHeight: 1.6 }} />
-          </div>
-          <div>
-            <label style={lbl}>Terms & Conditions</label>
-            <textarea value={inv.terms} onChange={(e) => upd("terms", e.target.value)} rows={3}
-              style={{ ...inp(), resize: "vertical", lineHeight: 1.6 }} />
+        {/* ── Notes & Terms ── */}
+        <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 24 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Notes & Terms <span style={{ color: "#d1d5db", fontWeight: 500 }}>(optional)</span></div>
+          <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div>
+              <label style={lbl}>Notes</label>
+              <textarea value={inv.notes} onChange={(e) => upd("notes", e.target.value)} placeholder="Additional notes…" rows={3}
+                style={{ ...inp(), resize: "vertical", lineHeight: 1.6 }} />
+            </div>
+            <div>
+              <label style={lbl}>Terms & Conditions</label>
+              <textarea value={inv.terms} onChange={(e) => upd("terms", e.target.value)} rows={3}
+                style={{ ...inp(), resize: "vertical", lineHeight: 1.6 }} />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom save buttons */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
-        <button onClick={handleSaveDraft} disabled={!!saving}
-          style={{ flex: 1, padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
-          {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved as Draft!" : "💾 Save Draft"}
-        </button>
-        <button onClick={handleSavePreview} disabled={!!saving}
-          style={{ flex: 2, padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#4c1d95,#7c3aed)", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
-          {saving === "preview" ? "Saving…" : "Preview & Print →"}
-        </button>
+        {/* Bottom save buttons */}
+        <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
+          <button onClick={handleSaveDraft} disabled={!!saving}
+            style={{ flex: 1, padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
+            {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved as Draft!" : "💾 Save Draft"}
+          </button>
+          <button onClick={handleSavePreview} disabled={!!saving}
+            style={{ flex: 2, padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#4c1d95,#7c3aed)", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+            {saving === "preview" ? "Saving…" : "Preview & Print →"}
+          </button>
+        </div>
       </div>
-    </div>
-  );
+       </div>
+      );
 }

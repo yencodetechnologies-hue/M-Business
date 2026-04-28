@@ -39,9 +39,11 @@ const NAV = [
   { key: "tasks", icon: "✅", label: "Tasks" },
   { key: "calendar", icon: "📅", label: "Calendar" },
   { key: "accounts", icon: "👤", label: "Accounts" },
+
+  { key: "expenses", icon: "💸", label: "Expenses" },
   { key: "interviews", icon: "🎯", label: "Interviews" },
   { key: "reports", icon: "📈", label: "Reports" },
-  { key: "mysubscriptions", icon: "🔔", label: "My Subscriptions" },
+
   { key: "packages", icon: "📦", label: "Packages" },
   { key: "payments", icon: "💰", label: "Payments" },
   { key: "vendors", icon: "🏬", label: "Vendors" },
@@ -51,7 +53,7 @@ const NAV = [
 function getNavForRole(role) {
   const r = (role || "").toLowerCase().trim();
   if (r === "subadmin" || r === "sub_admin" || r === "sub-admin")
-    return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "interviews", "reports", "mysubscriptions", "packages", "payments", "vendors", "rolePermissions"].includes(n.key));
+    return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "income", "expenses", "interviews", "reports", "mysubscriptions", "packages", "payments", "vendors", "rolePermissions"].includes(n.key));
   if (r === "manager")
     return NAV.filter(n => ["dashboard", "employees", "projects", "tracking", "tasks", "calendar", "interviews", "reports", "vendors"].includes(n.key));
   if (r === "employee")
@@ -205,6 +207,7 @@ function ClientsPage({ clients, setClients, onAddClient }) {
       phone: c.phone || "",
       address: c.address || "",
       status: c.status || "Active",
+      gstNumber: c.gstNumber || "",
     });
     setEditErr({});
     setEditClient(c);
@@ -256,7 +259,7 @@ function ClientsPage({ clients, setClients, onAddClient }) {
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 700 }}>
             <thead><tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
-              {["#", "Name", "Company", "Email", "Phone", "Status", "Joined", "Actions"].map(c => (
+              {["#", "Company Name", "Contact Person", "Email", "Phone", "Status", "Joined", "Actions"].map(c => (
                 <th key={c} style={{ padding: "10px 14px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{c.toUpperCase()}</th>
               ))}
             </tr></thead>
@@ -271,7 +274,7 @@ function ClientsPage({ clients, setClients, onAddClient }) {
                         <span style={{ fontWeight: 700, color: T.text }}>{c.clientName || c.name || "—"}</span>
                       </div>
                     </td>
-                    <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{c.companyName || c.company || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{c.contactPersonName || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{c.email || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{c.phone || "—"}</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={c.status || "Active"} /></td>
@@ -320,6 +323,7 @@ function ClientsPage({ clients, setClients, onAddClient }) {
             <Fld label="Company Name" value={editForm.companyName} onChange={v => setEditForm(p => ({ ...p, companyName: v }))} />
             <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
             <Fld label="Phone" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
+            <Fld label="Company Tax/GST" value={editForm.gstNumber} onChange={v => setEditForm(p => ({ ...p, gstNumber: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
           </div>
           <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
@@ -1659,10 +1663,9 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 // ═══════════════════════════════════════════════════════════
 function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick }) {
   const items = navItems || NAV;
-  const displayName = user?.companyName || user?.name || user?.email?.split("@")[0] || "Admin";
-  const initials = (user?.companyName || user?.name || "AD").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const companyName = user?.companyName || "M Business";
+  const initials = (companyName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const roleDisplay = (user?.role || "").toLowerCase().includes("subadmin") ? "" : (user?.role || "ADMIN").toUpperCase();
-  const companyName = user?.companyName || "Dashboard";
   const logoRef = useRef();
   
   return (
@@ -1679,7 +1682,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
               {companyLogo ? (
                 <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2 }} />
               ) : (
-                <span style={{ fontSize: 16, fontWeight: 900, color: "#9333ea" }}>{(companyName || "D")[0].toUpperCase()}</span>
+                <span style={{ fontSize: 16, fontWeight: 900, color: "#9333ea" }}>{initials}</span>
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
@@ -1690,7 +1693,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
           <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#fff", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }} className="sidebar-close">✕</button>
         </div>
         <nav style={{ flex: 1, minHeight: 0, padding: "10px 8px", overflowY: "auto", position: "relative", zIndex: 1 }}>
-          {!enforceMySubscriptions && items.map(n => { const on = active === n.key; return (<button key={n.key} onClick={() => { setActive(n.key); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "9px 12px", background: on ? "linear-gradient(90deg,rgba(147,51,234,0.35),rgba(168,85,247,0.15))" : "transparent", border: on ? "1px solid rgba(168,85,247,0.35)" : "1px solid transparent", borderRadius: 11, color: on ? "#e9d5ff" : "rgba(255,255,255,0.45)", fontWeight: on ? 700 : 400, fontSize: 12.5, cursor: "pointer", marginBottom: 2, textAlign: "left", fontFamily: "inherit" }}><span style={{ fontSize: 15 }}>{n.icon}</span><span style={{ flex: 1 }}>{n.label}</span>{on && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#c084fc", flexShrink: 0 }} />}</button>); })}
+          {items.map(n => { const on = active === n.key; return (<button key={n.key} onClick={() => { setActive(n.key); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "9px 12px", background: on ? "linear-gradient(90deg,rgba(147,51,234,0.35),rgba(168,85,247,0.15))" : "transparent", border: on ? "1px solid rgba(168,85,247,0.35)" : "1px solid transparent", borderRadius: 11, color: on ? "#e9d5ff" : "rgba(255,255,255,0.45)", fontWeight: on ? 700 : 400, fontSize: 12.5, cursor: "pointer", marginBottom: 2, textAlign: "left", fontFamily: "inherit" }}><span style={{ fontSize: 15 }}>{n.icon}</span><span style={{ flex: 1 }}>{n.label}</span>{on && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#c084fc", flexShrink: 0 }} />}</button>); })}
         </nav>
         <div style={{ padding: "10px 14px 14px", borderTop: "1px solid rgba(255,255,255,0.07)", position: "relative", zIndex: 1, flexShrink: 0 }}>
           <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 11, color: "#fca5a5", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>🚪 Logout</button>
@@ -2130,7 +2133,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   }, [profileDropdownOpen]);
 
   const [clients, setClients] = useState([]);
-  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "" });
+  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "" });
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
@@ -2387,7 +2390,8 @@ const handleEditPackage = (pkg) => {
         status: nc.status, 
         role: nc.role || "client",
         contactPersonName: nc.contactPersonName,
-        contactPersonNo: nc.contactPersonNo
+        contactPersonNo: nc.contactPersonNo,
+        gstNumber: nc.gstNumber
       };
       const res = await axios.post(BASE_URL + "/api/clients/add", payload);
       setClients(prev => [res.data.client, ...prev]);
@@ -2584,12 +2588,12 @@ const handleEditPackage = (pkg) => {
 
   useEffect(() => { if (!enforceMySubscriptions && validActive !== active) setActive(validActive); }, [user?.role, enforceMySubscriptions, validActive]);
 
-  const displayName = user?.companyName || user?.name || user?.email?.split("@")[0] || "Admin";
-  const initials = (user?.companyName || user?.name || "AD").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const displayName = user?.companyName || "M Business";
+  const initials = (displayName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const B = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
 
   const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
-  const companyNameStr = user?.companyName || user?.name || "";
+  const companyNameStr = displayName;
   const roleDisplay = user?.role || "Admin";
 
   return (
@@ -2604,32 +2608,43 @@ const handleEditPackage = (pkg) => {
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
       `}</style>
 
-      <Sidebar 
-        user={user} 
-        active={validActive} 
-        setActive={setActive} 
-        onLogout={handleLogout} 
-        open={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-        navItems={navItems} 
-        companyLogo={companyLogo} 
-        onLogoChange={onLogoChange} 
-        enforceMySubscriptions={enforceMySubscriptions} 
-        onLogoUploadClick={() => headerLogoRef.current?.click()}
-      />
+      {!enforceMySubscriptions && (
+        <Sidebar 
+          user={user} 
+          active={validActive} 
+          setActive={setActive} 
+          onLogout={handleLogout} 
+          open={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
+          navItems={navItems} 
+          companyLogo={companyLogo} 
+          onLogoChange={onLogoChange} 
+          enforceMySubscriptions={enforceMySubscriptions} 
+          onLogoUploadClick={() => headerLogoRef.current?.click()}
+        />
+      )}
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         {/* Mobile Topbar */}
         <div className="mob-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid #ede9fe", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(147,51,234,0.07)" }}>
-          <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#7c3aed", padding: "2px 6px", lineHeight: 1 }}>☰</button>
-          <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", fontWeight: 800, fontSize: 15, color: T.text }}>
+          {!enforceMySubscriptions ? (
+            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#7c3aed", padding: "2px 6px", lineHeight: 1 }}>☰</button>
+          ) : (
+            <div style={{ width: 40 }} />
+          )}
+          <div style={{ fontWeight: 800, fontSize: 15, color: T.text }}>
             {page?.label}
           </div>
           {user?.email !== "admin@gmail.com" && (
             <>
               <input type="file" ref={headerLogoRef} onChange={handleHeaderLogoUpload} accept="image/*" style={{ display: "none" }} />
-              <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ width: 34, height: 34, background: "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", overflow: "hidden", position: "relative" }}>
-                <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }} title="Click to upload logo">
-                  {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} /> : <span>{initials}</span>}
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {enforceMySubscriptions && (
+                  <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "6px 12px", color: "#ef4444", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
+                )}
+                <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ width: 34, height: 34, background: "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", overflow: "hidden", position: "relative" }}>
+                  <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }} title="Click to upload logo">
+                    {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} /> : <span>{initials}</span>}
+                  </div>
                 </div>
               </div>
             </>
@@ -2658,12 +2673,17 @@ const handleEditPackage = (pkg) => {
               {validActive === "vendors" && <button onClick={() => { setNvError({}); setModal("vendor_add"); }} style={B("#9333ea")}>+ Add Vendor</button>}
 
               {user?.email !== "admin@gmail.com" && (
-                <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", boxShadow: "0 2px 10px rgba(147,51,234,0.08)", flexShrink: 0 }}>
-                  <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: 30, height: 30, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, overflow: "hidden", flexShrink: 0, cursor: "pointer" }} title="Click to upload logo">
-                    {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} onError={() => setCompanyLogo(null)} /> : <span>{initials}</span>}
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {enforceMySubscriptions && (
+                    <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "8px 16px", color: "#ef4444", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.15)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.1)"}>Logout</button>
+                  )}
+                  <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", boxShadow: "0 2px 10px rgba(147,51,234,0.08)", flexShrink: 0 }}>
+                    <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: 30, height: 30, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, overflow: "hidden", flexShrink: 0, cursor: "pointer" }} title="Click to upload logo">
+                      {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} onError={() => setCompanyLogo(null)} /> : <span>{initials}</span>}
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: T.text, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
+                    <span style={{ fontSize: 10, color: "#a78bfa" }}>▾</span>
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: T.text, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
-                  <span style={{ fontSize: 10, color: "#a78bfa" }}>▾</span>
                 </div>
               )}
             </div>
@@ -2800,7 +2820,7 @@ const handleEditPackage = (pkg) => {
                       </div>
                       <div style={{ width: "100%" }}>
                         <div style={{ fontSize: 24, fontWeight: 800, color: T.text, marginBottom: 6, letterSpacing: "-0.5px", lineHeight: 1.2 }}>
-                          {user?.companyName || user?.name || "Company Name"}
+                          {displayName}
                         </div>
                         {user?.role && !user.role.toLowerCase().includes("subadmin") && (
                           <div style={{ display: "inline-block", padding: "4px 14px", background: "#f3e8ff", borderRadius: 20, fontSize: 10, color: "#7c3aed", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2 }}>
@@ -2889,6 +2909,8 @@ const handleEditPackage = (pkg) => {
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} />}
           {validActive === "calendar" && <CalendarPage projects={projects} clients={clients} companyId={companyId} />}
           {validActive === "accounts" && <AccountsPage ExpensesPage={ExpensesPage} />}
+          {validActive === "income" && <IncomePage />}
+          {validActive === "expenses" && <ExpensesPage />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
@@ -3147,14 +3169,15 @@ const handleEditPackage = (pkg) => {
         ) : (
           <>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-              <Fld label="Client Name*" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: "" })); }} error={ncError.name} />
+              <Fld label="Company Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: "" })); }} error={ncError.name} />
               <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: "" })); }} type="email" error={ncError.email} />
               <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
               <Fld label="Contact Person No" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
               <Fld label="Office No" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
+              <Fld label="Company Tax/GST" value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
               <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={["Active", "Inactive"]} />
             </div>
-            <Fld label="Office Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} />
+            <Fld label="Company Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} />
             <div style={{ marginBottom: 14 }}>
               <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
               <div style={{ position: "relative" }}>

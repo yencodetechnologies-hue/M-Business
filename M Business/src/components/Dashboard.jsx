@@ -5,10 +5,9 @@ import { BASE_URL } from "../config";
 import InvoiceCreator from "./InvoiceCreator";
 import TaskPage from "./TaskPage";
 import CalendarPage from "./CalendarPage";
-import AccountsPage, { ExpensesPage } from "./AccountsPage";
-import ReportsPage  from "./ReportsPage";
 import QuotationCreator   from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
+import AccountsPage, { ExpensesPage, IncomePage } from "./AccountsPage";
 import AdminProposalManagement from "./AdminProposalManagement";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -34,6 +33,8 @@ const NAV=[
   {key:"tasks",icon:"✅",label:"Tasks"},
   {key:"calendar",icon:"📅",label:"Calendar"},
   {key:"accounts",icon:"👤",label:"Accounts"},
+  {key:"expenses",icon:"💸",label:"Expenses"},
+
   {key:"interviews",icon:"🎯",label:"Interviews"},
   {key:"reports",icon:"📈",label:"Reports"}
 ];
@@ -41,7 +42,7 @@ const NAV=[
 function getNavForRole(role){
   const r=(role||"").toLowerCase().trim();
   if(r==="subadmin"||r==="sub_admin"||r==="sub-admin")
-    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","interviews","reports"].includes(n.key));
+    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","income","expenses","interviews","reports"].includes(n.key));
   if(r==="manager")
     return NAV.filter(n=>["dashboard","employees","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
   if(r==="employee")
@@ -195,6 +196,7 @@ function ClientsPage({clients,setClients,onAddClient}){
       phone:c.phone||"",
       address:c.address||"",
       status:c.status||"Active",
+      gstNumber:c.gstNumber||"",
     });
     setEditErr({});
     setEditClient(c);
@@ -246,7 +248,7 @@ function ClientsPage({clients,setClients,onAddClient}){
         <div style={{overflowX:"auto"}}>
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:700}}>
             <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
-              {["#","Name","Company","Email","Phone","Status","Joined","Actions"].map(c=>(
+              {["#", "Company Name", "Contact Person", "Email", "Phone", "Status", "Joined", "Actions"].map(c => (
                 <th key={c} style={{padding:"10px 14px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
               ))}
             </tr></thead>
@@ -261,7 +263,7 @@ function ClientsPage({clients,setClients,onAddClient}){
                         <span style={{fontWeight:700,color:T.text}}>{c.clientName||c.name||"—"}</span>
                       </div>
                     </td>
-                    <td style={{padding:"12px 14px",color:"#7c3aed"}}>{c.companyName||c.company||"—"}</td>
+                    <td style={{padding:"12px 14px",color:"#7c3aed"}}>{c.contactPersonName || "—"}</td>
                     <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{c.email||"—"}</td>
                     <td style={{padding:"12px 14px",color:"#6b7280",fontSize:12}}>{c.phone||"—"}</td>
                     <td style={{padding:"12px 14px"}}><Badge label={c.status||"Active"}/></td>
@@ -306,13 +308,14 @@ function ClientsPage({clients,setClients,onAddClient}){
       {editClient&&(
         <Mdl title="Edit Client" onClose={()=>setEditClient(null)}>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}} className="modal-2col">
-            <Fld label="Client Name *" value={editForm.clientName} onChange={v=>{setEditForm(p=>({...p,clientName:v}));setEditErr(p=>({...p,clientName:""}));}} error={editErr.clientName}/>
-            <Fld label="Company Name" value={editForm.companyName} onChange={v=>setEditForm(p=>({...p,companyName:v}))}/>
+            <Fld label="Company Name *" value={editForm.clientName} onChange={v=>{setEditForm(p=>({...p,clientName:v}));setEditErr(p=>({...p,clientName:""}));}} error={editErr.clientName}/>
+            <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v=>setEditForm(p=>({...p,contactPersonName:v}))}/>
             <Fld label="Email *" value={editForm.email} onChange={v=>{setEditForm(p=>({...p,email:v}));setEditErr(p=>({...p,email:""}));}} type="email" error={editErr.email}/>
             <Fld label="Phone" value={editForm.phone} onChange={v=>setEditForm(p=>({...p,phone:v}))}/>
+            <Fld label="Company Tax/GST" value={editForm.gstNumber} onChange={v=>setEditForm(p=>({...p,gstNumber:v}))}/>
             <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Active","Inactive"]}/>
           </div>
-          <Fld label="Address" value={editForm.address} onChange={v=>setEditForm(p=>({...p,address:v}))}/>
+          <Fld label="Company Address" value={editForm.address} onChange={v=>setEditForm(p=>({...p,address:v}))}/>
           <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:4}}>
             <button onClick={()=>setEditClient(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
             <button onClick={saveEdit} disabled={saving} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,color:"#fff",cursor:saving?"not-allowed":"pointer",fontFamily:"inherit",opacity:saving?0.7:1}}>{saving?"Saving…":"Save Changes →"}</button>
@@ -496,7 +499,7 @@ const loadEmpDocs = async (emp) => {
                   style={{flex:1,padding:"6px 10px",background:`${dt.color}10`,border:`1px solid ${dt.color}30`,borderRadius:7,fontSize:11,fontWeight:700,color:dt.color,cursor:"pointer",fontFamily:"inherit"}}>
                   👁 View
                 </button>
-                <a href={doc.url} downloadstyle={{flex:1,padding:"6px 10px",background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,fontSize:11,fontWeight:700,color:"#475569",textDecoration:"none",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <a href={doc.url} download style={{flex:1,padding:"6px 10px",background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,fontSize:11,fontWeight:700,color:"#475569",textDecoration:"none",display:"flex",alignItems:"center",justifyContent:"center"}}>
                   ⬇ Download
                 </a>
               </div>
@@ -558,19 +561,6 @@ function ManagersPage({managers,setManagers}){
     setEditErr({});
     setEditMgr(m);
   };
-const loadEmpDocs = async (emp) => {
-  setEmpDocs({});
-  setEmpDocsLoading(true);
-  try {
-    const r = await axios.get(
-      `${BASE_URL}/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
-    );
-    const map = {};
-    (r.data || []).forEach(d => { map[d.docType] = d; });
-    setEmpDocs(map);
-  } catch { setEmpDocs({}); }
-  finally { setEmpDocsLoading(false); }
-};
   const saveEdit=async()=>{
     const errs={};
     if(!editForm.managerName.trim())errs.managerName="Name required";
@@ -943,7 +933,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
 }
 
 // ═══════════════════════════════════════════════════════════
-// PROJECT STATUS PAGE (unchanged, just pass managers properly)
+// PROJECT STATUS PAGE
 // ═══════════════════════════════════════════════════════════
 function SearchDropdown({label,items,displayKey,value,onChange,error,placeholder}){
   const [open,setOpen]=useState(false);
@@ -982,13 +972,26 @@ function ProjectStatusPage({clients,employees,managers}){
   const [tsErr,setTsErr]=useState({});
   const [tsSaving,setTsSaving]=useState(false);
   const [tsToast,setTsToast]=useState("");
+  const [customStatuses, setCustomStatuses] = useState(["In Progress", "Pending", "Completed", "On Hold"]);
+  const [newStatus, setNewStatus] = useState("");
   useEffect(()=>{axios.get(BASE_URL + "/api/project-status").then(r=>{if(r.data?.length)setTrackList(r.data);}).catch(()=>{});},[]);
   const showToast=(msg)=>{setTsToast(msg);setTimeout(()=>setTsToast(""),2800);};
   const clientNames=clients.map(c=>({name:c.clientName||c.name||""}));
   const managerNames=managers.map(m=>({name:m.managerName||m.name||""}));
   const employeeNames=employees.map(e=>({name:e.name||""}));
   const displayed=trackList.filter(p=>{const okStatus=tsFilter==="All"||p.status===tsFilter;const q=tsSearch.toLowerCase();const okSearch=!q||(p.name||"").toLowerCase().includes(q)||(p.client||"").toLowerCase().includes(q)||(p.projectId||p.id||"").toLowerCase().includes(q);return okStatus&&okSearch;});
-  const tsStats=[{t:"Total",v:trackList.length,i:"📁",c:"#9333ea"},{t:"In Progress",v:trackList.filter(p=>p.status==="In Progress").length,i:"⚡",c:"#7c3aed"},{t:"Completed",v:trackList.filter(p=>p.status==="Completed").length,i:"✅",c:"#22C55E"},{t:"Pending",v:trackList.filter(p=>p.status==="Pending").length,i:"🕐",c:"#F59E0B"},{t:"On Hold",v:trackList.filter(p=>p.status==="On Hold").length,i:"⏸️",c:"#a855f7"}];
+  
+  useEffect(() => {
+    const unique = Array.from(new Set([...customStatuses, ...trackList.map(p => p.status)]));
+    setCustomStatuses(unique.filter(Boolean));
+  }, [trackList]);
+
+  const tsStats = customStatuses.slice(0, 5).map(s => ({
+    t: s,
+    v: trackList.filter(p => p.status === s).length,
+    i: s === "Completed" ? "✅" : s === "In Progress" ? "⚡" : s === "Pending" ? "🕐" : "📁",
+    c: s === "Completed" ? "#22C55E" : s === "In Progress" ? "#7c3aed" : s === "Pending" ? "#F59E0B" : "#9333ea"
+  }));
   const openAdd=()=>{setTsForm(EMPTY);setTsErr({});setTsEditId(null);setTsModal("add");};
   const openEdit=(p)=>{setTsForm({projectId:p.projectId||p.id||"",name:p.name||"",client:p.client||"",manager:p.manager||"",employee:p.employee||"",deadline:p.deadline||"",status:p.status||"In Progress",progress:p.progress||p.pct||0,notes:p.notes||p.note||""});setTsErr({});setTsEditId(p._id||p.id);setTsModal("edit");};
   const saveTs=async()=>{const errs={};if(!tsForm.name.trim())errs.name="Project name required";if(!tsForm.client.trim())errs.client="Client required";if(!tsForm.deadline)errs.deadline="Deadline required";const pv=Number(tsForm.progress);if(isNaN(pv)||pv<0||pv>100)errs.progress="0–100 only";if(Object.keys(errs).length){setTsErr(errs);return;}try{setTsSaving(true);const payload={...tsForm,progress:Number(tsForm.progress)};if(tsModal==="add"){if(!payload.projectId){const maxId=Math.max(...trackList.map(p=>{const match=(p.projectId||p.id||"").match(/PRJ(\d+)/);return match?parseInt(match[1]):0;}),0);payload.projectId=`PRJ${String(maxId+1).padStart(3,"0")}`;}const res=await axios.post(BASE_URL + "/api/project-status",payload);setTrackList(prev=>[res.data,...prev]);}else{const res=await axios.put(`https://mbusiness.octosofttechnologies.in/api/project-status/${tsEditId}`,payload);setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?res.data:p));}showToast(tsModal==="add"?"✅ Project added!":"✅ Project updated!");setTsModal(null);}catch{if(tsModal==="add"){const local={...tsForm,_id:Date.now().toString(),projectId:tsForm.projectId||`PRJ${String(trackList.length+1).padStart(3,"0")}`,progress:Number(tsForm.progress)};setTrackList(prev=>[local,...prev]);}else{setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?{...p,...tsForm,progress:Number(tsForm.progress)}:p));}showToast("✅ Saved locally!");setTsModal(null);}finally{setTsSaving(false);}};
@@ -1003,7 +1006,8 @@ function ProjectStatusPage({clients,employees,managers}){
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
         <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
           <div style={{position:"relative"}}><span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>🔍</span><input placeholder="Search…" value={tsSearch} onChange={e=>setTsSearch(e.target.value)} style={{padding:"9px 14px 9px 34px",border:"1.5px solid #ede9fe",borderRadius:10,fontSize:13,background:"#faf5ff",outline:"none",fontFamily:"inherit",width:240,color:T.text}}/></div>
-          {["All","In Progress","Pending","Completed","On Hold"].map(f=>(<button key={f} onClick={()=>setTsFilter(f)} style={{padding:"7px 13px",borderRadius:9,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",border:"1.5px solid",borderColor:tsFilter===f?"#9333ea":"#ede9fe",background:tsFilter===f?"rgba(147,51,234,0.1)":"#fff",color:tsFilter===f?"#9333ea":"#a78bfa"}}>{f}</button>))}
+          <button onClick={()=>setTsFilter("All")} style={{padding:"7px 13px",borderRadius:9,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",border:"1.5px solid",borderColor:tsFilter==="All"?"#9333ea":"#ede9fe",background:tsFilter==="All"?"rgba(147,51,234,0.1)":"#fff",color:tsFilter==="All"?"#9333ea":"#a78bfa"}}>All</button>
+          {customStatuses.map(f=>(<button key={f} onClick={()=>setTsFilter(f)} style={{padding:"7px 13px",borderRadius:9,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",border:"1.5px solid",borderColor:tsFilter===f?"#9333ea":"#ede9fe",background:tsFilter===f?"rgba(147,51,234,0.1)":"#fff",color:tsFilter===f?"#9333ea":"#a78bfa"}}>{f}</button>))}
         </div>
         <button onClick={openAdd} style={B2("#9333ea")}>+ Add Project Status</button>
       </div>
@@ -1037,7 +1041,21 @@ function ProjectStatusPage({clients,employees,managers}){
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v=>setTsForm({...tsForm,manager:v})} placeholder="-- Select Manager --"/>
           <SearchDropdown label="Employee" items={employeeNames} displayKey="name" value={tsForm.employee} onChange={v=>setTsForm({...tsForm,employee:v})} placeholder="-- Select Employee --"/>
           <Fld label="Deadline *" value={tsForm.deadline} type="date" onChange={v=>{setTsForm({...tsForm,deadline:v});setTsErr(p=>({...p,deadline:""}));}} error={tsErr.deadline}/>
-          <Fld label="Status" value={tsForm.status} onChange={v=>setTsForm({...tsForm,status:v})} options={["In Progress","Pending","Completed","On Hold"]}/>
+          <div>
+            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>STATUS</label>
+            <div style={{display:"flex",gap:8,marginBottom:14}}>
+              <select value={tsForm.status} onChange={e=>setTsForm({...tsForm,status:e.target.value})} style={{flex:1,padding:"10px 14px",borderRadius:10,border:"1.5px solid #ede9fe",background:"#faf5ff",fontSize:13,outline:"none"}}>
+                {customStatuses.map(s=><option key={s} value={s}>{s}</option>)}
+                <option value="custom">+ Add Custom Status</option>
+              </select>
+            </div>
+            {tsForm.status === "custom" && (
+              <div style={{display:"flex",gap:8,marginBottom:14}}>
+                <input placeholder="Enter new status..." value={newStatus} onChange={e=>setNewStatus(e.target.value)} style={{flex:1,padding:"10px 14px",borderRadius:10,border:"1.5px solid #ede9fe",background:"#faf5ff",fontSize:13,outline:"none"}}/>
+                <button onClick={()=>{if(newStatus.trim()){setCustomStatuses(p=>[...new Set([...p,newStatus.trim()])]);setTsForm({...tsForm,status:newStatus.trim()});setNewStatus("");}}} style={{padding:"0 14px",background:"#9333ea",color:"#fff",border:"none",borderRadius:10,fontSize:13,fontWeight:700,cursor:"pointer"}}>Add</button>
+              </div>
+            )}
+          </div>
           <Fld label="Progress (0–100)" value={String(tsForm.progress)} type="number" onChange={v=>{setTsForm({...tsForm,progress:v});setTsErr(p=>({...p,progress:""}));}} error={tsErr.progress} placeholder="e.g. 65"/>
         </div>
         <Fld label="Notes" value={tsForm.notes} onChange={v=>setTsForm({...tsForm,notes:v})} placeholder="Brief update…"/>
@@ -1055,7 +1073,7 @@ function ProjectStatusPage({clients,employees,managers}){
 }
 
 // ═══════════════════════════════════════════════════════════
-// INTERVIEW PAGE (unchanged)
+// INTERVIEW PAGE
 // ═══════════════════════════════════════════════════════════
 function InterviewPage({companyId,companyName}){
   const CID=companyId||"69b8fe0a6e3d6f1e056f3109";
@@ -1073,7 +1091,6 @@ function InterviewPage({companyId,companyName}){
   useEffect(()=>{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");if(saved.length){setCandidates(saved);setLoading(false);}axios.get(`${BASE_URL}/api/interviews?companyId=${CID}`).then(r=>{const list=r.data?.data||(Array.isArray(r.data)?r.data:[]);if(list.length){setCandidates(list);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));}}).catch(()=>{}).finally(()=>setLoading(false));},[CID]);
   const persist=(list)=>{setCandidates(list);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));};
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
- // ✅ Fix — works in HTTP + HTTPS + all browsers
   const copyLink = async () => {
   try {
       const companySlug = `${companyName}-${companyId}`.replace(/\s+/g, "-");
@@ -1088,10 +1105,10 @@ function InterviewPage({companyId,companyName}){
       document.execCommand("copy");
       document.body.removeChild(el);
     }
-    showToast("✅ Link copied!");          // ← toast.success பதிலா
+    showToast("✅ Link copied!");
   } catch (err) {
     console.error("Copy failed:", err);
-    showToast("❌ Copy failed. Please copy manually.");  // ← toast.error பதிலா
+    showToast("❌ Copy failed. Please copy manually.");
   }
 };
   const updateStatus=(idx,val)=>{const updated=[...candidates];updated[idx]={...updated[idx],status:val};persist(updated);const c=updated[idx];const id=c._id||c.id;if(id)axios.patch(`${API_URL}/api/interviews/${id}/status`,{status:val},{headers:{"Content-Type":"application/json"}}).catch(()=>{});showToast(`✅ Status → "${val}"`);if(viewModal&&(viewModal._id||viewModal.id)===id)setViewModal(updated[idx]);};
@@ -1225,7 +1242,7 @@ const finalResumeUrl=resumeUrl;return(
 }
 
 // ═══════════════════════════════════════════════════════════
-// PROFILE MODAL  
+// PROFILE MODAL
 // ═══════════════════════════════════════════════════════════
 function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
   const logoRef=useRef();
@@ -1269,7 +1286,7 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
 // ═══════════════════════════════════════════════════════════
 // SIDEBAR
 // ═══════════════════════════════════════════════════════════
-function Sidebar({active,setActive,onLogout,open,onClose,navItems}){
+function Sidebar({active,setActive,onLogout,open,onClose,navItems,initials,companyName}){
   const items=navItems||NAV;
   return(
     <>
@@ -1277,8 +1294,10 @@ function Sidebar({active,setActive,onLogout,open,onClose,navItems}){
       <div style={{width:225,background:"linear-gradient(180deg,#1e0a3c 0%,#2d1057 60%,#1e0a3c 100%)",color:"#fff",display:"flex",flexDirection:"column",height:"100vh",position:"fixed",top:0,left:0,zIndex:999,flexShrink:0,overflow:"hidden",boxShadow:"4px 0 24px rgba(0,0,0,0.25)",transform:open?"translateX(0)":"translateX(-100%)",transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)"}} className="sidebar">
         <div style={{padding:"18px 16px 14px",borderBottom:"1px solid rgba(255,255,255,0.08)",position:"relative",zIndex:1,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{width:36,height:36,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:11,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:17,color:"#fff",boxShadow:"0 4px 14px rgba(147,51,234,0.5)"}}>M</div>
-            <div><div style={{fontWeight:800,fontSize:14,color:"#fff"}}>M Business</div><div style={{fontSize:8,color:"rgba(255,255,255,0.35)",letterSpacing:1.5,marginTop:1}}>MANAGEMENT SUITE</div></div>
+            <div style={{width:36,height:36,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:11,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:17,color:"#fff",boxShadow:"0 4px 14px rgba(147,51,234,0.5)"}}>
+              {initials || "M"}
+            </div>
+            <div><div style={{fontWeight:800,fontSize:14,color:"#fff"}}>{companyName || "M Business"}</div><div style={{fontSize:8,color:"rgba(255,255,255,0.35)",letterSpacing:1.5,marginTop:1}}>MANAGEMENT SUITE</div></div>
           </div>
           <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(255,255,255,0.4)",fontSize:18,cursor:"pointer",padding:"2px 6px",lineHeight:1}} className="sidebar-close">✕</button>
         </div>
@@ -1306,7 +1325,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
   useEffect(()=>{setCompanyLogo(user?.logoUrl?user.logoUrl:(fixedLogo||null));},[user,fixedLogo]);
 
   const [clients,setClients]=useState([]);
-  const [nc,setNc]=useState({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active",contactPersonName:"",contactPersonNo:""});
+  const [nc,setNc]=useState({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active",contactPersonName:"",contactPersonNo:"",gstNumber:""});
   const [ncError,setNcError]=useState({});
   const [saveLoading,setSaveLoading]=useState(false);
   const [showClientPass,setShowClientPass]=useState(false);
@@ -1319,7 +1338,6 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const [empSaveLoading,setEmpSaveLoading]=useState(false);
 
   const [projects,setProjects]=useState([]);
-  const [projLoading,setProjLoading]=useState(false);
   const [np,setNp]=useState({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:[]});
   const [npError,setNpError]=useState({});
   const [projSaveLoading,setProjSaveLoading]=useState(false);
@@ -1357,12 +1375,13 @@ export default function Dashboard({setUser,user,fixedLogo}){
         password:nc.password,
         status:nc.status,
         contactPersonName:nc.contactPersonName,
-        contactPersonNo:nc.contactPersonNo
+        contactPersonNo:nc.contactPersonNo,
+        gstNumber:nc.gstNumber
       };
       const res=await axios.post(BASE_URL + "/api/clients/add",payload);
       setClients(prev=>[res.data.client,...prev]);
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
-      setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active"});
+      setNc({name:"",company:"",email:"",phone:"",address:"",project:"",password:"",status:"Active",gstNumber:""});
       setNcError({});
     }catch(err){
       setNcError({email:err.response?.data?.message||err.response?.data?.msg||"Failed to save"});
@@ -1383,16 +1402,13 @@ export default function Dashboard({setUser,user,fixedLogo}){
     }
     try{
       setProjSaveLoading(true);
-      console.log("Sending project data:", np);
       const res=await axios.post(BASE_URL + "/api/projects/add", np);
-      console.log("Project created:", res.data);
       await fetchProjects();
       setNp({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:[]});
       setNpError({});
       setModal(null);
       toast.success("✅ Project created successfully!");
     }catch(err){
-      console.error("Add project error:", err.response?.data);
       const errorMsg = err.response?.data?.msg || err.response?.data?.error || "Failed to save project";
       if(err.response?.data?.errors && Array.isArray(err.response.data.errors)){
         setNpError({name: err.response.data.errors.join(", ")});
@@ -1412,12 +1428,12 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const page=navItems.find(n=>n.key===validActive)||navItems[0];
   useEffect(()=>{if(validActive!==active)setActive(validActive);},[user?.role]);
 
-  const displayName=user?.name||user?.email?.split("@")[0]||"Admin";
-  const initials=displayName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+  const displayName = user?.companyName || "M Business";
+  const initials = (displayName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const B=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
 
   const companyId=user?.companyId||user?.company||user?._id||user?.id||"default";
-const companyNameStr = "M Business";
+  const companyNameStr = user?.companyName || "M Business";
 
   return(
     <div style={{display:"flex",minHeight:"100vh",background:"linear-gradient(135deg,#f5f3ff 0%,#faf5ff 50%,#f3e8ff 100%)",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
@@ -1431,15 +1447,16 @@ const companyNameStr = "M Business";
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
       `}</style>
 
-      <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} navItems={navItems}/>
+      <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr}/>
 
       <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}>
-        {/* Mobile Topbar */}
         <div className="mob-topbar" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:"#fff",borderBottom:"1px solid #ede9fe",position:"sticky",top:0,zIndex:100,boxShadow:"0 2px 8px rgba(147,51,234,0.07)"}}>
           <button onClick={()=>setSidebarOpen(true)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:"#7c3aed",padding:"2px 6px",lineHeight:1}}>☰</button>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <div style={{width:30,height:30,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff"}}>M</div>
-            <span style={{fontWeight:800,fontSize:14,color:T.text}}>M Business</span>
+            <div style={{width:30,height:30,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff"}}>
+              {companyNameStr[0] || "M"}
+            </div>
+            <span style={{fontWeight:800,fontSize:14,color:T.text}}>{companyNameStr}</span>
           </div>
           <div onClick={()=>setShowProfile(true)} style={{width:34,height:34,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:13,cursor:"pointer",overflow:"hidden"}}>
             {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:3,background:"#fff"}}/>:<span>{initials}</span>}
@@ -1447,7 +1464,6 @@ const companyNameStr = "M Business";
         </div>
 
         <div className="main-content" style={{flex:1,padding:"22px 24px",overflowY:"auto"}}>
-          {/* Page Header */}
           <div className="page-header" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
             <div>
               <h1 style={{margin:0,fontSize:22,fontWeight:800,color:T.text}}>{page?.icon} {page?.label}</h1>
@@ -1469,7 +1485,6 @@ const companyNameStr = "M Business";
             </div>
           </div>
 
-          {/* ── Dashboard ── */}
           {validActive==="dashboard"&&<>
             <div className="dash-stats" style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12,marginBottom:18}}>
               {[{t:"Total Clients",v:clients.length,i:"👥",c:"#9333ea"},{t:"Employees",v:employees.length,i:"👨‍💼",c:"#7c3aed"},{t:"Managers",v:managers.length,i:"🧑‍💼",c:"#f59e0b"},{t:"Projects",v:projects.length,i:"📁",c:"#a855f7"},{t:"Invoices",v:INVOICES.length,i:"🧾",c:"#22C55E"}].map(({t,v,i,c})=>(
@@ -1497,8 +1512,8 @@ const companyNameStr = "M Business";
           {validActive==="managers"&&<ManagersPage managers={managers} setManagers={setManagers}/>}
           {validActive==="projects"&&<ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees}/>}
 
-          {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
-          {validActive==="quotations"&&<QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} onLogoChange={onLogoChange}/>}
+          {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange}/>}
+          {validActive==="quotations"&&<QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange}/>}
           {validActive==="proposals" && <ProjectProposalCreator clients={clients} />}
           {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers}/>}
           {validActive==="tasks"&&<TaskPage projects={projects} employees={employees}/>}
@@ -1568,14 +1583,15 @@ const companyNameStr = "M Business";
         ) : (
           <>
             <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
-              <Fld label="Client Name (Company) *" value={nc.name} onChange={v=>{setNc({...nc,name:v});setNcError(p=>({...p,name:""}));}} error={ncError.name}/>
+              <Fld label="Company Name *" value={nc.name} onChange={v=>{setNc({...nc,name:v});setNcError(p=>({...p,name:""}));}} error={ncError.name}/>
               <Fld label="Email *" value={nc.email} onChange={v=>{setNc({...nc,email:v});setNcError(p=>({...p,email:""}));}} type="email" error={ncError.email}/>
               <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v=>setNc({...nc,contactPersonName:v})}/>
               <Fld label="Contact Person No." value={nc.contactPersonNo} onChange={v=>setNc({...nc,contactPersonNo:v})}/>
               <Fld label="Phone / Office No." value={nc.phone} onChange={v=>setNc({...nc,phone:v})}/>
+              <Fld label="Company Tax/GST" value={nc.gstNumber} onChange={v=>setNc({...nc,gstNumber:v})}/>
               <Fld label="Status" value={nc.status} onChange={v=>setNc({...nc,status:v})} options={["Active","Inactive"]}/>
             </div>
-            <Fld label="Office Address" value={nc.address} onChange={v=>setNc({...nc,address:v})}/>
+            <Fld label="Company Address" value={nc.address} onChange={v=>setNc({...nc,address:v})}/>
             <div style={{marginBottom:14}}>
               <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>PASSWORD *</label>
               <div style={{position:"relative"}}>

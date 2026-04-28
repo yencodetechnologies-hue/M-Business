@@ -9,9 +9,10 @@ const DEFAULT_LOGO_URL = "";
 function generateQuoteNo() {
   return `QT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 }
-function formatINR(val) {
+function formatCurrency(val, symbol = "₹") {
   const num = parseFloat(val) || 0;
-  return "₹" + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const isINR = symbol === "₹";
+  return symbol + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function formatDate(d) {
   if (!d) return "—";
@@ -52,6 +53,7 @@ function saveLocal(qt, items) {
 
 export default function QuotationCreator({ clients = [], projects = [], companyLogo, companyName, onLogoChange, onConvertToInvoice }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
+  const effectiveCompanyName = companyName || "";
   const [step, setStep]             = useState("list");
   const [qtList, setQtList]         = useState([]);
   const [listLoading, setListLoading] = useState(false);
@@ -67,8 +69,11 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     quoteNo: generateQuoteNo(), refNo: "", date: today, expiryDate: expDefault,
     client: "", project: "", gstRate: 18, notes: "",
     terms: "This quotation is valid for 30 days from the date of issue.",
-    companyName: companyName || "Your Company Name", companyEmail: "",
+    companyName: companyName || "", companyEmail: "",
     companyPhone: "", companyAddress: "",
+    currency: "₹",
+    template: "Modern",
+    footerMessage: "🙏 Thank you for considering us!"
   };
 
   const [qt, setQt]     = useState(blank);
@@ -143,6 +148,23 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     saveLocal(qt, items);
     setSaving(false);
     setStep("preview");
+  };
+
+  const shareQuotation = async (entry) => {
+    const link = `${window.location.origin}/quotation-view?id=${entry.id || entry.quoteNo}`;
+    const text = `Quotation ${entry.quoteNo} from ${qt.companyName}\nTotal: ${formatCurrency(entry.total, qt.currency)}\nView here: ${link}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, url: link }); } catch (err) { console.log(err); }
+    } else {
+      navigator.clipboard.writeText(text);
+      alert("📋 Link copied to clipboard!");
+    }
+  };
+
+  const shareWhatsApp = (entry) => {
+    const link = `${window.location.origin}/quotation-view?id=${entry.id || entry.quoteNo}`;
+    const text = encodeURIComponent(`Quotation ${entry.quoteNo} from ${qt.companyName}\nTotal: ${formatCurrency(entry.total, qt.currency)}\nView here: ${link}`);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
   const loadEntry = (entry) => {
@@ -227,8 +249,8 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12, marginBottom: 24 }}>
           {[
-            { label: "Total Quoted",   value: formatINR(totalAmt),    color: "#059669" },
-            { label: "Approved Value", value: formatINR(approvedAmt), color: "#16a34a" },
+            { label: "Total Quoted",   value: formatCurrency(totalAmt, enriched[0]?.qt?.currency || "₹"),    color: "#059669" },
+            { label: "Approved Value", value: formatCurrency(approvedAmt, enriched[0]?.qt?.currency || "₹"), color: "#16a34a" },
             { label: "Pending",        value: `${pendingCnt}`,        color: "#d97706" },
             { label: "Approved",       value: `${approvedCnt}`,       color: "#2563eb" },
           ].map((c) => (
@@ -265,7 +287,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
                 </div>
                 <div onClick={() => loadEntry(entry)} style={{ fontSize: 13, fontWeight: 600, color: "#059669", cursor: "pointer" }}>{entry.client || "—"}</div>
                 <div className="qt-hide" style={{ fontSize: 12, color: "#6b7280" }}>{qtD.project || entry.project || "—"}</div>
-                <div onClick={() => loadEntry(entry)} style={{ fontSize: 15, fontWeight: 800, color: "#111827", cursor: "pointer" }}>{formatINR(entry.total)}</div>
+                <div onClick={() => loadEntry(entry)} style={{ fontSize: 15, fontWeight: 800, color: "#111827", cursor: "pointer" }}>{formatCurrency(entry.total, qtD.currency || "₹")}</div>
                 <div className="qt-hide" style={{ fontSize: 12, color: "#374151" }}>{formatDate(qtD.date || entry.date)}</div>
                 <div className="qt-hide" style={{ fontSize: 12, color: "#d97706", fontWeight: 600 }}>{formatDate(qtD.expiryDate || entry.expiryDate)}</div>
                 <div onClick={(e) => e.stopPropagation()}>
@@ -277,6 +299,8 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
                   </select>
                 </div>
                 <div style={{ display: "flex", gap: 6 }} onClick={(e) => e.stopPropagation()}>
+                  <button onClick={() => shareQuotation(entry)} style={{ padding: "5px 10px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗</button>
+                  <button onClick={() => shareWhatsApp(entry)} style={{ padding: "5px 10px", background: "#dcfce7", border: "1px solid #bbf7d0", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬</button>
                   {entry.status === "approved" && (
                     <button onClick={() => handleConvert(entry)} disabled={convertingId === entry.id}
                       style={{ padding: "5px 10px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#fff", fontFamily: "inherit", whiteSpace: "nowrap" }}>
@@ -319,42 +343,50 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
             body * { visibility:hidden!important; }
             .qt-paper,.qt-paper * { visibility:visible!important; }
             .no-print { display:none!important; }
-            .qt-paper { position:fixed!important;top:0!important;left:0!important;width:210mm!important;height:297mm!important;max-width:210mm!important;margin:0!important;border-radius:0!important;box-shadow:none!important; }
+            .qt-paper { position:fixed!important;top:0!important;left:0!important;width:210mm!important;height:297mm!important;max-width:210mm!important;margin:0!important;border-radius:0!important;box-shadow:none!important;page-break-after:avoid!important; }
             .qt-paper * { -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important; }
           }
           @media (max-width:600px) { .qt-hgrid { flex-direction:column!important; } .qt-btgrid { grid-template-columns:1fr!important; } }
         `}</style>
 
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => setStep("form")} style={{ padding: "10px 20px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Edit</button>
-          <button onClick={() => setStep("list")} style={{ padding: "10px 20px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>📋 All Quotations</button>
-          <button onClick={() => window.print()} style={{ padding: "10px 24px", background: "linear-gradient(135deg,#059669,#10b981)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
+          <button onClick={() => setStep("form")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Edit</button>
+          <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>📋 List</button>
+          <button onClick={() => shareQuotation({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗 Share</button>
+          <button onClick={() => shareWhatsApp({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WhatsApp</button>
+          <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#059669,#10b981)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
         <div className="qt-paper">
-          {/* Green header */}
-          <div style={{ background: "linear-gradient(135deg,#022c22 0%,#064e3b 50%,#065f46 100%)", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0 }}>
-            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(52,211,153,0.15),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
+          {/* Header */}
+          <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
+            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(5,150,105,0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
             <div className="qt-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
               <div>
-                {effectiveLogo && <img src={effectiveLogo} alt="logo" style={{ height: 52, borderRadius: 9, marginBottom: 12, objectFit: "contain", background: "rgba(255,255,255,0.1)", padding: 6 }} />}
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>{qt.companyName}</div>
-                {qt.companyEmail   && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 3 }}>{qt.companyEmail}</div>}
-                {qt.companyPhone   && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 2 }}>{qt.companyPhone}</div>}
-                {qt.companyAddress && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 2 }}>{qt.companyAddress}</div>}
+                {effectiveLogo ? (
+                  <img src={effectiveLogo} alt="logo" style={{ height: 60, borderRadius: 10, marginBottom: 12, objectFit: "contain", background: "#fff", padding: 8, border: "1px solid #ede9fe" }} />
+                ) : (
+                  <div style={{ height: 60, width: 60, background: "#059669", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                    {effectiveCompanyName[0] || "?"}
+                  </div>
+                )}
+                <div style={{ fontSize: 24, fontWeight: 900, color: "#064e3b", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName || effectiveCompanyName}</div>
+                {qt.companyEmail   && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>{qt.companyEmail}</div>}
+                {qt.companyPhone   && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyPhone}</div>}
+                {qt.companyAddress && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyAddress}</div>}
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(255,255,255,0.07)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#6ee7b7" }}>{qt.quoteNo}</div>
-                {qt.refNo && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 3 }}>Ref # {qt.refNo}</div>}
+                <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(5,150,105,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#059669" }}>{qt.quoteNo}</div>
+                {qt.refNo && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>Ref # {qt.refNo}</div>}
                 <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                    <div style={{ fontSize: 12, color: "#fff", fontWeight: 700 }}>{formatDate(qt.date)}</div>
+                    <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                    <div style={{ fontSize: 12, color: "#064e3b", fontWeight: 700 }}>{formatDate(qt.date)}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
-                    <div style={{ fontSize: 12, color: "#fbbf24", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
+                    <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
+                    <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
                   </div>
                 </div>
               </div>
@@ -369,6 +401,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
               {selectedClient?.companyName && <div style={{ fontSize: 13, color: "#059669", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
               {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
               {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
+              {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: "#059669", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
             </div>
             {qt.project && (
               <div style={{ padding: "20px 32px" }}>
@@ -394,23 +427,23 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
                     <td style={{ padding: "12px 11px", color: "#6ee7b7", fontWeight: 700, fontSize: 12 }}>{String(idx+1).padStart(2,"0")}</td>
                     <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
                     <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatINR(item.rate)}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatINR((parseFloat(item.rate)||0)*(parseFloat(item.quantity)||0))}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, qt.currency)}</td>
+                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate)||0)*(parseFloat(item.quantity)||0), qt.currency)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
               <div style={{ width: "min(280px,100%)" }}>
-                {[["Subtotal", formatINR(subtotal)],[`GST (${qt.gstRate}%)`, formatINR(gstAmt)]].map(([l,v]) => (
+                {[["Subtotal", formatCurrency(subtotal, qt.currency)],[`GST (${qt.gstRate}%)`, formatCurrency(gstAmt, qt.currency)]].map(([l,v]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0fdf4" }}>
                     <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
                   </div>
                 ))}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "linear-gradient(135deg,#064e3b,#059669)", borderRadius: 12, marginTop: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#d1fae5" }}>QUOTED AMOUNT</span>
-                  <span style={{ fontSize: 19, fontWeight: 900, color: "#fff" }}>{formatINR(total)}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>QUOTED AMOUNT</span>
+                  <span style={{ fontSize: 19, fontWeight: 900, color: "#064e3b" }}>{formatCurrency(total, qt.currency)}</span>
                 </div>
               </div>
             </div>
@@ -444,10 +477,10 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
           <div style={{ flex: 1 }} />
 
           {/* Footer */}
-          <div style={{ background: "linear-gradient(135deg,#022c22,#064e3b)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{qt.companyName}</div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>🙏 Thank you for considering us!</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{qt.quoteNo}</div>
+          <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "1px solid #e2e8f0" }}>
+            <div style={{ fontSize: 11, color: "#94a3b8" }}>{effectiveCompanyName}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#059669" }}>{qt.footerMessage}</div>
+            <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.quoteNo}</div>
           </div>
         </div>
       </div>
@@ -509,7 +542,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
             <input type="date" value={qt.expiryDate} onChange={(e) => upd("expiryDate", e.target.value)} style={inp()} />
           </div>
           <div>
-            <label style={lbl}>Reference No <span style={{ color: "#d1d5db" }}>(optional)</span></label>
+            <label style={lbl}>Reference No <span style={{ color: "#d1d5db" }}></span></label>
             <input value={qt.refNo} onChange={(e) => upd("refNo", e.target.value)} placeholder="REF-001" style={inp()} />
           </div>
           <div>
@@ -517,6 +550,19 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
             <select value={qt.gstRate} onChange={(e) => upd("gstRate", Number(e.target.value))} style={inp()}>
               {GST_RATES.map((r) => <option key={r} value={r}>{r === 0 ? "No GST (0%)" : `GST ${r}%`}</option>)}
             </select>
+          </div>
+          <div>
+            <label style={lbl}>Currency</label>
+            <select value={qt.currency} onChange={(e) => upd("currency", e.target.value)} style={inp()}>
+              <option value="₹">INR (₹)</option>
+              <option value="$">USD ($)</option>
+              <option value="€">EUR (€)</option>
+              <option value="£">GBP (£)</option>
+            </select>
+          </div>
+          <div style={{ gridColumn: "span 3" }}>
+            <label style={lbl}>Message</label>
+            <input value={qt.footerMessage} onChange={(e) => upd("footerMessage", e.target.value)} placeholder="🙏 Thank you for considering us!" style={inp()} />
           </div>
         </div>
       </div>
@@ -543,7 +589,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
         </div>
         {selectedClient && (
           <div style={{ marginTop: 10, padding: "8px 12px", background: "#f0fdf4", borderRadius: 8, display: "flex", gap: 16, flexWrap: "wrap" }}>
-            {[["📧", selectedClient.email], ["📱", selectedClient.phone], ["📍", selectedClient.address]].filter(([,v]) => v).map(([icon, val], i) => (
+            {[["📧", selectedClient.email], ["📱", selectedClient.phone], ["📍", selectedClient.address], ["💎", selectedClient.gstNumber]].filter(([,v]) => v).map(([icon, val], i) => (
               <span key={i} style={{ fontSize: 12, color: "#6b7280" }}>{icon} {val}</span>
             ))}
           </div>
@@ -582,15 +628,15 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
           <div style={{ minWidth: 220 }}>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
               <span style={{ fontSize: 13, color: "#6b7280" }}>Subtotal</span>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatINR(subtotal)}</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(subtotal, qt.currency)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
               <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({qt.gstRate}%)</span>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatINR(gstAmt)}</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(gstAmt, qt.currency)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#064e3b,#059669)", borderRadius: 10, marginTop: 8 }}>
               <span style={{ fontSize: 14, fontWeight: 800, color: "#d1fae5" }}>Total</span>
-              <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{formatINR(total)}</span>
+              <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{formatCurrency(total, qt.currency)}</span>
             </div>
           </div>
         </div>

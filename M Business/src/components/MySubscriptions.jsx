@@ -296,7 +296,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
         <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
           <div style={{ fontSize: 36, marginBottom: 10 }}>🚀</div>
           <h2 style={{ fontSize: 26, fontWeight: 800, color: T.text, margin: "0 0 8px" }}>Choose Your Plan</h2>
-          <p style={{ color: T.muted, fontSize: 14, margin: 0 }}>Select the best plan for your business growth • Powered by Business Suite</p>
+          <p style={{ color: T.muted, fontSize: 14, margin: 0 }}>Select the best plan for your business growth • Powered by M Business </p>
         </div>
 
         {/* Plans Grid */}

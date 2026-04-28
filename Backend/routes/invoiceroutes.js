@@ -2,6 +2,7 @@
 const express = require("express");
 const router  = express.Router();
 const Invoice = require("../models/InvoiceModels");
+const Income  = require("../models/IncomeModels");
 
 // ── GET all invoices ─────────────────────────────────────────────────────────
 router.get("/", async (req, res) => {
@@ -32,6 +33,9 @@ router.get("/", async (req, res) => {
         companyEmail:   doc.companyEmail   || "",
         companyPhone:   doc.companyPhone   || "",
         companyAddress: doc.companyAddress || "",
+        amountPaid:     doc.amountPaid     || 0,
+        paymentMode:    doc.paymentMode    || "GPay",
+        transactionId:  doc.transactionId  || "",
       };
 
       return {
@@ -100,6 +104,9 @@ router.post("/", async (req, res) => {
       gstAmt,
       total,
       status: "draft",
+      amountPaid:     parseFloat(inv.amountPaid) || 0,
+      paymentMode:    inv.paymentMode            || "GPay",
+      transactionId:  inv.transactionId          || "",
       companyId: req.companyId || "",
     };
 
@@ -114,6 +121,25 @@ router.post("/", async (req, res) => {
 
     const newInvoice = new Invoice(flatData);
     await newInvoice.save();
+
+    // Automatic Income Tracking
+    if (flatData.amountPaid > 0) {
+      await Income.findOneAndUpdate(
+        { invoiceNo: flatData.invoiceNo, transactionId: flatData.transactionId },
+        {
+          title: `Payment for Invoice ${flatData.invoiceNo}`,
+          category: "Project Payment",
+          paymentMode: flatData.paymentMode,
+          amount: flatData.amountPaid,
+          client: flatData.client,
+          invoiceNo: flatData.invoiceNo,
+          transactionId: flatData.transactionId,
+          status: "Received",
+          companyId: flatData.companyId,
+        },
+        { upsert: true, new: true }
+      );
+    }
 
     return res.json({ success: true, invoice: newInvoice });
   } catch (err) {

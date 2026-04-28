@@ -66,6 +66,7 @@ const emailRoutes = require("./routes/emailroutes");
 const paymentRoutes = require("./routes/paymentroutes");
 const vendorRoutes = require("./routes/vendorRoutes");
 const rolePermissionRoutes = require("./routes/rolePermissionRoutes");
+const incomeRoutes = require("./routes/incomeroutes");
 
 // Static files (local resume storage)
 const path = require("path");
@@ -98,6 +99,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/role-permissions", rolePermissionRoutes);
 app.use("/api/integrations", integrationRoutes);
+app.use("/api/income", incomeRoutes);
 app.use("/upload", express.static("uploads"));
 
 app.get("/", (req, res) => {

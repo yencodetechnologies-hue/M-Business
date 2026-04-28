@@ -170,14 +170,15 @@ export default function AdminDashboard({ user, setUser }) {
     setUser(null);
   };
 
-  const initials = (user?.name || "Admin").substring(0, 2).toUpperCase();
+  const displayName = user?.companyName || "M Business";
+  const initials = (displayName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
       {/* SIDEBAR */}
       <div style={{ width: 240, background: "#0f172a", color: "#fff", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "24px 20px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 34, height: 34, background: "linear-gradient(135deg,#3b82f6,#2dd4bf)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900 }}>M</div>
+          <div style={{ width: 34, height: 34, background: "linear-gradient(135deg,#3b82f6,#2dd4bf)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900 }}>{initials[0]}</div>
           <div>
             <div style={{ fontWeight: 800, fontSize: 14 }}>M Business</div>
             <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: 1.5 }}>ADMIN DASHBOARD</div>
@@ -1378,7 +1379,7 @@ function ClientsPage({ clients, setClients }) {
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ background: "#f8fafc" }}>
-            {["Name", "Company", "Email", "Phone", "Status", "Joined"].map(h => (
+            {["Company Name", "Contact Person", "Email", "Phone", "Status", "Joined"].map(h => (
               <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
             ))}
           </tr>
@@ -1387,7 +1388,7 @@ function ClientsPage({ clients, setClients }) {
           {filtered.map((c, i) => (
             <tr key={c._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
               <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{c.clientName || c.name || "—"}</td>
-              <td style={{ padding: "14px 16px", color: "#475569" }}>{c.companyName || c.company || "—"}</td>
+              <td style={{ padding: "14px 16px", color: "#475569" }}>{c.contactPersonName || "—"}</td>
               <td style={{ padding: "14px 16px", color: "#475569" }}>{c.email || "—"}</td>
               <td style={{ padding: "14px 16px", color: "#475569" }}>{c.phone || "—"}</td>
               <td style={{ padding: "14px 16px" }}><Badge label={c.status || "Active"} /></td>

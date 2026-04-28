@@ -25,6 +25,9 @@ const invoiceSchema = new mongoose.Schema({
   subtotal:       Number,
   gstAmt:         Number,
   total:          Number,
+  amountPaid:     { type: Number, default: 0 },
+  paymentMode:    { type: String, default: "GPay" },
+  transactionId:  { type: String, default: "" },
   status:         { type: String, enum: ["draft", "sent", "paid"], default: "draft" },
   companyId:      { type: String, default: "" },
 }, { timestamps: true });

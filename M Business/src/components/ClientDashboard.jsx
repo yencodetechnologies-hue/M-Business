@@ -407,7 +407,7 @@ function ProfileDropdown({ user, onLogout }) {
                     {(acc.name || acc.clientName || "A").slice(0,2).toUpperCase()}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
-                     <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{acc.name || acc.clientName || "Client"}</div>
+                     <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{acc.companyName || acc.name || "Client"}</div>
                      <div style={{ fontSize:11, color:"#64748b", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{acc.email}</div>
                   </div>
                   {activeEmail === acc.email && <div style={{ fontSize:14, color:"#10b981" }}>✓</div>}
@@ -442,9 +442,9 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
       <div style={{ width:220, background:T.sidebar, color:"#fff", display:"flex", flexDirection:"column", height:"100vh", position:"fixed", top:0, left:0, zIndex:999, transform:open?"translateX(0)":"translateX(-100%)", transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)", boxShadow:"4px 0 32px rgba(0,0,0,0.18)" }} className="client-sidebar">
         <div style={{ padding:"24px 20px 18px", borderBottom:"1px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>C</div>
+            <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>{(clientUser?.company || "M")[0].toUpperCase()}</div>
             <div>
-              <div style={{ fontWeight:800, fontSize:13, color:"#fff", letterSpacing:-0.3 }}>ClientHub</div>
+              <div style={{ fontWeight:800, fontSize:13, color:"#fff", letterSpacing:-0.3 }}>{clientUser?.company || "M Business"}</div>
               <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{clientUser?.role || clientUser?.userRole || "CLIENT"}</div>
             </div>
           </div>
@@ -694,8 +694,8 @@ export default function ClientDashboard({ user, setUser }) {
   const clientUser = {
     name:    user?.name || user?.clientName || "Client",
     email:   user?.email || "",
-    company: user?.companyName || user?.company || "",
-    avatar:  (user?.name || user?.clientName || "C").slice(0,2).toUpperCase(),
+    company: user?.companyName || user?.company || "M Business",
+    avatar:  (user?.companyName || user?.company || "M").slice(0,2).toUpperCase(),
     plan:    "Pro",
   };
 

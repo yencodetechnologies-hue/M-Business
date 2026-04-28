@@ -65,13 +65,13 @@ function makeSlide(type, themeName="Violet", companyName="") {
     case "proposal":   return {...b, 
       companyName: companyName || "", 
       clientName:"", 
-      clientAddress:"",
-      refNo:"",
-      date:"",
+      companyPhone: "", companyAddress: "",
+      currency: "₹",
+      template: "Modern",
+      footerMessage: "🙏 Thank you for considering us!",
       projectType:"",
       scopeOfWork:[],
-      conceptStage:[],
-      companyAddress:""
+      conceptStage:[]
     };
     case "proposal_page2": return {...b,
       companyName: companyName || "",
@@ -439,6 +439,14 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
           </div>
         </div>
       )}
+      
+      {/* Footer Element */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#020617,#1e1b4b)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.companyName || companyName}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>{doc.footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.id}</div>
+      </div>
+      
     {elementsOverlay}
     </div>
   );
@@ -699,6 +707,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
 
       {/* Footer */}
       <div style={{position:"absolute",bottom:"40px",left:"60px",right:"60px",textAlign:"center",fontSize:"10px",color:"#666",borderTop:"2px solid #ff0000",paddingTop:"10px"}}>
+        <div style={{fontWeight: "bold", color: "#333", marginBottom: 4}}>{doc.footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
         <Txt val={slide.companyAddress} onCh={v=>upd({companyAddress:v})}/>
       </div>
       
@@ -1165,6 +1174,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
             <p style="font-size: 15px; color: #4b5563; line-height: 1.9; max-width: 620px; white-space: pre-wrap;">${slide.body}</p>
             ${elementsHTML}
+            <div style="position: absolute; bottom: 30px; left: 56px; right: 56px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; paddingTop: 15px;">
+              <span style="font-size: 11px; color: #64748b; font-weight: 700;">${slide.companyName || companyName}</span>
+              <span style="font-size: 12px; color: ${t.p}; font-weight: 800;">${proposal.footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</span>
+              <span style="font-size: 11px; color: #64748b;">${proposal.id}</span>
+            </div>
           </div>
         `;
       }
@@ -1183,6 +1197,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               `).join('')}
             </div>
             ${elementsHTML}
+            <div style="position: absolute; bottom: 30px; left: 56px; right: 56px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; paddingTop: 15px;">
+              <span style="font-size: 11px; color: #64748b; font-weight: 700;">${slide.companyName || companyName}</span>
+              <span style="font-size: 12px; color: ${t.p}; font-weight: 800;">${proposal.footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</span>
+              <span style="font-size: 11px; color: #64748b;">${proposal.id}</span>
+            </div>
           </div>
         `;
       }
@@ -1202,6 +1221,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading || 'Slide'}</h1>
           <p style="font-size: 15px; color: #4b5563; line-height: 1.9; white-space: pre-wrap;">${slide.body || ''}</p>
           ${elementsHTML}
+          <div style="position: absolute; bottom: 30px; left: 56px; right: 56px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; paddingTop: 15px;">
+            <span style="font-size: 11px; color: #64748b; font-weight: 700;">${slide.companyName || companyName}</span>
+            <span style="font-size: 12px; color: ${t.p}; font-weight: 800;">${proposal.footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</span>
+            <span style="font-size: 11px; color: #64748b;">${proposal.id}</span>
+          </div>
         </div>
       `;
     }).join("");
@@ -1496,6 +1520,16 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                 <option value="€">EUR (€)</option>
                 <option value="£">GBP (£)</option>
               </select>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:8,background:"#fff7ed",padding:"4px 12px",borderRadius:8,border:"1px solid #fdba74"}}>
+              <span style={{fontSize:11,fontWeight:800,color:"#ea580c"}}>FOOTER:</span>
+              <input 
+                value={doc.footerMessage || ""} 
+                onChange={e=>{const nd={...doc,footerMessage:e.target.value}; setDoc(nd); persist(nd);}}
+                disabled={!canEdit}
+                placeholder="Thank you message"
+                style={{background:"none",border:"none",fontSize:12,fontWeight:700,color:"#ea580c",outline:"none",cursor:"text", width: 140}}
+              />
             </div>
           </div>
         )}

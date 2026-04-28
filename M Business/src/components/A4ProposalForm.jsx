@@ -63,7 +63,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
   return (
     <div style={{ position: "relative", marginBottom: 14 }}>
       <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>
-        CLIENT NAME *
+        COMPANY NAME *
       </label>
       <div onClick={() => setOpen(!open)} style={{
         width: "100%",
@@ -263,7 +263,8 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
       "Material finalization",
       "Completion"
     ],
-    companyAddress: ""
+    companyAddress: "",
+    currency: "₹"
   });
 
   const [errors, setErrors] = useState({});
@@ -292,6 +293,23 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
   const removeScopeOfWork = (index) => {
     const updated = formData.scopeOfWork.filter((_, i) => i !== index);
     setFormData(prev => ({ ...prev, scopeOfWork: updated }));
+  };
+
+  const shareProposal = async (data = formData) => {
+    const link = `${window.location.origin}/proposal-view?id=${data.id}`;
+    const text = `Project Proposal: ${data.projectType}\nPrepared by ${data.companyName}\nView here: ${link}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: `Proposal: ${data.projectType}`, text, url: link }); } catch (err) { console.log(err); }
+    } else {
+      navigator.clipboard.writeText(text);
+      alert("📋 Link copied to clipboard!");
+    }
+  };
+
+  const shareWhatsApp = (data = formData) => {
+    const link = `${window.location.origin}/proposal-view?id=${data.id}`;
+    const text = encodeURIComponent(`Project Proposal: ${data.projectType}\nPrepared by ${data.companyName}\nView here: ${link}`);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
   const validateForm = () => {
@@ -527,6 +545,40 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
         </h2>
         <div style={{ display: "flex", gap: 8 }}>
           <button
+            onClick={shareProposal}
+            style={{
+              background: "#eff6ff",
+              color: "#2563eb",
+              border: "1px solid #bfdbfe",
+              borderRadius: 8,
+              padding: "8px 12px",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: "pointer",
+              fontFamily: "inherit"
+            }}
+            title="Share Link"
+          >
+            🔗
+          </button>
+          <button
+            onClick={shareWhatsApp}
+            style={{
+              background: "#dcfce7",
+              color: "#16a34a",
+              border: "1px solid #bbf7d0",
+              borderRadius: 8,
+              padding: "8px 12px",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: "pointer",
+              fontFamily: "inherit"
+            }}
+            title="WhatsApp"
+          >
+            💬
+          </button>
+          <button
             onClick={handlePrint}
             style={{
               background: "linear-gradient(135deg,#22c55e,#16a34a)",
@@ -574,11 +626,26 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
         />
       </div>
 
-      <Fld 
-        label="Date" 
-        value={formData.date} 
-        onChange={v => updateFormData("date", v)} 
-      />
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+        <Fld 
+          label="Date" 
+          value={formData.date} 
+          onChange={v => updateFormData("date", v)} 
+        />
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CURRENCY</label>
+          <select 
+            value={formData.currency} 
+            onChange={e => updateFormData("currency", e.target.value)}
+            style={{ width: "100%", border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }}
+          >
+            <option value="₹">INR (₹)</option>
+            <option value="$">USD ($)</option>
+            <option value="€">EUR (€)</option>
+            <option value="£">GBP (£)</option>
+          </select>
+        </div>
+      </div>
 
       <ClientDropdown 
         clients={clients}

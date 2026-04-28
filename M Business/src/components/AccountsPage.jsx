@@ -773,3 +773,189 @@ const save = async () => {
     </div>
   );
 }
+
+// ════════════════════════════════════════════════════════════
+//  INCOME PAGE  (named export)
+// ════════════════════════════════════════════════════════════
+const INCOME_API     = `${BASE_URL}/api/income`;
+const INCOME_CATS    = ["Project Payment", "Advance", "Service Fee", "Maintenance", "Miscellaneous"];
+const INCOME_MODES   = ["GPay", "NEFT", "RTGS", "Cash", "Check", "Card", "UPI", "Bank Transfer"];
+const INCOME_STATUSES = ["Received", "Pending", "Cancelled"];
+const INC_EMPTY      = { title:"", category:"Project Payment", paymentMode:"GPay", amount:"", client:"", invoiceNo:"", transactionId:"", status:"Received" };
+
+const INC_CAT_COLOR = {
+  "Project Payment":"#22c55e", Advance:"#3b82f6", "Service Fee":"#8b5cf6",
+  Maintenance:"#06b6d4", Miscellaneous:"#9333ea"
+};
+const INC_STATUS_COLOR = { Received:"#22C55E", Pending:"#f59e0b", Cancelled:"#EF4444" };
+
+export function IncomePage() {
+  const [income,       setIncome]       = useState([]);
+  const [loading,      setLoading]      = useState(false);
+  const [search,       setSearch]       = useState("");
+  const [catFilter,    setCatFilter]    = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [modal,        setModal]        = useState(null);
+  const [editId,       setEditId]       = useState(null);
+  const [form,         setForm]         = useState(INC_EMPTY);
+  const [err,          setErr]          = useState({});
+  const [saving,       setSaving]       = useState(false);
+  const [toast,        setToast]        = useState("");
+
+  useEffect(() => { fetchIncome(); }, []);
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
+
+  const fetchIncome = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(INCOME_API);
+      setIncome(res.data);
+    } catch { setIncome([]); }
+    finally { setLoading(false); }
+  };
+
+  const openAdd = () => { setForm(INC_EMPTY); setErr({}); setEditId(null); setModal("add"); };
+  const openEdit = (i) => {
+    setForm({
+      title:         i.title         || "",
+      category:      i.category      || "Project Payment",
+      paymentMode:   i.paymentMode   || "GPay",
+      amount:        i.amount != null ? String(i.amount) : "",
+      client:        i.client        || "",
+      invoiceNo:     i.invoiceNo     || "",
+      transactionId: i.transactionId || "",
+      status:        i.status        || "Received",
+    });
+    setEditId(i._id || i.id); setErr({}); setModal("edit");
+  };
+
+  const save = async () => {
+    const errs = {};
+    if (!form.title?.trim()) errs.title = "Title required";
+    if (!form.client?.trim()) errs.client = "Client required";
+    if (!form.amount || isNaN(form.amount) || Number(form.amount) <= 0)
+      errs.amount = "Valid amount required";
+    if (Object.keys(errs).length) { setErr(errs); return; }
+
+    const payload = { ...form, amount: Number(form.amount) };
+    try {
+      setSaving(true);
+      if (modal === "add") {
+        const res = await axios.post(INCOME_API, payload);
+        setIncome(prev => [res.data, ...prev]);
+      } else {
+        const res = await axios.put(`${INCOME_API}/${editId}`, payload);
+        setIncome(prev => prev.map(i => (i._id||i.id)===editId ? res.data : i));
+      }
+      showToast(modal==="add" ? "✅ Income added!" : "✅ Income updated!");
+      setModal(null);
+    } catch (e) {
+      setErr({ _general: e?.response?.data?.msg || "Failed to save" });
+    } finally { setSaving(false); }
+  };
+
+  const del = async (id) => {
+    if (!window.confirm("Delete this entry?")) return;
+    try { await axios.delete(`${INCOME_API}/${id}`); } catch {}
+    setIncome(prev => prev.filter(i => (i._id||i.id) !== id));
+    showToast("🗑️ Deleted!");
+  };
+
+  const totalIncome = income.reduce((s,i) => s + (Number(i.amount)||0), 0);
+  const received    = income.filter(i=>i.status==="Received").reduce((s,i)=>s+(Number(i.amount)||0),0);
+
+  const displayed = income.filter(i => {
+    const q = search.toLowerCase();
+    const matchSearch = !q ||
+      (i.title||"").toLowerCase().includes(q) ||
+      (i.client||"").toLowerCase().includes(q) ||
+      (i.invoiceNo||"").toLowerCase().includes(q) ||
+      (i.transactionId||"").toLowerCase().includes(q);
+    const matchCat    = catFilter    === "All" || i.category === catFilter;
+    const matchStatus = statusFilter === "All" || i.status   === statusFilter;
+    return matchSearch && matchCat && matchStatus;
+  });
+
+  const stats = [
+    { t:"Total Income", v:`₹${totalIncome.toLocaleString()}`,    c:"#22c55e", i:"💰" },
+    { t:"Received",     v:`₹${received.toLocaleString()}`,       c:"#16a34a", i:"✅" },
+    { t:"Pending",      v:income.filter(i=>i.status==="Pending").length,   c:"#f59e0b", i:"⏳" },
+    { t:"Categories",   v:[...new Set(income.map(i=>i.category))].length, c:"#8b5cf6", i:"🏷️" },
+  ];
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+      <Toast msg={toast} />
+
+      <div className="dash-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
+        {stats.map(({ t,v,i,c }) => (
+          <div key={t} style={{ background:"#fff", borderRadius:14, padding:"16px 14px", boxShadow:"0 4px 18px rgba(34,197,94,0.07)", border:"1px solid #ede9fe" }}>
+            <div style={{ width:38, height:38, borderRadius:10, background:`${c}15`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, marginBottom:8 }}>{i}</div>
+            <div style={{ fontSize:10, color:c, fontWeight:700, letterSpacing:0.5, marginBottom:2 }}>{t.toUpperCase()}</div>
+            <div style={{ fontSize:22, fontWeight:800, color:c }}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
+        <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+          {["All", ...INCOME_CATS].map(cat => (
+            <button key={cat} onClick={()=>setCatFilter(cat)} style={{ padding:"6px 14px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"1.5px solid", borderColor:catFilter===cat?"#22c55e":"#ede9fe", background:catFilter===cat?"#f0fdf4":"#fff", color:catFilter===cat?"#16a34a":"#a78bfa", fontFamily:"inherit" }}>{cat}</button>
+          ))}
+        </div>
+        <button onClick={openAdd} style={{ background:"linear-gradient(135deg,#16a34a,#22c55e)", color:"#fff", border:"none", borderRadius:10, padding:"8px 16px", fontWeight:700, fontSize:13, cursor:"pointer", fontFamily:"inherit" }}>+ Add Income</button>
+      </div>
+
+      <div style={{ background:"#fff", borderRadius:16, padding:22, boxShadow:"0 4px 24px rgba(34,197,94,0.08)", border:"1px solid #ede9fe" }}>
+        <div style={{ position:"relative", marginBottom:16 }}>
+          <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", pointerEvents:"none" }}>🔍</span>
+          <input placeholder="Search by title, client, invoice, txn..." value={search} onChange={e=>setSearch(e.target.value)} style={{ width:"100%", padding:"10px 14px 10px 40px", border:"1.5px solid #ede9fe", borderRadius:10, fontSize:13, color:"#1e0a3c", background:"#f0fdf4", outline:"none", fontFamily:"inherit" }} />
+        </div>
+
+        {loading ? <div style={{ textAlign:"center", padding:50, color:"#a78bfa" }}>Loading...</div> : displayed.length === 0 ? <div style={{ textAlign:"center", padding:50 }}><div style={{ fontSize:40, marginBottom:12 }}>💰</div><div style={{ color:"#a78bfa", fontSize:14, fontWeight:600 }}>No income found</div></div>
+          : <div style={{ overflowX:"auto" }}>
+              <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, minWidth:900 }}>
+                <thead><tr style={{ background:"linear-gradient(90deg,#f0fdf4,#faf5ff)" }}>{["ID","Title","Client","Inv #","Amount","Mode","Status","Date","Actions"].map(col => (<th key={col} style={{ padding:"10px 14px", textAlign:"left", color:"#16a34a", fontWeight:700, fontSize:11, borderBottom:"2px solid #ede9fe", whiteSpace:"nowrap" }}>{col.toUpperCase()}</th>))}</tr></thead>
+                <tbody>
+                  {displayed.map((inc, i) => (
+                    <tr key={inc._id||i} style={{ borderBottom:"1px solid #f3f0ff" }} onMouseEnter={ev=>ev.currentTarget.style.background="#f0fdf4"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
+                      <td style={{ padding:"12px 14px", fontFamily:"monospace", fontSize:11, color:"#a78bfa" }}>{`INC${String(i+1).padStart(3,"0")}`}</td>
+                      <td style={{ padding:"12px 14px" }}><div style={{ fontWeight:700, color:"#1e0a3c" }}>{inc.title}</div>{inc.transactionId && <div style={{ fontSize:10, color:"#a78bfa" }}>Txn: {inc.transactionId}</div>}</td>
+                      <td style={{ padding:"12px 14px", color:"#1e0a3c", fontWeight:600 }}>{inc.client}</td>
+                      <td style={{ padding:"12px 14px", color:"#16a34a", fontWeight:700 }}>{inc.invoiceNo||"—"}</td>
+                      <td style={{ padding:"12px 14px" }}><span style={{ fontWeight:800, color:"#16a34a", fontSize:14 }}>₹{Number(inc.amount||0).toLocaleString()}</span></td>
+                      <td style={{ padding:"12px 14px", color:"#a78bfa" }}>{inc.paymentMode}</td>
+                      <td style={{ padding:"12px 14px" }}><ExpBadge label={inc.status||"Received"} colorMap={INC_STATUS_COLOR} /></td>
+                      <td style={{ padding:"12px 14px", color:"#a78bfa", fontSize:12 }}>{inc.createdAt ? new Date(inc.createdAt).toLocaleDateString() : "—"}</td>
+                      <td style={{ padding:"12px 14px" }}><div style={{ display:"flex", gap:5 }}><button onClick={()=>openEdit(inc)} style={{ background:"#f0fdf4", border:"1px solid #dcfce7", borderRadius:7, padding:"4px 10px", fontSize:12, color:"#16a34a", cursor:"pointer", fontWeight:600 }}>Edit</button><button onClick={()=>del(inc._id||inc.id)} style={{ background:"#fee2e2", border:"1px solid #fecaca", borderRadius:7, padding:"4px 10px", fontSize:12, color:"#ef4444", cursor:"pointer", fontWeight:600 }}>Del</button></div></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+        }
+      </div>
+
+      {modal && (
+        <Modal title={modal==="add" ? "Add Income Entry" : "Edit Income Entry"} onClose={()=>setModal(null)}>
+          <div className="modal-2col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0 18px" }}>
+            <div style={{ gridColumn:"1 / -1" }}><Fld label="Income Title *" value={form.title} onChange={v=>{setForm({...form,title:v});setErr(p=>({...p,title:""}));}} error={err.title} placeholder="e.g. Payment for Invoice #001" /></div>
+            <Fld label="Client Name *" value={form.client} onChange={v=>{setForm({...form,client:v});setErr(p=>({...p,client:""}));}} error={err.client} placeholder="e.g. Acme Corp" />
+            <Fld label="Amount (₹) *" value={form.amount} type="number" onChange={v=>{setForm({...form,amount:v});setErr(p=>({...p,amount:""}));}} error={err.amount} placeholder="0.00" prefix="₹" />
+            <Fld label="Category" value={form.category} onChange={v=>setForm({...form,category:v})} options={INCOME_CATS} />
+            <Fld label="Payment Mode" value={form.paymentMode} onChange={v=>setForm({...form,paymentMode:v})} options={INCOME_MODES} />
+            <Fld label="Invoice No" value={form.invoiceNo} onChange={v=>setForm({...form,invoiceNo:v})} placeholder="INV-001" />
+            <Fld label="Transaction ID" value={form.transactionId} onChange={v=>setForm({...form,transactionId:v})} placeholder="TXN-9988" />
+            <div style={{ gridColumn:"1 / -1" }}><Fld label="Status" value={form.status} onChange={v=>setForm({...form,status:v})} options={INCOME_STATUSES} /></div>
+          </div>
+          {err._general && <div style={{ background:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:10, padding:"10px 14px", marginBottom:12, display:"flex", alignItems:"center", gap:8, fontSize:13, color:"#ef4444", fontWeight:600 }}><span>⚠️</span><span style={{ flex:1 }}>{err._general}</span><button onClick={()=>setErr({})} style={{ background:"none", border:"none", color:"#ef4444", cursor:"pointer", fontSize:16, lineHeight:1 }}>✕</button></div>}
+          <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:4 }}>
+            <button onClick={()=>setModal(null)} style={{ background:"#f5f3ff", border:"1px solid #ede9fe", color:"#1e0a3c", borderRadius:10, padding:"10px 16px", cursor:"pointer", fontWeight:600, fontSize:13 }}>Cancel</button>
+            <button onClick={save} disabled={saving} style={{ background:"linear-gradient(135deg,#16a34a,#22c55e)", color:"#fff", border:"none", borderRadius:10, padding:"10px 20px", fontWeight:700, fontSize:13, cursor:"pointer", opacity:saving?0.7:1 }}>{saving ? "Saving…" : modal==="add" ? "Save Income →" : "Update Income →"}</button>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}

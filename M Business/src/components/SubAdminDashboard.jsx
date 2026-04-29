@@ -27,36 +27,74 @@ const INVOICES = [{ id: "INV001", client: "TechNova Pvt Ltd", project: "Website 
 
 const NAV = [
   { key: "dashboard", icon: "🏠", label: "Dashboard" },
-  { key: "clients", icon: "👥", label: "Clients" },
-  { key: "subadmins", icon: "🛡️", label: "Partners" },
-  { key: "employees", icon: "👔", label: "Employees" },
-  { key: "managers", icon: "💼", label: "Managers" },
-  { key: "projects", icon: "📁", label: "Projects" },
-  { key: "quotations", icon: "📋", label: "Quotations" },
-  { key: "proposals", icon: "🎨", label: "Project Proposals" },
-  { key: "invoices", icon: "🧾", label: "Invoices" },
-  { key: "tracking", icon: "📊", label: "Project Status" },
-  { key: "tasks", icon: "✅", label: "Tasks" },
-  { key: "calendar", icon: "📅", label: "Calendar" },
-
-  { key: "payments", icon: "💰", label: "Client Payments" },
-  { key: "expenses", icon: "💸", label: "Client Expenses" },
-  { key: "interviews", icon: "🎯", label: "Interviews" },
-  { key: "reports", icon: "📈", label: "Reports" },
-  { key: "packages", icon: "📦", label: "Packages" },
-  { key: "vendors", icon: "🏬", label: "Vendors" },
-  { key: "rolePermissions", icon: "🛡️", label: "Role Permissions" }
+  { 
+    label: "Internal Management", 
+    type: "group", 
+    items: [
+      { key: "clients", icon: "👥", label: "Clients" },
+      { key: "subadmins", icon: "🛡️", label: "Partners" },
+      { key: "employees", icon: "👔", label: "Employees" },
+      { key: "managers", icon: "💼", label: "Managers" },
+      { key: "vendors", icon: "🏬", label: "Vendors" },
+    ]
+  },
+  {
+    label: "Projects & Tasks",
+    type: "group",
+    items: [
+      { key: "projects", icon: "📁", label: "Projects" },
+      { key: "tracking", icon: "📊", label: "Project Status" },
+      { key: "tasks", icon: "✅", label: "Tasks" },
+      { key: "calendar", icon: "📅", label: "Calendar" },
+    ]
+  },
+  {
+    label: "Finance",
+    type: "group",
+    items: [
+      { key: "quotations", icon: "📋", label: "Quotations" },
+      { key: "proposals", icon: "🎨", label: "Project Proposals" },
+      { key: "invoices", icon: "🧾", label: "Invoices" },
+      { key: "accounts", icon: "🏛️", label: "Accounts" },
+      { key: "payments", icon: "💰", label: "Payments" },
+      { key: "expenses", icon: "💸", label: "Expenses" },
+    ]
+  },
+  {
+    label: "Resources",
+    type: "group",
+    items: [
+      { key: "interviews", icon: "🎯", label: "Interviews" },
+      { key: "reports", icon: "📈", label: "Reports" },
+      { key: "packages", icon: "📦", label: "Packages" },
+      { key: "rolePermissions", icon: "🛡️", label: "Role Permissions" },
+    ]
+  },
+  { key: "mysubscriptions", icon: "🚀", label: "My Subscriptions" }
 ];
 
 function getNavForRole(role) {
   const r = (role || "").toLowerCase().trim();
-  if (r === "subadmin" || r === "sub_admin" || r === "sub-admin")
-    return NAV.filter(n => ["dashboard", "clients", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "payments", "expenses", "interviews", "reports", "mysubscriptions", "packages", "vendors", "rolePermissions"].includes(n.key));
-  if (r === "manager")
-    return NAV.filter(n => ["dashboard", "employees", "projects", "tracking", "tasks", "calendar", "interviews", "reports", "vendors"].includes(n.key));
-  if (r === "employee")
-    return NAV.filter(n => ["dashboard", "tasks", "calendar"].includes(n.key));
-  return NAV;
+  const allowedKeys = [];
+  
+  if (r === "subadmin" || r === "sub_admin" || r === "sub-admin") {
+    allowedKeys.push("dashboard", "clients", "subadmins", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "payments", "expenses", "interviews", "reports", "mysubscriptions", "packages", "vendors", "rolePermissions");
+  } else if (r === "manager") {
+    allowedKeys.push("dashboard", "employees", "projects", "tracking", "tasks", "calendar", "interviews", "reports", "vendors");
+  } else if (r === "employee") {
+    allowedKeys.push("dashboard", "tasks", "calendar");
+  } else {
+    // Default/Admin
+    return NAV;
+  }
+
+  return NAV.map(item => {
+    if (item.type === "group") {
+      const filteredItems = item.items.filter(i => allowedKeys.includes(i.key));
+      return filteredItems.length > 0 ? { ...item, items: filteredItems } : null;
+    }
+    return allowedKeys.includes(item.key) ? item : null;
+  }).filter(Boolean);
 }
 
 const sc = s => ({ Active: "#22C55E", Inactive: "#EF4444", "In Progress": "#9333ea", Pending: "#F59E0B", Completed: "#22C55E", "On Hold": "#a855f7", Sent: "#9333ea", Approved: "#22C55E", Rejected: "#EF4444", Paid: "#22C55E", Overdue: "#EF4444", Client: "#9333ea", Employee: "#c084fc", Manager: "#f59e0b", pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" }[s] || "#a855f7");
@@ -99,13 +137,20 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
   );
 }
 
-function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled }) {
+function Fld({ label, value, onChange, options, type = "text", error, placeholder, disabled, allowCustom }) {
   const s = { width: "100%", border: `1.5px solid ${error ? "#EF4444" : "#ede9fe"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: disabled ? "#f3f0ff" : "#faf5ff", boxSizing: "border-box", outline: "none", fontFamily: "inherit", opacity: disabled ? 0.7 : 1 };
+  const sCustom = { flex: 1.2, border: `1.5px solid ${error ? "#EF4444" : "#ede9fe"}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#fff", boxSizing: "border-box", outline: "none", fontFamily: "inherit" };
   return (
     <div style={{ marginBottom: 14 }}>
       <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
-      {options ? <select value={value} onChange={e => onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o => <option key={o}>{o}</option>)}</select>
-        : <input type={type} value={value} onChange={e => onChange(e.target.value)} style={s} placeholder={placeholder || ""} disabled={disabled} />}
+      {options ? (
+        allowCustom ? (
+          <div style={{ display: "flex", gap: 10 }}>
+            <select value={options.includes(value) ? value : "Custom"} onChange={e => { const v = e.target.value; if (v === "Custom") onChange(""); else onChange(v); }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o}</option>)}<option value="Custom">Custom Status...</option></select>
+            {!options.includes(value) && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} />}
+          </div>
+        ) : (<select value={value} onChange={e => onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o => <option key={o}>{o}</option>)}</select>)
+      ) : <input type={type} value={value} onChange={e => onChange(e.target.value)} style={s} placeholder={placeholder || ""} disabled={disabled} />}
       {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
     </div>
   );
@@ -1214,7 +1259,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             <Fld label="Start Date" value={editForm.start} type="date" onChange={v => setEditForm(p => ({ ...p, start: v }))} />
             <Fld label="End Date" value={editForm.end} type="date" onChange={v => setEditForm(p => ({ ...p, end: v }))} />
             <Fld label="Team Members" value={editForm.team} onChange={v => setEditForm(p => ({ ...p, team: v }))} />
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "In Progress", "Completed", "On Hold"]} />
+            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
           </div>
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES</label>
@@ -1389,7 +1434,7 @@ function ProjectStatusPage({ clients, employees, managers }) {
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
           <SearchDropdown label="Employee" items={employeeNames} displayKey="name" value={tsForm.employee} onChange={v => setTsForm({ ...tsForm, employee: v })} placeholder="-- Select Employee --" />
           <Fld label="Deadline *" value={tsForm.deadline} type="date" onChange={v => { setTsForm({ ...tsForm, deadline: v }); setTsErr(p => ({ ...p, deadline: "" })); }} error={tsErr.deadline} />
-          <Fld label="Status" value={tsForm.status} onChange={v => setTsForm({ ...tsForm, status: v })} options={["In Progress", "Pending", "Completed", "On Hold"]} />
+          <Fld label="Status" value={tsForm.status} onChange={v => setTsForm({ ...tsForm, status: v })} options={["In Progress", "Pending", "Completed", "On Hold"]} allowCustom={true} />
           <Fld label="Progress (0–100)" value={String(tsForm.progress)} type="number" onChange={v => { setTsForm({ ...tsForm, progress: v }); setTsErr(p => ({ ...p, progress: "" })); }} error={tsErr.progress} placeholder="e.g. 65" />
         </div>
         <Fld label="Notes" value={tsForm.notes} onChange={v => setTsForm({ ...tsForm, notes: v })} placeholder="Brief update…" />
@@ -1585,17 +1630,18 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
   const logoRef = useRef();
   const [editingComp, setEditingComp] = useState(false);
   const [compName, setCompName] = useState(user?.companyName || "");
+  const [upiId, setUpiId] = useState(user?.upiId || "");
   const displayName = user?.companyName || user?.name || user?.email?.split("@")[0] || "Admin";
   const initials = (user?.companyName || user?.name || "AD").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
-  const saveCompName = async () => {
+  const saveCompDetails = async () => {
     try {
-      await axios.put(`${BASE_URL}/api/subadmins/${user.id || user._id}`, { companyName: compName });
-      const updated = { ...user, companyName: compName };
+      await axios.put(`${BASE_URL}/api/subadmins/${user.id || user._id}`, { companyName: compName, upiId: upiId });
+      const updated = { ...user, companyName: compName, upiId: upiId };
       localStorage.setItem("user", JSON.stringify(updated));
       setUser(updated);
       setEditingComp(false);
-    } catch (err) { alert("Failed to save company name"); }
+    } catch (err) { alert("Failed to save company details"); }
   };
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
@@ -1640,13 +1686,21 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 9, color: "#9333ea", fontWeight: 700, textTransform: "uppercase" }}>Company Name</div>
                 {editingComp ? (
-                  <div style={{ display: "flex", gap: 5, marginTop: 4 }}>
-                    <input value={compName} onChange={e => setCompName(e.target.value)} style={{ flex: 1, padding: "4px 8px", fontSize: 11, border: "1.5px solid #ede9fe", borderRadius: 6, outline: "none" }} />
-                    <button onClick={saveCompName} style={{ background: "#22c55e", border: "none", color: "#fff", padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Save</button>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                    <div style={{ display: "flex", gap: 5 }}>
+                      <input value={compName} onChange={e => setCompName(e.target.value)} placeholder="Company Name" style={{ flex: 1, padding: "4px 8px", fontSize: 11, border: "1.5px solid #ede9fe", borderRadius: 6, outline: "none" }} />
+                    </div>
+                    <div style={{ display: "flex", gap: 5 }}>
+                      <input value={upiId} onChange={e => setUpiId(e.target.value)} placeholder="UPI ID (e.g. name@okaxis)" style={{ flex: 1, padding: "4px 8px", fontSize: 11, border: "1.5px solid #ede9fe", borderRadius: 6, outline: "none" }} />
+                      <button onClick={saveCompDetails} style={{ background: "#22c55e", border: "none", color: "#fff", padding: "4px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Save</button>
+                    </div>
                   </div>
                 ) : (
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#1e0a3c" }}>{user?.companyName || "Not Set"}</div>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#1e0a3c" }}>{user?.companyName || "Not Set"}</div>
+                      {user?.upiId && <div style={{ fontSize: 10, color: "#9333ea", fontWeight: 700 }}>UPI: {user.upiId}</div>}
+                    </div>
                     <button onClick={() => setEditingComp(true)} style={{ background: "none", border: "none", color: "#9333ea", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Edit</button>
                   </div>
                 )}
@@ -1742,8 +1796,54 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
   const companyName = user?.companyName || "M Business";
   const initials = (companyName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const roleDisplay = (user?.role || "").toLowerCase().includes("subadmin") ? "" : (user?.role || "ADMIN").toUpperCase();
-  const logoRef = useRef();
   
+  // Track expanded groups
+  const [expanded, setExpanded] = useState(() => {
+    const initial = {};
+    items.forEach(item => {
+      if (item.type === "group") {
+        const hasActive = item.items.some(i => i.key === active);
+        if (hasActive) initial[item.label] = true;
+      }
+    });
+    return initial;
+  });
+
+  const toggleGroup = (label) => {
+    setExpanded(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const NavItem = ({ n, isSub = false }) => {
+    const on = active === n.key;
+    return (
+      <button 
+        onClick={() => { setActive(n.key); onClose(); }} 
+        style={{ 
+          width: "100%", 
+          display: "flex", 
+          alignItems: "center", 
+          gap: 9, 
+          padding: isSub ? "8px 12px 8px 32px" : "9px 12px", 
+          background: on ? "linear-gradient(90deg,rgba(147,51,234,0.35),rgba(168,85,247,0.15))" : "transparent", 
+          border: on ? "1px solid rgba(168,85,247,0.35)" : "1px solid transparent", 
+          borderRadius: 11, 
+          color: on ? "#e9d5ff" : "rgba(255,255,255,0.45)", 
+          fontWeight: on ? 700 : 400, 
+          fontSize: isSub ? 12 : 12.5, 
+          cursor: "pointer", 
+          marginBottom: 2, 
+          textAlign: "left", 
+          fontFamily: "inherit",
+          transition: "all 0.2s"
+        }}
+      >
+        <span style={{ fontSize: isSub ? 13 : 15 }}>{n.icon}</span>
+        <span style={{ flex: 1 }}>{n.label}</span>
+        {on && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#c084fc", flexShrink: 0 }} />}
+      </button>
+    );
+  };
+
   return (
     <>
       {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998, display: "block" }} className="mob-overlay" />}
@@ -1769,7 +1869,45 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
           <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#fff", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }} className="sidebar-close">✕</button>
         </div>
         <nav style={{ flex: 1, minHeight: 0, padding: "10px 8px", overflowY: "auto", position: "relative", zIndex: 1 }}>
-          {items.map(n => { const on = active === n.key; return (<button key={n.key} onClick={() => { setActive(n.key); onClose(); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "9px 12px", background: on ? "linear-gradient(90deg,rgba(147,51,234,0.35),rgba(168,85,247,0.15))" : "transparent", border: on ? "1px solid rgba(168,85,247,0.35)" : "1px solid transparent", borderRadius: 11, color: on ? "#e9d5ff" : "rgba(255,255,255,0.45)", fontWeight: on ? 700 : 400, fontSize: 12.5, cursor: "pointer", marginBottom: 2, textAlign: "left", fontFamily: "inherit" }}><span style={{ fontSize: 15 }}>{n.icon}</span><span style={{ flex: 1 }}>{n.label}</span>{on && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#c084fc", flexShrink: 0 }} />}</button>); })}
+          {items.map(n => {
+            if (n.type === "group") {
+              const isExpanded = expanded[n.label];
+              const hasActive = n.items.some(i => i.key === active);
+              return (
+                <div key={n.label} style={{ marginBottom: 4 }}>
+                  <button 
+                    onClick={() => toggleGroup(n.label)}
+                    style={{ 
+                      width: "100%", 
+                      display: "flex", 
+                      alignItems: "center", 
+                      gap: 9, 
+                      padding: "10px 12px", 
+                      background: "transparent", 
+                      border: "none", 
+                      color: hasActive || isExpanded ? "#e9d5ff" : "rgba(255,255,255,0.45)", 
+                      fontWeight: 700, 
+                      fontSize: 11, 
+                      cursor: "pointer", 
+                      textAlign: "left", 
+                      fontFamily: "inherit",
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5
+                    }}
+                  >
+                    <span style={{ flex: 1 }}>{n.label}</span>
+                    <span style={{ fontSize: 8, transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "0.2s" }}>▼</span>
+                  </button>
+                  {isExpanded && (
+                    <div style={{ marginTop: 2 }}>
+                      {n.items.map(sub => <NavItem key={sub.key} n={sub} isSub={true} />)}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            return <NavItem key={n.key} n={n} />;
+          })}
         </nav>
         <div style={{ padding: "10px 14px 14px", borderTop: "1px solid rgba(255,255,255,0.07)", position: "relative", zIndex: 1, flexShrink: 0 }}>
           <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 11, color: "#fca5a5", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>🚪 Logout</button>
@@ -2161,6 +2299,7 @@ function VendorsPage({ vendors, setVendors }) {
 // MAIN DASHBOARD
 // ═══════════════════════════════════════════════════════════
 export default function Dashboard({ setUser, user, fixedLogo }) {
+  const companyNameStr = user?.companyName || "Your Business";
   const [active, setActive] = useState("dashboard");
   const [jumpProject, setJumpProject] = useState(null);
   const [modal, setModal] = useState(null);
@@ -2240,6 +2379,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [nmError, setNmError] = useState({});
   const [mgrSaveLoading, setMgrSaveLoading] = useState(false);
   const [showMgrPass, setShowMgrPass] = useState(false);
+  const [viewProject, setViewProject] = useState(null);
 
   const [subadmins, setSubadmins] = useState([]);
   const [ns, setNs] = useState({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10" });
@@ -2266,12 +2406,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [nvError, setNvError] = useState({});
   const [vendorSaveLoading, setVendorSaveLoading] = useState(false);
   const [invoices, setInvoices] = useState([]);
+  const [income, setIncome] = useState([]);
+  const [expenses, setExpenses] = useState([]);
 
   const hasFetched = useRef(false);
   useEffect(() => { 
     if (hasFetched.current) return;
     hasFetched.current = true;
-    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); 
+    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); 
   }, []);
 
   const fetchSubscription = async () => {
@@ -2308,6 +2450,26 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setPaymentHistory(res.data || []);
     } catch (err) {
       console.error("Payment history fetch failed", err);
+    }
+  };
+
+  const fetchIncome = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/income");
+      setIncome(res.data || []);
+    } catch (e) {
+      console.log("Fetch income error:", e);
+      setIncome([]);
+    }
+  };
+
+  const fetchExpenses = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/expense");
+      setExpenses(res.data || []);
+    } catch (e) {
+      console.log("Fetch expenses error:", e);
+      setExpenses([]);
     }
   };
 
@@ -2664,21 +2826,33 @@ const handleEditPackage = (pkg) => {
     ? rawNavItems.filter(n => ["mysubscriptions"].includes(n.key))
     : rawNavItems;
 
+  // Helper to find item in flat or nested structure
+  const findNavItem = (key) => {
+    for (const item of navItems) {
+      if (item.key === key) return item;
+      if (item.type === "group" && item.items) {
+        const sub = item.items.find(i => i.key === key);
+        if (sub) return sub;
+      }
+    }
+    return null;
+  };
+
   // Always land on mysubscriptions when enforced — never show dashboard
   const validActive = enforceMySubscriptions
     ? "mysubscriptions"
-    : (navItems.find(n => n.key === active) ? active : navItems[0]?.key || "dashboard");
+    : (findNavItem(active) ? active : navItems[0]?.key || "dashboard");
 
-  const page = navItems.find(n => n.key === validActive) || navItems[0];
+  const page = findNavItem(validActive) || navItems[0];
 
   useEffect(() => { if (!enforceMySubscriptions && validActive !== active) setActive(validActive); }, [user?.role, enforceMySubscriptions, validActive]);
 
-  const displayName = user?.companyName || "M Business";
+  const displayName = companyNameStr;
   const initials = (displayName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const B = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
 
   const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
-  const companyNameStr = displayName;
+
   const roleDisplay = user?.role || "Admin";
 
   return (
@@ -2942,7 +3116,9 @@ const handleEditPackage = (pkg) => {
                   { t: "Employees", v: employees.length, i: "👨‍💼", c: "#7c3aed", bg: "linear-gradient(135deg,#ede9fe,#f5f3ff)" },
                   { t: "Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b", bg: "linear-gradient(135deg,#fef3c7,#fffbeb)" },
                   { t: "Projects", v: projects.length, i: "📁", c: "#a855f7", bg: "linear-gradient(135deg,#f5f3ff,#faf5ff)" },
-                  { t: "Invoices", v: invoices.length, i: "🧾", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" }
+                  { t: "Invoices", v: invoices.length, i: "🧾", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
+                  { t: "Total Income", v: `₹${income.reduce((s, x) => s + (Number(x.amount) || 0), 0).toLocaleString()}`, i: "💰", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
+                  { t: "Total Expenses", v: `₹${expenses.reduce((s, x) => s + (Number(x.amount) || 0), 0).toLocaleString()}`, i: "💸", c: "#EF4444", bg: "linear-gradient(135deg,#fee2e2,#fff1f1)" }
                 ].map(({ t, v, i, c, bg }) => (
                   <div key={t} style={{ background: "#fff", borderRadius: 16, padding: "16px", boxShadow: "0 4px 20px rgba(147,51,234,0.05)", border: "1.5px solid #ede9fe", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ position: "absolute", top: 0, right: 0, width: 30, height: 30, background: bg, borderBottomLeftRadius: 20, opacity: 0.6 }} />
@@ -2961,18 +3137,48 @@ const handleEditPackage = (pkg) => {
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 600 }}>
                     <thead>
                       <tr style={{ background: "#faf5ff" }}>
-                        {["Project", "Client", "Status", "Deadline"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "#a78bfa", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe" }}>{c.toUpperCase()}</th>)}
+                        {["Project", "Client", "Status", "Deadline", "View"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "#a78bfa", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe" }}>{c.toUpperCase()}</th>)}
                       </tr>
                     </thead>
                     <tbody>
-                      {projects.length === 0 ? <tr><td colSpan={4} style={{ padding: 20, textAlign: "center", color: "#a78bfa" }}>No recent projects</td></tr> : projects.slice(0, 5).map((p, i) => (
+                      {projects.length === 0 ? <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "#a78bfa" }}>No recent projects</td></tr> : projects.slice(0, 5).map((p, i) => (
                         <tr key={i} style={{ borderBottom: "1px solid #f5f3ff" }}>
                           <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>{p.name}</td>
                           <td style={{ padding: "12px 12px", color: "#a78bfa" }}>{p.client}</td>
                           <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>
                           <td style={{ padding: "12px 12px", color: "#94a3b8" }}>{p.end ? new Date(p.end).toLocaleDateString() : "—"}</td>
+                          <td style={{ padding: "12px 12px" }}><button onClick={()=>setViewProject(p)} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>View</button></td>
                         </tr>
                       ))}
+                    </tbody>
+                  </table>
+                </div>
+              </SC>
+              <SC title="Recent Transactions" action={<button onClick={() => setActive("accounts")} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 8, padding: "4px 12px", fontSize: 11, fontWeight: 700, color: "#7c3aed", cursor: "pointer" }}>View All →</button>}>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 600 }}>
+                    <thead>
+                      <tr style={{ background: "#faf5ff" }}>
+                        {["Type", "Title", "Category", "Amount", "Date"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "#a78bfa", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe" }}>{c.toUpperCase()}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const all = [
+                          ...income.map(i => ({ ...i, _t: "Income", _c: "#22C55E" })),
+                          ...expenses.map(e => ({ ...e, _t: "Expense", _c: "#EF4444" }))
+                        ].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)).slice(0, 5);
+
+                        return all.length === 0 ? <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "#a78bfa" }}>No recent transactions</td></tr> : all.map((t, i) => (
+                          <tr key={i} style={{ borderBottom: "1px solid #f5f3ff" }}>
+                            <td style={{ padding: "12px 12px" }}><span style={{ color: t._c, fontWeight: 800, fontSize: 10 }}>{t._t.toUpperCase()}</span></td>
+                            <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>{t.title}</td>
+                            <td style={{ padding: "12px 12px", color: "#a78bfa" }}>{t.category}</td>
+                            <td style={{ padding: "12px 12px", fontWeight: 700, color: t._c }}>₹{Number(t.amount || 0).toLocaleString()}</td>
+                            <td style={{ padding: "12px 12px", color: "#94a3b8" }}>{t.date ? new Date(t.date).toLocaleDateString() : "—"}</td>
+                          </tr>
+                        ));
+                      })()}
                     </tbody>
                   </table>
                 </div>
@@ -2987,20 +3193,20 @@ const handleEditPackage = (pkg) => {
           {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} />}
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-          {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
-          {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
+          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
+          {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} />}
           {validActive === "calendar" && <CalendarPage projects={projects} clients={clients} companyId={companyId} />}
           {validActive === "accounts" && <AccountsPage ExpensesPage={ExpensesPage} />}
+          {validActive === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}
           {validActive === "expenses" && <ExpensesPage />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
           {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} />}
-          {validActive === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}
           {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
           {validActive === "rolePermissions" && <RolePermissionDashboard />}
         </div>
@@ -3356,34 +3562,7 @@ const handleEditPackage = (pkg) => {
           <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
           <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
           <Fld label="Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>STATUS</label>
-            <div style={{ display: "flex", gap: 10 }}>
-              <select 
-                value={["Pending", "In Progress", "Completed", "On Hold"].includes(np.status) ? np.status : "Custom"} 
-                onChange={e => {
-                  const v = e.target.value;
-                  if (v === "Custom") setNp({ ...np, status: "" });
-                  else setNp({ ...np, status: v });
-                }} 
-                style={{ flex: 1, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }}
-              >
-                <option value="Pending">Pending</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-                <option value="On Hold">On Hold</option>
-                <option value="Custom">Custom Status...</option>
-              </select>
-              {!["Pending", "In Progress", "Completed", "On Hold"].includes(np.status) && (
-                <input 
-                  placeholder="Type status..." 
-                  value={np.status} 
-                  onChange={e => setNp({ ...np, status: e.target.value })} 
-                  style={{ flex: 1.2, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#fff", outline: "none" }}
-                />
-              )}
-            </div>
-          </div>
+          <Fld label="Status" value={np.status} onChange={v => setNp({ ...np, status: v })} options={["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
         </div>
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "#a78bfa", fontWeight: 400 }}>(select multiple)</span></label>
@@ -3597,6 +3776,43 @@ const handleEditPackage = (pkg) => {
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button onClick={() => setEditPackage(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
             <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("#0ea5e9"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
+          </div>
+        </Mdl>
+      )}
+
+      {viewProject&&(
+        <Mdl title="Project Details" onClose={()=>setViewProject(null)} maxWidth={550}>
+          <div style={{padding:16,background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:14,border:"1px solid #ede9fe",marginBottom:18}}>
+            <div style={{fontSize:18,fontWeight:800,color:T.text,marginBottom:6}}>{viewProject.name}</div>
+            <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+              <Badge label={viewProject.status||"Pending"}/>
+              {viewProject.client&&<span style={{fontSize:12,color:"#9333ea",fontWeight:600}}>👥 {viewProject.client}</span>}
+            </div>
+          </div>
+          <InfoRow icon="💰" label="Budget" value={viewProject.budget}/>
+          <div style={{marginBottom:14}}>
+            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGNED EMPLOYEES</label>
+            {(() => {
+              const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
+              return assignedEmployees.length > 0
+                ?<div style={{display:"flex",flexDirection:"column",gap:6}}>
+                   {assignedEmployees.map((emp, idx)=>(
+                     <div key={idx} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:"#f8fafc",borderRadius:8,border:"1px solid #e2e8f0"}}>
+                       <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
+                       <span style={{color:"#1e0a3c",fontWeight:600,fontSize:12}}>{emp}</span>
+                     </div>
+                   ))}
+                 </div>
+                :<div style={{color:"#a78bfa",fontSize:13,fontStyle:"italic"}}>No employees assigned</div>
+            })()}
+          </div>
+          <InfoRow icon="📅" label="Start Date" value={viewProject.start}/>
+          <InfoRow icon="🏁" label="End Date" value={viewProject.end}/>
+          <InfoRow icon="🎯" label="Purpose" value={viewProject.purpose}/>
+          <InfoRow icon="👥" label="Team" value={viewProject.team}/>
+          <InfoRow icon="📝" label="Description" value={viewProject.description}/>
+          <div style={{display:"flex",gap:10,marginTop:16}}>
+            <button onClick={()=>setViewProject(null)} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>Close</button>
           </div>
         </Mdl>
       )}

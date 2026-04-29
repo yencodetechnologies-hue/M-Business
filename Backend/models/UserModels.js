@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
   mySubscriptions: { type: Boolean, default: false },
   numberOfSubscriptions: { type: Number, default: 0 },
   isVerified: { type: Boolean, default: false },
+  upiId: { type: String, default: "" },
   otp: { type: String, default: "" },
   otpExpires: { type: Date },
 }, { timestamps: true });

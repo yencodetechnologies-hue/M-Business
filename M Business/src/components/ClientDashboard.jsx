@@ -444,7 +444,7 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
             <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>{(clientUser?.company || "M")[0].toUpperCase()}</div>
             <div>
-              <div style={{ fontWeight:800, fontSize:13, color:"#fff", letterSpacing:-0.3 }}>{clientUser?.company || "M Business"}</div>
+              <div style={{ fontWeight:800, fontSize:13, color:"#fff", letterSpacing:-0.3 }}>{clientUser?.company || "Your Business"}</div>
               <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{clientUser?.role || clientUser?.userRole || "CLIENT"}</div>
             </div>
           </div>
@@ -694,8 +694,8 @@ export default function ClientDashboard({ user, setUser }) {
   const clientUser = {
     name:    user?.name || user?.clientName || "Client",
     email:   user?.email || "",
-    company: user?.companyName || user?.company || "M Business",
-    avatar:  (user?.companyName || user?.company || "M").slice(0,2).toUpperCase(),
+    company: user?.companyName || user?.company || "Your Business",
+    avatar:  (user?.companyName || user?.company || "Y").slice(0,2).toUpperCase(),
     plan:    "Pro",
   };
 

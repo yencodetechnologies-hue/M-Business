@@ -16,7 +16,7 @@ const IncomeSchema = new mongoose.Schema(
     paymentMode: {
       type: String,
       required: true,
-      enum: ["GPay", "PhonePe", "NEFT", "RTGS", "Cash", "Check", "Card", "UPI", "Bank Transfer"],
+      enum: ["GPay", "PhonePe", "NEFT", "RTGS", "Cash", "Cheque", "Card", "UPI", "Bank Transfer"],
       default: "GPay",
     },
     amount: {

@@ -8,6 +8,7 @@ import ClientDashboard    from "./components/ClientDashboard";
 import EmployeeDashboard  from "./components/EmployeeDashboard";
 
 import InvoiceViewer      from "./components/InvoiceViewer";
+import QuotationViewer    from "./components/QuotationViewer";
 import TasksPage          from "./components/TaskPage";
 import CalendarPage       from "./components/CalendarPage";
 import { ExpensesPage }   from "./components/AccountsPage";
@@ -116,6 +117,7 @@ const getRootPage = () => {
         <Route path="/tasks"             element={<TasksPage />} />
         <Route path="/canvas"            element={<CanvasPage />} />
         <Route path="/invoice-view"      element={<InvoiceViewer />} />
+        <Route path="/quotation-view"    element={<QuotationViewer />} />
         <Route path="/calendar"          element={<CalendarPage />} />
         <Route path="/expenses"          element={<ExpensesPage />} />
         <Route path="/reports"           element={<ReportsPage />} />

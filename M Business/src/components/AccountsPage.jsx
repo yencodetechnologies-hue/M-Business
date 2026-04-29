@@ -814,7 +814,7 @@ const save = async () => {
 // ════════════════════════════════════════════════════════════
 const INCOME_API     = `${BASE_URL}/api/income`;
 const INCOME_CATS    = ["Project Payment", "Advance", "Service Fee", "Maintenance", "Miscellaneous"];
-const INCOME_MODES   = ["GPay", "PhonePe", "NEFT", "RTGS", "Cash", "Check", "Card", "UPI", "Bank Transfer"];
+const INCOME_MODES   = ["GPay", "PhonePe", "NEFT", "RTGS", "Cash", "Cheque", "Card", "UPI", "Bank Transfer"];
 const INCOME_STATUSES = ["Received", "Pending", "Cancelled"];
 const INC_EMPTY      = { title:"", category:"Project Payment", paymentMode:"GPay", amount:"", client:"", invoiceNo:"", transactionId:"", status:"Received" };
 

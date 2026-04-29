@@ -77,11 +77,11 @@ router.post("/", async (req, res) => {
 // UPDATE a subadmin
 router.put("/:id", async (req, res) => {
   try {
-    const { name, email, phone, status, companyName } = req.body;
+    const { name, email, phone, status, companyName, upiId } = req.body;
     
     const updatedSubadmin = await User.findByIdAndUpdate(
       req.params.id,
-      { name, email, phone, companyName }, // status might not be in User schema, but let's pass it
+      { name, email, phone, companyName, upiId }, // status might not be in User schema, but let's pass it
       { new: true }
     );
     

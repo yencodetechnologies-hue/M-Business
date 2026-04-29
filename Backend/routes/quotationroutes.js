@@ -77,7 +77,7 @@ router.post("/", async (req, res) => {
             status: "Received",
             companyId: req.companyId || "",
           },
-          { upsert: true, new: true }
+          { upsert: true, returnDocument: "after" }
         );
       }
 
@@ -115,7 +115,7 @@ router.post("/", async (req, res) => {
           status: "Received",
           companyId: req.companyId || "",
         },
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: "after" }
       );
     }
 
@@ -139,7 +139,7 @@ router.put("/:id", async (req, res) => {
     const doc = await Quotation.findByIdAndUpdate(
       req.params.id,
       { qt, items, status: status || "draft" },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!doc) return res.status(404).json({ success: false, msg: "Quotation not found" });
@@ -186,9 +186,34 @@ router.patch("/:id/status", async (req, res) => {
     const doc = await Quotation.findOneAndUpdate(
       { _id: req.params.id, companyId },
       { status },
-      { new: true }
+      { returnDocument: "after" }
     );
     if (!doc) return res.status(404).json({ success: false, msg: "Not found or unauthorized" });
+
+    // Sync Income if status is Approved (effectively paid/confirmed for some users)
+    if (status === "approved" && doc.qt?.amountPaid > 0) {
+      const Income = require("../models/IncomeModel");
+      const query = { invoiceNo: doc.qt.quoteNo };
+      if (doc.qt.transactionId) query.transactionId = doc.qt.transactionId;
+
+      await Income.findOneAndUpdate(
+        query,
+        {
+          title: `Advance for Quotation ${doc.qt.quoteNo}`,
+          category: "Advance",
+          paymentMode: doc.qt.paymentMode || "GPay",
+          amount: parseFloat(doc.qt.amountPaid),
+          client: doc.qt.client,
+          invoiceNo: doc.qt.quoteNo,
+          transactionId: doc.qt.transactionId || "",
+          date: doc.qt.paymentDate || doc.qt.date,
+          status: "Received",
+          companyId: doc.companyId || req.companyId || "",
+        },
+        { upsert: true, returnDocument: "after" }
+      );
+    }
+
     return res.json({ success: true, quotation: doc });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message });
@@ -207,14 +232,24 @@ router.post("/:id/convert", async (req, res) => {
     // Generate Invoice number from Quote number
     const invoiceNo = (qt.quoteNo || "QT").replace(/^QT/, "INV");
 
-    const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
-    const gstAmt   = subtotal * ((parseFloat(qt.gstRate)||0) / 100);
-    const total    = subtotal + gstAmt;
+    const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
+    const gstRate = parseFloat(qt.gstRate) || 0;
+    const isGstIncluded = qt.isGstIncluded || false;
+    let subtotal, gstAmt, total;
+    if (isGstIncluded) {
+      total    = subtotalRaw;
+      subtotal = total / (1 + gstRate / 100);
+      gstAmt   = total - subtotal;
+    } else {
+      subtotal = subtotalRaw;
+      gstAmt   = subtotal * (gstRate / 100);
+      total    = subtotal + gstAmt;
+    }
 
     // 1. Check if an invoice was ALREADY created for this specific Quotation
     const existingForThis = await Invoice.findOne({ quotationId: req.params.id });
     if (existingForThis) {
-      await Quotation.findByIdAndUpdate(req.params.id, { status: "converted" });
+      await Quotation.findByIdAndUpdate(req.params.id, { status: "converted" }, { returnDocument: "after" });
       return res.json({ success: true, message: "Already converted", invoiceNo: existingForThis.invoiceNo, invoice: existingForThis });
     }
 
@@ -238,6 +273,7 @@ router.post("/:id/convert", async (req, res) => {
       client:         qt.client,
       project:        qt.project       || "",
       gstRate:        qt.gstRate       ?? 18,
+      isGstIncluded:  qt.isGstIncluded || false,
       notes:          qt.notes         || "",
       terms:          "Payment due within 30 days. Thank you for your business!",
       companyName:    qt.companyName   || "",
@@ -246,13 +282,45 @@ router.post("/:id/convert", async (req, res) => {
       companyAddress: qt.companyAddress|| "",
       items: items.map((i) => ({ description: i.description, quantity: parseFloat(i.quantity)||0, rate: parseFloat(i.rate)||0 })),
       subtotal, gstAmt, total,
+      amountPaid:     parseFloat(qt.amountPaid) || 0,
+      paymentDate:    qt.paymentDate            || today,
+      paymentMode:    qt.paymentMode            || "GPay",
+      transactionId:  qt.transactionId          || "",
       status: "draft",
       companyId: qtDoc.companyId || req.companyId || "",
     });
     await invoice.save();
 
+    // Automatic Income Tracking for advance/part payment on converted invoice
+    if (invoice.amountPaid > 0) {
+      const Income = require("../models/IncomeModel");
+      const isPartial = invoice.amountPaid < invoice.total;
+      const incomeTitle = isPartial
+        ? `Advance/Part Payment for Invoice ${invoice.invoiceNo}`
+        : `Full Payment for Invoice ${invoice.invoiceNo}`;
+      const query = { invoiceNo: invoice.invoiceNo };
+      if (invoice.transactionId) query.transactionId = invoice.transactionId;
+
+      await Income.findOneAndUpdate(
+        query,
+        {
+          title: incomeTitle,
+          category: isPartial ? "Advance" : "Project Payment",
+          paymentMode: invoice.paymentMode,
+          amount: invoice.amountPaid,
+          client: invoice.client,
+          invoiceNo: invoice.invoiceNo,
+          transactionId: invoice.transactionId || "",
+          date: invoice.paymentDate || invoice.date,
+          status: "Received",
+          companyId: invoice.companyId || req.companyId || "",
+        },
+        { upsert: true, returnDocument: "after" }
+      );
+    }
+
     // Mark quotation as converted
-    await Quotation.findByIdAndUpdate(req.params.id, { status: "converted" });
+    await Quotation.findByIdAndUpdate(req.params.id, { status: "converted" }, { returnDocument: "after" });
 
     return res.json({ success: true, invoiceNo, invoice });
   } catch (err) {

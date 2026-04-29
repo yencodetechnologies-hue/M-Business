@@ -52,6 +52,7 @@ function fmt(d){
 const COL_W = {
   checkbox: 36,
   task: 280,
+  project: 180,
   person: 150,
   status: 190,
   date: 160,
@@ -648,6 +649,89 @@ function PriorityPicker({anchor,currentValue,onSelect,onClose}){
     </div>
   );
 }
+
+/* ══════════════════════════════════════════════════════════
+   PROJECT PICKER
+══════════════════════════════════════════════════════════ */
+function ProjectPicker({ anchor, projects, currentProjectId, onSelect, onClose }) {
+  const [search, setSearch] = useState("");
+  const inputRef = useRef();
+  useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
+
+  const filtered = (projects || []).filter(p => 
+    !search || (p.name || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <DD anchor={anchor} onClose={onClose} w={320}>
+      <div style={{ padding: "12px 12px 6px" }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 6,
+          border: `1px solid #0073ea`, borderRadius: 6,
+          padding: "8px 12px", background: "#fff"
+        }}>
+          <span style={{ fontSize: 14, color: P.muted }}>🔍</span>
+          <input
+            ref={inputRef}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search projects..."
+            style={{
+              border: "none", outline: "none", background: "transparent",
+              fontSize: 13, color: P.text, fontFamily: "inherit", flex: 1
+            }}
+          />
+        </div>
+      </div>
+
+      <div style={{ maxHeight: 220, overflowY: "auto", padding: "4px 8px 8px" }}>
+        {filtered.length === 0 ? (
+          <div style={{ padding: "12px", textAlign: "center", color: P.muted, fontSize: 13 }}>No projects found</div>
+        ) : (
+          filtered.map(p => {
+            const isActive = currentProjectId === (p._id || p.id);
+            return (
+              <div
+                key={p._id || p.id}
+                onClick={() => { onSelect(p._id || p.id); onClose(); }}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  padding: "10px 12px", borderRadius: 8, cursor: "pointer",
+                  background: isActive ? "#f0f9ff" : "transparent"
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "#f5f6f8"}
+                onMouseLeave={e => e.currentTarget.style.background = isActive ? "#f0f9ff" : "transparent"}
+              >
+                <div style={{
+                  width: 32, height: 32, borderRadius: 8,
+                  background: "linear-gradient(135deg,#9333ea,#c084fc)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#fff", fontSize: 16, flexShrink: 0
+                }}>📁</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: P.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                  {p.client && <div style={{ fontSize: 11, color: P.muted }}>{p.client}</div>}
+                </div>
+                {isActive && <span style={{ color: "#0073ea", fontSize: 13 }}>✓</span>}
+              </div>
+            );
+          })
+        )}
+      </div>
+      
+      <div 
+        onClick={() => { onSelect(null); onClose(); }}
+        style={{ borderTop: `1px solid ${P.border}`, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
+        onMouseEnter={e => e.currentTarget.style.background = "#f5f6f8"}
+        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+      >
+        <div style={{ width: 24, height: 24, borderRadius: "50%", border: `1px dashed ${P.muted}`, display: "flex", alignItems: "center", justifyContent: "center", color: P.muted, fontSize: 12 }}>✕</div>
+        <span style={{ fontSize: 13, color: P.text }}>No project linked</span>
+      </div>
+    </DD>
+  );
+}
+
 
 /* ══════════════════════════════════════════════════════════
    PERSON PICKER
@@ -1372,9 +1456,61 @@ function StatusBarWithTooltip({ statusCounts, total }) {
    TASK ROW
 ══════════════════════════════════════════════════════════ */
 /* ══════════════════════════════════════════════════════════
+   PROJECT CELL
+══════════════════════════════════════════════════════════ */
+function ProjectCell({ task, projects, onField }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef();
+  const project = projects.find(p => (p._id || p.id) === task.projectId);
+  
+  return (
+    <div 
+      ref={ref}
+      style={{
+        width: COL_W.project,
+        flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRight: "1px solid " + P.border,
+        padding: "0 8px",
+        cursor: "pointer"
+      }}
+      onClick={() => setOpen(v => !v)}
+      onMouseEnter={e => e.currentTarget.style.background = P.light}
+      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+    >
+      <div style={{
+        fontSize: 12,
+        color: project ? P.text : P.muted,
+        fontWeight: project ? 600 : 400,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        display: "flex",
+        alignItems: "center",
+        gap: 6
+      }}>
+        <span style={{ fontSize: 14 }}>{project ? "📁" : "+"}</span>
+        <span>{project ? project.name : "Link project"}</span>
+      </div>
+      {open && (
+        <ProjectPicker 
+          anchor={ref} 
+          projects={projects} 
+          currentProjectId={task.projectId} 
+          onSelect={pid => onField(task._id || task.id, "projectId", pid)} 
+          onClose={() => setOpen(false)} 
+        />
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
    TASK ROW
 ══════════════════════════════════════════════════════════ */
-function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, onOpen, selected, groupColor, employees, extraCols, onExtraField, hiddenCols, onInvite, onAutoAssign }) {
+function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, onOpen, selected, groupColor, employees, extraCols, onExtraField, hiddenCols, onInvite, onAutoAssign, projects }) {
   const statusRef=useRef(); const dotsRef=useRef(); const personRef=useRef(); const priorityRef=useRef();
   const [spOpen,setSpOpen]=useState(false); const [ppOpen,setPpOpen]=useState(false);
   const [dotsOpen,setDotsOpen]=useState(false); const [personOpen,setPersonOpen]=useState(false);
@@ -1400,6 +1536,10 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
         <input key={task.title} defaultValue={task.title} onBlur={e=>{const v=e.target.value.trim();if(v&&v!==task.title)onField(id,"title",v);}} style={{background:"transparent",border:"none",outline:"none",fontSize:13,color:P.text,fontFamily:"inherit",width:"100%",padding:"9px 4px 9px 10px",textDecoration:task.checked?"line-through":"none",opacity:task.checked?.5:1,fontWeight:500,cursor:"pointer"}} onFocus={e=>{e.target.style.background="#fff";e.target.style.boxShadow="0 0 0 2px " + P.accent + "33";e.target.style.borderRadius="4px";}} onBlurCapture={e=>{e.target.style.background="transparent";e.target.style.boxShadow="none";}}/>
         <button className="openBtn" onClick={e=>{e.stopPropagation();onOpen(task);}} style={{opacity:0,background:"#e8f4fd",border:"1px solid #c3d9f0",borderRadius:6,cursor:"pointer",width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"#0073ea",flexShrink:0,transition:"opacity .15s",fontWeight:700}}>↗</button>
       </div>
+      {/* project */}
+      {!hcSet.has('project') && (
+        <ProjectCell task={task} projects={projects} onField={onField} />
+      )}
       {/* person */}
       {!hcSet.has('person')&&(
         <div 
@@ -1644,7 +1784,12 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
           🗑 Delete
         </button>
         <div ref={dotsRef} onClick={e=>{e.stopPropagation();setDotsOpen(v=>!v);}} style={{width:26,height:26,borderRadius:5,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,color:P.muted,letterSpacing:1,userSelect:"none"}} onMouseEnter={e=>e.currentTarget.style.background=P.border} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>···</div>
-        {dotsOpen&&(<DD anchor={dotsRef} onClose={()=>setDotsOpen(false)} w={160}><MI icon="⎘" title="Duplicate" onClick={()=>{onDup(task);setDotsOpen(false);}}/><Sep/><MI icon="🗑" title="Delete task" danger onClick={()=>{onDel(id);setDotsOpen(false);}}/></DD>)}
+        {dotsOpen&&(<DD anchor={dotsRef} onClose={()=>setDotsOpen(false)} w={180}>
+          <MI icon="⎘" title="Duplicate" onClick={()=>{onDup(task);setDotsOpen(false);}}/>
+          <MI icon="💬" title="Share WhatsApp" onClick={()=>{shareTask(task);setDotsOpen(false);}}/>
+          <Sep/>
+          <MI icon="🗑" title="Delete task" danger onClick={()=>{onDel(id);setDotsOpen(false);}}/>
+        </DD>)}
       </div>
     </div>
   );
@@ -1724,7 +1869,7 @@ function AddGroupRow({onAdd,triggerRef}){
 /* ══════════════════════════════════════════════════════════
    GROUP BLOCK
 ══════════════════════════════════════════════════════════ */
-function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, onAddTask, onDup, onDel, onOpen, selectedId, isVirtual, onDelGroup, employees, showToast, extraCols, onExtraField, onAddCol, onRenameCol, onDeleteCol, hiddenCols, onMoveCol, onInvite, onAutoAssign }) {
+function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, onAddTask, onDup, onDel, onOpen, selectedId, isVirtual, onDelGroup, employees, showToast, extraCols, onExtraField, onAddCol, onRenameCol, onDeleteCol, hiddenCols, onMoveCol, onInvite, onAutoAssign, projects }) {
   const [adding,setAdding]=useState(false); const [newTitle,setNewTitle]=useState("");
   const gid=group._id||group.id; const tasks=group.tasks||[];
   const done=tasks.filter(t=>t.status==="Done").length;
@@ -1778,7 +1923,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                   selected={selectedId===(t._id||t.id)}
                   groupColor={group.color} employees={employees}
                   extraCols={visibleExtraCols} onExtraField={onExtraField} hiddenCols={hiddenCols}
-                  onInvite={onInvite} onAutoAssign={onAutoAssign}/>
+                  onInvite={onInvite} onAutoAssign={onAutoAssign} projects={projects}/>
               ))}
 
               {!isVirtual&&(adding?(
@@ -1819,6 +1964,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                       <StatusBarWithTooltip statusCounts={statusCounts} total={total}/>
                       <span style={{fontSize:11,color:"#9aadbd",fontWeight:600,flexShrink:0}}>{doneCnt}/{total}</span>
                     </div>
+                    {!hcSet.has('project') && <div style={{width:COL_W.project,flexShrink:0,borderRight:`1px solid ${P.border}`}}/>}
                     {!hcSet.has('person')&&<div style={{width:COL_W.person,flexShrink:0,borderRight:`1px solid ${P.border}`}}/>}
                     {!hcSet.has('status')&&(<div style={{width:COL_W.status,flexShrink:0,borderRight:`1px solid ${P.border}`,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px",gap:6}}><StatusBarWithTooltip statusCounts={statusCounts} total={total}/><span style={{fontSize:11,color:"#9aadbd",fontWeight:600,flexShrink:0}}>{doneCnt}/{total}</span></div>)}
                     {!hcSet.has('date')&&(<div style={{width:COL_W.date,flexShrink:0,borderRight:`1px solid ${P.border}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"2px 8px"}}>{!earliestFmt?<span style={{fontSize:10,color:"#c5c9d6"}}>–</span>:sameDate?<><span style={{fontSize:13,color:"#323338",fontWeight:700,lineHeight:1.3}}>{latestFmt}</span><span style={{fontSize:10,color:"#9aadbd"}}>latest</span></>:<><div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontSize:12,color:"#323338",fontWeight:700}}>{earliestFmt}</span><span style={{fontSize:10,color:"#c5c9d6"}}>–</span><span style={{fontSize:12,color:"#323338",fontWeight:700}}>{latestFmt}</span></div><div style={{display:"flex",alignItems:"center",gap:3}}><span style={{fontSize:9,color:"#9aadbd"}}>earliest</span><span style={{fontSize:9,color:"#c5c9d6"}}>to</span><span style={{fontSize:9,color:"#9aadbd"}}>latest</span></div></>}</div>)}
@@ -1851,9 +1997,11 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
 /* ══════════════════════════════════════════════════════════
    DETAIL PANEL
 ══════════════════════════════════════════════════════════ */
-function DetailPanel({ task, onClose, onField }) {
+function DetailPanel({ task, onClose, onField, projects }) {
   const id=task._id||task.id; const sc=STATUS_CFG[task.status]||STATUS_CFG["Not Started"];
   const inp={width:"100%",border:`1.5px solid ${P.border}`,borderRadius:8,padding:"8px 11px",fontSize:13,fontFamily:"inherit",color:P.text,outline:"none",background:P.light,boxSizing:"border-box"};
+  const selectedProj = projects.find(p => (p._id || p.id) === task.projectId);
+  
   return(
     <div style={{width:340,flexShrink:0,background:"#fff",borderLeft:`1.5px solid ${P.border}`,display:"flex",flexDirection:"column",height:"100%",overflow:"hidden"}}>
       <div style={{background:P.light,borderBottom:`1.5px solid ${P.border}`,padding:"14px 16px",flexShrink:0}}>
@@ -1864,6 +2012,21 @@ function DetailPanel({ task, onClose, onField }) {
       </div>
       <div style={{flex:1,overflow:"auto",padding:16,display:"flex",flexDirection:"column",gap:13}}>
         {[{l:"Title",f:"title"},{l:"Assigned To",f:"assignTo"}].map(({l,f})=>(<div key={f}><div style={{fontSize:10,color:P.muted,fontWeight:700,letterSpacing:0.8,marginBottom:5,textTransform:"uppercase"}}>{l}</div><input key={task[f]} defaultValue={task[f]||""} onBlur={e=>{if(e.target.value.trim()!==String(task[f]||""))onField(id,f,e.target.value.trim());}} style={inp}/></div>))}
+        
+        <div>
+          <div style={{fontSize:10,color:P.muted,fontWeight:700,letterSpacing:0.8,marginBottom:5,textTransform:"uppercase"}}>Link to Project</div>
+          <select 
+            value={task.projectId || ""} 
+            onChange={e => onField(id, "projectId", e.target.value || null)}
+            style={inp}
+          >
+            <option value="">-- No Project --</option>
+            {projects.map(p => (
+              <option key={p._id || p.id} value={p._id || p.id}>{p.name}</option>
+            ))}
+          </select>
+        </div>
+
         <div><div style={{fontSize:10,color:P.muted,fontWeight:700,letterSpacing:0.8,marginBottom:5,textTransform:"uppercase"}}>Due Date</div><input type="date" key={task.date} defaultValue={task.date||""} onBlur={e=>onField(id,"date",e.target.value)} style={inp}/></div>
         <div><div style={{fontSize:10,color:P.muted,fontWeight:700,letterSpacing:0.8,marginBottom:5,textTransform:"uppercase"}}>Description</div><textarea key={task.description} defaultValue={task.description||""} placeholder="Add description…" onBlur={e=>onField(id,"description",e.target.value)} style={{...inp,resize:"vertical",minHeight:80}}/></div>
       </div>
@@ -2008,6 +2171,12 @@ export default function TaskPage({ projects = [], employees = [] }) {
   const setStatus=(id,s)=>updateField(id,"status",s);
   const setPriority=(id,v)=>updateField(id,"priority",v);
   const dupTask=async(task)=>addTask(task.groupId,task.title+" (copy)");
+
+  const shareTask = (task) => {
+    const text = `📌 *Task Alert* 📌\n\n*Task:* ${task.title}\n*Status:* ${task.status}\n*Priority:* ${task.priority || "Medium"}\n*Due Date:* ${task.date || "Not set"}\n*Assignee:* ${task.assignTo || "Unassigned"}\n\n_Managed via M Business_`;
+    const url = `whatsapp://send?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+  };
 
   const delTask=async(id)=>{const snap=groups;setGroups(p=>p.map(g=>({...g,tasks:(g.tasks||[]).filter(t=>(t._id||t.id)!==id)})));if(selected&&(selected._id||selected.id)===id)setSelected(null);try{await axios.delete(`${API}/tasks/${id}`);}catch{setGroups(snap);showToast("Failed to delete","error");}};
 
@@ -2209,7 +2378,7 @@ export default function TaskPage({ projects = [], employees = [] }) {
                     onExtraField={updateExtraField} onAddCol={()=>setShowAddCol(true)}
                     onRenameCol={renameExtraCol} onDeleteCol={deleteExtraCol}
                     hiddenCols={hiddenCols} onMoveCol={moveExtraCol}
-                    onInvite={setInviteTask} onAutoAssign={handleAutoAssign}/>
+                    onInvite={setInviteTask} onAutoAssign={handleAutoAssign} projects={projects}/>
                 ))}
                 {groupBy==="default"&&<AddGroupRow onAdd={addGroup} triggerRef={addGroupTrigger}/>}
               </div>
@@ -2230,7 +2399,7 @@ export default function TaskPage({ projects = [], employees = [] }) {
 
         </div>
 
-        {selected&&!sidekick&&!updatePanel&&<DetailPanel task={selected} onClose={()=>setSelected(null)} onField={updateField}/>}
+        {selected&&!sidekick&&!updatePanel&&<DetailPanel task={selected} onClose={()=>setSelected(null)} onField={updateField} projects={projects}/>}
         {sidekick&&!updatePanel&&<SidekickPanel onClose={()=>setSidekick(false)} groups={groups}/>}
         {updatePanel&&<TaskUpdatePanel task={updatePanel} onClose={()=>setUpdatePanel(null)} onField={updateField}/>}
       </div>

@@ -26,7 +26,8 @@ router.post("/login", async (req, res) => {
           email: "admin@gmail.com",
           role: "admin",
           companyId: "admin-company-id",
-          logoUrl: ""
+          logoUrl: "",
+          companyName: "Your Business"
         }
       });
     }
@@ -41,7 +42,8 @@ router.post("/login", async (req, res) => {
           email: "subadmin@gmail.com",
           role: "subadmin",
           companyId: "admin-company-id",
-          logoUrl: ""
+          logoUrl: "",
+          companyName: "Your Business"
         }
       });
     }
@@ -56,7 +58,8 @@ router.post("/login", async (req, res) => {
           email: "client@gmail.com",
           role: "client",
           companyId: "client-company-id",
-          logoUrl: ""
+          logoUrl: "",
+          companyName: "Your Business"
         }
       });
     }
@@ -145,6 +148,7 @@ router.post("/login", async (req, res) => {
         companyId: user.companyId || user._id.toString(),
         logoUrl: user.logoUrl || "",
         companyName: user.companyName || "",
+        upiId: user.upiId || "",
       },
     });
 
@@ -258,6 +262,7 @@ router.post("/verify-otp", async (req, res) => {
         companyId: user.companyId || user._id.toString(),
         logoUrl: user.logoUrl || "",
         companyName: user.companyName || "",
+        upiId: user.upiId || "",
       }
     });
   } catch (err) {
@@ -272,6 +277,16 @@ router.post("/save-logo", async (req, res) => {
     const { userId, logoUrl } = req.body;
 await User.findByIdAndUpdate(userId, { logoUrl }, { returnDocument: 'after' });
     res.json({ msg: "Logo saved" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+router.post("/save-company-name", async (req, res) => {
+  try {
+    const { userId, companyName } = req.body;
+    await User.findByIdAndUpdate(userId, { companyName }, { returnDocument: 'after' });
+    res.json({ msg: "Company name saved" });
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
   }

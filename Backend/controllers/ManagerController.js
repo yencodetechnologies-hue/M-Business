@@ -35,7 +35,7 @@ exports.addManager = async (req, res) => {
 
     // Send welcome email
     const welcomeMessage = `
-      <h3>Welcome to M Business, ${managerName}!</h3>
+      <h3>Welcome to the Platform, ${managerName}!</h3>
       <p>Your manager account has been successfully created.</p>
       <p><strong>Department:</strong> ${department || 'N/A'}</p>
       <p><strong>Role:</strong> ${role || 'Manager'}</p>
@@ -44,7 +44,7 @@ exports.addManager = async (req, res) => {
       <p>You can now access your dashboard and start managing your team.</p>
     `;
     
-    await sendQuickEmail(email, "Welcome to M Business - Manager Account Created", welcomeMessage);
+    await sendQuickEmail(email, "Welcome - Manager Account Created", welcomeMessage);
 
     res.status(201).json({
       message: "Manager Added Successfully",

@@ -170,8 +170,8 @@ export default function InterviewApplyForm() {
     const parts = slug.split("-");
     const last = parts[parts.length - 1] || "";
     const isMongo = /^[a-f0-9]{24}$/i.test(last);
-    if (isMongo) return { companyId: last, companyName: parts.slice(0, -1).join(" ") || "M Business" };
-    return { companyId: slug || "69b8fe0a6e3d6f1e056f3109", companyName: "M Business" };
+    if (isMongo) return { companyId: last, companyName: parts.slice(0, -1).join(" ") || "Your Business" };
+    return { companyId: slug || "69b8fe0a6e3d6f1e056f3109", companyName: "Your Business" };
   };
   const { companyId, companyName } = parseSlug(companySlug);
 

@@ -296,7 +296,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
         <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
           <div style={{ fontSize: 36, marginBottom: 10 }}>🚀</div>
           <h2 style={{ fontSize: 26, fontWeight: 800, color: T.text, margin: "0 0 8px" }}>Choose Your Plan</h2>
-          <p style={{ color: T.muted, fontSize: 14, margin: 0 }}>Select the best plan for your business growth • Powered by M Business </p>
+          <p style={{ color: T.muted, fontSize: 14, margin: 0 }}>Select the best plan for your business growth • Powered by {user?.companyName || "M Business"} </p>
         </div>
 
         {/* Plans Grid */}
@@ -595,9 +595,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
             </div>
           </Card>
 
-          <Card title="Provider — Business Suite" icon="🏢">
+          <Card title={`Provider — ${user?.companyName || "M Business"}`} icon="🏢">
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <InfoRow label="Company" value={subscription.providerCompany || "Business Suite"} icon="🏢" />
+              <InfoRow label="Company" value={subscription.providerCompany || user?.companyName || "M Business"} icon="🏢" />
               <InfoRow label="Email" value={subscription.providerEmail || "billing@business-suite.com"} icon="📧" />
               <InfoRow label="Phone" value={subscription.providerPhone || "+91-9876543210"} icon="📱" />
               <InfoRow label="GST" value={subscription.providerGst || "GSTIN-33AABCM1234Z1Z1"} icon="📋" />
@@ -669,7 +669,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
       {/* ── Invoices Tab ── */}
       {activeTab === "invoices" && (
-        <Card title={`Invoices from Business Suite (${invoices.length})`} icon="🧾">
+        <Card title={`Invoices from ${user?.companyName || "M Business"} (${invoices.length})`} icon="🧾">
           {invoices.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
@@ -700,7 +700,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
       {/* ── Quotations Tab ── */}
       {activeTab === "quotations" && (
-        <Card title={`Quotations from Business Suite (${quotations.length})`} icon="📄">
+        <Card title={`Quotations from ${user?.companyName || "M Business"} (${quotations.length})`} icon="📄">
           {quotations.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>📋</div>
@@ -780,7 +780,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
               {viewPayment.invoiceNo && <InfoRow label="Invoice No" value={viewPayment.invoiceNo} icon="🧾" />}
               {viewPayment.quotationNo && <InfoRow label="Quotation No" value={viewPayment.quotationNo} icon="📄" />}
               <div style={{ marginTop: 16, padding: 14, background: "#faf5ff", borderRadius: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Provider — M Business</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Provider — {user?.companyName || "M Business"}</div>
                 <InfoRow label="Company" value={viewPayment.providerCompany} icon="🏢" />
                 <InfoRow label="GST" value={viewPayment.providerGst} icon="📋" />
                 <InfoRow label="Address" value={viewPayment.providerAddress} icon="📍" />

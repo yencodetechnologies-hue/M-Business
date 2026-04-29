@@ -91,13 +91,20 @@ function Mdl({title,onClose,children,maxWidth=820}){
   );
 }
 
-function Fld({label,value,onChange,options,type="text",error,placeholder,disabled}){
+function Fld({label,value,onChange,options,type="text",error,placeholder,disabled,allowCustom}){
   const s={width:"100%",border:`1.5px solid ${error?"#EF4444":"#ede9fe"}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:T.text,background:disabled?"#f3f0ff":"#faf5ff",boxSizing:"border-box",outline:"none",fontFamily:"inherit",opacity:disabled?0.7:1};
+  const sCustom={flex:1.2,border:`1.5px solid ${error?"#EF4444":"#ede9fe"}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:T.text,background:"#fff",boxSizing:"border-box",outline:"none",fontFamily:"inherit"};
   return(
     <div style={{marginBottom:14}}>
       <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>{label.toUpperCase()}</label>
-      {options?<select value={value} onChange={e=>onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o=><option key={o}>{o}</option>)}</select>
-        :<input type={type} value={value} onChange={e=>onChange(e.target.value)} style={s} placeholder={placeholder||""} disabled={disabled}/>}
+      {options?(
+        allowCustom?(
+          <div style={{display:"flex",gap:10}}>
+            <select value={options.includes(value)?value:"Custom"} onChange={e=>{const v=e.target.value;if(v==="Custom")onChange("");else onChange(v);}} style={{...s,flex:1}} disabled={disabled}>{options.map(o=><option key={o} value={o}>{o}</option>)}<option value="Custom">Custom Status...</option></select>
+            {!options.includes(value)&&<input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value||""} onChange={e=>onChange(e.target.value)} style={sCustom} disabled={disabled}/>}
+          </div>
+        ):(<select value={value} onChange={e=>onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o=><option key={o}>{o}</option>)}</select>)
+      ):<input type={type} value={value} onChange={e=>onChange(e.target.value)} style={s} placeholder={placeholder||""} disabled={disabled}/>}
       {error&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {error}</div>}
     </div>
   );
@@ -909,7 +916,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
             <Fld label="Start Date" value={editForm.start} type="date" onChange={v=>setEditForm(p=>({...p,start:v}))}/>
             <Fld label="End Date" value={editForm.end} type="date" onChange={v=>setEditForm(p=>({...p,end:v}))}/>
             <Fld label="Team Members" value={editForm.team} onChange={v=>setEditForm(p=>({...p,team:v}))}/>
-            <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Pending","In Progress","Completed","On Hold"]}/>
+            <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Pending","In Progress","Completed","On Hold"]} allowCustom={true}/>
           </div>
           <div style={{marginBottom:14}}>
             <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEES</label>
@@ -1305,6 +1312,30 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
   const logoRef=useRef();
   const displayName=user?.name||user?.email?.split("@")[0]||"Admin";
   const initials=displayName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+  
+  const [editCN, setEditCN] = useState(false);
+  const [newCN, setNewCN] = useState(user?.companyName || "M Business");
+  const [savingCN, setSavingCN] = useState(false);
+
+  const saveCN = async () => {
+    if(!newCN.trim()) return alert("Company name cannot be empty");
+    try {
+      setSavingCN(true);
+      await axios.post(BASE_URL + "/api/auth/save-company-name", {
+        userId: user.id || user._id,
+        companyName: newCN.trim()
+      });
+      const updatedUser = { ...user, companyName: newCN.trim() };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      setEditCN(false);
+    } catch (e) {
+      alert("Failed to save company name");
+    } finally {
+      setSavingCN(false);
+    }
+  };
+
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.6)",backdropFilter:"blur(10px)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:16}} onClick={onClose}>
       <div style={{background:"#fff",borderRadius:22,width:"100%",maxWidth:420,maxHeight:"90vh",boxShadow:"0 32px 80px rgba(147,51,234,0.3)",display:"flex",flexDirection:"column",overflow:"hidden"}} onClick={e=>e.stopPropagation()}>
@@ -1318,6 +1349,24 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
           <span style={{display:"inline-block",marginTop:8,background:"rgba(255,255,255,0.18)",border:"1px solid rgba(255,255,255,0.28)",borderRadius:100,padding:"3px 12px",fontSize:10,fontWeight:700,color:"#fff",letterSpacing:1,textTransform:"uppercase"}}>{user?.role||"user"}</span>
         </div>
         <div style={{padding:"18px 24px",overflowY:"auto",flex:1}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fef2f2",borderRadius:9,border:"1px solid #fecaca",marginBottom:12}}>
+            <div style={{width:32,height:32,borderRadius:8,background:"rgba(239,68,68,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>🏢</div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:10,color:"#ef4444",fontWeight:700,letterSpacing:0.5,textTransform:"uppercase"}}>Company Name</div>
+              {editCN ? (
+                <div style={{display:"flex",gap:8,marginTop:4}}>
+                  <input value={newCN} onChange={e=>setNewCN(e.target.value)} style={{flex:1,padding:"6px 10px",fontSize:13,border:"1px solid #ddd",borderRadius:6,outline:"none"}} autoFocus/>
+                  <button onClick={saveCN} disabled={savingCN} style={{padding:"4px 10px",background:"#22C55E",color:"#fff",border:"none",borderRadius:6,fontSize:11,fontWeight:700,cursor:"pointer"}}>{savingCN?"...":"SAVE"}</button>
+                </div>
+              ) : (
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <div style={{fontSize:13,fontWeight:600,color:"#1e0a3c",marginTop:1}}>{user?.companyName || "M Business"}</div>
+                  {(user?.role === "admin" || user?.role === "subadmin") && <button onClick={()=>setEditCN(true)} style={{background:"none",border:"none",color:"#7c3aed",fontSize:11,fontWeight:700,cursor:"pointer"}}>EDIT</button>}
+                </div>
+              )}
+            </div>
+          </div>
+
           {[{icon:"👤",label:"Full Name",value:displayName},{icon:"📧",label:"Email",value:user?.email||"—"},{icon:"📱",label:"Phone",value:user?.phone||"—"},{icon:"🎭",label:"Role",value:user?.role||"user"},{icon:"🔑",label:"User ID",value:(user?.id||user?._id)?`#${String(user?.id||user?._id).slice(-8).toUpperCase()}`:"—"}].map(({icon,label,value})=>(
             <div key={label} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#faf5ff",borderRadius:9,border:"1px solid #ede9fe",marginBottom:7}}>
               <div style={{width:32,height:32,borderRadius:8,background:"rgba(147,51,234,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{icon}</div>
@@ -1354,7 +1403,7 @@ function Sidebar({active,setActive,onLogout,open,onClose,navItems,initials,compa
             <div style={{width:36,height:36,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:11,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:17,color:"#fff",boxShadow:"0 4px 14px rgba(147,51,234,0.5)"}}>
               {initials || "M"}
             </div>
-            <div><div style={{fontWeight:800,fontSize:14,color:"#fff"}}>{companyName || "M Business"}</div><div style={{fontSize:8,color:"rgba(255,255,255,0.35)",letterSpacing:1.5,marginTop:1}}>MANAGEMENT SUITE</div></div>
+            <div><div style={{fontWeight:800,fontSize:14,color:"#fff"}}>{companyName || "Your Business"}</div><div style={{fontSize:8,color:"rgba(255,255,255,0.35)",letterSpacing:1.5,marginTop:1}}>MANAGEMENT SUITE</div></div>
           </div>
           <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(255,255,255,0.4)",fontSize:18,cursor:"pointer",padding:"2px 6px",lineHeight:1}} className="sidebar-close">✕</button>
         </div>
@@ -1404,6 +1453,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const [nmError,setNmError]=useState({});
   const [mgrSaveLoading,setMgrSaveLoading]=useState(false);
   const [showMgrPass,setShowMgrPass]=useState(false);
+  const [viewProject,setViewProject]=useState(null);
 
   useEffect(()=>{fetchClients();fetchEmployees();fetchProjects();fetchManagers();},[]);
 
@@ -1486,12 +1536,12 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const page=navItems.find(n=>n.key===validActive)||navItems[0];
   useEffect(()=>{if(validActive!==active)setActive(validActive);},[user?.role]);
 
-  const displayName = user?.companyName || "M Business";
-  const initials = (displayName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const displayName = user?.companyName || "Your Business";
+  const initials = (displayName || "YB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const B=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
 
   const companyId=user?.companyId||user?.company||user?._id||user?.id||"default";
-  const companyNameStr = user?.companyName || "M Business";
+  const companyNameStr = user?.companyName || "Your Business";
 
   return(
     <div style={{display:"flex",minHeight:"100vh",background:"linear-gradient(135deg,#f5f3ff 0%,#faf5ff 50%,#f3e8ff 100%)",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
@@ -1525,7 +1575,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
           <div className="page-header" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
             <div>
               <h1 style={{margin:0,fontSize:22,fontWeight:800,color:T.text}}>{page?.icon} {page?.label}</h1>
-              <p style={{margin:"3px 0 0",color:"#a78bfa",fontSize:12}}>M Business Management Suite · {user?.role||"Admin"}</p>
+              <p style={{margin:"3px 0 0",color:"#a78bfa",fontSize:12}}>{companyNameStr} Management Suite · {user?.role||"Admin"}</p>
             </div>
             <div className="header-actions" style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
               {validActive==="clients"&&<button onClick={()=>{setNcError({});setShowClientPass(false);setModal("client");}} style={B("#9333ea")}>+ Add Client</button>}
@@ -1555,7 +1605,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
               ))}
             </div>
             <div className="dash-2col" style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:14,marginBottom:14}}>
-              <SC title="Recent Projects"><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:300}}><thead><tr style={{background:"#faf5ff"}}>{["Project","Client","Status"].map(c=><th key={c} style={{padding:"8px 10px",textAlign:"left",color:"#a78bfa",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe"}}>{c.toUpperCase()}</th>)}</tr></thead><tbody>{projects.slice(0,5).map((p,i)=><tr key={i} style={{borderBottom:"1px solid #f5f3ff"}}><td style={{padding:"9px 10px",fontWeight:600,color:T.text}}>{p.name}</td><td style={{padding:"9px 10px",color:"#a78bfa"}}>{p.client}</td><td style={{padding:"9px 10px"}}><Badge label={p.status}/></td></tr>)}</tbody></table></div></SC>
+              <SC title="Recent Projects"><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:300}}><thead><tr style={{background:"#faf5ff"}}>{["Project","Client","Status","View"].map(c=><th key={c} style={{padding:"8px 10px",textAlign:"left",color:"#a78bfa",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe"}}>{c.toUpperCase()}</th>)}</tr></thead><tbody>{projects.slice(0,5).map((p,i)=><tr key={i} style={{borderBottom:"1px solid #f5f3ff"}}><td style={{padding:"9px 10px",fontWeight:600,color:T.text}}>{p.name}</td><td style={{padding:"9px 10px",color:"#a78bfa"}}>{p.client}</td><td style={{padding:"9px 10px"}}><Badge label={p.status}/></td><td style={{padding:"9px 10px"}}><button onClick={()=>setViewProject(p)} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>View</button></td></tr>)}</tbody></table></div></SC>
               <SC title="Recent Activity">{[{icon:"👤",text:"New client added",time:"2m ago",c:"#9333ea"},{icon:"👨‍💼",text:"Employee joined",time:"30m ago",c:"#7c3aed"},{icon:"🧾",text:"Invoice created",time:"1h ago",c:"#22C55E"},{icon:"📁",text:"Project updated",time:"3h ago",c:"#a855f7"},{icon:"✅",text:"ERP completed",time:"2d ago",c:"#F59E0B"}].map((a,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",borderBottom:i<4?"1px solid #f5f3ff":"none"}}><div style={{width:28,height:28,borderRadius:8,background:`${a.c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0}}>{a.icon}</div><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,fontWeight:600,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.text}</div><div style={{fontSize:11,color:"#a78bfa"}}>{a.time}</div></div></div>))}</SC>
             </div>
             <div className="dash-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
@@ -1726,7 +1776,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
           <Fld label="Start Date" value={np.start} onChange={v=>setNp({...np,start:v})} type="date"/>
           <Fld label="End Date" value={np.end} onChange={v=>setNp({...np,end:v})} type="date"/>
           <Fld label="Team Members" value={np.team} onChange={v=>setNp({...np,team:v})}/>
-          <Fld label="Status" value={np.status} onChange={v=>setNp({...np,status:v})} options={["Pending","In Progress","Completed","On Hold"]}/>
+          <Fld label="Status" value={np.status} onChange={v=>setNp({...np,status:v})} options={["Pending","In Progress","Completed","On Hold"]} allowCustom={true}/>
         </div>
         <div style={{marginBottom:14}}>
           <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEES <span style={{fontSize:10,color:"#a78bfa",fontWeight:400}}>(select multiple)</span></label>
@@ -1786,6 +1836,43 @@ export default function Dashboard({setUser,user,fixedLogo}){
           <button onClick={addManager} disabled={mgrSaveLoading} style={{...B("#f59e0b"),opacity:mgrSaveLoading?0.7:1}}>{mgrSaveLoading?"Saving...":"Save Manager →"}</button>
         </div>
       </Mdl>}
+
+      {viewProject&&(
+        <Mdl title="Project Details" onClose={()=>setViewProject(null)} maxWidth={550}>
+          <div style={{padding:16,background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:14,border:"1px solid #ede9fe",marginBottom:18}}>
+            <div style={{fontSize:18,fontWeight:800,color:T.text,marginBottom:6}}>{viewProject.name}</div>
+            <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+              <Badge label={viewProject.status||"Pending"}/>
+              {viewProject.client&&<span style={{fontSize:12,color:"#9333ea",fontWeight:600}}>👥 {viewProject.client}</span>}
+            </div>
+          </div>
+          <InfoRow icon="💰" label="Budget" value={viewProject.budget}/>
+          <div style={{marginBottom:14}}>
+            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGNED EMPLOYEES</label>
+            {(() => {
+              const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
+              return assignedEmployees.length > 0
+                ?<div style={{display:"flex",flexDirection:"column",gap:6}}>
+                   {assignedEmployees.map((emp, idx)=>(
+                     <div key={idx} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:"#f8fafc",borderRadius:8,border:"1px solid #e2e8f0"}}>
+                       <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
+                       <span style={{color:"#1e0a3c",fontWeight:600,fontSize:12}}>{emp}</span>
+                     </div>
+                   ))}
+                 </div>
+                :<div style={{color:"#a78bfa",fontSize:13,fontStyle:"italic"}}>No employees assigned</div>
+            })()}
+          </div>
+          <InfoRow icon="📅" label="Start Date" value={viewProject.start}/>
+          <InfoRow icon="🏁" label="End Date" value={viewProject.end}/>
+          <InfoRow icon="🎯" label="Purpose" value={viewProject.purpose}/>
+          <InfoRow icon="👥" label="Team" value={viewProject.team}/>
+          <InfoRow icon="📝" label="Description" value={viewProject.description}/>
+          <div style={{display:"flex",gap:10,marginTop:16}}>
+            <button onClick={()=>setViewProject(null)} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>Close</button>
+          </div>
+        </Mdl>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { BASE_URL } from "../config";
+import { BASE_URL, FRONTEND_URL } from "../config";
 import axios from "axios";
 
 const GST_RATES = [0, 5, 12, 18, 28];
@@ -104,7 +104,7 @@ function ProjectDropdown({projects,value,onChange,onAddProject,disabled}){
   );
 }
 
-export default function QuotationCreator({ clients = [], projects = [], companyLogo, companyName, onLogoChange, onConvertToInvoice, onAddClient, onAddProject }) {
+export default function QuotationCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onConvertToInvoice, onAddClient, onAddProject }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
   const [step, setStep]             = useState("list");
@@ -114,6 +114,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
   const [draftSaved, setDraftSaved] = useState(false);
   const [errors, setErrors]         = useState({});
   const [convertingId, setConvertingId] = useState(null);
+  const [listSearch, setListSearch] = useState("");
 
   const today      = new Date().toISOString().split("T")[0];
   const expDefault = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
@@ -131,7 +132,8 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     amountPaid: 0,
     paymentDate: today,
     paymentMode: "GPay",
-    transactionId: ""
+    transactionId: "",
+    upiId: user?.upiId || "",
   };
 
   const [qt, setQt]     = useState(blank);
@@ -223,7 +225,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
   const shareQuotation = async (entry) => {
     const qtData = entry.qt || qt;
     const link = `${window.location.origin}/quotation-view?id=${entry.id || entry.quoteNo}`;
-    const text = `*${qtData.companyName || "Company"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`;
+    const text = `*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`;
     if (navigator.share) {
       try { await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, url: link }); } catch (err) { console.log(err); }
     } else {
@@ -235,7 +237,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
   const shareWhatsApp = (entry) => {
     const qtData = entry.qt || qt;
     const link = `${window.location.origin}/quotation-view?id=${entry.id || entry.quoteNo}`;
-    const text = encodeURIComponent(`*${qtData.companyName || "Company"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`);
+    const text = encodeURIComponent(`*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
@@ -273,6 +275,11 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
     try {
       await axios.patch(`${BASE_URL}/api/quotations/${entry.id}/status`, { status: newStatus });
       fetchList();
+      if (newStatus === "approved") {
+        const hasPaid = (entry.amountPaid || entry.qt?.amountPaid || 0) > 0;
+        if (hasPaid) alert("✅ Quotation Approved & Advance Recorded in Accounts!");
+        else alert("✅ Quotation Approved!");
+      }
     } catch (error) {
       console.error('Status update error:', error);
       alert("Status update failed");
@@ -313,10 +320,22 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
           <div>
             <p style={{ margin: "3px 0 0", color: "#9ca3af", fontSize: 13 }}>{enriched.length} total</p>
           </div>
-          <button onClick={() => { clearForm(); setStep("form"); }}
-            style={{ padding: "10px 22px", background: "linear-gradient(135deg,#9333ea,#10b981)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
-            + Create Quotation
-          </button>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <div style={{ position: "relative" }}>
+              <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 13 }}>🔍</span>
+              <input 
+                type="text" 
+                placeholder="Search quotations..." 
+                value={listSearch}
+                onChange={(e) => setListSearch(e.target.value)}
+                style={{ padding: "9px 12px 9px 34px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 13, outline: "none", width: 220, fontFamily: "inherit" }}
+              />
+            </div>
+            <button onClick={() => { clearForm(); setStep("form"); }}
+              style={{ padding: "10px 22px", background: "linear-gradient(135deg,#9333ea,#10b981)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
+              + Create Quotation
+            </button>
+          </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12, marginBottom: 24 }}>
@@ -348,11 +367,16 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
               <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>No quotations yet</div>
               <div style={{ fontSize: 13, color: "#9ca3af", marginTop: 4 }}>Click "+ Create Quotation" to get started</div>
             </div>
-          ) : enriched.map((entry, idx) => {
+          ) : enriched.filter(e => {
+            const term = listSearch.toLowerCase();
+            return (e.quoteNo || "").toLowerCase().includes(term) ||
+                   (e.client || "").toLowerCase().includes(term) ||
+                   (e.qt?.project || e.project || "").toLowerCase().includes(term);
+          }).map((entry, idx, arr) => {
             const qtD = entry.qt || {};
             return (
               <div key={entry.id || idx} className="qt-row"
-                style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr 0.8fr 1fr 0.9fr 0.9fr 1.1fr auto", padding: "13px 20px", borderBottom: idx < enriched.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff", gap: 8 }}>
+                style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr 0.8fr 1fr 0.9fr 0.9fr 1.1fr auto", padding: "13px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff", gap: 8 }}>
                 <div onClick={() => loadEntry(entry)} style={{ cursor: "pointer" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{entry.quoteNo || "—"}</div>
                   <div style={{ fontSize: 11, color: "#d1d5db", marginTop: 1 }}>{formatDateTime(entry.savedAt)}</div>
@@ -401,9 +425,10 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
       cl: qt.client, proj: qt.project, gst: qt.gstRate, notes: qt.notes, terms: qt.terms,
       incGst: qt.isGstIncluded,
       paid: qt.amountPaid,
+      upi: qt.upiId,
       items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
     };
-    const qrData = `${window.location.origin}/quotation-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
+    const qrData = `${FRONTEND_URL}/quotation-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
     return (
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>
@@ -511,7 +536,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
               <div style={{ width: "min(280px,100%)" }}>
                 {[
                   ["Subtotal", formatCurrency(subtotal, qt.currency)],
-                  [`GST (${qt.gstRate}%)`, formatCurrency(gstAmt, qt.currency)],
+                  [`GST (${qt.gstRate}%)${qt.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, qt.currency)],
                   ["Amount Paid", formatCurrency(amountPaid, qt.currency)]
                 ].map(([l,v]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0fdf4" }}>
@@ -637,12 +662,19 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
           </div>
           <div>
             <label style={lbl}>Currency</label>
-            <select value={qt.currency} onChange={(e) => upd("currency", e.target.value)} style={inp()}>
-              <option value="₹">INR (₹)</option>
-              <option value="$">USD ($)</option>
-              <option value="€">EUR (€)</option>
-              <option value="£">GBP (£)</option>
-            </select>
+            <div style={{ display: "flex", gap: 8 }}>
+              <select value={["₹", "$", "€", "£", "¥"].includes(qt.currency) ? qt.currency : "Custom"} onChange={(e) => upd("currency", e.target.value === "Custom" ? "" : e.target.value)} style={{ ...inp(), flex: 1 }}>
+                <option value="₹">INR (₹)</option>
+                <option value="$">USD ($)</option>
+                <option value="€">EUR (€)</option>
+                <option value="£">GBP (£)</option>
+                <option value="¥">JPY (¥)</option>
+                <option value="Custom">Custom...</option>
+              </select>
+              {!["₹", "$", "€", "£", "¥"].includes(qt.currency) && (
+                <input value={qt.currency} onChange={(e) => upd("currency", e.target.value)} style={{ ...inp(), flex: 1 }} placeholder="e.g. AUD" />
+              )}
+            </div>
           </div>
           <div>
             <label style={lbl}>Template</label>
@@ -675,7 +707,9 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
               <option value="NEFT">NEFT</option>
               <option value="RTGS">RTGS</option>
               <option value="Cash">Cash</option>
-              <option value="Check">Check</option>
+              <option value="Cheque">Cheque</option>
+              <option value="Card">Card</option>
+              <option value="UPI">UPI</option>
               <option value="Bank Transfer">Bank Transfer</option>
             </select>
           </div>
@@ -749,7 +783,7 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
               <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(subtotal, qt.currency)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
-              <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({qt.gstRate}%)</span>
+              <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({qt.gstRate}%){qt.isGstIncluded ? " (Incl.)" : ""}</span>
               <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(gstAmt, qt.currency)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#064e3b,#9333ea)", borderRadius: 10, marginTop: 8 }}>
@@ -790,6 +824,10 @@ export default function QuotationCreator({ clients = [], projects = [], companyL
           <div style={{ gridColumn: "1 / -1" }}>
             <label style={lbl}>Company Address</label>
             <textarea value={qt.companyAddress} onChange={(e) => upd("companyAddress", e.target.value)} placeholder="Full Address" rows={2} style={{ ...inp(), resize: "vertical", lineHeight: 1.6 }} />
+          </div>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label style={lbl}>UPI ID for Payment</label>
+            <input value={qt.upiId} onChange={(e) => upd("upiId", e.target.value)} placeholder="e.g. business@okaxis" style={inp()} />
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
             <label style={lbl}>Footer Message</label>

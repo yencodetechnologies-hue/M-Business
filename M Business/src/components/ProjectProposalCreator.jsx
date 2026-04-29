@@ -294,7 +294,7 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
   );
 }
 // ─── SLIDE RENDERER ───────────────────────────────────────────────────────────
-function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSelectElement, onUpdateElement, onDelete, preview=false, canvasRef, companyLogo, companyName }){
+function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSelectElement, onUpdateElement, onDelete, preview=false, canvasRef, companyLogo, companyName, footerMessage }){
   const t = THEMES.find(x=>x.name===tn)||THEMES[0];
   const upd = patch => onChange&&onChange({...slide,...patch});
   const fontSize = preview ? 0.22 : 1;
@@ -443,7 +443,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
       {/* Footer Element */}
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#020617,#1e1b4b)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.companyName || companyName}</div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>{doc.footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>{footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{slide.id}</div>
       </div>
       
@@ -707,7 +707,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
 
       {/* Footer */}
       <div style={{position:"absolute",bottom:"40px",left:"60px",right:"60px",textAlign:"center",fontSize:"10px",color:"#666",borderTop:"2px solid #ff0000",paddingTop:"10px"}}>
-        <div style={{fontWeight: "bold", color: "#333", marginBottom: 4}}>{doc.footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
+        <div style={{fontWeight: "bold", color: "#333", marginBottom: 4}}>{footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
         <Txt val={slide.companyAddress} onCh={v=>upd({companyAddress:v})}/>
       </div>
       
@@ -1510,8 +1510,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             <div style={{display:"flex",alignItems:"center",gap:8,background:"#f0fdf4",padding:"4px 12px",borderRadius:8,border:"1px solid #86efac"}}>
               <span style={{fontSize:11,fontWeight:800,color:"#16a34a"}}>CURRENCY:</span>
               <select 
-                value={doc.currency || "₹"} 
-                onChange={e=>{const nd={...doc,currency:e.target.value}; setDoc(nd); persist(nd);}}
+                value={["₹", "$", "€", "£", "¥"].includes(doc.currency || "₹") ? (doc.currency || "₹") : "Custom"} 
+                onChange={e=>{
+                  const val = e.target.value === "Custom" ? "" : e.target.value;
+                  const nd={...doc,currency:val}; setDoc(nd); persist(nd);
+                }}
                 disabled={!canEdit}
                 style={{background:"none",border:"none",fontSize:12,fontWeight:700,color:"#16a34a",outline:"none",cursor:"pointer"}}
               >
@@ -1519,7 +1522,18 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                 <option value="$">USD ($)</option>
                 <option value="€">EUR (€)</option>
                 <option value="£">GBP (£)</option>
+                <option value="¥">JPY (¥)</option>
+                <option value="Custom">Custom...</option>
               </select>
+              {!["₹", "$", "€", "£", "¥"].includes(doc.currency || "₹") && (
+                <input 
+                  value={doc.currency || ""} 
+                  onChange={e=>{const nd={...doc,currency:e.target.value}; setDoc(nd); persist(nd);}}
+                  disabled={!canEdit}
+                  placeholder="AUD" 
+                  style={{background:"#fff",border:"1px solid #bbf7d0",borderRadius:4,fontSize:12,fontWeight:700,color:"#16a34a",outline:"none",padding:"2px 6px",width:50}}
+                />
+              )}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,background:"#fff7ed",padding:"4px 12px",borderRadius:8,border:"1px solid #fdba74"}}>
               <span style={{fontSize:11,fontWeight:800,color:"#ea580c"}}>FOOTER:</span>
@@ -1706,7 +1720,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                       style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:8,overflow:"hidden",cursor:canEdit?"pointer":"not-allowed",transition:"all .2s",position:"relative"}} className="pgthumb">
                       <div style={{aspectRatio:ar, overflow:"hidden", width:"100%"}}>
                         <div style={{transform:`scale(${isP ? 294/900 : 294/900})`,transformOrigin:"top left",width:900,height:h,pointerEvents:"none"}}>
-                          <Slide slide={makeSlide(tmpl.id, doc.theme)} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview companyLogo={companyLogo} companyName={companyName}/>
+                          <Slide slide={makeSlide(tmpl.id, doc.theme)} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview companyLogo={companyLogo} companyName={companyName} footerMessage={doc?.footerMessage}/>
                         </div>
                       </div>
                       <div style={{padding:"8px 12px",fontSize:12,fontWeight:700,color:"#0f172a",background:"#fff",borderTop:"1px solid #f1f5f9",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
@@ -2016,6 +2030,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                       canvasRef={canvasRef}
                       companyLogo={companyLogo}
                       companyName={companyName}
+                      footerMessage={doc?.footerMessage}
                     />
                   </div>
                 </div>
@@ -2046,6 +2061,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                     canvasRef={canvasRef}
                     companyLogo={companyLogo}
                     companyName={companyName}
+                    footerMessage={doc?.footerMessage}
                   />
                 ) : (
                   <div style={{ width: 900, height: 506, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", color: "#64748b", fontSize: 14, fontWeight: 500 }}>
@@ -2092,7 +2108,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             <div key={s.id} onClick={()=>setPage(i)}
               style={{height:70,width:stripWidth,flexShrink:0,borderRadius:6,overflow:"hidden",cursor:"pointer",border:`2px solid ${i===page?"#7d2ae8":"#e2e8f0"}`,position:"relative",background:"#fff",transition:"all .2s",boxShadow:i===page?"0 0 0 2px rgba(125,42,232,0.2)":"none",transform:i===page?"scale(1.05)":"scale(1)"}}>
               <div style={{transform:`scale(${stripWidth/900})`,transformOrigin:"top left",width:900,height:h,pointerEvents:"none"}}>
-                <Slide slide={s} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview companyLogo={companyLogo} companyName={companyName}/>
+                <Slide slide={s} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview companyLogo={companyLogo} companyName={companyName} footerMessage={doc?.footerMessage}/>
               </div>
               <div style={{position:"absolute",bottom:4,left:6,fontSize:10,fontWeight:800,color:i===page?"#7d2ae8":"#94a3b8",background:"rgba(255,255,255,0.8)",padding:"0 4px",borderRadius:4}}>{i+1}</div>
               {canEdit && doc.slides.length > 1 && (

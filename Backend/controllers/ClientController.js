@@ -44,7 +44,7 @@ exports.addClient = async (req, res) => {
 
     // Send welcome email
     const welcomeMessage = `
-      <h3>Welcome to M Business, ${clientName}!</h3>
+      <h3>Welcome to the Platform, ${clientName}!</h3>
       <p>Your account has been successfully created.</p>
       <p><strong>Company:</strong> ${companyName || 'N/A'}</p>
       <p><strong>Email:</strong> ${email}</p>
@@ -52,7 +52,7 @@ exports.addClient = async (req, res) => {
       <p>You can now access your dashboard and start using our services.</p>
     `;
     
-    await sendQuickEmail(email, "Welcome to M Business - Account Created Successfully", welcomeMessage);
+    await sendQuickEmail(email, "Welcome - Account Created Successfully", welcomeMessage);
 
     res.status(201).json({
       message: "Client Added Successfully",

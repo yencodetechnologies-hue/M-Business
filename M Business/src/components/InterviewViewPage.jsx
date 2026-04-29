@@ -1,7 +1,7 @@
 // InterviewPage.jsx
 // Drop into Dashboard.jsx as a tab/page
 // Props: companyId, companyName (from logged-in user context)
-// Default: M Business — 69b8fe0a6e3d6f1e056f3109
+// Default: {companyName} — {companyId}
 
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -174,7 +174,7 @@ function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
 }
 
 // ── Main Page ─────────────────────────────────────────────
-export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", companyName = "M Business" }) {
+export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", companyName = "Your Business" }) {
   const STORAGE_KEY = `hr_candidates_${companyId}`;
   const [candidates, setCandidates] = useState([]);
   const [filter, setFilter]         = useState("all");

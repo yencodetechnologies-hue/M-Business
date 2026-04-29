@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import axios from "axios";
-import { BASE_URL } from "../config";
+import { BASE_URL, FRONTEND_URL } from "../config";
 
 const GST_RATES = [0, 5, 12, 18, 28];
 const DEFAULT_LOGO_URL = "";
@@ -143,7 +143,7 @@ function ProjectDropdown({projects,value,onChange,onAddProject,disabled}){
 }
 
 // ════════════════════════════════════════════════════════════
-export default function InvoiceCreator({ clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
@@ -157,6 +157,9 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   const [deleteTarget, setDeleteTarget] = useState(null); // entry to delete
   const [viewEntry, setViewEntry] = useState(null);       // entry for view modal
   const [statusUpdating, setStatusUpdating] = useState(null);
+  const [paymentModalEntry, setPaymentModalEntry] = useState(null);
+  const [paymentData, setPaymentData] = useState({ amountPaid: 0, paymentMode: "GPay", paymentDate: new Date().toISOString().split("T")[0], transactionId: "" });
+  const [listSearch, setListSearch] = useState("");
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
@@ -176,7 +179,8 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     paymentDate: today,
     paymentMode: "GPay",
     transactionId: "",
-    isGstIncluded: false
+    isGstIncluded: false,
+    upiId: user?.upiId || "",
   };
 
   const [inv, setInv] = useState(blank);
@@ -315,21 +319,45 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
   // ── Update status inline ────────────────────────────────────
   const handleStatusChange = async (entry, newStatus) => {
+    if (newStatus === "paid") {
+      setPaymentData({
+        amountPaid: entry.total || 0,
+        paymentMode: "GPay",
+        paymentDate: new Date().toISOString().split("T")[0],
+        transactionId: ""
+      });
+      setPaymentModalEntry(entry);
+      return; // Wait for modal confirmation
+    }
+    await updateStatusBackend(entry, newStatus);
+  };
+
+  const updateStatusBackend = async (entry, newStatus, paymentDetails = {}) => {
     const id = entry.id;
     setStatusUpdating(id);
     try {
-      await axios.patch(`${BASE_URL}/api/invoices/${id}/status`, { status: newStatus });
+      await axios.patch(`${BASE_URL}/api/invoices/${id}/status`, { status: newStatus, ...paymentDetails });
     } catch { }
     // update local list
     setInvoiceList(prev => prev.map(e =>
-      (e.id || e.invoiceNo) === (id || entry.invoiceNo) ? { ...e, status: newStatus } : e
+      (e.id || e.invoiceNo) === (id || entry.invoiceNo) ? { ...e, status: newStatus, ...(e.inv ? { inv: { ...e.inv, ...paymentDetails } } : {}), ...paymentDetails } : e
     ));
     // update localStorage
     const drafts = loadAllDrafts();
     const idx = drafts.findIndex(d => (d.id || d.invoiceNo) === (id || entry.invoiceNo));
-    if (idx >= 0) { drafts[idx].status = newStatus; localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts)); }
+    if (idx >= 0) { 
+      drafts[idx].status = newStatus; 
+      if (drafts[idx].inv) Object.assign(drafts[idx].inv, paymentDetails); 
+      Object.assign(drafts[idx], paymentDetails);
+      localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts)); 
+    }
     setStatusUpdating(null);
-    showToast(`✅ Status updated to ${newStatus}`);
+    if (newStatus === "paid") {
+      const isPartial = paymentDetails.amountPaid < (entry.total || 0);
+      showToast(isPartial ? "✅ Recorded as Part Payment in Accounts" : "✅ Recorded as Full Payment in Accounts");
+    } else {
+      showToast(`✅ Status updated to ${newStatus}`);
+    }
   };
 
   // ── QR ──────────────────────────────────────────────────────
@@ -339,14 +367,15 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
     cl: inv.client, proj: inv.project, gst: inv.gstRate, notes: inv.notes, terms: inv.terms,
     incGst: inv.isGstIncluded,
     paid: inv.amountPaid,
+    upi: inv.upiId,
     items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
   };
-  const qrData = `${window.location.origin}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
+  const qrData = `${FRONTEND_URL}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
   const shareInvoice = async (entry) => {
     const invData = entry.inv || inv;
     const link = `${window.location.origin}/invoice-view?id=${entry.id || entry.invoiceNo}`;
-    const text = `*${invData.companyName || "Company"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`;
+    const text = `*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`;
     if (navigator.share) {
       try { await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, url: link }); } catch (err) { console.log(err); }
     } else {
@@ -358,7 +387,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
   const shareWhatsApp = (entry) => {
     const invData = entry.inv || inv;
     const link = `${window.location.origin}/invoice-view?id=${entry.id || entry.invoiceNo}`;
-    const text = encodeURIComponent(`*${invData.companyName || "Company"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`);
+    const text = encodeURIComponent(`*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
@@ -407,16 +436,79 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
 
         <Toast msg={toast} />
         {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
+        
+        {/* Payment Modal */}
+        {paymentModalEntry && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#1e0a3c" }}>Payment Details</h3>
+                <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>✕</button>
+              </div>
+              
+              <div style={{ marginBottom: 16 }}>
+                <label style={lbl}>Amount Paid <span style={{color:"#ef4444"}}>*</span></label>
+                <div style={{position:"relative"}}>
+                  <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"#6b7280",fontSize:14,fontWeight:600}}>{inv.currency}</span>
+                  <input type="number" value={paymentData.amountPaid} onChange={e => setPaymentData(p => ({ ...p, amountPaid: e.target.value }))} style={{...inp(), paddingLeft:30}} />
+                </div>
+              </div>
+              
+              <div style={{ marginBottom: 16 }}>
+                <label style={lbl}>Payment Mode</label>
+                <select value={paymentData.paymentMode} onChange={e => setPaymentData(p => ({ ...p, paymentMode: e.target.value }))} style={inp()}>
+                  <option value="GPay">GPay</option>
+                  <option value="PhonePe">PhonePe</option>
+                  <option value="Paytm">Paytm</option>
+                  <option value="UPI">UPI</option>
+                  <option value="NEFT">NEFT / RTGS</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              
+              <div style={{ marginBottom: 16 }}>
+                <label style={lbl}>Payment Date</label>
+                <input type="date" value={paymentData.paymentDate} onChange={e => setPaymentData(p => ({ ...p, paymentDate: e.target.value }))} style={inp()} />
+              </div>
+
+              <div style={{ marginBottom: 24 }}>
+                <label style={lbl}>Transaction ID (Optional)</label>
+                <input type="text" value={paymentData.transactionId} onChange={e => setPaymentData(p => ({ ...p, transactionId: e.target.value }))} style={inp()} placeholder="e.g. UTR123456789" />
+              </div>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <button onClick={() => setPaymentModalEntry(null)} style={{ flex: 1, padding: "12px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#7c3aed", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+                <button onClick={() => {
+                  updateStatusBackend(paymentModalEntry, "paid", paymentData);
+                  setPaymentModalEntry(null);
+                }} style={{ flex: 1, padding: "12px", background: "linear-gradient(135deg,#16a34a,#15803d)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Confirm Payment</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
           <div>
             <p style={{ margin: "3px 0 0", color: "#9ca3af", fontSize: 13 }}>{enriched.length} total invoice{enriched.length !== 1 ? "s" : ""}</p>
           </div>
-          <button onClick={() => { clearForm(); setStep("form"); }}
-            style={{ padding: "10px 22px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(147,51,234,0.3)" }}>
-            + Create Invoice
-          </button>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <div style={{ position: "relative" }}>
+              <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 13 }}>🔍</span>
+              <input 
+                type="text" 
+                placeholder="Search invoices..." 
+                value={listSearch}
+                onChange={(e) => setListSearch(e.target.value)}
+                style={{ padding: "9px 12px 9px 34px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 13, outline: "none", width: 220, fontFamily: "inherit" }}
+              />
+            </div>
+            <button onClick={() => { clearForm(); setStep("form"); }}
+              style={{ padding: "10px 22px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(147,51,234,0.3)" }}>
+              + Create Invoice
+            </button>
+          </div>
         </div>
 
         {/* Summary cards */}
@@ -457,14 +549,19 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
               <div style={{ fontSize: 15, fontWeight: 700, color: "#111827", marginBottom: 4 }}>No invoices yet</div>
               <div style={{ fontSize: 13, color: "#9ca3af" }}>Click "+ Create Invoice" to get started</div>
             </div>
-          ) : enriched.map((entry, idx) => {
+          ) : enriched.filter(e => {
+            const term = listSearch.toLowerCase();
+            return (e.invoiceNo || "").toLowerCase().includes(term) ||
+                   (e.client || "").toLowerCase().includes(term) ||
+                   (e.inv?.project || e.project || "").toLowerCase().includes(term);
+          }).map((entry, idx, arr) => {
             const invD = entry.inv || {};
             const sc = statusColor[(entry.status || "draft").toLowerCase()] || "#6b7280";
             const isUpdating = statusUpdating === entry.id;
 
             return (
               <div key={entry.id || idx} className="inv-row"
-                style={{ display: "grid", gridTemplateColumns: "1.3fr 1.2fr 0.8fr 0.9fr 0.9fr 1fr 0.8fr 1.4fr", padding: "14px 20px", borderBottom: idx < enriched.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff" }}>
+                style={{ display: "grid", gridTemplateColumns: "1.3fr 1.2fr 0.8fr 0.9fr 0.9fr 1fr 0.8fr 1.4fr", padding: "14px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff" }}>
 
                 {/* Invoice No */}
                 <div onClick={() => setViewEntry(entry)}>
@@ -622,7 +719,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                       {/* Totals */}
                       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 18 }}>
                         <div style={{ minWidth: 240 }}>
-                          {[["Subtotal", formatCurrency(vSub, vInv.currency || inv.currency)], [`GST (${vInv.gstRate || 18}%)`, formatCurrency(vGst, vInv.currency || inv.currency)]].map(([l, v]) => (
+                          {[["Subtotal", formatCurrency(vSub, vInv.currency || inv.currency)], [`GST (${vInv.gstRate || 18}%)${vInv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(vGst, vInv.currency || inv.currency)]].map(([l, v]) => (
                             <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #f3f0ff" }}>
                               <span style={{ fontSize: 13, color: "#6b7280" }}>{l}</span>
                               <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
@@ -788,7 +885,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
             </table>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
               <div style={{ width: "min(280px,100%)" }}>
-                {[["Subtotal", formatCurrency(subtotal, inv.currency)], [`GST (${inv.gstRate}%)`, formatCurrency(gstAmt, inv.currency)], ["Amount Paid", formatCurrency(amountPaid, inv.currency)]].map(([l, v]) => (
+                {[["Subtotal", formatCurrency(subtotal, inv.currency)], [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)], ["Amount Paid", formatCurrency(amountPaid, inv.currency)]].map(([l, v]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f3f0ff" }}>
                     <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
@@ -926,13 +1023,19 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
           </div>
           <div>
             <label style={lbl}>Currency</label>
-            <select value={inv.currency} onChange={(e) => upd("currency", e.target.value)} style={inp()}>
-              <option value="₹">INR (₹)</option>
-              <option value="$">USD ($)</option>
-              <option value="€">EUR (€)</option>
-              <option value="£">GBP (£)</option>
-              <option value="¥">JPY (¥)</option>
-            </select>
+            <div style={{ display: "flex", gap: 8 }}>
+              <select value={["₹", "$", "€", "£", "¥"].includes(inv.currency) ? inv.currency : "Custom"} onChange={(e) => upd("currency", e.target.value === "Custom" ? "" : e.target.value)} style={{ ...inp(), flex: 1 }}>
+                <option value="₹">INR (₹)</option>
+                <option value="$">USD ($)</option>
+                <option value="€">EUR (€)</option>
+                <option value="£">GBP (£)</option>
+                <option value="¥">JPY (¥)</option>
+                <option value="Custom">Custom...</option>
+              </select>
+              {!["₹", "$", "€", "£", "¥"].includes(inv.currency) && (
+                <input value={inv.currency} onChange={(e) => upd("currency", e.target.value)} style={{ ...inp(), flex: 1 }} placeholder="e.g. AUD" />
+              )}
+            </div>
           </div>
           <div>
             <label style={lbl}>Template</label>
@@ -964,7 +1067,9 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                 <option value="NEFT">NEFT</option>
                 <option value="RTGS">RTGS</option>
                 <option value="Cash">Cash</option>
-                <option value="Check">Check</option>
+                <option value="Cheque">Cheque</option>
+                <option value="Card">Card</option>
+                <option value="UPI">UPI</option>
                 <option value="Bank Transfer">Bank Transfer</option>
               </select>
             </div>
@@ -1043,7 +1148,7 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
                 <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(subtotal, inv.currency)}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
-                <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({inv.gstRate}%)</span>
+                <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({inv.gstRate}%){inv.isGstIncluded ? " (Incl.)" : ""}</span>
                 <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(gstAmt, inv.currency)}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 10, marginTop: 8 }}>
@@ -1088,6 +1193,10 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
               <textarea value={inv.companyAddress} onChange={(e) => upd("companyAddress", e.target.value)} placeholder="Full Address" rows={2} style={{ ...inp(), resize: "vertical", lineHeight: 1.6 }} />
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
+              <label style={lbl}>UPI ID for Payment</label>
+              <input value={inv.upiId} onChange={(e) => upd("upiId", e.target.value)} placeholder="e.g. business@okaxis" style={inp()} />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
               <label style={lbl}>Footer Message</label>
               <input value={inv.footerMessage} onChange={(e) => upd("footerMessage", e.target.value)} placeholder="🙏 Thank you for considering us!" style={inp()} />
             </div>
@@ -1100,6 +1209,14 @@ export default function InvoiceCreator({ clients = [], projects = [], companyLog
             style={{ flex: 1, padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
             {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved as Draft!" : "💾 Save Draft"}
           </button>
+
+          {editingId && (
+            <>
+              <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }} title="Share Link">🔗 Share</button>
+              <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }} title="Share on WhatsApp">💬 WhatsApp</button>
+            </>
+          )}
+
           <button onClick={handleSavePreview} disabled={!!saving}
             style={{ flex: 2, padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#4c1d95,#7c3aed)", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
             {saving === "preview" ? "Saving…" : "Preview & Print →"}

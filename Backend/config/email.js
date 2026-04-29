@@ -13,22 +13,21 @@ const transporter = nodemailer.createTransport({
 
 const mbHeader = `
   <div style="background:linear-gradient(135deg,#9333ea 0%,#7c3aed 100%);padding:28px 32px;border-radius:12px 12px 0 0;text-align:center;">
-    <h2 style="color:#fff;margin:0;font-size:22px;font-family:Arial,sans-serif;letter-spacing:1px;">Business Suite</h2>
-    <p style="color:#e9d5ff;margin:4px 0 0;font-size:12px;">Workspace Management Suite</p>
+    <h2 style="color:#fff;margin:0;font-size:22px;font-family:Arial,sans-serif;letter-spacing:1px;">Management Platform</h2>
+    <p style="color:#e9d5ff;margin:4px 0 0;font-size:12px;">Automated Business Workflow</p>
   </div>
 `;
 
 const mbFooter = `
   <p style="color:#9ca3af;font-size:12px;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:16px;font-family:Arial,sans-serif;">
-    This is an automated message from Business Suite. Please do not reply directly.<br/>
-    For support: <a href="mailto:support@business-suite.com" style="color:#9333ea;">support@business-suite.com</a>
+    This is an automated message. Please do not reply directly.
   </p>
 `;
 
 const sendEmail = async (to, subject, html) => {
   try {
     const info = await transporter.sendMail({
-      from: `"Business Suite" <${process.env.SMTP_USER || 'noreply@business-suite.com'}>`,
+      from: `"Business Notification" <${process.env.SMTP_USER || 'noreply@platform.com'}>`,
       to,
       subject,
       html
@@ -142,7 +141,7 @@ const sendSubscriptionSuccess = async (userEmail, userName, planName, startDate,
       </div>
     </div>
   `;
-  const subject = isTrial ? `🎉 Your 30-Day Free Trial is Now Active — Business Suite` : `✅ Your ${planName} Subscription is Now Active!`;
+  const subject = isTrial ? `🎉 Your 30-Day Free Trial is Now Active` : `✅ Your ${planName} Subscription is Now Active!`;
   return await sendEmail(userEmail, subject, html);
 };
 
@@ -174,7 +173,7 @@ const sendOTPEmail = async (userEmail, otp, purpose = 'verification') => {
       </div>
     </div>
   `;
-  return await sendEmail(userEmail, `Your Business Suite OTP — ${purpose.replace('_', ' ').toUpperCase()}`, html);
+  return await sendEmail(userEmail, `Your OTP Code — ${purpose.replace('_', ' ').toUpperCase()}`, html);
 };
 
 // Quick email utility

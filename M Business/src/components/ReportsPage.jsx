@@ -61,7 +61,7 @@ function ReportCard({ r, idx }) {
         <div style={{ background:`${color}15`, border:`1px solid ${color}30`,
           borderRadius:10, padding:"6px 12px", flexShrink:0 }}>
           <div style={{ fontSize:11, fontWeight:800, color }}>
-            {typeof r.revenue === "string" ? r.revenue : `₹${r.revenue}`}
+            {typeof r.revenue === "string" ? r.revenue : (r.currency || "₹") + r.revenue}
           </div>
         </div>
       </div>
@@ -132,7 +132,7 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
       const n = parseFloat((p.budget||"0").toString().replace(/[^0-9.]/g,""));
       return acc + (isNaN(n)?0:n);
     },0);
-    const fmtINR = (n) => n>=100000 ? `₹${(n/100000).toFixed(2)}L` : `₹${n.toLocaleString("en-IN")}`;
+    const fmtCur = (n, sym = "₹") => n>=100000 ? `${sym}${(n/100000).toFixed(2)}L` : `${sym}${n.toLocaleString("en-IN")}`;
 
     const projThisMonth = projects.filter(p=>{
       const d = p.createdAt ? new Date(p.createdAt) : null;
@@ -144,17 +144,17 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
     setReports([
       { id:"RPT001", type:"Monthly Revenue",
         range:`${MONTHS[now.getMonth()]} ${now.getFullYear()}`,
-        total:projThisMonth.length, revenue:fmtINR(sumBudget(projThisMonth)),
+        total:projThisMonth.length, revenue:fmtCur(sumBudget(projThisMonth)),
         done:projThisMonth.filter(p=>p.status==="Completed").length,
         pending:projThisMonth.filter(p=>p.status!=="Completed").length },
       { id:"RPT002", type:"Project Summary",
         range:`Q${quarter} ${now.getFullYear()}`,
-        total:projects.length, revenue:fmtINR(sumBudget(projects)),
+        total:projects.length, revenue:fmtCur(sumBudget(projects)),
         done:projects.filter(p=>p.status==="Completed").length,
         pending:projects.filter(p=>p.status!=="Completed").length },
       { id:"RPT003", type:"Client Activity",
         range:`${MONTHS[now.getMonth()]} ${now.getFullYear()}`,
-        total:clients.length, revenue:fmtINR(sumBudget(projThisMonth)),
+        total:clients.length, revenue:fmtCur(sumBudget(projThisMonth)),
         done:clients.filter(c=>c.status==="Active").length,
         pending:clients.filter(c=>c.status!=="Active").length },
       { id:"RPT004", type:"Team Overview",

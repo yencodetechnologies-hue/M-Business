@@ -11,6 +11,7 @@ const vendorSchema = new mongoose.Schema({
   productDescription: { type: String },
   dateOfPurchase: { type: Date },
   modeOfPayment: { type: String },
+  currency: { type: String, default: "₹" },
   companyId: { type: String, default: "" }
 }, { timestamps: true });
 

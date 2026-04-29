@@ -342,8 +342,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12, marginBottom: 24 }}>
           {[
-            { label: "Total Quoted",   value: formatCurrency(totalAmt, enriched[0]?.qt?.currency || "₹"),    color: "#9333ea" },
-            { label: "Approved Value", value: formatCurrency(approvedAmt, enriched[0]?.qt?.currency || "₹"), color: "#16a34a" },
+            { label: "Total Quoted",   value: formatCurrency(totalAmt, qt.currency || "₹"),    color: "#9333ea" },
+            { label: "Approved Value", value: formatCurrency(approvedAmt, qt.currency || "₹"), color: "#16a34a" },
             { label: "Pending",        value: `${pendingCnt}`,        color: "#d97706" },
             { label: "Approved",       value: `${approvedCnt}`,       color: "#2563eb" },
           ].map((c) => (
@@ -507,6 +507,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       incGst: qt.isGstIncluded,
       paid: qt.amountPaid,
       upi: qt.upiId,
+      cur: qt.currency,
       items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
     };
     const qrData = `${FRONTEND_URL}/quotation-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
@@ -813,7 +814,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>⚠ {errors.client}</div>}
           </div>
           <div>
-            <label style={lbl}>Project <span style={{ color: "#d1d5db" }}>(optional)</span></label>
+            <label style={lbl}>Project <span style={{ color: "#d1d5db" }}></span></label>
             <ProjectDropdown projects={filteredProjects} value={qt.project} 
               onChange={(val) => upd("project", val)} 
               onAddProject={onAddProject}
@@ -836,7 +837,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <button onClick={addItem} style={{ padding: "6px 14px", background: "linear-gradient(135deg,#9333ea,#10b981)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>+ Add Item</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, paddingBottom: 8, borderBottom: "1px solid #f3f4f6", marginBottom: 8 }}>
-          {["Description","Qty","Rate (₹)",""].map((h, i) => <div key={i} style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>{h}</div>)}
+          {["Description","Qty",`Rate (${qt.currency || "₹"})`,""].map((h, i) => <div key={i} style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>{h}</div>)}
         </div>
         {items.map((item, idx) => {
           const dErr = errors[`item_${item.id}_description`];
@@ -877,7 +878,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
       {/* Notes & Terms */}
       <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Notes & Terms <span style={{ color: "#d1d5db", fontWeight: 500 }}>(optional)</span></div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Notes & Terms <span style={{ color: "#d1d5db", fontWeight: 500 }}></span></div>
         <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={lbl}>Notes</label>
@@ -892,7 +893,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
       {/* Company Details */}
       <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 24 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Company Details <span style={{ color: "#d1d5db", fontWeight: 500 }}>(optional)</span></div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Company Details <span style={{ color: "#d1d5db", fontWeight: 500 }}></span></div>
         <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={lbl}>Company Name</label>

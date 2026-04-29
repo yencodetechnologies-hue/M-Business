@@ -24,8 +24,13 @@ import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
 
 
 const T = { primary: "#3b0764", sidebar: "#1e0a3c", accent: "#9333ea", bg: "#f5f3ff", card: "#FFFFFF", text: "#1e0a3c", muted: "#7c3aed", border: "#ede9fe" };
+const formatCurrency = (amount, currency = "₹") => {
+  const sym = currency || "₹";
+  const val = Number(amount || 0).toLocaleString("en-IN");
+  return sym + val;
+};
 const TRACKING_SEED = [{ id: "PRJ001", name: "Website Redesign", client: "TechNova Pvt Ltd", deadline: "2024-05-30", pct: 65, status: "In Progress", note: "Design done, dev ongoing" }, { id: "PRJ002", name: "Mobile App Dev", client: "Bloom Creatives", deadline: "2024-08-15", pct: 15, status: "Pending", note: "Requirements gathering" }, { id: "PRJ003", name: "ERP Integration", client: "Infra Solutions", deadline: "2024-04-30", pct: 100, status: "Completed", note: "Signed off by client" }];
-const INVOICES = [{ id: "INV001", client: "TechNova Pvt Ltd", project: "Website Redesign", date: "2024-04-01", due: "2024-04-30", total: "₹1,47,500", status: "Paid" }, { id: "INV002", client: "Infra Solutions", project: "ERP Integration", date: "2024-05-01", due: "2024-05-15", total: "₹4,24,800", status: "Overdue" }, { id: "INV003", client: "Bloom Creatives", project: "Mobile App Dev", date: "2024-05-10", due: "2024-06-10", total: "₹1,18,000", status: "Pending" }];
+const INVOICES = [{ id: "INV001", client: "TechNova Pvt Ltd", project: "Website Redesign", date: "2024-04-01", due: "2024-04-30", total: "1,47,500", status: "Paid" }, { id: "INV002", client: "Infra Solutions", project: "ERP Integration", date: "2024-05-01", due: "2024-05-15", total: "4,24,800", status: "Overdue" }, { id: "INV003", client: "Bloom Creatives", project: "Mobile App Dev", date: "2024-05-10", due: "2024-06-10", total: "1,18,000", status: "Pending" }];
 
 const NAV = [
   { key: "dashboard", icon: "🏠", label: "Dashboard" },
@@ -1261,7 +1266,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                     <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{p.name}</td>
                     <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{p.client || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{p.currency || "₹"} {p.budget || "0"}</td>
+                    <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{formatCurrency(p.budget, p.currency)}</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={p.status || "Pending"} /></td>
                     <td style={{ padding: "12px 14px" }}>
                       {(() => {
@@ -1299,7 +1304,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
               {viewProj.client && <span style={{ fontSize: 12, color: "#9333ea", fontWeight: 600 }}>👥 {viewProj.client}</span>}
             </div>
           </div>
-          <InfoRow icon="💰" label="Budget" value={`${viewProj.currency || "₹"} ${viewProj.budget || "0"}`} />
+          <InfoRow icon="💰" label="Budget" value={formatCurrency(viewProj.budget, viewProj.currency)} />
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGNED EMPLOYEES</label>
             {(() => {
@@ -2387,9 +2392,9 @@ function VendorsPage({ vendors, setVendors }) {
                     <tr key={v._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{v.vendorName}</td>
                       <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{v.vendorProduct}</td>
-                      <td style={{ padding: "12px 14px", color: "#6b7280" }}>₹{total.toLocaleString()}</td>
-                      <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>₹{paid.toLocaleString()}</td>
-                      <td style={{ padding: "12px 14px", color: balance > 0 ? "#EF4444" : "#22C55E", fontWeight: 700 }}>₹{balance.toLocaleString()}</td>
+                      <td style={{ padding: "12px 14px", color: "#6b7280" }}>{formatCurrency(total, v.currency)}</td>
+                      <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{formatCurrency(paid, v.currency)}</td>
+                      <td style={{ padding: "12px 14px", color: balance > 0 ? "#EF4444" : "#22C55E", fontWeight: 700 }}>{formatCurrency(balance, v.currency)}</td>
                       <td style={{ padding: "12px 14px" }}><Badge label={v.modeOfPayment} /></td>
                       <td style={{ padding: "12px 14px", color: "#a78bfa" }}>{v.dateOfPurchase ? new Date(v.dateOfPurchase).toLocaleDateString() : "—"}</td>
                       <td style={{ padding: "12px 14px" }}>
@@ -2413,9 +2418,9 @@ function VendorsPage({ vendors, setVendors }) {
               <div style={{ fontSize: 13, color: "#9333ea", marginTop: 2 }}>{viewVendor.vendorProduct}</div>
             </div>
           </div>
-          <InfoRow icon="💰" label="Total Amount" value={`₹${(viewVendor.amountTaxGst || 0).toLocaleString()}`} />
-          <InfoRow icon="💸" label="Paid Amount" value={`₹${(viewVendor.paidAmount || 0).toLocaleString()}`} />
-          <InfoRow icon="⚖️" label="Balance Due" value={`₹${((viewVendor.amountTaxGst || 0) - (viewVendor.paidAmount || 0)).toLocaleString()}`} />
+          <InfoRow icon="💰" label="Total Amount" value={formatCurrency(viewVendor.amountTaxGst, viewVendor.currency)} />
+          <InfoRow icon="💸" label="Paid Amount" value={formatCurrency(viewVendor.paidAmount, viewVendor.currency)} />
+          <InfoRow icon="⚖️" label="Balance Due" value={formatCurrency((viewVendor.amountTaxGst || 0) - (viewVendor.paidAmount || 0), viewVendor.currency)} />
           <InfoRow icon="💳" label="Mode of Payment" value={viewVendor.modeOfPayment} />
           <InfoRow icon="📅" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
           <InfoRow icon="📝" label="Description" value={viewVendor.productDescription} />
@@ -3290,8 +3295,8 @@ const handleEditPackage = (pkg) => {
                   { t: "Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b", bg: "linear-gradient(135deg,#fef3c7,#fffbeb)" },
                   { t: "Projects", v: projects.length, i: "📁", c: "#a855f7", bg: "linear-gradient(135deg,#f5f3ff,#faf5ff)" },
                   { t: "Invoices", v: invoices.length, i: "🧾", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
-                  { t: "Total Income", v: `₹${income.reduce((s, x) => s + (Number(x.amount) || 0), 0).toLocaleString()}`, i: "💰", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
-                  { t: "Total Expenses", v: `₹${expenses.reduce((s, x) => s + (Number(x.amount) || 0), 0).toLocaleString()}`, i: "💸", c: "#EF4444", bg: "linear-gradient(135deg,#fee2e2,#fff1f1)" }
+                  { t: "Total Income", v: formatCurrency(income.reduce((s, x) => s + (Number(x.amount) || 0), 0), user?.currency), i: "💰", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
+                  { t: "Total Expenses", v: formatCurrency(expenses.reduce((s, x) => s + (Number(x.amount) || 0), 0), user?.currency), i: "💸", c: "#EF4444", bg: "linear-gradient(135deg,#fee2e2,#fff1f1)" }
                 ].map(({ t, v, i, c, bg }) => (
                   <div key={t} style={{ background: "#fff", borderRadius: 16, padding: "16px", boxShadow: "0 4px 20px rgba(147,51,234,0.05)", border: "1.5px solid #ede9fe", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ position: "absolute", top: 0, right: 0, width: 30, height: 30, background: bg, borderBottomLeftRadius: 20, opacity: 0.6 }} />
@@ -3318,7 +3323,7 @@ const handleEditPackage = (pkg) => {
                         <tr key={i} style={{ borderBottom: "1px solid #f5f3ff" }}>
                           <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
                             <div style={{ fontSize: 13 }}>{p.name}</div>
-                            <div style={{ fontSize: 11, color: "#22C55E" }}>{p.currency || "₹"} {p.budget || "0"}</div>
+                            <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
                           </td>
                           <td style={{ padding: "12px 12px", color: "#a78bfa" }}>{p.client}</td>
                           <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>

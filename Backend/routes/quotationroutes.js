@@ -75,6 +75,7 @@ router.post("/", async (req, res) => {
             transactionId: qt.transactionId || "",
             date: qt.paymentDate || qt.date,
             status: "Received",
+            currency: qt.currency || "₹",
             companyId: req.companyId || "",
           },
           { upsert: true, returnDocument: "after" }
@@ -113,6 +114,7 @@ router.post("/", async (req, res) => {
           transactionId: qt.transactionId || "",
           date: qt.paymentDate || qt.date,
           status: "Received",
+          currency: qt.currency || "₹",
           companyId: req.companyId || "",
         },
         { upsert: true, returnDocument: "after" }
@@ -162,6 +164,7 @@ router.put("/:id", async (req, res) => {
           transactionId: qt.transactionId || "",
           date: qt.paymentDate || qt.date,
           status: "Received",
+          currency: qt.currency || "₹",
           companyId: req.companyId || "",
         },
         { upsert: true }
@@ -208,6 +211,7 @@ router.patch("/:id/status", async (req, res) => {
           transactionId: doc.qt.transactionId || "",
           date: doc.qt.paymentDate || doc.qt.date,
           status: "Received",
+          currency: doc.qt.currency || "₹",
           companyId: doc.companyId || req.companyId || "",
         },
         { upsert: true, returnDocument: "after" }
@@ -280,6 +284,8 @@ router.post("/:id/convert", async (req, res) => {
       companyEmail:   qt.companyEmail  || "",
       companyPhone:   qt.companyPhone  || "",
       companyAddress: qt.companyAddress|| "",
+      currency:       qt.currency      || "₹",
+      upiId:          qt.upiId         || "",
       items: items.map((i) => ({ description: i.description, quantity: parseFloat(i.quantity)||0, rate: parseFloat(i.rate)||0 })),
       subtotal, gstAmt, total,
       amountPaid:     parseFloat(qt.amountPaid) || 0,
@@ -313,6 +319,7 @@ router.post("/:id/convert", async (req, res) => {
           transactionId: invoice.transactionId || "",
           date: invoice.paymentDate || invoice.date,
           status: "Received",
+          currency: invoice.currency || "₹",
           companyId: invoice.companyId || req.companyId || "",
         },
         { upsert: true, returnDocument: "after" }

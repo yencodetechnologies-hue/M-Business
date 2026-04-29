@@ -34,9 +34,9 @@ const NAV = [
 ];
 
 const SEED_PROJECTS = [
-  { _id:"p1", name:"E-Commerce Revamp",  client:"Nila Retail", budget:"₹1,20,000", deadline:"2026-03-28", status:"active", progress:65 },
-  { _id:"p2", name:"HR Portal",          client:"TechCorp",    budget:"₹95,000",   deadline:"2026-04-10", status:"review", progress:85 },
-  { _id:"p3", name:"Mobile App Design",  client:"Kavi Labs",   budget:"₹75,000",   deadline:"2026-03-22", status:"active", progress:40 },
+  { _id:"p1", name:"E-Commerce Revamp",  client:"Nila Retail", budget:120000, currency:"₹", deadline:"2026-03-28", status:"active", progress:65 },
+  { _id:"p2", name:"HR Portal",          client:"TechCorp",    budget:95000,  currency:"₹", deadline:"2026-04-10", status:"review", progress:85 },
+  { _id:"p3", name:"Mobile App Design",  client:"Kavi Labs",   budget:75000,  currency:"₹", deadline:"2026-03-22", status:"active", progress:40 },
 ];
 const SEED_TASKS = [
   { _id:"t1", title:"Homepage wireframe review",     project:"E-Commerce Revamp", priority:"High",   status:"done",        dueDate:"2026-03-10", description:"Review all desktop and mobile layouts" },
@@ -90,7 +90,7 @@ const PERMISSION_TYPES = [
 ];
 
 const todayStr = () => new Date().toISOString().split("T")[0];
-const fmt = (n) => Number(n||0).toLocaleString("en-IN");
+const fmt = (n, sym = "₹") => (sym||"₹") + Number(n||0).toLocaleString("en-IN");
 
 const statusIcon = (s) => {
   const l=(s||"").toLowerCase();
@@ -358,7 +358,7 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage, doc
         <StatCard icon="◈" label="My Projects"   value={projects.length}  sub="Assigned to you" color="#6366f1" onClick={()=>setPage("projects")}/>
         <StatCard icon="◉" label="Pending Tasks" value={pendingTasks}      sub="Need attention"  color="#f59e0b" onClick={()=>setPage("tasks")}/>
         <StatCard icon="◷" label="Present Days"  value={presentDays}       sub="This month"      color="#10b981" onClick={()=>setPage("attendance")}/>
-        <StatCard icon="◆" label="Last Salary"   value={latestSalary?`₹${fmt(latestSalary.net)}`:"—"} sub={latestSalary?.month||"Not yet"} color="#8b5cf6" onClick={()=>setPage("salary")}/>
+        <StatCard icon="◆" label="Last Salary"   value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month||"Not yet"} color="#8b5cf6" onClick={()=>setPage("salary")}/>
       </div>
 
       {/* Projects + Tasks row */}
@@ -458,7 +458,7 @@ function ProjectsPage({ projects }) {
           {[["Budget",selected.budget||"—"],["Progress",`${selected.progress||0}%`],["Manager",selected.manager||"—"]].map(([k,v])=>(
             <div key={k} style={{ background:"#f8fafc", borderRadius:12, padding:"12px 14px" }}>
               <div style={{ fontSize:11, color:"#94a3b8", fontWeight:700, textTransform:"uppercase", marginBottom:4 }}>{k}</div>
-              <div style={{ fontSize:16, fontWeight:800, color:"#0f172a" }}>{v}</div>
+              <div style={{ fontSize:16, fontWeight:800, color:"#0f172a" }}>{k==="Budget" ? fmt(v, selected.currency) : v}</div>
             </div>
           ))}
         </div>
@@ -485,7 +485,7 @@ function ProjectsPage({ projects }) {
               onMouseLeave={e=>{ e.currentTarget.style.background="#f8fafc"; e.currentTarget.style.borderColor="#f1f5f9"; }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 }}>
                 <div><div style={{ fontSize:14, fontWeight:800, color:"#0f172a" }}>{p.name}</div>
-                  <div style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>Client: {p.client||"—"} · Budget: {p.budget||"—"} · Due: {p.deadline||"—"}</div></div>
+                  <div style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>Client: {p.client||"—"} · Budget: {fmt(p.budget, p.currency)} · Due: {p.deadline||"—"}</div></div>
                 <Badge label={p.status||"active"}/>
               </div>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
@@ -750,7 +750,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                 ))}
               </div>
             </InputField>
-            <InputField label="Note (optional)"><input value={addNote} onChange={e=>setAddNote(e.target.value)} placeholder="e.g. WFH, field visit…" style={inputStyle}/></InputField>
+            <InputField label="Note"><input value={addNote} onChange={e=>setAddNote(e.target.value)} placeholder="e.g. WFH, field visit…" style={inputStyle}/></InputField>
           </div>
           <div style={{ display:"flex", gap:10, justifyContent:"flex-end" }}>
             <button onClick={()=>{setAddForm(false);setAddDate(todayStr());setAddStatus("present");setAddNote("");}} style={{ padding:"9px 20px", border:"1.5px solid #e2e8f0", borderRadius:10, background:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", color:"#374151" }}>Cancel</button>

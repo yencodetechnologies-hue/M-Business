@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import QRScanner from "./QRScanner.jsx";
 
-function formatINR(val) {
+function formatCurrency(val, symbol = "₹") {
   const num = parseFloat(val) || 0;
-  return "₹" + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const isINR = symbol === "₹";
+  return symbol + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatDate(d) {
@@ -45,7 +46,7 @@ export default function InvoiceViewer() {
         client: slim.cl, project: slim.proj,
         gstRate: slim.gst, notes: slim.notes, terms: slim.terms,
         isGstIncluded: slim.incGst, amountPaid: slim.paid || 0,
-        upiId: slim.upi || "",
+        upiId: slim.upi || "", currency: slim.cur || "₹",
       };
       const items = (slim.items || []).map((i, idx) => ({
         id: idx + 1, description: i.d, quantity: i.q, rate: i.r,
@@ -136,7 +137,7 @@ export default function InvoiceViewer() {
 
       <div style={{ background: "linear-gradient(135deg,#4c1d95,#6d28d9)", margin: "0 12px", borderRadius: "0 0 16px 16px", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <span style={{ fontSize: 12, fontWeight: 700, color: "#e9d5ff" }}>{balanceDue > 0 ? "BALANCE DUE" : "TOTAL AMOUNT"}</span>
-        <span style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{formatINR(balanceDue > 0 ? balanceDue : total)}</span>
+        <span style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{formatCurrency(balanceDue > 0 ? balanceDue : total, inv.currency)}</span>
       </div>
 
       {inv.upiId && balanceDue > 0 && (
@@ -187,8 +188,8 @@ export default function InvoiceViewer() {
                 <td style={{ color: "#a78bfa", fontWeight: 700, fontSize: 11 }}>{String(idx + 1).padStart(2, "0")}</td>
                 <td className="desc">{item.description || "—"}</td>
                 <td className="r">{item.quantity}</td>
-                <td className="r">{formatINR(item.rate)}</td>
-                <td className="r amt">{formatINR((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0))}</td>
+                <td className="r">{formatCurrency(item.rate, inv.currency)}</td>
+                <td className="r amt">{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
               </tr>
             ))}
           </tbody>
@@ -196,10 +197,10 @@ export default function InvoiceViewer() {
 
         <div style={{ padding: "14px 18px 2px", borderTop: "2px solid #f3f0ff", marginTop: 4 }}>
           {[
-            ["Subtotal", formatINR(subtotal)],
-            [`GST (${inv.gstRate}%)`, formatINR(gstAmt)],
-            ["Total", formatINR(total)],
-            ["Amount Paid", formatINR(inv.amountPaid)]
+            ["Subtotal", formatCurrency(subtotal, inv.currency)],
+            [`GST (${inv.gstRate}%)`, formatCurrency(gstAmt, inv.currency)],
+            ["Total", formatCurrency(total, inv.currency)],
+            ["Amount Paid", formatCurrency(inv.amountPaid, inv.currency)]
           ].map(([l, v]) => (
             <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #f5f3ff" }}>
               <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
@@ -208,7 +209,7 @@ export default function InvoiceViewer() {
           ))}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 12, padding: "12px 14px" }}>
             <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>BALANCE DUE</span>
-            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatINR(data.balanceDue)}</span>
+            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(data.balanceDue, inv.currency)}</span>
           </div>
         </div>
       </div>

@@ -357,7 +357,7 @@ export default function InterviewApplyForm() {
           <div className="fade-up d6">
             <label style={sty.label}>
               Interviewer Name{" "}
-              <span style={{ fontSize: 10, color: "#a78bfa", fontWeight: 400, textTransform: "none" }}>(optional)</span>
+              <span style={{ fontSize: 10, color: "#a78bfa", fontWeight: 400, textTransform: "none" }}></span>
             </label>
             <input
               type="text"
@@ -411,7 +411,7 @@ export default function InterviewApplyForm() {
           <div className="fade-up d8">
             <label style={sty.label}>
               Additional Notes{" "}
-              <span style={{ fontSize: 10, color: "#a78bfa", fontWeight: 400, textTransform: "none" }}>(optional)</span>
+              <span style={{ fontSize: 10, color: "#a78bfa", fontWeight: 400, textTransform: "none" }}></span>
             </label>
             <textarea
               rows={3} placeholder="Any additional info..."

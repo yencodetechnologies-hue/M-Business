@@ -13,6 +13,11 @@ import { BASE_URL } from "../config";
 // ── Shared theme ─────────────────────────────────────────────
 const T = { text:"#1e0a3c", muted:"#7c3aed", border:"#ede9fe" };
 
+const formatCurrency = (amount, symbol = "₹") => {
+  const num = Number(amount) || 0;
+  return `${symbol}${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
+
 // ── Shared UI components ──────────────────────────────────────
 function Modal({ title, onClose, children }) {
   return (
@@ -386,9 +391,9 @@ const openEdit = (a) => {
         onChange={v=>setForm({...form,paymentMode:v})}
         options={["Cash","Card","UPI","Bank Transfer","Cheque"]} />
 
-      <Fld label="Amount (₹) *" value={form.amount} type="number"
+      <Fld label="Amount *" value={form.amount} type="number"
         onChange={v=>{setForm({...form,amount:v});setErr(p=>({...p,amount:""}));}}
-        error={err.amount} placeholder="0.00" prefix="₹" />
+        error={err.amount} placeholder="0.00" />
 
       <div style={{ gridColumn:"1 / -1" }}>
         <Fld label="Status" value={form.status}
@@ -541,8 +546,8 @@ const save = async () => {
   });
 
   const stats = [
-    { t:"Total Expenses", v:`₹${totalAmount.toLocaleString()}`,    c:"#9333ea", i:"💸" },
-    { t:"Approved",       v:`₹${approvedAmount.toLocaleString()}`, c:"#22C55E", i:"✅" },
+    { t:"Total Expenses", v:formatCurrency(totalAmount),    c:"#9333ea", i:"💸" },
+    { t:"Approved",       v:formatCurrency(approvedAmount), c:"#22C55E", i:"✅" },
     { t:"Pending",        v:expenses.filter(e=>e.status==="Pending").length,  c:"#f59e0b", i:"⏳" },
     { t:"Rejected",       v:expenses.filter(e=>e.status==="Rejected").length, c:"#EF4444", i:"❌" },
   ];
@@ -589,7 +594,7 @@ const save = async () => {
               <div style={{ fontSize:18, fontWeight:800, color:c }}>{count}</div>
               <div style={{ fontSize:10, color: catFilter===cat ? c : "#a78bfa",
                 fontWeight:700, marginTop:2 }}>{cat}</div>
-              {total > 0 && <div style={{ fontSize:10, color:"#a78bfa", marginTop:2 }}>₹{total.toLocaleString()}</div>}
+              {total > 0 && <div style={{ fontSize:10, color:"#a78bfa", marginTop:2 }}>{formatCurrency(total)}</div>}
             </div>
           );
         })}
@@ -688,7 +693,7 @@ const save = async () => {
                         <td style={{ padding:"12px 14px", color:"#a78bfa" }}>{e.paymentMode||"—"}</td>
                         <td style={{ padding:"12px 14px" }}>
                           <span style={{ fontWeight:800, color:"#1e0a3c", fontSize:14 }}>
-                            ₹{Number(e.amount||0).toLocaleString()}
+                            {formatCurrency(e.amount, e.currency)}
                           </span>
                         </td>
                         <td style={{ padding:"12px 14px" }}>
@@ -718,7 +723,7 @@ const save = async () => {
                         SHOWING {displayed.length} OF {expenses.length} EXPENSES
                       </td>
                       <td style={{ padding:"12px 14px", fontWeight:800, color:"#9333ea", fontSize:15 }}>
-                        ₹{displayed.reduce((s,e)=>s+(Number(e.amount)||0),0).toLocaleString()}
+                        {formatCurrency(displayed.reduce((s,e)=>s+(Number(e.amount)||0),0))}
                       </td>
                       <td colSpan={3} />
                     </tr>
@@ -774,7 +779,7 @@ const save = async () => {
               </div>
               {form.amount && (
                 <div style={{ fontWeight:800, fontSize:18, color:"#9333ea" }}>
-                  ₹{Number(form.amount).toLocaleString()}
+                  {formatCurrency(form.amount, form.currency)}
                 </div>
               )}
             </div>
@@ -913,8 +918,8 @@ export function IncomePage() {
   });
 
   const stats = [
-    { t:"Total Income", v:`₹${totalIncome.toLocaleString()}`,    c:"#22c55e", i:"💰" },
-    { t:"Received",     v:`₹${received.toLocaleString()}`,       c:"#16a34a", i:"✅" },
+    { t:"Total Income", v:formatCurrency(totalIncome),    c:"#22c55e", i:"💰" },
+    { t:"Received",     v:formatCurrency(received),       c:"#16a34a", i:"✅" },
     { t:"Pending",      v:income.filter(i=>i.status==="Pending").length,   c:"#f59e0b", i:"⏳" },
     { t:"Categories",   v:[...new Set(income.map(i=>i.category))].length, c:"#8b5cf6", i:"🏷️" },
   ];
@@ -959,7 +964,7 @@ export function IncomePage() {
                       <td style={{ padding:"12px 14px" }}><div style={{ fontWeight:700, color:"#1e0a3c" }}>{inc.title}</div>{inc.transactionId && <div style={{ fontSize:10, color:"#a78bfa" }}>Txn: {inc.transactionId}</div>}</td>
                       <td style={{ padding:"12px 14px", color:"#1e0a3c", fontWeight:600 }}>{inc.client}</td>
                       <td style={{ padding:"12px 14px", color:"#16a34a", fontWeight:700 }}>{inc.invoiceNo||"—"}</td>
-                      <td style={{ padding:"12px 14px" }}><span style={{ fontWeight:800, color:"#16a34a", fontSize:14 }}>₹{Number(inc.amount||0).toLocaleString()}</span></td>
+                      <td style={{ padding:"12px 14px" }}><span style={{ fontWeight:800, color:"#16a34a", fontSize:14 }}>{formatCurrency(inc.amount, inc.currency)}</span></td>
                       <td style={{ padding:"12px 14px", color:"#a78bfa" }}>{inc.paymentMode}</td>
                       <td style={{ padding:"12px 14px" }}><ExpBadge label={inc.status||"Received"} colorMap={INC_STATUS_COLOR} /></td>
                       <td style={{ padding:"12px 14px", color:"#a78bfa", fontSize:12 }}>{inc.date || (inc.createdAt ? new Date(inc.createdAt).toLocaleDateString() : "—")}</td>
@@ -977,7 +982,7 @@ export function IncomePage() {
           <div className="modal-2col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0 18px" }}>
             <div style={{ gridColumn:"1 / -1" }}><Fld label="Income Title *" value={form.title} onChange={v=>{setForm({...form,title:v});setErr(p=>({...p,title:""}));}} error={err.title} placeholder="e.g. Payment for Invoice #001" /></div>
             <Fld label="Client Name *" value={form.client} onChange={v=>{setForm({...form,client:v});setErr(p=>({...p,client:""}));}} error={err.client} placeholder="e.g. Acme Corp" />
-            <Fld label="Amount (₹) *" value={form.amount} type="number" onChange={v=>{setForm({...form,amount:v});setErr(p=>({...p,amount:""}));}} error={err.amount} placeholder="0.00" prefix="₹" />
+            <Fld label="Amount *" value={form.amount} type="number" onChange={v=>{setForm({...form,amount:v});setErr(p=>({...p,amount:""}));}} error={err.amount} placeholder="0.00" />
             <Fld label="Category" value={form.category} onChange={v=>setForm({...form,category:v})} options={INCOME_CATS} />
             <Fld label="Payment Mode" value={form.paymentMode} onChange={v=>setForm({...form,paymentMode:v})} options={INCOME_MODES} />
             <Fld label="Invoice No" value={form.invoiceNo} onChange={v=>setForm({...form,invoiceNo:v})} placeholder="INV-001" />

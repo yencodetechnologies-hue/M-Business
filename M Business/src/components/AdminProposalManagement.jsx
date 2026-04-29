@@ -1159,7 +1159,7 @@ export default function AdminProposalManagement() {
               color: "#7c3aed",
               marginBottom: 8
             }}>
-              Rejection Reason (optional):
+              Rejection Reason :
             </label>
             <textarea
               value={rejectReason}

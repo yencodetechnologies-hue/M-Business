@@ -37,6 +37,8 @@ router.get("/", async (req, res) => {
         amountPaid:     doc.amountPaid     || 0,
         paymentMode:    doc.paymentMode    || "GPay",
         transactionId:  doc.transactionId  || "",
+        currency:       doc.currency       || "₹",
+        upiId:          doc.upiId          || "",
       };
 
       return {
@@ -120,6 +122,8 @@ router.post("/", async (req, res) => {
       paymentMode:    inv.paymentMode            || "GPay",
       transactionId:  inv.transactionId          || "",
       paymentDate:    inv.paymentDate            || "",
+      currency:       inv.currency               || "₹",
+      upiId:          inv.upiId                  || "",
       companyId: req.companyId || "",
     };
 
@@ -162,6 +166,7 @@ router.post("/", async (req, res) => {
           transactionId: flatData.transactionId,
           date: flatData.paymentDate || flatData.date, 
           status: "Received",
+          currency: flatData.currency,
           companyId: flatData.companyId,
         },
         { upsert: true, returnDocument: "after" }
@@ -199,6 +204,8 @@ router.put("/:id", async (req, res) => {
       status: status || "draft",
       amountPaid: parseFloat(inv.amountPaid) || 0,
       paymentDate: inv.paymentDate || "",
+      currency: inv.currency || "₹",
+      upiId: inv.upiId || "",
       companyId: req.companyId || "",
     };
 
@@ -222,6 +229,7 @@ router.put("/:id", async (req, res) => {
           transactionId: updated.transactionId,
           date: updated.paymentDate || updated.date,
           status: "Received",
+          currency: updated.currency || "₹",
           companyId: req.companyId || "",
         },
         { upsert: true }
@@ -280,6 +288,7 @@ router.patch("/:id/status", async (req, res) => {
           transactionId: invoice.transactionId || "",
           date: invoice.paymentDate || invoice.date || new Date().toISOString().split("T")[0],
           status: "Received",
+          currency: invoice.currency || "₹",
           companyId: invoice.companyId || req.companyId || "",
         },
         { upsert: true }

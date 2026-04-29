@@ -21,6 +21,8 @@ const invoiceSchema = new mongoose.Schema({
   companyEmail:   String,
   companyPhone:   String,
   companyAddress: String,
+  currency:       { type: String, default: "₹" },
+  upiId:          { type: String, default: "" },
   items:          [itemSchema],
   subtotal:       Number,
   gstAmt:         Number,

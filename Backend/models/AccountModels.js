@@ -31,6 +31,10 @@ const ExpenseSchema = new mongoose.Schema(
       required: true,
       min: [0, "Amount cannot be negative"],
     },
+    currency: {
+      type: String,
+      default: "₹",
+    },
     status: {
       type: String,
       enum: ["Pending", "Approved", "Rejected"],

@@ -3677,7 +3677,7 @@ const handleEditPackage = (pkg) => {
 
 
       {/* ── Add Client Modal ── */}
-      {modal === "client" && <Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }}>
+      {modal === "client" && <Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
         {clientSuccessData ? (
             <div style={{ textAlign: "center", padding: "5px 0" }}>
               <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>

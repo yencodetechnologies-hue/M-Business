@@ -1492,7 +1492,7 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
         <div style={{background:"linear-gradient(135deg,#7c3aed,#a855f7,#c084fc)",padding:"28px 28px 22px",textAlign:"center",flexShrink:0}}>
           <button onClick={onClose} style={{position:"absolute",top:14,right:14,background:"rgba(255,255,255,0.2)",border:"none",width:30,height:30,borderRadius:8,color:"#fff",fontSize:16,cursor:"pointer"}}>✕</button>
           <div style={{width:72,height:72,borderRadius:16,background:"rgba(255,255,255,0.22)",border:"3px solid rgba(255,255,255,0.45)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",overflow:"hidden"}}>
-            {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:5,background:"#fff"}}/>:<span style={{fontSize:24,fontWeight:800,color:"#fff"}}>{initials}</span>}
+            {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:24,fontWeight:800,color:"#fff"}}>{initials}</span>}
           </div>
           <h2 style={{margin:0,fontSize:18,fontWeight:800,color:"#fff"}}>{displayName}</h2>
           <p style={{margin:"4px 0 0",fontSize:12,color:"rgba(255,255,255,0.65)"}}>{user?.email||"—"}</p>

@@ -55,7 +55,7 @@ router.post("/", async (req, res) => {
         const gstRate = parseFloat(qt.gstRate) || 0;
         const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
 
-        const query = { quoteNo: qt.quoteNo };
+        const query = { invoiceNo: qt.quoteNo };
         if (qt.transactionId) query.transactionId = qt.transactionId;
 
         const isPartial = qt.amountPaid < total;
@@ -94,7 +94,7 @@ router.post("/", async (req, res) => {
       const gstRate = parseFloat(qt.gstRate) || 0;
       const total = qt.isGstIncluded ? subtotalRaw : subtotalRaw * (1 + gstRate / 100);
 
-      const query = { quoteNo: qt.quoteNo };
+      const query = { invoiceNo: qt.quoteNo };
       if (qt.transactionId) query.transactionId = qt.transactionId;
 
       const isPartial = qt.amountPaid < total;

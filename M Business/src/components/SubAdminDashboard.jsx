@@ -34,7 +34,7 @@ const NAV = [
     type: "group", 
     items: [
       { key: "clients", icon: "👥", label: "Clients" },
-      { key: "subadmins", icon: "🛡️", label: "Partners" },
+
       { key: "employees", icon: "👔", label: "Employees" },
       { key: "managers", icon: "💼", label: "Managers" },
       { key: "vendors", icon: "🏬", label: "Vendors" },

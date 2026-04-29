@@ -1691,7 +1691,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
   useEffect(()=>{if(validActive!==active)setActive(validActive);},[user?.role]);
 
   const displayName = user?.companyName || "Your Business";
-  const initials = (displayName || "YB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const B=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
 
   const companyId=user?.companyId||user?.company||user?._id||user?.id||"default";
@@ -1801,7 +1801,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
 
           {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive==="quotations"&&<QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
-          {validActive==="proposals" && <ProjectProposalCreator clients={clients} />}
+          {validActive==="proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "Workspace Suite"} />}
           {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config}/>}
           {validActive==="tasks"&&<TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} />}
           {validActive==="calendar"&&<CalendarPage projects={projects} tasks={tasks} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}

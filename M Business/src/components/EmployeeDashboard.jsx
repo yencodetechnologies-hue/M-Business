@@ -186,7 +186,8 @@ const inputStyle = {
 };
 
 function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems }) {
-  const initials=(user?.name||"E").slice(0,2).toUpperCase();
+  const companyName = user?.companyName || "Workspace Suite";
+  const initials = (companyName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   return (
     <>
       {open && <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)", zIndex:998 }}/>}
@@ -199,7 +200,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
               </div>
             ) : (
               <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>
-                {(user?.companyName || user?.name || "W")[0].toUpperCase()}
+                {initials[0]}
               </div>
             )}
             <div>

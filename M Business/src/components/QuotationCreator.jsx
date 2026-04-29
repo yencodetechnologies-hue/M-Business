@@ -106,7 +106,7 @@ function ProjectDropdown({projects,value,onChange,onAddProject,disabled}){
 
 export default function QuotationCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onConvertToInvoice, onAddClient, onAddProject }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
-  const effectiveCompanyName = companyName || "";
+  const effectiveCompanyName = companyName || user?.companyName || "Workspace Suite";
   const [step, setStep]             = useState("list");
   const [qtList, setQtList]         = useState([]);
   const [listLoading, setListLoading] = useState(false);
@@ -124,7 +124,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     quoteNo: generateQuoteNo(), refNo: "", date: today, expiryDate: expDefault,
     client: "", project: "", gstRate: 18, notes: "",
     terms: "This quotation is valid for 30 days from the date of issue.",
-    companyName: companyName || "", companyEmail: "",
+    companyName: companyName || user?.companyName || "Workspace Suite", companyEmail: "",
     companyPhone: "", companyAddress: "",
     currency: "₹",
     template: "Modern",

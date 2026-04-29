@@ -389,7 +389,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(10px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div style={{ background: "#fff", width: "100%", maxWidth: 420, borderRadius: 24, overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,0.3)", animation: "slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}>
               <style>{`@keyframes slideUp { from { transform: translateY(40px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }`}</style>
-              
+
               {/* Header */}
               <div style={{ background: "linear-gradient(135deg,#1e0a3c,#3b0764)", padding: "32px 24px", color: "#fff", position: "relative" }}>
                 <button onClick={() => setMockGatewayOpen(null)} style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
@@ -415,7 +415,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={async () => {
                     const { plan, orderId } = mockGatewayOpen;
                     setMockGatewayOpen({ ...mockGatewayOpen, processing: true });
@@ -436,7 +436,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                         razorpay_payment_id: `pay_mock_${Date.now()}`,
                         razorpay_signature: "mock_signature",
                         paymentId: orderId, paymentMethod: "other"
-                      }).catch(() => {});
+                      }).catch(() => { });
 
                       await fetchData();
                       setMockGatewayOpen(null);

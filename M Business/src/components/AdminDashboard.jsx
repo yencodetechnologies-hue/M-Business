@@ -170,8 +170,8 @@ export default function AdminDashboard({ user, setUser }) {
     setUser(null);
   };
 
-  const displayName = user?.companyName || "";
-  const initials = (displayName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const displayName = user?.companyName || "Workspace Suite";
+  const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
@@ -179,8 +179,8 @@ export default function AdminDashboard({ user, setUser }) {
       <div style={{ width: 240, background: "#0f172a", color: "#fff", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "24px 20px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 34, height: 34, background: "linear-gradient(135deg,#3b82f6,#2dd4bf)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900 }}>{initials[0]}</div>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: 14 }}>{user?.companyName || ""}</div>
+          <div style={{ overflow: "hidden" }}>
+            <div style={{ fontWeight: 800, fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
             <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: 1.5 }}>ADMIN DASHBOARD</div>
           </div>
         </div>
@@ -242,7 +242,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
           {active === "quotations" && <QuotationCreator clients={clients} projects={projects} />}
-          {active === "proposals" && <ProjectProposalCreator clients={clients} />}
+          {active === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "Workspace Suite"} />}
           {active === "invoices" && <InvoiceCreator clients={clients} projects={projects} />}
           {active === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {active === "tasks" && <TaskPage projects={projects} employees={employees} />}

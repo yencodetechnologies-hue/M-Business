@@ -247,7 +247,7 @@ router.put("/:id", async (req, res) => {
 router.patch("/:id/status", async (req, res) => {
   try {
     const { status, amountPaid, paymentMode, paymentDate, transactionId } = req.body;
-    const allowed = ["draft", "sent", "paid", "unpaid", "overdue"]; 
+    const allowed = ["draft", "sent", "paid", "unpaid", "overdue", "part_paid"]; 
 
     if (!allowed.includes(status)) {
       return res.status(400).json({ success: false, msg: "Invalid status" });
@@ -269,8 +269,8 @@ router.patch("/:id/status", async (req, res) => {
       return res.status(404).json({ success: false, msg: "Invoice not found" });
     }
 
-    // Sync Income if status is Paid
-    if (status === "paid") {
+    // Sync Income if status is Paid or Part Paid
+    if (status === "paid" || status === "part_paid") {
       // If they marked it paid, use the updated amountPaid. If it is 0, assume full payment.
       const syncAmount = invoice.amountPaid > 0 ? invoice.amountPaid : invoice.total;
       const query = { invoiceNo: invoice.invoiceNo };

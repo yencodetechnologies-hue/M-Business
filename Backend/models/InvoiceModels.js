@@ -32,7 +32,7 @@ const invoiceSchema = new mongoose.Schema({
   paymentMode:    { type: String, default: "GPay" },
   transactionId:  { type: String, default: "" },
   isGstIncluded:  { type: Boolean, default: false },
-  status:         { type: String, enum: ["draft", "sent", "paid", "unpaid", "overdue"], default: "draft" },
+  status:         { type: String, enum: ["draft", "sent", "paid", "unpaid", "overdue", "part_paid"], default: "draft" },
   companyId:      { type: String, default: "" },
 }, { timestamps: true });
 

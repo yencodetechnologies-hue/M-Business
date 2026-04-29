@@ -21,6 +21,8 @@ import { DOC_TYPES } from "./EmployeeProfilePanel";
 import AuthPage from "./AuthPage";
 import MySubscriptions from "./MySubscriptions";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
+import ImageCropModal from "./ImageCropModal";
+
 
 
 const T = { primary: "#3b0764", sidebar: "#1e0a3c", accent: "#9333ea", bg: "#f5f3ff", card: "#FFFFFF", text: "#1e0a3c", muted: "#7c3aed", border: "#ede9fe" };
@@ -286,7 +288,8 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 // ═══════════════════════════════════════════════════════════
 // CLIENTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject }) {
+function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject, triggerCrop }) {
+
   const [search, setSearch] = useState("");
   const [viewClient, setViewClient] = useState(null);
   const [editClient, setEditClient] = useState(null);
@@ -480,13 +483,9 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
               <label style={{ position: "absolute", bottom: 0, right: 0, background: "#7c3aed", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                 <span style={{ fontSize: 16 }}>📷</span>
                 <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => setEditForm(p => ({ ...p, logoUrl: reader.result }));
-                    reader.readAsDataURL(file);
-                  }
+                  triggerCrop(e, (croppedImage) => setEditForm(p => ({ ...p, logoUrl: croppedImage })), 1);
                 }} />
+
               </label>
             </div>
           </div>
@@ -1840,7 +1839,8 @@ function InterviewPage({ companyId, companyName }) {
 // ═══════════════════════════════════════════════════════════
 // PROFILE MODAL  
 // ═══════════════════════════════════════════════════════════
-function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoChange, paymentHistory, projects, invoices }) {
+function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoChange, paymentHistory, projects, invoices, onLogoUpload }) {
+
   const logoRef = useRef();
   const [editingComp, setEditingComp] = useState(false);
   const [compName, setCompName] = useState(user?.companyName || "");
@@ -1995,8 +1995,9 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
           </div>
         </div>
         <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }}
-          onChange={async (e) => { const file = e.target.files[0]; if (!file) return; const formData = new FormData(); formData.append("file", file); try { const cloudRes = await axios.post(BASE_URL + "/api/upload/logo", formData); const uploadedUrl = cloudRes.data.logoUrl; await axios.post(BASE_URL + "/api/auth/save-logo", { userId: user.id || user._id, logoUrl: uploadedUrl }); const updatedUser = { ...user, logoUrl: uploadedUrl }; localStorage.setItem("user", JSON.stringify(updatedUser)); setUser(updatedUser); onLogoChange(uploadedUrl); } catch (err) { console.error(err); alert("Upload failed!"); } }}
+          onChange={onLogoUpload}
         />
+
       </div>
     </div>
   );
@@ -2524,21 +2525,41 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [accountAuthTab, setAccountAuthTab] = useState("register");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [companyLogo, setCompanyLogo] = useState(user?.logoUrl ? user.logoUrl : (fixedLogo || null));
+  const [cropImage, setCropImage] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropCallback, setCropCallback] = useState(null);
+  const [cropAspect, setCropAspect] = useState(1);
   const [accounts, setAccounts] = useState([]);
+
+
   const headerLogoRef = useRef();
   
   useEffect(() => { setCompanyLogo(user?.logoUrl ? user.logoUrl : (fixedLogo || null)); }, [user, fixedLogo]);
   
   const handleHeaderLogoUpload = (e) => {
+    triggerCrop(e, (croppedImage) => onLogoChange?.(croppedImage), 1);
+  };
+
+  const triggerCrop = (e, callback, aspect = 1) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        onLogoChange?.(reader.result);
+        setCropImage(reader.result);
+        setCropCallback(() => callback);
+        setCropAspect(aspect);
+        setShowCropModal(true);
       };
       reader.readAsDataURL(file);
     }
   };
+
+  const handleCropComplete = async (croppedImage) => {
+    setShowCropModal(false);
+    if (cropCallback) cropCallback(croppedImage);
+  };
+
+
 
   // Load saved accounts from localStorage
   useEffect(() => {
@@ -3114,6 +3135,17 @@ const handleEditPackage = (pkg) => {
           onLogoUploadClick={() => headerLogoRef.current?.click()}
         />
       )}
+
+      {showCropModal && (
+        <ImageCropModal
+          image={cropImage}
+          onCropComplete={handleCropComplete}
+          onCancel={() => setShowCropModal(false)}
+          aspect={cropAspect}
+        />
+      )}
+
+
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         {/* Mobile Topbar */}
         <div className="mob-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid #ede9fe", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(147,51,234,0.07)" }}>
@@ -3296,7 +3328,8 @@ const handleEditPackage = (pkg) => {
                       <div style={{ position: "relative", width: 90, height: 90, flexShrink: 0, marginBottom: 4 }}>
                         <div style={{ width: "100%", height: "100%", borderRadius: 24, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 36, fontWeight: 800, overflow: "hidden", border: "2px solid #ede9fe", boxShadow: "0 8px 16px rgba(147,51,234,0.12)" }}>
                           {companyLogo ? (
-                            <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 8 }} />
+                            <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+
                           ) : (
                             initials
                           )}
@@ -3422,7 +3455,8 @@ const handleEditPackage = (pkg) => {
           </>)}
 
           {/* ── Pages using new components ── */}
-          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} />}
+          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} triggerCrop={triggerCrop} />}
+
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} />}
@@ -3638,7 +3672,9 @@ const handleEditPackage = (pkg) => {
         paymentHistory={paymentHistory}
         projects={projects}
         invoices={invoices}
+        onLogoUpload={handleHeaderLogoUpload}
       />}
+
 
       {/* ── Add Client Modal ── */}
       {modal === "client" && <Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }}>
@@ -3707,13 +3743,9 @@ const handleEditPackage = (pkg) => {
                 <label style={{ position: "absolute", bottom: 0, right: 0, background: "#7c3aed", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                   <span style={{ fontSize: 16 }}>📷</span>
                   <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => setNc(p => ({ ...p, logoUrl: reader.result }));
-                      reader.readAsDataURL(file);
-                    }
+                    triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
                   }} />
+
                 </label>
               </div>
             </div>

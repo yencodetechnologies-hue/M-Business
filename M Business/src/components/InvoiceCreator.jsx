@@ -31,6 +31,7 @@ function StatusBadge({ status }) {
     overdue: { bg: "#fee2e2", color: "#dc2626", label: "🔴 Overdue" },
     draft: { bg: "#f3f4f6", color: "#6b7280", label: "📝 Draft" },
     sent: { bg: "#eff6ff", color: "#2563eb", label: "📤 Sent" },
+    part_paid: { bg: "#fdf4ff", color: "#a855f7", label: "💰 Part Payment" },
   };
   const s = map[(status || "draft").toLowerCase()] || map.draft;
   return (
@@ -158,6 +159,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [viewEntry, setViewEntry] = useState(null);       // entry for view modal
   const [statusUpdating, setStatusUpdating] = useState(null);
   const [paymentModalEntry, setPaymentModalEntry] = useState(null);
+  const [paymentModalStatus, setPaymentModalStatus] = useState("paid");
   const [paymentData, setPaymentData] = useState({ amountPaid: 0, paymentMode: "GPay", paymentDate: new Date().toISOString().split("T")[0], transactionId: "" });
   const [listSearch, setListSearch] = useState("");
 
@@ -319,13 +321,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   // ── Update status inline ────────────────────────────────────
   const handleStatusChange = async (entry, newStatus) => {
-    if (newStatus === "paid") {
+    if (newStatus === "paid" || newStatus === "part_paid") {
       setPaymentData({
-        amountPaid: entry.total || 0,
+        amountPaid: newStatus === "paid" ? (entry.total || 0) : (entry.amountPaid || 0),
         paymentMode: "GPay",
         paymentDate: new Date().toISOString().split("T")[0],
         transactionId: ""
       });
+      setPaymentModalStatus(newStatus);
       setPaymentModalEntry(entry);
       return; // Wait for modal confirmation
     }
@@ -352,8 +355,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts)); 
     }
     setStatusUpdating(null);
-    if (newStatus === "paid") {
-      const isPartial = paymentDetails.amountPaid < (entry.total || 0);
+    if (newStatus === "paid" || newStatus === "part_paid") {
+      const isPartial = (paymentDetails.amountPaid || 0) < (entry.total || 0);
       showToast(isPartial ? "✅ Recorded as Part Payment in Accounts" : "✅ Recorded as Full Payment in Accounts");
     } else {
       showToast(`✅ Status updated to ${newStatus}`);
@@ -401,7 +404,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const lbl = { display: "block", fontSize: 12, color: "#6b7280", fontWeight: 600, marginBottom: 4 };
 
   const statusColor = {
-    paid: "#16a34a", unpaid: "#ea580c", overdue: "#dc2626", draft: "#6b7280", sent: "#2563eb",
+    paid: "#16a34a", unpaid: "#ea580c", overdue: "#dc2626", draft: "#6b7280", sent: "#2563eb", part_paid: "#a855f7",
   };
 
   // ════════════════════════════════════════════════════════════
@@ -420,7 +423,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     const draftCnt = enriched.filter(e => e.status === "draft").length;
 
     return (
-      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: 1100 }}>
+      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: "100%", paddingRight: 20 }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
@@ -443,12 +446,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#1e0a3c" }}>Payment Details</h3>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#1e0a3c" }}>Payment Information</h3>
                 <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>✕</button>
               </div>
               
               <div style={{ marginBottom: 16 }}>
-                <label style={lbl}>Amount Paid <span style={{color:"#ef4444"}}>*</span></label>
+                <label style={lbl}>Amount Paid (Advance / Part) <span style={{color:"#ef4444"}}>*</span></label>
                 <div style={{position:"relative"}}>
                   <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"#6b7280",fontSize:14,fontWeight:600}}>{inv.currency}</span>
                   <input type="number" value={paymentData.amountPaid} onChange={e => setPaymentData(p => ({ ...p, amountPaid: e.target.value }))} style={{...inp(), paddingLeft:30}} />
@@ -460,9 +463,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <select value={paymentData.paymentMode} onChange={e => setPaymentData(p => ({ ...p, paymentMode: e.target.value }))} style={inp()}>
                   <option value="GPay">GPay</option>
                   <option value="PhonePe">PhonePe</option>
-                  <option value="Paytm">Paytm</option>
+                  <option value="NEFT">NEFT</option>
+                  <option value="RTGS">RTGS</option>
                   <option value="UPI">UPI</option>
-                  <option value="NEFT">NEFT / RTGS</option>
+                  <option value="Net Banking">Net Banking</option>
                   <option value="Cash">Cash</option>
                   <option value="Other">Other</option>
                 </select>
@@ -481,9 +485,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <div style={{ display: "flex", gap: 10 }}>
                 <button onClick={() => setPaymentModalEntry(null)} style={{ flex: 1, padding: "12px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#7c3aed", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
                 <button onClick={() => {
-                  updateStatusBackend(paymentModalEntry, "paid", paymentData);
+                  updateStatusBackend(paymentModalEntry, paymentModalStatus, paymentData);
                   setPaymentModalEntry(null);
-                }} style={{ flex: 1, padding: "12px", background: "linear-gradient(135deg,#16a34a,#15803d)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Confirm Payment</button>
+                }} style={{ flex: 1, padding: "12px", background: paymentModalStatus === "paid" ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#a855f7,#9333ea)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+                  {paymentModalStatus === "paid" ? "Confirm Full Payment" : "Confirm Part Payment"}
+                </button>
               </div>
             </div>
           </div>
@@ -533,7 +539,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #f3f4f6", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
 
           {/* Table header */}
-          <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1.3fr 1.2fr 0.8fr 0.9fr 0.9fr 1fr 0.8fr 1.4fr", padding: "12px 20px", background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", borderBottom: "2px solid #ede9fe" }}>
+          <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 0.8fr 0.8fr 0.8fr 1.2fr 1fr 0.8fr", padding: "12px 20px", background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", borderBottom: "2px solid #ede9fe" }}>
             {["Invoice No", "Client", "Project", "Date", "Due Date", "Amount", "Status", "Actions"].map((h) => (
               <div key={h} style={{ fontSize: 11, fontWeight: 700, color: "#7c3aed", letterSpacing: 0.5, textTransform: "uppercase" }}>{h}</div>
             ))}
@@ -562,7 +568,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
             return (
               <div key={entry.id || idx} className="inv-row"
-                style={{ display: "grid", gridTemplateColumns: "1.3fr 1.2fr 0.8fr 0.9fr 0.9fr 1fr 0.8fr 1.4fr", padding: "14px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff" }}>
+                style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 0.8fr 0.8fr 0.8fr 1.2fr 1fr 0.8fr", padding: "14px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff" }}>
 
                 {/* Invoice No */}
                 <div onClick={() => setViewEntry(entry)}>
@@ -614,6 +620,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     }}>
                     <option value="draft">📝 Draft</option>
                     <option value="sent">📤 Sent</option>
+                    <option value="part_paid">💰 Part Payment</option>
                     <option value="paid">✅ Paid</option>
                     <option value="unpaid">⏳ Unpaid</option>
                     <option value="overdue">🔴 Overdue</option>
@@ -623,10 +630,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 {/* Action buttons */}
                 <div onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 4, flexWrap: "nowrap" }}>
                   <button onClick={() => setViewEntry(entry)} style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#374151", cursor: "pointer", fontWeight: 700 }}>👁 View</button>
-                  <button onClick={() => shareInvoice(entry)} style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#2563eb", cursor: "pointer", fontWeight: 700 }}>🔗 Share</button>
-                  <button onClick={() => shareWhatsApp(entry)} style={{ background: "#dcfce7", border: "1px solid #bbf7d0", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#16a34a", cursor: "pointer", fontWeight: 700 }}>💬 WA</button>
-                  <button onClick={() => loadEntry(entry)} style={{ background: "#f3e8ff", border: "1px solid #e9d5ff", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#7c3aed", cursor: "pointer", fontWeight: 700 }}>✏️ Edit</button>
-                  <button onClick={() => setDeleteTarget(entry)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#ef4444", cursor: "pointer", fontWeight: 700 }}>🗑</button>
+
                 </div>
               </div>
             );
@@ -673,11 +677,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 18 }}>
                         {[
                           { label: "Client", value: viewEntry.client || "—", icon: "👥" },
-                          { label: "Project", value: vInv.project || "—", icon: "📁" },
                           { label: "Invoice No", value: viewEntry.invoiceNo || "—", icon: "🧾" },
                           { label: "Date", value: formatDate(vInv.date), icon: "📅" },
                           { label: "Due Date", value: formatDate(vInv.dueDate), icon: "⏰" },
-                          { label: "GST Rate", value: `${vInv.gstRate || 18}%`, icon: "🏦" },
                           { label: "Client GST", value: clients.find(c => (c.clientName || c.name) === (viewEntry.client || vInv.client))?.gstNumber || "—", icon: "💎" },
                         ].map(({ label, value, icon }) => (
                           <div key={label} style={{ background: "#faf5ff", borderRadius: 10, padding: "10px 12px", border: "1px solid #ede9fe" }}>
@@ -757,14 +759,22 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       )}
 
                       {/* Action row */}
-                      <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+                      <div style={{ display: "flex", gap: 10, marginTop: 10, paddingTop: 16, borderTop: "1px solid #f3f0ff" }}>
                         <button onClick={() => { setViewEntry(null); loadEntry(viewEntry); }}
-                          style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
-                          ✏️ Edit Invoice
+                          style={{ flex: 1, padding: "12px", background: "#f3e8ff", border: "1.5px solid #e9d5ff", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#7c3aed", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "inherit" }}>
+                          ✏️ Edit
+                        </button>
+                        <button onClick={() => shareInvoice(viewEntry)}
+                          style={{ flex: 1, padding: "12px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#2563eb", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "inherit" }}>
+                          🔗 Share
+                        </button>
+                        <button onClick={() => shareWhatsApp(viewEntry)}
+                          style={{ flex: 1, padding: "12px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#16a34a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "inherit" }}>
+                          💬 WA
                         </button>
                         <button onClick={() => { setViewEntry(null); setDeleteTarget(viewEntry); }}
-                          style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
-                          🗑 Delete Invoice
+                          style={{ padding: "12px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#ef4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>
+                          🗑️
                         </button>
                       </div>
                     </>
@@ -973,7 +983,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             ← Back
           </button>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>
-            {editingId ? "✏️ Edit Invoice" : "➕ New Invoice"}
+
           </span>
           {editingId && (
             <span style={{ background: "#f3e8ff", color: "#9333ea", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>

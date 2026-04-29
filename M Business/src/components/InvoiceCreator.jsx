@@ -996,12 +996,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="#1e0a3c" />
               </div>
               <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
-              
-              {window.location.hostname === "localhost" && (
-                <div className="no-print" style={{ marginTop: 12, padding: 8, background: "#fff7ed", border: "1px solid #ffedd5", borderRadius: 8, fontSize: 9, color: "#9a3412", textAlign: "center", maxWidth: 120, lineHeight: 1.3 }}>
-                  💡 To scan on phone, use your <b>Network IP</b> (e.g. 192.168...) in the browser instead of localhost.
-                </div>
-              )}
             </div>
           </div>
 

@@ -31,7 +31,7 @@ router.post("/", async (req, res) => {
 // PUT update event
 router.put("/:id", async (req, res) => {
   try {
-    const event = await Event.findByIdAndUpdate(req.id, req.body, { new: true });
+    const event = await Event.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!event) return res.status(404).json({ msg: "Event not found" });
     res.json(event);
   } catch (err) {

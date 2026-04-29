@@ -17,6 +17,9 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
   
   const [verifyEmail, setVerifyEmail] = useState("");
   const [otp, setOtp] = useState("");
+
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [resetData, setResetData] = useState({ email: "", otp: "", newPassword: "", confirm: "" });
 const handleLogin = async () => {
   const errs = {};
   if (!loginData.email.trim()) errs.email = "Email is required";
@@ -157,6 +160,45 @@ const handleVerifyOTP = async () => {
     setLoading(false);
   }
 };
+
+const handleForgotPassword = async () => {
+  if (!forgotEmail.trim()) { setError("Please enter your email"); return; }
+  try {
+    setLoading(true);
+    setError("");
+    await axios.post(`${BASE_URL}/api/auth/forgot-password`, { email: forgotEmail });
+    setSuccess("OTP sent to your email!");
+    setResetData(p => ({ ...p, email: forgotEmail, otp: "", newPassword: "", confirm: "" }));
+    setTab("reset");
+  } catch (e) {
+    setError(e.response?.data?.msg || "Failed to send reset OTP");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleResetPassword = async () => {
+  if (!resetData.otp.trim()) { setError("Please enter the OTP"); return; }
+  if (resetData.newPassword.length < 6) { setError("Password must be at least 6 characters"); return; }
+  if (resetData.newPassword !== resetData.confirm) { setError("Passwords do not match"); return; }
+
+  try {
+    setLoading(true);
+    setError("");
+    await axios.post(`${BASE_URL}/api/auth/reset-password`, {
+      email: resetData.email,
+      otp: resetData.otp,
+      newPassword: resetData.newPassword
+    });
+    setSuccess("Password reset successfully! Please login with your new password.");
+    setTab("login");
+    setLoginData(p => ({ ...p, email: resetData.email, password: "" }));
+  } catch (e) {
+    setError(e.response?.data?.msg || "Failed to reset password");
+  } finally {
+    setLoading(false);
+  }
+};
   const iStyle = (err) => ({
     width: "100%", padding: "12px 16px",
     background: "rgba(255,255,255,0.1)",
@@ -244,10 +286,10 @@ const handleVerifyOTP = async () => {
 
             <div style={{ marginBottom:22 }}>
               <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.35)", letterSpacing:2, marginBottom:4 }}>
-                {tab==="login" ? "WELCOME BACK" : tab==="otp" ? "VERIFY EMAIL" : "CREATE YOUR ACCOUNT"}
+                {tab==="login" ? "WELCOME BACK" : tab==="otp" ? "VERIFY EMAIL" : tab==="forgot" ? "FORGOT PASSWORD" : tab==="reset" ? "RESET PASSWORD" : "CREATE YOUR ACCOUNT"}
               </div>
               <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>
-                {tab==="login" ? "" : tab==="otp" ? `Enter the 6-digit OTP sent to ${verifyEmail}` : "Fill in the details below to get started."}
+                {tab==="login" ? "" : tab==="otp" ? `Enter the 6-digit OTP sent to ${verifyEmail}` : tab==="forgot" ? "Enter your email to receive a password reset OTP." : tab==="reset" ? `Enter the OTP and your new password.` : "Fill in the details below to get started."}
               </div>
             </div>
 
@@ -273,6 +315,9 @@ const handleVerifyOTP = async () => {
                     <button type="button" onClick={()=>setShowPass(!showPass)} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", color:"rgba(255,255,255,0.45)", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>{showPass?"HIDE":"SHOW"}</button>
                   </div>
                   {loginErr.password && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {loginErr.password}</div>}
+                  <div style={{ textAlign:"right", marginTop:6 }}>
+                    <button onClick={()=>{setTab("forgot");setError("");setSuccess("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.6)", fontSize:11, cursor:"pointer", fontFamily:"inherit" }}>Forgot Password?</button>
+                  </div>
                 </div>
                 <button onClick={handleLogin} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
                   <span>{loading ? "Signing in..." : "Proceed to my Account"}</span>
@@ -302,6 +347,48 @@ const handleVerifyOTP = async () => {
                 <div style={{ textAlign:"center", marginTop:18, fontSize:12, color:"rgba(255,255,255,0.3)" }}>
                   <button onClick={()=>{setTab("login");setError("");setSuccess("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.8)", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>← Back to login</button>
                 </div>
+              </div>
+            )}
+
+            {/* FORGOT PASSWORD */}
+            {tab==="forgot" && (
+              <div>
+                <div style={{ marginBottom:22 }}>
+                  <label style={lStyle}>Email Address</label>
+                  <div style={{ position:"relative" }}>
+                    <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>✉️</span>
+                    <input type="email" value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleForgotPassword()} placeholder="you@email.com" style={{ ...iStyle(false), paddingLeft:38 }}/>
+                  </div>
+                </div>
+                <button onClick={handleForgotPassword} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
+                  <span>{loading ? "Sending..." : "Send Reset OTP"}</span>
+                  {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
+                </button>
+                <div style={{ textAlign:"center", marginTop:18, fontSize:12, color:"rgba(255,255,255,0.3)" }}>
+                  <button onClick={()=>{setTab("login");setError("");setSuccess("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.8)", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>← Back to login</button>
+                </div>
+              </div>
+            )}
+
+            {/* RESET PASSWORD */}
+            {tab==="reset" && (
+              <div>
+                <div style={{ marginBottom:14 }}>
+                  <label style={lStyle}>OTP</label>
+                  <input value={resetData.otp} onChange={e=>setResetData(p=>({...p,otp:e.target.value}))} placeholder="6-digit code" style={{ ...iStyle(false) }} maxLength={6}/>
+                </div>
+                <div style={{ marginBottom:14 }}>
+                  <label style={lStyle}>New Password</label>
+                  <input type="password" value={resetData.newPassword} onChange={e=>setResetData(p=>({...p,newPassword:e.target.value}))} placeholder="Min 6 chars" style={{ ...iStyle(false) }}/>
+                </div>
+                <div style={{ marginBottom:22 }}>
+                  <label style={lStyle}>Confirm Password</label>
+                  <input type="password" value={resetData.confirm} onChange={e=>setResetData(p=>({...p,confirm:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&handleResetPassword()} placeholder="Repeat password" style={{ ...iStyle(false) }}/>
+                </div>
+                <button onClick={handleResetPassword} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
+                  <span>{loading ? "Updating..." : "Reset Password"}</span>
+                  {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
+                </button>
               </div>
             )}
 

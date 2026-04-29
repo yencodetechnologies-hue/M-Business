@@ -10,6 +10,8 @@ const employeeSchema = new mongoose.Schema({
   password: { type: String, default: "" } , 
   status:     { type: String, enum: ["Active","Inactive"], default: "Active" },
   companyId: { type: String, default: "" },
+  otp: { type: String, default: "" },
+  otpExpires: { type: Date },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Employee", employeeSchema);

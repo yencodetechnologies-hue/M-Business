@@ -303,4 +303,60 @@ router.get("/debug-clients", async (req, res) => {
   }
 });
 
+// ── POST /api/auth/forgot-password ──────────────────────────────────────────
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    let user = await User.findOne({ email });
+    if (!user) user = await Client.findOne({ email });
+    if (!user) user = await Manager.findOne({ email });
+    if (!user) user = await Employee.findOne({ email });
+
+    if (!user) return res.status(404).json({ msg: "User with this email not found" });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpires = new Date(Date.now() + 10 * 60000); // 10 minutes
+    await user.save();
+
+    const emailRes = await sendOTPEmail(email, otp, 'password_reset');
+    if (!emailRes.success) {
+      return res.status(500).json({ msg: "Failed to send OTP email" });
+    }
+
+    res.json({ msg: "OTP sent to your email" });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// ── POST /api/auth/reset-password ───────────────────────────────────────────
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    let user = await User.findOne({ email });
+    if (!user) user = await Client.findOne({ email });
+    if (!user) user = await Manager.findOne({ email });
+    if (!user) user = await Employee.findOne({ email });
+
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    if (user.otp !== otp || !user.otpExpires || user.otpExpires < new Date()) {
+      return res.status(400).json({ msg: "Invalid or expired OTP" });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    user.otp = "";
+    user.otpExpires = null;
+    await user.save();
+
+    res.json({ msg: "Password updated successfully" });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 module.exports = router;

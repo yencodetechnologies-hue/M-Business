@@ -14,6 +14,8 @@ const ClientSchema = new mongoose.Schema({
   gstNumber:       { type: String, default: "" },
   logoUrl:         { type: String, default: "" },
   companyId: { type: String, default: "" },
+  otp: { type: String, default: "" },
+  otpExpires: { type: Date },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Client", ClientSchema);

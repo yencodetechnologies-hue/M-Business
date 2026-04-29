@@ -125,17 +125,22 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
     setSaving(false);
   };
 
-  const updateStatus = async (type, id, newStatus) => {
+  const updateProjectTask = async (type, id, updates) => {
     setSaving(true);
     try {
       if (type === "project") {
-        await axios.put(`${BASE_URL}/api/projects/${id}`, { status: newStatus });
+        await axios.put(`${BASE_URL}/api/projects/${id}`, updates);
         if (onUpdateProject) onUpdateProject();
-        showToast("✅ Project status updated!");
+        showToast("✅ Project updated!");
       } else if (type === "task") {
-        await axios.patch(`${BASE_URL}/api/tasks/${id}/status`, { status: newStatus });
+        // Use PUT for full update if available, or stay with PATCH for status only
+        if (updates.date || updates.dueDate) {
+          await axios.put(`${BASE_URL}/api/tasks/${id}`, updates);
+        } else {
+          await axios.patch(`${BASE_URL}/api/tasks/${id}/status`, updates);
+        }
         if (onUpdateTask) onUpdateTask();
-        showToast("✅ Task status updated!");
+        showToast("✅ Task updated!");
       }
       setModal(null);
     } catch (err) {
@@ -551,16 +556,29 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
               <div style={{ fontSize:12, color:T.muted, marginTop:4 }}>Deadline: {form.date}</div>
               <div style={{ fontSize:12, color:T.muted }}>Client: {form.client || "—"}</div>
             </div>
+            <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700, marginBottom:8 }}>DEADLINE</label>
+            <input 
+              type="date" 
+              value={form.date} 
+              onChange={e => setForm({ ...form, date: e.target.value })}
+              style={{ ...inp(false), marginBottom: 16 }}
+            />
             <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700, marginBottom:8 }}>UPDATE STATUS</label>
             <select 
               value={form._original.status} 
-              onChange={e => updateStatus("project", form._original._id, e.target.value)}
+              onChange={e => setForm({ ...form, _original: { ...form._original, status: e.target.value } })}
               style={inp(false)}
             >
               {(config?.projectStatuses || ["Pending","In Progress","Completed","On Hold"]).map(s=><option key={s}>{s}</option>)}
             </select>
-            <div style={{ display:"flex", justifyContent:"flex-end", marginTop:20 }}>
-              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>Close</button>
+            <div style={{ display:"flex", justifyContent:"flex-end", gap: 10, marginTop:20 }}>
+              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>Cancel</button>
+              <button 
+                onClick={() => updateProjectTask("project", form._original._id, { status: form._original.status, deadline: form.date })}
+                style={{ background:"linear-gradient(135deg,#9333ea,#a855f7)", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         </div>
@@ -575,16 +593,29 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
               <div style={{ fontSize:12, color:T.muted, marginTop:4 }}>Due Date: {form.date}</div>
               <div style={{ fontSize:12, color:T.muted }}>Project: {form.project || "—"}</div>
             </div>
+            <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700, marginBottom:8 }}>DUE DATE</label>
+            <input 
+              type="date" 
+              value={form.date} 
+              onChange={e => setForm({ ...form, date: e.target.value })}
+              style={{ ...inp(false), marginBottom: 16 }}
+            />
             <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700, marginBottom:8 }}>UPDATE STATUS</label>
             <select 
               value={form._original.status} 
-              onChange={e => updateStatus("task", form._original._id, e.target.value)}
+              onChange={e => setForm({ ...form, _original: { ...form._original, status: e.target.value } })}
               style={inp(false)}
             >
               {(config?.taskStatuses || ["Pending","In Progress","Completed","On Hold"]).map(s=><option key={s}>{s}</option>)}
             </select>
-            <div style={{ display:"flex", justifyContent:"flex-end", marginTop:20 }}>
-              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>Close</button>
+            <div style={{ display:"flex", justifyContent:"flex-end", gap: 10, marginTop:20 }}>
+              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>Cancel</button>
+              <button 
+                onClick={() => updateProjectTask("task", form._original._id, { status: form._original.status, date: form.date })}
+                style={{ background:"linear-gradient(135deg,#9333ea,#a855f7)", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         </div>

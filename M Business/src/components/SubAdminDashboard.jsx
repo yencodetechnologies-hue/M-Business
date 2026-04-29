@@ -154,8 +154,61 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
             {!options.includes(value) && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} />}
           </div>
         ) : (<select value={value} onChange={e => onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o => <option key={o}>{o}</option>)}</select>)
-      ) : <input type={type} value={value} onChange={e => onChange(e.target.value)} style={s} placeholder={placeholder || ""} disabled={disabled} />}
+      ) : <input type={type} value={value || ""} onChange={e => onChange(e.target.value)} style={s} placeholder={placeholder || ""} disabled={disabled} />}
       {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
+    </div>
+  );
+}
+
+function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onItemsPerPageChange }) {
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  if (totalItems === 0) return null;
+
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20, padding: "12px 0 4px", borderTop: "1px solid #ede9fe", flexWrap: "wrap", gap: 15 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{ fontSize: 13, color: "#7c3aed", fontWeight: 600 }}>Page {currentPage} of {totalPages}</span>
+        <select 
+          value={itemsPerPage} 
+          onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+          style={{ padding: "7px 12px", borderRadius: 10, border: "1.5px solid #ede9fe", fontSize: 13, background: "#faf5ff", color: "#1e0a3c", outline: "none", cursor: "pointer", fontWeight: 500 }}
+        >
+          {[10, 25, 50, 100].map(n => <option key={n} value={n}>Show {n}</option>)}
+        </select>
+      </div>
+      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+        <button 
+          disabled={currentPage === 1} 
+          onClick={() => onPageChange(currentPage - 1)}
+          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid #ede9fe", background: currentPage === 1 ? "#f8fafc" : "#fff", color: currentPage === 1 ? "#cbd5e1" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: currentPage === 1 ? "not-allowed" : "pointer", transition: "all 0.2s" }}
+        >
+          Previous
+        </button>
+        
+        {totalPages <= 7 ? (
+          [...Array(totalPages)].map((_, i) => (
+            <button key={i+1} onClick={() => onPageChange(i+1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === (i+1) ? "#9333ea" : "#ede9fe", background: currentPage === (i+1) ? "#9333ea" : "#fff", color: currentPage === (i+1) ? "#fff" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>{i+1}</button>
+          ))
+        ) : (
+          <>
+            <button onClick={() => onPageChange(1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === 1 ? "#9333ea" : "#ede9fe", background: currentPage === 1 ? "#9333ea" : "#fff", color: currentPage === 1 ? "#fff" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>1</button>
+            {currentPage > 3 && <span style={{ color: "#cbd5e1" }}>...</span>}
+            {currentPage > 2 && currentPage < totalPages - 1 && (
+               <button onClick={() => onPageChange(currentPage)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid #9333ea", background: "#9333ea", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{currentPage}</button>
+            )}
+            {currentPage < totalPages - 2 && <span style={{ color: "#cbd5e1" }}>...</span>}
+            <button onClick={() => onPageChange(totalPages)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === totalPages ? "#9333ea" : "#ede9fe", background: currentPage === totalPages ? "#9333ea" : "#fff", color: currentPage === totalPages ? "#fff" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{totalPages}</button>
+          </>
+        )}
+
+        <button 
+          disabled={currentPage === totalPages} 
+          onClick={() => onPageChange(currentPage + 1)}
+          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid #ede9fe", background: currentPage === totalPages ? "#f8fafc" : "#fff", color: currentPage === totalPages ? "#cbd5e1" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: currentPage === totalPages ? "not-allowed" : "pointer", transition: "all 0.2s" }}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
@@ -238,6 +291,9 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
   const filtered = clients.filter(c =>
@@ -245,6 +301,9 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
     (c.email || "").toLowerCase().includes(search.toLowerCase()) ||
     (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase())
   );
+
+  useEffect(() => { setCurrentPage(1); }, [search, clients.length]);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (c) => {
     setEditForm({
@@ -315,10 +374,10 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
               ))}
             </tr></thead>
             <tbody>
-              {filtered.length === 0 ? <tr><td colSpan={8} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No clients found</td></tr>
-                : filtered.map((c, i) => (
+              {paginated.length === 0 ? <tr><td colSpan={8} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No clients found</td></tr>
+                : paginated.map((c, i) => (
                   <tr key={c._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`CLT${String(i + 1).padStart(3, "0")}`}</td>
+                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`CLT${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: c.logoUrl ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden", border: c.logoUrl ? "1px solid #ede9fe" : "none" }}>
@@ -344,6 +403,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
       {/* View Modal */}
@@ -471,6 +531,8 @@ function EmployeesPage({ employees, setEmployees }) {
   const [toast, setToast] = useState("");
   const [empDocs, setEmpDocs] = useState({});
   const [empDocsLoading, setEmpDocsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const loadEmpDocs = async (emp) => {
     setEmpDocs({});
@@ -493,6 +555,9 @@ function EmployeesPage({ employees, setEmployees }) {
     (e.role || "").toLowerCase().includes(search.toLowerCase()) ||
     (e.department || "").toLowerCase().includes(search.toLowerCase())
   );
+
+  useEffect(() => { setCurrentPage(1); }, [search, employees.length]);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (e) => {
     setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "", department: e.department || "", salary: e.salary || "", status: e.status || "Active" });
@@ -550,10 +615,10 @@ function EmployeesPage({ employees, setEmployees }) {
               ))}
             </tr></thead>
             <tbody>
-              {filtered.length === 0 ? <tr><td colSpan={9} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No employees found</td></tr>
-                : filtered.map((e, i) => (
+              {paginated.length === 0 ? <tr><td colSpan={9} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No employees found</td></tr>
+                : paginated.map((e, i) => (
                   <tr key={e._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={ev => ev.currentTarget.style.background = "#faf5ff"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
-                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`EMP${String(i + 1).padStart(3, "0")}`}</td>
+                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`EMP${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(e.name || "?")[0].toUpperCase()}</div>
@@ -578,6 +643,7 @@ function EmployeesPage({ employees, setEmployees }) {
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
       {viewEmp && (
@@ -682,8 +748,14 @@ function ManagersPage({ managers, setManagers }) {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
   const filtered = managers.filter(m => (m.managerName || "").toLowerCase().includes(search.toLowerCase()) || (m.email || "").toLowerCase().includes(search.toLowerCase()) || (m.department || "").toLowerCase().includes(search.toLowerCase()));
+
+  useEffect(() => { setCurrentPage(1); }, [search, managers.length]);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (m) => {
     setEditForm({ managerName: m.managerName || "", email: m.email || "", phone: m.phone || "", department: m.department || "", role: m.role || "Manager", address: m.address || "", status: m.status || "Active" });
@@ -740,10 +812,10 @@ function ManagersPage({ managers, setManagers }) {
               ))}
             </tr></thead>
             <tbody>
-              {filtered.length === 0 ? <tr><td colSpan={9} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No managers found</td></tr>
-                : filtered.map((m, i) => (
+              {paginated.length === 0 ? <tr><td colSpan={9} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No managers found</td></tr>
+                : paginated.map((m, i) => (
                   <tr key={m._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={ev => ev.currentTarget.style.background = "#faf5ff"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
-                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`MGR${String(i + 1).padStart(3, "0")}`}</td>
+                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`MGR${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(m.managerName || "?")[0].toUpperCase()}</div>
@@ -764,6 +836,7 @@ function ManagersPage({ managers, setManagers }) {
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
       {viewMgr && (
@@ -1109,8 +1182,14 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
     }
   }, [jumpProject]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
   const filtered = projects.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()) || (p.client || "").toLowerCase().includes(search.toLowerCase()));
+
+  useEffect(() => { setCurrentPage(1); }, [search, projects.length]);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (p) => {
     setEditForm({ name: p.name || "", client: p.client || "", purpose: p.purpose || "", description: p.description || "", start: p.start || "", end: p.end || "", budget: p.budget || "", team: p.team || "", status: p.status || "Pending", assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []) });
@@ -1176,10 +1255,10 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
               ))}
             </tr></thead>
             <tbody>
-              {filtered.length === 0 ? <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No projects found</td></tr>
-                : filtered.map((p, i) => (
+              {paginated.length === 0 ? <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No projects found</td></tr>
+                : paginated.map((p, i) => (
                   <tr key={p._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={ev => ev.currentTarget.style.background = "#faf5ff"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
-                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`PRJ${String(i + 1).padStart(3, "0")}`}</td>
+                    <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{p.name}</td>
                     <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{p.client || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{p.budget || "—"}</td>
@@ -1208,6 +1287,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
       {viewProj && (
@@ -1269,29 +1349,47 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES</label>
             <div style={{ border: "1.5px solid #ede9fe", borderRadius: 10, padding: "12px", background: "#faf5ff", maxHeight: 200, overflowY: "auto" }}>
               {employees.length === 0 ? <div style={{ color: "#a78bfa", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
-                : employees.map(e => (
-                  <div key={e._id || e.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid #f5f3ff" }}>
+                : employees.map(emp => (
+                  <div key={emp._id || emp.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid #f5f3ff" }}>
                     <input type="checkbox"
-                      id={`edit-emp-${e._id || e.email}`}
-                      checked={Array.isArray(editForm.assignedTo) ? editForm.assignedTo.includes(e.name) : (editForm.assignedTo === e.name)}
+                      id={`edit-emp-${emp._id || emp.email}`}
+                      checked={Array.isArray(editForm.assignedTo) ? editForm.assignedTo.includes(emp.name) : (editForm.assignedTo === emp.name)}
                       onChange={e => {
                         const currentAssigned = Array.isArray(editForm.assignedTo) ? editForm.assignedTo : (editForm.assignedTo ? [editForm.assignedTo] : []);
                         if (e.target.checked) {
-                          setEditForm({ ...editForm, assignedTo: [...currentAssigned, e.name] });
+                          setEditForm({ ...editForm, assignedTo: [...currentAssigned, emp.name] });
                         } else {
-                          setEditForm({ ...editForm, assignedTo: currentAssigned.filter(name => name !== e.name) });
+                          setEditForm({ ...editForm, assignedTo: currentAssigned.filter(name => name !== emp.name) });
                         }
                       }}
                       style={{ width: 16, height: 16, cursor: "pointer" }}
                     />
-                    <label htmlFor={`edit-emp-${e._id || e.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "#1e0a3c", display: "flex", alignItems: "center", gap: 8 }}>
-                      <span>{e.name}</span>
-                      {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
+                    <label htmlFor={`edit-emp-${emp._id || emp.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "#1e0a3c", display: "flex", alignItems: "center", gap: 8 }}>
+                      <span>{emp.name}</span>
+                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
                     </label>
                   </div>
                 ))}
             </div>
-            {editForm.assignedTo && editForm.assignedTo.length > 0 && <div style={{ marginTop: 6, fontSize: 11, color: "#9333ea", fontWeight: 600 }}>{editForm.assignedTo.length} employee(s) selected</div>}
+            {editForm.assignedTo && editForm.assignedTo.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <label style={{ display: "block", fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({editForm.assignedTo.length})</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {editForm.assignedTo.map(name => (
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#f3e8ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#7c3aed" }}>{name}</span>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setEditForm({ ...editForm, assignedTo: editForm.assignedTo.filter(n => n !== name) }); }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <Fld label="Description" value={editForm.description} onChange={v => setEditForm(p => ({ ...p, description: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
@@ -1307,29 +1405,47 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 8 }}>SELECT EMPLOYEES TO ASSIGN</label>
             <div style={{ border: "1.5px solid #ede9fe", borderRadius: 10, padding: "12px", background: "#faf5ff", maxHeight: 200, overflowY: "auto" }}>
               {employees.length === 0 ? <div style={{ color: "#a78bfa", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
-                : employees.map(e => (
-                  <div key={e._id || e.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid #f5f3ff" }}>
+                : employees.map(emp => (
+                  <div key={emp._id || emp.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid #f5f3ff" }}>
                     <input type="checkbox"
-                      id={`assign-emp-${e._id || e.email}`}
-                      checked={Array.isArray(assignTo) ? assignTo.includes(e.name) : (assignTo === e.name)}
+                      id={`assign-emp-${emp._id || emp.email}`}
+                      checked={Array.isArray(assignTo) ? assignTo.includes(emp.name) : (assignTo === emp.name)}
                       onChange={e => {
                         const currentAssigned = Array.isArray(assignTo) ? assignTo : (assignTo ? [assignTo] : []);
                         if (e.target.checked) {
-                          setAssignTo([...currentAssigned, e.name]);
+                          setAssignTo([...currentAssigned, emp.name]);
                         } else {
-                          setAssignTo(currentAssigned.filter(name => name !== e.name));
+                          setAssignTo(currentAssigned.filter(name => name !== emp.name));
                         }
                       }}
                       style={{ width: 16, height: 16, cursor: "pointer" }}
                     />
-                    <label htmlFor={`assign-emp-${e._id || e.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "#1e0a3c", display: "flex", alignItems: "center", gap: 8 }}>
-                      <span>{e.name}</span>
-                      {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
+                    <label htmlFor={`assign-emp-${emp._id || emp.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "#1e0a3c", display: "flex", alignItems: "center", gap: 8 }}>
+                      <span>{emp.name}</span>
+                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "#f3e8ff", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
                     </label>
                   </div>
                 ))}
             </div>
-            {assignTo && assignTo.length > 0 && <div style={{ marginTop: 8, fontSize: 11, color: "#9333ea", fontWeight: 600 }}>{assignTo.length} employee(s) will be assigned</div>}
+            {assignTo && assignTo.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <label style={{ display: "block", fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({assignTo.length})</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {assignTo.map(name => (
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#f3e8ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#7c3aed" }}>{name}</span>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setAssignTo(assignTo.filter(n => n !== name)); }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button onClick={() => setAssignModal(null)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
@@ -1388,7 +1504,15 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
   const clientNames = clients.map(c => ({ name: c.clientName || c.name || "" }));
   const managerNames = managers.map(m => ({ name: m.managerName || m.name || "" }));
   const employeeNames = employees.map(e => ({ name: e.name || "" }));
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const displayed = trackList.filter(p => { const okStatus = tsFilter === "All" || p.status === tsFilter; const q = tsSearch.toLowerCase(); const okSearch = !q || (p.name || "").toLowerCase().includes(q) || (p.client || "").toLowerCase().includes(q) || (p.projectId || p.id || "").toLowerCase().includes(q); return okStatus && okSearch; });
+  
+  useEffect(() => { setCurrentPage(1); }, [tsSearch, tsFilter, trackList.length]);
+  const paginated = displayed.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   const tsStats = [{ t: "Total", v: trackList.length, i: "📁", c: "#9333ea" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "⚡", c: "#7c3aed" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "✅", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "🕐", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "⏸️", c: "#a855f7" }];
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
   const openEdit = (p) => { setTsForm({ projectId: p.projectId || p.id || "", name: p.name || "", client: p.client || "", manager: p.manager || "", employee: p.employee || "", deadline: p.deadline || "", status: p.status || "In Progress", progress: p.progress || p.pct || 0, notes: p.notes || p.note || "" }); setTsErr({}); setTsEditId(p._id || p.id); setTsModal("edit"); };
@@ -1413,9 +1537,9 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 900 }}>
             <thead><tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>{["ID", "Project", "Client", "Manager", "Employee", "Deadline", "Status", "Progress", "Notes", "Actions"].map(c => (<th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{c.toUpperCase()}</th>))}</tr></thead>
             <tbody>
-              {displayed.length === 0 ? <tr><td colSpan={10} style={{ padding: 40, textAlign: "center", color: "#a78bfa" }}>No projects found</td></tr>
-                : displayed.map((p, i) => (<tr key={p._id || p.id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                  <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 11, color: "#a78bfa" }}>{p.projectId || p.id || `PRJ${String(i + 1).padStart(3, "0")}`}</td>
+              {paginated.length === 0 ? <tr><td colSpan={10} style={{ padding: 40, textAlign: "center", color: "#a78bfa" }}>No projects found</td></tr>
+                : paginated.map((p, i) => (<tr key={p._id || p.id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 11, color: "#a78bfa" }}>{p.projectId || p.id || `PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                   <td style={{ padding: "11px 12px", fontWeight: 700, color: T.text }}>{p.name}</td>
                   <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "—"}</span></div></td>
                   <td style={{ padding: "11px 12px", color: "#7c3aed", fontSize: 12 }}>{p.manager || "—"}</td>
@@ -1429,6 +1553,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={displayed.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
       {tsModal && (<Mdl title={tsModal === "add" ? "Add Project Status" : "Edit Project Status"} onClose={() => setTsModal(null)}>
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
@@ -1498,7 +1623,14 @@ function InterviewPage({ companyId, companyName }) {
   const updateStatus = (idx, val) => { const updated = [...candidates]; updated[idx] = { ...updated[idx], status: val }; persist(updated); const c = updated[idx]; const id = c._id || c.id; if (id) axios.patch(`${API_URL}/api/interviews/${id}/status`, { status: val }, { headers: { "Content-Type": "application/json" } }).catch(() => { }); showToast(`✅ Status → "${val}"`); if (viewModal && (viewModal._id || viewModal.id) === id) setViewModal(updated[idx]); };
   const deleteCandidate = (idx) => { if (!window.confirm("Delete this candidate?")) return; const c = candidates[idx]; const id = c._id || c.id; if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { }); persist(candidates.filter((_, i) => i !== idx)); showToast("🗑️ Deleted"); setViewModal(null); };
   const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const displayed = candidates.filter(c => { const okF = filter === "all" || (c.status || "pending").toLowerCase() === filter; const q = search.toLowerCase(); const okS = !q || (c.name || "").toLowerCase().includes(q) || (c.role || "").toLowerCase().includes(q) || (c.email || "").toLowerCase().includes(q) || (c.mobile || "").includes(q); return okF && okS; });
+  
+  useEffect(() => { setCurrentPage(1); }, [search, filter, candidates.length]);
+  const paginated = displayed.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   const counts = { total: candidates.length, pending: candidates.filter(c => (c.status || "pending").toLowerCase() === "pending").length, hired: candidates.filter(c => (c.status || "").toLowerCase() === "hired").length, rejected: candidates.filter(c => (c.status || "").toLowerCase() === "rejected").length };
   const sColor = { pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" };
   const sC = (s = "pending") => sColor[s.toLowerCase()] || "#a855f7";
@@ -1527,11 +1659,11 @@ function InterviewPage({ companyId, companyName }) {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 950 }}>
               <thead><tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>{["#", "Candidate", "Contact", "Experience", "Role", "Interviewer", "Date", "Status", "Resume", "Actions"].map(h => (<th key={h} style={{ padding: "10px 12px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 10, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>))}</tr></thead>
               <tbody>
-                {displayed.map((c, i) => {
+                {paginated.map((c, i) => {
                   const idx = candidates.indexOf(c); const status = (c.status || "pending").toLowerCase(); const resumeUrl = c.resumeUrl || (c.resumePath ? `https://mbusiness.octosofttechnologies.in/uploads/resumes/${c.resumePath.split(/[\\/]/).pop()}` : null);
                   const finalResumeUrl = resumeUrl; return (
                     <tr key={c._id || c.id || i} style={{ borderBottom: "1px solid #f3f0ff", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                      <td style={{ padding: "12px 12px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{String(i + 1).padStart(3, "0")}</td>
+                      <td style={{ padding: "12px 12px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}</td>
                       <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "#1e0a3c" }}>{c.name || "—"}</span></div></td>
                       <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "#7c3aed" }}>{c.email || "—"}</div><div style={{ fontSize: 11, color: "#a78bfa", marginTop: 2 }}>{c.mobile || ""}</div></td>
                       <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>🎓 Fresher</span> : <span style={{ background: "rgba(147,51,234,0.12)", color: "#9333ea", border: "1px solid rgba(147,51,234,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>💼 {c.years || "?"}yrs</span>}</td>
@@ -1548,6 +1680,7 @@ function InterviewPage({ companyId, companyName }) {
             </table>
           </div>
         )}
+        <Pagination totalItems={displayed.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </div>
       {viewModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
@@ -1798,7 +1931,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick }) {
   const items = navItems || NAV;
   const companyName = user?.companyName || "";
-  const initials = (companyName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const initials = (companyName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const roleDisplay = (user?.role || "").toLowerCase().includes("subadmin") ? "" : (user?.role || "ADMIN").toUpperCase();
   
   // Track expanded groups
@@ -2303,7 +2436,7 @@ function VendorsPage({ vendors, setVendors }) {
 // MAIN DASHBOARD
 // ═══════════════════════════════════════════════════════════
 export default function Dashboard({ setUser, user, fixedLogo }) {
-  const companyNameStr = user?.companyName || "Your Business";
+  const companyNameStr = user?.companyName || "Workspace Suite";
   const [active, setActive] = useState("dashboard");
   const [jumpProject, setJumpProject] = useState(null);
   const [modal, setModal] = useState(null);
@@ -2487,7 +2620,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get(BASE_URL + "/api/expense");
+      const res = await axios.get(BASE_URL + "/api/expenses");
       setExpenses(res.data || []);
     } catch (e) {
       console.log("Fetch expenses error:", e);
@@ -2870,7 +3003,7 @@ const handleEditPackage = (pkg) => {
   useEffect(() => { if (!enforceMySubscriptions && validActive !== active) setActive(validActive); }, [user?.role, enforceMySubscriptions, validActive]);
 
   const displayName = companyNameStr;
-  const initials = (displayName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const B = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
 
   const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
@@ -3017,7 +3150,7 @@ const handleEditPackage = (pkg) => {
                       🚀 Renew Subscription
                     </button>
                     <button 
-                      onClick={() => window.open("mailto:support@mbusiness.com")}
+                      onClick={() => window.open(`mailto:${user?.email || "support@workspace.com"}`)}
                       style={{
                         background: "#fff",
                         border: "1.5px solid #ef4444",

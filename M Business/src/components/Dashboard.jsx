@@ -115,6 +115,60 @@ function Fld({label,value,onChange,options,type="text",error,placeholder,disable
   );
 }
 
+function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onItemsPerPageChange }) {
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  if (totalItems === 0) return null;
+
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20, padding: "12px 0 4px", borderTop: "1px solid #ede9fe", flexWrap: "wrap", gap: 15 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{ fontSize: 13, color: "#7c3aed", fontWeight: 600 }}>Page {currentPage} of {totalPages}</span>
+        <select 
+          value={itemsPerPage} 
+          onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+          style={{ padding: "7px 12px", borderRadius: 10, border: "1.5px solid #ede9fe", fontSize: 13, background: "#faf5ff", color: "#1e0a3c", outline: "none", cursor: "pointer", fontWeight: 500 }}
+        >
+          {[10, 25, 50, 100].map(n => <option key={n} value={n}>Show {n}</option>)}
+        </select>
+      </div>
+      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+        <button 
+          disabled={currentPage === 1} 
+          onClick={() => onPageChange(currentPage - 1)}
+          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid #ede9fe", background: currentPage === 1 ? "#f8fafc" : "#fff", color: currentPage === 1 ? "#cbd5e1" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: currentPage === 1 ? "not-allowed" : "pointer", transition: "all 0.2s" }}
+        >
+          Previous
+        </button>
+        
+        {/* Simple page numbers */}
+        {totalPages <= 7 ? (
+          [...Array(totalPages)].map((_, i) => (
+            <button key={i+1} onClick={() => onPageChange(i+1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === (i+1) ? "#9333ea" : "#ede9fe", background: currentPage === (i+1) ? "#9333ea" : "#fff", color: currentPage === (i+1) ? "#fff" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>{i+1}</button>
+          ))
+        ) : (
+          <>
+            <button onClick={() => onPageChange(1)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === 1 ? "#9333ea" : "#ede9fe", background: currentPage === 1 ? "#9333ea" : "#fff", color: currentPage === 1 ? "#fff" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>1</button>
+            {currentPage > 3 && <span style={{ color: "#cbd5e1" }}>...</span>}
+            {currentPage > 2 && currentPage < totalPages - 1 && (
+               <button onClick={() => onPageChange(currentPage)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid #9333ea", background: "#9333ea", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{currentPage}</button>
+            )}
+            {currentPage < totalPages - 2 && <span style={{ color: "#cbd5e1" }}>...</span>}
+            <button onClick={() => onPageChange(totalPages)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, border: "1.5px solid", borderColor: currentPage === totalPages ? "#9333ea" : "#ede9fe", background: currentPage === totalPages ? "#9333ea" : "#fff", color: currentPage === totalPages ? "#fff" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{totalPages}</button>
+          </>
+        )}
+
+        <button 
+          disabled={currentPage === totalPages} 
+          onClick={() => onPageChange(currentPage + 1)}
+          style={{ padding: "7px 14px", borderRadius: 10, border: "1.5px solid #ede9fe", background: currentPage === totalPages ? "#f8fafc" : "#fff", color: currentPage === totalPages ? "#cbd5e1" : "#7c3aed", fontSize: 13, fontWeight: 700, cursor: currentPage === totalPages ? "not-allowed" : "pointer", transition: "all 0.2s" }}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ConfirmModal({title,message,onConfirm,onCancel,confirmLabel="Delete",danger=true}){
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.6)",backdropFilter:"blur(8px)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
@@ -132,6 +186,7 @@ function ConfirmModal({title,message,onConfirm,onCancel,confirmLabel="Delete",da
     </div>
   );
 }
+
 
 // ── Action Buttons (View / Edit / Delete) ────────────────────
 function ActionBtns({onView,onEdit,onDelete}){
@@ -195,11 +250,17 @@ function ClientsPage({clients,setClients,projects=[],onAddClient}){
 
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const filtered=clients.filter(c=>
     (c.clientName||c.name||"").toLowerCase().includes(search.toLowerCase())||
     (c.email||"").toLowerCase().includes(search.toLowerCase())||
     (c.companyName||c.company||"").toLowerCase().includes(search.toLowerCase())
   );
+
+  useEffect(() => { setCurrentPage(1); }, [search, clients.length]);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit=(c)=>{
     setEditForm({
@@ -270,10 +331,10 @@ function ClientsPage({clients,setClients,projects=[],onAddClient}){
               ))}
             </tr></thead>
             <tbody>
-              {filtered.length===0?<tr><td colSpan={8} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No clients found</td></tr>
-                :filtered.map((c,i)=>(
+              {paginated.length===0?<tr><td colSpan={8} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No clients found</td></tr>
+                :paginated.map((c,i)=>(
                   <tr key={c._id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`CLT${String(i+1).padStart(3,"0")}`}</td>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`CLT${String((currentPage-1)*itemsPerPage + i + 1).padStart(3,"0")}`}</td>
                     <td style={{padding:"12px 14px"}}>
                       <div style={{display:"flex",alignItems:"center",gap:8}}>
                         <div style={{width:28,height:28,borderRadius:"50%",background:c.logoUrl?"#fff":"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden",border:c.logoUrl?"1px solid #ede9fe":"none"}}>{c.logoUrl?<img src={c.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain"}}/>:((c.clientName||c.name||"?")[0].toUpperCase())}</div>
@@ -297,6 +358,7 @@ function ClientsPage({clients,setClients,projects=[],onAddClient}){
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
       {/* View Modal */}
@@ -427,12 +489,18 @@ const loadEmpDocs = async (emp) => {
 };
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const filtered=employees.filter(e=>
     (e.name||"").toLowerCase().includes(search.toLowerCase())||
     (e.email||"").toLowerCase().includes(search.toLowerCase())||
     (e.role||"").toLowerCase().includes(search.toLowerCase())||
     (e.department||"").toLowerCase().includes(search.toLowerCase())
   );
+
+  useEffect(() => { setCurrentPage(1); }, [search, employees.length]);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit=(e)=>{
     setEditForm({name:e.name||"",email:e.email||"",phone:e.phone||"",role:e.role||"",department:e.department||"",salary:e.salary||"",status:e.status||"Active"});
@@ -490,10 +558,10 @@ const loadEmpDocs = async (emp) => {
               ))}
             </tr></thead>
             <tbody>
-              {filtered.length===0?<tr><td colSpan={9} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No employees found</td></tr>
-                :filtered.map((e,i)=>(
+              {paginated.length===0?<tr><td colSpan={9} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No employees found</td></tr>
+                :paginated.map((e,i)=>(
                   <tr key={e._id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={ev=>ev.currentTarget.style.background="#faf5ff"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
-                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`EMP${String(i+1).padStart(3,"0")}`}</td>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`EMP${String((currentPage-1)*itemsPerPage + i + 1).padStart(3,"0")}`}</td>
                     <td style={{padding:"12px 14px"}}>
                       <div style={{display:"flex",alignItems:"center",gap:8}}>
                         <div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#7c3aed,#a855f7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(e.name||"?")[0].toUpperCase()}</div>
@@ -518,6 +586,7 @@ const loadEmpDocs = async (emp) => {
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
       {viewEmp&&(
@@ -622,8 +691,14 @@ function ManagersPage({managers,setManagers}){
   const [saving,setSaving]=useState(false);
   const [toast,setToast]=useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
   const filtered=managers.filter(m=>(m.managerName||"").toLowerCase().includes(search.toLowerCase())||(m.email||"").toLowerCase().includes(search.toLowerCase())||(m.department||"").toLowerCase().includes(search.toLowerCase()));
+
+  useEffect(() => { setCurrentPage(1); }, [search, managers.length]);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit=(m)=>{
     setEditForm({managerName:m.managerName||"",email:m.email||"",phone:m.phone||"",department:m.department||"",role:m.role||"Manager",address:m.address||"",status:m.status||"Active"});
@@ -680,10 +755,10 @@ function ManagersPage({managers,setManagers}){
               ))}
             </tr></thead>
             <tbody>
-              {filtered.length===0?<tr><td colSpan={9} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No managers found</td></tr>
-                :filtered.map((m,i)=>(
+              {paginated.length===0?<tr><td colSpan={9} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No managers found</td></tr>
+                :paginated.map((m,i)=>(
                   <tr key={m._id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={ev=>ev.currentTarget.style.background="#faf5ff"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
-                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`MGR${String(i+1).padStart(3,"0")}`}</td>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`MGR${String((currentPage-1)*itemsPerPage + i + 1).padStart(3,"0")}`}</td>
                     <td style={{padding:"12px 14px"}}>
                       <div style={{display:"flex",alignItems:"center",gap:8}}>
                         <div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(m.managerName||"?")[0].toUpperCase()}</div>
@@ -704,6 +779,7 @@ function ManagersPage({managers,setManagers}){
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
       {viewMgr&&(
@@ -767,8 +843,14 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
   const [saving,setSaving]=useState(false);
   const [toast,setToast]=useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),2800);};
   const filtered=projects.filter(p=>(p.name||"").toLowerCase().includes(search.toLowerCase())||(p.client||"").toLowerCase().includes(search.toLowerCase()));
+
+  useEffect(() => { setCurrentPage(1); }, [search, projects.length]);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit=(p)=>{
     setEditForm({name:p.name||"",client:p.client||"",purpose:p.purpose||"",description:p.description||"",start:p.start||"",end:p.end||"",budget:p.budget||"",team:p.team||"",status:p.status||"Pending",assignedTo:Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])});
@@ -834,10 +916,10 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
               ))}
             </tr></thead>
             <tbody>
-              {filtered.length===0?<tr><td colSpan={7} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No projects found</td></tr>
-                :filtered.map((p,i)=>(
+              {paginated.length===0?<tr><td colSpan={7} style={{padding:30,textAlign:"center",color:"#a78bfa"}}>No projects found</td></tr>
+                :paginated.map((p,i)=>(
                   <tr key={p._id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={ev=>ev.currentTarget.style.background="#faf5ff"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
-                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`PRJ${String(i+1).padStart(3,"0")}`}</td>
+                    <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`PRJ${String((currentPage-1)*itemsPerPage + i + 1).padStart(3,"0")}`}</td>
                     <td style={{padding:"12px 14px",fontWeight:700,color:T.text}}>{p.name}</td>
                     <td style={{padding:"12px 14px",color:"#7c3aed"}}>{p.client||"—"}</td>
                     <td style={{padding:"12px 14px",color:"#22C55E",fontWeight:600}}>{p.budget||"—"}</td>
@@ -866,6 +948,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
       {viewProj&&(
@@ -927,29 +1010,47 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
             <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEES</label>
             <div style={{border:"1.5px solid #ede9fe",borderRadius:10,padding:"12px",background:"#faf5ff",maxHeight:200,overflowY:"auto"}}>
               {employees.length===0?<div style={{color:"#a78bfa",fontSize:13,textAlign:"center",padding:"20px"}}>No employees available</div>
-                :employees.map(e=>(
-                  <div key={e._id||e.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
+                :employees.map(emp=>(
+                  <div key={emp._id||emp.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
                     <input type="checkbox" 
-                      id={`edit-emp-${e._id||e.email}`}
-                      checked={Array.isArray(editForm.assignedTo) ? editForm.assignedTo.includes(e.name) : (editForm.assignedTo === e.name)}
+                      id={`edit-emp-${emp._id||emp.email}`}
+                      checked={Array.isArray(editForm.assignedTo) ? editForm.assignedTo.includes(emp.name) : (editForm.assignedTo === emp.name)}
                       onChange={e=>{
                         const currentAssigned = Array.isArray(editForm.assignedTo) ? editForm.assignedTo : (editForm.assignedTo ? [editForm.assignedTo] : []);
                         if(e.target.checked){
-                          setEditForm({...editForm,assignedTo:[...currentAssigned,e.name]});
+                          setEditForm({...editForm,assignedTo:[...currentAssigned,emp.name]});
                         }else{
-                          setEditForm({...editForm,assignedTo:currentAssigned.filter(name=>name!==e.name)});
+                          setEditForm({...editForm,assignedTo:currentAssigned.filter(name=>name!==emp.name)});
                         }
                       }}
                       style={{width:16,height:16,cursor:"pointer"}}
                     />
-                    <label htmlFor={`edit-emp-${e._id||e.email}`} style={{flex:1,cursor:"pointer",fontSize:13,color:"#1e0a3c",display:"flex",alignItems:"center",gap:8}}>
-                      <span>{e.name}</span>
-                      {e.department&&<span style={{fontSize:11,color:"#a78bba",background:"#f3e8ff",padding:"2px 6px",borderRadius:4}}>{e.department}</span>}
+                    <label htmlFor={`edit-emp-${emp._id||emp.email}`} style={{flex:1,cursor:"pointer",fontSize:13,color:"#1e0a3c",display:"flex",alignItems:"center",gap:8}}>
+                      <span>{emp.name}</span>
+                      {emp.department&&<span style={{fontSize:11,color:"#a78bba",background:"#f3e8ff",padding:"2px 6px",borderRadius:4}}>{emp.department}</span>}
                     </label>
                   </div>
                 ))}
             </div>
-            {editForm.assignedTo && editForm.assignedTo.length>0&&<div style={{marginTop:6,fontSize:11,color:"#9333ea",fontWeight:600}}>{editForm.assignedTo.length} employee(s) selected</div>}
+            {editForm.assignedTo && editForm.assignedTo.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <label style={{ display: "block", fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({editForm.assignedTo.length})</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {editForm.assignedTo.map(name => (
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#f3e8ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#7c3aed" }}>{name}</span>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setEditForm({ ...editForm, assignedTo: editForm.assignedTo.filter(n => n !== name) }); }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <Fld label="Description" value={editForm.description} onChange={v=>setEditForm(p=>({...p,description:v}))}/>
           <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:4}}>
@@ -965,29 +1066,47 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
             <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:8}}>SELECT EMPLOYEES TO ASSIGN</label>
             <div style={{border:"1.5px solid #ede9fe",borderRadius:10,padding:"12px",background:"#faf5ff",maxHeight:200,overflowY:"auto"}}>
               {employees.length===0?<div style={{color:"#a78bfa",fontSize:13,textAlign:"center",padding:"20px"}}>No employees available</div>
-                :employees.map(e=>(
-                  <div key={e._id||e.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
+                :employees.map(emp=>(
+                  <div key={emp._id||emp.email} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:"1px solid #f5f3ff"}}>
                     <input type="checkbox" 
-                      id={`assign-emp-${e._id||e.email}`}
-                      checked={Array.isArray(assignTo) ? assignTo.includes(e.name) : (assignTo === e.name)}
+                      id={`assign-emp-${emp._id||emp.email}`}
+                      checked={Array.isArray(assignTo) ? assignTo.includes(emp.name) : (assignTo === emp.name)}
                       onChange={e=>{
                         const currentAssigned = Array.isArray(assignTo) ? assignTo : (assignTo ? [assignTo] : []);
                         if(e.target.checked){
-                          setAssignTo([...currentAssigned,e.name]);
+                          setAssignTo([...currentAssigned,emp.name]);
                         }else{
-                          setAssignTo(currentAssigned.filter(name=>name!==e.name));
+                          setAssignTo(currentAssigned.filter(name=>name!==emp.name));
                         }
                       }}
                       style={{width:16,height:16,cursor:"pointer"}}
                     />
-                    <label htmlFor={`assign-emp-${e._id||e.email}`} style={{flex:1,cursor:"pointer",fontSize:13,color:"#1e0a3c",display:"flex",alignItems:"center",gap:8}}>
-                      <span>{e.name}</span>
-                      {e.department&&<span style={{fontSize:11,color:"#a78bba",background:"#f3e8ff",padding:"2px 6px",borderRadius:4}}>{e.department}</span>}
+                    <label htmlFor={`assign-emp-${emp._id||emp.email}`} style={{flex:1,cursor:"pointer",fontSize:13,color:"#1e0a3c",display:"flex",alignItems:"center",gap:8}}>
+                      <span>{emp.name}</span>
+                      {emp.department&&<span style={{fontSize:11,color:"#a78bba",background:"#f3e8ff",padding:"2px 6px",borderRadius:4}}>{emp.department}</span>}
                     </label>
                   </div>
                 ))}
             </div>
-            {assignTo && assignTo.length>0&&<div style={{marginTop:8,fontSize:11,color:"#9333ea",fontWeight:600}}>{assignTo.length} employee(s) will be assigned</div>}
+            {assignTo && assignTo.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <label style={{ display: "block", fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({assignTo.length})</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {assignTo.map(name => (
+                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#f3e8ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#7c3aed" }}>{name}</span>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setAssignTo(assignTo.filter(n => n !== name)); }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <div style={{display:"flex",justifyContent:"flex-end",gap:10}}>
             <button onClick={()=>setAssignModal(null)} style={{background:"#f5f3ff",border:"1px solid #ede9fe",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
@@ -1043,6 +1162,9 @@ function ProjectStatusPage({clients,employees,managers,config}){
   const [tsToast,setTsToast]=useState("");
   const [customStatuses, setCustomStatuses] = useState(config?.projectStatuses || ["In Progress", "Pending", "Completed", "On Hold"]);
   const [newStatus, setNewStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   useEffect(()=>{axios.get(BASE_URL + "/api/project-status").then(r=>{if(r.data?.length)setTrackList(r.data);}).catch(()=>{});},[]);
   const showToast=(msg)=>{setTsToast(msg);setTimeout(()=>setTsToast(""),2800);};
   const clientNames=clients.map(c=>({name:c.clientName||c.name||""}));
@@ -1050,6 +1172,9 @@ function ProjectStatusPage({clients,employees,managers,config}){
   const employeeNames=employees.map(e=>({name:e.name||""}));
   const displayed=trackList.filter(p=>{const okStatus=tsFilter==="All"||p.status===tsFilter;const q=tsSearch.toLowerCase();const okSearch=!q||(p.name||"").toLowerCase().includes(q)||(p.client||"").toLowerCase().includes(q)||(p.projectId||p.id||"").toLowerCase().includes(q);return okStatus&&okSearch;});
   
+  useEffect(() => { setCurrentPage(1); }, [tsSearch, tsFilter, trackList.length]);
+  const paginated = displayed.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   useEffect(() => {
     const unique = Array.from(new Set([...customStatuses, ...trackList.map(p => p.status)]));
     setCustomStatuses(unique.filter(Boolean));
@@ -1085,9 +1210,9 @@ function ProjectStatusPage({clients,employees,managers,config}){
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:900}}>
             <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>{["ID","Project","Client","Manager","Employee","Deadline","Status","Progress","Notes","Actions"].map(c=>(<th key={c} style={{padding:"10px 12px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>))}</tr></thead>
             <tbody>
-              {displayed.length===0?<tr><td colSpan={10} style={{padding:40,textAlign:"center",color:"#a78bfa"}}>No projects found</td></tr>
-                :displayed.map((p,i)=>(<tr key={p._id||p.id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                  <td style={{padding:"11px 12px",fontFamily:"monospace",fontSize:11,color:"#a78bfa"}}>{p.projectId||p.id||`PRJ${String(i+1).padStart(3,"0")}`}</td>
+              {paginated.length===0?<tr><td colSpan={10} style={{padding:40,textAlign:"center",color:"#a78bfa"}}>No projects found</td></tr>
+                :paginated.map((p,i)=>(<tr key={p._id||p.id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  <td style={{padding:"11px 12px",fontFamily:"monospace",fontSize:11,color:"#a78bfa"}}>{p.projectId||p.id||`PRJ${String((currentPage-1)*itemsPerPage + i + 1).padStart(3,"0")}`}</td>
                   <td style={{padding:"11px 12px",fontWeight:700,color:T.text}}>{p.name}</td>
                   <td style={{padding:"11px 12px"}}><div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,flexShrink:0}}>{(p.client||"?")[0].toUpperCase()}</div><span style={{color:T.text,fontSize:12}}>{p.client||"—"}</span></div></td>
                   <td style={{padding:"11px 12px",color:"#7c3aed",fontSize:12}}>{p.manager||"—"}</td>
@@ -1101,6 +1226,7 @@ function ProjectStatusPage({clients,employees,managers,config}){
             </tbody>
           </table>
         </div>
+        <Pagination totalItems={displayed.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
       {tsModal&&(<Mdl title={tsModal==="add"?"Add Project Status":"Edit Project Status"} onClose={()=>setTsModal(null)}>
         <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
@@ -1207,15 +1333,15 @@ function InterviewPage({companyId,companyName}){
           <div style={{position:"relative",flex:1,minWidth:200}}><span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>🔍</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e=>setSearch(e.target.value)} style={{width:"100%",padding:"9px 14px 9px 34px",border:"1.5px solid #ede9fe",borderRadius:10,fontSize:13,background:"#faf5ff",outline:"none",fontFamily:"inherit",color:"#1e0a3c",boxSizing:"border-box"}}/></div>
           {["all","pending","hired","rejected"].map(f=>(<button key={f} onClick={()=>setFilter(f)} style={{padding:"7px 14px",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",border:"1.5px solid",borderColor:filter===f?(f==="all"?"#9333ea":sC(f)):"#ede9fe",background:filter===f?`${f==="all"?"#9333ea":sC(f)}15`:"#fff",color:filter===f?(f==="all"?"#9333ea":sC(f)):"#a78bfa",transition:"all 0.15s"}}>{f==="all"?"🎯 All":f==="pending"?"⏳ Pending":f==="hired"?"✅ Hired":"❌ Rejected"}</button>))}
         </div>
-        {loading?(<div style={{textAlign:"center",padding:50,color:"#a78bfa"}}>Loading candidates...</div>):displayed.length===0?(<div style={{textAlign:"center",padding:"50px 20px",color:"#a78bfa"}}><div style={{fontSize:48,marginBottom:12}}>📭</div><div style={{fontSize:15,fontWeight:700,color:"#1e0a3c",marginBottom:6}}>{candidates.length===0?"No applications yet":"No results found"}</div></div>):(
+        {loading?(<div style={{textAlign:"center",padding:50,color:"#a78bfa"}}>Loading candidates...</div>):paginated.length===0?(<div style={{textAlign:"center",padding:"50px 20px",color:"#a78bfa"}}><div style={{fontSize:48,marginBottom:12}}>📭</div><div style={{fontSize:15,fontWeight:700,color:"#1e0a3c",marginBottom:6}}>{candidates.length===0?"No applications yet":"No results found"}</div></div>):(
           <div style={{overflowX:"auto"}}>
             <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:950}}>
               <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>{["#","Candidate","Contact","Experience","Role","Interviewer","Date","Status","Resume","Actions"].map(h=>(<th key={h} style={{padding:"10px 12px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:10,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{h.toUpperCase()}</th>))}</tr></thead>
               <tbody>
-                {displayed.map((c,i)=>{const idx=candidates.indexOf(c);const status=(c.status||"pending").toLowerCase();const resumeUrl=c.resumeUrl||(c.resumePath?`https://mbusiness.octosofttechnologies.in/uploads/resumes/${c.resumePath.split(/[\\/]/).pop()}`:null);
+                {paginated.map((c,i)=>{const idx=candidates.indexOf(c);const status=(c.status||"pending").toLowerCase();const resumeUrl=c.resumeUrl||(c.resumePath?`https://mbusiness.octosofttechnologies.in/uploads/resumes/${c.resumePath.split(/[\\/]/).pop()}`:null);
 const finalResumeUrl=resumeUrl;return(
                   <tr key={c._id||c.id||i} style={{borderBottom:"1px solid #f3f0ff",transition:"background 0.15s"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                    <td style={{padding:"12px 12px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{String(i+1).padStart(3,"0")}</td>
+                    <td style={{padding:"12px 12px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{String((currentPage-1)*itemsPerPage + i + 1).padStart(3,"0")}</td>
                     <td style={{padding:"12px 12px"}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0}}>{(c.name||"?")[0].toUpperCase()}</div><span style={{fontWeight:700,color:"#1e0a3c"}}>{c.name||"—"}</span></div></td>
                     <td style={{padding:"12px 12px"}}><div style={{fontSize:12,color:"#7c3aed"}}>{c.email||"—"}</div><div style={{fontSize:11,color:"#a78bfa",marginTop:2}}>{c.mobile||""}</div></td>
                     <td style={{padding:"12px 12px"}}>{(c.experience||"").toLowerCase()==="fresher"?<span style={{background:"rgba(34,197,94,0.12)",color:"#22C55E",border:"1px solid rgba(34,197,94,0.25)",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>🎓 Fresher</span>:<span style={{background:"rgba(147,51,234,0.12)",color:"#9333ea",border:"1px solid rgba(147,51,234,0.25)",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>💼 {c.years||"?"}yrs</span>}</td>
@@ -1231,6 +1357,7 @@ const finalResumeUrl=resumeUrl;return(
             </table>
           </div>
         )}
+        <Pagination totalItems={displayed.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </div>
       {viewModal && (
         <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
@@ -1571,7 +1698,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
           <button onClick={()=>setSidebarOpen(true)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:"#7c3aed",padding:"2px 6px",lineHeight:1}}>☰</button>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <div style={{width:30,height:30,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff"}}>
-              {companyNameStr[0] || "M"}
+              {companyNameStr[0] || "W"}
             </div>
             <span style={{fontWeight:800,fontSize:14,color:T.text}}>{companyNameStr}</span>
           </div>
@@ -1584,7 +1711,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
           <div className="page-header" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
             <div>
               <h1 style={{margin:0,fontSize:22,fontWeight:800,color:T.text}}>{page?.icon} {page?.label}</h1>
-              <p style={{margin:"3px 0 0",color:"#a78bfa",fontSize:12}}>{companyNameStr} Management Suite · {user?.role||"Admin"}</p>
+              <p style={{margin:"3px 0 0",color:"#a78bfa",fontSize:12}}>{companyNameStr} Business Suite · {user?.role||"Admin"}</p>
             </div>
             <div className="header-actions" style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
               {validActive==="clients"&&<button onClick={()=>{setNcError({});setShowClientPass(false);setModal("client");}} style={B("#9333ea")}>+ Add Client</button>}

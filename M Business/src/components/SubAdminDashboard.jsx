@@ -11,6 +11,8 @@ import QuotationCreator from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
 import AdminProposalManagement from "./AdminProposalManagement";
 import RolePermissionDashboard from "./RolePermissionDashboard";
+import MessagingPage from "./MessagingPage";
+import SettingsPage from "./SettingsPage";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { QRCodeSVG } from "qrcode.react";
@@ -66,6 +68,8 @@ const NAV = [
     items: [
       { key: "interviews", icon: "🎯", label: "Interviews" },
       { key: "reports", icon: "📈", label: "Reports" },
+      { key: "messaging", icon: "💬", label: "Messages" },
+      { key: "settings", icon: "⚙️", label: "Settings" },
       { key: "packages", icon: "📦", label: "Packages" },
       { key: "rolePermissions", icon: "🛡️", label: "Role Permissions" },
     ]
@@ -78,11 +82,11 @@ function getNavForRole(role) {
   const allowedKeys = [];
   
   if (r === "subadmin" || r === "sub_admin" || r === "sub-admin") {
-    allowedKeys.push("dashboard", "clients", "subadmins", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "payments", "expenses", "interviews", "reports", "mysubscriptions", "packages", "vendors", "rolePermissions");
+    allowedKeys.push("dashboard", "clients", "subadmins", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "payments", "expenses", "interviews", "reports", "mysubscriptions", "packages", "vendors", "rolePermissions", "messaging", "settings");
   } else if (r === "manager") {
-    allowedKeys.push("dashboard", "employees", "projects", "tracking", "tasks", "calendar", "interviews", "reports", "vendors");
+    allowedKeys.push("dashboard", "employees", "projects", "tracking", "tasks", "calendar", "interviews", "reports", "vendors", "messaging");
   } else if (r === "employee") {
-    allowedKeys.push("dashboard", "tasks", "calendar");
+    allowedKeys.push("dashboard", "tasks", "calendar", "messaging");
   } else {
     // Default/Admin
     return NAV;
@@ -1086,7 +1090,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject }) {
+function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject, config }) {
   const [search, setSearch] = useState("");
   const [viewProj, setViewProj] = useState(null);
   const [editProj, setEditProj] = useState(null);
@@ -1259,7 +1263,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             <Fld label="Start Date" value={editForm.start} type="date" onChange={v => setEditForm(p => ({ ...p, start: v }))} />
             <Fld label="End Date" value={editForm.end} type="date" onChange={v => setEditForm(p => ({ ...p, end: v }))} />
             <Fld label="Team Members" value={editForm.team} onChange={v => setEditForm(p => ({ ...p, team: v }))} />
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
+            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
           </div>
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES</label>
@@ -1368,7 +1372,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
   );
 }
 
-function ProjectStatusPage({ clients, employees, managers }) {
+function ProjectStatusPage({ clients, employees, managers, config }) {
   const EMPTY = { projectId: "", name: "", client: "", manager: "", employee: "", deadline: "", status: "In Progress", progress: 0, notes: "" };
   const [trackList, setTrackList] = useState([]);
   const [tsFilter, setTsFilter] = useState("All");
@@ -1434,7 +1438,7 @@ function ProjectStatusPage({ clients, employees, managers }) {
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
           <SearchDropdown label="Employee" items={employeeNames} displayKey="name" value={tsForm.employee} onChange={v => setTsForm({ ...tsForm, employee: v })} placeholder="-- Select Employee --" />
           <Fld label="Deadline *" value={tsForm.deadline} type="date" onChange={v => { setTsForm({ ...tsForm, deadline: v }); setTsErr(p => ({ ...p, deadline: "" })); }} error={tsErr.deadline} />
-          <Fld label="Status" value={tsForm.status} onChange={v => setTsForm({ ...tsForm, status: v })} options={["In Progress", "Pending", "Completed", "On Hold"]} allowCustom={true} />
+          <Fld label="Status" value={tsForm.status} onChange={v => setTsForm({ ...tsForm, status: v })} options={config?.projectStatuses || ["In Progress", "Pending", "Completed", "On Hold"]} allowCustom={true} />
           <Fld label="Progress (0–100)" value={String(tsForm.progress)} type="number" onChange={v => { setTsForm({ ...tsForm, progress: v }); setTsErr(p => ({ ...p, progress: "" })); }} error={tsErr.progress} placeholder="e.g. 65" />
         </div>
         <Fld label="Notes" value={tsForm.notes} onChange={v => setTsForm({ ...tsForm, notes: v })} placeholder="Brief update…" />
@@ -1793,7 +1797,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 // ═══════════════════════════════════════════════════════════
 function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick }) {
   const items = navItems || NAV;
-  const companyName = user?.companyName || "M Business";
+  const companyName = user?.companyName || "";
   const initials = (companyName || "MB").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const roleDisplay = (user?.role || "").toLowerCase().includes("subadmin") ? "" : (user?.role || "ADMIN").toUpperCase();
   
@@ -2379,6 +2383,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [nmError, setNmError] = useState({});
   const [mgrSaveLoading, setMgrSaveLoading] = useState(false);
   const [showMgrPass, setShowMgrPass] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [config, setConfig] = useState(null);
   const [viewProject, setViewProject] = useState(null);
 
   const [subadmins, setSubadmins] = useState([]);
@@ -2413,8 +2419,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   useEffect(() => { 
     if (hasFetched.current) return;
     hasFetched.current = true;
-    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); 
+    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
   }, []);
+  
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/tasks");
+      setTasks(res.data || []);
+    } catch (e) { console.log(e); }
+  };
+
+  const fetchConfig = async () => {
+    try {
+      const cid = user?._id || user?.id;
+      if (!cid) return;
+      const res = await axios.get(`${BASE_URL}/api/config/${cid}`);
+      setConfig(res.data);
+    } catch (e) { console.log(e); }
+  };
 
   const fetchSubscription = async () => {
     try {
@@ -3190,15 +3212,17 @@ const handleEditPackage = (pkg) => {
           {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} />}
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} />}
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} />}
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
           {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
-          {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
-          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} />}
-          {validActive === "calendar" && <CalendarPage projects={projects} clients={clients} companyId={companyId} />}
+          {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
+          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} />}
+          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
+          {validActive === "messaging" && <MessagingPage user={user} />}
+          {validActive === "settings" && <SettingsPage user={user} />}
           {validActive === "accounts" && <AccountsPage ExpensesPage={ExpensesPage} />}
           {validActive === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}
           {validActive === "expenses" && <ExpensesPage />}

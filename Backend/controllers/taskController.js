@@ -143,7 +143,7 @@ exports.updateTask = async (req, res) => {
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false, companyId },
       { $set: updates },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     ).populate("projectId", "name color");
 
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -174,7 +174,7 @@ exports.deleteTask = async (req, res) => {
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false, companyId },
       { isDeleted: true },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!task) return res.status(404).json({ message: "Task not found" });
     res.json({ message: "Task deleted", _id: task._id });
@@ -195,7 +195,7 @@ exports.moveTask = async (req, res) => {
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false, companyId },
       { groupId },
-      { new: true }
+      { returnDocument: 'after' }
     ).populate("projectId", "name color");
 
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -325,7 +325,7 @@ exports.autoAssignTask = async (req, res) => {
         $addToSet: { assignedTo: randomUser._id },
         autoAssign: true
       },
-      { new: true }
+      { returnDocument: 'after' }
     ).populate("assignedTo", "name email");
 
     res.json(updatedTask);
@@ -343,7 +343,7 @@ exports.updateIntegrations = async (req, res) => {
     const task = await Task.findOneAndUpdate(
       { _id: taskId, isDeleted: false, companyId },
       { integrations },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!task) return res.status(404).json({ message: "Task not found" });

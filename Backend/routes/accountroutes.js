@@ -31,7 +31,7 @@ router.put("/:id", async (req, res) => {
     const expense = await Expense.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     );
     if (!expense) return res.status(404).json({ msg: "Expense not found" });
     res.json(expense);

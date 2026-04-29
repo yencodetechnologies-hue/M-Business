@@ -93,11 +93,15 @@ const VIEW_LIST = [
 /* ══════════════════════════════════════════════════════════
    CHART VIEW
 ══════════════════════════════════════════════════════════ */
-function ChartView({ groups }) {
+function ChartView({ groups, config }) {
+  const S_LIST = config?.taskStatuses || STATUS_LIST;
+  const P_LIST = config?.taskPriorities || PRIORITY_LIST;
+
   const allTasks = groups.flatMap(g => g.tasks || []);
-  const statusData = Object.entries(STATUS_CFG).map(([s, cfg]) => ({
-    label: s, count: allTasks.filter(t => t.status === s).length, color: cfg.bg
-  })).filter(x => x.count > 0);
+  const statusData = S_LIST.map(s => {
+    const cfg = STATUS_CFG[s] || { bg: "#94a3b8", fg: "#fff" };
+    return { label: s, count: allTasks.filter(t => t.status === s).length, color: cfg.bg };
+  }).filter(x => x.count > 0);
 
   const groupData = groups.map(g => ({
     label: g.label, color: g.color,
@@ -105,10 +109,10 @@ function ChartView({ groups }) {
     total: (g.tasks||[]).length
   }));
 
-  const priorityData = PRIORITY_LIST.slice(0,4).map(p => ({
-    label: p, count: allTasks.filter(t => (t.priority||"—") === p).length,
-    color: PRIORITY_CFG[p].bg
-  })).filter(x => x.count > 0);
+  const priorityData = P_LIST.map(p => {
+    const cfg = PRIORITY_CFG[p] || { bg: "#e2e8f0", fg: "#94a3b8" };
+    return { label: p, count: allTasks.filter(t => (t.priority||"—") === p).length, color: cfg.bg };
+  }).filter(x => x.count > 0);
 
   const maxStatus = Math.max(...statusData.map(x => x.count), 1);
   const maxGroup  = Math.max(...groupData.map(x => x.total), 1);
@@ -229,7 +233,7 @@ function ChartView({ groups }) {
 /* ══════════════════════════════════════════════════════════
    GANTT VIEW
 ══════════════════════════════════════════════════════════ */
-function GanttView({ groups }) {
+function GanttView({ groups, config }) {
   const allTasks = groups.flatMap(g => (g.tasks||[]).map(t => ({ ...t, groupColor:g.color })));
   const withDates = allTasks.filter(t => t.date);
 
@@ -290,7 +294,7 @@ function GanttView({ groups }) {
                   const td = task.date ? new Date(task.date) : null;
                   let dayOff = null;
                   if (td) { const t2=new Date(td); t2.setHours(0,0,0,0); dayOff=Math.floor((t2-minD)/(1000*60*60*24)); }
-                  const sc = STATUS_CFG[task.status]||STATUS_CFG["Not Started"];
+                  const sc = (STATUS_CFG[task.status]||STATUS_CFG["Not Started"]) || { bg: "#94a3b8", fg: "#fff" };
                   return (
                     <div key={task._id||task.id} style={{ display:"flex", alignItems:"center", borderBottom:`1px solid ${P.border}`, minHeight:40 }}
                       onMouseEnter={e=>e.currentTarget.style.background=P.hover}
@@ -324,7 +328,7 @@ function GanttView({ groups }) {
 /* ══════════════════════════════════════════════════════════
    CALENDAR VIEW
 ══════════════════════════════════════════════════════════ */
-function CalendarView({ groups }) {
+function CalendarView({ groups, config }) {
   const allTasks = groups.flatMap(g => (g.tasks||[]).map(t => ({ ...t, groupColor:g.color })));
   const [cur, setCur] = useState(new Date());
   const yr = cur.getFullYear(); const mo = cur.getMonth();
@@ -368,7 +372,7 @@ function CalendarView({ groups }) {
                   <>
                     <div style={{ width:24, height:24, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", background:isToday(day)?"#fdab3d":"transparent", color:isToday(day)?"#fff":P.text, fontSize:12, fontWeight:700, marginBottom:4 }}>{day}</div>
                     {tasks.slice(0,3).map(t=>{
-                      const sc = STATUS_CFG[t.status]||STATUS_CFG["Not Started"];
+                      const sc = (STATUS_CFG[t.status]||STATUS_CFG["Not Started"]) || { bg: "#94a3b8", fg: "#fff" };
                       return <div key={t._id||t.id} style={{ fontSize:10, fontWeight:600, padding:"2px 5px", borderRadius:4, background:sc.bg, color:sc.fg, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", marginBottom:2 }}>{t.title}</div>;
                     })}
                     {tasks.length>3 && <div style={{ fontSize:9, color:P.muted, fontWeight:600 }}>+{tasks.length-3} more</div>}
@@ -386,11 +390,12 @@ function CalendarView({ groups }) {
 /* ══════════════════════════════════════════════════════════
    KANBAN VIEW
 ══════════════════════════════════════════════════════════ */
-function KanbanView({ groups, onStatusChange }) {
+function KanbanView({ groups, onStatusChange, config }) {
+  const S_LIST = config?.taskStatuses || STATUS_LIST;
   const allTasks = groups.flatMap(g => (g.tasks||[]).map(t => ({ ...t, groupColor:g.color, groupLabel:g.label })));
   const [dragging, setDragging] = useState(null);
   const [overCol, setOverCol]   = useState(null);
-  const cols = STATUS_LIST.map(s => ({ s, cfg:STATUS_CFG[s], tasks:allTasks.filter(t=>t.status===s) }));
+  const cols = S_LIST.map(s => ({ s, cfg: STATUS_CFG[s] || { bg: "#94a3b8", fg: "#fff" }, tasks:allTasks.filter(t=>t.status===s) }));
 
   return (
     <div style={{ padding:24, overflowX:"auto" }}>
@@ -570,14 +575,15 @@ function ViewSwitcherDropdown({ anchor, currentView, onSelect, onClose }) {
 /* ══════════════════════════════════════════════════════════
    STATUS PICKER
 ══════════════════════════════════════════════════════════ */
-function StatusPicker({anchor,onSelect,onClose}){
+function StatusPicker({anchor,onSelect,onClose,config}){
+  const S_LIST = config?.taskStatuses || STATUS_LIST;
   const ref = useRef();
   const [pos,setPos]=useState({top:0,left:0});
   useEffect(()=>{
     const calc=()=>{
       if(anchor?.current){
         const r=anchor.current.getBoundingClientRect();
-        const panelH=Object.keys(STATUS_CFG).length*38+16;
+        const panelH=S_LIST.length*38+16;
         const spaceBelow=window.innerHeight-r.bottom;
         const top=spaceBelow>panelH?r.bottom+2:r.top-panelH-2;
         let left=r.left; if(left+190>window.innerWidth-8) left=window.innerWidth-198;
@@ -587,21 +593,24 @@ function StatusPicker({anchor,onSelect,onClose}){
     calc();
     window.addEventListener('scroll',calc,true); window.addEventListener('resize',calc);
     return()=>{ window.removeEventListener('scroll',calc,true); window.removeEventListener('resize',calc); };
-  },[anchor]);
+  },[anchor, S_LIST]);
   useEffect(()=>{
     const h=e=>{ if(ref.current&&!ref.current.contains(e.target)&&!anchor?.current?.contains(e.target)) onClose(); };
     document.addEventListener('mousedown',h); return()=>document.removeEventListener('mousedown',h);
   },[anchor,onClose]);
   return (
     <div ref={ref} style={{ position:"fixed",top:pos.top,left:pos.left,zIndex:9999,background:"#fff",border:`1.5px solid ${P.border}`,borderRadius:10,padding:6,boxShadow:"0 8px 32px rgba(124,58,237,0.22)",minWidth:190,animation:"ddIn .1s ease" }}>
-      {Object.entries(STATUS_CFG).map(([s,sc])=>(
-        <div key={s} onClick={e=>{e.stopPropagation();onSelect(s);onClose();}}
-          style={{borderRadius:7,overflow:"hidden",marginBottom:3,cursor:"pointer",transition:"transform .1s"}}
-          onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"}
-          onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
-          <div style={{background:sc.bg,color:sc.fg,padding:"8px 14px",fontSize:12,fontWeight:700,textAlign:"center"}}>{s}</div>
-        </div>
-      ))}
+      {S_LIST.map(s=>{
+        const sc = STATUS_CFG[s] || { bg: "#94a3b8", fg: "#fff" };
+        return (
+          <div key={s} onClick={e=>{e.stopPropagation();onSelect(s);onClose();}}
+            style={{borderRadius:7,overflow:"hidden",marginBottom:3,cursor:"pointer",transition:"transform .1s"}}
+            onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"}
+            onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
+            <div style={{background:sc.bg,color:sc.fg,padding:"8px 14px",fontSize:12,fontWeight:700,textAlign:"center"}}>{s}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -2104,7 +2113,9 @@ function InviteModal({ task, onClose, onSend }) {
 /* ══════════════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════════════ */
-export default function TaskPage({ projects = [], employees = [] }) {
+export default function TaskPage({ projects = [], employees = [], config, user }) {
+  const S_LIST = config?.taskStatuses || STATUS_LIST;
+  const P_LIST = config?.taskPriorities || PRIORITY_LIST;
   const [groups,setGroups]=useState([]);
   const [loading,setLoading]=useState(true);
   const [toast,setToast]=useState(null);
@@ -2173,7 +2184,7 @@ export default function TaskPage({ projects = [], employees = [] }) {
   const dupTask=async(task)=>addTask(task.groupId,task.title+" (copy)");
 
   const shareTask = (task) => {
-    const text = `📌 *Task Alert* 📌\n\n*Task:* ${task.title}\n*Status:* ${task.status}\n*Priority:* ${task.priority || "Medium"}\n*Due Date:* ${task.date || "Not set"}\n*Assignee:* ${task.assignTo || "Unassigned"}\n\n_Managed via M Business_`;
+    const text = `📌 *Task Alert* 📌\n\n*Task:* ${task.title}\n*Status:* ${task.status}\n*Priority:* ${task.priority || "Medium"}\n*Due Date:* ${task.date || "Not set"}\n*Assignee:* ${task.assignTo || "Unassigned"}\n\n_Managed via ${user?.companyName || ""} _`;
     const url = `whatsapp://send?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   };
@@ -2386,16 +2397,16 @@ export default function TaskPage({ projects = [], employees = [] }) {
           )}
 
           {/* CHART VIEW */}
-          {currentView==="chart"&&<ChartView groups={filteredGroups}/>}
+          {currentView==="chart"&&<ChartView groups={filteredGroups} config={config}/>}
 
           {/* GANTT VIEW */}
-          {currentView==="gantt"&&<GanttView groups={filteredGroups}/>}
+          {currentView==="gantt"&&<GanttView groups={filteredGroups} config={config}/>}
 
           {/* CALENDAR VIEW */}
-          {currentView==="calendar"&&<CalendarView groups={filteredGroups}/>}
+          {currentView==="calendar"&&<CalendarView groups={filteredGroups} config={config}/>}
 
           {/* KANBAN VIEW */}
-          {currentView==="kanban"&&<KanbanView groups={filteredGroups} onStatusChange={kanbanStatusChange}/>}
+          {currentView==="kanban"&&<KanbanView groups={filteredGroups} onStatusChange={kanbanStatusChange} config={config}/>}
 
         </div>
 

@@ -14,6 +14,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { QRCodeSVG } from "qrcode.react";
 import { SubAdminDocumentsPage } from "./EmployeeProfilePanel";
 import { DOC_TYPES } from "./EmployeeProfilePanel";
+import ReportsPage from "./ReportsPage";
+import MessagingPage from "./MessagingPage";
+import SettingsPage from "./SettingsPage";
 
 
 const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"#9333ea",bg:"#f5f3ff",card:"#FFFFFF",text:"#1e0a3c",muted:"#7c3aed",border:"#ede9fe"};
@@ -32,6 +35,8 @@ const NAV=[
   {key:"tracking",icon:"📊",label:"Project Status"},
   {key:"tasks",icon:"✅",label:"Tasks"},
   {key:"calendar",icon:"📅",label:"Calendar"},
+  {key:"messaging",icon:"💬",label:"Messages"},
+  {key:"settings",icon:"⚙️",label:"Settings"},
   {key:"accounts",icon:"👤",label:"Accounts"},
 
   {key:"expenses",icon:"💸",label:"Client Expenses"},
@@ -43,11 +48,11 @@ const NAV=[
 function getNavForRole(role){
   const r=(role||"").toLowerCase().trim();
   if(r==="subadmin"||r==="sub_admin"||r==="sub-admin")
-    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","income","expenses","interviews","reports"].includes(n.key));
+    return NAV.filter(n=>["dashboard","clients","projects","invoices","tracking","tasks","calendar","income","expenses","interviews","reports","messaging","settings"].includes(n.key));
   if(r==="manager")
-    return NAV.filter(n=>["dashboard","employees","projects","tracking","tasks","calendar","interviews","reports"].includes(n.key));
+    return NAV.filter(n=>["dashboard","employees","projects","tracking","tasks","calendar","interviews","reports","messaging"].includes(n.key));
   if(r==="employee")
-    return NAV.filter(n=>["dashboard","tasks","calendar"].includes(n.key));
+    return NAV.filter(n=>["dashboard","tasks","calendar","messaging"].includes(n.key));
   return NAV;
 }
 
@@ -750,7 +755,7 @@ function ManagersPage({managers,setManagers}){
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({projects,setProjects,clients,employees}){
+function ProjectsPage({projects,setProjects,clients,employees,config}){
   const [search,setSearch]=useState("");
   const [viewProj,setViewProj]=useState(null);
   const [editProj,setEditProj]=useState(null);
@@ -916,7 +921,7 @@ function ProjectsPage({projects,setProjects,clients,employees}){
             <Fld label="Start Date" value={editForm.start} type="date" onChange={v=>setEditForm(p=>({...p,start:v}))}/>
             <Fld label="End Date" value={editForm.end} type="date" onChange={v=>setEditForm(p=>({...p,end:v}))}/>
             <Fld label="Team Members" value={editForm.team} onChange={v=>setEditForm(p=>({...p,team:v}))}/>
-            <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={["Pending","In Progress","Completed","On Hold"]} allowCustom={true}/>
+            <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={config?.projectStatuses || ["Pending","In Progress","Completed","On Hold"]} allowCustom={true}/>
           </div>
           <div style={{marginBottom:14}}>
             <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEES</label>
@@ -1025,7 +1030,7 @@ function SearchDropdown({label,items,displayKey,value,onChange,error,placeholder
   );
 }
 
-function ProjectStatusPage({clients,employees,managers}){
+function ProjectStatusPage({clients,employees,managers,config}){
   const EMPTY={projectId:"",name:"",client:"",manager:"",employee:"",deadline:"",status:"In Progress",progress:0,notes:""};
   const [trackList,setTrackList]=useState(TRACKING_SEED);
   const [tsFilter,setTsFilter]=useState("All");
@@ -1036,7 +1041,7 @@ function ProjectStatusPage({clients,employees,managers}){
   const [tsErr,setTsErr]=useState({});
   const [tsSaving,setTsSaving]=useState(false);
   const [tsToast,setTsToast]=useState("");
-  const [customStatuses, setCustomStatuses] = useState(["In Progress", "Pending", "Completed", "On Hold"]);
+  const [customStatuses, setCustomStatuses] = useState(config?.projectStatuses || ["In Progress", "Pending", "Completed", "On Hold"]);
   const [newStatus, setNewStatus] = useState("");
   useEffect(()=>{axios.get(BASE_URL + "/api/project-status").then(r=>{if(r.data?.length)setTrackList(r.data);}).catch(()=>{});},[]);
   const showToast=(msg)=>{setTsToast(msg);setTimeout(()=>setTsToast(""),2800);};
@@ -1141,7 +1146,7 @@ function ProjectStatusPage({clients,employees,managers}){
 // ═══════════════════════════════════════════════════════════
 function InterviewPage({companyId,companyName}){
   const CID=companyId||"69b8fe0a6e3d6f1e056f3109";
-  const CNAME=companyName||"M Business";
+  const CNAME=companyName||"";
   const STORAGE_KEY=`hr_candidates_${CID}`;
   const API_URL = BASE_URL;
   const [candidates,setCandidates]=useState([]);
@@ -1314,7 +1319,7 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
   const initials=displayName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
   
   const [editCN, setEditCN] = useState(false);
-  const [newCN, setNewCN] = useState(user?.companyName || "M Business");
+  const [newCN, setNewCN] = useState(user?.companyName || "");
   const [savingCN, setSavingCN] = useState(false);
 
   const saveCN = async () => {
@@ -1360,7 +1365,7 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
                 </div>
               ) : (
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <div style={{fontSize:13,fontWeight:600,color:"#1e0a3c",marginTop:1}}>{user?.companyName || "M Business"}</div>
+                  <div style={{fontSize:13,fontWeight:600,color:"#1e0a3c",marginTop:1}}>{user?.companyName || ""}</div>
                   {(user?.role === "admin" || user?.role === "subadmin") && <button onClick={()=>setEditCN(true)} style={{background:"none",border:"none",color:"#7c3aed",fontSize:11,fontWeight:700,cursor:"pointer"}}>EDIT</button>}
                 </div>
               )}
@@ -1453,9 +1458,11 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const [nmError,setNmError]=useState({});
   const [mgrSaveLoading,setMgrSaveLoading]=useState(false);
   const [showMgrPass,setShowMgrPass]=useState(false);
+  const [tasks,setTasks]=useState([]);
+  const [config,setConfig]=useState(null);
   const [viewProject,setViewProject]=useState(null);
 
-  useEffect(()=>{fetchClients();fetchEmployees();fetchProjects();fetchManagers();},[]);
+  useEffect(()=>{fetchClients();fetchEmployees();fetchProjects();fetchManagers();fetchTasks();fetchConfig();},[]);
 
   const handleLogout=()=>{localStorage.removeItem("user");setUser(null);};
   const onLogoChange=async(logo)=>{setCompanyLogo(logo||fixedLogo);const updatedUser={...user,logoUrl:logo||""};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);try{await axios.post(BASE_URL + "/api/auth/save-logo",{userId:user._id||user.id,logoUrl:logo||""});}catch(e){console.log(e);}};
@@ -1464,6 +1471,8 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const fetchEmployees=async()=>{try{const res=await axios.get(BASE_URL + "/api/employees");setEmployees(res.data);}catch(e){console.log(e);}};
   const fetchProjects=async()=>{try{const res=await axios.get(BASE_URL + "/api/projects");setProjects(res.data);}catch(e){console.log(e);}};
   const fetchManagers=async()=>{try{const res=await axios.get(BASE_URL + "/api/managers");setManagers(res.data);}catch(e){console.log(e);}};
+  const fetchTasks=async()=>{try{const res=await axios.get(BASE_URL + "/api/tasks");setTasks(res.data);}catch(e){console.log(e);}};
+  const fetchConfig=async()=>{try{const cid=user?._id||user?.id;if(!cid)return;const res=await axios.get(`${BASE_URL}/api/config/${cid}`);setConfig(res.data);}catch(e){console.log(e);}};
 
   const addClient=async()=>{
     const errors={};
@@ -1618,14 +1627,16 @@ export default function Dashboard({setUser,user,fixedLogo}){
           {validActive==="clients"&&<ClientsPage clients={clients} setClients={setClients} projects={projects} onAddClient={()=>{setNcError({});setShowClientPass(false);setModal("client");}}/>}
           {validActive==="employees"&&<EmployeesPage employees={employees} setEmployees={setEmployees}/>}
           {validActive==="managers"&&<ManagersPage managers={managers} setManagers={setManagers}/>}
-          {validActive==="projects"&&<ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees}/>}
+          {validActive==="projects"&&<ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config}/>}
 
           {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive==="quotations"&&<QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive==="proposals" && <ProjectProposalCreator clients={clients} />}
-          {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers}/>}
-          {validActive==="tasks"&&<TaskPage projects={projects} employees={employees}/>}
-          {validActive==="calendar"&&<CalendarPage projects={projects} clients={clients}/>}
+          {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config}/>}
+          {validActive==="tasks"&&<TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} />}
+          {validActive==="calendar"&&<CalendarPage projects={projects} tasks={tasks} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
+          {validActive==="messaging"&&<MessagingPage user={user} />}
+          {validActive==="settings"&&<SettingsPage user={user} />}
           {validActive==="accounts"&&<AccountsPage />}
           {validActive==="expenses"&&<ExpensesPage />}
           {validActive==="income"&&<IncomePage />}

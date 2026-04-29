@@ -128,7 +128,7 @@ router.post("/create", async (req, res) => {
 router.put("/update/:id", async (req, res) => {
   try {
     const data = { ...req.body, updatedAt: new Date() };
-    const sub = await Subscription.findByIdAndUpdate(req.params.id, data, { new: true });
+    const sub = await Subscription.findByIdAndUpdate(req.params.id, data, { returnDocument: "after" });
     if (!sub) return res.status(404).json({ error: "Subscription not found" });
     res.json({ success: true, subscription: sub });
   } catch (err) {

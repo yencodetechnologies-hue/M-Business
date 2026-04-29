@@ -39,7 +39,7 @@ exports.updateVendor = async (req, res) => {
     const vendor = await Vendor.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!vendor) return res.status(404).json({ message: 'Vendor not found' });
     res.json(vendor);

@@ -6,6 +6,8 @@ import { EmployeeProfilePanel, DOC_TYPES } from "./EmployeeProfilePanel";
 import AuthPage from "./AuthPage";
 import { BASE_URL } from "../config";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
+import CalendarPage from "./CalendarPage";
+import MessagingPage from "./MessagingPage";
 
 const BASE = "/api/employee-dashboard";
 
@@ -26,6 +28,7 @@ const NAV = [
   { key:"tasks",     icon:"◉", label:"Active Tasks" },
   { key:"payments",  icon:"◆", label:"Payments" },
   { key:"calendar",  icon:"◷", label:"Calendar" },
+  { key:"messaging", icon:"💬", label:"Messages" },
   { key:"reports",   icon:"▦", label:"Reports" },
   { key:"settings",  icon:"◌", label:"Settings" },
 ];
@@ -1403,6 +1406,8 @@ const fetchSubscription = async () => {
           {page==="tasks"      && <TasksPage      tasks={tasks}/>}
           {page==="attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify}/>}
           {page==="salary"     && <SalaryPage     salary={salary} user={resolvedUser}/>}
+          {page==="calendar"   && <CalendarPage projects={projects} tasks={tasks} user={resolvedUser} onUpdateProject={() => {}} onUpdateTask={() => {}} />}
+          {page==="messaging"  && <MessagingPage user={resolvedUser} />}
         </div>
       </div>
 

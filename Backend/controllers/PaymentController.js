@@ -92,7 +92,7 @@ class PaymentController {
           receiptUrl: `https://razorpay.com/payment/${razorpay_payment_id}`,
           paymentDate: new Date()
         },
-        { new: true }
+        { returnDocument: 'after' }
       );
 
       if (!payment) {
@@ -128,7 +128,7 @@ class PaymentController {
           notes: `Payment failed: ${reason} (Error: ${errorCode})`,
           updatedAt: new Date()
         },
-        { new: true }
+        { returnDocument: 'after' }
       );
 
       if (!payment) {

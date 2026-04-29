@@ -11,7 +11,7 @@ const TYPES  = ["Meeting","Call","Review","Planning","Handover","Other"];
 const TC = { Meeting:"#9333ea", Call:"#7c3aed", Review:"#22C55E", Planning:"#f59e0b", Handover:"#a855f7", Other:"#6b7280" };
 const EMPTY = { name:"", project:"", client:"", date:"", start:"", end:"", notes:"", type:"Meeting" };
 
-export default function CalendarPage({ projects=[], clients=[], companyId }) {
+export default function CalendarPage({ projects=[], tasks=[], clients=[], companyId, onUpdateProject, onUpdateTask, config }) {
   const [events,  setEvents]  = useState([]);
   const [loading, setLoading] = useState(true);
   const [search,  setSearch]  = useState("");
@@ -45,12 +45,41 @@ export default function CalendarPage({ projects=[], clients=[], companyId }) {
     setLoading(false);
   };
 
+  // Combine real events with project/task deadlines
+  const allDisplayEvents = [
+    ...events.map(e => ({ ...e, _type: "event" })),
+    ...projects.filter(p => p.deadline || p.end).map(p => ({
+      _id: `proj-${p._id || p.id}`,
+      name: `🏁 Deadline: ${p.name}`,
+      date: p.deadline || p.end,
+      type: "Planning",
+      project: p.name,
+      client: p.client,
+      _type: "project",
+      _original: p
+    })),
+    ...tasks.filter(t => t.date || t.dueDate).map(t => ({
+      _id: `task-${t._id || t.id}`,
+      name: `📝 Task: ${t.title || t.name}`,
+      date: t.date || t.dueDate,
+      type: "Review",
+      project: t.project,
+      _type: "task",
+      _original: t
+    }))
+  ];
+
   const openAdd = (dateStr) => {
     setForm({ ...EMPTY, date: dateStr || "" });
     setErr({}); setEditId(null); setModal("add");
   };
 
   const openEdit = (ev) => {
+    if (ev._type === "project" || ev._type === "task") {
+      setModal(ev._type);
+      setForm(ev);
+      return;
+    }
     setForm({
       name:    ev.name||"",
       project: ev.project||"",
@@ -96,6 +125,25 @@ export default function CalendarPage({ projects=[], clients=[], companyId }) {
     setSaving(false);
   };
 
+  const updateStatus = async (type, id, newStatus) => {
+    setSaving(true);
+    try {
+      if (type === "project") {
+        await axios.put(`${BASE_URL}/api/projects/${id}`, { status: newStatus });
+        if (onUpdateProject) onUpdateProject();
+        showToast("✅ Project status updated!");
+      } else if (type === "task") {
+        await axios.patch(`${BASE_URL}/api/tasks/${id}/status`, { status: newStatus });
+        if (onUpdateTask) onUpdateTask();
+        showToast("✅ Task status updated!");
+      }
+      setModal(null);
+    } catch (err) {
+      showToast("❌ Update failed!");
+    }
+    setSaving(false);
+  };
+
   const del = async (id) => {
     if (!window.confirm("Delete this event?")) return;
     try { await axios.delete(`${API}/${id}`); } catch {}
@@ -128,7 +176,7 @@ export default function CalendarPage({ projects=[], clients=[], companyId }) {
   const dateStr = (d) =>
     `${calYear}-${String(calMonth + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
 
-  const eventsOnDay = (d) => events.filter(e => e.date === dateStr(d));
+  const eventsOnDay = (d) => allDisplayEvents.filter(e => e.date === dateStr(d));
 
   const f = (x) => {
     const q = search.toLowerCase();
@@ -150,13 +198,13 @@ export default function CalendarPage({ projects=[], clients=[], companyId }) {
     return ms && mf;
   };
 
-  const shown = [...events].filter(f).sort((a,b) => (a.date||"") < (b.date||"") ? -1 : 1);
+  const shown = [...allDisplayEvents].filter(f).sort((a,b) => (a.date||"") < (b.date||"") ? -1 : 1);
 
   const stats = [
-    { t:"Total",    v:events.length,                           c:"#9333ea", i:"📅" },
-    { t:"Today",    v:events.filter(x=>x.date===today).length, c:"#7c3aed", i:"📌" },
-    { t:"Upcoming", v:events.filter(x=>x.date>today).length,   c:"#f59e0b", i:"⏰" },
-    { t:"Past",     v:events.filter(x=>x.date<today).length,   c:"#22C55E", i:"✅" },
+    { t:"Total",    v:allDisplayEvents.length,                           c:"#9333ea", i:"📅" },
+    { t:"Today",    v:allDisplayEvents.filter(x=>x.date===today).length, c:"#7c3aed", i:"📌" },
+    { t:"Upcoming", v:allDisplayEvents.filter(x=>x.date>today).length,   c:"#f59e0b", i:"⏰" },
+    { t:"Past",     v:allDisplayEvents.filter(x=>x.date<today).length,   c:"#22C55E", i:"✅" },
   ];
 
   const pNames = projects.map(p=>p.name||"");
@@ -470,14 +518,16 @@ export default function CalendarPage({ projects=[], clients=[], companyId }) {
                           background:"#f5f3ff", border:"1px solid #ede9fe",
                           borderRadius:7, padding:"5px 12px", fontSize:11,
                           color:"#7c3aed", cursor:"pointer", fontWeight:700 }}>
-                          ✏️ Edit
+                          {ev._type ? "👁️ View" : "✏️ Edit"}
                         </button>
-                        <button onClick={()=>del(ev._id||ev.id)} style={{
-                          background:"#fee2e2", border:"1px solid #fecaca",
-                          borderRadius:7, padding:"5px 12px", fontSize:11,
-                          color:"#ef4444", cursor:"pointer", fontWeight:700 }}>
-                          🗑️
-                        </button>
+                        {!ev._type && (
+                          <button onClick={()=>del(ev._id||ev.id)} style={{
+                            background:"#fee2e2", border:"1px solid #fecaca",
+                            borderRadius:7, padding:"5px 12px", fontSize:11,
+                            color:"#ef4444", cursor:"pointer", fontWeight:700 }}>
+                            🗑️
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -491,8 +541,56 @@ export default function CalendarPage({ projects=[], clients=[], companyId }) {
       </div>
       {/* END SPLIT LAYOUT */}
 
-      {/* ── MODAL ───────────────────────────────────────────────── */}
-      {modal && (
+      {/* ── MODALS ───────────────────────────────────────────────── */}
+      {modal === "project" && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(59,7,100,0.55)", backdropFilter:"blur(8px)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:450, padding:24, boxShadow:"0 32px 80px rgba(147,51,234,0.28)" }}>
+            <h2 style={{ margin:"0 0 16px", fontSize:18, fontWeight:800, color:T.text }}>🏗️ Project Deadline</h2>
+            <div style={{ background:"#f5f3ff", padding:16, borderRadius:12, marginBottom:20 }}>
+              <div style={{ fontSize:16, fontWeight:700, color:T.text }}>{form._original.name}</div>
+              <div style={{ fontSize:12, color:T.muted, marginTop:4 }}>Deadline: {form.date}</div>
+              <div style={{ fontSize:12, color:T.muted }}>Client: {form.client || "—"}</div>
+            </div>
+            <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700, marginBottom:8 }}>UPDATE STATUS</label>
+            <select 
+              value={form._original.status} 
+              onChange={e => updateStatus("project", form._original._id, e.target.value)}
+              style={inp(false)}
+            >
+              {(config?.projectStatuses || ["Pending","In Progress","Completed","On Hold"]).map(s=><option key={s}>{s}</option>)}
+            </select>
+            <div style={{ display:"flex", justifyContent:"flex-end", marginTop:20 }}>
+              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modal === "task" && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(59,7,100,0.55)", backdropFilter:"blur(8px)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:450, padding:24, boxShadow:"0 32px 80px rgba(147,51,234,0.28)" }}>
+            <h2 style={{ margin:"0 0 16px", fontSize:18, fontWeight:800, color:T.text }}>📝 Task Details</h2>
+            <div style={{ background:"#f5f3ff", padding:16, borderRadius:12, marginBottom:20 }}>
+              <div style={{ fontSize:16, fontWeight:700, color:T.text }}>{form._original.title || form._original.name}</div>
+              <div style={{ fontSize:12, color:T.muted, marginTop:4 }}>Due Date: {form.date}</div>
+              <div style={{ fontSize:12, color:T.muted }}>Project: {form.project || "—"}</div>
+            </div>
+            <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700, marginBottom:8 }}>UPDATE STATUS</label>
+            <select 
+              value={form._original.status} 
+              onChange={e => updateStatus("task", form._original._id, e.target.value)}
+              style={inp(false)}
+            >
+              {(config?.taskStatuses || ["Pending","In Progress","Completed","On Hold"]).map(s=><option key={s}>{s}</option>)}
+            </select>
+            <div style={{ display:"flex", justifyContent:"flex-end", marginTop:20 }}>
+              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modal && !["project", "task"].includes(modal) && (
         <div style={{ position:"fixed", inset:0, background:"rgba(59,7,100,0.55)",
           backdropFilter:"blur(8px)", zIndex:1000, display:"flex",
           alignItems:"center", justifyContent:"center", padding:16 }}

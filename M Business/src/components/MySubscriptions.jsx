@@ -164,7 +164,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
   // ── Razorpay Payment for Paid Plans ─────────────────────────────────────────
   const startRazorpayPayment = async (plan) => {
     if (plan.isTrial) { startTrial(); return; }
-    if (!plan.price) { window.open("mailto:billing@mbusiness.com"); return; }
+    if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
 
     try {
       setPayLoading(plan.name);
@@ -296,7 +296,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
         <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
           <div style={{ fontSize: 36, marginBottom: 10 }}>🚀</div>
           <h2 style={{ fontSize: 26, fontWeight: 800, color: T.text, margin: "0 0 8px" }}>Choose Your Plan</h2>
-          <p style={{ color: T.muted, fontSize: 14, margin: 0 }}>Select the best plan for your business growth • Powered by {user?.companyName || "M Business"} </p>
+          <p style={{ color: T.muted, fontSize: 14, margin: 0 }}>Select the best plan for your business growth • {user?.companyName && `Powered by ${user.companyName}`} </p>
         </div>
 
         {/* Plans Grid */}
@@ -492,7 +492,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           Your subscription expired {daysSinceExpiry} days ago. Access has been restricted. Please contact your administrator to renew your plan.
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-          <a href="mailto:billing@mbusiness.com" style={{ display: "inline-block", background: "linear-gradient(135deg,#9333ea,#7c3aed)", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>
+          <a href={`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`} style={{ display: "inline-block", background: "linear-gradient(135deg,#9333ea,#7c3aed)", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>
             📧 Contact Administrator
           </a>
           <a href="tel:+919876543210" style={{ display: "inline-block", background: "#f1f5f9", color: "#1e0a3c", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "1.5px solid #e2e8f0" }}>
@@ -595,9 +595,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
             </div>
           </Card>
 
-          <Card title={`Provider — ${user?.companyName || "M Business"}`} icon="🏢">
+          <Card title={`Provider — ${user?.companyName || ""}`} icon="🏢">
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <InfoRow label="Company" value={subscription.providerCompany || user?.companyName || "M Business"} icon="🏢" />
+              <InfoRow label="Company" value={subscription.providerCompany || user?.companyName || ""} icon="🏢" />
               <InfoRow label="Email" value={subscription.providerEmail || "billing@business-suite.com"} icon="📧" />
               <InfoRow label="Phone" value={subscription.providerPhone || "+91-9876543210"} icon="📱" />
               <InfoRow label="GST" value={subscription.providerGst || "GSTIN-33AABCM1234Z1Z1"} icon="📋" />
@@ -669,7 +669,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
       {/* ── Invoices Tab ── */}
       {activeTab === "invoices" && (
-        <Card title={`Invoices from ${user?.companyName || "M Business"} (${invoices.length})`} icon="🧾">
+        <Card title={`Invoices from ${user?.companyName || ""} (${invoices.length})`} icon="🧾">
           {invoices.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
@@ -700,7 +700,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
       {/* ── Quotations Tab ── */}
       {activeTab === "quotations" && (
-        <Card title={`Quotations from ${user?.companyName || "M Business"} (${quotations.length})`} icon="📄">
+        <Card title={`Quotations from ${user?.companyName || ""} (${quotations.length})`} icon="📄">
           {quotations.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>📋</div>
@@ -780,7 +780,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
               {viewPayment.invoiceNo && <InfoRow label="Invoice No" value={viewPayment.invoiceNo} icon="🧾" />}
               {viewPayment.quotationNo && <InfoRow label="Quotation No" value={viewPayment.quotationNo} icon="📄" />}
               <div style={{ marginTop: 16, padding: 14, background: "#faf5ff", borderRadius: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Provider — {user?.companyName || "M Business"}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Provider — {user?.companyName || ""}</div>
                 <InfoRow label="Company" value={viewPayment.providerCompany} icon="🏢" />
                 <InfoRow label="GST" value={viewPayment.providerGst} icon="📋" />
                 <InfoRow label="Address" value={viewPayment.providerAddress} icon="📍" />

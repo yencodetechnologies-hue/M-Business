@@ -44,7 +44,7 @@ exports.updateGroup = async (req, res) => {
     const group = await Group.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false },
       { $set: updates },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
     if (!group) return res.status(404).json({ message: "Group not found" });
     res.json(group);
@@ -58,7 +58,7 @@ exports.deleteGroup = async (req, res) => {
     const group = await Group.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false },
       { isDeleted: true },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!group) return res.status(404).json({ message: "Group not found" });
 

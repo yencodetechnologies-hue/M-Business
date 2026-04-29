@@ -1,10 +1,8 @@
 import axios from "axios";
-export const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "192.168.1.101")
-  ? "http://192.168.1.101:5000"
-  : "https://mbusiness.octosofttechnologies.in";
-export const FRONTEND_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") 
-  ? "http://192.168.1.101:5173" 
-  : window.location.origin;
+export const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+  ? "http://localhost:5000"
+  : `http://${window.location.hostname}:5000`;
+export const FRONTEND_URL = window.location.origin;
 
 // Global interceptor for Multi-Tenant Architecture
 axios.interceptors.request.use((config) => {

@@ -115,6 +115,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   const [errors, setErrors]         = useState({});
   const [convertingId, setConvertingId] = useState(null);
   const [listSearch, setListSearch] = useState("");
+  const [viewEntry, setViewEntry] = useState(null);
 
   const today      = new Date().toISOString().split("T")[0];
   const expDefault = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
@@ -307,8 +308,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     const approvedCnt = enriched.filter((e) => e.status === "approved").length;
 
     return (
-      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: 1100 }}>
-        <style>{`
+      <>
+        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: 1100 }}>
+          <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
           .qt-row:hover { background: #f0fdf4 !important; cursor: pointer; }
@@ -375,15 +377,15 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           }).map((entry, idx, arr) => {
             const qtD = entry.qt || {};
             return (
-              <div key={entry.id || idx} className="qt-row"
+              <div key={entry.id || idx} className="qt-row" onClick={() => setViewEntry(entry)}
                 style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr 0.8fr 1fr 0.9fr 0.9fr 1.1fr auto", padding: "13px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff", gap: 8 }}>
-                <div onClick={() => loadEntry(entry)} style={{ cursor: "pointer" }}>
+                <div style={{ cursor: "pointer" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{entry.quoteNo || "—"}</div>
                   <div style={{ fontSize: 11, color: "#d1d5db", marginTop: 1 }}>{formatDateTime(entry.savedAt)}</div>
                 </div>
-                <div onClick={() => loadEntry(entry)} style={{ fontSize: 13, fontWeight: 600, color: "#9333ea", cursor: "pointer" }}>{entry.client || "—"}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#9333ea", cursor: "pointer" }}>{entry.client || "—"}</div>
                 <div className="qt-hide" style={{ fontSize: 12, color: "#6b7280" }}>{qtD.project || entry.project || "—"}</div>
-                <div onClick={() => loadEntry(entry)} style={{ fontSize: 15, fontWeight: 800, color: "#111827", cursor: "pointer" }}>{formatCurrency(entry.total, qtD.currency || "₹")}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#111827", cursor: "pointer" }}>{formatCurrency(entry.total, qtD.currency || "₹")}</div>
                 <div className="qt-hide" style={{ fontSize: 12, color: "#374151" }}>{formatDate(qtD.date || entry.date)}</div>
                 <div className="qt-hide" style={{ fontSize: 12, color: "#d97706", fontWeight: 600 }}>{formatDate(qtD.expiryDate || entry.expiryDate)}</div>
                 <div onClick={(e) => e.stopPropagation()}>
@@ -412,8 +414,87 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               </div>
             );
           })}
+          </div>
         </div>
-      </div>
+
+        {/* VIEW MODAL */}
+        {viewEntry && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.5)", backdropFilter: "blur(6px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 640, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 24px 60px rgba(0,0,0,0.2)" }}>
+            {/* Modal Header */}
+            <div style={{ padding: "16px 24px", borderBottom: "1px solid #f3f0ff", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,#f9f8ff,#fff)" }}>
+              <div>
+                <div style={{ fontSize: 10, color: "#9333ea", fontWeight: 800, letterSpacing: 1.5, marginBottom: 2 }}>QUOTATION DETAILS</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#1e0a3c" }}>{viewEntry.quoteNo}</div>
+              </div>
+              <button onClick={() => setViewEntry(null)} style={{ background: "#f5f3ff", border: "none", width: 32, height: 32, borderRadius: "50%", color: "#9333ea", cursor: "pointer", fontSize: 18, fontWeight: 700 }}>✕</button>
+            </div>
+
+            <div style={{ overflowY: "auto", padding: 24, flex: 1 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
+                <div>
+                  <div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>CLIENT</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#1e0a3c" }}>{viewEntry.client}</div>
+                  <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>{viewEntry.qt?.companyName}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>STATUS</div>
+                  <StatusBadge status={viewEntry.status} />
+                </div>
+              </div>
+
+              {/* Items Table */}
+              <div style={{ background: "#faf9ff", borderRadius: 12, padding: 16, marginBottom: 24 }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: "left", fontSize: 10, color: "#a78bfa", paddingBottom: 10 }}>DESCRIPTION</th>
+                      <th style={{ textAlign: "right", fontSize: 10, color: "#a78bfa", paddingBottom: 10 }}>TOTAL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(viewEntry.items || []).map((item, i) => (
+                      <tr key={i} style={{ borderTop: "1px solid #f3f0ff" }}>
+                        <td style={{ padding: "10px 0", fontSize: 13, color: "#1e0a3c", fontWeight: 600 }}>{item.description}</td>
+                        <td style={{ padding: "10px 0", textAlign: "right", fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), viewEntry.qt?.currency)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Payment Summary */}
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <div style={{ width: "100%", maxWidth: 280 }}>
+                  {[
+                    ["Subtotal", formatCurrency(viewEntry.qt?.subtotal || (viewEntry.total / (1 + (viewEntry.qt?.gstRate || 18) / 100)), viewEntry.qt?.currency)],
+                    [`GST (${viewEntry.qt?.gstRate || 18}%)`, formatCurrency(viewEntry.qt?.gstAmt || (viewEntry.total - (viewEntry.total / (1 + (viewEntry.qt?.gstRate || 18) / 100))), viewEntry.qt?.currency)],
+                    ["Total Amount", formatCurrency(viewEntry.total, viewEntry.qt?.currency)],
+                    ["Advance Paid", formatCurrency(viewEntry.qt?.amountPaid || 0, viewEntry.qt?.currency)]
+                  ].map(([l, v]) => (
+                    <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #f3f0ff" }}>
+                      <span style={{ fontSize: 13, color: "#6b7280" }}>{l}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
+                    </div>
+                  ))}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,#9333ea,#10b981)", borderRadius: 10, marginTop: 8 }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>BALANCE DUE</span>
+                    <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(viewEntry.total - (viewEntry.qt?.amountPaid || 0), viewEntry.qt?.currency)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{ padding: "16px 24px", borderTop: "1px solid #f3f0ff", background: "#f9f8ff", display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button onClick={() => setViewEntry(null)} style={{ padding: "10px 20px", background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 10, color: "#6b7280", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Close</button>
+              <button onClick={() => { loadEntry(viewEntry); setViewEntry(null); }} style={{ padding: "10px 20px", background: "#f3e8ff", border: "1px solid #d8b4fe", borderRadius: 10, color: "#9333ea", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Edit Quotation</button>
+              <button onClick={() => { setQt(viewEntry.qt); setItems(viewEntry.items); setStep("preview"); setViewEntry(null); }} style={{ padding: "10px 20px", background: "linear-gradient(135deg,#9333ea,#10b981)", border: "none", borderRadius: 10, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Print / PDF</button>
+            </div>
+          </div>
+        </div>
+      )}
+      </>
     );
   }
 

@@ -74,6 +74,8 @@ const incomeRoutes = require("./routes/incomeroutes");
 const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+const messageRoutes = require("./routes/messageroutes");
+
 app.use("/api/users", userRoutes);
 app.use("/api/interviews", interviewRoutes);
 app.use("/api/auth", authRoutes);
@@ -103,6 +105,9 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/role-permissions", rolePermissionRoutes);
 app.use("/api/integrations", integrationRoutes);
+app.use("/api/messages", messageRoutes);
+const configRoutes = require("./routes/configroutes");
+app.use("/api/config", configRoutes);
 
 app.use("/upload", express.static("uploads"));
 

@@ -719,15 +719,20 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       {/* Totals */}
                       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 18 }}>
                         <div style={{ minWidth: 240 }}>
-                          {[["Subtotal", formatCurrency(vSub, vInv.currency || inv.currency)], [`GST (${vInv.gstRate || 18}%)${vInv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(vGst, vInv.currency || inv.currency)]].map(([l, v]) => (
+                          {[
+                            ["Subtotal", formatCurrency(vSub, vInv.currency || inv.currency)], 
+                            [`GST (${vInv.gstRate || 18}%)${vInv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(vGst, vInv.currency || inv.currency)],
+                            ["Total Amount", formatCurrency(vTot, vInv.currency || inv.currency)],
+                            ["Advance Paid", formatCurrency(viewEntry.amountPaid || vInv.amountPaid || 0, vInv.currency || inv.currency)]
+                          ].map(([l, v]) => (
                             <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #f3f0ff" }}>
                               <span style={{ fontSize: 13, color: "#6b7280" }}>{l}</span>
                               <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
                             </div>
                           ))}
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,#4c1d95,#7c3aed)", borderRadius: 10, marginTop: 8 }}>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>TOTAL DUE</span>
-                            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(vTot, vInv.currency || inv.currency)}</span>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>BALANCE DUE</span>
+                            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(vTot - (viewEntry.amountPaid || vInv.amountPaid || 0), vInv.currency || inv.currency)}</span>
                           </div>
                         </div>
                       </div>
@@ -885,7 +890,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </table>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
               <div style={{ width: "min(280px,100%)" }}>
-                {[["Subtotal", formatCurrency(subtotal, inv.currency)], [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)], ["Amount Paid", formatCurrency(amountPaid, inv.currency)]].map(([l, v]) => (
+                {[
+                  ["Subtotal", formatCurrency(subtotal, inv.currency)], 
+                  [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)], 
+                  ["Total Amount", formatCurrency(total, inv.currency)],
+                  ["Advance Paid", formatCurrency(amountPaid, inv.currency)]
+                ].map(([l, v]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f3f0ff" }}>
                     <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>

@@ -837,7 +837,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
   const [editProj,setEditProj]=useState(null);
   const [deleteTarget,setDeleteTarget]=useState(null);
   const [assignModal,setAssignModal]=useState(null);
-  const [editForm,setEditForm]=useState({});
+  const [editForm,setEditForm]=useState({ currency: "₹" });
   const [editErr,setEditErr]=useState({});
   const [assignTo,setAssignTo]=useState([]);
   const [saving,setSaving]=useState(false);
@@ -853,7 +853,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit=(p)=>{
-    setEditForm({name:p.name||"",client:p.client||"",purpose:p.purpose||"",description:p.description||"",start:p.start||"",end:p.end||"",budget:p.budget||"",team:p.team||"",status:p.status||"Pending",assignedTo:Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])});
+    setEditForm({name:p.name||"",client:p.client||"",purpose:p.purpose||"",description:p.description||"",start:p.start||"",end:p.end||"",budget:p.budget||"",currency: p.currency || "₹",team:p.team||"",status:p.status||"Pending",assignedTo:Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])});
     setEditErr({});
     setEditProj(p);
   };
@@ -922,7 +922,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
                     <td style={{padding:"12px 14px",color:"#a78bfa",fontSize:11,fontFamily:"monospace"}}>{`PRJ${String((currentPage-1)*itemsPerPage + i + 1).padStart(3,"0")}`}</td>
                     <td style={{padding:"12px 14px",fontWeight:700,color:T.text}}>{p.name}</td>
                     <td style={{padding:"12px 14px",color:"#7c3aed"}}>{p.client||"—"}</td>
-                    <td style={{padding:"12px 14px",color:"#22C55E",fontWeight:600}}>{p.budget||"—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{p.currency || "₹"} {p.budget || "0"}</td>
                     <td style={{padding:"12px 14px"}}><Badge label={p.status||"Pending"}/></td>
                     <td style={{padding:"12px 14px"}}>
                       {(() => {
@@ -960,7 +960,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
               {viewProj.client&&<span style={{fontSize:12,color:"#9333ea",fontWeight:600}}>👥 {viewProj.client}</span>}
             </div>
           </div>
-          <InfoRow icon="💰" label="Budget" value={viewProj.budget}/>
+          <InfoRow icon="💰" label="Budget" value={`${viewProj.currency || "₹"} ${viewProj.budget || "0"}`} />
           <div style={{marginBottom:14}}>
             <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGNED EMPLOYEES</label>
             {(() => {
@@ -1000,7 +1000,25 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
               {editErr.client&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {editErr.client}</div>}
             </div>
             <Fld label="Purpose" value={editForm.purpose} onChange={v=>setEditForm(p=>({...p,purpose:v}))}/>
-            <Fld label="Budget" value={editForm.budget} onChange={v=>setEditForm(p=>({...p,budget:v}))}/>
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <select 
+                  value={editForm.currency} 
+                  onChange={e => setEditForm({ ...editForm, currency: e.target.value })} 
+                  style={{ width: 70, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }}
+                >
+                  {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR"].map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <input 
+                  type="text" 
+                  value={editForm.budget} 
+                  onChange={e => setEditForm({ ...editForm, budget: e.target.value })} 
+                  style={{ flex: 1, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }} 
+                  placeholder="0.00" 
+                />
+              </div>
+            </div>
             <Fld label="Start Date" value={editForm.start} type="date" onChange={v=>setEditForm(p=>({...p,start:v}))}/>
             <Fld label="End Date" value={editForm.end} type="date" onChange={v=>setEditForm(p=>({...p,end:v}))}/>
             <Fld label="Team Members" value={editForm.team} onChange={v=>setEditForm(p=>({...p,team:v}))}/>
@@ -1576,7 +1594,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const [empSaveLoading,setEmpSaveLoading]=useState(false);
 
   const [projects,setProjects]=useState([]);
-  const [np,setNp]=useState({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",team:"",status:"Pending",assignedTo:[]});
+  const [np,setNp]=useState({name:"",client:"",purpose:"",description:"",start:"",end:"",budget:"",currency: "₹",team:"",status:"Pending",assignedTo:[]});
   const [npError,setNpError]=useState({});
   const [projSaveLoading,setProjSaveLoading]=useState(false);
 
@@ -1741,7 +1759,32 @@ export default function Dashboard({setUser,user,fixedLogo}){
               ))}
             </div>
             <div className="dash-2col" style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:14,marginBottom:14}}>
-              <SC title="Recent Projects"><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:300}}><thead><tr style={{background:"#faf5ff"}}>{["Project","Client","Status","View"].map(c=><th key={c} style={{padding:"8px 10px",textAlign:"left",color:"#a78bfa",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe"}}>{c.toUpperCase()}</th>)}</tr></thead><tbody>{projects.slice(0,5).map((p,i)=><tr key={i} style={{borderBottom:"1px solid #f5f3ff"}}><td style={{padding:"9px 10px",fontWeight:600,color:T.text}}>{p.name}</td><td style={{padding:"9px 10px",color:"#a78bfa"}}>{p.client}</td><td style={{padding:"9px 10px"}}><Badge label={p.status}/></td><td style={{padding:"9px 10px"}}><button onClick={()=>setViewProject(p)} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>View</button></td></tr>)}</tbody></table></div></SC>
+              <SC title="Recent Projects">
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 300 }}>
+                    <thead>
+                      <tr style={{ background: "#faf5ff" }}>
+                        {["Project", "Client", "Status", "View"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "#a78bfa", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe" }}>{c.toUpperCase()}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {projects.slice(0, 5).map((p, i) => (
+                        <tr key={i} style={{ borderBottom: "1px solid #f5f3ff" }}>
+                          <td style={{ padding: "9px 10px", fontWeight: 600, color: T.text }}>
+                            <div style={{ fontSize: 13 }}>{p.name}</div>
+                            <div style={{ fontSize: 11, color: "#22C55E" }}>{p.currency || "₹"} {p.budget || "0"}</div>
+                          </td>
+                          <td style={{ padding: "9px 10px", color: "#a78bfa" }}>{p.client}</td>
+                          <td style={{ padding: "9px 10px" }}><Badge label={p.status} /></td>
+                          <td style={{ padding: "9px 10px" }}>
+                            <button onClick={() => setViewProject(p)} style={{ background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </SC>
               <SC title="Recent Activity">{[{icon:"👤",text:"New client added",time:"2m ago",c:"#9333ea"},{icon:"👨‍💼",text:"Employee joined",time:"30m ago",c:"#7c3aed"},{icon:"🧾",text:"Invoice created",time:"1h ago",c:"#22C55E"},{icon:"📁",text:"Project updated",time:"3h ago",c:"#a855f7"},{icon:"✅",text:"ERP completed",time:"2d ago",c:"#F59E0B"}].map((a,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",borderBottom:i<4?"1px solid #f5f3ff":"none"}}><div style={{width:28,height:28,borderRadius:8,background:`${a.c}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0}}>{a.icon}</div><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,fontWeight:600,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.text}</div><div style={{fontSize:11,color:"#a78bfa"}}>{a.time}</div></div></div>))}</SC>
             </div>
             <div className="dash-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
@@ -1910,7 +1953,25 @@ export default function Dashboard({setUser,user,fixedLogo}){
             {npError.client&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {npError.client}</div>}
           </div>
           <Fld label="Purpose" value={np.purpose} onChange={v=>setNp({...np,purpose:v})}/>
-          <Fld label="Budget" value={np.budget} onChange={v=>setNp({...np,budget:v})}/>
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              <select 
+                value={np.currency} 
+                onChange={e => setNp({ ...np, currency: e.target.value })} 
+                style={{ width: 80, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }}
+              >
+                {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR"].map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <input 
+                type="text" 
+                value={np.budget} 
+                onChange={e => setNp({ ...np, budget: e.target.value })} 
+                style={{ flex: 1, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }} 
+                placeholder="0.00" 
+              />
+            </div>
+          </div>
           <Fld label="Start Date" value={np.start} onChange={v=>setNp({...np,start:v})} type="date"/>
           <Fld label="End Date" value={np.end} onChange={v=>setNp({...np,end:v})} type="date"/>
           <Fld label="Team Members" value={np.team} onChange={v=>setNp({...np,team:v})}/>
@@ -1941,7 +2002,25 @@ export default function Dashboard({setUser,user,fixedLogo}){
                 </div>
               ))}
           </div>
-          {np.assignedTo.length>0&&<div style={{marginTop:6,fontSize:11,color:"#9333ea",fontWeight:600}}>{np.assignedTo.length} employee(s) selected</div>}
+          {np.assignedTo.length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <label style={{ display: "block", fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({np.assignedTo.length})</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {np.assignedTo.map(name => (
+                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#f3e8ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#7c3aed" }}>{name}</span>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== name) })); }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <Fld label="Description" value={np.description} onChange={v=>setNp({...np,description:v})}/>
         <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>

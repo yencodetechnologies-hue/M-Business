@@ -1169,7 +1169,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
   const [editProj, setEditProj] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [assignModal, setAssignModal] = useState(null);
-  const [editForm, setEditForm] = useState({});
+  const [editForm, setEditForm] = useState({ currency: "₹" });
   const [editErr, setEditErr] = useState({});
   const [assignTo, setAssignTo] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -1192,7 +1192,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (p) => {
-    setEditForm({ name: p.name || "", client: p.client || "", purpose: p.purpose || "", description: p.description || "", start: p.start || "", end: p.end || "", budget: p.budget || "", team: p.team || "", status: p.status || "Pending", assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []) });
+    setEditForm({ name: p.name || "", client: p.client || "", purpose: p.purpose || "", description: p.description || "", start: p.start || "", end: p.end || "", budget: p.budget || "", currency: p.currency || "₹", team: p.team || "", status: p.status || "Pending", assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []) });
     setEditErr({});
     setEditProj(p);
   };
@@ -1261,7 +1261,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                     <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{p.name}</td>
                     <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{p.client || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{p.budget || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{p.currency || "₹"} {p.budget || "0"}</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={p.status || "Pending"} /></td>
                     <td style={{ padding: "12px 14px" }}>
                       {(() => {
@@ -1299,7 +1299,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
               {viewProj.client && <span style={{ fontSize: 12, color: "#9333ea", fontWeight: 600 }}>👥 {viewProj.client}</span>}
             </div>
           </div>
-          <InfoRow icon="💰" label="Budget" value={viewProj.budget} />
+          <InfoRow icon="💰" label="Budget" value={`${viewProj.currency || "₹"} ${viewProj.budget || "0"}`} />
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGNED EMPLOYEES</label>
             {(() => {
@@ -1339,7 +1339,25 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
               {editErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {editErr.client}</div>}
             </div>
             <Fld label="Purpose" value={editForm.purpose} onChange={v => setEditForm(p => ({ ...p, purpose: v }))} />
-            <Fld label="Budget" value={editForm.budget} onChange={v => setEditForm(p => ({ ...p, budget: v }))} />
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <select 
+                  value={editForm.currency} 
+                  onChange={e => setEditForm({ ...editForm, currency: e.target.value })} 
+                  style={{ width: 70, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }}
+                >
+                  {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR"].map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <input 
+                  type="text" 
+                  value={editForm.budget} 
+                  onChange={e => setEditForm({ ...editForm, budget: e.target.value })} 
+                  style={{ flex: 1, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }} 
+                  placeholder="0.00" 
+                />
+              </div>
+            </div>
             <Fld label="Start Date" value={editForm.start} type="date" onChange={v => setEditForm(p => ({ ...p, start: v }))} />
             <Fld label="End Date" value={editForm.end} type="date" onChange={v => setEditForm(p => ({ ...p, end: v }))} />
             <Fld label="Team Members" value={editForm.team} onChange={v => setEditForm(p => ({ ...p, team: v }))} />
@@ -1660,7 +1678,7 @@ function InterviewPage({ companyId, companyName }) {
               <thead><tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>{["#", "Candidate", "Contact", "Experience", "Role", "Interviewer", "Date", "Status", "Resume", "Actions"].map(h => (<th key={h} style={{ padding: "10px 12px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 10, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>))}</tr></thead>
               <tbody>
                 {paginated.map((c, i) => {
-                  const idx = candidates.indexOf(c); const status = (c.status || "pending").toLowerCase(); const resumeUrl = c.resumeUrl || (c.resumePath ? `https://mbusiness.octosofttechnologies.in/uploads/resumes/${c.resumePath.split(/[\\/]/).pop()}` : null);
+                  const idx = candidates.indexOf(c); const status = (c.status || "pending").toLowerCase(); const resumeUrl = c.resumeUrl || (c.resumePath ? `${BASE_URL}/uploads/resumes/${c.resumePath.split(/[\\/]/).pop()}` : null);
                   const finalResumeUrl = resumeUrl; return (
                     <tr key={c._id || c.id || i} style={{ borderBottom: "1px solid #f3f0ff", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "12px 12px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}</td>
@@ -2507,7 +2525,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [projects, setProjects] = useState([]);
   const [projLoading, setProjLoading] = useState(false);
-  const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", team: "", status: "Pending", assignedTo: [] });
+  const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", assignedTo: [] });
   const [npError, setNpError] = useState({});
   const [projSaveLoading, setProjSaveLoading] = useState(false);
 
@@ -3298,7 +3316,10 @@ const handleEditPackage = (pkg) => {
                     <tbody>
                       {projects.length === 0 ? <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "#a78bfa" }}>No recent projects</td></tr> : projects.slice(0, 5).map((p, i) => (
                         <tr key={i} style={{ borderBottom: "1px solid #f5f3ff" }}>
-                          <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>{p.name}</td>
+                          <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
+                            <div style={{ fontSize: 13 }}>{p.name}</div>
+                            <div style={{ fontSize: 11, color: "#22C55E" }}>{p.currency || "₹"} {p.budget || "0"}</div>
+                          </td>
                           <td style={{ padding: "12px 12px", color: "#a78bfa" }}>{p.client}</td>
                           <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>
                           <td style={{ padding: "12px 12px", color: "#94a3b8" }}>{p.end ? new Date(p.end).toLocaleDateString() : "—"}</td>
@@ -3715,7 +3736,25 @@ const handleEditPackage = (pkg) => {
           <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
           <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
           <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
-          <Fld label="Budget" value={np.budget} onChange={v => setNp({ ...np, budget: v })} />
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              <select 
+                value={np.currency} 
+                onChange={e => setNp({ ...np, currency: e.target.value })} 
+                style={{ width: 80, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }}
+              >
+                {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR"].map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <input 
+                type="text" 
+                value={np.budget} 
+                onChange={e => setNp({ ...np, budget: e.target.value })} 
+                style={{ flex: 1, border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }} 
+                placeholder="0.00" 
+              />
+            </div>
+          </div>
           <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
           <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
           <Fld label="Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
@@ -3746,7 +3785,25 @@ const handleEditPackage = (pkg) => {
                 </div>
               ))}
           </div>
-          {np.assignedTo.length > 0 && <div style={{ marginTop: 6, fontSize: 11, color: "#9333ea", fontWeight: 600 }}>{np.assignedTo.length} employee(s) selected</div>}
+          {np.assignedTo.length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <label style={{ display: "block", fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({np.assignedTo.length})</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {np.assignedTo.map(name => (
+                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "#f3e8ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#7c3aed" }}>{name}</span>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== name) })); }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <Fld label="Description" value={np.description} onChange={v => setNp({ ...np, description: v })} />
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>

@@ -199,7 +199,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
               </div>
             ) : (
               <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>
-                {(user?.companyName || user?.name || "M")[0].toUpperCase()}
+                {(user?.companyName || user?.name || "W")[0].toUpperCase()}
               </div>
             )}
             <div>

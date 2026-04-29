@@ -316,7 +316,7 @@ const PaymentDashboard = ({ userId, userEmail, userName }) => {
                         description={`${plan.name} - ${plan.duration} subscription`}
                       />
                     ) : (
-                      <button className="btn-primary" onClick={() => window.location.href = 'mailto:support@mbusiness.com'}>
+                      <button className="btn-primary" onClick={() => window.location.href = `mailto:${user?.supportEmail || 'support@workspace.com'}`}>
                         Contact Us
                       </button>
                     )}

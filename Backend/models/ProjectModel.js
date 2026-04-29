@@ -9,6 +9,7 @@ const projectSchema = new mongoose.Schema({
   end: { type: String, default: "" },
   deadline: { type: String, default: "" },
   budget: { type: String, default: "" },
+  currency: { type: String, default: "₹" },
   team: { type: String, default: "" },
   status: { type: String, default: "Pending" },
   progress: { type: Number, default: 0 },

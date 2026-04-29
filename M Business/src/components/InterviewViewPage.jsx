@@ -6,7 +6,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://mbusiness.octosofttechnologies.in";
+import { BASE_URL } from "../config";
+const API_URL = import.meta.env.VITE_API_URL || BASE_URL;
 
 const statusColor = { pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" };
 const sc = (s = "pending") => statusColor[s.toLowerCase()] || "#a855f7";

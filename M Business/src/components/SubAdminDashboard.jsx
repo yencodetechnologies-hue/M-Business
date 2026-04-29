@@ -1864,7 +1864,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
           <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>✕</button>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 8, margin: "0 auto 12px", position: "relative", width: "fit-content" }}>
             <div style={{ width: 72, height: 72, borderRadius: 16, background: "rgba(255,255,255,0.22)", border: "3px solid rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-              {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 5, background: "#fff" }} /> : <span style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{initials}</span>}
+              {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>{initials}</span>}
             </div>
             <button 
               onClick={() => logoRef.current.click()} 
@@ -2067,13 +2067,13 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
           <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
             <div 
               onClick={onLogoUploadClick}
-              style={{ width: 34, height: 34, borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer", border: "1.5px solid rgba(255,255,255,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}
+              style={{ width: 42, height: 42, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer", border: "1.5px solid rgba(255,255,255,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}
               title="Click to change logo"
             >
               {companyLogo ? (
-                <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2 }} />
+                <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               ) : (
-                <span style={{ fontSize: 16, fontWeight: 900, color: "#9333ea" }}>{initials}</span>
+                <span style={{ fontSize: 18, fontWeight: 900, color: "#9333ea" }}>{initials}</span>
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
@@ -2514,7 +2514,7 @@ function VendorsPage({ vendors, setVendors }) {
 // MAIN DASHBOARD
 // ═══════════════════════════════════════════════════════════
 export default function Dashboard({ setUser, user, fixedLogo }) {
-  const companyNameStr = user?.companyName || "Workspace Suite";
+  const companyNameStr = user?.companyName || "M Business";
   const [active, setActive] = useState("dashboard");
   const [jumpProject, setJumpProject] = useState(null);
   const [modal, setModal] = useState(null);
@@ -3164,9 +3164,9 @@ const handleEditPackage = (pkg) => {
                 {enforceMySubscriptions && (
                   <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "6px 12px", color: "#ef4444", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
                 )}
-                <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ width: 34, height: 34, background: "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", overflow: "hidden", position: "relative" }}>
+                <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ width: 34, height: 34, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", overflow: "hidden", position: "relative" }}>
                   <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }} title="Click to upload logo">
-                    {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} /> : <span>{initials}</span>}
+                    {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <span>{initials}</span>}
                   </div>
                 </div>
               </div>
@@ -3679,56 +3679,56 @@ const handleEditPackage = (pkg) => {
       {/* ── Add Client Modal ── */}
       {modal === "client" && <Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }}>
         {clientSuccessData ? (
-          <div style={{ textAlign: "center", padding: "10px 0" }}>
-            <div style={{ width: 68, height: 68, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, margin: "0 auto 20px", boxShadow: "0 8px 20px rgba(22,163,74,0.15)" }}>✓</div>
-            <h3 style={{ fontSize: 20, fontWeight: 800, color: T.text, marginBottom: 12 }}>Registration Successful!</h3>
-            <p style={{ fontSize: 14, color: "#64748b", marginBottom: 24, lineHeight: 1.5, maxWidth: 360, margin: "0 auto 24px" }}>
-              The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created. 
-              Share these credentials securely.
-            </p>
-            
-            <div style={{ background: "linear-gradient(135deg,#f8fafc,#f1f5f9)", border: "1.5px solid #e2e8f0", borderRadius: 16, padding: "20px", marginBottom: 28, textAlign: "left", boxShadow: "inset 0 2px 4px rgba(0,0,0,0.02)" }}>
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 6, letterSpacing: 1 }}>LOGIN EMAIL</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: T.text, background: "#fff", padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>{clientSuccessData.email}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 6, letterSpacing: 1 }}>TEMPORARY PASSWORD</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#7c3aed", background: "#fff", padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password}</div>
-              </div>
-            </div>
-            
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <button 
-                onClick={() => {
-                  const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
-                  navigator.clipboard.writeText(text);
-                  toast.success("📋 Credentials copied to clipboard!");
-                }}
-                style={{ width: "100%", background: "linear-gradient(135deg,#7c3aed,#9333ea)", color: "#fff", border: "none", borderRadius: 12, padding: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, boxShadow: "0 10px 20px rgba(124,58,237,0.25)", transition: "transform 0.2s" }}
-              >
-                📋 Copy Login Details
-              </button>
+            <div style={{ textAlign: "center", padding: "5px 0" }}>
+              <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
+              <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
+                The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created. 
+                Share these credentials securely.
+              </p>
               
-              <button 
-                onClick={() => {
-                  const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password}\n\nLogin URL: ${window.location.origin}`;
-                  const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                  window.open(wpUrl, "_blank");
-                }}
-                style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 12, padding: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, boxShadow: "0 10px 20px rgba(37,211,102,0.25)" }}
-              >
-                <span style={{ fontSize: 20 }}>💬</span> Share via WhatsApp
-              </button>
+              <div style={{ background: "linear-gradient(135deg,#f8fafc,#f1f5f9)", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.02)" }}>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>LOGIN EMAIL</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: T.text, background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>{clientSuccessData.email}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#7c3aed", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password}</div>
+                </div>
+              </div>
+              
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <button 
+                  onClick={() => {
+                    const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
+                    navigator.clipboard.writeText(text);
+                    toast.success("📋 Credentials copied!");
+                  }}
+                  style={{ width: "100%", background: "linear-gradient(135deg,#7c3aed,#9333ea)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(124,58,237,0.2)", transition: "all 0.2s" }}
+                >
+                  📋 Copy Login Details
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password}\n\nLogin URL: ${window.location.origin}`;
+                    const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                    window.open(wpUrl, "_blank");
+                  }}
+                  style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(37,211,102,0.2)" }}
+                >
+                  <span style={{ fontSize: 16 }}>💬</span> Share via WhatsApp
+                </button>
 
-              <button 
-                onClick={() => { setModal(null); setClientSuccessData(null); }}
-                style={{ width: "100%", background: "transparent", border: "1.5px solid #ede9fe", color: "#64748b", borderRadius: 12, padding: "12px", fontWeight: 700, cursor: "pointer", fontSize: 13, marginTop: 10 }}
-              >
-                Done & Close
-              </button>
+                <button 
+                  onClick={() => { setModal(null); setClientSuccessData(null); }}
+                  style={{ width: "100%", background: "transparent", border: "1.2px solid #ede9fe", color: "#64748b", borderRadius: 10, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 12, marginTop: 6 }}
+                >
+                  Done & Close
+                </button>
+              </div>
             </div>
-          </div>
         ) : (
           <>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>

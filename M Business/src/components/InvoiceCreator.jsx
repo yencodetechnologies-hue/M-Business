@@ -162,6 +162,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [paymentModalStatus, setPaymentModalStatus] = useState("paid");
   const [paymentData, setPaymentData] = useState({ amountPaid: 0, paymentMode: "GPay", paymentDate: new Date().toISOString().split("T")[0], transactionId: "" });
   const [sendReceipt, setSendReceipt] = useState(false);
+  const [receiptEntry, setReceiptEntry] = useState(null);
   const [listSearch, setListSearch] = useState("");
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
@@ -184,6 +185,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     transactionId: "",
     isGstIncluded: false,
     upiId: user?.upiId || "",
+    bankName: "",
+    accountName: "",
+    accountNumber: "",
+    ifscCode: "",
   };
 
   const [inv, setInv] = useState(blank);
@@ -292,9 +297,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     saveDraftLocal(inv, items, "draft");
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);
     setDraftSaved(true);
-    setTimeout(() => setDraftSaved(false), 2500);
     setSaving(false);
     showToast("💾 Draft saved!");
+    setTimeout(() => {
+      setDraftSaved(false);
+      setStep("list");
+    }, 1000);
   };
 
   // ── Save & Preview ──────────────────────────────────────────
@@ -409,6 +417,89 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   };
 
   // ════════════════════════════════════════════════════════════
+  // RECEIPT VIEW
+  // ════════════════════════════════════════════════════════════
+  if (step === "receipt" && receiptEntry) {
+    const r = receiptEntry;
+    const pd = r.paymentData || {};
+    const invData = r.inv || inv;
+    const receiptNo = `RCP-${Date.now().toString().slice(-6)}`;
+    
+    return (
+      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#f5f3ff", minHeight: "100vh", padding: "40px 20px" }}>
+        <style>{`
+          @media print {
+            .no-print { display: none !important; }
+            body { background: #fff !important; }
+            .receipt-paper { box-shadow: none !important; border: 1px solid #eee !important; margin: 0 !important; width: 100% !important; }
+          }
+        `}</style>
+
+        <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
+          <button onClick={() => setStep("list")} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Back to List</button>
+          <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(147,51,234,0.3)" }}>🖨️ Print Receipt</button>
+        </div>
+
+        <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "#fff", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", overflow: "hidden", border: "1px solid #f3f0ff" }}>
+          {/* Header */}
+          <div style={{ background: "linear-gradient(135deg,#4c1d95,#7c3aed)", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
+            <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>💸</div>
+            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>PAYMENT RECEIPT</h2>
+            <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4, fontWeight: 600 }}>{receiptNo}</div>
+          </div>
+
+          <div style={{ padding: "32px" }}>
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <div style={{ fontSize: 36, fontWeight: 900, color: "#1e0a3c" }}>{formatCurrency(pd.amountPaid, invData.currency)}</div>
+              <div style={{ fontSize: 12, color: "#7c3aed", fontWeight: 700, marginTop: 4, textTransform: "uppercase", letterSpacing: 1 }}>Amount Received</div>
+            </div>
+
+            <div style={{ display: "grid", gap: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+                <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Received From</span>
+                <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{r.client}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+                <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Date</span>
+                <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{formatDate(pd.paymentDate)}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+                <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Mode</span>
+                <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{pd.paymentMode}</span>
+              </div>
+              {pd.transactionId && (
+                <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+                  <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Transaction ID</span>
+                  <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700, fontFamily: "monospace" }}>{pd.transactionId}</span>
+                </div>
+              )}
+              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+                <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Invoice Number</span>
+                <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{r.invoiceNo}</span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 40, textAlign: "center", background: "#fdf4ff", borderRadius: 16, padding: "20px" }}>
+              <div style={{ fontSize: 14, color: "#7c3aed", fontWeight: 800 }}>THANK YOU!</div>
+              <div style={{ fontSize: 12, color: "#a855f7", marginTop: 4 }}>We appreciate your business.</div>
+            </div>
+
+            <div style={{ marginTop: 32, textAlign: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#1e0a3c" }}>{invData.companyName || "M Business"}</div>
+              {invData.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{invData.companyEmail}</div>}
+              {invData.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{invData.companyPhone}</div>}
+            </div>
+          </div>
+          
+          <div style={{ background: "#fafafa", padding: "16px", textAlign: "center", borderTop: "1px solid #f3f0ff" }}>
+            <div style={{ fontSize: 10, color: "#d1d5db", fontWeight: 700, letterSpacing: 1 }}>COMPUTER GENERATED RECEIPT</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ════════════════════════════════════════════════════════════
   // LIST VIEW
   // ════════════════════════════════════════════════════════════
   if (step === "list") {
@@ -501,6 +592,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <button onClick={() => setPaymentModalEntry(null)} style={{ flex: 1, padding: "12px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#7c3aed", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
                 <button onClick={() => {
                   updateStatusBackend(paymentModalEntry, paymentModalStatus, paymentData);
+                  if (sendReceipt) {
+                    setReceiptEntry({ ...paymentModalEntry, paymentData: { ...paymentData }, status: paymentModalStatus });
+                    setStep("receipt");
+                  }
                   setPaymentModalEntry(null);
                 }} style={{ flex: 1, padding: "12px", background: paymentModalStatus === "paid" ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#a855f7,#9333ea)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
                   {paymentModalStatus === "paid" ? "Confirm Full Payment" : "Confirm Part Payment"}
@@ -645,6 +740,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 {/* Action buttons */}
                 <div onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 4, flexWrap: "nowrap" }}>
                   <button onClick={() => { loadEntry(entry); setStep("preview"); }} style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#374151", cursor: "pointer", fontWeight: 700 }}>👁 View</button>
+                  {(entry.status === "paid" || entry.status === "part_paid") && (
+                    <button onClick={() => {
+                      setReceiptEntry({ ...entry, paymentData: { amountPaid: entry.amountPaid || entry.total, paymentMode: entry.paymentMode || "Other", paymentDate: entry.paymentDate || new Date().toISOString(), transactionId: entry.transactionId } });
+                      setStep("receipt");
+                    }} style={{ background: "#fdf4ff", border: "1px solid #f0abfc", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#a21caf", cursor: "pointer", fontWeight: 700 }}>🧾 Receipt</button>
+                  )}
 
                 </div>
               </div>
@@ -807,9 +908,44 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                               <div style={{ fontSize: 9, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>📜 Terms</div>
                               <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.6 }}>{vInv.terms}</div>
                             </div>
+                      )}
+                      </div>
+                    )}
+
+                    {/* Payment Instructions */}
+                    {(vInv.upiId || vInv.bankName) && (
+                      <div style={{ background: "#f8fafc", borderRadius: 12, padding: "14px 18px", border: "1px solid #e2e8f0", marginBottom: 12 }}>
+                        <div style={{ fontSize: 9, color: "#7c3aed", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textTransform: "uppercase" }}>💳 Payment Instructions</div>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
+                          {vInv.upiId && (
+                            <div>
+                              <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>UPI ID</div>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c" }}>{vInv.upiId}</div>
+                            </div>
+                          )}
+                          {vInv.bankName && (
+                            <>
+                              <div>
+                                <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>BANK</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c" }}>{vInv.bankName}</div>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>ACC NAME</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c" }}>{vInv.accountName}</div>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>ACC NO</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c", fontFamily: "monospace" }}>{vInv.accountNumber}</div>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>IFSC</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c", fontFamily: "monospace" }}>{vInv.ifscCode}</div>
+                              </div>
+                            </>
                           )}
                         </div>
-                      )}
+                      </div>
+                    )}
 
                       {/* Action row */}
                       <div style={{ display: "flex", gap: 10, marginTop: 10, paddingTop: 16, borderTop: "1px solid #f3f0ff" }}>
@@ -825,6 +961,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                           style={{ flex: 1, padding: "12px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#16a34a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "inherit" }}>
                           💬 WA
                         </button>
+                        {(viewEntry.status === "paid" || viewEntry.status === "part_paid") && (
+                          <button onClick={() => {
+                            setReceiptEntry({ ...viewEntry, paymentData: { amountPaid: viewEntry.amountPaid || viewEntry.total, paymentMode: viewEntry.paymentMode || "Other", paymentDate: viewEntry.paymentDate || new Date().toISOString(), transactionId: viewEntry.transactionId } });
+                            setStep("receipt");
+                            setViewEntry(null);
+                          }} style={{ flex: 1.2, padding: "12px", background: "#fdf4ff", border: "1.5px solid #f0abfc", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#a21caf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "inherit" }}>
+                            🧾 Receipt
+                          </button>
+                        )}
                         <button onClick={() => { setViewEntry(null); setDeleteTarget(viewEntry); }}
                           style={{ padding: "12px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#ef4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>
                           🗑️
@@ -853,12 +998,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           .invoice-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(100,60,200,0.18); overflow: hidden; }
           @media print {
             @page { size: A4 portrait; margin: 0; }
-            html,body { width:210mm!important;height:297mm!important;margin:0!important;padding:0!important;background:white!important;overflow:hidden!important; }
-            body * { visibility:hidden!important; }
-            .invoice-paper,.invoice-paper * { visibility:visible!important; }
-            .no-print { display:none!important; }
-            .invoice-paper { position:fixed!important;top:0!important;left:0!important;width:210mm!important;height:297mm!important;max-width:210mm!important;margin:0!important;padding:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;page-break-after:avoid!important; }
-            .invoice-paper * { -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important; }
+            html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
+            .no-print, .no-print * { display: none !important; }
+            .invoice-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+            /* Hide every sibling of the paper to ensure no extra space */
+            body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
           }
           @media (max-width:600px) {
             .inv-hgrid { flex-direction:column!important;gap:16px!important; }
@@ -884,7 +1028,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
               <div>
                 {effectiveLogo ? (
-                  <img src={effectiveLogo} alt="logo" style={{ height: 60, borderRadius: 10, marginBottom: 12, objectFit: "contain", background: "#fff", padding: 8, border: "1px solid #ede9fe" }} />
+                  <img src={effectiveLogo} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                 ) : (
                   <div style={{ height: 60, width: 60, background: "#7c3aed", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
                     {effectiveCompanyName[0] || "?"}
@@ -987,6 +1131,39 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <div style={{ background: "#faf5ff", borderRadius: 11, padding: "14px 16px", border: "1px solid #ede9fe" }}>
                   <div style={{ fontSize: 9, color: "#a78bfa", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
                   <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.terms}</div>
+                </div>
+              )}
+              {(inv.upiId || inv.bankName) && (
+                <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                  <div style={{ fontSize: 9, color: "#7c3aed", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 PAYMENT INSTRUCTIONS</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
+                    {inv.upiId && (
+                      <div>
+                        <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>UPI ID</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#1e0a3c" }}>{inv.upiId}</div>
+                      </div>
+                    )}
+                    {inv.bankName && (
+                      <>
+                        <div>
+                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>BANK NAME</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#1e0a3c" }}>{inv.bankName}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NAME</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#1e0a3c" }}>{inv.accountName}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NUMBER</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#1e0a3c", fontFamily: "monospace" }}>{inv.accountNumber}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>IFSC CODE</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#1e0a3c", fontFamily: "monospace" }}>{inv.ifscCode}</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -1278,6 +1455,23 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={lbl}>UPI ID for Payment</label>
               <input value={inv.upiId} onChange={(e) => upd("upiId", e.target.value)} placeholder="e.g. business@okaxis" style={inp()} />
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "#7c3aed", marginTop: 10, gridColumn: "1 / -1", textTransform: "uppercase", letterSpacing: 1 }}>Bank Transfer Details (Optional)</div>
+            <div>
+              <label style={lbl}>Bank Name</label>
+              <input value={inv.bankName} onChange={(e) => upd("bankName", e.target.value)} placeholder="e.g. HDFC Bank" style={inp()} />
+            </div>
+            <div>
+              <label style={lbl}>Account Name</label>
+              <input value={inv.accountName} onChange={(e) => upd("accountName", e.target.value)} placeholder="Account Holder Name" style={inp()} />
+            </div>
+            <div>
+              <label style={lbl}>Account Number</label>
+              <input value={inv.accountNumber} onChange={(e) => upd("accountNumber", e.target.value)} placeholder="Bank Account Number" style={inp()} />
+            </div>
+            <div>
+              <label style={lbl}>IFSC Code</label>
+              <input value={inv.ifscCode} onChange={(e) => upd("ifscCode", e.target.value)} placeholder="Bank IFSC Code" style={inp()} />
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={lbl}>Footer Message</label>

@@ -195,7 +195,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SiQ9gcKvWsbGiX",
         amount: order.amount,
         currency: order.currency,
-        name: "Business Suite",
+        name: "M Business",
         description: `${plan.name} Plan Subscription`,
         image: "/logo.png",
         order_id: order.id,
@@ -394,7 +394,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
               <div style={{ background: "linear-gradient(135deg,#1e0a3c,#3b0764)", padding: "32px 24px", color: "#fff", position: "relative" }}>
                 <button onClick={() => setMockGatewayOpen(null)} style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1, opacity: 0.8 }}>BUSINESS SUITE</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1, opacity: 0.8 }}>M BUSINESS</div>
                   <div style={{ background: "rgba(255,255,255,0.15)", padding: "4px 10px", borderRadius: 12, fontSize: 11, fontWeight: 700, letterSpacing: 0.5 }}>TEST MODE</div>
                 </div>
                 <div style={{ fontSize: 14, opacity: 0.9, marginBottom: 4 }}>Amount to Pay</div>
@@ -462,7 +462,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 20 }}>
                   <span style={{ fontSize: 14 }}>🔒</span>
-                  <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>Secured by Business Suite Simulated Gateway</span>
+                  <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>Secured by M Business Simulated Gateway</span>
                 </div>
               </div>
             </div>
@@ -673,7 +673,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           {invoices.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
-              <p style={{ margin: 0 }}>No invoices yet. Invoices are provided by Business Suite upon payment.</p>
+              <p style={{ margin: 0 }}>No invoices yet. Invoices are provided by M Business upon payment.</p>
             </div>
           ) : (
             <div style={{ display: "grid", gap: 12 }}>
@@ -684,7 +684,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>Invoice #{inv.invoiceNo}</div>
                       <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>{inv.description} • {formatDate(inv.paymentDate)}</div>
-                      <div style={{ fontSize: 11, color: "#10b981", marginTop: 2, fontWeight: 600 }}>From: {inv.providerCompany || "Business Suite"}</div>
+                      <div style={{ fontSize: 11, color: "#10b981", marginTop: 2, fontWeight: 600 }}>From: {inv.providerCompany || "M Business"}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
@@ -704,7 +704,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           {quotations.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>📋</div>
-              <p style={{ margin: 0 }}>No quotations yet. Quotations are provided by Business Suite before payment.</p>
+              <p style={{ margin: 0 }}>No quotations yet. Quotations are provided by M Business before payment.</p>
             </div>
           ) : (
             <div style={{ display: "grid", gap: 12 }}>
@@ -715,7 +715,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>Quotation #{q.quotationNo}</div>
                       <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>{q.description} • {formatDate(q.paymentDate)}</div>
-                      <div style={{ fontSize: 11, color: "#d97706", marginTop: 2, fontWeight: 600 }}>From: {q.providerCompany || "Business Suite"}</div>
+                      <div style={{ fontSize: 11, color: "#d97706", marginTop: 2, fontWeight: 600 }}>From: {q.providerCompany || "M Business"}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>

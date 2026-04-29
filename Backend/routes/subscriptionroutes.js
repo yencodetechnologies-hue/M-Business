@@ -74,7 +74,7 @@ router.post("/start-trial", async (req, res) => {
       usageCount: 0,
       features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Basic Reports", "Email Support"],
       paymentMethod: "other",
-      providerCompany: "Business Suite",
+      providerCompany: "M Business",
       notes: "Free 30-day trial"
     });
 
@@ -368,8 +368,8 @@ router.post("/assign-to-subadmin", async (req, res) => {
     await User.findByIdAndUpdate(subadminId, { mySubscriptions: true }).catch(() => {});
 
     try {
-      await sendQuickEmail(subadminEmail, "Business Suite Package Assigned",
-        `Hi ${subadminName},<br><br>Your <strong>${packageTitle || "Custom"}</strong> package has been assigned by Business Suite. It is valid until <strong>${endDate.toLocaleDateString("en-IN")}</strong>.<br><br>Login to your dashboard to view your subscription details.<br><br>Business Suite Team`
+      await sendQuickEmail(subadminEmail, "M Business Package Assigned",
+        `Hi ${subadminName},<br><br>Your <strong>${packageTitle || "Custom"}</strong> package has been assigned by M Business. It is valid until <strong>${endDate.toLocaleDateString("en-IN")}</strong>.<br><br>Login to your dashboard to view your subscription details.<br><br>M Business Team`
       );
     } catch (e) { console.log("Assignment email failed:", e.message); }
 
@@ -423,8 +423,8 @@ router.post("/seed/:userId", async (req, res) => {
       type: "subscription", invoiceNo: `INV-SUB-${ts}-001`, quotationNo: `QUO-SUB-${ts}-001`,
       description: `${planName || "Professional"} Plan - Monthly Subscription`,
       status: "completed", paymentMethod: "card",
-      providerCompany: "Business Suite", providerGst: "GSTIN-33AABCM1234Z1Z1",
-      providerAddress: "Business Suite Support, India",
+      providerCompany: "M Business", providerGst: "GSTIN-33AABCM1234Z1Z1",
+      providerAddress: "M Business Support, India",
       paymentDate: new Date(), planName: planName || "Professional", planDuration: "monthly"
     });
     await p1.save();

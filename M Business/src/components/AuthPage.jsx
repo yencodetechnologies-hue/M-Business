@@ -267,7 +267,7 @@ const handleResetPassword = async () => {
         <div className="auth-right">
           <div className="auth-card">
             <div style={{ textAlign: "center", marginBottom: 30 }}>
-              <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: 0 }}>Workspace Suite</h1>
+              <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: 0 }}>M Business</h1>
               <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 5 }}>Manage your workspace efficiently</p>
             </div>
             {/* Tab */}

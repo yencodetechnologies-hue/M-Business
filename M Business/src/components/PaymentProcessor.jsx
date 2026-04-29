@@ -67,7 +67,7 @@ const PaymentProcessor = ({
 key: process.env.REACT_APP_RAZORPAY_KEY_ID, // Test key
       amount: order.amount,
       currency: order.currency,
-      name: 'Business Suite',
+      name: 'M Business',
       description: order.receipt,
       order_id: order.id,
       handler: async function (response) {

@@ -170,7 +170,7 @@ export default function AdminDashboard({ user, setUser }) {
     setUser(null);
   };
 
-  const displayName = user?.companyName || "Workspace Suite";
+  const displayName = user?.companyName || "M Business";
   const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
   return (
@@ -242,7 +242,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
           {active === "quotations" && <QuotationCreator clients={clients} projects={projects} />}
-          {active === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "Workspace Suite"} />}
+          {active === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {active === "invoices" && <InvoiceCreator clients={clients} projects={projects} />}
           {active === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {active === "tasks" && <TaskPage projects={projects} employees={employees} />}

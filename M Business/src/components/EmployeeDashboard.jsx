@@ -186,7 +186,7 @@ const inputStyle = {
 };
 
 function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems }) {
-  const companyName = user?.companyName || "Workspace Suite";
+  const companyName = user?.companyName || "M Business";
   const initials = (companyName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   return (
     <>
@@ -204,7 +204,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
               </div>
             )}
             <div>
-              <div style={{ fontWeight:800, fontSize:13, color:"#fff" }}>{user?.companyName || "Workspace Suite"}</div>
+              <div style={{ fontWeight:800, fontSize:13, color:"#fff" }}>{user?.companyName || "M Business"}</div>
               <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{user?.role || user?.userRole || "EMPLOYEE"}</div>
             </div>
           </div>

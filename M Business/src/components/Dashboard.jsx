@@ -1542,7 +1542,7 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
 // ═══════════════════════════════════════════════════════════
 // SIDEBAR
 // ═══════════════════════════════════════════════════════════
-function Sidebar({active,setActive,onLogout,open,onClose,navItems,initials,companyName}){
+function Sidebar({active,setActive,onLogout,open,onClose,navItems,initials,companyName,companyLogo}){
   const items=navItems||NAV;
   return(
     <>
@@ -1550,10 +1550,12 @@ function Sidebar({active,setActive,onLogout,open,onClose,navItems,initials,compa
       <div style={{width:225,background:"linear-gradient(180deg,#1e0a3c 0%,#2d1057 60%,#1e0a3c 100%)",color:"#fff",display:"flex",flexDirection:"column",height:"100vh",position:"fixed",top:0,left:0,zIndex:999,flexShrink:0,overflow:"hidden",boxShadow:"4px 0 24px rgba(0,0,0,0.25)",transform:open?"translateX(0)":"translateX(-100%)",transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)"}} className="sidebar">
         <div style={{padding:"18px 16px 14px",borderBottom:"1px solid rgba(255,255,255,0.08)",position:"relative",zIndex:1,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{width:36,height:36,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:11,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:17,color:"#fff",boxShadow:"0 4px 14px rgba(147,51,234,0.5)"}}>
-              {initials || "M"}
+            <div style={{width:44,height:44,background:"#fff",borderRadius:11,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:17,color:"#fff",boxShadow:"0 4px 14px rgba(147,51,234,0.3)",overflow:"hidden"}}>
+              {companyLogo ? (
+                <img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}} />
+              ) : (initials || "M")}
             </div>
-            <div><div style={{fontWeight:800,fontSize:14,color:"#fff"}}>{companyName || "Your Business"}</div><div style={{fontSize:8,color:"rgba(255,255,255,0.35)",letterSpacing:1.5,marginTop:1}}>MANAGEMENT SUITE</div></div>
+            <div><div style={{fontWeight:800,fontSize:14,color:"#fff",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName || "Your Business"}</div><div style={{fontSize:8,color:"rgba(255,255,255,0.35)",letterSpacing:1.5,marginTop:1}}>MANAGEMENT SUITE</div></div>
           </div>
           <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(255,255,255,0.4)",fontSize:18,cursor:"pointer",padding:"2px 6px",lineHeight:1}} className="sidebar-close">✕</button>
         </div>
@@ -1709,7 +1711,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
       `}</style>
 
-      <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr}/>
+      <Sidebar active={validActive} setActive={setActive} onLogout={handleLogout} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} navItems={navItems} initials={initials} companyName={companyNameStr} companyLogo={companyLogo}/>
 
       <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}>
         <div className="mob-topbar" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:"#fff",borderBottom:"1px solid #ede9fe",position:"sticky",top:0,zIndex:100,boxShadow:"0 2px 8px rgba(147,51,234,0.07)"}}>
@@ -1721,7 +1723,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
             <span style={{fontWeight:800,fontSize:14,color:T.text}}>{companyNameStr}</span>
           </div>
           <div onClick={()=>setShowProfile(true)} style={{width:34,height:34,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:13,cursor:"pointer",overflow:"hidden"}}>
-            {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:3,background:"#fff"}}/>:<span>{initials}</span>}
+            {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain"}}/>:<span>{initials}</span>}
           </div>
         </div>
 
@@ -1729,7 +1731,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
           <div className="page-header" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
             <div>
               <h1 style={{margin:0,fontSize:22,fontWeight:800,color:T.text}}>{page?.icon} {page?.label}</h1>
-              <p style={{margin:"3px 0 0",color:"#a78bfa",fontSize:12}}>{companyNameStr} Business Suite · {user?.role||"Admin"}</p>
+              <p style={{margin:"3px 0 0",color:"#a78bfa",fontSize:12}}>{companyNameStr} M Business · {user?.role||"Admin"}</p>
             </div>
             <div className="header-actions" style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
               {validActive==="clients"&&<button onClick={()=>{setNcError({});setShowClientPass(false);setModal("client");}} style={B("#9333ea")}>+ Add Client</button>}
@@ -1739,7 +1741,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
              
               <div onClick={()=>setShowProfile(true)} className="mob-topbar-hide" style={{background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,padding:"6px 12px",display:"flex",alignItems:"center",gap:8,cursor:"pointer",boxShadow:"0 2px 10px rgba(147,51,234,0.08)",flexShrink:0}}>
                 <div style={{width:30,height:30,background:"linear-gradient(135deg,#9333ea,#c084fc)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:12,overflow:"hidden",flexShrink:0}}>
-                  {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain",padding:3,background:"#fff"}} onError={()=>setCompanyLogo(null)}/>:<span>{initials}</span>}
+                  {companyLogo?<img src={companyLogo} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain"}} onError={()=>setCompanyLogo(null)}/>:<span>{initials}</span>}
                 </div>
                 <span style={{fontSize:13,fontWeight:600,color:T.text,maxWidth:100,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{displayName}</span>
                 <span style={{fontSize:10,color:"#a78bfa"}}>▾</span>
@@ -1801,7 +1803,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
 
           {validActive==="invoices"&&<InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive==="quotations"&&<QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
-          {validActive==="proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "Workspace Suite"} />}
+          {validActive==="proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config}/>}
           {validActive==="tasks"&&<TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} />}
           {validActive==="calendar"&&<CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={user?.companyId || user?._id || ""} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}

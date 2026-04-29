@@ -15,8 +15,8 @@ const paymentHistorySchema = new mongoose.Schema({
   type: { type: String, enum: ["subscription", "invoice", "quotation", "other"], default: "subscription" },
   
   // Reference Documents
-  invoiceNo: { type: String }, // Business Suite Invoice Number
-  quotationNo: { type: String }, // Business Suite Quotation Number
+  invoiceNo: { type: String }, // M Business Invoice Number
+  quotationNo: { type: String }, // M Business Quotation Number
   description: { type: String }, // Description of payment
   
   // Payment Status
@@ -31,10 +31,10 @@ const paymentHistorySchema = new mongoose.Schema({
     walletName: { type: String }
   },
   
-  // Provider Info (Business Suite)
-  providerCompany: { type: String, default: "Business Suite" },
+  // Provider Info (M Business)
+  providerCompany: { type: String, default: "M Business" },
   providerGst: { type: String, default: "GSTIN-XXXXXXXXXX" },
-  providerAddress: { type: String, default: "Business Suite Support, India" },
+  providerAddress: { type: String, default: "M Business Support, India" },
   
   // Transaction Dates
   paymentDate: { type: Date, default: Date.now },

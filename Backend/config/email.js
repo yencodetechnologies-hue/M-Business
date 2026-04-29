@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 
 const mbHeader = `
   <div style="background:linear-gradient(135deg,#9333ea 0%,#7c3aed 100%);padding:28px 32px;border-radius:12px 12px 0 0;text-align:center;">
-    <h2 style="color:#fff;margin:0;font-size:22px;font-family:Arial,sans-serif;letter-spacing:1px;">Management Platform</h2>
+    <h2 style="color:#fff;margin:0;font-size:22px;font-family:Arial,sans-serif;letter-spacing:1px;">M Business</h2>
     <p style="color:#e9d5ff;margin:4px 0 0;font-size:12px;">Automated Business Workflow</p>
   </div>
 `;
@@ -27,7 +27,7 @@ const mbFooter = `
 const sendEmail = async (to, subject, html) => {
   try {
     const info = await transporter.sendMail({
-      from: `"Business Notification" <${process.env.SMTP_USER || 'noreply@platform.com'}>`,
+      from: `"M Business" <${process.env.SMTP_USER || 'noreply@platform.com'}>`,
       to,
       subject,
       html
@@ -124,7 +124,7 @@ const sendSubscriptionSuccess = async (userEmail, userName, planName, startDate,
       <div style="background:#fff;padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
         <h3 style="color:#16a34a;margin-top:0;">🎉 Subscription Activated!</h3>
         <p style="color:#4b5563;">Hello <strong>${userName}</strong>,</p>
-        <p style="color:#4b5563;">Your <strong>${planName}</strong> plan has been successfully activated. ${isTrial ? "Enjoy your 30-day free trial!" : "Thank you for choosing Business Suite."}</p>
+        <p style="color:#4b5563;">Your <strong>${planName}</strong> plan has been successfully activated. ${isTrial ? "Enjoy your 30-day free trial!" : "Thank you for choosing M Business."}</p>
         <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:20px;margin:24px 0;">
           <table style="width:100%;font-size:14px;color:#166534;">
             <tr><td style="padding:5px 0;font-weight:600;">Plan Name</td><td>${planName}</td></tr>

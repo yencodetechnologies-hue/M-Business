@@ -9,7 +9,7 @@ const FULL_MONTHS = ["January","February","March","April","May","June","July","A
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const TYPES  = ["Meeting","Call","Review","Planning","Handover","Other"];
 const TC = { Meeting:"#9333ea", Call:"#7c3aed", Review:"#22C55E", Planning:"#f59e0b", Handover:"#a855f7", Other:"#6b7280" };
-const EMPTY = { name:"", project:"", client:"", date:"", start:"", end:"", notes:"", type:"Meeting" };
+const EMPTY = { name:"", project:"", client:"", date:"", start:"", end:"", notes:"", type:"Meeting", category: "Event" };
 
 export default function CalendarPage({ projects=[], tasks=[], clients=[], companyId, onUpdateProject, onUpdateTask, config }) {
   const [events,  setEvents]  = useState([]);
@@ -103,9 +103,21 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
     setSaving(true);
     try {
       if (modal === "add") {
-        const r = await axios.post(API, { ...form, companyId: companyId || "" });
-        setEvents(p => [r.data, ...p]);
-        showToast("✅ Event added!");
+        if (form.category === "Project") {
+          const payload = { name: form.name, client: form.client, start: form.date, end: form.date, deadline: form.date, status: "Pending", budget: "0", currency: "₹" };
+          await axios.post(`${BASE_URL}/api/projects/add`, payload);
+          if (onUpdateProject) onUpdateProject();
+          showToast("✅ Project added!");
+        } else if (form.category === "Task") {
+          const payload = { title: form.name, project: form.project, date: form.date, status: "Pending", priority: "Medium" };
+          await axios.post(`${BASE_URL}/api/tasks`, payload);
+          if (onUpdateTask) onUpdateTask();
+          showToast("✅ Task added!");
+        } else {
+          const r = await axios.post(API, { ...form, companyId: companyId || "" });
+          setEvents(p => [r.data, ...p]);
+          showToast("✅ Event added!");
+        }
       } else {
         const r = await axios.put(`${API}/${editId}`, form);
         setEvents(p => p.map(x => (x._id||x.id)===editId ? r.data : x));
@@ -459,9 +471,10 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
             ) : (
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {shown.map((ev, idx) => {
-                  const d   = ev.date ? new Date(ev.date+"T00:00:00") : null;
+                  const isValidDate = ev.date && !isNaN(new Date(ev.date + "T00:00:00").getTime());
+                  const d = isValidDate ? new Date(ev.date + "T00:00:00") : null;
                   const day = d ? d.getDate() : "--";
-                  const mon = d ? MONTHS[d.getMonth()] : "---";
+                  const mon = d ? (MONTHS[d.getMonth()] || "---") : "---";
                   const c   = TC[ev.type||"Meeting"] || "#9333ea";
                   const past = ev.date && ev.date < today;
 
@@ -635,7 +648,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
               display:"flex", justifyContent:"space-between", alignItems:"center",
               background:"linear-gradient(90deg,#f5f3ff,#faf5ff)", flexShrink:0 }}>
               <h2 style={{ margin:0, fontSize:17, fontWeight:800, color:T.text }}>
-                {modal==="add" ? "📅 Add New Event" : "✏️ Edit Event"}
+                {modal==="add" ? "📅 Add New" : "✏️ Edit Event"}
               </h2>
               <button onClick={()=>{ setModal(null); setForm(EMPTY); setErr({}); }} style={{
                 background:"none", border:"none", fontSize:20,
@@ -644,15 +657,41 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
 
             {/* Modal body */}
             <div style={{ overflowY:"auto", padding:"20px 22px", flex:1 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0 18px" }}>
+              {modal === "add" && (
+                <div style={{ display: "flex", gap: 10, marginBottom: 20, background: "#f5f3ff", padding: 12, borderRadius: 12 }}>
+                  {["Event", "Project", "Task"].map(cat => (
+                    <button 
+                      key={cat} 
+                      onClick={() => setForm({ ...form, category: cat })}
+                      style={{ 
+                        flex: 1, 
+                        padding: "8px", 
+                        borderRadius: 8, 
+                        border: "1.5px solid", 
+                        borderColor: form.category === cat ? "#9333ea" : "#ede9fe",
+                        background: form.category === cat ? "#9333ea" : "#fff",
+                        color: form.category === cat ? "#fff" : "#7c3aed",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: "pointer"
+                      }}
+                    >
+                      {cat === "Event" ? "📅 Event" : cat === "Project" ? "🏗️ Project" : "📝 Task"}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-                {/* Event Name */}
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0 18px" }}>
+                {/* Name */}
                 <div style={{ marginBottom:14 }}>
                   <label style={{ display:"block", fontSize:11, color:"#7c3aed",
-                    fontWeight:700, letterSpacing:0.5, marginBottom:5 }}>EVENT NAME *</label>
+                    fontWeight:700, letterSpacing:0.5, marginBottom:5 }}>
+                    {(form.category || "Event").toUpperCase()} NAME *
+                  </label>
                   <input value={form.name}
                     onChange={e=>{setForm({...form,name:e.target.value});setErr(p=>({...p,name:""}));}}
-                    placeholder="e.g. Client Review Meeting"
+                    placeholder={`e.g. ${form.category === "Project" ? "New Website Development" : form.category === "Task" ? "Design Homepage" : "Client Review Meeting"}`}
                     style={inp(err.name)} />
                   {err.name && <div style={{ fontSize:11, color:"#ef4444", marginTop:4 }}>⚠️ {err.name}</div>}
                 </div>

@@ -43,11 +43,29 @@ router.patch('/:id/read', async (req, res) => {
 router.get('/users', async (req, res) => {
     try {
         const { companyId } = req.query;
-        // In a real app, you'd fetch from SubAdmin, Employee, Manager, Client models
-        // For simplicity, let's assume they are all in User model or linked.
-        // Let's try to get them from User model.
-        const users = await User.find({ companyId }).select('name email role');
-        res.json(users);
+        if (!companyId) return res.status(400).json({ msg: "Company ID required" });
+
+        const Client = require('../models/ClientModel');
+        const Manager = require('../models/ManagerModel');
+        const Employee = require('../models/EmployeeModel');
+
+        // Fetch from all collections
+        const [users, clients, managers, employees] = await Promise.all([
+            User.find({ companyId }).select('name email role'),
+            Client.find({ companyId }).select('clientName email role'),
+            Manager.find({ companyId }).select('managerName email role'),
+            Employee.find({ companyId }).select('name email role department')
+        ]);
+
+        // Normalize and combine
+        const allUsers = [
+            ...users.map(u => ({ _id: u._id, name: u.name, email: u.email, role: u.role })),
+            ...clients.map(c => ({ _id: c._id, name: c.clientName, email: c.email, role: "client" })),
+            ...managers.map(m => ({ _id: m._id, name: m.managerName, email: m.email, role: "manager" })),
+            ...employees.map(e => ({ _id: e._id, name: e.name, email: e.email, role: "employee", department: e.department }))
+        ];
+
+        res.json(allUsers);
     } catch (err) {
         res.status(500).json({ msg: err.message });
     }

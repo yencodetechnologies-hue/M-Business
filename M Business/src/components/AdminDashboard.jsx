@@ -246,7 +246,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "invoices" && <InvoiceCreator clients={clients} projects={projects} />}
           {active === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} />}
           {active === "tasks" && <TaskPage projects={projects} employees={employees} />}
-          {active === "calendar" && <CalendarPage projects={projects} clients={clients} />}
+          {active === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} />}
           {active === "accounts" && <AccountsPage ExpensesPage={ExpensesPage} />}
           {active === "interviews" && <InterviewPage />}
           {active === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}

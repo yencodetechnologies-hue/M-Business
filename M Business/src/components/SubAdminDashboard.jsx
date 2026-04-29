@@ -1267,7 +1267,34 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                     <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{p.name}</td>
                     <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{p.client || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{formatCurrency(p.budget, p.currency)}</td>
-                    <td style={{ padding: "12px 14px" }}><Badge label={p.status || "Pending"} /></td>
+                    <td style={{ padding: "12px 14px" }}>
+                      <select 
+                        value={p.status || "Pending"} 
+                        onChange={async (e) => {
+                          const newStatus = e.target.value;
+                          try {
+                            await axios.put(`${BASE_URL}/api/projects/${p._id}`, { status: newStatus });
+                            setProjects(prev => prev.map(proj => proj._id === p._id ? { ...proj, status: newStatus } : proj));
+                            showToast("✅ Status updated!");
+                          } catch {
+                            showToast("❌ Update failed");
+                          }
+                        }}
+                        style={{ 
+                          background: `${sc(p.status)}18`, 
+                          color: sc(p.status), 
+                          border: `1px solid ${sc(p.status)}33`, 
+                          padding: "3px 8px", 
+                          borderRadius: 20, 
+                          fontSize: 11, 
+                          fontWeight: 700,
+                          outline: "none",
+                          cursor: "pointer"
+                        }}
+                      >
+                        {(config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]).map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </td>
                     <td style={{ padding: "12px 14px" }}>
                       {(() => {
                         const assignedEmployees = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
@@ -1568,7 +1595,34 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                   <td style={{ padding: "11px 12px", color: "#7c3aed", fontSize: 12 }}>{p.manager || "—"}</td>
                   <td style={{ padding: "11px 12px", color: "#7c3aed", fontSize: 12 }}>{p.employee || "—"}</td>
                   <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 12, color: "#a78bfa", whiteSpace: "nowrap" }}>{p.deadline || "—"}</td>
-                  <td style={{ padding: "11px 12px" }}><Badge label={p.status} /></td>
+                  <td style={{ padding: "11px 12px" }}>
+                    <select 
+                      value={p.status || "Pending"} 
+                      onChange={async (e) => {
+                        const newStatus = e.target.value;
+                        try {
+                          await axios.put(`${BASE_URL}/api/project-status/${p._id || p.id}`, { status: newStatus });
+                          setTrackList(prev => prev.map(track => (track._id || track.id) === (p._id || p.id) ? { ...track, status: newStatus } : track));
+                          showToast("✅ Status updated!");
+                        } catch {
+                          showToast("❌ Update failed");
+                        }
+                      }}
+                      style={{ 
+                        background: `${sc(p.status)}18`, 
+                        color: sc(p.status), 
+                        border: `1px solid ${sc(p.status)}33`, 
+                        padding: "3px 8px", 
+                        borderRadius: 20, 
+                        fontSize: 11, 
+                        fontWeight: 700,
+                        outline: "none",
+                        cursor: "pointer"
+                      }}
+                    >
+                      {(config?.projectStatuses || ["In Progress", "Pending", "Completed", "On Hold"]).map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </td>
                   <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "#ede9fe", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,#9333ea,#c084fc)", borderRadius: 6, height: "100%" }} /></div><span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span></div></td>
                   <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "#a78bfa", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `📝 ${p.notes || p.note}` : "—"}</span></td>
                   <td style={{ padding: "11px 12px" }}><ActionBtns onEdit={() => openEdit(p)} onDelete={() => deleteTs(p._id || p.id)} /></td>
@@ -3379,7 +3433,7 @@ const handleEditPackage = (pkg) => {
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} />}
-          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
+          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
           {validActive === "settings" && <SettingsPage user={user} />}
           {validActive === "accounts" && <AccountsPage ExpensesPage={ExpensesPage} />}

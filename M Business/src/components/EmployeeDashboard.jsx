@@ -1407,7 +1407,7 @@ const fetchSubscription = async () => {
           {page==="tasks"      && <TasksPage      tasks={tasks}/>}
           {page==="attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify}/>}
           {page==="salary"     && <SalaryPage     salary={salary} user={resolvedUser}/>}
-          {page==="calendar"   && <CalendarPage projects={projects} tasks={tasks} user={resolvedUser} onUpdateProject={() => {}} onUpdateTask={() => {}} />}
+          {page==="calendar"   && <CalendarPage projects={projects} tasks={tasks} user={resolvedUser} onUpdateProject={loadData} onUpdateTask={loadData} />}
           {page==="messaging"  && <MessagingPage user={resolvedUser} />}
         </div>
       </div>

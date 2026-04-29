@@ -11,7 +11,6 @@ const ProjectStatusSchema = new mongoose.Schema({
   deadline:  { type: String, required: true },
   status:    {
     type: String,
-    enum: ["In Progress","Pending","Completed","On Hold"],
     default: "Pending",
   },
   progress:  { type: Number, min: 0, max: 100, default: 0 },
@@ -80,19 +79,18 @@ router.put("/:id", async (req, res) => {
   try {
     console.log("📥 PUT body:", req.body); // ← debug
 
-    const { name,client,manager,employee,deadline,status,progress,notes } = req.body;
-    if (!name?.trim())   return res.status(400).json({ msg: "name is required" });
-    if (!client?.trim()) return res.status(400).json({ msg: "client is required" });
+    // Allow partial updates for PUT
+    const updateData = {};
+    const fields = ["name", "client", "manager", "employee", "deadline", "status", "progress", "notes"];
+    fields.forEach(f => {
+      if (req.body[f] !== undefined) {
+        updateData[f] = (typeof req.body[f] === 'string') ? req.body[f].trim() : req.body[f];
+      }
+    });
 
     const doc = await ProjectStatus.findByIdAndUpdate(
       req.params.id,
-      {
-        name: name.trim(), client: client.trim(),
-        manager: manager || "", employee: employee || "",
-        deadline, status,
-        progress: Math.min(100, Math.max(0, Number(progress) || 0)),
-        notes: notes || ""
-      },
+      { $set: updateData },
       { new: true, runValidators: true }
     );
 

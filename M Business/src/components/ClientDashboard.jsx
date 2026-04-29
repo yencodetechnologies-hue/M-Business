@@ -1239,7 +1239,7 @@ export default function ClientDashboard({ user, setUser }) {
             </div>
           )}
 
-          {active==="calendar" && <CalendarPage/>}
+          {active==="calendar" && <CalendarPage projects={projects} tasks={tasks} />}
 
           {active==="notifications" && (
             <NotificationsPage notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo}/>

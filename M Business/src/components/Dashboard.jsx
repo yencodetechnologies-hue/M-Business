@@ -1804,7 +1804,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
           {validActive==="proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "Workspace Suite"} />}
           {validActive==="tracking"&&<ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config}/>}
           {validActive==="tasks"&&<TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} />}
-          {validActive==="calendar"&&<CalendarPage projects={projects} tasks={tasks} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
+          {validActive==="calendar"&&<CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={user?.companyId || user?._id || ""} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
           {validActive==="messaging"&&<MessagingPage user={user} />}
           {validActive==="settings"&&<SettingsPage user={user} />}
           {validActive==="accounts"&&<AccountsPage />}

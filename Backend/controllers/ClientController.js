@@ -18,7 +18,10 @@ exports.addClient = async (req, res) => {
       logoUrl,
     } = req.body;
 
+    console.log("Adding client:", { clientName, email, companyId: req.companyId });
+
     if (!clientName || !email) {
+      console.log("Validation failed: Missing clientName or email");
       return res.status(400).json({ message: "Name and Email are required" });
     }
 

@@ -584,6 +584,7 @@ function ViewSwitcherDropdown({ anchor, currentView, onSelect, onClose }) {
   );
 }
 
+
 function ProjectPicker({ anchor, projects, currentProjectId, onSelect, onClose }) {
   const [search, setSearch] = useState("");
   const inputRef = useRef();
@@ -662,6 +663,98 @@ function ProjectPicker({ anchor, projects, currentProjectId, onSelect, onClose }
     </DD>
   );
 }
+
+function StatusPicker({ anchor, onSelect, onClose }) {
+  const ref = useRef();
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  
+  useEffect(() => {
+    if (anchor?.current) {
+      const r = anchor.current.getBoundingClientRect();
+      let left = r.left;
+      if (left + 180 > window.innerWidth - 8) left = window.innerWidth - 188;
+      setPos({ top: r.bottom + 4, left });
+    }
+  }, [anchor]);
+
+  useEffect(() => {
+    const h = e => {
+      if (ref.current && !ref.current.contains(e.target) && !anchor?.current?.contains(e.target)) onClose();
+    };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [anchor, onClose]);
+
+  return (
+    <div ref={ref} style={{
+      position: "fixed", top: pos.top, left: pos.left, zIndex: 7000,
+      background: "#fff", border: `1.5px solid ${P.border}`, borderRadius: 12,
+      boxShadow: "0 8px 32px rgba(0,0,0,0.15)", padding: 6, minWidth: 180,
+      animation: "ddIn .1s ease"
+    }}>
+      {STATUS_LIST.map(s => {
+        const cfg = STATUS_CFG[s] || { bg: "#e2e8f0", fg: "#94a3b8" };
+        return (
+          <div key={s} onClick={() => onSelect(s)} style={{
+            background: cfg.bg, color: cfg.fg, padding: "8px 12px",
+            borderRadius: 8, fontSize: 12, fontWeight: 800, textAlign: "center",
+            cursor: "pointer", marginBottom: 4
+          }} onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.1)"}
+             onMouseLeave={e => e.currentTarget.style.filter = "none"}>
+            {s}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PriorityPicker({ anchor, currentValue, onSelect, onClose }) {
+  const ref = useRef();
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    if (anchor?.current) {
+      const r = anchor.current.getBoundingClientRect();
+      let left = r.left;
+      if (left + 160 > window.innerWidth - 8) left = window.innerWidth - 168;
+      setPos({ top: r.bottom + 4, left });
+    }
+  }, [anchor]);
+
+  useEffect(() => {
+    const h = e => {
+      if (ref.current && !ref.current.contains(e.target) && !anchor?.current?.contains(e.target)) onClose();
+    };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [anchor, onClose]);
+
+  return (
+    <div ref={ref} style={{
+      position: "fixed", top: pos.top, left: pos.left, zIndex: 7000,
+      background: "#fff", border: `1.5px solid ${P.border}`, borderRadius: 12,
+      boxShadow: "0 8px 32px rgba(0,0,0,0.15)", padding: 6, minWidth: 160,
+      animation: "ddIn .1s ease"
+    }}>
+      {PRIORITY_LIST.map(p => {
+        const cfg = PRIORITY_CFG[p] || { bg: "#e2e8f0", fg: "#94a3b8" };
+        return (
+          <div key={p} onClick={() => onSelect(p)} style={{
+            background: cfg.bg, color: cfg.fg, padding: "8px 12px",
+            borderRadius: 8, fontSize: 12, fontWeight: 800, textAlign: "center",
+            cursor: "pointer", marginBottom: 4, border: currentValue === p ? "2px solid #fff" : "none",
+            boxShadow: currentValue === p ? "0 0 0 2px " + cfg.bg : "none"
+          }} onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.1)"}
+             onMouseLeave={e => e.currentTarget.style.filter = "none"}>
+            {p}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 
 
 /* ══════════════════════════════════════════════════════════
@@ -1450,7 +1543,7 @@ function ProjectCell({ task, projects, onField }) {
 /* ══════════════════════════════════════════════════════════
    TASK ROW
 ══════════════════════════════════════════════════════════ */
-function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, onOpen, selected, groupColor, employees, extraCols, onExtraField, hiddenCols, onInvite, onAutoAssign, projects }) {
+function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, onOpen, selected, groupColor, employees, extraCols, onExtraField, hiddenCols, onInvite, onAutoAssign, projects, shareTask }) {
   const statusRef = useRef(); const dotsRef = useRef(); const personRef = useRef(); const priorityRef = useRef();
   const [spOpen, setSpOpen] = useState(false); const [ppOpen, setPpOpen] = useState(false);
   const [dotsOpen, setDotsOpen] = useState(false); const [personOpen, setPersonOpen] = useState(false);
@@ -1830,7 +1923,7 @@ function AddGroupRow({ onAdd, triggerRef }) {
 /* ══════════════════════════════════════════════════════════
    GROUP BLOCK
 ══════════════════════════════════════════════════════════ */
-function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, onAddTask, onDup, onDel, onOpen, selectedId, isVirtual, onDelGroup, employees, showToast, extraCols, onExtraField, onAddCol, onRenameCol, onDeleteCol, hiddenCols, onMoveCol, onInvite, onAutoAssign, projects }) {
+function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, onAddTask, onDup, onDel, onOpen, selectedId, isVirtual, onDelGroup, employees, showToast, extraCols, onExtraField, onAddCol, onRenameCol, onDeleteCol, hiddenCols, onMoveCol, onInvite, onAutoAssign, projects, shareTask }) {
   const [adding, setAdding] = useState(false); const [newTitle, setNewTitle] = useState("");
   const gid = group._id || group.id; const tasks = group.tasks || [];
   const done = tasks.filter(t => t.status === "Done").length;
@@ -1884,7 +1977,8 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                   selected={selectedId === (t._id || t.id)}
                   groupColor={group.color} employees={employees}
                   extraCols={visibleExtraCols} onExtraField={onExtraField} hiddenCols={hiddenCols}
-                  onInvite={onInvite} onAutoAssign={onAutoAssign} projects={projects} />
+                  onInvite={onInvite} onAutoAssign={onAutoAssign} projects={projects}
+                  shareTask={shareTask} />
               ))}
 
               {!isVirtual && (adding ? (
@@ -2357,7 +2451,8 @@ export default function TaskPage({ projects = [], employees = [], config, user }
                     onExtraField={updateExtraField} onAddCol={() => setShowAddCol(true)}
                     onRenameCol={renameExtraCol} onDeleteCol={deleteExtraCol}
                     hiddenCols={hiddenCols} onMoveCol={moveExtraCol}
-                    onInvite={setInviteTask} onAutoAssign={handleAutoAssign} projects={projects} />
+                    onInvite={setInviteTask} onAutoAssign={handleAutoAssign} projects={projects}
+                    shareTask={shareTask} />
                 ))}
                 {groupBy === "default" && <AddGroupRow onAdd={addGroup} triggerRef={addGroupTrigger} />}
               </div>
@@ -2390,6 +2485,22 @@ export default function TaskPage({ projects = [], employees = [], config, user }
       {showAutomate && <AutomateModal onClose={() => setShowAutomate(false)} />}
       {inviteTask && <InviteModal task={inviteTask} onClose={() => setInviteTask(null)} onSend={handleInvite} />}
       {toast && <Toast msg={toast.msg} type={toast.type} />}
+      <style>{`
+        @keyframes ddIn {
+          from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        .trow:hover .openBtn { opacity: 1 !important; }
+        .col-hdr-wrap:hover .col-menu-btn { opacity: 1 !important; }
+      `}</style>
     </div>
   );
 }
+

@@ -161,6 +161,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [paymentModalEntry, setPaymentModalEntry] = useState(null);
   const [paymentModalStatus, setPaymentModalStatus] = useState("paid");
   const [paymentData, setPaymentData] = useState({ amountPaid: 0, paymentMode: "GPay", paymentDate: new Date().toISOString().split("T")[0], transactionId: "" });
+  const [sendReceipt, setSendReceipt] = useState(false);
   const [listSearch, setListSearch] = useState("");
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
@@ -451,10 +452,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               </div>
               
               <div style={{ marginBottom: 16 }}>
-                <label style={lbl}>Amount Paid (Advance / Part) <span style={{color:"#ef4444"}}>*</span></label>
+                <label style={lbl}>Amount Paid {paymentModalStatus === "part_paid" ? "(Advance / Part)" : ""} <span style={{color:"#ef4444"}}>*</span></label>
                 <div style={{position:"relative"}}>
                   <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"#6b7280",fontSize:14,fontWeight:600}}>{inv.currency}</span>
-                  <input type="number" value={paymentData.amountPaid} onChange={e => setPaymentData(p => ({ ...p, amountPaid: e.target.value }))} style={{...inp(), paddingLeft:30}} />
+                  <input type="number" 
+                    value={paymentData.amountPaid === 0 ? "" : paymentData.amountPaid} 
+                    onChange={e => setPaymentData(p => ({ ...p, amountPaid: e.target.value === "" ? 0 : Number(e.target.value) }))} 
+                    placeholder="0"
+                    style={{...inp(), paddingLeft:30}} />
                 </div>
               </div>
               
@@ -477,9 +482,19 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <input type="date" value={paymentData.paymentDate} onChange={e => setPaymentData(p => ({ ...p, paymentDate: e.target.value }))} style={inp()} />
               </div>
 
-              <div style={{ marginBottom: 24 }}>
+              <div style={{ marginBottom: 16 }}>
                 <label style={lbl}>Transaction ID (Optional)</label>
                 <input type="text" value={paymentData.transactionId} onChange={e => setPaymentData(p => ({ ...p, transactionId: e.target.value }))} style={inp()} placeholder="e.g. UTR123456789" />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, padding: "0 4px" }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>Send a receipt</span>
+                <label style={{ position: "relative", display: "inline-block", width: 42, height: 22 }}>
+                  <input type="checkbox" checked={sendReceipt} onChange={e => setSendReceipt(e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
+                  <span style={{ position: "absolute", cursor: "pointer", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: sendReceipt ? "#16a34a" : "#ccc", transition: ".4s", borderRadius: 34 }}>
+                    <span style={{ position: "absolute", height: 16, width: 16, left: sendReceipt ? 20 : 4, bottom: 3, backgroundColor: "white", transition: ".4s", borderRadius: "50%" }}></span>
+                  </span>
+                </label>
               </div>
 
               <div style={{ display: "flex", gap: 10 }}>
@@ -629,7 +644,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
                 {/* Action buttons */}
                 <div onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 4, flexWrap: "nowrap" }}>
-                  <button onClick={() => setViewEntry(entry)} style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#374151", cursor: "pointer", fontWeight: 700 }}>👁 View</button>
+                  <button onClick={() => { loadEntry(entry); setStep("preview"); }} style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#374151", cursor: "pointer", fontWeight: 700 }}>👁 View</button>
 
                 </div>
               </div>
@@ -689,16 +704,54 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                         ))}
                       </div>
 
-                      {/* Status */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
-                        <span style={{ fontSize: 11, color: "#7c3aed", fontWeight: 700 }}>STATUS:</span>
-                        <span style={{ background: `${sc2}15`, color: sc2, border: `1px solid ${sc2}30`, borderRadius: 20, padding: "4px 14px", fontSize: 12, fontWeight: 700 }}>
-                          {viewEntry.status || "draft"}
-                        </span>
-                        <span style={{ fontSize: 12, color: "#9ca3af", marginLeft: "auto" }}>
-                          Order: {vInv.orderNo || "—"}
-                        </span>
-                      </div>
+                      {/* Status Tracker */}
+                      {(() => {
+                        const vClient = clients.find(c => (c.clientName || c.name) === (viewEntry.client || vInv.client)) || {};
+                        const currentStatus = (viewEntry.status || "draft").toLowerCase();
+                        const isSent = currentStatus !== "draft";
+                        const isRead = ["sent", "paid", "part_paid"].includes(currentStatus); // In a real app, this would be a separate flag
+                        const isPaid = ["paid", "part_paid"].includes(currentStatus);
+
+                        return (
+                          <div style={{ background: "#f8fafc", borderRadius: 16, padding: "18px 24px", border: "1px solid #e2e8f0", marginBottom: 18 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+                              <div>
+                                <div style={{ fontSize: 18, fontWeight: 800, color: "#1e0a3c", textTransform: "capitalize" }}>{viewEntry.status || "Draft"}</div>
+                                <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>{vClient.email || "No email provided"}</div>
+                              </div>
+                              <div style={{ textAlign: "right" }}>
+                                <div style={{ fontSize: 18, fontWeight: 900, color: "#1e0a3c" }}>{formatCurrency(vTot, vInv.currency || inv.currency)}</div>
+                                <div style={{ fontSize: 11, color: "#ef4444", fontWeight: 700, marginTop: 2 }}>Due on {formatDate(vInv.dueDate)}</div>
+                              </div>
+                            </div>
+
+                            <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 10px" }}>
+                              <div style={{ position: "absolute", left: 20, right: 20, height: 2, background: "#e2e8f0", top: "50%", transform: "translateY(-50%)", zIndex: 0 }} />
+                              <div style={{ position: "absolute", left: 20, width: isPaid ? "calc(100% - 40px)" : isRead ? "50%" : isSent ? "0%" : "0%", height: 2, background: "#22c55e", top: "50%", transform: "translateY(-50%)", zIndex: 1, transition: "0.5s ease" }} />
+                              
+                              {[
+                                { id: "sent", label: "Sent", date: formatDate(viewEntry.savedAt || viewEntry.createdAt), active: isSent },
+                                { id: "read", label: "Read", date: isRead ? "Just now" : "", active: isRead },
+                                { id: "paid", label: "Paid", date: isPaid ? formatDate(viewEntry.updatedAt || new Date()) : "", active: isPaid }
+                              ].map((step, idx) => (
+                                <div key={step.label} style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                                  <div style={{ width: 24, height: 24, borderRadius: "50%", background: step.active ? "#22c55e" : "#fff", border: `2px solid ${step.active ? "#22c55e" : "#cbd5e1"}`, display: "flex", alignItems: "center", justifyContent: "center", transition: "0.3s" }}>
+                                    {step.active && <span style={{ color: "#fff", fontSize: 12 }}>✓</span>}
+                                  </div>
+                                  <div style={{ textAlign: "center" }}>
+                                    <div style={{ fontSize: 12, fontWeight: 700, color: step.active ? "#1e0a3c" : "#94a3b8" }}>{step.label}</div>
+                                    <div style={{ fontSize: 10, color: "#94a3b8" }}>{step.date}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            <button style={{ width: "100%", marginTop: 22, padding: "12px", background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#1e0a3c", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                              <span style={{ fontSize: 16 }}>🔔</span> Set overdue email
+                            </button>
+                          </div>
+                        );
+                      })()}
 
                       {/* Items table */}
                       <div style={{ border: "1px solid #ede9fe", borderRadius: 12, overflow: "hidden", marginBottom: 18 }}>
@@ -816,10 +869,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         {/* Toolbar */}
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => setStep("form")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Edit</button>
-          <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>📋 List</button>
+          <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>📋 Back to List</button>
+          <button onClick={() => setStep("form")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>✏️ Edit</button>
           <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗 Share</button>
-          <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WhatsApp</button>
+          <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WA</button>
+          <button onClick={() => { setDeleteTarget({ id: editingId, invoiceNo: inv.invoiceNo }); }} style={{ padding: "10px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ef4444", fontFamily: "inherit" }}>🗑️ Delete</button>
           <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
@@ -942,6 +996,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="#1e0a3c" />
               </div>
               <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
+              
+              {window.location.hostname === "localhost" && (
+                <div className="no-print" style={{ marginTop: 12, padding: 8, background: "#fff7ed", border: "1px solid #ffedd5", borderRadius: 8, fontSize: 9, color: "#9a3412", textAlign: "center", maxWidth: 120, lineHeight: 1.3 }}>
+                  💡 To scan on phone, use your <b>Network IP</b> (e.g. 192.168...) in the browser instead of localhost.
+                </div>
+              )}
             </div>
           </div>
 
@@ -1074,7 +1134,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div className="f3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
             <div>
               <label style={lbl}>Amount Paid (Advance)</label>
-              <input type="number" value={inv.amountPaid} onChange={(e) => upd("amountPaid", e.target.value)} placeholder="e.g. 10000" style={inp()} />
+              <input type="number" 
+                value={inv.amountPaid === 0 ? "" : inv.amountPaid} 
+                onChange={(e) => upd("amountPaid", e.target.value === "" ? 0 : Number(e.target.value))} 
+                placeholder="0" 
+                style={inp()} />
             </div>
             <div>
               <label style={lbl}>Payment Date</label>
@@ -1149,10 +1213,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     placeholder={`Item ${idx + 1} description`} style={{ ...inp(dErr), fontSize: 13 }} />
                   {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                 </div>
-                <input type="number" min="1" value={item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value)}
-                  style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
+                <input type="number" 
+                  value={item.quantity === 0 ? "" : item.quantity} 
+                  onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} 
+                  placeholder="0" style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
                 <div>
-                  <input type="number" min="0" value={item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value)}
+                  <input type="number" 
+                    value={item.rate === 0 ? "" : item.rate} 
+                    onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} 
                     placeholder="0.00" style={{ ...inp(rErr), textAlign: "right", fontSize: 13 }} />
                   {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                 </div>

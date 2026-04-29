@@ -473,17 +473,35 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 {/* Payment Summary */}
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
                   <div style={{ width: "100%", maxWidth: 280 }}>
-                    {[
-                      ["Subtotal", formatCurrency(viewEntry.qt?.subtotal || (viewEntry.total / (1 + (viewEntry.qt?.gstRate || 18) / 100)), viewEntry.qt?.currency)],
-                      [`GST (${viewEntry.qt?.gstRate || 18}%)`, formatCurrency(viewEntry.qt?.gstAmt || (viewEntry.total - (viewEntry.total / (1 + (viewEntry.qt?.gstRate || 18) / 100))), viewEntry.qt?.currency)],
-                      ["Total Amount", formatCurrency(viewEntry.total, viewEntry.qt?.currency)],
-                      ["Advance Paid", formatCurrency(viewEntry.qt?.amountPaid || 0, viewEntry.qt?.currency)]
-                    ].map(([l, v]) => (
-                      <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #f3f0ff" }}>
-                        <span style={{ fontSize: 13, color: "#6b7280" }}>{l}</span>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
-                      </div>
-                    ))}
+                    {(() => {
+                      const vQt = viewEntry.qt || {};
+                      const vItems = viewEntry.items || [];
+                      const vSubRaw = vItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+                      const vGstRate = parseFloat(vQt.gstRate) || 0;
+                      let vSub, vGst, vTot;
+                      
+                      if (vQt.isGstIncluded) {
+                        vTot = vSubRaw;
+                        vSub = vTot / (1 + vGstRate / 100);
+                        vGst = vTot - vSub;
+                      } else {
+                        vSub = vSubRaw;
+                        vGst = vSub * (vGstRate / 100);
+                        vTot = vSub + vGst;
+                      }
+
+                      return [
+                        ["Subtotal", formatCurrency(vSub, vQt.currency)],
+                        [`GST (${vGstRate}%)${vQt.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(vGst, vQt.currency)],
+                        ["Total Amount", formatCurrency(vTot, vQt.currency)],
+                        ["Advance Paid", formatCurrency(vQt.amountPaid || 0, vQt.currency)]
+                      ].map(([l, v]) => (
+                        <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #f3f0ff" }}>
+                          <span style={{ fontSize: 13, color: "#6b7280" }}>{l}</span>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
+                        </div>
+                      ));
+                    })()}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,#9333ea,#10b981)", borderRadius: 10, marginTop: 8 }}>
                       <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>BALANCE DUE</span>
                       <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(viewEntry.total - (viewEntry.qt?.amountPaid || 0), viewEntry.qt?.currency)}</span>
@@ -659,6 +677,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 {[
                   ["Subtotal", formatCurrency(subtotal, qt.currency)],
                   [`GST (${qt.gstRate}%)${qt.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, qt.currency)],
+                  ["Total Amount", formatCurrency(total, qt.currency)],
                   ["Amount Paid", formatCurrency(amountPaid, qt.currency)]
                 ].map(([l, v]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0fdf4" }}>
@@ -756,6 +775,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         @keyframes shake { 0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)} }
         .shake { animation: shake 0.35s ease; }
         @media (max-width:600px) { .f2col { grid-template-columns:1fr!important; } .f3col { grid-template-columns:1fr 1fr!important; } }
+        /* Hide Arrows in Number Inputs */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
       `}</style>
 
       {/* Top nav */}
@@ -848,7 +870,12 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         <div className="f3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
           <div>
             <label style={lbl}>Amount Paid (Advance)</label>
-            <input type="number" value={qt.amountPaid} onChange={(e) => upd("amountPaid", e.target.value)} placeholder="e.g. 10000" style={inp()} />
+            <input type="number" 
+              value={qt.amountPaid === 0 ? "" : qt.amountPaid} 
+              onChange={(e) => upd("amountPaid", e.target.value === "" ? 0 : Number(e.target.value))} 
+              onWheel={(e) => e.target.blur()}
+              placeholder="0" 
+              style={inp()} />
           </div>
           <div>
             <label style={lbl}>Payment Date</label>
@@ -921,9 +948,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 <input value={item.description} onChange={(e) => updItem(item.id, "description", e.target.value)} placeholder={`Item ${idx + 1} description`} style={{ ...inp(dErr), fontSize: 13 }} />
                 {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
               </div>
-              <input type="number" min="1" value={item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value)} style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
+              <input type="number" min="1" value={item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value)} onWheel={(e) => e.target.blur()} style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
               <div>
-                <input type="number" min="0" value={item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value)} placeholder="0.00" style={{ ...inp(rErr), textAlign: "right", fontSize: 13 }} />
+                <input type="number" min="0" value={item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value)} onWheel={(e) => e.target.blur()} placeholder="0.00" style={{ ...inp(rErr), textAlign: "right", fontSize: 13 }} />
                 {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
               </div>
               <button onClick={() => removeItem(item.id)} disabled={items.length === 1}

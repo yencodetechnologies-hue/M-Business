@@ -782,9 +782,20 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 {(() => {
                   const vInv = viewEntry.inv || {};
                   const vItems = viewEntry.items || [];
-                  const vSub = vItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-                  const vGst = vSub * ((parseFloat(vInv.gstRate) || 18) / 100);
-                  const vTot = vSub + vGst;
+                  const vSubRaw = vItems.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+                  const vGstRate = parseFloat(vInv.gstRate) || 0;
+                  let vSub, vGst, vTot;
+                  
+                  if (vInv.isGstIncluded) {
+                    vTot = vSubRaw;
+                    vSub = vTot / (1 + vGstRate / 100);
+                    vGst = vTot - vSub;
+                  } else {
+                    vSub = vSubRaw;
+                    vGst = vSub * (vGstRate / 100);
+                    vTot = vSub + vGst;
+                  }
+                  
                   const sc2 = statusColor[(viewEntry.status || "draft").toLowerCase()] || "#6b7280";
 
                   return (
@@ -1203,6 +1214,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         @keyframes shake { 0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)} }
         .shake { animation: shake 0.35s ease; }
         @media (max-width:600px) { .f2col { grid-template-columns: 1fr !important; } .f3col { grid-template-columns: 1fr 1fr !important; } }
+        /* Hide Arrows in Number Inputs */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
       `}</style>
 
       <Toast msg={toast} />
@@ -1308,6 +1322,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <input type="number" 
                 value={inv.amountPaid === 0 ? "" : inv.amountPaid} 
                 onChange={(e) => upd("amountPaid", e.target.value === "" ? 0 : Number(e.target.value))} 
+                onWheel={(e) => e.target.blur()}
                 placeholder="0" 
                 style={inp()} />
             </div>
@@ -1387,11 +1402,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <input type="number" 
                   value={item.quantity === 0 ? "" : item.quantity} 
                   onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} 
+                  onWheel={(e) => e.target.blur()}
                   placeholder="0" style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
                 <div>
                   <input type="number" 
                     value={item.rate === 0 ? "" : item.rate} 
                     onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} 
+                    onWheel={(e) => e.target.blur()}
                     placeholder="0.00" style={{ ...inp(rErr), textAlign: "right", fontSize: 13 }} />
                   {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                 </div>

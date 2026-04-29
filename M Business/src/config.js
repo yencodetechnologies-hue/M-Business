@@ -1,7 +1,9 @@
 import axios from "axios";
 export const BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
   ? "http://localhost:5000"
-  : `http://${window.location.hostname}:5000`;
+  : (window.location.protocol === "https:")
+    ? ""
+    : `http://${window.location.hostname}:5000`;
 export const FRONTEND_URL = window.location.origin;
 
 // Global interceptor for Multi-Tenant Architecture

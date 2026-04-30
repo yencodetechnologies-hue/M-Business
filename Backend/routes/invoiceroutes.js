@@ -65,12 +65,17 @@ router.get("/", async (req, res) => {
 
 router.get("/client/:clientName", async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
+    const companyId = req.companyId || "";
     const name = decodeURIComponent(req.params.clientName).trim();
-    const invoices = await Invoice.find({
-      companyId,
-      client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") }
-    }).sort({ createdAt: -1 }).lean();
+    const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
+    
+    const conditions = [];
+    if (name) conditions.push({ client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } });
+    if (companyName) conditions.push({ client: { $regex: new RegExp(`^\\s*${companyName}\\s*$`, "i") } });
+    
+    const filter = conditions.length > 0 ? { $or: conditions } : {};
+    if (companyId && companyId !== "NONE") filter.companyId = companyId;
+    const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
     const normalised = invoices.map((doc) => {
       const subtotal = (doc.items || []).reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);

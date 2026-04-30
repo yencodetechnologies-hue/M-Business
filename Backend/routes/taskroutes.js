@@ -26,22 +26,31 @@ router.get("/client/:clientName", async (req, res) => {
     const Task = require("../models/TaskModels");
     const companyId = req.companyId || "";
     const name = decodeURIComponent(req.params.clientName).trim();
+    const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
     
     // 1. Find all projects belonging to this client
-    const projectFilter = { client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } };
-    if (companyId) projectFilter.companyId = companyId;
+    const projectConditions = [];
+    if (name) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } });
+    if (companyName) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${companyName}\\s*$`, "i") } });
+    
+    const projectFilter = projectConditions.length > 0 ? { $or: projectConditions } : {};
+    if (companyId && companyId !== "NONE") projectFilter.companyId = companyId;
     const projects = await Project.find(projectFilter);
     const projectIds = projects.map(p => p._id);
     
     // 2. Find all tasks for those projects OR directly assigned to the client
+    const assignConditions = [];
+    if (name) assignConditions.push({ assignTo: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } });
+    if (companyName) assignConditions.push({ assignTo: { $regex: new RegExp(`^\\s*${companyName}\\s*$`, "i") } });
+
     const taskFilter = {
       $or: [
         { projectId: { $in: projectIds } },
-        { assignTo: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } }
+        ...assignConditions
       ],
       isDeleted: false,
     };
-    if (companyId) taskFilter.companyId = companyId;
+    if (companyId && companyId !== "NONE") taskFilter.companyId = companyId;
 
     const tasks = await Task.find(taskFilter).sort({ createdAt: -1 });
     

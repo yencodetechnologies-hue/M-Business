@@ -18,12 +18,20 @@ router.get("/", async (req, res) => {
 // GET projects by client name
 router.get("/client/:clientName", async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
+    const companyId = req.companyId || "";
     const name = decodeURIComponent(req.params.clientName).trim();
-    const projects = await Project.find({
-      client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") },
-      companyId
-    }).sort({ createdAt: -1 });
+    const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
+    
+    const conditions = [];
+    if (name) conditions.push({ client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } });
+    if (companyName) conditions.push({ client: { $regex: new RegExp(`^\\s*${companyName}\\s*$`, "i") } });
+    
+    const filter = conditions.length > 0 ? { $or: conditions } : {};
+    
+    if (companyId && companyId !== "NONE") {
+      filter.companyId = companyId;
+    }
+    const projects = await Project.find(filter).sort({ createdAt: -1 });
     res.json(projects);
   } catch (err) {
     console.error("GET by-client error:", err.message);

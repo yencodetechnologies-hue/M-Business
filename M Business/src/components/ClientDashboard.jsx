@@ -706,13 +706,15 @@ export default function ClientDashboard({ user, setUser }) {
   });
 
   const refreshData = () => {
-    const currentClientName = (user?.name || user?.clientName || user?.companyName || user?.client || "").trim();
-    if (!currentClientName) return;
+    const currentClientName = (user?.name || user?.clientName || user?.client || "").trim();
+    const currentCompanyName = (user?.companyName || user?.company || "").trim();
+    if (!currentClientName && !currentCompanyName) return;
 
-    const encodedName = encodeURIComponent(currentClientName);
+    const encodedName = encodeURIComponent(currentClientName || currentCompanyName);
+    const companyQuery = currentCompanyName ? `?company=${encodeURIComponent(currentCompanyName)}` : "";
 
     // Fetch Proposals
-    axios.get(`${BASE_URL}/api/proposals/client/${encodedName}`)
+    axios.get(`${BASE_URL}/api/proposals/client/${encodedName}${companyQuery}`)
       .then(res => {
         const clientProposals = res.data.filter(p => 
           ["draft", "pending", "approved", "rejected"].includes(p.status)
@@ -725,7 +727,7 @@ export default function ClientDashboard({ user, setUser }) {
       });
 
     // Fetch Projects
-    axios.get(`${BASE_URL}/api/projects/client/${encodedName}`)
+    axios.get(`${BASE_URL}/api/projects/client/${encodedName}${companyQuery}`)
       .then(res => {
         if (res.data) setProjects(res.data);
       })
@@ -734,14 +736,14 @@ export default function ClientDashboard({ user, setUser }) {
       });
 
     // Fetch Tasks
-    axios.get(`${BASE_URL}/api/tasks/client/${encodedName}`)
+    axios.get(`${BASE_URL}/api/tasks/client/${encodedName}${companyQuery}`)
       .then(res => {
         if (res.data) setTasks(res.data);
       })
       .catch(err => console.error("Error fetching tasks:", err));
 
     // Fetch Invoices
-    axios.get(`${BASE_URL}/api/invoices/client/${encodedName}`)
+    axios.get(`${BASE_URL}/api/invoices/client/${encodedName}${companyQuery}`)
       .then(res => {
         if (res.data) {
           const mapped = res.data.map(inv => ({

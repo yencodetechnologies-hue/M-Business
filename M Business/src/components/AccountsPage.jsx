@@ -64,6 +64,11 @@ function Fld({ label, value, onChange, options, type="text", error, placeholder,
   };
   return (
     <div style={{ marginBottom:14 }}>
+      <style>{`
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+      `}</style>
       <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700,
         letterSpacing:0.5, marginBottom:5 }}>{label.toUpperCase()}</label>
       <div style={{ position:"relative" }}>
@@ -77,7 +82,12 @@ function Fld({ label, value, onChange, options, type="text", error, placeholder,
           ? <select value={value} onChange={e=>onChange(e.target.value)} style={s}>
               {options.map(o=><option key={o}>{o}</option>)}
             </select>
-          : <input type={type} value={value} onChange={e=>onChange(e.target.value)}
+          : <input type={type} value={value} onChange={e => {
+              const val = e.target.value;
+              const isNumericField = ['phone', 'pincode', 'zip', 'salary', 'mobile', 'account', 'pan', 'person no', 'office no'].some(keyword => label.toLowerCase().includes(keyword));
+              if (isNumericField && val && !/^\d*$/.test(val)) return;
+              onChange(val);
+            }} onWheel={(e) => type === "number" && e.target.blur()}
               style={s} placeholder={placeholder||""} />}
       </div>
       {error && <div style={{ fontSize:11, color:"#EF4444", marginTop:4 }}>⚠️ {error}</div>}

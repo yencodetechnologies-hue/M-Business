@@ -28,12 +28,17 @@ router.get("/:dbId", async (req, res) => {
 // GET proposals for a specific client
 router.get("/client/:name", async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
+    const companyId = req.companyId || "";
     const name = decodeURIComponent(req.params.name).trim();
-    const list = await Proposal.find({ 
-      client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") },
-      companyId
-    }).sort({ updatedAt: -1 });
+    const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
+    
+    const conditions = [];
+    if (name) conditions.push({ client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } });
+    if (companyName) conditions.push({ client: { $regex: new RegExp(`^\\s*${companyName}\\s*$`, "i") } });
+    
+    const filter = conditions.length > 0 ? { $or: conditions } : {};
+    if (companyId && companyId !== "NONE") filter.companyId = companyId;
+    const list = await Proposal.find(filter).sort({ updatedAt: -1 });
     res.json(list);
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });

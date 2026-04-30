@@ -39,7 +39,16 @@ const taskSchema = new mongoose.Schema(
       googleCalendar: { type: Boolean, default: false },
       github: { type: Boolean, default: false },
       zapier: { type: Boolean, default: false }
-    }
+    },
+    subtasks: [{
+      title: { type: String, required: true },
+      done:  { type: Boolean, default: false }
+    }],
+    comments: [{
+      user: { type: String, required: true },
+      text: { type: String, required: true },
+      date: { type: Date, default: Date.now }
+    }]
   },
   { timestamps: true }
 );

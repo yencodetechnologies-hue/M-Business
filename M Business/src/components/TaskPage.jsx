@@ -51,12 +51,12 @@ function fmt(d) {
 
 const COL_W = {
   checkbox: 36,
-  task: 280,
-  project: 180,
-  person: 150,
-  status: 190,
-  date: 160,
-  priority_col: 190,
+  task: 300,
+  project: 160,
+  person: 140,
+  status: 160,
+  date: 140,
+  priority_col: 140,
   addcol: 44,
   dots: 80
 };
@@ -1486,7 +1486,10 @@ function StatusBarWithTooltip({ statusCounts, total }) {
 function ProjectCell({ task, projects, onField }) {
   const [open, setOpen] = useState(false);
   const ref = useRef();
-  const project = projects.find(p => (p._id || p.id) === task.projectId);
+  const project = projects.find(p => {
+    const tid = task.projectId?._id || task.projectId || task.project;
+    return (p._id || p.id) === tid;
+  });
 
   return (
     <div
@@ -1594,17 +1597,19 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
           {task.assignTo && task.assignTo !== "Unassigned" ? (
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{
-                width: 26,
-                height: 26,
+                width: 28,
+                height: 28,
                 borderRadius: "50%",
                 background: getAvatarColor(task.assignTo),
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#fff",
-                fontSize: 9,
+                fontSize: 10,
                 fontWeight: 700,
-                flexShrink: 0
+                flexShrink: 0,
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                border: "1.5px solid #fff"
               }}>
                 {task.assignTo.slice(0, 2).toUpperCase()}
               </div>
@@ -1642,15 +1647,16 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             </div>
           ) : (
             <div style={{
-              width: 26,
-              height: 26,
+              width: 28,
+              height: 28,
               borderRadius: "50%",
               border: "1.5px dashed " + P.muted,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               color: P.muted,
-              fontSize: 16
+              fontSize: 14,
+              background: P.light
             }}>+</div>
           )}
         </div>
@@ -1759,7 +1765,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
       )}
       {/* priority - click opens PriorityPicker */}
       {!hcSet.has('priority_col') && (
-        <div style={{ width: COL_W.status, flexShrink: 0, display: "flex", alignItems: "stretch", borderRight: "1px solid " + P.border }}>
+        <div style={{ width: COL_W.priority_col, flexShrink: 0, display: "flex", alignItems: "stretch", borderRight: "1px solid " + P.border }}>
           <div
             ref={priorityRef}
             onClick={() => setPpOpen(v => !v)}
@@ -1897,11 +1903,8 @@ function AddGroupRow({ onAdd, triggerRef }) {
     <div style={{ marginBottom: 16 }}>
       {active ? (
         <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
-          <div style={{ width: 4, background: P.accent, borderRadius: "3px 0 0 3px", minHeight: 40, flexShrink: 0 }} />
+  
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", flex: 1, background: P.light, border: `1.5px solid ${P.accent}`, borderLeft: "none", borderRadius: "0 8px 8px 0" }}>
-            <input ref={inputRef} value={label} onChange={e => setLabel(e.target.value)} placeholder="Group name…" onKeyDown={e => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setActive(false); setLabel(""); } }} style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 14, fontWeight: 700, color: P.accent, fontFamily: "inherit" }} />
-            <button onClick={submit} style={{ background: `linear-gradient(135deg,${P.accent},#a855f7)`, color: "#fff", border: "none", borderRadius: 7, padding: "5px 16px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Create</button>
-            <button onClick={() => { setActive(false); setLabel(""); }} style={{ background: "#fff", color: P.mid, border: `1px solid ${P.border}`, borderRadius: 7, padding: "5px 10px", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
           </div>
         </div>
       ) : (
@@ -1909,7 +1912,7 @@ function AddGroupRow({ onAdd, triggerRef }) {
           <div style={{ width: 4, background: "transparent", borderRadius: "3px 0 0 3px", minHeight: 36, flexShrink: 0 }} />
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", flex: 1, border: `1.5px dashed ${P.border}`, borderLeft: "none", borderRadius: "0 8px 8px 0", background: "transparent" }} onMouseEnter={e => { e.currentTarget.style.background = P.light; e.currentTarget.style.borderColor = P.accent; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = P.border; }}>
             <span style={{ fontSize: 16, color: P.accent, fontWeight: 300, lineHeight: 1 }}>+</span>
-            <span style={{ fontSize: 13, color: P.mid, fontWeight: 600 }}>Add new group</span>
+
           </div>
         </div>
       )}
@@ -1930,7 +1933,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
   const hcSet = hiddenCols || new Set();
   const visibleExtraCols = (extraCols || []).filter(c => !hcSet.has(c.id));
   const submit = () => { if (!newTitle.trim()) { setAdding(false); return; } onAddTask(gid, newTitle.trim()); setNewTitle(""); setAdding(false); };
-  const totalW = COL_W.checkbox + COL_W.task + (!hcSet.has('person') ? COL_W.person : 0) + (!hcSet.has('status') ? COL_W.status : 0) + (!hcSet.has('date') ? COL_W.date : 0) + (!hcSet.has('priority_col') ? COL_W.status : 0) + visibleExtraCols.reduce((s, c) => s + extraColWidth(c.type), 0) + COL_W.addcol + COL_W.dots;
+  const totalW = COL_W.checkbox + COL_W.task + (!hcSet.has('project') ? COL_W.project : 0) + (!hcSet.has('person') ? COL_W.person : 0) + (!hcSet.has('status') ? COL_W.status : 0) + (!hcSet.has('date') ? COL_W.date : 0) + (!hcSet.has('priority_col') ? COL_W.priority_col : 0) + visibleExtraCols.reduce((s, c) => s + extraColWidth(c.type), 0) + COL_W.addcol + COL_W.dots;
 
   return (
     <div style={{ marginBottom: 16 }}>
@@ -1954,11 +1957,12 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
               <div style={{ display: "flex", alignItems: "stretch", background: P.light, borderBottom: `1.5px solid ${P.border}`, minWidth: "max-content" }}>
                 <div style={{ width: COL_W.checkbox, flexShrink: 0, position: "sticky", left: 0, zIndex: 20, background: P.light, borderRight: `1px solid ${P.border}` }} />
                 <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: COL_W.checkbox, zIndex: 20, background: P.light, borderRight: `1px solid ${P.border}`, boxShadow: "2px 0 4px rgba(0,0,0,0.04)", fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, letterSpacing: 0.3, display: "flex", alignItems: "center" }}>Task</div>
-                {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Owner</div>}
+                {!hcSet.has('project') && <div style={{ width: COL_W.project, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Project</div>}
+                {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Employee</div>}
                 {!hcSet.has('status') && <div style={{ width: COL_W.status, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Status <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
 
                 {!hcSet.has('date') && <div style={{ width: COL_W.date, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Due date <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
-                {!hcSet.has('priority_col') && <div style={{ width: COL_W.status, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Priority <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
+                {!hcSet.has('priority_col') && <div style={{ width: COL_W.priority_col, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Priority <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
                 {visibleExtraCols.map((col, ci) => (
                   <div key={col.id} className="col-hdr-wrap" style={{ width: extraColWidth(col.type), flexShrink: 0, borderRight: `1px solid ${P.border}`, background: P.light, display: "flex", alignItems: "center", justifyContent: "center" }} onMouseEnter={e => { const btns = e.currentTarget.querySelectorAll(".col-menu-btn,.col-move-btn"); btns.forEach(b => b.style.opacity = "1"); }} onMouseLeave={e => { const btns = e.currentTarget.querySelectorAll(".col-menu-btn,.col-move-btn"); btns.forEach(b => b.style.opacity = "0"); }}>
                     <ColHeader col={col} onRename={onRenameCol} onDelete={onDeleteCol} onMoveLeft={() => onMoveCol && onMoveCol(col.id, "left")} onMoveRight={() => onMoveCol && onMoveCol(col.id, "right")} canMoveLeft={(extraCols || []).findIndex(x => x.id === col.id) > 0} canMoveRight={(extraCols || []).findIndex(x => x.id === col.id) < (extraCols || []).length - 1} />
@@ -1989,10 +1993,11 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                     <button onClick={submit} style={{ background: `linear-gradient(135deg,${P.accent},#a855f7)`, color: "#fff", border: "none", borderRadius: 6, padding: "5px 13px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Add</button>
                     <button onClick={() => { setAdding(false); setNewTitle(""); }} style={{ background: "#fff", color: P.mid, border: `1px solid ${P.border}`, borderRadius: 6, padding: "5px 9px", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>✕</button>
                   </div>
+                  {!hcSet.has('project') && <div style={{ width: COL_W.project, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {!hcSet.has('status') && <div style={{ width: COL_W.status, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {!hcSet.has('date') && <div style={{ width: COL_W.date, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
-                  {!hcSet.has('priority_col') && <div style={{ width: COL_W.status, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
+                  {!hcSet.has('priority_col') && <div style={{ width: COL_W.priority_col, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {visibleExtraCols.map(c => <div key={c.id} style={{ width: extraColWidth(c.type), flexShrink: 0, borderRight: `1px solid ${P.border}` }} />)}
                   <div style={{ width: COL_W.addcol, flexShrink: 0, borderRight: `1px solid ${P.border}` }} /><div style={{ width: COL_W.dots, flexShrink: 0 }} />
                 </div>
@@ -2023,7 +2028,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                     {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                     {!hcSet.has('status') && (<div style={{ width: COL_W.status, flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 8px", gap: 6 }}><StatusBarWithTooltip statusCounts={statusCounts} total={total} /><span style={{ fontSize: 11, color: "#9aadbd", fontWeight: 600, flexShrink: 0 }}>{doneCnt}/{total}</span></div>)}
                     {!hcSet.has('date') && (<div style={{ width: COL_W.date, flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2px 8px" }}>{!earliestFmt ? <span style={{ fontSize: 10, color: "#c5c9d6" }}>–</span> : sameDate ? <><span style={{ fontSize: 13, color: "#323338", fontWeight: 700, lineHeight: 1.3 }}>{latestFmt}</span><span style={{ fontSize: 10, color: "#9aadbd" }}>latest</span></> : <><div style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ fontSize: 12, color: "#323338", fontWeight: 700 }}>{earliestFmt}</span><span style={{ fontSize: 10, color: "#c5c9d6" }}>–</span><span style={{ fontSize: 12, color: "#323338", fontWeight: 700 }}>{latestFmt}</span></div><div style={{ display: "flex", alignItems: "center", gap: 3 }}><span style={{ fontSize: 9, color: "#9aadbd" }}>earliest</span><span style={{ fontSize: 9, color: "#c5c9d6" }}>to</span><span style={{ fontSize: 9, color: "#9aadbd" }}>latest</span></div></>}</div>)}
-                    {!hcSet.has('priority_col') && (<div style={{ width: COL_W.status, flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 8px", gap: 6 }}>
+                    {!hcSet.has('priority_col') && (<div style={{ width: COL_W.priority_col, flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 8px", gap: 6 }}>
                       <div style={{ display: "flex", height: 10, borderRadius: 4, overflow: "hidden", flex: 1, gap: 1 }}>
                         {priorityCounts.map(({ p, bg, n }) => <div key={p} style={{ flex: n, background: bg, minWidth: 4 }} />)}
                         {(() => { const nd = total - priorityCounts.reduce((a, x) => a + x.n, 0); return nd > 0 ? <div style={{ flex: nd, background: "#e2e8f0", minWidth: 4 }} /> : null; })()}
@@ -2175,7 +2180,7 @@ function InviteModal({ task, onClose, onSend }) {
 /* ══════════════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════════════ */
-export default function TaskPage({ projects = [], employees = [], config, user }) {
+export default function TaskPage({ projects = [], employees = [], config, user, selectedProjectId = null, selectedProjectName = null, onClearProjectFilter, onUpdate }) {
   const S_LIST = config?.taskStatuses || STATUS_LIST;
   const P_LIST = config?.taskPriorities || PRIORITY_LIST;
   const [groups, setGroups] = useState([]);
@@ -2229,17 +2234,44 @@ export default function TaskPage({ projects = [], employees = [], config, user }
   const toggleGroup = async (gid) => { const g = groups.find(x => (x._id || x.id) === gid); const nv = !g?.open; setGroups(p => p.map(x => (x._id || x.id) === gid ? { ...x, open: nv } : x)); try { await axios.put(`${API}/groups/${gid}`, { open: nv }); } catch { } };
 
   const addTask = async (groupId, title) => {
-    const tmp = { _id: "tmp_" + Date.now(), title, assignTo: "", status: "Not Started", priority: "—", date: "", checked: false, groupId, createdAt: new Date().toISOString() };
+    const projId = selectedProjectId || null;
+    const tmp = { 
+      _id: "tmp_" + Date.now(), 
+      title, 
+      assignTo: "", 
+      status: "Not Started", 
+      priority: "—", 
+      date: "", 
+      checked: false, 
+      groupId, 
+      projectId: projId,
+      createdAt: new Date().toISOString() 
+    };
+    
     setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: [...(g.tasks || []), tmp] } : g));
-    try { const r = await axios.post(`${API}/tasks`, { title, assignTo: "Unassigned", groupId, status: "Not Started" }); setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === tmp._id ? r.data : t) } : g)); }
-    catch { setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: (g.tasks || []).filter(t => (t._id || t.id) !== tmp._id) } : g)); showToast("Failed to add task", "error"); }
+    
+    try { 
+      const r = await axios.post(`${API}/tasks`, { 
+        title, 
+        assignTo: "Unassigned", 
+        groupId, 
+        status: "Not Started",
+        projectId: projId
+      }); 
+      setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === tmp._id ? r.data : t) } : g)); 
+      onUpdate?.();
+    }
+    catch (err) { 
+      setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: (g.tasks || []).filter(t => (t._id || t.id) !== tmp._id) } : g)); 
+      showToast(err.response?.data?.message || "Failed to add task", "error"); 
+    }
   };
 
   const addNewTask = async () => { const first = groups[0]; if (!first) return; await addTask(first._id || first.id, "New task"); };
 
   const toggleCheck = async (id) => { const task = groups.flatMap(g => g.tasks || []).find(t => (t._id || t.id) === id); if (!task) return; const nv = !task.checked; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, checked: nv } : t) }))); if (selected && (selected._id || selected.id) === id) setSelected(p => ({ ...p, checked: nv })); try { await axios.patch(`${API}/tasks/${id}/toggle`); } catch { } };
 
-  const updateField = async (id, field, value) => { if (!id || String(id).startsWith("tmp_")) return; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, [field]: value } : t) }))); if (selected && (selected._id || selected.id) === id) setSelected(p => ({ ...p, [field]: value })); try { await axios.put(`${API}/tasks/${id}`, { [field]: value }); } catch { showToast("Failed to save", "error"); } };
+  const updateField = async (id, field, value) => { if (!id || String(id).startsWith("tmp_")) return; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, [field]: value } : t) }))); if (selected && (selected._id || selected.id) === id) setSelected(p => ({ ...p, [field]: value })); onUpdate?.(); try { await axios.put(`${API}/tasks/${id}`, { [field]: value }); } catch { showToast("Failed to save", "error"); } };
 
   const setStatus = (id, s) => updateField(id, "status", s);
   const setPriority = (id, v) => updateField(id, "priority", v);
@@ -2251,13 +2283,13 @@ export default function TaskPage({ projects = [], employees = [], config, user }
     window.open(url, "_blank");
   };
 
-  const delTask = async (id) => { const snap = groups; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).filter(t => (t._id || t.id) !== id) }))); if (selected && (selected._id || selected.id) === id) setSelected(null); try { await axios.delete(`${API}/tasks/${id}`); } catch { setGroups(snap); showToast("Failed to delete", "error"); } };
+  const delTask = async (id) => { const snap = groups; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).filter(t => (t._id || t.id) !== id) }))); if (selected && (selected._id || selected.id) === id) setSelected(null); onUpdate?.(); try { await axios.delete(`${API}/tasks/${id}`); } catch { setGroups(snap); showToast("Failed to delete", "error"); } };
 
-  const addGroup = async (label) => { const color = GRP_COLORS[groups.length % GRP_COLORS.length]; try { const r = await axios.post(`${API}/groups`, { label, color }); setGroups(p => [...p, { ...r.data, tasks: [], open: true }]); } catch { showToast("Failed to create group", "error"); } };
+  const addGroup = async (label) => { const color = GRP_COLORS[groups.length % GRP_COLORS.length]; try { const r = await axios.post(`${API}/groups`, { label, color }); setGroups(p => [...p, { ...r.data, tasks: [], open: true }]); onUpdate?.(); } catch { showToast("Failed to create group", "error"); } };
 
   const importTasks = async (tasks) => { const first = groups[0]; if (!first) { showToast("Add a group first", "error"); return; } const gid = first._id || first.id; for (const t of tasks) await addTask(gid, t.title || "Imported task"); showToast(`${tasks.length} tasks imported!`); };
 
-  const delGroup = async (id) => { const snap = groups; setGroups(p => p.filter(g => (g._id || g.id) !== id)); try { await axios.delete(`${API}/groups/${id}`); showToast("Group deleted"); } catch { setGroups(snap); showToast("Failed", "error"); } };
+  const delGroup = async (id) => { const snap = groups; setGroups(p => p.filter(g => (g._id || g.id) !== id)); onUpdate?.(); try { await axios.delete(`${API}/groups/${id}`); showToast("Group deleted"); } catch { setGroups(snap); showToast("Failed", "error"); } };
 
   const handleAutoAssign = async (task) => {
     try {
@@ -2312,7 +2344,23 @@ export default function TaskPage({ projects = [], employees = [], config, user }
 
   const sortFn = tasks => { if (!sort) return tasks; return [...tasks].sort((a, b) => { if (sort === "name-asc") return (a.title || "").localeCompare(b.title || ""); if (sort === "name-desc") return (b.title || "").localeCompare(a.title || ""); if (sort === "date-asc") return (a.date || "").localeCompare(b.date || ""); if (sort === "date-desc") return (b.date || "").localeCompare(a.date || ""); if (sort === "status") return STATUS_LIST.indexOf(a.status) - STATUS_LIST.indexOf(b.status); return 0; }); };
 
-  const filteredGroups = groups.map(g => ({ ...g, tasks: sortFn((g.tasks || []).filter(t => { if (filters.owner.size > 0 && !filters.owner.has(t.assignTo || "")) return false; if (filters.status.size > 0 && !filters.status.has(t.status)) return false; if (search && !t.title?.toLowerCase().includes(search.toLowerCase())) return false; return true; })) }));
+  const filteredGroups = groups.map(g => ({ 
+    ...g, 
+    tasks: sortFn((g.tasks || []).filter(t => { 
+      const tProjId = t.projectId?._id || t.projectId || t.project;
+      if (selectedProjectId && String(tProjId) !== String(selectedProjectId)) return false; 
+      if (selectedProjectName && !selectedProjectId && t.project !== selectedProjectName && t.projectName !== selectedProjectName) return false; 
+      if (filters.owner.size > 0 && !filters.owner.has(t.assignTo || "")) return false; 
+      if (filters.status.size > 0 && !filters.status.has(t.status)) return false; 
+      if (search && !t.title?.toLowerCase().includes(search.toLowerCase())) return false; 
+      return true; 
+    })) 
+  })).filter(g => {
+    if (selectedProjectId || selectedProjectName) {
+      return g.tasks.length > 0;
+    }
+    return true;
+  });
 
   let displayGroups;
   if (groupBy === "default") { displayGroups = filteredGroups.map(g => ({ ...g, isVirtual: false })); }
@@ -2379,8 +2427,7 @@ export default function TaskPage({ projects = [], employees = [], config, user }
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-            <button onClick={() => setShowIntegrate(true)} style={{ display: "flex", alignItems: "center", gap: 6, background: "transparent", border: `1.5px solid ${P.border}`, borderRadius: 8, padding: "6px 13px", fontSize: 12, fontWeight: 600, color: P.mid, cursor: "pointer" }}><span>🔗</span> Integrate</button>
-            <button onClick={() => setShowShare(true)} style={{ display: "flex", alignItems: "center", gap: 6, background: "transparent", border: `1.5px solid ${P.border}`, borderRadius: 8, padding: "6px 13px", fontSize: 12, fontWeight: 600, color: P.mid, cursor: "pointer" }}>Share</button>
+
             {!loading && allTasks.length > 0 && (<div style={{ display: "flex", alignItems: "center", gap: 7, paddingLeft: 6, borderLeft: `1px solid ${P.border}` }}><div style={{ width: 60, height: 5, borderRadius: 3, background: P.border, overflow: "hidden" }}><div style={{ width: `${Math.round(doneCnt / allTasks.length * 100)}%`, height: "100%", background: `linear-gradient(90deg,${P.accent},#c084fc)`, borderRadius: 3 }} /></div><span style={{ fontSize: 11, color: P.muted, fontWeight: 600 }}>{doneCnt}/{allTasks.length}</span></div>)}
           </div>
         </div>
@@ -2390,14 +2437,19 @@ export default function TaskPage({ projects = [], employees = [], config, user }
           <div style={{ background: "#fff", borderBottom: `1.5px solid ${P.border}`, padding: "6px 18px", display: "flex", alignItems: "center", gap: 4, flexShrink: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(124,58,237,0.06)" }}>
             <NewTaskBtn onAddTask={addNewTask} onTriggerGroup={() => addGroupTrigger.current?.trigger()} showToast={showToast} onImport={() => setShowImport(true)} groups={groups} onAddTaskToGroup={addTask} setGroups={setGroups} />
             <div style={{ width: 1, height: 22, background: P.border, margin: "0 4px", flexShrink: 0 }} />
-            <div style={{ position: "relative", flexShrink: 0 }}>
-              <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, pointerEvents: "none", color: P.muted }}>🔍</span>
-              <input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)}
-                style={{ border: `1.5px solid ${search ? P.accent : P.border}`, borderRadius: 8, padding: "5px 10px 5px 28px", fontSize: 13, color: P.text, outline: "none", width: search ? 160 : 100, background: search ? "#fff" : P.light, transition: "all .2s", fontFamily: "inherit" }}
-                onFocus={e => { e.target.style.borderColor = P.accent; e.target.style.background = "#fff"; e.target.style.width = "160px"; }}
-                onBlur={e => { if (!search) { e.target.style.borderColor = P.border; e.target.style.background = P.light; e.target.style.width = "100px"; } }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: P.text, marginRight: 8, background: P.light, padding: "4px 10px", borderRadius: 8, border: `1px solid ${P.border}` }}>
+                {selectedProjectName ? `📂 Project: ${selectedProjectName}` : "🌐 All Tasks"}
+              </div>
+              
+              <div style={{ position: "relative", flexShrink: 0 }}>
+                <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, pointerEvents: "none", color: P.muted }}>🔍</span>
+                <input placeholder="Search tasks..." value={search} onChange={e => setSearch(e.target.value)}
+                  style={{ border: `1.5px solid ${search ? P.accent : P.border}`, borderRadius: 8, padding: "5px 10px 5px 28px", fontSize: 13, color: P.text, outline: "none", width: search ? 160 : 100, background: search ? "#fff" : P.light, transition: "all .2s", fontFamily: "inherit" }}
+                  onFocus={e => { e.target.style.borderColor = P.accent; e.target.style.background = "#fff"; e.target.style.width = "160px"; }}
+                  onBlur={e => { if (!search) { e.target.style.borderColor = P.border; e.target.style.background = P.light; e.target.style.width = "100px"; } }} />
+              </div>
             </div>
-            <TB ref={personRef} icon="👤" label="Person" active={filters.owner.size > 0} badge={filters.owner.size > 0 ? filters.owner.size : null} onClick={() => { closeAll(); setPersonOpen(v => !v); }} />
             {personOpen && <PersonFilterPanel anchor={personRef} onClose={() => setPersonOpen(false)} groups={groups} filters={filters} onToggle={toggleFilter} onClear={() => setFilters(p => ({ ...p, owner: new Set() }))} />}
             <TB ref={filterRef} icon="▽" label="Filter" active={filters.status.size > 0} badge={filters.status.size > 0 ? filters.status.size : null} onClick={() => { closeAll(); setFilterOpen(v => !v); }} />
             {filterOpen && <FilterMenu anchor={filterRef} groups={groups} filters={filters} onToggle={toggleFilter} onClear={clearFilters} onClose={() => setFilterOpen(false)} />}
@@ -2503,4 +2555,6 @@ export default function TaskPage({ projects = [], employees = [], config, user }
     </div>
   );
 }
+
+
 

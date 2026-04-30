@@ -12,8 +12,8 @@ axios.interceptors.request.use((config) => {
   if (savedUser) {
     try {
       const parsed = JSON.parse(savedUser);
-      // Admins and Subadmins use their own ID. Employees use companyId.
-      const companyId = (parsed.role === "admin" || parsed.role === "subadmin") ? (parsed.id || parsed._id) : (parsed.companyId || "");
+      // Prioritize companyId if available (admins/subadmins have their own ID as companyId if they are the owner)
+      const companyId = parsed.companyId || (parsed.role === "admin" ? (parsed.id || parsed._id) : "");
       if (companyId) {
         config.headers["x-company-id"] = companyId;
       }

@@ -21,9 +21,11 @@ router.get("/projects/:name", async (req, res) => {
 
 router.get("/my-projects/:clientName", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.clientName);
+    const companyId = req.companyId || "NONE";
+    const name = decodeURIComponent(req.params.clientName).trim();
     const projects = await Project.find({
-      client: { $regex: new RegExp(`^${name}$`, "i") }
+      client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") },
+      companyId
     }).sort({ createdAt: -1 });
     res.json(projects);
   } catch (err) {

@@ -16,11 +16,12 @@ router.get("/", async (req, res) => {
 });
 
 // GET projects by client name
-router.get("/by-client/:clientName", async (req, res) => {
+router.get("/client/:clientName", async (req, res) => {
   try {
     const companyId = req.companyId || "NONE";
+    const name = decodeURIComponent(req.params.clientName).trim();
     const projects = await Project.find({
-      client: req.params.clientName,
+      client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") },
       companyId
     }).sort({ createdAt: -1 });
     res.json(projects);

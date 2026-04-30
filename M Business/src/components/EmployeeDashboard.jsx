@@ -327,12 +327,15 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
 
 // ── Page 1: Dashboard ─────────────────────────────────────────────────────────
 
-function DashboardPage({ user, projects, tasks, attendance, salary, setPage, docStatus, onOpenProfile }) {
+function DashboardPage({ user, projects, tasks, proposals, attendance, salary, setPage, docStatus, onOpenProfile }) {
   const name        = user?.name || "Employee";
   const today       = todayStr();
   const todayAtt    = attendance.find(a=>a.date===today);
   const presentDays = attendance.filter(a=>a.status==="present").length;
-  const pendingTasks= tasks.filter(t=>t.status!=="done"&&t.status!=="completed").length;
+  const pendingTasks= tasks.filter(t=>{
+    const s = (t.status||"").toLowerCase();
+    return !["done","completed"].includes(s);
+  }).length;
   const latestSalary= salary[0];
 
   return (
@@ -355,7 +358,8 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage, doc
 
       {/* Stat cards */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }} className="stat-grid">
-        <StatCard icon="◈" label="My Projects"   value={projects.length}  sub="Assigned to you" color="#6366f1" onClick={()=>setPage("projects")}/>
+         <StatCard icon="◈" label="My Projects"   value={projects.length}  sub="Assigned to you" color="#6366f1" onClick={()=>setPage("projects")}/>
+        <StatCard icon="📄" label="Proposals"     value={proposals.length} sub="Assigned to you" color="#ec4899" onClick={()=>setPage("proposals")}/>
         <StatCard icon="◉" label="Pending Tasks" value={pendingTasks}      sub="Need attention"  color="#f59e0b" onClick={()=>setPage("tasks")}/>
         <StatCard icon="◷" label="Present Days"  value={presentDays}       sub="This month"      color="#10b981" onClick={()=>setPage("attendance")}/>
         <StatCard icon="◆" label="Last Salary"   value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month||"Not yet"} color="#8b5cf6" onClick={()=>setPage("salary")}/>
@@ -380,18 +384,23 @@ function DashboardPage({ user, projects, tasks, attendance, salary, setPage, doc
           {projects.length===0 && <div style={{ textAlign:"center", padding:"1.5rem", color:"#94a3b8", fontSize:13 }}>No projects assigned</div>}
         </Card>
         <Card title="My Tasks" action={<button onClick={()=>setPage("tasks")} style={{ background:"none", border:"none", color:"#6366f1", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>View all →</button>}>
-          {tasks.slice(0,5).map((t,i)=>(
+          {tasks.slice(0,5).map((t,i)=>{
+            const isDone = ["done","completed"].includes((t.status||"").toLowerCase());
+            const projectName = t.projectId?.name || t.project || "—";
+            const dueDate = t.date || t.dueDate || "—";
+            return (
             <div key={t._id||i} style={{ display:"flex", alignItems:"flex-start", gap:10, padding:"9px 0", borderBottom:i<4?"1px solid #f8fafc":"none" }}>
-              <div style={{ width:16, height:16, borderRadius:4, border:`2px solid ${t.status==="done"?"#10b981":"#e2e8f0"}`, background:t.status==="done"?"#10b981":"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1 }}>
-                {(t.status==="done"||t.status==="completed")&&<span style={{ color:"#fff", fontSize:10, fontWeight:900 }}>✓</span>}
+              <div style={{ width:16, height:16, borderRadius:4, border:`2px solid ${isDone?"#10b981":"#e2e8f0"}`, background:isDone?"#10b981":"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1 }}>
+                {isDone&&<span style={{ color:"#fff", fontSize:10, fontWeight:900 }}>✓</span>}
               </div>
               <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontSize:12, fontWeight:600, color:t.status==="done"?"#94a3b8":"#0f172a", textDecoration:t.status==="done"?"line-through":"none", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{t.title}</div>
-                <div style={{ fontSize:10, color:"#94a3b8", marginTop:2 }}>{t.project} · Due {t.dueDate||"—"}</div>
+                <div style={{ fontSize:12, fontWeight:600, color:isDone?"#94a3b8":"#0f172a", textDecoration:isDone?"line-through":"none", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{t.title}</div>
+                <div style={{ fontSize:10, color:"#94a3b8", marginTop:2 }}>{projectName} · Due {dueDate}</div>
               </div>
               <Badge label={t.priority||"medium"}/>
             </div>
-          ))}
+            );
+          })}
           {tasks.length===0 && <div style={{ textAlign:"center", padding:"1.5rem", color:"#94a3b8", fontSize:13 }}>No tasks assigned</div>}
         </Card>
       </div>
@@ -503,17 +512,32 @@ function ProjectsPage({ projects }) {
 function TasksPage({ tasks }) {
   const [filter, setFilter] = useState("all");
   const [expanded, setExpanded] = useState(null);
-  const tabs = [
-    { key:"all",         label:`All (${tasks.length})` },
-    { key:"in progress", label:`In Progress (${tasks.filter(t=>(t.status||"").toLowerCase()==="in progress").length})` },
-    { key:"pending",     label:`Pending (${tasks.filter(t=>(t.status||"").toLowerCase()==="pending").length})` },
-    { key:"done",        label:`Done (${tasks.filter(t=>["done","completed"].includes((t.status||"").toLowerCase())).length})` },
-  ];
-  const list = filter==="all" ? tasks : tasks.filter(t=>{
-    const s=(t.status||"").toLowerCase();
-    if(filter==="done") return s==="done"||s==="completed";
-    return s===filter;
+
+  // Normalize task fields — supports both old (dueDate/project) and new (date/projectId) schemas
+  const norm = (t) => ({
+    ...t,
+    _project: t.projectId?.name || t.project || "—",
+    _due: t.date || t.dueDate || "—",
+    _statusRaw: (t.status || "").toLowerCase(),
+    _isDone: ["done", "completed"].includes((t.status || "").toLowerCase()),
   });
+
+  const normalized = tasks.map(norm);
+
+  const tabs = [
+    { key:"all",         label:`All (${normalized.length})` },
+    { key:"in progress", label:`In Progress (${normalized.filter(t => ["in progress", "working on it"].includes(t._statusRaw)).length})` },
+    { key:"pending",     label:`Pending (${normalized.filter(t => ["pending", "not started"].includes(t._statusRaw)).length})` },
+    { key:"done",        label:`Done (${normalized.filter(t => t._isDone).length})` },
+  ];
+
+  const list = filter === "all" ? normalized : normalized.filter(t => {
+    if (filter === "done")        return t._isDone;
+    if (filter === "in progress") return ["in progress", "working on it"].includes(t._statusRaw);
+    if (filter === "pending")     return ["pending", "not started"].includes(t._statusRaw);
+    return true;
+  });
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
       <div><h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>My Tasks</h1>
@@ -522,26 +546,28 @@ function TasksPage({ tasks }) {
         <TabBar tabs={tabs} active={filter} onChange={setFilter}/>
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {list.map((t,i)=>{
-            const done  = t.status==="done"||t.status==="completed";
             const isOpen= expanded===t._id;
             return (
               <div key={t._id||i} style={{ background:"#f8fafc", borderRadius:14, border:`1px solid ${isOpen?"#c7d2fe":"#f1f5f9"}`, overflow:"hidden" }}>
                 <div onClick={()=>setExpanded(isOpen?null:t._id)} style={{ padding:"14px 16px", cursor:"pointer", display:"flex", alignItems:"flex-start", gap:12 }}>
-                  <div style={{ width:18, height:18, borderRadius:5, border:`2px solid ${done?"#10b981":"#e2e8f0"}`, background:done?"#10b981":"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:2 }}>
-                    {done && <span style={{ color:"#fff", fontSize:11, fontWeight:900 }}>✓</span>}
+                  <div style={{ width:18, height:18, borderRadius:5, border:`2px solid ${t._isDone?"#10b981":"#e2e8f0"}`, background:t._isDone?"#10b981":"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:2 }}>
+                    {t._isDone && <span style={{ color:"#fff", fontSize:11, fontWeight:900 }}>✓</span>}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:14, fontWeight:700, color:done?"#94a3b8":"#0f172a", textDecoration:done?"line-through":"none" }}>{t.title}</div>
+                    <div style={{ fontSize:14, fontWeight:700, color:t._isDone?"#94a3b8":"#0f172a", textDecoration:t._isDone?"line-through":"none" }}>{t.title}</div>
                     <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginTop:5, alignItems:"center" }}>
-                      <Badge label={t.priority||"medium"}/><Badge label={t.status||"pending"}/>
-                      <span style={{ fontSize:11, color:"#94a3b8" }}>📁 {t.project}</span>
-                      <span style={{ fontSize:11, color:"#94a3b8" }}>⏱ {t.dueDate||"—"}</span>
+                      <Badge label={t.priority||"medium"}/>
+                      <Badge label={t.status||"pending"}/>
+                      <span style={{ fontSize:11, color:"#94a3b8" }}>📁 {t._project}</span>
+                      <span style={{ fontSize:11, color:"#94a3b8" }}>⏱ {t._due}</span>
                     </div>
                   </div>
                   <span style={{ fontSize:12, color:"#94a3b8", transform:isOpen?"rotate(180deg)":"rotate(0)", display:"inline-block" }}>▾</span>
                 </div>
                 {isOpen && <div style={{ padding:"0 16px 16px", borderTop:"1px solid #f1f5f9" }}>
                   {t.description && <p style={{ fontSize:13, color:"#374151", marginTop:12, lineHeight:1.6 }}>{t.description}</p>}
+                  {t.notes && <p style={{ fontSize:12, color:"#64748b", marginTop:8, lineHeight:1.5 }}><strong>Notes:</strong> {t.notes}</p>}
+                  {t.assignTo && t.assignTo !== "Unassigned" && <p style={{ fontSize:12, color:"#64748b", marginTop:6 }}>👤 Assigned to: <strong>{t.assignTo}</strong></p>}
                 </div>}
               </div>
             );
@@ -1117,15 +1143,57 @@ function SalaryPage({ salary, user }) {
   );
 }
 
+function ProposalsPage({ proposals }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div>
+        <h1 style={{ fontSize: 20, fontWeight: 800, color: "#0f172a", margin: 0 }}>My Proposals</h1>
+        <p style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>Proposals assigned to you by subadmin</p>
+      </div>
+      <Card>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {proposals.map((p, i) => (
+            <div key={p._id || i} style={{ background: "#f8fafc", borderRadius: 14, border: "1px solid #f1f5f9", padding: "16px 18px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>{p.title}</div>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>Client: {p.client || "No client"} · Slides: {p.slides?.length || 0}</div>
+                </div>
+                <div style={{ background: p.status === "approved" ? "#10b98115" : p.status === "pending" ? "#f59e0b15" : "#64748b15", color: p.status === "approved" ? "#10b981" : p.status === "pending" ? "#f59e0b" : "#64748b", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, textTransform: "capitalize" }}>
+                  {p.status}
+                </div>
+              </div>
+                           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                <button
+                   onClick={() => window.location.href = `/project-proposal?edit=${p.id || p._id}`}
+                   style={{ background: "#6366f115", color: "#6366f1", border: "1px solid #6366f130", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                  ✏️ Edit Proposal
+                </button>
+                <button 
+                   onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")}
+                   style={{ background: "#10b98115", color: "#10b981", border: "1px solid #10b98130", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                  🖨️ Print
+                </button>
+              </div>
+            </div>
+          ))}
+          {proposals.length === 0 && <div style={{ textAlign: "center", padding: "2rem", color: "#94a3b8", fontSize: 13 }}>No proposals assigned</div>}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 // ── Root Component ────────────────────────────────────────────────────────────
 
 export default function EmployeeDashboard({ user, setUser }) {
   const [page,        setPage]        = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [projects,    setProjects]    = useState(SEED_PROJECTS);
-  const [tasks,       setTasks]       = useState(SEED_TASKS);
+   const [projects,    setProjects]    = useState([]);
+  const [tasks,       setTasks]       = useState([]);
+  const [proposals,   setProposals]   = useState([]);
   const [attendance,  setAttendance]  = useState([]);
-  const [salary,      setSalary]      = useState(SEED_SALARY);
+  const [salary,      setSalary]      = useState([]);
   const [toast,       setToast]       = useState("");
   const [toastType,   setToastType]   = useState("success");
   const [subscription, setSubscription] = useState(null);
@@ -1220,6 +1288,17 @@ export default function EmployeeDashboard({ user, setUser }) {
   if(setUser) setUser(null);
   else window.location.href="/";
 };
+  const loadData = useCallback((name) => {
+    const n = name || empName;
+    if (!n) return;
+    const enc = encodeURIComponent(n);
+     axios.get(`${BASE}/projects/${enc}`).then(r => { if (r.data?.length) setProjects(r.data); else setProjects([]); }).catch(() => {});
+    axios.get(`${BASE}/tasks/${enc}`).then(r => { if (r.data?.length) setTasks(r.data); else setTasks([]); }).catch(() => {});
+    axios.get(`${BASE_URL}/api/proposals/employee/${enc}`).then(r => { if (r.data?.length) setProposals(r.data); else setProposals([]); }).catch(() => {});
+    axios.get(`${BASE}/attendance/${enc}`).then(r => { if (r.data) setAttendance(r.data); }).catch(() => {});
+    axios.get(`${BASE}/salary/${enc}`).then(r => { if (r.data?.length) setSalary(r.data); else setSalary([]); }).catch(() => {});
+  }, [empName]);
+
 useEffect(()=>{
   // empName மாறும்போது docs reset பண்ணு
   setDocStatus({});
@@ -1227,10 +1306,11 @@ useEffect(()=>{
   
   if(!empName) return;
   const enc=encodeURIComponent(empName);
-  axios.get(`${BASE}/projects/${enc}`).then(r=>{ if(r.data?.length) setProjects(r.data); }).catch(()=>{});
-  axios.get(`${BASE}/tasks/${enc}`).then(r=>{ if(r.data?.length) setTasks(r.data); }).catch(()=>{});
+   axios.get(`${BASE}/projects/${enc}`).then(r=>{ if(r.data?.length) setProjects(r.data); else setProjects([]); }).catch(()=>{});
+  axios.get(`${BASE}/tasks/${enc}`).then(r=>{ if(r.data?.length) setTasks(r.data); else setTasks([]); }).catch(()=>{});
+  axios.get(`${BASE_URL}/api/proposals/employee/${enc}`).then(r=>{ if(r.data?.length) setProposals(r.data); else setProposals([]); }).catch(()=>{});
   axios.get(`${BASE}/attendance/${enc}`).then(r=>{ if(r.data) setAttendance(r.data); }).catch(()=>{});
-  axios.get(`${BASE}/salary/${enc}`).then(r=>{ if(r.data?.length) setSalary(r.data); }).catch(()=>{});
+  axios.get(`${BASE}/salary/${enc}`).then(r=>{ if(r.data?.length) setSalary(r.data); else setSalary([]); }).catch(()=>{});
   fetchSubscription();
 }, [empName]);
 
@@ -1396,6 +1476,7 @@ const fetchSubscription = async () => {
               user={resolvedUser}
               projects={projects}
               tasks={tasks}
+              proposals={proposals}
               attendance={attendance}
               salary={salary}
               setPage={setPage}
@@ -1403,11 +1484,12 @@ const fetchSubscription = async () => {
               onOpenProfile={()=>setProfileOpen(true)}  // ← NEW
             />
           )}
-          {page==="projects"   && <ProjectsPage   projects={projects}/>}
+           {page==="projects"   && <ProjectsPage   projects={projects}/>}
+          {page==="proposals"  && <ProposalsPage  proposals={proposals}/>}
           {page==="tasks"      && <TasksPage      tasks={tasks}/>}
           {page==="attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify}/>}
           {page==="salary"     && <SalaryPage     salary={salary} user={resolvedUser}/>}
-          {page==="calendar"   && <CalendarPage projects={projects} tasks={tasks} user={resolvedUser} onUpdateProject={loadData} onUpdateTask={loadData} />}
+          {page==="calendar"   && <CalendarPage projects={projects} tasks={tasks} user={resolvedUser} onUpdateProject={()=>loadData()} onUpdateTask={()=>loadData()} />}
           {page==="messaging"  && <MessagingPage user={resolvedUser} />}
         </div>
       </div>

@@ -48,12 +48,12 @@ const NAV = [
     ]
   },
   {
-    label: "Projects & Tasks",
+    label: "Projects",
     type: "group",
     items: [
       { key: "projects", icon: "📁", label: "Projects" },
       { key: "tracking", icon: "📊", label: "Project Status" },
-      { key: "tasks", icon: "✅", label: "Tasks" },
+
       { key: "calendar", icon: "📅", label: "Calendar" },
     ]
   },
@@ -241,10 +241,10 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
 // ── Action Buttons (View / Edit / Delete) ────────────────────
 function ActionBtns({ onView, onEdit, onDelete }) {
   return (
-    <div style={{ display: "flex", gap: 5, flexWrap: "nowrap" }}>
-      {onView && <button onClick={onView} title="View" style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#6366f1", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>👁 View</button>}
-      <button onClick={onEdit} title="Edit" style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#9333ea", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>✏️ Edit</button>
-      <button onClick={onDelete} title="Delete" style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap" }}>🗑 Delete</button>
+    <div style={{ display: "flex", gap: 6, flexWrap: "nowrap" }}>
+      {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "#f5f3ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#7c3aed", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>👁 View</button>}
+      <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f59e0b", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>✏️ Edit</button>
+      <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>🗑 Delete</button>
     </div>
   );
 }
@@ -1167,7 +1167,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject, config }) {
+function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks }) {
   const [search, setSearch] = useState("");
   const [viewProj, setViewProj] = useState(null);
   const [editProj, setEditProj] = useState(null);
@@ -1178,6 +1178,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
   const [assignTo, setAssignTo] = useState([]);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
+  const [selectedProjForTaskModal, setSelectedProjForTaskModal] = useState(null);
   
   useEffect(() => {
     if (jumpProject) {
@@ -1261,12 +1262,18 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             <tbody>
               {paginated.length === 0 ? <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "#a78bfa" }}>No projects found</td></tr>
                 : paginated.map((p, i) => (
-                  <tr key={p._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={ev => ev.currentTarget.style.background = "#faf5ff"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
+                  <tr 
+                    key={p._id || i} 
+                    style={{ borderBottom: "1px solid #f3f0ff", cursor: "pointer" }} 
+                    onMouseEnter={ev => ev.currentTarget.style.background = "#faf5ff"} 
+                    onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}
+                    onClick={() => setSelectedProjForTaskModal(p)}
+                  >
                     <td style={{ padding: "12px 14px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{`PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{p.name}</td>
                     <td style={{ padding: "12px 14px", color: "#7c3aed" }}>{p.client || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{formatCurrency(p.budget, p.currency)}</td>
-                    <td style={{ padding: "12px 14px" }}>
+                    <td style={{ padding: "12px 14px" }} onClick={e => e.stopPropagation()}>
                       <select 
                         value={p.status || "Pending"} 
                         onChange={async (e) => {
@@ -1307,7 +1314,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                             ))}
                             {assignedEmployees.length > 2 && <div style={{ fontSize: 10, color: "#a78bfa", fontStyle: "italic" }}>+{assignedEmployees.length - 2} more</div>}
                           </div>
-                          : <button onClick={() => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#6366f1", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
+                          : <button onClick={(e) => { e.stopPropagation(); setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#6366f1", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
                       })()}
                     </td>
                     <td style={{ padding: "12px 14px" }}>
@@ -1318,45 +1325,81 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             </tbody>
           </table>
         </div>
+
+
         <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={550}>
-          <div style={{ padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe", marginBottom: 18 }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 6 }}>{viewProj.name}</div>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-              <Badge label={viewProj.status || "Pending"} />
-              {viewProj.client && <span style={{ fontSize: 12, color: "#9333ea", fontWeight: 600 }}>👥 {viewProj.client}</span>}
+          <div style={{ background: "#fff", borderRadius: 16 }}>
+            {/* Header Info */}
+            <div style={{ background: "#f8f7ff", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid #f3efff" }}>
+               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#1e0a3c", marginBottom: 8 }}>{viewProj.name}</h2>
+               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <Badge label={viewProj.status || "Pending"} />
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#7c3aed", fontSize: 13, fontWeight: 600 }}>
+                    <span>👥</span> {viewProj.client}
+                  </div>
+               </div>
+            </div>
+
+            {/* Budget Row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "#f8f7ff", borderRadius: 16, border: "1px solid #f3efff", marginBottom: 18 }}>
+               <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(124,58,237,0.08)" }}>💰</div>
+               <div>
+                  <div style={{ fontSize: 9, color: "#a78bfa", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "#1e0a3c" }}>{formatCurrency(viewProj.budget, viewProj.currency)}</div>
+               </div>
+            </div>
+
+            {/* Assigned Employees */}
+            <div style={{ marginBottom: 18 }}>
+              <h3 style={{ fontSize: 10, fontWeight: 800, color: "#7c3aed", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>ASSIGNED EMPLOYEES</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {(() => {
+                  const assignedEmployees = Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : []);
+                  return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f8f7ff", borderRadius: 12, border: "1px solid #f3efff" }}>
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#a78bfa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c" }}>{emp}</span>
+                    </div>
+                  )) : <div style={{ color: "#a78bfa", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
+                })()}
+              </div>
+            </div>
+
+            {/* Purpose Row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "#f8f7ff", borderRadius: 16, border: "1px solid #f3efff", marginBottom: 24 }}>
+               <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(124,58,237,0.08)" }}>🎯</div>
+               <div>
+                  <div style={{ fontSize: 9, color: "#a78bfa", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#1e0a3c" }}>{viewProj.purpose || "—"}</div>
+               </div>
+            </div>
+
+            {/* Bottom Buttons */}
+            <div style={{ display: "flex", gap: 10 }}>
+               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#9333ea,#c084fc)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>✏️ Edit</button>
+               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#6366f1,#8b5cf6)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>👤 Assign</button>
+               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#ef4444,#dc2626)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>🗑 Delete</button>
             </div>
           </div>
-          <InfoRow icon="💰" label="Budget" value={formatCurrency(viewProj.budget, viewProj.currency)} />
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGNED EMPLOYEES</label>
-            {(() => {
-              const assignedEmployees = Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : []);
-              return assignedEmployees.length > 0
-                ? <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {assignedEmployees.map((emp, idx) => (
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                      <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#a78bfa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
-                      <span style={{ color: "#1e0a3c", fontWeight: 600, fontSize: 12 }}>{emp}</span>
-                    </div>
-                  ))}
-                </div>
-                : <div style={{ color: "#a78bfa", fontSize: 13, fontStyle: "italic" }}>No employees assigned</div>
-            })()}
-          </div>
-          <InfoRow icon="📅" label="Start Date" value={viewProj.start} />
-          <InfoRow icon="🏁" label="End Date" value={viewProj.end} />
-          <InfoRow icon="🎯" label="Purpose" value={viewProj.purpose} />
-          <InfoRow icon="👥" label="Team" value={viewProj.team} />
-          <InfoRow icon="📝" label="Description" value={viewProj.description} />
-          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️ Edit</button>
-            <button onClick={() => { setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#6366f1,#8b5cf6)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>👤 Assign</button>
-            <button onClick={() => { setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🗑 Delete</button>
-          </div>
+        </Mdl>
+      )}
+
+      {selectedProjForTaskModal && (
+        <Mdl title={`Tasks: ${selectedProjForTaskModal.name}`} onClose={() => setSelectedProjForTaskModal(null)} maxWidth={1100}>
+          <TaskPage 
+            projects={projects} 
+            employees={employees} 
+            onUpdate={() => fetchTasks && fetchTasks()} 
+            config={config} 
+            user={user} 
+            selectedProjectId={selectedProjForTaskModal._id} 
+            selectedProjectName={selectedProjForTaskModal.name} 
+            onClearProjectFilter={() => setSelectedProjForTaskModal(null)} 
+          />
         </Mdl>
       )}
 
@@ -2517,6 +2560,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "M Business";
   const [active, setActive] = useState("dashboard");
   const [jumpProject, setJumpProject] = useState(null);
+  const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
+  const [projectForTaskModal, setProjectForTaskModal] = useState(null);
   const [modal, setModal] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
@@ -3407,7 +3452,7 @@ const handleEditPackage = (pkg) => {
                     </thead>
                     <tbody>
                       {projects.length === 0 ? <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "#a78bfa" }}>No recent projects</td></tr> : projects.slice(0, 5).map((p, i) => (
-                        <tr key={i} style={{ borderBottom: "1px solid #f5f3ff" }}>
+                        <tr key={i} style={{ borderBottom: "1px solid #f5f3ff", cursor: "pointer" }} onClick={() => setProjectForTaskModal(p)}>
                           <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
                             <div style={{ fontSize: 13 }}>{p.name}</div>
                             <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
@@ -3415,7 +3460,7 @@ const handleEditPackage = (pkg) => {
                           <td style={{ padding: "12px 12px", color: "#a78bfa" }}>{p.client}</td>
                           <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>
                           <td style={{ padding: "12px 12px", color: "#94a3b8" }}>{p.end ? new Date(p.end).toLocaleDateString() : "—"}</td>
-                          <td style={{ padding: "12px 12px" }}><button onClick={()=>setViewProject(p)} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>View</button></td>
+                          <td style={{ padding: "12px 12px" }} onClick={e => e.stopPropagation()}><button onClick={()=>setViewProject(p)} style={{background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>View</button></td>
                         </tr>
                       ))}
                     </tbody>
@@ -3459,14 +3504,14 @@ const handleEditPackage = (pkg) => {
 
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} />}
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj)=>{setSelectedProjectForTasks(proj);setActive("tasks");}} user={user} fetchTasks={fetchTasks} />}
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
           {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
-          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} />}
+          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id||null} selectedProjectName={selectedProjectForTasks?.name||null} onClearProjectFilter={()=>setSelectedProjectForTasks(null)} />}
           {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
           {validActive === "settings" && <SettingsPage user={user} />}
@@ -3482,6 +3527,20 @@ const handleEditPackage = (pkg) => {
           {validActive === "rolePermissions" && <RolePermissionDashboard />}
         </div>
       </div>
+
+      {projectForTaskModal && (
+        <Mdl title={`Tasks: ${projectForTaskModal.name}`} onClose={() => setProjectForTaskModal(null)} maxWidth={1100}>
+          <TaskPage 
+            projects={projects} 
+            employees={employees} 
+            onUpdate={() => fetchTasks && fetchTasks()} 
+            config={config} 
+            user={user} 
+            selectedProjectId={projectForTaskModal._id} 
+            selectedProjectName={projectForTaskModal.name} 
+          />
+        </Mdl>
+      )}
 
       {profileDropdownOpen && (
         <div
@@ -4087,40 +4146,60 @@ const handleEditPackage = (pkg) => {
 
       {viewProject&&(
         <Mdl title="Project Details" onClose={()=>setViewProject(null)} maxWidth={550}>
-          <div style={{padding:16,background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",borderRadius:14,border:"1px solid #ede9fe",marginBottom:18}}>
-            <div style={{fontSize:18,fontWeight:800,color:T.text,marginBottom:6}}>{viewProject.name}</div>
-            <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
-              <Badge label={viewProject.status||"Pending"}/>
-              {viewProject.client&&<span style={{fontSize:12,color:"#9333ea",fontWeight:600}}>👥 {viewProject.client}</span>}
+          <div style={{ background: "#fff", borderRadius: 16 }}>
+            {/* Header Info */}
+            <div style={{ background: "#f8f7ff", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid #f3efff" }}>
+               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#1e0a3c", marginBottom: 8 }}>{viewProject.name}</h2>
+               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <Badge label={viewProject.status || "Pending"} />
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#7c3aed", fontSize: 13, fontWeight: 600 }}>
+                    <span>👥</span> {viewProject.client}
+                  </div>
+               </div>
             </div>
-          </div>
-          <InfoRow icon="💰" label="Budget" value={viewProject.budget}/>
-          <div style={{marginBottom:14}}>
-            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGNED EMPLOYEES</label>
-            {(() => {
-              const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
-              return assignedEmployees.length > 0
-                ?<div style={{display:"flex",flexDirection:"column",gap:6}}>
-                   {assignedEmployees.map((emp, idx)=>(
-                     <div key={idx} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:"#f8fafc",borderRadius:8,border:"1px solid #e2e8f0"}}>
-                       <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#a78bfa)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
-                       <span style={{color:"#1e0a3c",fontWeight:600,fontSize:12}}>{emp}</span>
-                     </div>
-                   ))}
-                 </div>
-                :<div style={{color:"#a78bfa",fontSize:13,fontStyle:"italic"}}>No employees assigned</div>
-            })()}
-          </div>
-          <InfoRow icon="📅" label="Start Date" value={viewProject.start}/>
-          <InfoRow icon="🏁" label="End Date" value={viewProject.end}/>
-          <InfoRow icon="🎯" label="Purpose" value={viewProject.purpose}/>
-          <InfoRow icon="👥" label="Team" value={viewProject.team}/>
-          <InfoRow icon="📝" label="Description" value={viewProject.description}/>
-          <div style={{display:"flex",gap:10,marginTop:16}}>
-            <button onClick={()=>setViewProject(null)} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#9333ea,#a855f7)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>Close</button>
+
+            {/* Budget Row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "#f8f7ff", borderRadius: 16, border: "1px solid #f3efff", marginBottom: 18 }}>
+               <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(124,58,237,0.08)" }}>💰</div>
+               <div>
+                  <div style={{ fontSize: 9, color: "#a78bfa", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "#1e0a3c" }}>{formatCurrency(viewProject.budget, viewProject.currency)}</div>
+               </div>
+            </div>
+
+            {/* Assigned Employees */}
+            <div style={{ marginBottom: 18 }}>
+              <h3 style={{ fontSize: 10, fontWeight: 800, color: "#7c3aed", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>ASSIGNED EMPLOYEES</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {(() => {
+                  const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
+                  return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f8f7ff", borderRadius: 12, border: "1px solid #f3efff" }}>
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#a78bfa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c" }}>{emp}</span>
+                    </div>
+                  )) : <div style={{ color: "#a78bfa", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
+                })()}
+              </div>
+            </div>
+
+            {/* Purpose Row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "#f8f7ff", borderRadius: 16, border: "1px solid #f3efff", marginBottom: 24 }}>
+               <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(124,58,237,0.08)" }}>🎯</div>
+               <div>
+                  <div style={{ fontSize: 9, color: "#a78bfa", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#1e0a3c" }}>{viewProject.purpose || "—"}</div>
+               </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={()=>setViewProject(null)} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+            </div>
           </div>
         </Mdl>
       )}
     </div>
   );
 }
+
+

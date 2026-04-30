@@ -20,51 +20,7 @@ const sc = (s) => ({
   "Pending Approval": "#f59e0b", "Approved": "#10b981", "Rejected": "#ef4444", "Draft": "#64748b"
 }[s] || "#6366f1");
 
-// ── Fallback Seed Data (API fail aaana use aagum) ──────────────
-const MY_PROJECTS = [
-  { id:"PRJ001", name:"Website Redesign",   status:"In Progress", progress:65,  startDate:"2024-01-15", deadline:"2024-05-30", budget:"₹2,59,600", spent:"₹1,68,740", manager:"Kiran Dev",  tasks:12, completedTasks:8 },
-  { id:"PRJ002", name:"Mobile App Dev",     status:"Pending",     progress:15,  startDate:"2024-03-01", deadline:"2024-08-15", budget:"₹5,31,000", spent:"₹79,650",   manager:"Meena Raj",  tasks:24, completedTasks:4 },
-  { id:"PRJ003", name:"Brand Identity Kit", status:"Completed",   progress:100, startDate:"2023-12-01", deadline:"2024-03-01", budget:"₹85,000",   spent:"₹82,500",   manager:"Kiran Dev",  tasks:8,  completedTasks:8 },
-  { id:"PRJ004", name:"E-Commerce Platform", status:"In Progress", progress:45,  startDate:"2024-02-01", deadline:"2024-07-15", budget:"₹8,50,000", spent:"₹3,82,500", manager:"Arjun Kumar",  tasks:18, completedTasks:8 },
-  { id:"PRJ005", name:"Logo Design Package", status:"Completed",   progress:100, startDate:"2024-01-10", deadline:"2024-02-28", budget:"₹45,000",   spent:"₹44,000",   manager:"Priya Singh",  tasks:6,  completedTasks:6 },
-];
-
-const MY_PAYMENTS = [
-  { id:"INV001", project:"Website Redesign",   date:"2024-04-01", due:"2024-04-30", paid:"2024-04-28", amount:"₹1,47,500", status:"Paid",    method:"UPI" },
-  { id:"INV002", project:"Mobile App Dev",     date:"2024-05-01", due:"2024-05-15", paid:null,         amount:"₹79,650",   status:"Overdue", method:"—" },
-  { id:"INV003", project:"Brand Identity Kit", date:"2024-03-10", due:"2024-04-10", paid:"2024-04-08", amount:"₹82,500",   status:"Paid",    method:"Bank Transfer" },
-  { id:"INV004", project:"Website Redesign",   date:"2024-05-10", due:"2024-06-10", paid:null,         amount:"₹1,12,100", status:"Pending", method:"—" },
-];
-
-const MY_TASKS = [
-  { id:"TSK001", title:"Homepage wireframe review",       project:"Website Redesign",   priority:"High",   status:"Done",        due:"2024-05-10", subtasks:[{title:"Desktop layout",done:true},{title:"Mobile layout",done:true}], comments:3 },
-  { id:"TSK002", title:"UI Component library approval",   project:"Website Redesign",   priority:"High",   status:"In Progress", due:"2024-05-22", subtasks:[{title:"Color palette sign-off",done:true},{title:"Typography review",done:false},{title:"Icon set approval",done:false}], comments:7 },
-  { id:"TSK003", title:"App feature requirements doc",    project:"Mobile App Dev",     priority:"Medium", status:"In Progress", due:"2024-05-28", subtasks:[{title:"Core features list",done:true},{title:"User flow diagrams",done:false}], comments:2 },
-  { id:"TSK004", title:"Brand color palette selection",   project:"Brand Identity Kit", priority:"Low",    status:"Done",        due:"2024-02-15", subtasks:[{title:"Primary palette",done:true}], comments:5 },
-  { id:"TSK005", title:"Content delivery for About page", project:"Website Redesign",   priority:"Medium", status:"Pending",     due:"2024-06-05", subtasks:[{title:"Write copy",done:false},{title:"Provide photos",done:false}], comments:1 },
-];
-
-const MY_EVENTS = [
-  { id:"EVT001", title:"Design Review Call",  project:"Website Redesign", date:"2024-05-20", time:"10:00 – 11:30", type:"Meeting" },
-  { id:"EVT002", title:"Payment Due",         project:"Mobile App Dev",   date:"2024-05-15", time:"EOD",           type:"Payment" },
-  { id:"EVT003", title:"App Demo Session",    project:"Mobile App Dev",   date:"2024-05-22", time:"14:00 – 15:30", type:"Demo" },
-  { id:"EVT004", title:"Feedback Submission", project:"Website Redesign", date:"2024-05-25", time:"EOD",           type:"Deadline" },
-];
-
-const INIT_NOTIFICATIONS = [
-  { id:1, icon:"🚨", text:"Invoice INV002 is overdue by 10 days",       time:"2h ago", type:"danger",  read:false, action:"View Invoice", actionPage:"payments" },
-  { id:2, icon:"✅", text:"Task 'Homepage wireframe' marked complete",   time:"5h ago", type:"success", read:false, action:"View Task",    actionPage:"tasks" },
-  { id:3, icon:"💬", text:"Kiran Dev commented on Website Redesign",     time:"1d ago", type:"info",    read:false, action:"Open Project", actionPage:"projects" },
-  { id:4, icon:"📁", text:"New project Mobile App Dev assigned to you",  time:"3d ago", type:"info",    read:true,  action:"View Project", actionPage:"projects" },
-  { id:5, icon:"💰", text:"Payment of ₹1,12,100 due on Jun 10",         time:"3d ago", type:"warning", read:true,  action:"Pay Now",      actionPage:"payments" },
-  { id:6, icon:"📊", text:"Q1 Project Summary report is ready",          time:"5d ago", type:"success", read:true,  action:"View Report",  actionPage:"reports" },
-];
-
-const MY_REPORTS = [
-  { id:"RPT001", title:"Q1 Project Summary", range:"Jan–Mar 2024", projects:3, revenue:"₹3,29,750", status:"Ready" },
-  { id:"RPT002", title:"April Activity",     range:"Apr 2024",     projects:2, revenue:"₹2,59,600", status:"Ready" },
-];
-
+// ── NAV ───────────────────────────────────────────────────────
 const NAV = [
   { key:"dashboard", icon:"⌂", label:"Dashboard" },
   { key:"projects",  icon:"◈", label:"My Projects" },
@@ -564,22 +520,42 @@ function TasksFiltered({ tasks }) {
 }
 
 // ── Calendar Page ─────────────────────────────────────────────
-function CalendarPage() {
-  const year=2024, month=4;
+function CalendarPage({ projects, tasks }) {
+  const year=new Date().getFullYear(), month=new Date().getMonth();
   const daysInMonth=new Date(year,month+1,0).getDate();
   const firstDay=new Date(year,month,1).getDay();
   const cells=Array.from({length:firstDay+daysInMonth},(_,i)=>i<firstDay?null:i-firstDay+1);
-  const eventDays=MY_EVENTS.reduce((acc,e)=>{ const d=parseInt(e.date.split("-")[2]); if(!acc[d]) acc[d]=[]; acc[d].push(e); return acc; },{});
+  
+  // Create events from tasks and projects
+  const events = [
+    ...projects.map(p => ({ id: p._id, title: p.name, date: p.deadline, type: "Deadline" })),
+    ...tasks.map(t => ({ id: t._id, title: t.title, date: t.date, type: "Meeting" }))
+  ].filter(e => e.date);
+
+  const eventDays=events.reduce((acc,e)=>{ 
+    const dateParts = e.date.split("-");
+    if (dateParts.length < 3) return acc;
+    const d=parseInt(dateParts[2]); 
+    if(!acc[d]) acc[d]=[]; 
+    acc[d].push(e); 
+    return acc; 
+  },{});
+
   const [selected,setSelected]=useState(null);
+  const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date());
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
       <div style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", padding:20 }}>
-        <div style={{ fontSize:16, fontWeight:800, color:"#0f172a", marginBottom:16 }}>May 2024</div>
+        <div style={{ fontSize:16, fontWeight:800, color:"#0f172a", marginBottom:16 }}>{monthName} {year}</div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:4, marginBottom:8 }}>
           {["S","M","T","W","T","F","S"].map((d,i)=><div key={i} style={{ textAlign:"center", fontSize:10, fontWeight:700, color:"#94a3b8", letterSpacing:0.5, padding:"4px 0" }}>{d}</div>)}
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:4 }}>
-          {cells.map((day,i)=>{ const hasEvent=day&&eventDays[day]; const isToday=day===17; const isSel=day===selected;
+          {cells.map((day,i)=>{ 
+            const hasEvent=day&&eventDays[day]; 
+            const isToday=day===new Date().getDate(); 
+            const isSel=day===selected;
             return <div key={i} onClick={()=>day&&setSelected(isSel?null:day)} style={{ padding:"8px 4px", textAlign:"center", borderRadius:8, fontSize:12, fontWeight:hasEvent?700:400, color:isToday?"#fff":isSel?"#6366f1":day?"#374151":"transparent", background:isToday?"#6366f1":isSel?"#eef2ff":hasEvent?"#f5f3ff":"transparent", border:isSel&&!isToday?"1.5px solid #6366f1":"1.5px solid transparent", cursor:day?"pointer":"default", position:"relative" }}>
               {day||""}
               {hasEvent&&!isToday&&<div style={{ position:"absolute", bottom:3, left:"50%", transform:"translateX(-50%)", display:"flex", gap:2 }}>{eventDays[day].slice(0,2).map((e,j)=><div key={j} style={{ width:4, height:4, borderRadius:"50%", background:e.type==="Payment"?"#ef4444":e.type==="Demo"?"#10b981":"#6366f1" }}/>)}</div>}
@@ -589,9 +565,9 @@ function CalendarPage() {
       </div>
       <div>
         <div style={{ fontSize:13, fontWeight:700, color:"#64748b", marginBottom:10 }}>
-          {selected&&eventDays[selected]?`Events on May ${selected}`:"All Upcoming Events"}
+          {selected&&eventDays[selected]?`Events on ${monthName} ${selected}`:"Upcoming Project Milestones"}
         </div>
-        {(selected&&eventDays[selected]?eventDays[selected]:MY_EVENTS).map(e=>(
+        {(selected&&eventDays[selected]?eventDays[selected]:events).map(e=>(
           <div key={e.id} style={{ background:"#fff", borderRadius:12, padding:"12px 14px", border:"1px solid #e2e8f0", marginBottom:8, display:"flex", alignItems:"center", gap:12 }}>
             <div style={{ width:36, height:36, borderRadius:10, background:e.type==="Payment"?"#fef2f2":e.type==="Demo"?"#f0fdf4":"#eef2ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0 }}>
               {e.type==="Payment"?"💳":e.type==="Demo"?"🖥️":e.type==="Deadline"?"⏰":"📞"}
@@ -685,10 +661,10 @@ function NotificationsPage({ notifications, onMarkRead, onMarkAllRead, onNavigat
 export default function ClientDashboard({ user, setUser }) {
   const [active,        setActive]        = useState("dashboard");
   const [sidebarOpen,   setSidebarOpen]   = useState(false);
-  const [notifications, setNotifications] = useState(INIT_NOTIFICATIONS);
-  const [projects,      setProjects]      = useState(MY_PROJECTS);
-  const [tasks,         setTasks]         = useState(MY_TASKS);
-  const [payments,      setPayments]      = useState(MY_PAYMENTS);
+  const [notifications, setNotifications] = useState([]);
+  const [projects,      setProjects]      = useState([]);
+  const [tasks,         setTasks]         = useState([]);
+  const [payments,      setPayments]      = useState([]);
   const [loading,       setLoading]       = useState(false);
 
   const clientUser = {
@@ -721,53 +697,55 @@ export default function ClientDashboard({ user, setUser }) {
   });
 
   useEffect(() => {
-    // Load proposals from backend
-    console.log("User object:", user);
     const currentClientName = (user?.name || user?.clientName || user?.companyName || user?.client || "").trim();
-    console.log("Current client name:", currentClientName);
-    
-    // Show available client names from proposals for debugging
-    if (user) {
-      axios.get(`${BASE_URL}/api/proposals`)
-        .then(res => {
-          const clientNames = [...new Set(res.data.map(p => p.client).filter(Boolean))];
-          console.log("Available client names in proposals:", clientNames);
-        })
-        .catch(err => console.error("Error fetching client names:", err));
-    }
-    if (currentClientName) {
-      // Load all proposals and filter by client name on frontend
-      axios.get(`${BASE_URL}/api/proposals`)
-        .then(res => {
-          console.log("All proposals API response:", res.data);
-          // Filter by client name (exact match or normalized match)
-          const clientProposals = res.data.filter(p => 
-            p.client && currentClientName && 
-            p.client.toLowerCase() === currentClientName.toLowerCase() &&
-            ["draft", "pending", "approved", "rejected"].includes(p.status)
-          );
-          setProposals(clientProposals);
-          console.log(`Loaded ${clientProposals.length} proposals for client ${currentClientName}`);
-        })
-        .catch(err => {
-          console.error("Error loading proposals from backend:", err);
-          setProposals([]);
-        });
-    } else {
-      console.log("No client name found in user object");
-    }
+    if (!currentClientName) return;
 
-    if (!user?.name) return;
-    const name = encodeURIComponent(user.name);
     setLoading(true);
-    // Standardizing to local API
-    axios.get(`/api/projects/by-client/${name}`)
+    const encodedName = encodeURIComponent(currentClientName);
+
+    // Fetch Proposals for this specific client
+    axios.get(`${BASE_URL}/api/proposals/client/${encodedName}`)
+      .then(res => {
+        const clientProposals = res.data.filter(p => 
+          ["draft", "pending", "approved", "rejected"].includes(p.status)
+        );
+        setProposals(clientProposals);
+      })
+      .catch(err => {
+        console.error("Error loading proposals:", err);
+        setProposals([]);
+      });
+
+    // Fetch Projects for this specific client
+    axios.get(`${BASE_URL}/api/projects/client/${encodedName}`)
       .then(res => {
         if (res.data) setProjects(res.data);
       })
       .catch((err) => {
         console.error("Error fetching projects:", err);
+      });
+
+    // Fetch Tasks for this specific client
+    axios.get(`${BASE_URL}/api/tasks/client/${encodedName}`)
+      .then(res => {
+        if (res.data) setTasks(res.data);
       })
+      .catch(err => console.error("Error fetching tasks:", err));
+
+    // Fetch Invoices (Payments) for this specific client
+    axios.get(`${BASE_URL}/api/invoices/client/${encodedName}`)
+      .then(res => {
+        if (res.data) {
+          const mapped = res.data.map(inv => ({
+            ...inv,
+            amount: `${inv.currency || "₹"}${inv.total.toLocaleString("en-IN")}`,
+            project: inv.project || "—",
+            due: inv.dueDate || inv.date,
+          }));
+          setPayments(mapped);
+        }
+      })
+      .catch(err => console.error("Error fetching invoices:", err))
       .finally(() => setLoading(false));
   }, [user]);
   const handleLogout = () => { localStorage.removeItem("user"); if(setUser) setUser(null); };
@@ -897,11 +875,14 @@ export default function ClientDashboard({ user, setUser }) {
                 </div>
                 <div style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", padding:"16px 18px" }}>
                   <div style={{ fontSize:13, fontWeight:800, color:"#0f172a", marginBottom:12 }}>Upcoming</div>
-                  {MY_EVENTS.map(e=>(
+                  {[
+                    ...projects.map(p => ({ id: p._id, title: p.name, date: p.deadline, type: "Deadline", time: "EOD" })),
+                    ...tasks.filter(t => t.date).map(t => ({ id: t._id, title: t.title, date: t.date, type: "Task", time: t.time || "All day" }))
+                  ].slice(0, 4).map(e=>(
                     <div key={e.id} style={{ display:"flex", gap:10, padding:"8px 0", borderBottom:"1px solid #f8fafc", alignItems:"center" }}>
-                      <div style={{ background:"#f5f3ff", borderRadius:8, padding:"6px 8px", textAlign:"center", flexShrink:0 }}>
-                        <div style={{ fontSize:13, fontWeight:800, color:"#6366f1", lineHeight:1 }}>{e.date.split("-")[2]}</div>
-                        <div style={{ fontSize:8, color:"#94a3b8", fontWeight:700 }}>MAY</div>
+                      <div style={{ background:"#f5f3ff", borderRadius:8, padding:"6px 8px", textAlign:"center", flexShrink:0, minWidth:36 }}>
+                        <div style={{ fontSize:13, fontWeight:800, color:"#6366f1", lineHeight:1 }}>{e.date?.split("-")[2] || "—"}</div>
+                        <div style={{ fontSize:8, color:"#94a3b8", fontWeight:700 }}>{e.date ? new Date(e.date).toLocaleString('en-US', {month:'short'}).toUpperCase() : "DATE"}</div>
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ fontSize:12, fontWeight:700, color:"#0f172a", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{e.title}</div>
@@ -909,6 +890,9 @@ export default function ClientDashboard({ user, setUser }) {
                       </div>
                     </div>
                   ))}
+                  {projects.length === 0 && tasks.length === 0 && (
+                    <div style={{ fontSize:11, color:"#94a3b8", textAlign:"center", padding:"20px 0" }}>No upcoming events</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -919,138 +903,19 @@ export default function ClientDashboard({ user, setUser }) {
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
               
               {/* Projects Header */}
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
-                <div style={{ fontSize:13, color:"#64748b" }}>
-                  {projects.length} project{projects.length !== 1 ? "s" : ""} found
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10, background: "#f8fafc", padding: "12px 18px", borderRadius: 12, border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", gap: 20 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#6366f1" }}></div>
+                    <div style={{ fontSize:13, fontWeight: 700, color:"#1e293b" }}>
+                      {projects.length} Active Project{projects.length !== 1 ? "s" : ""}
+                    </div>
+                  </div>
                 </div>
-                <button 
-                  onClick={() => window.open("/project-proposal", "_blank")}
-                  style={{ 
-                    background:"linear-gradient(135deg,#6366f1,#8b5cf6)", 
-                    color:"#fff", 
-                    border:"none", 
-                    borderRadius:9, 
-                    padding:"8px 16px", 
-                    fontSize:12, 
-                    fontWeight:700, 
-                    cursor:"pointer", 
-                    fontFamily:"inherit" 
-                  }}
-                >
-                  ➕ Create New Project
-                </button>
               </div>
               
-              {/* Proposals Section */}
-              {proposals.length > 0 && (
-                <>
-                  <div style={{ fontSize:15, fontWeight:800, color:"#94a3b8", textTransform:"uppercase", letterSpacing:1, marginTop:8 }}>Proposals Awaiting Action</div>
-                  {proposals.map(p=>(
-                    <div key={p.id} style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", padding:"20px 22px" }}>
-                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
-                        <div>
-                          <div style={{ fontSize:16, fontWeight:800, color:"#0f172a" }}>{p.title}</div>
-                          <div style={{ fontSize:11, color:"#94a3b8", marginTop:4 }}>{p.id} · {new Date(p.updated).toLocaleDateString()}</div>
-                        </div>
-                        <Badge label={p.status==="pending" ? "Pending Approval" : p.status==="approved" ? "Approved" : p.status==="rejected" ? "Rejected" : "Draft"} size="lg"/>
-                      </div>
-                      {/* View Proposal Button - Always visible */}
-                      <div style={{ marginTop:12, marginBottom:12 }}>
-                        <button
-                          onClick={() => window.open(`/project-proposal?view=${p.id || p._id}`, "_blank")}
-                          style={{
-                            background:"linear-gradient(135deg,#6366f1,#8b5cf6)",
-                            color:"#fff",
-                            border:"none",
-                            borderRadius:8,
-                            padding:"10px 16px",
-                            fontSize:12,
-                            fontWeight:700,
-                            cursor:"pointer",
-                            fontFamily:"inherit",
-                            display:"flex",
-                            alignItems:"center",
-                            gap:6
-                          }}
-                        >
-                          <span>👁</span> View Full Proposal
-                        </button>
-                      </div>
-
-                      {p.status==="pending" && (
-                        <div style={{ marginTop:16, display:"flex", gap:10, paddingTop:16, borderTop:"1px solid #f1f5f9" }}>
-                          <button onClick={()=>{
-                            const updatedProposal = {...p, status:"approved", updated:new Date().toISOString()};
-                            axios.put(`${BASE_URL}/api/proposals/${p._id}/approve`, { status: "approved" })
-                              .then(res => {
-                                setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                                alert("🎉 Proposal Approved!");
-                              })
-                              .catch(err => console.error("Error approving proposal:", err));
-                          }} style={{ flex:1, background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>✅ Approve</button>
-
-                          <button onClick={()=>{
-                            const reason = window.prompt("Reason for rejection:");
-                            if(reason===null) return;
-                            const updatedProposal = {...p, status:"rejected", rejectNote:reason||"Needs revision", updated:new Date().toISOString()};
-                            axios.put(`${BASE_URL}/api/proposals/${p._id}/reject`, { rejectNote: reason || "Needs revision" })
-                              .then(res => {
-                                setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                                alert("❌ Proposal Rejected");
-                              })
-                              .catch(err => console.error("Error rejecting proposal:", err));
-                          }} style={{ flex:1, background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>❌ Reject & Apply Changes</button>
-                        </div>
-                      )}
-                      {p.status==="rejected" && (
-                        <div style={{ marginTop:16, padding:12, background:"#fef2f2", borderRadius:8, color:"#9f1239", fontSize:12 }}>
-                          <strong style={{ display:"block", marginBottom:4 }}>❌ Rejected for revision:</strong>
-                          {p.rejectNote}
-                          <div style={{ marginTop:12, display:"flex", gap:8 }}>
-                            
-                            <button
-                              onClick={() => {
-                                const updatedProposal = {...p, status:"pending", updated:new Date().toISOString()};
-                                axios.put(`${BASE_URL}/api/proposals/${p._id}/submit`)
-                                  .then(res => {
-                                    setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                                    alert("📤 Proposal resubmitted!");
-                                  })
-                                  .catch(err => console.error("Error resubmitting proposal:", err));
-                              }}
-                              style={{
-                                background:"#f59e0b",
-                                color:"#fff",
-                                border:"none",
-                                borderRadius:6,
-                                padding:"8px 12px",
-                                fontSize:11,
-                                fontWeight:700,
-                                cursor:"pointer"
-                              }}
-                            >
-                              Resubmit for Approval
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                      {p.status==="approved" && (
-                        <div style={{ marginTop:16, padding:12, background:"#f0fdf4", borderRadius:8, color:"#16a34a", fontSize:12, fontWeight:700 }}>
-                          ✅ Proposal successfully approved!
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </>
-              )}
-
-              {/* Projects Section */}
-              {proposals.length > 0 && (
-                <div style={{ fontSize:15, fontWeight:800, color:"#94a3b8", textTransform:"uppercase", letterSpacing:1, marginTop:8 }}>Active Projects</div>
-              )}
-              {proposals.length === 0 && (
-                <div style={{ fontSize:15, fontWeight:800, color:"#94a3b8", textTransform:"uppercase", letterSpacing:1, marginTop:8 }}>Your Projects</div>
-              )}
+              {/* Projects List */}
+              <div style={{ fontSize:15, fontWeight:800, color:"#94a3b8", textTransform:"uppercase", letterSpacing:1, marginTop:8 }}>Your Projects</div>
               {projects.map(p=>(
                 <div key={p.id||p._id} style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", padding:"20px 22px" }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10, marginBottom:14 }}>
@@ -1175,21 +1040,37 @@ export default function ClientDashboard({ user, setUser }) {
                     )}
                     
                     <div style={{ marginTop:12, display:"flex", gap:8 }}>
-                      
-                      <button 
-                        onClick={() => window.open(`/project-proposal?view=${p.id}`, "_blank")}
+                        <button 
+                          onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")}
                         style={{ 
-                          background:"none", 
-                          border:"1px solid #e2e8f0", 
-                          borderRadius:6, 
-                          padding:"6px 12px", 
-                          fontSize:11, 
-                          color:"#64748b", 
+                          background:"#6366f1", 
+                          border:"none", 
+                          borderRadius:8, 
+                          padding:"8px 16px", 
+                          fontSize:12, 
+                          color:"#fff", 
+                          fontWeight: 700,
                           cursor:"pointer", 
                           fontFamily:"inherit" 
                         }}
                       >
                         View Full Proposal
+                      </button>
+                      <button 
+                          onClick={() => window.open(`/project-proposal?view=${p._id || p.id}&print=true`, "_blank")}
+                        style={{ 
+                          background:"#10b981", 
+                          border:"none", 
+                          borderRadius:8, 
+                          padding:"8px 16px", 
+                          fontSize:12, 
+                          color:"#fff", 
+                          fontWeight: 700,
+                          cursor:"pointer", 
+                          fontFamily:"inherit" 
+                        }}
+                      >
+                        🖨️ Print
                       </button>
                     </div>
                   </div>
@@ -1246,27 +1127,12 @@ export default function ClientDashboard({ user, setUser }) {
           )}
 
           {active==="reports" && (
-            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-              {MY_REPORTS.map(r=>(
-                <div key={r.id} style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", padding:"20px 22px" }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
-                    <div>
-                      <div style={{ fontSize:15, fontWeight:800, color:"#0f172a" }}>{r.title}</div>
-                      <div style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace", marginTop:2 }}>📅 {r.range}</div>
-                    </div>
-                    <Badge label={r.status} size="lg"/>
-                  </div>
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, marginBottom:14 }}>
-                    {[["Projects",r.projects],["Total Spend",r.revenue]].map(([k,v])=>(
-                      <div key={k} style={{ background:"#f8fafc", borderRadius:10, padding:"10px 12px", border:"1px solid #f1f5f9" }}>
-                        <div style={{ fontSize:10, color:"#94a3b8", fontWeight:700, letterSpacing:0.5, textTransform:"uppercase", marginBottom:3 }}>{k}</div>
-                        <div style={{ fontSize:16, fontWeight:800, color:"#0f172a", fontFamily:"'DM Mono',monospace" }}>{v}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <button style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", border:"none", borderRadius:9, padding:"9px 18px", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>📥 Download PDF</button>
-                </div>
-              ))}
+            <div style={{ display:"flex", flexDirection:"column", gap:14, padding: "20px", textAlign: "center", background: "#fff", borderRadius: 16, border: "1px solid #e2e8f0" }}>
+              <div style={{ fontSize: 40 }}>📊</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Project Reports</div>
+              <div style={{ fontSize: 13, color: "#94a3b8" }}>
+                Detailed activity and financial reports will be generated once your projects have significant activity.
+              </div>
             </div>
           )}
 

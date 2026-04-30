@@ -13,6 +13,18 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET single proposal by ID
+router.get("/:dbId", async (req, res) => {
+  try {
+    const companyId = req.companyId || "NONE";
+    const proposal = await Proposal.findOne({ _id: req.params.dbId, companyId });
+    if (!proposal) return res.status(404).json({ msg: "Proposal not found" });
+    res.json(proposal);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
 // GET proposals for a specific client
 router.get("/client/:name", async (req, res) => {
   try {
@@ -20,6 +32,21 @@ router.get("/client/:name", async (req, res) => {
     const name = decodeURIComponent(req.params.name).trim();
     const list = await Proposal.find({ 
       client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") },
+      companyId
+    }).sort({ updatedAt: -1 });
+    res.json(list);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
+// GET proposals for a specific employee
+router.get("/employee/:name", async (req, res) => {
+  try {
+    const companyId = req.companyId || "NONE";
+    const name = decodeURIComponent(req.params.name).trim();
+    const list = await Proposal.find({ 
+      assignedEmployee: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") },
       companyId
     }).sort({ updatedAt: -1 });
     res.json(list);

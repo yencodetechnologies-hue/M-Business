@@ -65,6 +65,8 @@ exports.getBoardData = async (req, res) => {
             checked:       t.checked,
             groupId:       t.groupId,
             projectId:     t.projectId,
+            subtasks:      t.subtasks || [],
+            comments:      t.comments || [],
             createdAt:     t.createdAt,
           })),
         };
@@ -128,7 +130,7 @@ exports.updateTask = async (req, res) => {
     const allowed = [
       "title","description","notes","status","priority",
       "assignTo","type","date","time","estimatedTime",
-      "checked","groupId","projectId","order",
+      "checked","groupId","projectId","order","subtasks","comments",
     ];
 
     const updates = {};

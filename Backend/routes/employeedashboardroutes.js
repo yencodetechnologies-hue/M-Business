@@ -165,7 +165,12 @@ router.get("/projects/:name", async (req, res) => {
 router.get("/tasks/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name);
-    const tasks = await Task.find({ assignedTo: { $regex: new RegExp(name, "i") } }).sort({ createdAt: -1 });
+    const tasks = await Task.find({
+      assignTo: { $regex: new RegExp(name, "i") },
+      isDeleted: false
+    })
+    .populate("projectId", "name color")
+    .sort({ createdAt: -1 });
     res.json(tasks);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
 });
@@ -446,7 +451,7 @@ router.get("/summary/:name", async (req, res) => {
     const name = decodeURIComponent(req.params.name);
     const [projects, tasks, attendance, salary] = await Promise.all([
       Project.find({ $or: [{ assignedTo: { $regex: new RegExp(name, "i") } }, { manager: { $regex: new RegExp(name, "i") } }] }),
-      Task.find({ assignedTo: { $regex: new RegExp(name, "i") } }),
+      Task.find({ assignTo: { $regex: new RegExp(name, "i") }, isDeleted: false }),
       Attendance.find({ employeeName: { $regex: new RegExp(name, "i") } }),
       Salary.find({ employeeName: { $regex: new RegExp(name, "i") } }).sort({ createdAt: -1 }).limit(1),
     ]);

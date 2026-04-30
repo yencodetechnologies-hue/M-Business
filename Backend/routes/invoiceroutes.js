@@ -63,6 +63,40 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/client/:clientName", async (req, res) => {
+  try {
+    const companyId = req.companyId || "NONE";
+    const name = decodeURIComponent(req.params.clientName).trim();
+    const invoices = await Invoice.find({
+      companyId,
+      client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") }
+    }).sort({ createdAt: -1 }).lean();
+
+    const normalised = invoices.map((doc) => {
+      const subtotal = (doc.items || []).reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+      const gstRate = parseFloat(doc.gstRate) || 0;
+      const total = doc.total || subtotal * (1 + gstRate / 100);
+      return {
+        id: doc._id.toString(),
+        invoiceNo: doc.invoiceNo || "—",
+        client: doc.client || "—",
+        project: doc.project || "",
+        date: doc.date || null,
+        dueDate: doc.dueDate || null,
+        status: doc.status || "draft",
+        total,
+        amountPaid: doc.amountPaid || 0,
+        currency: doc.currency || "₹",
+        savedAt: doc.createdAt || Date.now(),
+        items: doc.items || [],
+      };
+    });
+    res.json(normalised);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
 // ── POST create / update invoice ─────────────────────────────────────────────
 // Frontend sends { inv, items } — flatten to match your flat model schema
 router.post("/", async (req, res) => {

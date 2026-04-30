@@ -15,7 +15,7 @@ const THEMES = [
 ];
 
 const printProposal = (proposal) => {
-  if (!proposal || !proposal.slides) return;
+  if (!proposal) return;
   
   const getElementsHTML = (elements) => {
     if (!elements || elements.length === 0) return '';
@@ -23,30 +23,41 @@ const printProposal = (proposal) => {
       <div style="position:absolute; inset:0; pointer-events:none; z-index:20;">
         ${elements.map(el => {
           let content = '';
-          if (el.type === "text") {
-            content = `<div style="font-size:${el.fontSize}px; font-weight:${el.fontWeight}; color:${el.color||'#000'}; white-space:nowrap;">${el.val || ''}</div>`;
+          const val = el.val || el.text || '';
+          if (el.type === "text" || el.type === "heading") {
+            const fs = el.fontSize || (el.type === "heading" ? 24 : 16);
+            const fw = el.fontWeight || (el.type === "heading" ? 700 : 400);
+            content = `<div style="font-size:${fs}px; font-weight:${fw}; color:${el.color||'#000'}; white-space:pre-wrap; width:${el.width||el.w}px;">${val}</div>`;
           } else if (el.type === "shape") {
-             const br = el.borderRadius !== undefined ? el.borderRadius + 'px' : (el.shape === 'circle' ? '50%' : '4px');
-             content = `<div style="width:${el.width||60}px; height:${el.height||60}px; background:${el.color||'#7c3aed'}; border-radius:${br};"></div>`;
+             const br = el.borderRadius !== undefined ? (typeof el.borderRadius === 'number' ? el.borderRadius + 'px' : el.borderRadius) : (el.shape === 'circle' ? '50%' : '4px');
+             content = `<div style="width:${el.width||el.w||60}px; height:${el.height||el.h||60}px; background:${el.color||'#7c3aed'}; border-radius:${br};"></div>`;
           } else if (el.type === "image") {
-             content = `<img src="${el.src}" style="width:${el.width||200}px; height:${el.height||'auto'}; object-fit:contain; pointer-events:none;" />`;
+             content = `<img src="${el.src}" style="width:${el.width||el.w||200}px; height:${el.height||el.h||'auto'}; object-fit:contain; pointer-events:none;" />`;
           } else if (el.type === "icon") {
              content = `<div style="font-size:${el.fontSize||40}px; display:flex; align-items:center; justify-content:center;">${el.icon}</div>`;
           }
-          return `<div style="position:absolute; left:${el.x}px; top:${el.y}px;">${content}</div>`;
+          return `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width||el.w||'auto'}px; height:${el.height||el.h||'auto'}px;">${content}</div>`;
         }).join('')}
       </div>
     `;
   };
 
-  const proposalHTML = proposal.slides.map(slide => {
+  let proposalHTML = "";
+
+  if (proposal.format === "canvas" && proposal.canvasElements) {
+    proposalHTML = `
+      <div style="page-break-after: always; min-height: 100vh; position: relative; background: #fff; overflow: hidden;">
+        ${getElementsHTML(proposal.canvasElements)}
+      </div>
+    `;
+  } else if (proposal.slides && proposal.slides.length > 0) {
+    proposalHTML = proposal.slides.map(slide => {
       const t = THEMES.find(x=>x.name===proposal.theme)||THEMES[0];
       const elementsHTML = getElementsHTML(slide.elements);
       
-      // Generate HTML for different slide types
       if (slide.type === "cover") {
         return `
-          <div style="page-break-after: always; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; position: relative; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); color: white; padding: 48px 56px;">
+          <div style="page-break-after: always; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; position: relative; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); color: white; padding: 48px 56px; overflow: hidden;">
             <div style="position: absolute; inset: 0; background: url('${slide.coverImage || ''}') center/cover; z-index: -2;"></div>
             <div style="position: absolute; inset: 0; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); z-index: -1;"></div>
             <h1 style="font-size: 48px; font-weight: 900; margin-bottom: 16px; line-height: 1.05;">${slide.title}</h1>
@@ -58,7 +69,7 @@ const printProposal = (proposal) => {
       
       if (slide.type === "overview" || slide.type === "closing") {
         return `
-          <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative;">
+          <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
             <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
             <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
             <p style="font-size: 15px; color: #4b5563; line-height: 1.9; max-width: 620px; white-space: pre-wrap;">${slide.body}</p>
@@ -69,11 +80,11 @@ const printProposal = (proposal) => {
       
       if (slide.type === "objectives") {
         return `
-          <div style="page-break-after: always; min-height: 100vh; padding: 56px; position: relative;">
+          <div style="page-break-after: always; min-height: 100vh; padding: 56px; position: relative; background: #fff; overflow: hidden;">
             <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
-            <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
+            <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading}</h1>
             <div style="display: flex; flex-direction: column; gap: 14px;">
-              ${slide.items.map((item, i) => `
+              ${(slide.items || []).map((item, i) => `
                 <div style="display: flex; gap: 18px; align-items: flex-start; padding: 16px 22px; background: ${t.l}; border-radius: 14px; border: 1px solid ${t.p}20;">
                   <div style="width: 36px; height: 36px; border-radius: 50%; background: ${t.g}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; flex-shrink: 0;">${i+1}</div>
                   <div style="flex: 1; font-size: 14px; color: #1e293b; font-weight: 600; padding-top: 6px;">${item}</div>
@@ -87,45 +98,50 @@ const printProposal = (proposal) => {
       
       // Default slide handling
       return `
-        <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative;">
+        <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
           <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading || 'Slide'}</h1>
           <p style="font-size: 15px; color: #4b5563; line-height: 1.9; white-space: pre-wrap;">${slide.body || ''}</p>
           ${elementsHTML}
         </div>
       `;
     }).join("");
+  } else {
+    proposalHTML = `<div style="padding: 56px; text-align: center; color: #666;">This proposal has no content yet.</div>`;
+  }
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      alert("Please allow popups to print.");
-      return;
-    }
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${proposal.title} - Proposal</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { background: white; font-family: Arial, sans-serif; }
-            @page { size: A4; margin: 0; }
-            @media print {
-              body { margin: 0; }
-            }
-          </style>
-        </head>
-        <body>
-          ${proposalHTML}
-          <script>
-            window.onload = () => {
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    alert("Please allow popups to print.");
+    return;
+  }
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${proposal.title || 'Proposal'}</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { background: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+          @page { size: A4; margin: 0; }
+          @media print {
+            body { margin: 0; -webkit-print-color-adjust: exact; }
+          }
+        </style>
+      </head>
+      <body>
+        ${proposalHTML}
+        <script>
+          window.onload = () => {
+            setTimeout(() => {
               window.print();
               window.onafterprint = () => window.close();
-            };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+            }, 500);
+          };
+        </script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
 };
 
 const T = {
@@ -363,6 +379,168 @@ function ClientDropdown({ clients, value, onChange, error }) {
   );
 }
 
+function EmployeeDropdown({ employees, value, onChange, error }) {
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const filtered = employees.filter(e => 
+    (e.name || "").toLowerCase().includes(search.toLowerCase())
+  );
+  
+  return (
+    <div style={{ position: "relative" }}>
+      <div onClick={() => setOpen(!open)} style={{
+        width: "100%",
+        border: `1.5px solid ${error ? "#EF4444" : open ? "#9333ea" : "#ede9fe"}`,
+        borderRadius: 10,
+        padding: "10px 36px 10px 14px",
+        fontSize: 13,
+        color: value ? T.text : "#a78bfa",
+        background: "#faf5ff",
+        cursor: "pointer",
+        userSelect: "none",
+        boxSizing: "border-box",
+        position: "relative",
+        minHeight: 42
+      }}>
+        {value ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#fff",
+              fontSize: 10,
+              fontWeight: 700,
+              flexShrink: 0
+            }}>
+              {value[0].toUpperCase()}
+            </div>
+            <span>{value}</span>
+          </div>
+        ) : "-- Select Employee --"}
+        <span style={{
+          position: "absolute",
+          right: 12,
+          top: "50%",
+          transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`,
+          fontSize: 10,
+          color: "#a78bfa",
+          transition: "0.2s"
+        }}>▼</span>
+      </div>
+      {open && (
+        <div style={{
+          position: "absolute",
+          top: "calc(100% + 4px)",
+          left: 0,
+          right: 0,
+          background: "#fff",
+          border: "1.5px solid #ede9fe",
+          borderRadius: 12,
+          boxShadow: "0 8px 32px rgba(147,51,234,0.15)",
+          zIndex: 999,
+          overflow: "hidden"
+        }}>
+          <div style={{ padding: "10px 10px 6px" }}>
+            <div style={{ position: "relative" }}>
+              <span style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: 12
+              }}>🔍</span>
+              <input
+                autoFocus
+                placeholder="Search employee..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onClick={e => e.stopPropagation()}
+                style={{
+                  width: "100%",
+                  padding: "7px 10px 7px 30px",
+                  border: "1.5px solid #ede9fe",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  background: "#faf5ff",
+                  outline: "none",
+                  fontFamily: "inherit",
+                  boxSizing: "border-box"
+                }}
+              />
+            </div>
+          </div>
+          <div style={{ maxHeight: 180, overflowY: "auto" }}>
+            {filtered.length === 0 ? (
+              <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>
+                No employees found
+              </div>
+            ) : (
+              filtered.map((e, i) => {
+                const name = e.name || "";
+                const isSel = value === name;
+                return (
+                  <div
+                    key={i}
+                    onClick={() => {
+                      onChange(name);
+                      setOpen(false);
+                      setSearch("");
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      padding: "10px 14px",
+                      cursor: "pointer",
+                      background: isSel ? "#f3e8ff" : "transparent",
+                      borderBottom: "1px solid #f5f3ff"
+                    }}
+                    onMouseEnter={ev => ev.currentTarget.style.background = "#faf5ff"}
+                    onMouseLeave={ev => ev.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}
+                  >
+                    <div style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: "50%",
+                      background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#fff",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      flexShrink: 0
+                    }}>
+                      {name[0]?.toUpperCase() || "?"}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>
+                    </div>
+                    {isSel && <span style={{ fontSize: 14, color: "#9333ea" }}>✓</span>}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+      {open && <div style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 998
+      }} onClick={() => {
+        setOpen(false);
+        setSearch("");
+      }} />}
+    </div>
+  );
+}
+
 function Mdl({ title, onClose, children, maxWidth = 820 }) {
   return (
     <div style={{
@@ -420,8 +598,9 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
 }
 
 export default function AdminProposalManagement() {
-  const [proposals, setProposals] = useState([]);
+   const [proposals, setProposals] = useState([]);
   const [clients, setClients] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedProposal, setSelectedProposal] = useState(null);
@@ -430,14 +609,17 @@ export default function AdminProposalManagement() {
   const [rejectReason, setRejectReason] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState("");
+  const [selectedEmployee, setSelectedEmployee] = useState("");
   const [proposalTitle, setProposalTitle] = useState("");
   const [creatingProposal, setCreatingProposal] = useState(false);
   const [showCanvasEditor, setShowCanvasEditor] = useState(false);
   const [editingProposalId, setEditingProposalId] = useState(null);
+  const [isUpdatingEmployee, setIsUpdatingEmployee] = useState(false);
 
   useEffect(() => {
     fetchProposals();
     fetchClients();
+    fetchEmployees();
 
     // Auto-refresh proposals every 5 seconds
     const interval = setInterval(() => {
@@ -454,13 +636,23 @@ export default function AdminProposalManagement() {
     };
   }, []);
 
-  const fetchClients = async () => {
+   const fetchClients = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/clients`);
       setClients(response.data || []);
     } catch (error) {
       console.error("Error fetching clients:", error);
       setClients([]);
+    }
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/employees`);
+      setEmployees(response.data || []);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      setEmployees([]);
     }
   };
 
@@ -491,8 +683,9 @@ export default function AdminProposalManagement() {
       setCreatingProposal(true);
       const newProposal = {
         id: `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random()*9000)+1000)}`,
-        title: proposalTitle.trim(),
+         title: proposalTitle.trim(),
         client: selectedClient,
+        assignedEmployee: selectedEmployee,
         status: "draft",
         theme: "Violet",
         format: "ppt",
@@ -545,13 +738,29 @@ export default function AdminProposalManagement() {
     }
   };
 
-  const handleReject = async (proposalId, reason) => {
+   const handleReject = async (proposalId, reason) => {
     try {
       await axios.put(`${BASE_URL}/api/proposals/${proposalId}/reject`, { rejectNote: reason });
       setProposals(prev => prev.map(p => p._id === proposalId ? { ...p, status: "rejected", rejectNote: reason } : p));
       setRejectTarget(null);
     } catch (error) {
       console.error("Error rejecting proposal:", error);
+    }
+  };
+
+  const handleUpdateEmployee = async (proposalId, employeeName) => {
+    try {
+      setIsUpdatingEmployee(true);
+      const res = await axios.put(`${BASE_URL}/api/proposals/${proposalId}`, { assignedEmployee: employeeName });
+      setProposals(prev => prev.map(p => p._id === proposalId ? res.data : p));
+      if (selectedProposal && selectedProposal._id === proposalId) {
+        setSelectedProposal(res.data);
+      }
+    } catch (error) {
+      console.error("Error updating assigned employee:", error);
+      alert("Failed to update assigned employee");
+    } finally {
+      setIsUpdatingEmployee(false);
     }
   };
 
@@ -566,9 +775,10 @@ export default function AdminProposalManagement() {
     fetchProposals(); // Refresh proposals after closing editor
   };
 
-  const filtered = proposals.filter(p =>
+   const filtered = proposals.filter(p =>
     (p.title || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.client || "").toLowerCase().includes(search.toLowerCase()) ||
+    (p.assignedEmployee || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.status || "").toLowerCase().includes(search.toLowerCase())
   );
 
@@ -675,9 +885,9 @@ export default function AdminProposalManagement() {
             fontSize: 13,
             minWidth: 700
           }}>
-            <thead>
+             <thead>
               <tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
-                {["#", "Title", "Client", "Slides", "Status", "Updated", "Actions"].map(c => (
+                {["#", "Title", "Client", "Assigned To", "Slides", "Status", "Updated", "Actions"].map(c => (
                   <th key={c} style={{
                     padding: "10px 14px",
                     textAlign: "left",
@@ -723,11 +933,37 @@ export default function AdminProposalManagement() {
                     }}>
                       {proposal.title || "Untitled Proposal"}
                     </td>
-                    <td style={{
+                     <td style={{
                       padding: "12px 14px",
                       color: "#7c3aed"
                     }}>
                       {proposal.client || "No client"}
+                    </td>
+                    <td style={{
+                      padding: "12px 14px",
+                      color: "#6b7280"
+                    }}>
+                      {proposal.assignedEmployee ? (
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <div style={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: "50%",
+                            background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#fff",
+                            fontSize: 9,
+                            fontWeight: 700
+                          }}>
+                            {proposal.assignedEmployee[0].toUpperCase()}
+                          </div>
+                          <span>{proposal.assignedEmployee}</span>
+                        </div>
+                      ) : (
+                        <span style={{ color: "#a78bfa", fontStyle: "italic" }}>Not assigned</span>
+                      )}
                     </td>
                     <td style={{
                       padding: "12px 14px",
@@ -909,9 +1145,19 @@ export default function AdminProposalManagement() {
                 <h4 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700, color: T.text }}>
                   {selectedProposal.title || "Untitled Proposal"}
                 </h4>
-                <p style={{ margin: 0, fontSize: 13, color: "#7c3aed" }}>
+                 <p style={{ margin: 0, fontSize: 13, color: "#7c3aed" }}>
                   Client: {selectedProposal.client || "No client"}
                 </p>
+                <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#6b7280" }}>Assigned To:</span>
+                  <div style={{ flex: 1, maxWidth: 200 }}>
+                    <EmployeeDropdown 
+                      employees={employees}
+                      value={selectedProposal.assignedEmployee || ""}
+                      onChange={(val) => handleUpdateEmployee(selectedProposal._id, val)}
+                    />
+                  </div>
+                </div>
               </div>
               <Badge status={selectedProposal.status || "draft"} />
             </div>
@@ -1235,10 +1481,28 @@ export default function AdminProposalManagement() {
               }}>
                 CLIENT *
               </label>
-              <ClientDropdown
+               <ClientDropdown
                 clients={clients}
                 value={selectedClient}
                 onChange={setSelectedClient}
+              />
+            </div>
+
+            <div>
+              <label style={{
+                display: "block",
+                fontSize: 11,
+                color: "#7c3aed",
+                fontWeight: 700,
+                letterSpacing: 0.5,
+                marginBottom: 5
+              }}>
+                ASSIGN TO EMPLOYEE
+              </label>
+              <EmployeeDropdown
+                employees={employees}
+                value={selectedEmployee}
+                onChange={setSelectedEmployee}
               />
             </div>
             

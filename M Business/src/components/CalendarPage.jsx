@@ -193,7 +193,15 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
   const dateStr = (d) =>
     `${calYear}-${String(calMonth + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
 
-  const eventsOnDay = (d) => allDisplayEvents.filter(e => e.date === dateStr(d));
+  const eventsOnDay = (d) => {
+    const targetDateStr = dateStr(d);
+    return allDisplayEvents.filter(e => {
+      if (!e.date) return false;
+      // Handle both YYYY-MM-DD and ISO strings
+      const eDate = e.date.includes('T') ? e.date.split('T')[0] : e.date;
+      return eDate === targetDateStr;
+    });
+  };
 
   const f = (x) => {
     const q = search.toLowerCase();
@@ -269,7 +277,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
       </div>
 
       {/* ── MAIN SPLIT LAYOUT ─────────────────────────────────────── */}
-      <div style={{ display:"grid", gridTemplateColumns:"420px 1fr", gap:16, alignItems:"start" }}>
+      <div style={{ display:"grid", gridTemplateColumns:"360px 1fr", gap:16, alignItems:"start", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
 
         {/* ── LEFT: CALENDAR ──────────────────────────────────────── */}
         <div style={{ background:"#fff", borderRadius:16, padding:20,

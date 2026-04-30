@@ -14,7 +14,7 @@ function getNavForRole(role) {
   }
   if (r === "employee") {
     return NAV.filter(n =>
-      ["dashboard","tasks","calendar"].includes(n.key)
+      ["dashboard","tasks","payments","salary","calendar"].includes(n.key)
     );
   }
   return NAV;

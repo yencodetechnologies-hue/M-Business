@@ -109,7 +109,12 @@ function Fld({label,value,onChange,options,type="text",error,placeholder,disable
             {!options.includes(value)&&<input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value||""} onChange={e=>onChange(e.target.value)} style={sCustom} disabled={disabled}/>}
           </div>
         ):(<select value={value} onChange={e=>onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o=><option key={o}>{o}</option>)}</select>)
-      ):<input type={type} value={value} onChange={e=>onChange(e.target.value)} style={s} placeholder={placeholder||""} disabled={disabled}/>}
+      ):<input type={type} value={value||""} onChange={e=>{
+        const val=e.target.value;
+        const isNumericField = ["phone", "pincode", "zip", "salary", "mobile", "account", "pan", "person no", "office no"].some(l => label.toLowerCase().includes(l));
+        if (isNumericField && val && !/^\d*$/.test(val)) return;
+        onChange(val);
+      }} style={s} placeholder={placeholder||""} disabled={disabled}/>}
       {error&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {error}</div>}
     </div>
   );

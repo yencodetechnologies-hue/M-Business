@@ -1463,7 +1463,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
             <div>
               <label style={lbl}>Company Phone / Number</label>
-              <input value={inv.companyPhone} onChange={(e) => upd("companyPhone", e.target.value)} placeholder="Phone Number" style={inp()} />
+              <input value={inv.companyPhone} onChange={(e) => {
+                const val = e.target.value;
+                if(val && !/^\d*$/.test(val)) return;
+                upd("companyPhone", val);
+              }} placeholder="Phone Number" style={inp()} />
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={lbl}>Company Address</label>
@@ -1484,7 +1488,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
             <div>
               <label style={lbl}>Account Number</label>
-              <input value={inv.accountNumber} onChange={(e) => upd("accountNumber", e.target.value)} placeholder="Bank Account Number" style={inp()} />
+              <input value={inv.accountNumber} onChange={(e) => {
+                const val = e.target.value;
+                if(val && !/^\d*$/.test(val)) return;
+                upd("accountNumber", val);
+              }} placeholder="Bank Account Number" style={inp()} />
             </div>
             <div>
               <label style={lbl}>IFSC Code</label>

@@ -1001,7 +1001,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
           <div>
             <label style={lbl}>Company Phone / Number</label>
-            <input value={qt.companyPhone} onChange={(e) => upd("companyPhone", e.target.value)} placeholder="Phone Number" style={inp()} />
+            <input value={qt.companyPhone} onChange={(e) => {
+              const val = e.target.value;
+              if (val && !/^\d*$/.test(val)) return;
+              upd("companyPhone", val);
+            }} placeholder="Phone Number" style={inp()} />
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
             <label style={lbl}>Company Address</label>
@@ -1022,7 +1026,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
           <div>
             <label style={lbl}>Account Number</label>
-            <input value={qt.accountNumber} onChange={(e) => upd("accountNumber", e.target.value)} placeholder="Bank Account Number" style={inp()} />
+            <input value={qt.accountNumber} onChange={(e) => {
+              const val = e.target.value;
+              if (val && !/^\d*$/.test(val)) return;
+              upd("accountNumber", val);
+            }} placeholder="Bank Account Number" style={inp()} />
           </div>
           <div>
             <label style={lbl}>IFSC Code</label>

@@ -362,7 +362,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
         <StatCard icon="📄" label="Proposals"     value={proposals.length} sub="Assigned to you" color="#ec4899" onClick={()=>setPage("proposals")}/>
         <StatCard icon="◉" label="Pending Tasks" value={pendingTasks}      sub="Need attention"  color="#f59e0b" onClick={()=>setPage("tasks")}/>
         <StatCard icon="◷" label="Present Days"  value={presentDays}       sub="This month"      color="#10b981" onClick={()=>setPage("attendance")}/>
-        <StatCard icon="◆" label="Last Salary"   value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month||"Not yet"} color="#8b5cf6" onClick={()=>setPage("salary")}/>
+        <StatCard icon="◆" label="Last Payment"  value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month||"Not yet"} color="#8b5cf6" onClick={()=>setPage("salary")}/>
       </div>
 
       {/* Projects + Tasks row */}
@@ -1078,8 +1078,8 @@ function SalaryPage({ salary, user }) {
   const [selected, setSelected] = useState(salary[0]||null);
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-      <div><h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>Salary Slip</h1>
-        <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Your monthly salary breakdown</p></div>
+      <div><h1 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:0 }}>Payments History</h1>
+        <p style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Your monthly payment breakdown</p></div>
       <div style={{ display:"grid", gridTemplateColumns:"1fr 2fr", gap:16, alignItems:"start" }} className="two-col">
         <Card title="Select Month">
           {salary.map((s,i)=>(
@@ -1094,12 +1094,12 @@ function SalaryPage({ salary, user }) {
               </div>
             </div>
           ))}
-          {salary.length===0 && <div style={{ textAlign:"center", padding:"1.5rem", color:"#94a3b8", fontSize:13 }}>No salary records</div>}
+          {salary.length===0 && <div style={{ textAlign:"center", padding:"1.5rem", color:"#94a3b8", fontSize:13 }}>No payment records</div>}
         </Card>
         {selected ? (
           <Card>
             <div style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:12, padding:"20px 22px", marginBottom:20, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <div><div style={{ fontSize:16, fontWeight:800, color:"#fff" }}>Salary Slip</div>
+              <div><div style={{ fontSize:16, fontWeight:800, color:"#fff" }}>Payment Slip</div>
                 <div style={{ fontSize:13, color:"rgba(255,255,255,0.7)", marginTop:2 }}>{selected.month}</div></div>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,0.6)" }}>{user?.name||"Employee"}</div>
@@ -1127,7 +1127,7 @@ function SalaryPage({ salary, user }) {
               </div>
             </div>
             <div style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:12, padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <div><div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:600 }}>NET SALARY</div>
+              <div><div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:600 }}>NET PAYMENT</div>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,0.5)", marginTop:2 }}>Paid on {selected.paidOn||"—"}</div></div>
               <div style={{ fontSize:26, fontWeight:800, color:"#fff" }}>₹{fmt(selected.net)}</div>
             </div>
@@ -1136,7 +1136,7 @@ function SalaryPage({ salary, user }) {
             </button>
           </Card>
         ) : (
-          <Card><div style={{ textAlign:"center", padding:"3rem", color:"#94a3b8", fontSize:13 }}>Select a month to view salary slip</div></Card>
+          <Card><div style={{ textAlign:"center", padding:"3rem", color:"#94a3b8", fontSize:13 }}>Select a month to view payment slip</div></Card>
         )}
       </div>
     </div>
@@ -1488,7 +1488,7 @@ const fetchSubscription = async () => {
           {page==="proposals"  && <ProposalsPage  proposals={proposals}/>}
           {page==="tasks"      && <TasksPage      tasks={tasks}/>}
           {page==="attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify}/>}
-          {page==="salary"     && <SalaryPage     salary={salary} user={resolvedUser}/>}
+          {(page==="salary" || page==="payments") && <SalaryPage salary={salary} user={resolvedUser}/>}
           {page==="calendar"   && <CalendarPage projects={projects} tasks={tasks} user={resolvedUser} onUpdateProject={()=>loadData()} onUpdateTask={()=>loadData()} />}
           {page==="messaging"  && <MessagingPage user={resolvedUser} />}
         </div>

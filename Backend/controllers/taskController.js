@@ -7,8 +7,9 @@ const nodemailer = require("nodemailer");
 
 exports.getAllTasks = async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
-    const filter = { isDeleted: false, companyId };
+    const companyId = req.companyId || "";
+    const filter = { isDeleted: false };
+    if (companyId) filter.companyId = companyId;
     if (req.query.groupId)  filter.groupId  = req.query.groupId;
     if (req.query.status)   filter.status   = req.query.status;
     if (req.query.assignTo) filter.assignTo = req.query.assignTo;
@@ -32,13 +33,15 @@ exports.getAllTasks = async (req, res) => {
 
 exports.getBoardData = async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
-    const groupFilter = { isDeleted: false, companyId };
+    const companyId = req.companyId || "";
+    const groupFilter = { isDeleted: false };
+    if (companyId) groupFilter.companyId = companyId;
     const groups = await Group.find(groupFilter).sort({ order: 1, createdAt: 1 });
 
     const board = await Promise.all(
       groups.map(async (g) => {
-        const taskFilter = { groupId: g._id, isDeleted: false, companyId };
+        const taskFilter = { groupId: g._id, isDeleted: false };
+        if (companyId) taskFilter.companyId = companyId;
         const tasks = await Task.find(taskFilter)
           .populate("projectId", "name color")
           .sort({ order: 1, createdAt: 1 });
@@ -81,8 +84,10 @@ exports.getBoardData = async (req, res) => {
 
 exports.getTask = async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
-    const task = await Task.findOne({ _id: req.params.id, isDeleted: false, companyId })
+    const companyId = req.companyId || "";
+    const taskQuery = { _id: req.params.id, isDeleted: false };
+    if (companyId) taskQuery.companyId = companyId;
+    const task = await Task.findOne(taskQuery)
       .populate("projectId", "name color")
       .populate("groupId", "label color");
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -159,7 +164,7 @@ exports.updateTask = async (req, res) => {
 
 exports.toggleChecked = async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
+    const companyId = req.companyId || "";
     const task = await Task.findOne({ _id: req.params.id, isDeleted: false, companyId });
     if (!task) return res.status(404).json({ message: "Task not found" });
     task.checked = !task.checked;
@@ -172,7 +177,7 @@ exports.toggleChecked = async (req, res) => {
 
 exports.deleteTask = async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
+    const companyId = req.companyId || "";
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, isDeleted: false, companyId },
       { isDeleted: true },

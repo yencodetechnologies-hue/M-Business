@@ -24,22 +24,26 @@ router.get("/client/:clientName", async (req, res) => {
   try {
     const Project = require("../models/ProjectModel");
     const Task = require("../models/TaskModels");
-    const companyId = req.companyId || "NONE";
+    const companyId = req.companyId || "";
     const name = decodeURIComponent(req.params.clientName).trim();
     
     // 1. Find all projects belonging to this client
-    const projects = await Project.find({
-      client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") },
-      companyId
-    });
+    const projectFilter = { client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } };
+    if (companyId) projectFilter.companyId = companyId;
+    const projects = await Project.find(projectFilter);
     const projectIds = projects.map(p => p._id);
     
-    // 2. Find all tasks for those projects
-    const tasks = await Task.find({
-      projectId: { $in: projectIds },
+    // 2. Find all tasks for those projects OR directly assigned to the client
+    const taskFilter = {
+      $or: [
+        { projectId: { $in: projectIds } },
+        { assignTo: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } }
+      ],
       isDeleted: false,
-      companyId
-    }).sort({ createdAt: -1 });
+    };
+    if (companyId) taskFilter.companyId = companyId;
+
+    const tasks = await Task.find(taskFilter).sort({ createdAt: -1 });
     
     res.json(tasks);
   } catch (err) {

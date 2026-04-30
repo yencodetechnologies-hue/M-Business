@@ -314,12 +314,17 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
   const accent = { width:56,height:6,background:t.g,borderRadius:3,marginBottom:20 };
   const h1 = { fontSize:36,fontWeight:800,color:"#0f172a",marginBottom:24,letterSpacing:-0.5,lineHeight:1.1 };
 
-  const Txt = ({val,onCh,big,center,white,weight,size}) => {
+  const Txt = ({val,onCh,big,center,white,weight,size,numeric}) => {
     const s={background:"transparent",border:"none",borderRadius:4,padding:"2px 4px",outline:"none",fontSize:size||"inherit",color:white?"rgba(255,255,255,0.9)":"inherit",fontWeight:weight||"inherit",fontFamily:"inherit",lineHeight:"inherit",width:"100%",boxSizing:"border-box",textAlign:center?"center":"left",resize:"none",transition:"background .15s"};
     if(!editing) return <span style={{display:"block",whiteSpace:"pre-wrap"}}>{val}</span>;
+    const onInputChange = (e) => {
+      const v = e.target.value;
+      if (numeric && v && !/^\d*$/.test(v)) return;
+      onCh(v);
+    };
     return big 
-      ? <textarea value={val} onChange={e=>onCh(e.target.value)} rows={4} style={s} onFocus={e=>e.target.style.background="rgba(124,58,237,0.05)"} onBlur={e=>e.target.style.background="transparent"}/> 
-      : <input value={val} onChange={e=>onCh(e.target.value)} style={s} onFocus={e=>e.target.style.background="rgba(124,58,237,0.05)"} onBlur={e=>e.target.style.background="transparent"}/>;
+      ? <textarea value={val} onChange={onInputChange} rows={4} style={s} onFocus={e=>e.target.style.background="rgba(124,58,237,0.05)"} onBlur={e=>e.target.style.background="transparent"}/> 
+      : <input value={val} onChange={onInputChange} style={s} onFocus={e=>e.target.style.background="rgba(124,58,237,0.05)"} onBlur={e=>e.target.style.background="transparent"}/>;
   };
 
   const elementsOverlay = (

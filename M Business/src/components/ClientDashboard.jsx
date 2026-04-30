@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import React from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import CalendarPage from "./CalendarPage";
 
 // ── Theme ──────────────────────────────────────────────────────
 const T = {
@@ -424,10 +425,7 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
           })}
         </nav>
         <div style={{ padding:"12px 10px 20px", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
-          <div style={{ background:"rgba(99,102,241,0.12)", border:"1px solid rgba(99,102,241,0.2)", borderRadius:10, padding:"10px 12px", fontSize:11, color:"rgba(255,255,255,0.5)", lineHeight:1.6 }}>
-            <div style={{ color:"#a5b4fc", fontWeight:700, marginBottom:2 }}>{clientUser.plan} Plan</div>
-            Active through Dec 2024
-          </div>
+       
           <button onClick={onLogout} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"10px 12px", background:"rgba(239,68,68,0.15)", border:"1px solid rgba(239,68,68,0.35)", borderRadius:10, color:"#fca5a5", fontSize:12.5, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
             🚪 Logout
           </button>
@@ -547,170 +545,48 @@ function TasksFiltered({ tasks, onCommentAdded }) {
   );
 }
 
-// ── Calendar Page ─────────────────────────────────────────────
-function CalendarPage({ projects, tasks }) {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selected, setSelected] = useState(null);
-
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay();
-  const cells = Array.from({ length: firstDay + daysInMonth }, (_, i) => i < firstDay ? null : i - firstDay + 1);
-
-  // Create events from tasks and projects
-  const events = [
-    ...projects.map(p => ({ id: p._id, title: p.name, date: p.deadline, type: "Project", color: "#6366f1" })),
-    ...tasks.map(t => ({ id: t._id, title: t.title, date: t.date, type: "Task", color: "#10b981" }))
-  ].filter(e => {
-    if (!e.date) return false;
-    const d = new Date(e.date);
-    return d.getFullYear() === year && d.getMonth() === month;
-  });
-
-  const eventDays = events.reduce((acc, e) => {
-    const d = new Date(e.date).getDate();
-    if (!acc[d]) acc[d] = [];
-    acc[d].push(e);
-    return acc;
-  }, {});
-
-  const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
-
-  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
-  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
-  const goToToday = () => setCurrentDate(new Date());
-
-  const todayDate = new Date();
-  const isViewingCurrentMonth = todayDate.getFullYear() === year && todayDate.getMonth() === month;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20, animation: "slide-in 0.4s ease-out" }}>
-      <div style={{ background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.03)" }}>
-        
-        {/* Calendar Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-          <div>
-            <h2 style={{ fontSize: 20, fontWeight: 800, color: "#0f172a", margin: 0 }}>{monthName} {year}</h2>
-            <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>{events.length} events scheduled this month</div>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={prevMonth} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, width: 36, height: 36, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", transition: "0.2s" }} onMouseEnter={e => e.currentTarget.style.borderColor = "#6366f1"} onMouseLeave={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
-              <span style={{ fontSize: 18 }}>‹</span>
-            </button>
-            <button onClick={goToToday} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, padding: "0 14px", height: 36, cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#6366f1", transition: "0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = "#f8fafc"}>
-              Today
-            </button>
-            <button onClick={nextMonth} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, width: 36, height: 36, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", transition: "0.2s" }} onMouseEnter={e => e.currentTarget.style.borderColor = "#6366f1"} onMouseLeave={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
-              <span style={{ fontSize: 18 }}>›</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Days of Week */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 10, marginBottom: 12 }}>
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d, i) => (
-            <div key={i} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: 1, textTransform: "uppercase" }}>{d}</div>
-          ))}
-        </div>
-
-        {/* Calendar Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 10 }}>
-          {cells.map((day, i) => {
-            const hasEvent = day && eventDays[day];
-            const isToday = isViewingCurrentMonth && day === todayDate.getDate();
-            const isSel = day === selected;
-            
-            return (
-              <div 
-                key={i} 
-                onClick={() => day && setSelected(isSel ? null : day)} 
-                style={{ 
-                  aspectRatio: "1/1",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 14,
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: day ? "pointer" : "default",
-                  position: "relative",
-                  transition: "all 0.2s",
-                  background: isToday ? "linear-gradient(135deg, #6366f1, #4f46e5)" : isSel ? "#eef2ff" : hasEvent ? "#f8fafc" : "transparent",
-                  color: isToday ? "#fff" : isSel ? "#6366f1" : day ? "#334155" : "transparent",
-                  border: isToday ? "none" : isSel ? "2px solid #6366f1" : "2px solid transparent",
-                  boxShadow: isToday ? "0 4px 12px rgba(99, 102, 241, 0.3)" : "none"
-                }}
-                onMouseEnter={e => { if(day && !isToday) e.currentTarget.style.background = isSel ? "#eef2ff" : "#f1f5f9"; }}
-                onMouseLeave={e => { if(day && !isToday) e.currentTarget.style.background = isSel ? "#eef2ff" : hasEvent ? "#f8fafc" : "transparent"; }}
-              >
-                {day || ""}
-                {hasEvent && !isToday && (
-                  <div style={{ position: "absolute", bottom: 8, display: "flex", gap: 3 }}>
-                    {eventDays[day].slice(0, 3).map((e, j) => (
-                      <div key={j} style={{ width: 5, height: 5, borderRadius: "50%", background: e.color || "#6366f1" }} />
-                    ))}
-                    {eventDays[day].length > 3 && <div style={{ fontSize: 8, color: "#94a3b8", fontWeight: 800 }}>+</div>}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Selected Day / Upcoming Events Section */}
-      <div style={{ animation: "slide-in 0.5s ease-out" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 800, color: "#1e293b", margin: 0 }}>
-            {selected ? (
-              <span>Events for <strong style={{ color: "#6366f1" }}>{monthName} {selected}</strong></span>
-            ) : "Upcoming Events"}
-          </h3>
-          {selected && (
-            <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: "#64748b", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Clear Selection</button>
-          )}
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {(selected ? (eventDays[selected] || []) : events.slice(0, 5)).map((e, idx) => (
-            <div key={idx} style={{ background: "#fff", borderRadius: 16, padding: "16px", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 16, transition: "transform 0.2s", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.transform = "translateX(4px)"} onMouseLeave={e => e.currentTarget.style.transform = "none"}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: `${e.color}10`, color: e.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                {e.type === "Project" ? "📁" : "🎯"}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 4 }}>{e.title}</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{e.type}</span>
-                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#cbd5e1" }}></div>
-                  <span style={{ fontSize: 11, color: "#64748b", fontFamily: "'DM Mono', monospace" }}>{e.date}</span>
-                </div>
-              </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: e.color, background: `${e.color}15`, padding: "6px 12px", borderRadius: 10 }}>
-                View
-              </div>
-            </div>
-          ))}
-          
-          {((selected && (!eventDays[selected] || eventDays[selected].length === 0)) || (!selected && events.length === 0)) && (
-            <div style={{ padding: "40px 20px", textAlign: "center", background: "#fff", borderRadius: 16, border: "1px dashed #cbd5e1" }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>📅</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#64748b" }}>No events found for this period</div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Settings Page ─────────────────────────────────────────────
 function SettingsPage({ clientUser }) {
-  const [form,setForm]=useState({ name:clientUser?.name||"", email:clientUser?.email||"", phone:"", company:clientUser?.company||"", notifications:true, invoiceAlerts:true, weeklyReport:false });
-  const [saved,setSaved]=useState(false);
-  const save=()=>{ setSaved(true); setTimeout(()=>setSaved(false),2200); };
+  const notifKey = `client_notif_prefs_${clientUser?.name || "client"}`;
+  
+  const [form, setForm] = useState(() => {
+    const defaultForm = { name: clientUser?.name || "", email: clientUser?.email || "", phone: "", company: clientUser?.company || "", notifications: true, invoiceAlerts: true, weeklyReport: false };
+    try {
+      const saved = localStorage.getItem(notifKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return { ...defaultForm, notifications: parsed.notifications, invoiceAlerts: parsed.invoiceAlerts, weeklyReport: parsed.weeklyReport };
+      }
+    } catch {}
+    return defaultForm;
+  });
+
+  const [saved, setSaved] = useState(false);
+
+  const updateToggle = (key) => {
+    const newVal = !form[key];
+    const updatedForm = { ...form, [key]: newVal };
+    setForm(updatedForm);
+    try {
+      localStorage.setItem(notifKey, JSON.stringify({
+        notifications: updatedForm.notifications,
+        invoiceAlerts: updatedForm.invoiceAlerts,
+        weeklyReport: updatedForm.weeklyReport
+      }));
+    } catch {}
+  };
+
+  const save = () => {
+    try {
+      localStorage.setItem(notifKey, JSON.stringify({
+        notifications: form.notifications,
+        invoiceAlerts: form.invoiceAlerts,
+        weeklyReport: form.weeklyReport
+      }));
+    } catch {}
+    setSaved(true); 
+    setTimeout(() => setSaved(false), 2200); 
+  };
   return (
     <div style={{ maxWidth:560 }}>
       <div style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", overflow:"hidden" }}>
@@ -726,14 +602,24 @@ function SettingsPage({ clientUser }) {
           {[{label:"Full Name",key:"name"},{label:"Email",key:"email",type:"email"},{label:"Phone",key:"phone"},{label:"Company",key:"company"}].map(({label,key,type="text"})=>(
             <div key={key} style={{ marginBottom:14 }}>
               <label style={{ display:"block", fontSize:11, color:"#64748b", fontWeight:700, letterSpacing:0.5, textTransform:"uppercase", marginBottom:5 }}>{label}</label>
-              <input type={type} value={form[key]||""} onChange={e=>setForm({...form,[key]:e.target.value})} style={{ width:"100%", border:"1.5px solid #e2e8f0", borderRadius:10, padding:"9px 12px", fontSize:13, color:"#0f172a", background:"#f8fafc", outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}/>
+              <input 
+                type={type} 
+                value={form[key]||""} 
+                onChange={e=>{
+                  const val = e.target.value;
+                  const isNumField = ["phone", "pincode", "zip", "salary", "mobile", "accountNumber", "pancard"].some(k => key.toLowerCase().includes(k.toLowerCase()) || label.toLowerCase().includes(k.toLowerCase()));
+                  if(isNumField && val && !/^\d*$/.test(val)) return;
+                  setForm({...form,[key]:val});
+                }} 
+                style={{ width:"100%", border:"1.5px solid #e2e8f0", borderRadius:10, padding:"9px 12px", fontSize:13, color:"#0f172a", background:"#f8fafc", outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}
+              />
             </div>
           ))}
           <div style={{ marginTop:20, marginBottom:4, fontSize:11, fontWeight:700, color:"#64748b", letterSpacing:0.5, textTransform:"uppercase" }}>Notification Preferences</div>
           {[{label:"Email Notifications",key:"notifications"},{label:"Invoice Payment Alerts",key:"invoiceAlerts"},{label:"Weekly Progress Report",key:"weeklyReport"}].map(({label,key})=>(
             <div key={key} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0", borderBottom:"1px solid #f1f5f9" }}>
               <span style={{ fontSize:13, color:"#374151" }}>{label}</span>
-              <div onClick={()=>setForm({...form,[key]:!form[key]})} style={{ width:40, height:22, borderRadius:99, background:form[key]?"#6366f1":"#e2e8f0", cursor:"pointer", position:"relative", transition:"background 0.2s", flexShrink:0 }}>
+              <div onClick={() => updateToggle(key)} style={{ width:40, height:22, borderRadius:99, background:form[key]?"#6366f1":"#e2e8f0", cursor:"pointer", position:"relative", transition:"background 0.2s", flexShrink:0 }}>
                 <div style={{ position:"absolute", top:3, left:form[key]?21:3, width:16, height:16, borderRadius:"50%", background:"#fff", boxShadow:"0 1px 3px rgba(0,0,0,0.2)", transition:"left 0.2s" }}/>
               </div>
             </div>
@@ -1247,7 +1133,7 @@ export default function ClientDashboard({ user, setUser }) {
             </div>
           )}
 
-          {active==="calendar" && <CalendarPage projects={projects} tasks={tasks} />}
+          {active==="calendar" && <CalendarPage projects={projects} tasks={tasks} user={user} onUpdateProject={refreshData} onUpdateTask={refreshData} />}
 
           {active==="notifications" && (
             <NotificationsPage notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo}/>

@@ -178,7 +178,9 @@ export default function AdminDashboard({ user, setUser }) {
       {/* SIDEBAR */}
       <div style={{ width: 240, background: "#0f172a", color: "#fff", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "24px 20px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 34, height: 34, background: "linear-gradient(135deg,#3b82f6,#2dd4bf)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900 }}>{initials[0]}</div>
+          <div style={{ width: 38, height: 38, background: user?.logoUrl ? "#fff" : "linear-gradient(135deg,#3b82f6,#2dd4bf)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, overflow: "hidden" }}>
+            {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials[0]}
+          </div>
           <div style={{ overflow: "hidden" }}>
             <div style={{ fontWeight: 800, fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
             <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: 1.5 }}>ADMIN DASHBOARD</div>

@@ -195,8 +195,8 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
         <div style={{ padding:"24px 20px 18px", borderBottom:"1px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
             {user?.logoUrl ? (
-              <div style={{ width:34, height:34, background:"#fff", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
-                <img src={user.logoUrl} alt="logo" style={{ width:"100%", height:"100%", objectFit:"contain", padding:2 }} />
+              <div style={{ width:38, height:38, background:"#fff", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
+                <img src={user.logoUrl} alt="logo" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
               </div>
             ) : (
               <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>

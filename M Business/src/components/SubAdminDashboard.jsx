@@ -43,7 +43,7 @@ const NAV = [
       { key: "clients", icon: "👥", label: "Clients" },
 
       { key: "employees", icon: "👔", label: "Employees" },
-      { key: "managers", icon: "💼", label: "Managers" },
+
       { key: "vendors", icon: "🏬", label: "Vendors" },
     ]
   },
@@ -2110,7 +2110,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
           <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
             <div 
               onClick={onLogoUploadClick}
-              style={{ width: 42, height: 42, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer", border: "1.5px solid rgba(255,255,255,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}
+              style={{ width: 38, height: 38, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer", border: "1.5px solid rgba(255,255,255,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}
               title="Click to change logo"
             >
               {companyLogo ? (
@@ -3209,9 +3209,9 @@ const handleEditPackage = (pkg) => {
                 {enforceMySubscriptions && (
                   <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "6px 12px", color: "#ef4444", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
                 )}
-                <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ width: 34, height: 34, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", overflow: "hidden", position: "relative" }}>
+                <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ width: 38, height: 38, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", overflow: "hidden", position: "relative", background: "#fff" }}>
                   <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }} title="Click to upload logo">
-                    {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <span>{initials}</span>}
+                    {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2 }} /> : <span>{initials}</span>}
                   </div>
                 </div>
               </div>
@@ -3246,8 +3246,8 @@ const handleEditPackage = (pkg) => {
                     <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "8px 16px", color: "#ef4444", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.15)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.1)"}>Logout</button>
                   )}
                   <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", boxShadow: "0 2px 10px rgba(147,51,234,0.08)", flexShrink: 0 }}>
-                    <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: 30, height: 30, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, overflow: "hidden", flexShrink: 0, cursor: "pointer" }} title="Click to upload logo">
-                      {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} onError={() => setCompanyLogo(null)} /> : <span>{initials}</span>}
+                    <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ width: 38, height: 38, background: companyLogo ? "#fff" : "linear-gradient(135deg,#9333ea,#c084fc)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, overflow: "hidden", flexShrink: 0, cursor: "pointer" }} title="Click to upload logo">
+                      {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} onError={() => setCompanyLogo(null)} /> : <span>{initials}</span>}
                     </div>
                     <span style={{ fontSize: 13, fontWeight: 600, color: T.text, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
                     <span style={{ fontSize: 10, color: "#a78bfa" }}>▾</span>
@@ -3562,8 +3562,8 @@ const handleEditPackage = (pkg) => {
           {/* Current Account Header */}
           <div style={{ padding: "12px 14px", borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg,#f5f3ff,#faf5ff)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14, overflow: "hidden" }}>
-                {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3, background: "#fff" }} /> : <span>{initials}</span>}
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14, overflow: "hidden" }}>
+                {companyLogo ? <img src={companyLogo} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{initials}</span>}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>

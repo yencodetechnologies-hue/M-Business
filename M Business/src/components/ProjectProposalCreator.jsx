@@ -1190,8 +1190,10 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         if (slide.type === "overview" || slide.type === "closing") {
           return `
             <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
-              <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
-              <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
+              ${slide.heading ? `
+                <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
+                <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
+              ` : ''}
               <p style="font-size: 15px; color: #4b5563; line-height: 1.9; max-width: 620px; white-space: pre-wrap;">${slide.body}</p>
               ${elementsHTML}
             </div>
@@ -1201,8 +1203,10 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         if (slide.type === "objectives") {
           return `
             <div style="page-break-after: always; min-height: 100vh; padding: 56px; position: relative; background: #fff; overflow: hidden;">
-              <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
-              <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading}</h1>
+              ${slide.heading ? `
+                <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
+                <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading}</h1>
+              ` : ''}
               <div style="display: flex; flex-direction: column; gap: 14px;">
                 ${(slide.items || []).map((item, i) => `
                   <div style="display: flex; gap: 18px; align-items: flex-start; padding: 16px 22px; background: ${t.l}; border-radius: 14px; border: 1px solid ${t.p}20;">
@@ -1222,7 +1226,6 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               ${slide.type === "proposal" ? `
                 <div style="text-align: center; margin-bottom: 30px;">
                   <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">${slide.companyName || proposal.companyName || ''}</h1>
-                  <div style="font-size: 14px; color: #666;">Project Proposal</div>
                 </div>
               ` : ''}
               ${elementsHTML}
@@ -1268,8 +1271,10 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         // Default slide handling
         return `
           <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
-            <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
-            <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading || 'Slide'}</h1>
+            ${slide.heading ? `
+              <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
+              <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading}</h1>
+            ` : ''}
             <p style="font-size: 15px; color: #4b5563; line-height: 1.9; white-space: pre-wrap;">${slide.body || ''}</p>
             ${elementsHTML}
           </div>

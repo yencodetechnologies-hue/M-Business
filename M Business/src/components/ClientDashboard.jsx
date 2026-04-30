@@ -345,8 +345,8 @@ function ProfileDropdown({ user, onLogout }) {
   return (
     <div ref={ref} style={{ position:"relative" }}>
       <button onClick={()=>setOpen(v=>!v)} style={{ display:"flex", alignItems:"center", gap:8, background:"none", border:"none", cursor:"pointer", padding:"2px", outline:"none" }}>
-        <div style={{ width:40, height:40, borderRadius:12, background:"linear-gradient(135deg,#6366f1,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:900, fontSize:15, border:"2px solid #fff", boxShadow:"0 2px 6px rgba(0,0,0,0.1)" }}>
-          {(user?.name || user?.clientName || "C").slice(0,2).toUpperCase()}
+        <div style={{ width:38, height:38, borderRadius:10, background:user?.logoUrl ? "#fff" : "linear-gradient(135deg,#6366f1,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:900, fontSize:15, border:"2px solid #fff", boxShadow:"0 2px 6px rgba(0,0,0,0.1)", overflow:"hidden" }}>
+          {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width:"100%", height:"100%", objectFit:"contain", padding:2 }} /> : (user?.name || user?.clientName || "C").slice(0,2).toUpperCase()}
         </div>
       </button>
 
@@ -398,7 +398,9 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
       <div style={{ width:220, background:T.sidebar, color:"#fff", display:"flex", flexDirection:"column", height:"100vh", position:"fixed", top:0, left:0, zIndex:999, transform:open?"translateX(0)":"translateX(-100%)", transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)", boxShadow:"4px 0 32px rgba(0,0,0,0.18)" }} className="client-sidebar">
         <div style={{ padding:"24px 20px 18px", borderBottom:"1px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>{(clientUser?.company || "W")[0].toUpperCase()}</div>
+            <div style={{ width:38, height:38, background:clientUser?.logoUrl ? "#fff" : "linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff", overflow:"hidden" }}>
+              {clientUser?.logoUrl ? <img src={clientUser.logoUrl} alt="logo" style={{ width:"100%", height:"100%", objectFit:"contain", padding:2 }} /> : (clientUser?.company || "W")[0].toUpperCase()}
+            </div>
             <div>
               <div style={{ fontWeight:800, fontSize:13, color:"#fff", letterSpacing:-0.3 }}>{clientUser?.company || "M Business"}</div>
               <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{clientUser?.role || clientUser?.userRole || "CLIENT"}</div>
@@ -672,6 +674,7 @@ export default function ClientDashboard({ user, setUser }) {
     email:   user?.email || "",
     company: user?.companyName || user?.company || "Your Business",
     avatar:  (user?.companyName || user?.company || "W").slice(0,2).toUpperCase(),
+    logoUrl: user?.logoUrl || "",
     plan:    "Pro",
   };
 

@@ -10,6 +10,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
+// ── Constants ─────────────────────────────────────────────
+const ACCOUNTS_API = `${BASE_URL}/api/accounts`;
+const EXPENSES_API = `${BASE_URL}/api/expenses`;
+const INCOME_API   = `${BASE_URL}/api/income`;
+
 // ── Shared theme ─────────────────────────────────────────────
 const T = { text:"#1e0a3c", muted:"#7c3aed", border:"#ede9fe" };
 
@@ -82,7 +87,6 @@ function Fld({ label, value, onChange, options, type="text", error, placeholder,
 
 //  ACCOUNTS PAGE  (default export)
 // ════════════════════════════════════════════════════════════
-const ACCOUNTS_API = `${BASE_URL}/api/accounts`;
 const ROLES        = ["Client","Employee","Manager","Admin","SubAdmin"];
 const ACC_STATUSES = ["Active","Inactive"];
 const ACC_EMPTY = {
@@ -110,8 +114,12 @@ function RoleBadge({ label }) {
   );
 }
 
-export default function AccountsPage() {
-  const [activeTab, setActiveTab] = useState("income"); // "income" or "expenses"
+export default function AccountsPage({ initialTab = "overview" }) {
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
 
   const tabStyle = (active) => ({
     padding: "10px 24px",
@@ -131,14 +139,147 @@ export default function AccountsPage() {
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Tabs */}
       <div style={{ display: "flex", gap: 4, borderBottom: "1px solid #ede9fe", padding: "0 10px" }}>
-       
+        <button onClick={() => setActiveTab("overview")} style={tabStyle(activeTab === "overview")}>
+          📊 Overview
+        </button>
+        <button onClick={() => setActiveTab("income")} style={tabStyle(activeTab === "income")}>
+          💰 Income / Payments
+        </button>
         <button onClick={() => setActiveTab("expenses")} style={tabStyle(activeTab === "expenses")}>
-          💸 Client Expenses
+          💸 Expenses
         </button>
       </div>
 
       <div style={{ padding: "0 4px" }}>
-        {activeTab === "income" ? <IncomePage /> : <ExpensesPage />}
+        {activeTab === "overview" && <FinancialOverview />}
+        {activeTab === "income" && <IncomePage />}
+        {activeTab === "expenses" && <ExpensesPage />}
+      </div>
+    </div>
+  );
+}
+
+// ── Financial Overview ──────────────────────────────────────────
+function FinancialOverview() {
+  const [income, setIncome] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [incRes, expRes] = await Promise.all([
+          axios.get(INCOME_API),
+          axios.get(EXPENSES_API)
+        ]);
+        setIncome(incRes.data || []);
+        setExpenses(expRes.data || []);
+      } catch (err) {
+        console.error("Failed to fetch financial data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const totalIncome = income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const totalExpenses = expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const netBalance = totalIncome - totalExpenses;
+
+  const stats = [
+    { t: "Total Income", v: formatCurrency(totalIncome), c: "#22c55e", i: "💰", desc: "Money coming in" },
+    { t: "Total Expenses", v: formatCurrency(totalExpenses), c: "#ef4444", i: "💸", desc: "Money going out" },
+    { t: "Net Balance", v: formatCurrency(netBalance), c: netBalance >= 0 ? "#7c3aed" : "#f43f5e", i: "🏦", desc: "Overall Profit/Loss" },
+  ];
+
+  if (loading) return <div style={{ textAlign: "center", padding: 50, color: "#a78bfa" }}>Loading overview...</div>;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      {/* Summary Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+        {stats.map(({ t, v, i, c, desc }) => (
+          <div key={t} style={{
+            background: "#fff", borderRadius: 20, padding: 24,
+            boxShadow: "0 10px 30px rgba(124, 58, 237, 0.08)",
+            border: `1px solid #ede9fe`,
+            position: "relative", overflow: "hidden"
+          }}>
+            <div style={{ position: "absolute", right: -10, top: -10, fontSize: 100, opacity: 0.05, pointerEvents: "none" }}>{i}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{i}</div>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#a78bfa", letterSpacing: 1 }}>{t.toUpperCase()}</div>
+                <div style={{ fontSize: 12, color: "#94a3b8" }}>{desc}</div>
+              </div>
+            </div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: c }}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Breakdown and Recent Transactions */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: 20 }}>
+        {/* Category Distribution (Simple List) */}
+        <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #ede9fe" }}>
+          <h3 style={{ margin: "0 0 20px 0", fontSize: 16, fontWeight: 700, color: T.text }}>Income vs Expenses Breakdown</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13 }}>
+                <span style={{ color: "#64748b", fontWeight: 600 }}>Income</span>
+                <span style={{ color: "#22c55e", fontWeight: 700 }}>{formatCurrency(totalIncome)}</span>
+              </div>
+              <div style={{ height: 8, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ height: "100%", background: "#22c55e", width: `${Math.min(100, (totalIncome / (totalIncome + totalExpenses || 1)) * 100)}%` }}></div>
+              </div>
+            </div>
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13 }}>
+                <span style={{ color: "#64748b", fontWeight: 600 }}>Expenses</span>
+                <span style={{ color: "#ef4444", fontWeight: 700 }}>{formatCurrency(totalExpenses)}</span>
+              </div>
+              <div style={{ height: 8, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ height: "100%", background: "#ef4444", width: `${Math.min(100, (totalExpenses / (totalIncome + totalExpenses || 1)) * 100)}%` }}></div>
+              </div>
+            </div>
+          </div>
+          
+          <div style={{ marginTop: 30, padding: 20, background: "#f8fafc", borderRadius: 16 }}>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>Profit Margin</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: netBalance >= 0 ? "#22c55e" : "#ef4444", marginTop: 4 }}>
+                {totalIncome > 0 ? ((netBalance / totalIncome) * 100).toFixed(1) : 0}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #ede9fe" }}>
+          <h3 style={{ margin: "0 0 20px 0", fontSize: 16, fontWeight: 700, color: T.text }}>Recent Transactions</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {[...income.map(i => ({ ...i, type: "income" })), ...expenses.map(e => ({ ...e, type: "expense" }))]
+              .sort((a, b) => new Date(b.createdAt || b.date) || new Date(b.createdAt) - new Date(a.createdAt || a.date) || new Date(a.createdAt))
+              .slice(0, 5)
+              .map((item, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 12, borderBottom: idx === 4 ? "none" : "1px solid #f1f5f9" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: item.type === "income" ? "#dcfce7" : "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+                    {item.type === "income" ? "➕" : "➖"}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{item.title}</div>
+                    <div style={{ fontSize: 11, color: "#94a3b8" }}>{new Date(item.createdAt || item.date).toLocaleDateString()} • {item.category}</div>
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: item.type === "income" ? "#16a34a" : "#dc2626" }}>
+                    {item.type === "income" ? "+" : "-"}{formatCurrency(item.amount)}
+                  </div>
+                </div>
+              ))}
+            {(income.length === 0 && expenses.length === 0) && <div style={{ textAlign: "center", color: "#94a3b8", fontSize: 13, padding: 20 }}>No transactions yet</div>}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -434,7 +575,6 @@ const openEdit = (a) => {
 // ════════════════════════════════════════════════════════════
 //  EXPENSES PAGE  (named export)
 // ════════════════════════════════════════════════════════════
-const EXPENSES_API   = `${BASE_URL}/api/expenses`;
 const CATEGORIES     = ["Food","Travel","Office","Utilities","Marketing","Salary","Miscellaneous"];
 const EXPENSE_TYPES  = ["Operational","Capital","Recurring","One-Time"];
 const PAYMENT_MODES  = ["GPay", "PhonePe", "NEFT", "RTGS", "Cash", "Card", "UPI", "Bank Transfer", "Cheque"];
@@ -817,7 +957,6 @@ const save = async () => {
 // ════════════════════════════════════════════════════════════
 //  INCOME PAGE  (named export)
 // ════════════════════════════════════════════════════════════
-const INCOME_API     = `${BASE_URL}/api/income`;
 const INCOME_CATS    = ["Project Payment", "Advance", "Service Fee", "Maintenance", "Miscellaneous"];
 const INCOME_MODES   = ["GPay", "PhonePe", "NEFT", "RTGS", "Cash", "Cheque", "Card", "UPI", "Bank Transfer"];
 const INCOME_STATUSES = ["Received", "Pending", "Cancelled"];

@@ -376,3 +376,22 @@ exports.getTaskMembers = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.addComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user, text } = req.body;
+    const companyId = req.companyId || "NONE";
+
+    const task = await Task.findOneAndUpdate(
+      { _id: id, isDeleted: false, companyId },
+      { $push: { comments: { user, text, date: new Date() } } },
+      { returnDocument: 'after' }
+    );
+
+    if (!task) return res.status(404).json({ message: "Task not found" });
+    res.json(task);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

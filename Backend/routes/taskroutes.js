@@ -14,6 +14,7 @@ const {
   autoAssignTask,
   updateIntegrations,
   getTaskMembers,
+  addComment,
 } = require("../controllers/taskController");
 
 router.get("/board",          getBoardData);
@@ -55,6 +56,7 @@ router.patch("/:id/toggle",   toggleChecked);
 router.patch("/:id/move",     moveTask);
 router.patch("/:id/auto-assign", autoAssignTask);
 router.patch("/:id/integrations", updateIntegrations);
+router.post("/:id/comment", addComment);
 router.delete("/:id",         deleteTask);
 
 module.exports = router;

@@ -3515,9 +3515,9 @@ const handleEditPackage = (pkg) => {
           {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
           {validActive === "settings" && <SettingsPage user={user} />}
-          {validActive === "accounts" && <AccountsPage ExpensesPage={ExpensesPage} />}
-          {validActive === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}
-          {validActive === "expenses" && <ExpensesPage />}
+          {validActive === "accounts" && <AccountsPage initialTab="overview" />}
+          {validActive === "payments" && <AccountsPage initialTab="income" />}
+          {validActive === "expenses" && <AccountsPage initialTab="expenses" />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}

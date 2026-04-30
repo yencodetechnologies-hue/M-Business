@@ -439,11 +439,33 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
 }
 
 // ── Task Card ─────────────────────────────────────────────────
-function TaskCard({ task }) {
+function TaskCard({ task, onCommentAdded }) {
   const [expanded, setExpanded] = useState(false);
   const [localCommentOpen, setLocalCommentOpen] = useState(false);
   const [comment, setComment] = useState("");
-  const [comments, setComments] = useState([]);
+  // Use task.comments as the source of truth if it's an array
+  const taskComments = Array.isArray(task.comments) ? task.comments : [];
+  
+  const handleAddComment = async () => {
+    if (!comment.trim()) return;
+    try {
+      const userStr = localStorage.getItem("user");
+      const userData = userStr ? JSON.parse(userStr) : null;
+      const userName = userData?.clientName || userData?.name || "Client";
+      
+      const res = await axios.post(`${BASE_URL}/api/tasks/${task._id}/comment`, {
+        user: userName,
+        text: comment.trim()
+      });
+      
+      setComment("");
+      if (onCommentAdded) onCommentAdded(res.data); // Notify parent to update task data
+    } catch (err) {
+      console.error("Failed to add comment:", err);
+      alert("Failed to add comment");
+    }
+  };
+
   const done  = task.subtasks ? task.subtasks.filter(s=>s.done).length : 0;
   const total = task.subtasks ? task.subtasks.length : 0;
   return (
@@ -479,20 +501,24 @@ function TaskCard({ task }) {
           {total > 0 && <ProgressBar pct={Math.round((done/total)*100)}/>}
           <div style={{ marginTop:12 }}>
             <button onClick={()=>setLocalCommentOpen(!localCommentOpen)} style={{ background:"none", border:"1px solid #e2e8f0", borderRadius:8, padding:"5px 12px", fontSize:12, color:"#6366f1", fontWeight:600, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:5 }}>
-              💬 Comments ({(task.comments||0)+comments.length})
+              💬 Comments ({taskComments.length})
             </button>
             {localCommentOpen && (
               <div style={{ marginTop:8 }}>
-                {comments.map((c,i) => (
+                {taskComments.map((c,i) => (
                   <div key={i} style={{ background:"#f8fafc", borderRadius:8, padding:"7px 10px", marginBottom:6, fontSize:12, color:"#374151" }}>
-                    <span style={{ fontWeight:700, color:"#6366f1", marginRight:6 }}>You:</span>{c}
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:2 }}>
+                       <span style={{ fontWeight:700, color:"#6366f1" }}>{c.user}:</span>
+                       <span style={{ fontSize:9, color:"#94a3b8" }}>{new Date(c.date).toLocaleString()}</span>
+                    </div>
+                    <div>{c.text}</div>
                   </div>
                 ))}
                 <div style={{ display:"flex", gap:6, marginTop:6 }}>
                   <input value={comment} onChange={e=>setComment(e.target.value)} placeholder="Add a comment…"
                     style={{ flex:1, border:"1.5px solid #e2e8f0", borderRadius:8, padding:"7px 10px", fontSize:12, color:"#0f172a", background:"#fff", outline:"none", fontFamily:"inherit" }}
-                    onKeyDown={e=>{ if(e.key==="Enter"&&comment.trim()){ setComments([...comments,comment.trim()]); setComment(""); } }}/>
-                  <button onClick={()=>{ if(comment.trim()){ setComments([...comments,comment.trim()]); setComment(""); } }} style={{ background:"#6366f1", border:"none", borderRadius:8, padding:"7px 12px", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Send</button>
+                    onKeyDown={e=>{ if(e.key==="Enter") handleAddComment(); }}/>
+                  <button onClick={handleAddComment} style={{ background:"#6366f1", border:"none", borderRadius:8, padding:"7px 12px", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Send</button>
                 </div>
               </div>
             )}
@@ -504,7 +530,7 @@ function TaskCard({ task }) {
 }
 
 // ── Tasks with filter ─────────────────────────────────────────
-function TasksFiltered({ tasks }) {
+function TasksFiltered({ tasks, onCommentAdded }) {
   const [filter,setFilter] = useState("All");
   const displayed = filter==="All" ? tasks : tasks.filter(t=>t.status===filter);
   return (
@@ -516,71 +542,165 @@ function TasksFiltered({ tasks }) {
           </button>
         ))}
       </div>
-      {displayed.map(t=><TaskCard key={t.id||t._id} task={t}/>)}
+      {displayed.map(t=><TaskCard key={t.id||t._id} task={t} onCommentAdded={onCommentAdded}/>)}
     </>
   );
 }
 
 // ── Calendar Page ─────────────────────────────────────────────
 function CalendarPage({ projects, tasks }) {
-  const year=new Date().getFullYear(), month=new Date().getMonth();
-  const daysInMonth=new Date(year,month+1,0).getDate();
-  const firstDay=new Date(year,month,1).getDay();
-  const cells=Array.from({length:firstDay+daysInMonth},(_,i)=>i<firstDay?null:i-firstDay+1);
-  
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selected, setSelected] = useState(null);
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const cells = Array.from({ length: firstDay + daysInMonth }, (_, i) => i < firstDay ? null : i - firstDay + 1);
+
   // Create events from tasks and projects
   const events = [
-    ...projects.map(p => ({ id: p._id, title: p.name, date: p.deadline, type: "Deadline" })),
-    ...tasks.map(t => ({ id: t._id, title: t.title, date: t.date, type: "Meeting" }))
-  ].filter(e => e.date);
+    ...projects.map(p => ({ id: p._id, title: p.name, date: p.deadline, type: "Project", color: "#6366f1" })),
+    ...tasks.map(t => ({ id: t._id, title: t.title, date: t.date, type: "Task", color: "#10b981" }))
+  ].filter(e => {
+    if (!e.date) return false;
+    const d = new Date(e.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  });
 
-  const eventDays=events.reduce((acc,e)=>{ 
-    const dateParts = e.date.split("-");
-    if (dateParts.length < 3) return acc;
-    const d=parseInt(dateParts[2]); 
-    if(!acc[d]) acc[d]=[]; 
-    acc[d].push(e); 
-    return acc; 
-  },{});
+  const eventDays = events.reduce((acc, e) => {
+    const d = new Date(e.date).getDate();
+    if (!acc[d]) acc[d] = [];
+    acc[d].push(e);
+    return acc;
+  }, {});
 
-  const [selected,setSelected]=useState(null);
-  const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date());
+  const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
+
+  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+  const goToToday = () => setCurrentDate(new Date());
+
+  const todayDate = new Date();
+  const isViewingCurrentMonth = todayDate.getFullYear() === year && todayDate.getMonth() === month;
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-      <div style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", padding:20 }}>
-        <div style={{ fontSize:16, fontWeight:800, color:"#0f172a", marginBottom:16 }}>{monthName} {year}</div>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:4, marginBottom:8 }}>
-          {["S","M","T","W","T","F","S"].map((d,i)=><div key={i} style={{ textAlign:"center", fontSize:10, fontWeight:700, color:"#94a3b8", letterSpacing:0.5, padding:"4px 0" }}>{d}</div>)}
+    <div style={{ display: "flex", flexDirection: "column", gap: 20, animation: "slide-in 0.4s ease-out" }}>
+      <div style={{ background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.03)" }}>
+        
+        {/* Calendar Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+          <div>
+            <h2 style={{ fontSize: 20, fontWeight: 800, color: "#0f172a", margin: 0 }}>{monthName} {year}</h2>
+            <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>{events.length} events scheduled this month</div>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={prevMonth} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, width: 36, height: 36, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", transition: "0.2s" }} onMouseEnter={e => e.currentTarget.style.borderColor = "#6366f1"} onMouseLeave={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
+              <span style={{ fontSize: 18 }}>‹</span>
+            </button>
+            <button onClick={goToToday} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, padding: "0 14px", height: 36, cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#6366f1", transition: "0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"} onMouseLeave={e => e.currentTarget.style.background = "#f8fafc"}>
+              Today
+            </button>
+            <button onClick={nextMonth} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, width: 36, height: 36, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", transition: "0.2s" }} onMouseEnter={e => e.currentTarget.style.borderColor = "#6366f1"} onMouseLeave={e => e.currentTarget.style.borderColor = "#e2e8f0"}>
+              <span style={{ fontSize: 18 }}>›</span>
+            </button>
+          </div>
         </div>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:4 }}>
-          {cells.map((day,i)=>{ 
-            const hasEvent=day&&eventDays[day]; 
-            const isToday=day===new Date().getDate(); 
-            const isSel=day===selected;
-            return <div key={i} onClick={()=>day&&setSelected(isSel?null:day)} style={{ padding:"8px 4px", textAlign:"center", borderRadius:8, fontSize:12, fontWeight:hasEvent?700:400, color:isToday?"#fff":isSel?"#6366f1":day?"#374151":"transparent", background:isToday?"#6366f1":isSel?"#eef2ff":hasEvent?"#f5f3ff":"transparent", border:isSel&&!isToday?"1.5px solid #6366f1":"1.5px solid transparent", cursor:day?"pointer":"default", position:"relative" }}>
-              {day||""}
-              {hasEvent&&!isToday&&<div style={{ position:"absolute", bottom:3, left:"50%", transform:"translateX(-50%)", display:"flex", gap:2 }}>{eventDays[day].slice(0,2).map((e,j)=><div key={j} style={{ width:4, height:4, borderRadius:"50%", background:e.type==="Payment"?"#ef4444":e.type==="Demo"?"#10b981":"#6366f1" }}/>)}</div>}
-            </div>;
+
+        {/* Days of Week */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 10, marginBottom: 12 }}>
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d, i) => (
+            <div key={i} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: 1, textTransform: "uppercase" }}>{d}</div>
+          ))}
+        </div>
+
+        {/* Calendar Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 10 }}>
+          {cells.map((day, i) => {
+            const hasEvent = day && eventDays[day];
+            const isToday = isViewingCurrentMonth && day === todayDate.getDate();
+            const isSel = day === selected;
+            
+            return (
+              <div 
+                key={i} 
+                onClick={() => day && setSelected(isSel ? null : day)} 
+                style={{ 
+                  aspectRatio: "1/1",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 14,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: day ? "pointer" : "default",
+                  position: "relative",
+                  transition: "all 0.2s",
+                  background: isToday ? "linear-gradient(135deg, #6366f1, #4f46e5)" : isSel ? "#eef2ff" : hasEvent ? "#f8fafc" : "transparent",
+                  color: isToday ? "#fff" : isSel ? "#6366f1" : day ? "#334155" : "transparent",
+                  border: isToday ? "none" : isSel ? "2px solid #6366f1" : "2px solid transparent",
+                  boxShadow: isToday ? "0 4px 12px rgba(99, 102, 241, 0.3)" : "none"
+                }}
+                onMouseEnter={e => { if(day && !isToday) e.currentTarget.style.background = isSel ? "#eef2ff" : "#f1f5f9"; }}
+                onMouseLeave={e => { if(day && !isToday) e.currentTarget.style.background = isSel ? "#eef2ff" : hasEvent ? "#f8fafc" : "transparent"; }}
+              >
+                {day || ""}
+                {hasEvent && !isToday && (
+                  <div style={{ position: "absolute", bottom: 8, display: "flex", gap: 3 }}>
+                    {eventDays[day].slice(0, 3).map((e, j) => (
+                      <div key={j} style={{ width: 5, height: 5, borderRadius: "50%", background: e.color || "#6366f1" }} />
+                    ))}
+                    {eventDays[day].length > 3 && <div style={{ fontSize: 8, color: "#94a3b8", fontWeight: 800 }}>+</div>}
+                  </div>
+                )}
+              </div>
+            );
           })}
         </div>
       </div>
-      <div>
-        <div style={{ fontSize:13, fontWeight:700, color:"#64748b", marginBottom:10 }}>
-          {selected&&eventDays[selected]?`Events on ${monthName} ${selected}`:"Upcoming Project Milestones"}
+
+      {/* Selected Day / Upcoming Events Section */}
+      <div style={{ animation: "slide-in 0.5s ease-out" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <h3 style={{ fontSize: 15, fontWeight: 800, color: "#1e293b", margin: 0 }}>
+            {selected ? (
+              <span>Events for <strong style={{ color: "#6366f1" }}>{monthName} {selected}</strong></span>
+            ) : "Upcoming Events"}
+          </h3>
+          {selected && (
+            <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: "#64748b", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Clear Selection</button>
+          )}
         </div>
-        {(selected&&eventDays[selected]?eventDays[selected]:events).map(e=>(
-          <div key={e.id} style={{ background:"#fff", borderRadius:12, padding:"12px 14px", border:"1px solid #e2e8f0", marginBottom:8, display:"flex", alignItems:"center", gap:12 }}>
-            <div style={{ width:36, height:36, borderRadius:10, background:e.type==="Payment"?"#fef2f2":e.type==="Demo"?"#f0fdf4":"#eef2ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0 }}>
-              {e.type==="Payment"?"💳":e.type==="Demo"?"🖥️":e.type==="Deadline"?"⏰":"📞"}
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {(selected ? (eventDays[selected] || []) : events.slice(0, 5)).map((e, idx) => (
+            <div key={idx} style={{ background: "#fff", borderRadius: 16, padding: "16px", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 16, transition: "transform 0.2s", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.transform = "translateX(4px)"} onMouseLeave={e => e.currentTarget.style.transform = "none"}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: `${e.color}10`, color: e.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                {e.type === "Project" ? "📁" : "🎯"}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 4 }}>{e.title}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{e.type}</span>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#cbd5e1" }}></div>
+                  <span style={{ fontSize: 11, color: "#64748b", fontFamily: "'DM Mono', monospace" }}>{e.date}</span>
+                </div>
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: e.color, background: `${e.color}15`, padding: "6px 12px", borderRadius: 10 }}>
+                View
+              </div>
             </div>
-            <div style={{ flex:1 }}>
-              <div style={{ fontSize:13, fontWeight:700, color:"#0f172a" }}>{e.title}</div>
-              <div style={{ fontSize:11, color:"#94a3b8" }}>{e.project} · {e.time}</div>
+          ))}
+          
+          {((selected && (!eventDays[selected] || eventDays[selected].length === 0)) || (!selected && events.length === 0)) && (
+            <div style={{ padding: "40px 20px", textAlign: "center", background: "#fff", borderRadius: 16, border: "1px dashed #cbd5e1" }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>📅</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#64748b" }}>No events found for this period</div>
             </div>
-            <Badge label={e.type}/>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
     </div>
   );
@@ -699,14 +819,13 @@ export default function ClientDashboard({ user, setUser }) {
     return permissions[item.key] === true;
   });
 
-  useEffect(() => {
+  const refreshData = () => {
     const currentClientName = (user?.name || user?.clientName || user?.companyName || user?.client || "").trim();
     if (!currentClientName) return;
 
-    setLoading(true);
     const encodedName = encodeURIComponent(currentClientName);
 
-    // Fetch Proposals for this specific client
+    // Fetch Proposals
     axios.get(`${BASE_URL}/api/proposals/client/${encodedName}`)
       .then(res => {
         const clientProposals = res.data.filter(p => 
@@ -719,7 +838,7 @@ export default function ClientDashboard({ user, setUser }) {
         setProposals([]);
       });
 
-    // Fetch Projects for this specific client
+    // Fetch Projects
     axios.get(`${BASE_URL}/api/projects/client/${encodedName}`)
       .then(res => {
         if (res.data) setProjects(res.data);
@@ -728,14 +847,14 @@ export default function ClientDashboard({ user, setUser }) {
         console.error("Error fetching projects:", err);
       });
 
-    // Fetch Tasks for this specific client
+    // Fetch Tasks
     axios.get(`${BASE_URL}/api/tasks/client/${encodedName}`)
       .then(res => {
         if (res.data) setTasks(res.data);
       })
       .catch(err => console.error("Error fetching tasks:", err));
 
-    // Fetch Invoices (Payments) for this specific client
+    // Fetch Invoices
     axios.get(`${BASE_URL}/api/invoices/client/${encodedName}`)
       .then(res => {
         if (res.data) {
@@ -750,6 +869,11 @@ export default function ClientDashboard({ user, setUser }) {
       })
       .catch(err => console.error("Error fetching invoices:", err))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    refreshData();
   }, [user]);
   const handleLogout = () => { localStorage.removeItem("user"); if(setUser) setUser(null); };
   const markRead     = (id) => setNotifications(prev=>prev.map(n=>n.id===id?{...n,read:true}:n));
@@ -1085,7 +1209,7 @@ export default function ClientDashboard({ user, setUser }) {
           {/* ── TASKS — live tasks state ── */}
           {active==="tasks" && (
             <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-              <TasksFiltered tasks={tasks}/>
+              <TasksFiltered tasks={tasks} onCommentAdded={refreshData}/>
             </div>
           )}
 

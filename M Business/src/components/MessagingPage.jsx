@@ -1,14 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { T } from "../index";
 import { BASE_URL } from "../config";
 
-const T = { 
-  text: "#1e0a3c", 
-  muted: "#7c3aed", 
-  border: "#ede9fe", 
-  primary: "#9333ea",
-  bg: "#faf5ff"
-};
+
 
 export default function MessagingPage({ user }) {
   const [messages, setMessages] = useState([]);

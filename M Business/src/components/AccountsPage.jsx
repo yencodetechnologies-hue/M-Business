@@ -124,6 +124,32 @@ function RoleBadge({ label }) {
   );
 }
 
+function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const filtered = clients.filter(c => (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) || (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase()));
+  const selected = clients.find(c => (c.clientName || c.name) === value);
+  return (
+    <div style={{ position: "relative" }}>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#a78bfa", transition: "0.2s" }}>▼</span>
+      </div>
+      {open && (
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(147,51,234,0.15)", zIndex: 999, overflow: "hidden" }}>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
+          <div style={{ maxHeight: 180, overflowY: "auto" }}>
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No company names found</div>
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
+          </div>
+        </div>
+      )}
+      {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
+    </div>
+  );
+}
+
 export default function AccountsPage({ initialTab = "overview" }) {
   const [activeTab, setActiveTab] = useState(initialTab);
 
@@ -980,6 +1006,7 @@ const INC_STATUS_COLOR = { Received:"#22C55E", Pending:"#f59e0b", Cancelled:"#EF
 
 export function IncomePage() {
   const [income,       setIncome]       = useState([]);
+  const [clients,      setClients]      = useState([]);
   const [loading,      setLoading]      = useState(false);
   const [search,       setSearch]       = useState("");
   const [catFilter,    setCatFilter]    = useState("All");
@@ -991,7 +1018,17 @@ export function IncomePage() {
   const [saving,       setSaving]       = useState(false);
   const [toast,        setToast]        = useState("");
 
-  useEffect(() => { fetchIncome(); }, []);
+  useEffect(() => { 
+    fetchIncome(); 
+    fetchClients();
+  }, []);
+
+  const fetchClients = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/clients`);
+      setClients(res.data);
+    } catch { setClients([]); }
+  };
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
@@ -1099,19 +1136,19 @@ export function IncomePage() {
       <div style={{ background:"#fff", borderRadius:16, padding:22, boxShadow:"0 4px 24px rgba(34,197,94,0.08)", border:"1px solid var(--app-border)" }}>
         <div style={{ position:"relative", marginBottom:16 }}>
           <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", pointerEvents:"none" }}>🔍</span>
-          <input placeholder="Search by title, client, invoice, txn..." value={search} onChange={e=>setSearch(e.target.value)} style={{ width:"100%", padding:"10px 14px 10px 40px", border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13, color:"#1e0a3c", background:"#f0fdf4", outline:"none", fontFamily:"inherit" }} />
+          <input placeholder="Search by title, company, invoice, txn..." value={search} onChange={e=>setSearch(e.target.value)} style={{ width:"100%", padding:"10px 14px 10px 40px", border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13, color:"#1e0a3c", background:"#f0fdf4", outline:"none", fontFamily:"inherit" }} />
         </div>
 
         {loading ? <div style={{ textAlign:"center", padding:50, color:"#a78bfa" }}>Loading...</div> : displayed.length === 0 ? <div style={{ textAlign:"center", padding:50 }}><div style={{ fontSize:40, marginBottom:12 }}>💰</div><div style={{ color:"#a78bfa", fontSize:14, fontWeight:600 }}>No income found</div></div>
           : <div style={{ overflowX:"auto" }}>
               <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, minWidth:900 }}>
-                <thead><tr style={{ background:"linear-gradient(90deg,#f0fdf4,var(--app-bg))" }}>{["ID","Title","Client","Inv #","Amount","Mode","Status","Date","Actions"].map(col => (<th key={col} style={{ padding:"10px 14px", textAlign:"left", color:"#16a34a", fontWeight:700, fontSize:11, borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>{col.toUpperCase()}</th>))}</tr></thead>
+                <thead><tr style={{ background:"linear-gradient(90deg,#f0fdf4,var(--app-bg))" }}>{["ID","Title","Company Name","Inv #","Amount","Mode","Status","Date","Actions"].map(col => (<th key={col} style={{ padding:"10px 14px", textAlign:"left", color:"#16a34a", fontWeight:700, fontSize:11, borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>{col.toUpperCase()}</th>))}</tr></thead>
                 <tbody>
                   {displayed.map((inc, i) => (
                     <tr key={inc._id||i} style={{ borderBottom:"1px solid #f3f0ff" }} onMouseEnter={ev=>ev.currentTarget.style.background="#f0fdf4"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
                       <td style={{ padding:"12px 14px", fontFamily:"monospace", fontSize:11, color:"#a78bfa" }}>{`INC${String(i+1).padStart(3,"0")}`}</td>
-                      <td style={{ padding:"12px 14px" }}><div style={{ fontWeight:700, color:"#1e0a3c" }}>{inc.title}</div>{inc.transactionId && <div style={{ fontSize:10, color:"#a78bfa" }}>Txn: {inc.transactionId}</div>}</td>
-                      <td style={{ padding:"12px 14px", color:"#1e0a3c", fontWeight:600 }}>{inc.client}</td>
+                      <td style={{ padding:"12px 14px" }}><div style={{ fontWeight:600, color:"#64748b", fontSize: 12 }}>{inc.title}</div>{inc.transactionId && <div style={{ fontSize:10, color:"#a78bfa" }}>Txn: {inc.transactionId}</div>}</td>
+                      <td style={{ padding:"12px 14px", color:"#1e0a3c", fontWeight:800, fontSize: 15 }}>{inc.client}</td>
                       <td style={{ padding:"12px 14px", color:"#16a34a", fontWeight:700 }}>{inc.invoiceNo||"—"}</td>
                       <td style={{ padding:"12px 14px" }}><span style={{ fontWeight:800, color:"#16a34a", fontSize:14 }}>{formatCurrency(inc.amount, inc.currency)}</span></td>
                       <td style={{ padding:"12px 14px", color:"#a78bfa" }}>{inc.paymentMode}</td>
@@ -1130,7 +1167,11 @@ export function IncomePage() {
         <Modal title={modal==="add" ? "Add Income Entry" : "Edit Income Entry"} onClose={()=>setModal(null)}>
           <div className="modal-2col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0 18px" }}>
             <div style={{ gridColumn:"1 / -1" }}><Fld label="Income Title *" value={form.title} onChange={v=>{setForm({...form,title:v});setErr(p=>({...p,title:""}));}} error={err.title} placeholder="e.g. Payment for Invoice #001" /></div>
-            <Fld label="Client Name *" value={form.client} onChange={v=>{setForm({...form,client:v});setErr(p=>({...p,client:""}));}} error={err.client} placeholder="e.g. Acme Corp" />
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
+              <ClientDropdown clients={clients} value={form.client} onChange={v => { setForm({ ...form, client: v }); setErr(p => ({ ...p, client: "" })); }} error={err.client} />
+              {err.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {err.client}</div>}
+            </div>
             <Fld label="Amount *" value={form.amount} type="number" onChange={v=>{setForm({...form,amount:v});setErr(p=>({...p,amount:""}));}} error={err.amount} placeholder="0.00" />
             <Fld label="Category" value={form.category} onChange={v=>setForm({...form,category:v})} options={INCOME_CATS} />
             <Fld label="Payment Mode" value={form.paymentMode} onChange={v=>setForm({...form,paymentMode:v})} options={INCOME_MODES} />

@@ -321,7 +321,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
   const isPortrait = docFormat === "a4-portrait" || (!docFormat && (slide.type === "proposal" || slide.type === "portrait"));
   const isLandscape = docFormat === "a4-landscape" || (!docFormat && slide.type === "landscape");
   const slideH = isPortrait ? 1273 : isLandscape ? 637 : 506;
-  const W = { width:900, minHeight:slideH, background:"var(--app-bg)ff", fontFamily:"'Outfit',sans-serif", position:"relative", overflow:"hidden", flexShrink:0 };
+  const W = { width:900, minHeight:slideH, background:"var(--app-bg)ff", fontFamily:"'DM Sans',sans-serif", position:"relative", overflow:"hidden", flexShrink:0 };
   const accent = { width:56,height:6,background:t.g,borderRadius:3,marginBottom:20 };
   const h1 = { fontSize:36,fontWeight:800,color:"#0f172a",marginBottom:24,letterSpacing:-0.5,lineHeight:1.1 };
 
@@ -717,7 +717,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
           <div style={{marginTop:"40px"}}>(Authorised Signatory)</div>
         </div>
         <div style={{fontWeight:"bold",textAlign:"center"}}>
-          <div style={{marginTop:"40px"}}>(Client Signature)</div>
+          <div style={{marginTop:"40px"}}>(Company Signature)</div>
         </div>
       </div>
 
@@ -1347,7 +1347,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
 
   // ══ LIST VIEW ══════════════════════════════════════════════════════════════
   if(view==="list") return (
-    <div style={{fontFamily:"'Outfit',sans-serif",minHeight:"100%",background:"#f8fafc",padding:"24px"}}>
+    <div style={{fontFamily:"'DM Sans',sans-serif",minHeight:"100%",background:"#f8fafc",padding:"24px"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');.pc{transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);cursor:pointer;}.pc:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 25px 60px rgba(0,0,0,0.15)!important;}.pc:hover .pci{transform:scale(1.08);}.pci{transition:transform .5s cubic-bezier(0.4, 0, 0.2, 1);}.hb:hover{opacity:.9;transform:translateY(-2px) scale(1.05);}.hb:active{transform:translateY(0) scale(0.98);}@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}.fade-in{animation:fadeIn 0.6s ease-out;}`}</style>
       
       {/* Header Section */}
@@ -1357,7 +1357,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",position:"relative",zIndex:1,flexWrap:"wrap",gap:20}}>
           <div style={{flex:1,minWidth:"250px"}}>
-            <h1 style={{margin:0,fontSize:32,fontWeight:900,color:"#fff",marginBottom:8,textShadow:"0 2px 4px rgba(0,0,0,0.1)"}}>Project Proposals</h1>
+            <h1 style={{margin:0,fontSize:32,fontWeight:900,color:"#fff",marginBottom:8,textShadow:"0 2px 4px rgba(0,0,0,0.1)",fontFamily:"'Syne',sans-serif"}}>Project Proposals</h1>
             <p style={{margin:0,fontSize:16,color:"rgba(255,255,255,0.9)",fontWeight:500}}>Create, manage and track your professional proposals</p>
             <div style={{display:"flex",gap:16,marginTop:16}}>
               <div style={{display:"flex",alignItems:"center",gap:8,color:"rgba(255,255,255,0.8)",fontSize:14}}>
@@ -1467,9 +1467,9 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
 
   // ══ EDITOR - full Canva layout ═════════════════════════════════════════════
   return (
-    <div style={{position:"fixed",inset:0,zIndex:9999,display:"flex",flexDirection:"column",fontFamily:"'Outfit',sans-serif",background:"#f0f0f0",overflow:"hidden"}} className={isViewMode ? "view-mode" : ""}>
+    <div style={{position:"fixed",inset:0,zIndex:9999,display:"flex",flexDirection:"column",fontFamily:"'DM Sans',sans-serif",background:"#f0f0f0",overflow:"hidden"}} className={isViewMode ? "view-mode" : ""}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap');
         ::-webkit-scrollbar{width:5px;height:5px;}
         ::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px;}
         .pgthumb{transition:all .15s;cursor:pointer;}
@@ -1839,7 +1839,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                 <div>
                   <div style={{fontSize:13,fontWeight:700,color:"#0f172a",marginBottom:12}}>Brand Fonts</div>
                   <div style={{background:"#f8fafc",border:"1px solid #e2e8f0",padding:"16px",borderRadius:8,textAlign:"center"}}>
-                    <div style={{fontSize:24,fontWeight:800,marginBottom:8,fontFamily:"'Outfit',sans-serif"}}>Heading Font</div>
+                    <div style={{fontSize:24,fontWeight:800,marginBottom:8,fontFamily:"'DM Sans',sans-serif"}}>Heading Font</div>
                     <div style={{fontSize:16,fontWeight:500,color:"#475569"}}>Body Font</div>
                   </div>
                 </div>

@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { T } from "../index";
 import { BASE_URL } from "../config";
 import { toast } from "react-toastify";
 
-const T = { 
-  primary: "#3b0764", 
-  sidebar: "#1e0a3c", 
-  accent: "#9333ea", 
-  bg: "#f5f3ff", 
-  card: "#FFFFFF", 
-  text: "#1e0a3c", 
-  muted: "#7c3aed", 
-  border: "#ede9fe" 
-};
+
 
 const PERMISSION_KEYS = [
   "dashboard", "clients", "subadmins", "employees", "managers", 
@@ -114,7 +106,7 @@ const RolePermissionDashboard = () => {
                     borderBottomLeftRadius: 12,
                     textTransform: "capitalize"
                   }}>
-                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                    {key === "clients" ? "Company Names" : key.replace(/([A-Z])/g, ' $1').trim()}
                   </td>
                   {roles.map((r, idx) => (
                     <td key={`${r.role}-${key}`} style={{ padding: "16px 15px", textAlign: "center" }}>

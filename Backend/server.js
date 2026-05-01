@@ -70,6 +70,7 @@ const paymentRoutes = require("./routes/paymentroutes");
 const vendorRoutes = require("./routes/vendorRoutes");
 const rolePermissionRoutes = require("./routes/rolePermissionRoutes");
 const incomeRoutes = require("./routes/incomeroutes");
+const notificationRoutes = require("./routes/notificationroutes");
 
 
 // Static files (local resume storage)
@@ -108,6 +109,7 @@ app.use("/api/vendors", vendorRoutes);
 app.use("/api/role-permissions", rolePermissionRoutes);
 app.use("/api/integrations", integrationRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/notifications", notificationRoutes);
 const configRoutes = require("./routes/configroutes");
 app.use("/api/config", configRoutes);
 

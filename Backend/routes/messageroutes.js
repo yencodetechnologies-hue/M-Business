@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Message = require('../models/MessageModel');
 const User = require('../models/UserModels');
+const Notification = require('../models/NotificationModel');
 
 // Get all messages for a company
 router.get('/', async (req, res) => {
@@ -23,6 +24,18 @@ router.post('/', async (req, res) => {
             senderId, senderName, receiverId, receiverName, content, companyId
         });
         const savedMessage = await newMessage.save();
+
+        // Create notification for receiver
+        const notification = new Notification({
+            userId: receiverId,
+            text: `New message from ${senderName}: "${content.substring(0, 30)}${content.length > 30 ? '...' : ''}"`,
+            type: 'info',
+            icon: '💬',
+            link: 'messaging',
+            companyId
+        });
+        await notification.save();
+
         res.json(savedMessage);
     } catch (err) {
         res.status(500).json({ msg: err.message });
@@ -50,11 +63,12 @@ router.get('/users', async (req, res) => {
         const Employee = require('../models/EmployeeModel');
 
         // Fetch from all collections
-        const [users, clients, managers, employees] = await Promise.all([
+        const [users, clients, managers, employees, owner] = await Promise.all([
             User.find({ companyId }).select('name email role'),
             Client.find({ companyId }).select('clientName email role'),
             Manager.find({ companyId }).select('managerName email role'),
-            Employee.find({ companyId }).select('name email role department')
+            Employee.find({ companyId }).select('name email role department'),
+            User.findById(companyId).select('name email role') // The subadmin
         ]);
 
         // Normalize and combine
@@ -62,10 +76,14 @@ router.get('/users', async (req, res) => {
             ...users.map(u => ({ _id: u._id, name: u.name, email: u.email, role: u.role })),
             ...clients.map(c => ({ _id: c._id, name: c.clientName, email: c.email, role: "client" })),
             ...managers.map(m => ({ _id: m._id, name: m.managerName, email: m.email, role: "manager" })),
-            ...employees.map(e => ({ _id: e._id, name: e.name, email: e.email, role: "employee", department: e.department }))
+            ...employees.map(e => ({ _id: e._id, name: e.name, email: e.email, role: "employee", department: e.department })),
+            ...(owner ? [{ _id: owner._id, name: owner.name, email: owner.email, role: owner.role }] : [])
         ];
 
-        res.json(allUsers);
+        // Remove duplicates by ID (in case owner was already in users)
+        const uniqueUsers = Array.from(new Map(allUsers.map(u => [u._id.toString(), u])).values());
+
+        res.json(uniqueUsers);
     } catch (err) {
         res.status(500).json({ msg: err.message });
     }

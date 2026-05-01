@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { T } from "../index";
 import { BASE_URL } from '../config';
 
-const T = {
-  primary: "var(--app-primary)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)",
-  bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)",
-  muted: "var(--app-muted)", border: "var(--app-border)"
-};
+
 
 const SC = ({ title, children }) => (
   <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(147,51,234,0.08)", border: "1px solid var(--app-border)", marginBottom: 20 }}>

@@ -3,14 +3,11 @@ import React from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import CalendarPage from "./CalendarPage";
+import MessagingPage from "./MessagingPage";
+import SettingsPage from "./SettingsPage";
+import { T } from "../index";
 
-// ── Theme ──────────────────────────────────────────────────────
-const T = {
-  primary: "var(--app-primary)", accent: "var(--app-accent)", accent2: "#3b82f6",
-  success: "#10b981", warning: "#f59e0b", danger: "#ef4444",
-  bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)",
-  muted: "var(--app-muted)", border: "var(--app-border)", sidebar: "var(--app-sidebar)",
-};
+
 
 const sc = (s) => ({
   Active:"#10b981", Inactive:"#ef4444", "In Progress":"#6366f1",
@@ -29,8 +26,8 @@ const NAV = [
   { key:"tasks",     icon:"◉", label:"Active Tasks" },
   { key:"payments",  icon:"◆", label:"Payments" },
   { key:"calendar",  icon:"◷", label:"Calendar" },
+  { key:"messaging", icon:"💬", label:"Messages" },
   { key:"reports",   icon:"▦", label:"Reports" },
-
 ];
 
 const notifColor = (type) => ({ danger:"#ef4444", warning:"#f59e0b", success:"#10b981", info:"#6366f1" }[type]||"#6366f1");
@@ -364,7 +361,7 @@ function ProfileDropdown({ user, onLogout }) {
                     {(acc.name || acc.clientName || "A").slice(0,2).toUpperCase()}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
-                     <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{acc.companyName || acc.name || "Client"}</div>
+                     <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{acc.companyName || acc.name || "Company"}</div>
                      <div style={{ fontSize:11, color:"#64748b", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{acc.email}</div>
                   </div>
                   {activeEmail === acc.email && <div style={{ fontSize:14, color:"#10b981" }}>✓</div>}
@@ -403,8 +400,8 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
               {clientUser?.logoUrl ? <img src={clientUser.logoUrl} alt="logo" style={{ maxHeight:"100%", maxWidth:"120px", objectFit:"contain" }} /> : (clientUser?.company || "W")[0].toUpperCase()}
             </div>
             <div>
-              <div style={{ fontWeight:800, fontSize:13, color:"#fff", letterSpacing:-0.3 }}>{clientUser?.company || "M Business"}</div>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{clientUser?.role || clientUser?.userRole || "CLIENT"}</div>
+              <div style={{ fontWeight: 800, fontSize: 13, color: "#fff", letterSpacing: -0.3, fontFamily: T.fontSyne }}>{clientUser?.company || "M Business"}</div>
+              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{clientUser?.role || clientUser?.userRole || "COMPANY"}</div>
             </div>
           </div>
           <button onClick={onClose} className="sidebar-close-btn" style={{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:16, cursor:"pointer", padding:"2px 4px" }}>✕</button>
@@ -695,6 +692,25 @@ export default function ClientDashboard({ user, setUser }) {
       })
       .catch(err => console.error("Error fetching events:", err))
       .finally(() => setLoading(false));
+
+    // Fetch real notifications
+    axios.get(`${BASE_URL}/api/notifications/${user?._id || user?.id}`)
+      .then(res => {
+        if (Array.isArray(res.data)) {
+          const mapped = res.data.map(n => ({
+            id: n._id,
+            type: n.type,
+            icon: n.icon,
+            text: n.text,
+            time: new Date(n.createdAt).toLocaleString(),
+            read: n.isRead,
+            action: n.link ? "View" : null,
+            actionPage: n.link || null
+          }));
+          setNotifications(mapped);
+        }
+      })
+      .catch(err => console.error("Error fetching notifications:", err));
   };
 
   useEffect(() => {
@@ -703,66 +719,34 @@ export default function ClientDashboard({ user, setUser }) {
   }, [user]);
 
   useEffect(() => {
-    // Generate some meaningful notifications locally from the data
-    const notifs = [];
-    
-    // Check pending proposals
-    proposals.forEach(p => {
-      if (p.status === "pending") {
-        notifs.push({ id: `prop-${p._id||p.id}`, type: "info", icon: "📄", text: `Proposal "${p.title}" requires your approval.`, time: "Action Required", read: false, action: "View", actionPage: "proposals" });
-      }
-    });
-
-    // Check overdue/pending payments
-    payments.forEach(p => {
-      if (p.status === "Overdue") {
-        notifs.push({ id: `pay-od-${p._id||p.id||p.invoiceId}`, type: "danger", icon: "🚨", text: `Payment Overdue for ${p.project} (${p.amount})`, time: "Urgent", read: false, action: "Pay Now", actionPage: "payments" });
-      } else if (p.status === "Pending") {
-        notifs.push({ id: `pay-pend-${p._id||p.id||p.invoiceId}`, type: "warning", icon: "⏳", text: `Pending invoice for ${p.project} (${p.amount})`, time: "Soon", read: false, action: "View", actionPage: "payments" });
-      }
-    });
-
-    // Check active tasks
-    tasks.forEach(t => {
-      if (t.status !== "Done" && t.status !== "Completed") {
-        notifs.push({ id: `task-${t._id||t.id}`, type: "info", icon: "◉", text: `Active task: ${t.title}`, time: "In Progress", read: false, action: "View", actionPage: "tasks" });
-      }
-    });
-
-    // Check upcoming events
-    const today = new Date().toISOString().slice(0, 10);
-    dashboardEvents.forEach(e => {
-      if (e.date && e.date >= today) {
-        notifs.push({ id: `evt-${e._id||e.id}`, type: "info", icon: "📅", text: `Upcoming ${e.type || "Event"}: ${e.name}`, time: e.date === today ? "Today" : "Upcoming", read: false, action: "View", actionPage: "calendar" });
-      }
-    });
-
-    setNotifications(prev => {
-      // Load saved read IDs from localStorage
-      const savedReadIds = JSON.parse(localStorage.getItem(`read_notifs_${user?._id || 'guest'}`) || "[]");
-      const readSet = new Set([...prev.filter(n => n.read).map(n => n.id), ...savedReadIds]);
-      return notifs.map(n => ({ ...n, read: readSet.has(n.id) }));
-    });
+    // Generate some meaningful notifications locally from the data if needed
+    // But now we primarily use backend notifications
   }, [projects, tasks, payments, proposals, dashboardEvents, user?._id]);
+
+  // Mark messaging notifications as read when on messaging page
+  useEffect(() => {
+    if (active === "messaging") {
+      const unreadMessaging = notifications.filter(n => !n.read && n.actionPage === "messaging");
+      unreadMessaging.forEach(n => markRead(n.id));
+    }
+  }, [active, notifications]);
 
   const handleLogout = () => { localStorage.removeItem("user"); if(setUser) setUser(null); };
 
   const markRead = (id) => {
-    setNotifications(prev => {
-      const updated = prev.map(n => n.id === id ? { ...n, read: true } : n);
-      const readIds = updated.filter(n => n.read).map(n => n.id);
-      localStorage.setItem(`read_notifs_${user?._id || 'guest'}`, JSON.stringify(readIds));
-      return updated;
-    });
+    axios.patch(`${BASE_URL}/api/notifications/${id}/read`)
+      .then(() => {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+      })
+      .catch(err => console.error("Error marking read:", err));
   };
 
   const markAllRead = () => {
-    setNotifications(prev => {
-      const updated = prev.map(n => ({ ...n, read: true }));
-      const readIds = updated.map(n => n.id);
-      localStorage.setItem(`read_notifs_${user?._id || 'guest'}`, JSON.stringify(readIds));
-      return updated;
-    });
+    axios.patch(`${BASE_URL}/api/notifications/read-all/${user?._id || user?.id}`)
+      .then(() => {
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      })
+      .catch(err => console.error("Error marking all read:", err));
   };
   const navigateTo   = (pg) => setActive(pg);
   const unread       = notifications.filter(n=>!n.read).length;
@@ -813,7 +797,7 @@ export default function ClientDashboard({ user, setUser }) {
         {/* Mobile topbar */}
         <div className="mob-topbar" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background:"#fff", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
           <button onClick={()=>setSidebarOpen(true)} style={{ background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#6366f1" }}>☰</button>
-          <span style={{ fontWeight:800, fontSize:14, color:"#0f172a" }}>ClientHub</span>
+          <span style={{ fontWeight:800, fontSize:14, color:"#0f172a" }}>CompanyHub</span>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo}/>
             <ProfileDropdown user={user} />
@@ -1134,6 +1118,8 @@ export default function ClientDashboard({ user, setUser }) {
           )}
 
           {active==="calendar" && <CalendarPage projects={projects} tasks={tasks} user={{...user, role: 'client'}} onUpdateProject={refreshData} onUpdateTask={refreshData} />}
+
+          {active==="messaging" && <MessagingPage user={user} />}
 
           {active==="notifications" && (
             <NotificationsPage notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo}/>

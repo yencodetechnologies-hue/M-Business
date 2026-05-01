@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { T } from "../index";
 import { BASE_URL } from "../config";
 import CanvasProposalEditor from "./CanvasProposalEditor";
 
@@ -148,16 +149,7 @@ const printProposal = (proposal) => {
   printWindow.document.close();
 };
 
-const T = {
-  primary: "#3b0764",
-  sidebar: "#1e0a3c", 
-  accent: "#9333ea",
-  bg: "#f5f3ff",
-  card: "#FFFFFF",
-  text: "#1e0a3c",
-  muted: "#7c3aed",
-  border: "#ede9fe"
-};
+
 
 const STATUS = {
   draft: { label: "Draft", icon: "✏️", bg: "#f8fafc", fg: "#475569", br: "#cbd5e1" },

@@ -17,9 +17,10 @@ import { DOC_TYPES } from "./EmployeeProfilePanel";
 import ReportsPage from "./ReportsPage";
 import MessagingPage from "./MessagingPage";
 import SettingsPage from "./SettingsPage";
+import { T } from "../index";
 
 
-const T = { primary: "var(--app-primary)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)" };
+
 const TRACKING_SEED=[{id:"PRJ001",name:"Website Redesign",client:"TechNova Pvt Ltd",deadline:"2024-05-30",pct:65,status:"In Progress",note:"Design done, dev ongoing"},{id:"PRJ002",name:"Mobile App Dev",client:"Bloom Creatives",deadline:"2024-08-15",pct:15,status:"Pending",note:"Requirements gathering"},{id:"PRJ003",name:"ERP Integration",client:"Infra Solutions",deadline:"2024-04-30",pct:100,status:"Completed",note:"Signed off by client"}];
 const INVOICES=[{id:"INV001",client:"TechNova Pvt Ltd",project:"Website Redesign",date:"2024-04-01",due:"2024-04-30",total:"₹1,47,500",status:"Paid"},{id:"INV002",client:"Infra Solutions",project:"ERP Integration",date:"2024-05-01",due:"2024-05-15",total:"₹4,24,800",status:"Overdue"},{id:"INV003",client:"Bloom Creatives",project:"Mobile App Dev",date:"2024-05-10",due:"2024-06-10",total:"₹1,18,000",status:"Pending"}];
 
@@ -866,7 +867,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
   const saveEdit=async()=>{
     const errs={};
     if(!editForm.name.trim())errs.name="Name required";
-    if(!editForm.client.trim())errs.client="Client required";
+    if(!editForm.client.trim())errs.client="Company name required";
     if(Object.keys(errs).length){setEditErr(errs);return;}
     try{
       setSaving(true);
@@ -912,11 +913,11 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
       </div>
 
       <SC title={`All Projects (${filtered.length})`}>
-        <Search value={search} onChange={setSearch} placeholder="Search by project name, client..."/>
+        <Search value={search} onChange={setSearch} placeholder="Search by project name, company name..."/>
         <div style={{overflowX:"auto"}}>
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:800}}>
             <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>
-              {["#","Name","Client","Budget","Status","Assigned To","Actions"].map(c=>(
+              {["#","Name","Company Name","Budget","Status","Assigned To","Actions"].map(c=>(
                 <th key={c} style={{padding:"10px 14px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>
               ))}
             </tr></thead>
@@ -1000,7 +1001,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}} className="modal-2col">
             <Fld label="Project Name *" value={editForm.name} onChange={v=>{setEditForm(p=>({...p,name:v}));setEditErr(p=>({...p,name:""}));}} error={editErr.name}/>
             <div style={{marginBottom:14}}>
-              <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>CLIENT *</label>
+              <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>COMPANY NAME *</label>
               <ClientDropdown clients={clients} value={editForm.client} onChange={v=>{setEditForm(p=>({...p,client:v}));setEditErr(p=>({...p,client:""}));}} error={editErr.client}/>
               {editErr.client&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {editErr.client}</div>}
             </div>
@@ -1211,7 +1212,7 @@ function ProjectStatusPage({clients,employees,managers,config}){
   }));
   const openAdd=()=>{setTsForm(EMPTY);setTsErr({});setTsEditId(null);setTsModal("add");};
   const openEdit=(p)=>{setTsForm({projectId:p.projectId||p.id||"",name:p.name||"",client:p.client||"",manager:p.manager||"",employee:p.employee||"",deadline:p.deadline||"",status:p.status||"In Progress",progress:p.progress||p.pct||0,notes:p.notes||p.note||""});setTsErr({});setTsEditId(p._id||p.id);setTsModal("edit");};
-  const saveTs=async()=>{const errs={};if(!tsForm.name.trim())errs.name="Project name required";if(!tsForm.client.trim())errs.client="Client required";if(!tsForm.deadline)errs.deadline="Deadline required";const pv=Number(tsForm.progress);if(isNaN(pv)||pv<0||pv>100)errs.progress="0–100 only";if(Object.keys(errs).length){setTsErr(errs);return;}try{setTsSaving(true);const payload={...tsForm,progress:Number(tsForm.progress)};if(tsModal==="add"){if(!payload.projectId){const maxId=Math.max(...trackList.map(p=>{const match=(p.projectId||p.id||"").match(/PRJ(\d+)/);return match?parseInt(match[1]):0;}),0);payload.projectId=`PRJ${String(maxId+1).padStart(3,"0")}`;}const res=await axios.post(BASE_URL + "/api/project-status",payload);setTrackList(prev=>[res.data,...prev]);}else{const res=await axios.put(`https://mbusiness.octosofttechnologies.in/api/project-status/${tsEditId}`,payload);setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?res.data:p));}showToast(tsModal==="add"?"✅ Project added!":"✅ Project updated!");setTsModal(null);}catch{if(tsModal==="add"){const local={...tsForm,_id:Date.now().toString(),projectId:tsForm.projectId||`PRJ${String(trackList.length+1).padStart(3,"0")}`,progress:Number(tsForm.progress)};setTrackList(prev=>[local,...prev]);}else{setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?{...p,...tsForm,progress:Number(tsForm.progress)}:p));}showToast("✅ Saved locally!");setTsModal(null);}finally{setTsSaving(false);}};
+  const saveTs=async()=>{const errs={};if(!tsForm.name.trim())errs.name="Project name required";if(!tsForm.client.trim())errs.client="Company name required";if(!tsForm.deadline)errs.deadline="Deadline required";const pv=Number(tsForm.progress);if(isNaN(pv)||pv<0||pv>100)errs.progress="0–100 only";if(Object.keys(errs).length){setTsErr(errs);return;}try{setTsSaving(true);const payload={...tsForm,progress:Number(tsForm.progress)};if(tsModal==="add"){if(!payload.projectId){const maxId=Math.max(...trackList.map(p=>{const match=(p.projectId||p.id||"").match(/PRJ(\d+)/);return match?parseInt(match[1]):0;}),0);payload.projectId=`PRJ${String(maxId+1).padStart(3,"0")}`;}const res=await axios.post(BASE_URL + "/api/project-status",payload);setTrackList(prev=>[res.data,...prev]);}else{const res=await axios.put(`https://mbusiness.octosofttechnologies.in/api/project-status/${tsEditId}`,payload);setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?res.data:p));}showToast(tsModal==="add"?"✅ Project added!":"✅ Project updated!");setTsModal(null);}catch{if(tsModal==="add"){const local={...tsForm,_id:Date.now().toString(),projectId:tsForm.projectId||`PRJ${String(trackList.length+1).padStart(3,"0")}`,progress:Number(tsForm.progress)};setTrackList(prev=>[local,...prev]);}else{setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?{...p,...tsForm,progress:Number(tsForm.progress)}:p));}showToast("✅ Saved locally!");setTsModal(null);}finally{setTsSaving(false);}};
   const deleteTs=async(id)=>{if(!window.confirm("Delete?"))return;try{await axios.delete(`https://mbusiness.octosofttechnologies.in/api/project-status/${id}`);}catch{}setTrackList(prev=>prev.filter(p=>(p._id||p.id)!==id));showToast("🗑️ Deleted!");};
   const B2=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
   return(
@@ -1231,7 +1232,7 @@ function ProjectStatusPage({clients,employees,managers,config}){
       <SC title={`Project Status (${displayed.length})`}>
         <div style={{overflowX:"auto"}}>
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:900}}>
-            <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>{["ID","Project","Client","Manager","Employee","Deadline","Status","Progress","Notes","Actions"].map(c=>(<th key={c} style={{padding:"10px 12px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>))}</tr></thead>
+            <thead><tr style={{background:"linear-gradient(90deg,#f5f3ff,#faf5ff)"}}>{["ID","Project","Company Name","Manager","Employee","Deadline","Status","Progress","Notes","Actions"].map(c=>(<th key={c} style={{padding:"10px 12px",textAlign:"left",color:"#7c3aed",fontWeight:700,fontSize:11,borderBottom:"2px solid #ede9fe",whiteSpace:"nowrap"}}>{c.toUpperCase()}</th>))}</tr></thead>
             <tbody>
               {paginated.length===0?<tr><td colSpan={10} style={{padding:40,textAlign:"center",color:"#a78bfa"}}>No projects found</td></tr>
                 :paginated.map((p,i)=>(<tr key={p._id||p.id||i} style={{borderBottom:"1px solid #f3f0ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
@@ -1255,7 +1256,7 @@ function ProjectStatusPage({clients,employees,managers,config}){
         <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
           <Fld label="Project ID" value={tsForm.projectId || "Auto-generated"} onChange={v=>setTsForm({...tsForm,projectId:v})} placeholder="Auto-generated (PRJ001)" disabled={tsModal==="add"}/>
           <Fld label="Project Name *" value={tsForm.name} onChange={v=>{setTsForm({...tsForm,name:v});setTsErr(p=>({...p,name:""}));}} error={tsErr.name}/>
-          <div style={{marginBottom:14}}><label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>CLIENT *</label><ClientDropdown clients={clientNames.length?clients:[]} value={tsForm.client} onChange={v=>{setTsForm({...tsForm,client:v});setTsErr(p=>({...p,client:""}));}} error={tsErr.client}/>{tsErr.client&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {tsErr.client}</div>}</div>
+          <div style={{marginBottom:14}}><label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length?clients:[]} value={tsForm.client} onChange={v=>{setTsForm({...tsForm,client:v});setTsErr(p=>({...p,client:""}));}} error={tsErr.client}/>{tsErr.client&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {tsErr.client}</div>}</div>
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v=>setTsForm({...tsForm,manager:v})} placeholder="-- Select Manager --"/>
           <SearchDropdown label="Employee" items={employeeNames} displayKey="name" value={tsForm.employee} onChange={v=>setTsForm({...tsForm,employee:v})} placeholder="-- Select Employee --"/>
           <Fld label="Deadline *" value={tsForm.deadline} type="date" onChange={v=>{setTsForm({...tsForm,deadline:v});setTsErr(p=>({...p,deadline:""}));}} error={tsErr.deadline}/>
@@ -1578,7 +1579,7 @@ function Sidebar({active,setActive,onLogout,open,onClose,navItems,initials,compa
               ) : (initials || "M")}
             </div>
             <div style={{textAlign:"center"}}>
-              <div style={{fontWeight:800,fontSize:14,color:"#fff",maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",letterSpacing:0.5}}>{companyName || "Your Business"}</div>
+              <div style={{fontWeight:800,fontSize:14,color:"#fff",maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",letterSpacing:0.5,fontFamily:T.fontSyne}}>{companyName || "Your Business"}</div>
               <div style={{fontSize:8,color:"rgba(255,255,255,0.4)",letterSpacing:1.5,marginTop:2,fontWeight:700}}>MANAGEMENT SUITE</div>
             </div>
           </div>
@@ -1724,7 +1725,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const companyNameStr = user?.companyName || "Your Business";
 
   return(
-    <div style={{display:"flex",minHeight:"100vh",background:"#f8fafc",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+    <div style={{display:"flex",minHeight:"100vh",background:"#f8fafc",fontFamily:T.fontDM}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
@@ -1816,7 +1817,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 300 }}>
                     <thead>
                       <tr style={{ background: "#faf5ff" }}>
-                        {["Project", "Client", "Status", "View"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "#a78bfa", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe" }}>{c.toUpperCase()}</th>)}
+                        {["Project", "Company Name", "Status", "View"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "#a78bfa", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe" }}>{c.toUpperCase()}</th>)}
                       </tr>
                     </thead>
                     <tbody>
@@ -2000,7 +2001,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
         <div className="modal-2col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 18px"}}>
           <Fld label="Project Name *" value={np.name} onChange={v=>setNp({...np,name:v})} error={npError.name}/>
           <div style={{marginBottom:14}}>
-            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>CLIENT NAME *</label>
+            <label style={{display:"block",fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>COMPANY NAME *</label>
             <ClientDropdown clients={clients} value={np.client} onChange={v=>setNp({...np,client:v})} error={npError.client} onAddClient={()=>{setModal("client");setNcError({});setShowClientPass(false);}}/>
             {npError.client&&<div style={{fontSize:11,color:"#EF4444",marginTop:4}}>⚠️ {npError.client}</div>}
           </div>

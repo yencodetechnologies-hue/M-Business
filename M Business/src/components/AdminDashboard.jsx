@@ -46,7 +46,7 @@ export default function AdminDashboard({ user, setUser }) {
   const [managers, setManagers] = useState([]);
   const [quotations, setQuotations] = useState([]);
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "", isFree: false, price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", assignedSubadmins: [] });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "", isFree: false, price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Company manage", assignedSubadmins: [] });
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
   const [modal, setModal] = useState(null);
   const [invoices, setInvoices] = useState([]);
@@ -534,7 +534,7 @@ export default function AdminDashboard({ user, setUser }) {
 // ── Dashboard Overview ──
 function OverviewPage({ subadmins, clients, employees, managers, projects, packages, invoices }) {
   const stats = [
-    { label: "Total Clients", value: clients.length, color: "var(--app-accent)" },
+    { label: "Total Company Names", value: clients.length, color: "var(--app-accent)" },
     { label: "Employees", value: employees.length, color: "var(--app-accent)" },
     { label: "Managers", value: managers.length, color: "#f59e0b" },
     { label: "Projects", value: projects.length, color: "var(--app-accent)" },
@@ -1370,9 +1370,9 @@ function ClientsPage({ clients, setClients }) {
   return (
     <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>All Clients ({filtered.length})</h3>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>All Company Names ({filtered.length})</h3>
         <input
-          placeholder="Search clients..."
+          placeholder="Search company names..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13, minWidth: 200 }}
@@ -1397,7 +1397,7 @@ function ClientsPage({ clients, setClients }) {
               <td style={{ padding: "14px 16px", color: "#64748b" }}>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
             </tr>
           ))}
-          {filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No clients found</td></tr>}
+          {filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No company names found</td></tr>}
         </tbody>
       </table>
     </div>
@@ -1520,7 +1520,7 @@ function ProjectsPage({ projects, setProjects, clients, employees }) {
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ background: "#f8fafc" }}>
-            {["Project Name", "Client", "Status", "Start Date", "End Date", "Budget"].map(h => (
+            {["Project Name", "Company Name", "Status", "Start Date", "End Date", "Budget"].map(h => (
               <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
             ))}
           </tr>
@@ -1551,7 +1551,7 @@ function ProjectStatusPage({ projects }) {
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ background: "#f8fafc" }}>
-            {["Project Name", "Client", "Deadline", "Progress", "Status"].map(h => (
+            {["Project Name", "Company Name", "Deadline", "Progress", "Status"].map(h => (
               <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
             ))}
           </tr>

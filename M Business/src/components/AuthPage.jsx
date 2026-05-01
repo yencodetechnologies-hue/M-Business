@@ -217,7 +217,7 @@ const handleResetPassword = async () => {
     <div style={{
       minHeight: "100vh", width: "100%",
       background: "linear-gradient(135deg,#0f0528 0%,#1e0a3c 40%,#3b0764 75%,#1e0a3c 100%)",
-      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      fontFamily: "'DM Sans', sans-serif",
       position: "relative", overflow: "hidden",
       display: "flex", alignItems: "stretch",
     }}>
@@ -267,7 +267,7 @@ const handleResetPassword = async () => {
         <div className="auth-right">
           <div className="auth-card">
             <div style={{ textAlign: "center", marginBottom: 30 }}>
-              <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: 0 }}>M Business</h1>
+              <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: 0, fontFamily: "'Syne', sans-serif" }}>M Business</h1>
               <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 5 }}>Manage your workspace efficiently</p>
             </div>
             {/* Tab */}

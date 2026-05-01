@@ -40,7 +40,7 @@ const NAV = [
     label: "Internal Management",
     type: "group",
     items: [
-      { key: "clients", icon: "👥", label: "Clients" },
+      { key: "clients", icon: "🏢", label: "Company Names" },
 
       { key: "employees", icon: "👔", label: "Employees" },
 

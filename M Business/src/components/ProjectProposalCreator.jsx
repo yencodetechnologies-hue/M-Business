@@ -1542,14 +1542,14 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               style={{background:"none",border:"none",fontSize:13,fontWeight:700,color:"#0f172a",outline:"none",textAlign:"center",width:"100%",fontFamily:"inherit"}}/>
           </div>
           <div style={{display:"flex",alignItems:"center",gap:8,background:"var(--app-border)",padding:"4px 12px",borderRadius:8,border:"1px solid var(--app-accent)"}}>
-            <span style={{fontSize:11,fontWeight:800,color:"var(--app-accent)"}}>FOR CLIENT:</span>
+            <span style={{fontSize:11,fontWeight:800,color:"var(--app-accent)"}}>FOR COMPANY NAME:</span>
             <select 
               value={doc.client || ""} 
               onChange={e=>{const nd={...doc,client:e.target.value}; setDoc(nd); persist(nd);}}
               disabled={!canEdit}
               style={{background:"none",border:"none",fontSize:12,fontWeight:700,color:"var(--app-accent)",outline:"none",cursor:"pointer"}}
             >
-              <option value="">-- Select Client --</option>
+              <option value="">-- Select Company Name --</option>
               {clientsData.map(c=>(
                 <option key={c._id} value={c.name||c.clientName}>{c.name||c.clientName}</option>
               ))}
@@ -1568,7 +1568,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
              </button>
           ) : doc.status==="pending" ? (
              <span style={{fontSize:13,fontWeight:800,color:"#f59e0b",padding:"0 10px",display:"flex",alignItems:"center",gap:6}}>
-               ⏳ Waiting for client approval...
+               ⏳ Waiting for company approval...
              </span>
           ) : (
              <span style={{fontSize:13,fontWeight:800,color:"#10b981",padding:"0 10px",display:"flex",alignItems:"center",gap:6}}>

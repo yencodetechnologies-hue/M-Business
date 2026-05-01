@@ -212,7 +212,7 @@ function Search({ value, onChange, placeholder }) {
   );
 }
 
-function ClientDropdown({ clients, value, onChange, error }) {
+function CompanyDropdown({ clients, value, onChange, error }) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const filtered = clients.filter(c => 
@@ -259,7 +259,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
               <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>
             )}
           </div>
-        ) : "-- Select Client --"}
+        ) : "-- Select Company Name --"}
         <span style={{
           position: "absolute",
           right: 12,
@@ -294,7 +294,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
               }}>🔍</span>
               <input
                 autoFocus
-                placeholder="Search client..."
+                placeholder="Search company name..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 onClick={e => e.stopPropagation()}
@@ -315,7 +315,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? (
               <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>
-                No clients found
+                No companies found
               </div>
             ) : (
               filtered.map((c, i) => {
@@ -679,7 +679,7 @@ export default function AdminProposalManagement() {
 
   const handleCreateProposal = async () => {
     if (!selectedClient || !proposalTitle.trim()) {
-      alert("Please select a client and enter a proposal title");
+      alert("Please select a company name and enter a proposal title");
       return;
     }
 
@@ -891,7 +891,7 @@ export default function AdminProposalManagement() {
           }}>
              <thead>
               <tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
-                {["#", "Title", "Client", "Assigned To", "Slides", "Status", "Updated", "Actions"].map(c => (
+                {["#", "Title", "Company Name", "Assigned To", "Slides", "Status", "Updated", "Actions"].map(c => (
                   <th key={c} style={{
                     padding: "10px 14px",
                     textAlign: "left",
@@ -941,7 +941,7 @@ export default function AdminProposalManagement() {
                       padding: "12px 14px",
                       color: "#7c3aed"
                     }}>
-                      {proposal.client || "No client"}
+                      {proposal.client || "No company name"}
                     </td>
                     <td style={{
                       padding: "12px 14px",
@@ -1150,7 +1150,7 @@ export default function AdminProposalManagement() {
                   {selectedProposal.title || "Untitled Proposal"}
                 </h4>
                  <p style={{ margin: 0, fontSize: 13, color: "#7c3aed" }}>
-                  Client: {selectedProposal.client || "No client"}
+                  Company Name: {selectedProposal.client || "No company name"}
                 </p>
                 <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: "#6b7280" }}>Assigned To:</span>
@@ -1483,9 +1483,9 @@ export default function AdminProposalManagement() {
                 letterSpacing: 0.5,
                 marginBottom: 5
               }}>
-                CLIENT *
+                COMPANY NAME *
               </label>
-               <ClientDropdown
+               <CompanyDropdown
                 clients={clients}
                 value={selectedClient}
                 onChange={setSelectedClient}

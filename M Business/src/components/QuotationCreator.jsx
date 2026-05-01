@@ -51,7 +51,7 @@ function saveLocal(qt, items) {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
 }
 
-const T = { primary: "#3b0764", sidebar: "#1e0a3c", accent: "#9333ea", bg: "#f5f3ff", card: "#FFFFFF", text: "#1e0a3c", muted: "#7c3aed", border: "#ede9fe" };
+const T = { primary: "#3b0764", sidebar: "#1e0a3c", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "#FFFFFF", text: "#1e0a3c", muted: "var(--app-accent)", border: "var(--app-border)" };
 
 function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   const [search, setSearch] = useState("");
@@ -60,17 +60,17 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative" }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "#9333ea" : "#ede9fe"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "#faf5ff", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#a78bfa", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 12, boxShadow: "0 8px 32px rgba(147,51,234,0.15)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid #ede9fe", borderRadius: 8, fontSize: 12, background: "#faf5ff", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#f3e8ff,#faf5ff)", borderBottom: "2px solid #ede9fe" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "#9333ea" }}>Add New Client</div></div></div>}
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(147,51,234,0.15)", zIndex: 999, overflow: "hidden" }}>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No clients found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f3e8ff" : "transparent", borderBottom: "1px solid #f5f3ff" }} onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "#9333ea" }}>✓</span>}</div>); })}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
       )}
@@ -85,17 +85,17 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
   const filtered = projects.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()));
   return (
     <div style={{ position: "relative" }}>
-      <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "#9333ea" : "#ede9fe"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "#faf5ff", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#10b981)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
+      <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#10b981)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#a78bfa", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 12, boxShadow: "0 8px 32px rgba(5,150,105,0.15)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid #ede9fe", borderRadius: 8, fontSize: 12, background: "#faf5ff", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#f0fdf4,#f7fffe)", borderBottom: "2px solid #ede9fe" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#10b981)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "#9333ea" }}>Add New Project</div></div></div>}
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(5,150,105,0.15)", zIndex: 999, overflow: "hidden" }}>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#f0fdf4,#f7fffe)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#10b981)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No projects found</div>
-              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f0fdf4" : "transparent", borderBottom: "1px solid #f5f3ff" }} onMouseEnter={e => e.currentTarget.style.background = "#f7fffe"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f0fdf4" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#10b981)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "#9333ea" }}>✓</span>}</div>); })}
+              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f0fdf4" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "#f7fffe"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f0fdf4" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#10b981)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
       )}
@@ -341,7 +341,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 />
               </div>
               <button onClick={() => { clearForm(); setStep("form"); }}
-                style={{ padding: "10px 22px", background: "linear-gradient(135deg,#9333ea,#10b981)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
+                style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),#10b981)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
                 + Create Quotation
               </button>
             </div>
@@ -349,7 +349,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12, marginBottom: 24 }}>
             {[
-              { label: "Total Quoted", value: formatCurrency(totalAmt, qt.currency || "₹"), color: "#9333ea" },
+              { label: "Total Quoted", value: formatCurrency(totalAmt, qt.currency || "₹"), color: "var(--app-accent)" },
               { label: "Approved Value", value: formatCurrency(approvedAmt, qt.currency || "₹"), color: "#16a34a" },
               { label: "Pending", value: `${pendingCnt}`, color: "#d97706" },
               { label: "Approved", value: `${approvedCnt}`, color: "#2563eb" },
@@ -390,7 +390,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{entry.quoteNo || "—"}</div>
                     <div style={{ fontSize: 11, color: "#d1d5db", marginTop: 1 }}>{formatDateTime(entry.savedAt)}</div>
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#9333ea", cursor: "pointer" }}>{entry.client || "—"}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-accent)", cursor: "pointer" }}>{entry.client || "—"}</div>
                   <div className="qt-hide" style={{ fontSize: 12, color: "#6b7280" }}>{qtD.project || entry.project || "—"}</div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: "#111827", cursor: "pointer" }}>{formatCurrency(entry.total, qtD.currency || "₹")}</div>
                   <div className="qt-hide" style={{ fontSize: 12, color: "#374151" }}>{formatDate(qtD.date || entry.date)}</div>
@@ -408,7 +408,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                     <button onClick={() => shareWhatsApp(entry)} style={{ padding: "5px 10px", background: "#dcfce7", border: "1px solid #bbf7d0", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬</button>
                     {entry.status === "approved" && (
                       <button onClick={() => handleConvert(entry)} disabled={convertingId === entry.id}
-                        style={{ padding: "5px 10px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#fff", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                        style={{ padding: "5px 10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#fff", fontFamily: "inherit", whiteSpace: "nowrap" }}>
                         {convertingId === entry.id ? "…" : "→ Invoice"}
                       </button>
                     )}
@@ -416,7 +416,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                       <span style={{ fontSize: 10, fontWeight: 800, color: "#6366f1", padding: "5px 10px", background: "#eef2ff", borderRadius: 7 }}>✓ Invoiced</span>
                     )}
                     <button onClick={() => loadEntry(entry)}
-                      style={{ padding: "5px 10px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#9333ea", fontFamily: "inherit" }}>✏️</button>
+                      style={{ padding: "5px 10px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "var(--app-accent)", fontFamily: "inherit" }}>✏️</button>
                   </div>
                 </div>
               );
@@ -431,10 +431,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               {/* Modal Header */}
               <div style={{ padding: "16px 24px", borderBottom: "1px solid #f3f0ff", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,#f9f8ff,#fff)" }}>
                 <div>
-                  <div style={{ fontSize: 10, color: "#9333ea", fontWeight: 800, letterSpacing: 1.5, marginBottom: 2 }}>QUOTATION DETAILS</div>
+                  <div style={{ fontSize: 10, color: "var(--app-accent)", fontWeight: 800, letterSpacing: 1.5, marginBottom: 2 }}>QUOTATION DETAILS</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: "#1e0a3c" }}>{viewEntry.quoteNo}</div>
                 </div>
-                <button onClick={() => setViewEntry(null)} style={{ background: "#f5f3ff", border: "none", width: 32, height: 32, borderRadius: "50%", color: "#9333ea", cursor: "pointer", fontSize: 18, fontWeight: 700 }}>✕</button>
+                <button onClick={() => setViewEntry(null)} style={{ background: "var(--app-bg)", border: "none", width: 32, height: 32, borderRadius: "50%", color: "var(--app-accent)", cursor: "pointer", fontSize: 18, fontWeight: 700 }}>✕</button>
               </div>
 
               <div style={{ overflowY: "auto", padding: 24, flex: 1 }}>
@@ -502,14 +502,14 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                         </div>
                       ));
                     })()}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,#9333ea,#10b981)", borderRadius: 10, marginTop: 8 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,var(--app-accent),#10b981)", borderRadius: 10, marginTop: 8 }}>
                       <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>BALANCE DUE</span>
                       <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(viewEntry.total - (viewEntry.qt?.amountPaid || 0), viewEntry.qt?.currency)}</span>
                     </div>
                     {/* Payment Instructions */}
                     {(viewEntry.qt?.upiId || viewEntry.qt?.bankName) && (
                       <div style={{ background: "#f8fafc", borderRadius: 12, padding: "14px 18px", border: "1px solid #e2e8f0", marginBottom: 12 }}>
-                        <div style={{ fontSize: 9, color: "#9333ea", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textTransform: "uppercase" }}>💳 Payment Instructions</div>
+                        <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textTransform: "uppercase" }}>💳 Payment Instructions</div>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
                           {viewEntry.qt?.upiId && (
                             <div>
@@ -546,9 +546,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
               {/* Modal Footer */}
               <div style={{ padding: "16px 24px", borderTop: "1px solid #f3f0ff", background: "#f9f8ff", display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                <button onClick={() => setViewEntry(null)} style={{ padding: "10px 20px", background: "#fff", border: "1.5px solid #ede9fe", borderRadius: 10, color: "#6b7280", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Close</button>
-                <button onClick={() => { loadEntry(viewEntry); setViewEntry(null); }} style={{ padding: "10px 20px", background: "#f3e8ff", border: "1px solid #d8b4fe", borderRadius: 10, color: "#9333ea", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Edit Quotation</button>
-                <button onClick={() => { setQt(viewEntry.qt); setItems(viewEntry.items); setStep("preview"); setViewEntry(null); }} style={{ padding: "10px 20px", background: "linear-gradient(135deg,#9333ea,#10b981)", border: "none", borderRadius: 10, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Print / PDF</button>
+                <button onClick={() => setViewEntry(null)} style={{ padding: "10px 20px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 10, color: "#6b7280", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Close</button>
+                <button onClick={() => { loadEntry(viewEntry); setViewEntry(null); }} style={{ padding: "10px 20px", background: "var(--app-border)", border: "1px solid var(--app-border)", borderRadius: 10, color: "var(--app-accent)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Edit Quotation</button>
+                <button onClick={() => { setQt(viewEntry.qt); setItems(viewEntry.items); setStep("preview"); setViewEntry(null); }} style={{ padding: "10px 20px", background: "linear-gradient(135deg,var(--app-accent),#10b981)", border: "none", borderRadius: 10, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Print / PDF</button>
               </div>
             </div>
           </div>
@@ -593,7 +593,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>📋 List</button>
           <button onClick={() => shareQuotation({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗 Share</button>
           <button onClick={() => shareWhatsApp({ id: qt.quoteNo, quoteNo: qt.quoteNo, total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WhatsApp</button>
-          <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#9333ea,#10b981)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
+          <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),#10b981)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
         <div className="qt-paper">
@@ -605,7 +605,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 {effectiveLogo ? (
                   <img src={effectiveLogo} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                 ) : (
-                  <div style={{ height: 60, width: 60, background: "#9333ea", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                  <div style={{ height: 60, width: 60, background: "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
                     {effectiveCompanyName[0] || "?"}
                   </div>
                 )}
@@ -616,15 +616,15 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               </div>
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(5,150,105,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#9333ea" }}>{qt.quoteNo}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-accent)" }}>{qt.quoteNo}</div>
                 {qt.refNo && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>Ref # {qt.refNo}</div>}
                 <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 9, color: "#9333ea", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                    <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
                     <div style={{ fontSize: 12, color: "#064e3b", fontWeight: 700 }}>{formatDate(qt.date)}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 9, color: "#9333ea", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
+                    <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
                     <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
                   </div>
                 </div>
@@ -635,16 +635,16 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           {/* Prepared for */}
           <div className="qt-btgrid" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4", flexShrink: 0 }}>
             <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #f0fdf4" : "none" }}>
-              <div style={{ fontSize: 9, color: "#9333ea", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
+              <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
               <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{qt.client || "—"}</div>
-              {selectedClient?.companyName && <div style={{ fontSize: 13, color: "#9333ea", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
+              {selectedClient?.companyName && <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
               {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
               {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
-              {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: "#9333ea", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
+              {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: "var(--app-accent)", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
             </div>
             {qt.project && (
               <div style={{ padding: "20px 32px" }}>
-                <div style={{ fontSize: 9, color: "#9333ea", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
+                <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{qt.project}</div>
               </div>
             )}
@@ -656,7 +656,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               <thead>
                 <tr style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#9333ea", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
                 </tr>
               </thead>
@@ -698,19 +698,19 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {qt.notes && (
                 <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
-                  <div style={{ fontSize: 9, color: "#9333ea", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📝 NOTES</div>
+                  <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📝 NOTES</div>
                   <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.notes}</div>
                 </div>
               )}
               {qt.terms && (
                 <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
-                  <div style={{ fontSize: 9, color: "#9333ea", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
+                  <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
                   <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.terms}</div>
                 </div>
               )}
               {(qt.upiId || qt.bankName) && (
                 <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                  <div style={{ fontSize: 9, color: "#9333ea", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 PAYMENT INSTRUCTIONS</div>
+                  <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 PAYMENT INSTRUCTIONS</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
                     {qt.upiId && (
                       <div>
@@ -743,7 +743,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f0fdf4", borderRadius: 12, padding: "14px 16px", border: "1px solid #d1fae5", minWidth: 110 }}>
-              <div style={{ fontSize: 8, color: "#9333ea", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
+              <div style={{ fontSize: 8, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
               <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #d1fae5" }}>
                 <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="#064e3b" />
               </div>
@@ -756,7 +756,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           {/* Footer */}
           <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "1px solid #e2e8f0" }}>
             <div style={{ fontSize: 11, color: "#94a3b8" }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#9333ea" }}>{qt.footerMessage}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-accent)" }}>{qt.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.quoteNo}</div>
           </div>
         </div>
@@ -771,7 +771,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
-        input:focus,select:focus,textarea:focus { border-color: #9333ea !important; box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
+        input:focus,select:focus,textarea:focus { border-color: var(--app-accent) !important; box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
         @keyframes shake { 0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)} }
         .shake { animation: shake 0.35s ease; }
         @media (max-width:600px) { .f2col { grid-template-columns:1fr!important; } .f3col { grid-template-columns:1fr 1fr!important; } }
@@ -782,7 +782,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
       {/* Top nav */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <button onClick={() => setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#9333ea", fontWeight: 700, padding: 0, fontFamily: "inherit" }}>← Back</button>
+        <button onClick={() => setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit" }}>← Back</button>
         <div style={{ display: "flex", gap: 8 }}>
           <button onClick={clearForm} style={{ padding: "8px 14px", background: "#fff", border: "1.5px solid #f3f4f6", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit" }}>Clear</button>
           <button onClick={handleSaveDraft} disabled={!!saving}
@@ -790,7 +790,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved!" : "💾 Save Draft"}
           </button>
           <button onClick={handleSavePreview} disabled={!!saving}
-            style={{ padding: "8px 22px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#9333ea,#10b981)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+            style={{ padding: "8px 22px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),#10b981)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
             {saving === "preview" ? "Saving…" : "Preview →"}
           </button>
         </div>
@@ -832,7 +832,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             </select>
             <select value={qt.isGstIncluded ? "including" : "excluding"}
               onChange={(e) => upd("isGstIncluded", e.target.value === "including")}
-              style={{ ...inp(), marginTop: 6, fontSize: 11, fontWeight: 700, color: "#9333ea" }}>
+              style={{ ...inp(), marginTop: 6, fontSize: 11, fontWeight: 700, color: "var(--app-accent)" }}>
               <option value="excluding">Excluding GST</option>
               <option value="including">Including GST</option>
             </select>
@@ -934,7 +934,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>Items / Services</div>
-          <button onClick={addItem} style={{ padding: "6px 14px", background: "linear-gradient(135deg,#9333ea,#10b981)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>+ Add Item</button>
+          <button onClick={addItem} style={{ padding: "6px 14px", background: "linear-gradient(135deg,var(--app-accent),#10b981)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>+ Add Item</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, paddingBottom: 8, borderBottom: "1px solid #f3f4f6", marginBottom: 8 }}>
           {["Description", "Qty", `Rate (${qt.currency || "₹"})`, ""].map((h, i) => <div key={i} style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>{h}</div>)}
@@ -968,7 +968,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({qt.gstRate}%){qt.isGstIncluded ? " (Incl.)" : ""}</span>
               <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(gstAmt, qt.currency)}</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#064e3b,#9333ea)", borderRadius: 10, marginTop: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#064e3b,var(--app-accent))", borderRadius: 10, marginTop: 8 }}>
               <span style={{ fontSize: 14, fontWeight: 800, color: "#d1fae5" }}>Total</span>
               <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{formatCurrency(total, qt.currency)}</span>
             </div>
@@ -1015,7 +1015,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             <label style={lbl}>UPI ID for Payment</label>
             <input value={qt.upiId} onChange={(e) => upd("upiId", e.target.value)} placeholder="e.g. business@okaxis" style={inp()} />
           </div>
-          <div style={{ fontSize: 11, fontWeight: 800, color: "#7c3aed", marginTop: 10, gridColumn: "1 / -1", textTransform: "uppercase", letterSpacing: 1 }}>Bank Transfer Details (Optional)</div>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", marginTop: 10, gridColumn: "1 / -1", textTransform: "uppercase", letterSpacing: 1 }}>Bank Transfer Details (Optional)</div>
           <div>
             <label style={lbl}>Bank Name</label>
             <input value={qt.bankName} onChange={(e) => upd("bankName", e.target.value)} placeholder="e.g. HDFC Bank" style={inp()} />
@@ -1050,7 +1050,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved as Draft!" : "💾 Save Draft"}
         </button>
         <button onClick={handleSavePreview} disabled={!!saving}
-          style={{ flex: 2, padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#064e3b,#9333ea)", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+          style={{ flex: 2, padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#064e3b,var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
           {saving === "preview" ? "Saving…" : "Preview & Print →"}
         </button>
       </div>

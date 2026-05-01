@@ -31,7 +31,7 @@ function StatusBadge({ status }) {
     overdue: { bg: "#fee2e2", color: "#dc2626", label: "🔴 Overdue" },
     draft: { bg: "#f3f4f6", color: "#6b7280", label: "📝 Draft" },
     sent: { bg: "#eff6ff", color: "#2563eb", label: "📤 Sent" },
-    part_paid: { bg: "#fdf4ff", color: "#a855f7", label: "💰 Part Payment" },
+    part_paid: { bg: "#fdf4ff", color: "var(--app-accent)", label: "💰 Part Payment" },
   };
   const s = map[(status || "draft").toLowerCase()] || map.draft;
   return (
@@ -49,10 +49,10 @@ function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px" }}>🗑️</div>
         <h3 style={{ margin: "0 0 8px", fontSize: 16, fontWeight: 800, color: "#1e0a3c" }}>Delete Invoice?</h3>
         <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 22px", lineHeight: 1.5 }}>
-          Are you sure you want to delete <strong style={{ color: "#9333ea" }}>{invoiceNo}</strong>? This cannot be undone.
+          Are you sure you want to delete <strong style={{ color: "var(--app-accent)" }}>{invoiceNo}</strong>? This cannot be undone.
         </p>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onCancel} style={{ flex: 1, padding: "10px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 10, fontSize: 13, fontWeight: 600, color: "#1e0a3c", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+          <button onClick={onCancel} style={{ flex: 1, padding: "10px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, fontSize: 13, fontWeight: 600, color: "#1e0a3c", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
           <button onClick={onConfirm} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
         </div>
       </div>
@@ -90,7 +90,7 @@ function deleteDraftLocal(invoiceNo) {
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
 }
 
-const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"#9333ea",bg:"#f5f3ff",card:"#FFFFFF",text:"#1e0a3c",muted:"#7c3aed",border:"#ede9fe"};
+const T={primary:"#3b0764",sidebar:"#1e0a3c",accent:"var(--app-accent)",bg:"var(--app-bg)",card:"#FFFFFF",text:"#1e0a3c",muted:"var(--app-accent)",border:"var(--app-border)"};
 
 function ClientDropdown({clients,value,onChange,error,onAddClient}){
   const [search,setSearch]=useState("");
@@ -99,17 +99,17 @@ function ClientDropdown({clients,value,onChange,error,onAddClient}){
   const selected=clients.find(c=>(c.clientName||c.name)===value);
   return(
     <div style={{position:"relative"}}>
-      <div onClick={()=>setOpen(!open)} style={{width:"100%",border:`1.5px solid ${error?"#EF4444":open?"#9333ea":"#ede9fe"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"#a78bfa",background:"#faf5ff",cursor:"pointer",userSelect:"none",boxSizing:"border-box",position:"relative",minHeight:42}}>
-        {value?(<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName&&<span style={{fontSize:11,color:"#a78bfa"}}>({selected.companyName})</span>}</div>):"-- Select Client --"}
+      <div onClick={()=>setOpen(!open)} style={{width:"100%",border:`1.5px solid ${error?"#EF4444":open?"var(--app-accent)":"var(--app-border)"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"#a78bfa",background:"var(--app-bg)",cursor:"pointer",userSelect:"none",boxSizing:"border-box",position:"relative",minHeight:42}}>
+        {value?(<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName&&<span style={{fontSize:11,color:"#a78bfa"}}>({selected.companyName})</span>}</div>):"-- Select Client --"}
         <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"#a78bfa",transition:"0.2s"}}>▼</span>
       </div>
       {open&&(
-        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,boxShadow:"0 8px 32px rgba(147,51,234,0.15)",zIndex:999,overflow:"hidden"}}>
-          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid #ede9fe",borderRadius:8,fontSize:12,background:"#faf5ff",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
-          {onAddClient&&<div onClick={()=>{setOpen(false);setSearch("");onAddClient();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,#f3e8ff,#faf5ff)",borderBottom:"2px solid #ede9fe"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"#9333ea"}}>Add New Client</div></div></div>}
+        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid var(--app-border)",borderRadius:12,boxShadow:"0 8px 32px rgba(147,51,234,0.15)",zIndex:999,overflow:"hidden"}}>
+          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid var(--app-border)",borderRadius:8,fontSize:12,background:"var(--app-bg)",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
+          {onAddClient&&<div onClick={()=>{setOpen(false);setSearch("");onAddClient();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,var(--app-border),var(--app-bg))",borderBottom:"2px solid var(--app-border)"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"var(--app-accent)"}}>Add New Client</div></div></div>}
           <div style={{maxHeight:180,overflowY:"auto"}}>
             {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"#a78bfa",fontSize:13}}>No clients found</div>
-              :filtered.map((c,i)=>{const name=c.clientName||c.name||"";const company=c.companyName||c.company||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"#f3e8ff":"transparent",borderBottom:"1px solid #f5f3ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"#f3e8ff":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div>{company&&<div style={{fontSize:11,color:"#a78bfa"}}>{company}</div>}</div>{isSel&&<span style={{fontSize:14,color:"#9333ea"}}>✓</span>}</div>);})}
+              :filtered.map((c,i)=>{const name=c.clientName||c.name||"";const company=c.companyName||c.company||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"var(--app-border)":"transparent",borderBottom:"1px solid var(--app-bg)"}} onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"var(--app-border)":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div>{company&&<div style={{fontSize:11,color:"#a78bfa"}}>{company}</div>}</div>{isSel&&<span style={{fontSize:14,color:"var(--app-accent)"}}>✓</span>}</div>);})}
           </div>
         </div>
       )}
@@ -124,17 +124,17 @@ function ProjectDropdown({projects,value,onChange,onAddProject,disabled}){
   const filtered=projects.filter(p=>(p.name||"").toLowerCase().includes(search.toLowerCase()));
   return(
     <div style={{position:"relative"}}>
-      <div onClick={()=>{if(!disabled)setOpen(!open)}} style={{width:"100%",border:`1.5px solid ${open?"#9333ea":"#ede9fe"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"#a78bfa",background:"#faf5ff",cursor:disabled?"not-allowed":"pointer",userSelect:"none",boxSizing:"border-box",position:"relative",minHeight:42,opacity:disabled?0.5:1}}>
-        {value?(<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{value[0].toUpperCase()}</div><span>{value}</span></div>):"-- Select Project --"}
+      <div onClick={()=>{if(!disabled)setOpen(!open)}} style={{width:"100%",border:`1.5px solid ${open?"var(--app-accent)":"var(--app-border)"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"#a78bfa",background:"var(--app-bg)",cursor:disabled?"not-allowed":"pointer",userSelect:"none",boxSizing:"border-box",position:"relative",minHeight:42,opacity:disabled?0.5:1}}>
+        {value?(<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{value[0].toUpperCase()}</div><span>{value}</span></div>):"-- Select Project --"}
         <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"#a78bfa",transition:"0.2s"}}>▼</span>
       </div>
       {open&&(
-        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid #ede9fe",borderRadius:12,boxShadow:"0 8px 32px rgba(147,51,234,0.15)",zIndex:999,overflow:"hidden"}}>
-          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid #ede9fe",borderRadius:8,fontSize:12,background:"#faf5ff",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
-          {onAddProject&&<div onClick={()=>{setOpen(false);setSearch("");onAddProject();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,#f3e8ff,#faf5ff)",borderBottom:"2px solid #ede9fe"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"#9333ea"}}>Add New Project</div></div></div>}
+        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid var(--app-border)",borderRadius:12,boxShadow:"0 8px 32px rgba(147,51,234,0.15)",zIndex:999,overflow:"hidden"}}>
+          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid var(--app-border)",borderRadius:8,fontSize:12,background:"var(--app-bg)",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
+          {onAddProject&&<div onClick={()=>{setOpen(false);setSearch("");onAddProject();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,var(--app-border),var(--app-bg))",borderBottom:"2px solid var(--app-border)"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"var(--app-accent)"}}>Add New Project</div></div></div>}
           <div style={{maxHeight:180,overflowY:"auto"}}>
             {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"#a78bfa",fontSize:13}}>No projects found</div>
-              :filtered.map((p,i)=>{const name=p.name||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"#f3e8ff":"transparent",borderBottom:"1px solid #f5f3ff"}} onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"#f3e8ff":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,#9333ea,#c084fc)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div></div>{isSel&&<span style={{fontSize:14,color:"#9333ea"}}>✓</span>}</div>);})}
+              :filtered.map((p,i)=>{const name=p.name||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"var(--app-border)":"transparent",borderBottom:"1px solid var(--app-bg)"}} onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"var(--app-border)":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div></div>{isSel&&<span style={{fontSize:14,color:"var(--app-accent)"}}>✓</span>}</div>);})}
           </div>
         </div>
       )}
@@ -413,7 +413,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const lbl = { display: "block", fontSize: 12, color: "#6b7280", fontWeight: 600, marginBottom: 4 };
 
   const statusColor = {
-    paid: "#16a34a", unpaid: "#ea580c", overdue: "#dc2626", draft: "#6b7280", sent: "#2563eb", part_paid: "#a855f7",
+    paid: "#16a34a", unpaid: "#ea580c", overdue: "#dc2626", draft: "#6b7280", sent: "#2563eb", part_paid: "var(--app-accent)",
   };
 
   // ════════════════════════════════════════════════════════════
@@ -426,7 +426,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     const receiptNo = `RCP-${Date.now().toString().slice(-6)}`;
     
     return (
-      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#f5f3ff", minHeight: "100vh", padding: "40px 20px" }}>
+      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "40px 20px" }}>
         <style>{`
           @media print {
             .no-print { display: none !important; }
@@ -437,12 +437,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
           <button onClick={() => setStep("list")} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Back to List</button>
-          <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(147,51,234,0.3)" }}>🖨️ Print Receipt</button>
+          <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(147,51,234,0.3)" }}>🖨️ Print Receipt</button>
         </div>
 
         <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "#fff", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", overflow: "hidden", border: "1px solid #f3f0ff" }}>
           {/* Header */}
-          <div style={{ background: "linear-gradient(135deg,#4c1d95,#7c3aed)", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
+          <div style={{ background: "linear-gradient(135deg,#4c1d95,var(--app-accent))", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
             <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>💸</div>
             <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>{r.status === "part_paid" ? "PART PAYMENT RECEIPT" : "PAYMENT RECEIPT"}</h2>
             <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4, fontWeight: 600 }}>{receiptNo}</div>
@@ -451,34 +451,34 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div style={{ padding: "32px" }}>
             <div style={{ textAlign: "center", marginBottom: 32 }}>
               <div style={{ fontSize: 36, fontWeight: 900, color: "#1e0a3c" }}>{formatCurrency(pd.amountPaid, invData.currency)}</div>
-              <div style={{ fontSize: 12, color: "#7c3aed", fontWeight: 700, marginTop: 4, textTransform: "uppercase", letterSpacing: 1 }}>Amount Received</div>
+              <div style={{ fontSize: 12, color: "var(--app-accent)", fontWeight: 700, marginTop: 4, textTransform: "uppercase", letterSpacing: 1 }}>Amount Received</div>
             </div>
 
             <div style={{ display: "grid", gap: 20 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                 <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Received From</span>
                 <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{r.client}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                 <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Date</span>
                 <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{formatDate(pd.paymentDate)}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                 <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Mode</span>
                 <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{pd.paymentMode}</span>
               </div>
               {pd.transactionId && (
-                <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                   <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Transaction ID</span>
                   <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700, fontFamily: "monospace" }}>{pd.transactionId}</span>
                 </div>
               )}
-              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                 <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Invoice Number</span>
                 <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{r.invoiceNo}</span>
               </div>
               {r.status === "part_paid" && (
-                <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                   <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 700 }}>Remaining Balance</span>
                   <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 800 }}>{formatCurrency((r.total || 0) - (pd.amountPaid || 0), invData.currency)}</span>
                 </div>
@@ -486,8 +486,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
 
             <div style={{ marginTop: 40, textAlign: "center", background: "#fdf4ff", borderRadius: 16, padding: "20px" }}>
-              <div style={{ fontSize: 14, color: "#7c3aed", fontWeight: 800 }}>THANK YOU!</div>
-              <div style={{ fontSize: 12, color: "#a855f7", marginTop: 4 }}>We appreciate your business.</div>
+              <div style={{ fontSize: 14, color: "var(--app-accent)", fontWeight: 800 }}>THANK YOU!</div>
+              <div style={{ fontSize: 12, color: "var(--app-accent)", marginTop: 4 }}>We appreciate your business.</div>
             </div>
 
             <div style={{ marginTop: 32, textAlign: "center" }}>
@@ -525,7 +525,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
-          .inv-row:hover { background: #f5f3ff !important; }
+          .inv-row:hover { background: var(--app-bg) !important; }
           .inv-row { transition: background 0.15s; cursor: pointer; }
           .inv-action-btn { transition: all 0.15s; }
           .inv-action-btn:hover { opacity: 0.85; transform: translateY(-1px); }
@@ -545,7 +545,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                 <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#1e0a3c" }}>Payment Information</h3>
-                <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>✕</button>
+                <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
               </div>
               
               <div style={{ marginBottom: 16 }}>
@@ -595,7 +595,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               </div>
 
               <div style={{ display: "flex", gap: 10 }}>
-                <button onClick={() => setPaymentModalEntry(null)} style={{ flex: 1, padding: "12px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#7c3aed", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+                <button onClick={() => setPaymentModalEntry(null)} style={{ flex: 1, padding: "12px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
                 <button onClick={() => {
                   updateStatusBackend(paymentModalEntry, paymentModalStatus, paymentData);
                   if (sendReceipt) {
@@ -603,7 +603,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     setStep("receipt");
                   }
                   setPaymentModalEntry(null);
-                }} style={{ flex: 1, padding: "12px", background: paymentModalStatus === "paid" ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#a855f7,#9333ea)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+                }} style={{ flex: 1, padding: "12px", background: paymentModalStatus === "paid" ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
                   {paymentModalStatus === "paid" ? "Confirm Full Payment" : "Confirm Part Payment"}
                 </button>
               </div>
@@ -628,7 +628,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               />
             </div>
             <button onClick={() => { clearForm(); setStep("form"); }}
-              style={{ padding: "10px 22px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(147,51,234,0.3)" }}>
+              style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(147,51,234,0.3)" }}>
               + Create Invoice
             </button>
           </div>
@@ -655,9 +655,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #f3f4f6", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
 
           {/* Table header */}
-          <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 0.8fr 0.8fr 0.8fr 1.2fr 1fr 0.8fr", padding: "12px 20px", background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", borderBottom: "2px solid #ede9fe" }}>
+          <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 0.8fr 0.8fr 0.8fr 1.2fr 1fr 0.8fr", padding: "12px 20px", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}>
             {["Invoice No", "Client", "Project", "Date", "Due Date", "Amount", "Status", "Actions"].map((h) => (
-              <div key={h} style={{ fontSize: 11, fontWeight: 700, color: "#7c3aed", letterSpacing: 0.5, textTransform: "uppercase" }}>{h}</div>
+              <div key={h} style={{ fontSize: 11, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 0.5, textTransform: "uppercase" }}>{h}</div>
             ))}
           </div>
 
@@ -688,14 +688,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
                 {/* Invoice No */}
                 <div onClick={() => setViewEntry(entry)}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>{entry.invoiceNo || "—"}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{entry.invoiceNo || "—"}</div>
                   <div style={{ fontSize: 10, color: "#d1d5db", marginTop: 1, fontFamily: "monospace" }}>{formatDateTime(entry.savedAt)}</div>
                 </div>
 
                 {/* Client */}
                 <div onClick={() => setViewEntry(entry)} style={{ fontSize: 13, fontWeight: 600, color: "#111827" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                    <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
+                    <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
                       {(entry.client || "?")[0].toUpperCase()}
                     </div>
                     <span>{entry.client || "—"}</span>
@@ -765,14 +765,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 680, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
 
               {/* Modal header */}
-              <div style={{ padding: "16px 22px", borderBottom: "1px solid #ede9fe", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", flexShrink: 0 }}>
+              <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
                 <div>
                   <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e0a3c" }}>🧾 {viewEntry.invoiceNo}</h2>
                   <p style={{ margin: "2px 0 0", fontSize: 11, color: "#a78bfa" }}>{formatDateTime(viewEntry.savedAt)}</p>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <button onClick={() => { setViewEntry(null); loadEntry(viewEntry); }}
-                    style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 8, padding: "7px 14px", fontSize: 12, color: "#9333ea", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                    style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 8, padding: "7px 14px", fontSize: 12, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                     ✏️ Edit
                   </button>
                   <button onClick={() => { setViewEntry(null); setDeleteTarget(viewEntry); }}
@@ -780,7 +780,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     🗑 Delete
                   </button>
                   <button onClick={() => setViewEntry(null)}
-                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>✕</button>
+                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
                 </div>
               </div>
 
@@ -815,8 +815,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                           { label: "Due Date", value: formatDate(vInv.dueDate), icon: "⏰" },
                           { label: "Client GST", value: clients.find(c => (c.clientName || c.name) === (viewEntry.client || vInv.client))?.gstNumber || "—", icon: "💎" },
                         ].map(({ label, value, icon }) => (
-                          <div key={label} style={{ background: "#faf5ff", borderRadius: 10, padding: "10px 12px", border: "1px solid #ede9fe" }}>
-                            <div style={{ fontSize: 9, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 4, textTransform: "uppercase" }}>{icon} {label}</div>
+                          <div key={label} style={{ background: "var(--app-bg)", borderRadius: 10, padding: "10px 12px", border: "1px solid var(--app-border)" }}>
+                            <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 4, textTransform: "uppercase" }}>{icon} {label}</div>
                             <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c" }}>{value}</div>
                           </div>
                         ))}
@@ -872,10 +872,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       })()}
 
                       {/* Items table */}
-                      <div style={{ border: "1px solid #ede9fe", borderRadius: 12, overflow: "hidden", marginBottom: 18 }}>
-                        <div style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", padding: "9px 14px", display: "grid", gridTemplateColumns: "1fr 60px 90px 90px", gap: 8 }}>
+                      <div style={{ border: "1px solid var(--app-border)", borderRadius: 12, overflow: "hidden", marginBottom: 18 }}>
+                        <div style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", padding: "9px 14px", display: "grid", gridTemplateColumns: "1fr 60px 90px 90px", gap: 8 }}>
                           {["Description", "Qty", "Rate", "Amount"].map(h => (
-                            <div key={h} style={{ fontSize: 10, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: 0.5 }}>{h}</div>
+                            <div key={h} style={{ fontSize: 10, fontWeight: 700, color: "var(--app-accent)", textTransform: "uppercase", letterSpacing: 0.5 }}>{h}</div>
                           ))}
                         </div>
                         {vItems.length === 0 ? (
@@ -904,7 +904,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                               <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
                             </div>
                           ))}
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,#4c1d95,#7c3aed)", borderRadius: 10, marginTop: 8 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,#4c1d95,var(--app-accent))", borderRadius: 10, marginTop: 8 }}>
                             <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>BALANCE DUE</span>
                             <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(vTot - (viewEntry.amountPaid || vInv.amountPaid || 0), vInv.currency || inv.currency)}</span>
                           </div>
@@ -915,14 +915,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       {(vInv.notes || vInv.terms) && (
                         <div style={{ display: "grid", gridTemplateColumns: vInv.notes && vInv.terms ? "1fr 1fr" : "1fr", gap: 10, marginBottom: 10 }}>
                           {vInv.notes && (
-                            <div style={{ background: "#faf5ff", borderRadius: 10, padding: "12px 14px", border: "1px solid #ede9fe" }}>
-                              <div style={{ fontSize: 9, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>📝 Notes</div>
+                            <div style={{ background: "var(--app-bg)", borderRadius: 10, padding: "12px 14px", border: "1px solid var(--app-border)" }}>
+                              <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>📝 Notes</div>
                               <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.6 }}>{vInv.notes}</div>
                             </div>
                           )}
                           {vInv.terms && (
-                            <div style={{ background: "#faf5ff", borderRadius: 10, padding: "12px 14px", border: "1px solid #ede9fe" }}>
-                              <div style={{ fontSize: 9, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>📜 Terms</div>
+                            <div style={{ background: "var(--app-bg)", borderRadius: 10, padding: "12px 14px", border: "1px solid var(--app-border)" }}>
+                              <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>📜 Terms</div>
                               <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.6 }}>{vInv.terms}</div>
                             </div>
                       )}
@@ -932,7 +932,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     {/* Payment Instructions */}
                     {(vInv.upiId || vInv.bankName) && (
                       <div style={{ background: "#f8fafc", borderRadius: 12, padding: "14px 18px", border: "1px solid #e2e8f0", marginBottom: 12 }}>
-                        <div style={{ fontSize: 9, color: "#7c3aed", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textTransform: "uppercase" }}>💳 Payment Instructions</div>
+                        <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textTransform: "uppercase" }}>💳 Payment Instructions</div>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
                           {vInv.upiId && (
                             <div>
@@ -967,7 +967,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                       {/* Action row */}
                       <div style={{ display: "flex", gap: 10, marginTop: 10, paddingTop: 16, borderTop: "1px solid #f3f0ff" }}>
                         <button onClick={() => { setViewEntry(null); loadEntry(viewEntry); }}
-                          style={{ flex: 1, padding: "12px", background: "#f3e8ff", border: "1.5px solid #e9d5ff", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#7c3aed", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "inherit" }}>
+                          style={{ flex: 1, padding: "12px", background: "var(--app-border)", border: "1.5px solid #e9d5ff", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "var(--app-accent)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: "inherit" }}>
                           ✏️ Edit
                         </button>
                         <button onClick={() => shareInvoice(viewEntry)}
@@ -1035,7 +1035,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗 Share</button>
           <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WA</button>
           <button onClick={() => { setDeleteTarget({ id: editingId, invoiceNo: inv.invoiceNo }); }} style={{ padding: "10px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ef4444", fontFamily: "inherit" }}>🗑️ Delete</button>
-          <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
+          <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
         <div className="invoice-paper">
@@ -1047,7 +1047,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 {effectiveLogo ? (
                   <img src={effectiveLogo} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                 ) : (
-                  <div style={{ height: 60, width: 60, background: "#7c3aed", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                  <div style={{ height: 60, width: 60, background: "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
                     {effectiveCompanyName[0] || "?"}
                   </div>
                 )}
@@ -1058,7 +1058,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               </div>
               <div className="inv-hright" style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 36, fontWeight: 900, color: "rgba(124,58,237,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#7c3aed" }}>{inv.invoiceNo}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-accent)" }}>{inv.invoiceNo}</div>
                 {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
                 <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                   <div style={{ textAlign: "right" }}>
@@ -1079,10 +1079,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div style={{ padding: "20px 32px", borderRight: inv.project ? "1px solid #f3f0ff" : "none" }}>
               <div style={{ fontSize: 9, color: "#a78bfa", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
               <div style={{ fontSize: 17, fontWeight: 800, color: "#1e0a3c" }}>{inv.client || "—"}</div>
-              {selectedClient?.companyName && <div style={{ fontSize: 13, color: "#7c3aed", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
+              {selectedClient?.companyName && <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
               {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
               {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
-              {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: "#7c3aed", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
+              {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: "var(--app-accent)", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
             </div>
             {inv.project && (
               <div style={{ padding: "20px 32px" }}>
@@ -1096,15 +1096,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+                <tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#7c3aed", letterSpacing: 1.5, borderBottom: "2px solid #ede9fe", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, idx) => (
-                  <tr key={item.id} style={{ borderBottom: "1px solid #f5f3ff" }}>
+                  <tr key={item.id} style={{ borderBottom: "1px solid var(--app-bg)" }}>
                     <td style={{ padding: "12px 11px", color: "#a78bfa", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
                     <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{item.description || "—"}</td>
                     <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
@@ -1139,20 +1139,20 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {inv.notes && (
-                <div style={{ background: "#faf5ff", borderRadius: 11, padding: "14px 16px", border: "1px solid #ede9fe" }}>
+                <div style={{ background: "var(--app-bg)", borderRadius: 11, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
                   <div style={{ fontSize: 9, color: "#a78bfa", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📝 NOTES</div>
                   <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.notes}</div>
                 </div>
               )}
               {inv.terms && (
-                <div style={{ background: "#faf5ff", borderRadius: 11, padding: "14px 16px", border: "1px solid #ede9fe" }}>
+                <div style={{ background: "var(--app-bg)", borderRadius: 11, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
                   <div style={{ fontSize: 9, color: "#a78bfa", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
                   <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.terms}</div>
                 </div>
               )}
               {(inv.upiId || inv.bankName) && (
                 <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                  <div style={{ fontSize: 9, color: "#7c3aed", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 PAYMENT INSTRUCTIONS</div>
+                  <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 PAYMENT INSTRUCTIONS</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
                     {inv.upiId && (
                       <div>
@@ -1184,9 +1184,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#faf5ff", borderRadius: 12, padding: "14px 16px", border: "1px solid #ede9fe", minWidth: 110 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)", minWidth: 110 }}>
               <div style={{ fontSize: 8, color: "#a78bfa", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN INVOICE</div>
-              <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #ede9fe" }}>
+              <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid var(--app-border)" }}>
                 <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="#1e0a3c" />
               </div>
               <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
@@ -1216,7 +1216,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
-        input:focus, select:focus, textarea:focus { border-color: #7c3aed !important; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+        input:focus, select:focus, textarea:focus { border-color: var(--app-accent) !important; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
         @keyframes shake { 0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)} }
         .shake { animation: shake 0.35s ease; }
         @media (max-width:600px) { .f2col { grid-template-columns: 1fr !important; } .f3col { grid-template-columns: 1fr 1fr !important; } }
@@ -1230,14 +1230,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       {/* Top nav */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={() => setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#7c3aed", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
+          <button onClick={() => setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
             ← Back
           </button>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>
 
           </span>
           {editingId && (
-            <span style={{ background: "#f3e8ff", color: "#9333ea", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>
+            <span style={{ background: "var(--app-border)", color: "var(--app-accent)", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>
               {inv.invoiceNo}
             </span>
           )}
@@ -1249,7 +1249,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved!" : "💾 Save Draft"}
           </button>
           <button onClick={handleSavePreview} disabled={!!saving}
-            style={{ padding: "8px 22px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+            style={{ padding: "8px 22px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
             {saving === "preview" ? "Saving…" : "Preview →"}
           </button>
         </div>
@@ -1288,7 +1288,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </select>
             <select value={inv.isGstIncluded ? "including" : "excluding"} 
               onChange={(e) => upd("isGstIncluded", e.target.value === "including")} 
-              style={{ ...inp(), marginTop: 6, fontSize: 11, fontWeight: 700, color: "#7c3aed" }}>
+              style={{ ...inp(), marginTop: 6, fontSize: 11, fontWeight: 700, color: "var(--app-accent)" }}>
               <option value="excluding">Excluding GST</option>
               <option value="including">Including GST</option>
             </select>
@@ -1388,7 +1388,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>Items / Services</div>
-            <button onClick={addItem} style={{ padding: "6px 14px", background: "linear-gradient(135deg,#7c3aed,#9333ea)", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>+ Add Item</button>
+            <button onClick={addItem} style={{ padding: "6px 14px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 12, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>+ Add Item</button>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, paddingBottom: 8, borderBottom: "1px solid #f3f4f6", marginBottom: 8 }}>
             {["Description", "Qty", `Rate (${inv.currency || "₹"})`, ""].map((h, i) => (
@@ -1483,7 +1483,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <label style={lbl}>UPI ID for Payment</label>
               <input value={inv.upiId} onChange={(e) => upd("upiId", e.target.value)} placeholder="e.g. business@okaxis" style={inp()} />
             </div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "#7c3aed", marginTop: 10, gridColumn: "1 / -1", textTransform: "uppercase", letterSpacing: 1 }}>Bank Transfer Details (Optional)</div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", marginTop: 10, gridColumn: "1 / -1", textTransform: "uppercase", letterSpacing: 1 }}>Bank Transfer Details (Optional)</div>
             <div>
               <label style={lbl}>Bank Name</label>
               <input value={inv.bankName} onChange={(e) => upd("bankName", e.target.value)} placeholder="e.g. HDFC Bank" style={inp()} />
@@ -1526,7 +1526,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           )}
 
           <button onClick={handleSavePreview} disabled={!!saving}
-            style={{ flex: 2, padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#4c1d95,#7c3aed)", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+            style={{ flex: 2, padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#4c1d95,var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
             {saving === "preview" ? "Saving…" : "Preview & Print →"}
           </button>
         </div>

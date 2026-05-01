@@ -16,7 +16,7 @@ const EXPENSES_API = `${BASE_URL}/api/expenses`;
 const INCOME_API   = `${BASE_URL}/api/income`;
 
 // ── Shared theme ─────────────────────────────────────────────
-const T = { text:"#1e0a3c", muted:"#7c3aed", border:"#ede9fe" };
+const T = { text:"#1e0a3c", muted:"var(--app-accent)", border:"var(--app-border)" };
 
 const formatCurrency = (amount, symbol = "₹") => {
   const num = Number(amount) || 0;
@@ -32,12 +32,12 @@ function Modal({ title, onClose, children }) {
       <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:720,
         maxHeight:"90vh", overflow:"hidden", display:"flex", flexDirection:"column",
         boxShadow:"0 32px 80px rgba(147,51,234,0.25)" }}>
-        <div style={{ padding:"16px 22px", borderBottom:"1px solid #ede9fe",
+        <div style={{ padding:"16px 22px", borderBottom:"1px solid var(--app-border)",
           display:"flex", justifyContent:"space-between", alignItems:"center",
-          background:"linear-gradient(90deg,#f5f3ff,#faf5ff)", flexShrink:0 }}>
+          background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink:0 }}>
           <h2 style={{ margin:0, fontSize:17, fontWeight:800, color:T.text }}>{title}</h2>
           <button onClick={onClose} style={{ background:"none", border:"none",
-            fontSize:20, cursor:"pointer", color:"#7c3aed", padding:"4px 8px" }}>✕</button>
+            fontSize:20, cursor:"pointer", color:"var(--app-accent)", padding:"4px 8px" }}>✕</button>
         </div>
         <div style={{ overflowY:"auto", padding:"20px 22px", flex:1 }}>{children}</div>
       </div>
@@ -57,9 +57,9 @@ function Toast({ msg }) {
 
 function Fld({ label, value, onChange, options, type="text", error, placeholder, prefix }) {
   const s = {
-    width:"100%", border:`1.5px solid ${error?"#EF4444":"#ede9fe"}`,
+    width:"100%", border:`1.5px solid ${error?"#EF4444":"var(--app-border)"}`,
     borderRadius:10, padding: prefix ? "10px 14px 10px 30px" : "10px 14px",
-    fontSize:13, color:T.text, background:"#faf5ff",
+    fontSize:13, color:T.text, background:"var(--app-bg)",
     boxSizing:"border-box", outline:"none", fontFamily:"inherit"
   };
   return (
@@ -69,7 +69,7 @@ function Fld({ label, value, onChange, options, type="text", error, placeholder,
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
       `}</style>
-      <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700,
+      <label style={{ display:"block", fontSize:11, color:"var(--app-accent)", fontWeight:700,
         letterSpacing:0.5, marginBottom:5 }}>{label.toUpperCase()}</label>
       <div style={{ position:"relative" }}>
         {prefix && (
@@ -109,13 +109,13 @@ const ACC_EMPTY = {
 };
 
 const ROLE_COLOR = {
-  Client:"#9333ea", Employee:"#c084fc", Manager:"#f59e0b",
-  Admin:"#7c3aed",  SubAdmin:"#a855f7"
+  Client:"var(--app-accent)", Employee:"var(--app-accent)", Manager:"#f59e0b",
+  Admin:"var(--app-accent)",  SubAdmin:"var(--app-accent)"
 };
 const ACC_STATUS_COLOR = { Active:"#22C55E", Inactive:"#EF4444" };
 
 function RoleBadge({ label }) {
-  const c = ROLE_COLOR[label] || ACC_STATUS_COLOR[label] || "#9333ea";
+  const c = ROLE_COLOR[label] || ACC_STATUS_COLOR[label] || "var(--app-accent)";
   return (
     <span style={{ background:`${c}18`, color:c, border:`1px solid ${c}33`,
       padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>
@@ -139,16 +139,16 @@ export default function AccountsPage({ initialTab = "overview" }) {
     cursor: "pointer",
     border: "none",
     background: active ? "#fff" : "transparent",
-    color: active ? "#7c3aed" : "#a78bfa",
+    color: active ? "var(--app-accent)" : "#a78bfa",
     transition: "all 0.3s",
-    borderBottom: active ? "3px solid #7c3aed" : "none",
+    borderBottom: active ? "3px solid var(--app-accent)" : "none",
     fontFamily: "inherit"
   });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, borderBottom: "1px solid #ede9fe", padding: "0 10px" }}>
+      <div style={{ display: "flex", gap: 4, borderBottom: "1px solid var(--app-border)", padding: "0 10px" }}>
         <button onClick={() => setActiveTab("overview")} style={tabStyle(activeTab === "overview")}>
           📊 Overview
         </button>
@@ -201,7 +201,7 @@ function FinancialOverview() {
   const stats = [
     { t: "Total Income", v: formatCurrency(totalIncome), c: "#22c55e", i: "💰", desc: "Money coming in" },
     { t: "Total Expenses", v: formatCurrency(totalExpenses), c: "#ef4444", i: "💸", desc: "Money going out" },
-    { t: "Net Balance", v: formatCurrency(netBalance), c: netBalance >= 0 ? "#7c3aed" : "#f43f5e", i: "🏦", desc: "Overall Profit/Loss" },
+    { t: "Net Balance", v: formatCurrency(netBalance), c: netBalance >= 0 ? "var(--app-accent)" : "#f43f5e", i: "🏦", desc: "Overall Profit/Loss" },
   ];
 
   if (loading) return <div style={{ textAlign: "center", padding: 50, color: "#a78bfa" }}>Loading overview...</div>;
@@ -214,7 +214,7 @@ function FinancialOverview() {
           <div key={t} style={{
             background: "#fff", borderRadius: 20, padding: 24,
             boxShadow: "0 10px 30px rgba(124, 58, 237, 0.08)",
-            border: `1px solid #ede9fe`,
+            border: `1px solid var(--app-border)`,
             position: "relative", overflow: "hidden"
           }}>
             <div style={{ position: "absolute", right: -10, top: -10, fontSize: 100, opacity: 0.05, pointerEvents: "none" }}>{i}</div>
@@ -233,7 +233,7 @@ function FinancialOverview() {
       {/* Breakdown and Recent Transactions */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: 20 }}>
         {/* Category Distribution (Simple List) */}
-        <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #ede9fe" }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid var(--app-border)" }}>
           <h3 style={{ margin: "0 0 20px 0", fontSize: 16, fontWeight: 700, color: T.text }}>Income vs Expenses Breakdown</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div>
@@ -267,7 +267,7 @@ function FinancialOverview() {
         </div>
 
         {/* Recent Activity */}
-        <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #ede9fe" }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid var(--app-border)" }}>
           <h3 style={{ margin: "0 0 20px 0", fontSize: 16, fontWeight: 700, color: T.text }}>Recent Transactions</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[...income.map(i => ({ ...i, type: "income" })), ...expenses.map(e => ({ ...e, type: "expense" }))]
@@ -375,14 +375,14 @@ const openEdit = (a) => {
   });
 
   const stats = [
-    { t:"Total Accounts", v:accounts.length,                                 c:"#9333ea", i:"👤" },
+    { t:"Total Accounts", v:accounts.length,                                 c:"var(--app-accent)", i:"👤" },
     { t:"Active",         v:accounts.filter(a=>a.status==="Active").length,  c:"#22C55E", i:"✅" },
     { t:"Inactive",       v:accounts.filter(a=>a.status==="Inactive").length,c:"#EF4444", i:"⛔" },
     { t:"Roles",          v:[...new Set(accounts.map(a=>a.role))].length,    c:"#f59e0b", i:"🎭" },
   ];
 
   const BtnPrimary = {
-    background:"linear-gradient(135deg,#7c3aed,#9333ea)", color:"#fff",
+    background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", color:"#fff",
     border:"none", borderRadius:10, padding:"8px 16px",
     fontWeight:700, fontSize:13, cursor:"pointer", fontFamily:"inherit"
   };
@@ -396,7 +396,7 @@ const openEdit = (a) => {
         style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
         {stats.map(({ t,v,i,c }) => (
           <div key={t} style={{ background:"#fff", borderRadius:14, padding:"16px 14px",
-            boxShadow:"0 4px 18px rgba(147,51,234,0.07)", border:"1px solid #ede9fe" }}>
+            boxShadow:"0 4px 18px rgba(147,51,234,0.07)", border:"1px solid var(--app-border)" }}>
             <div style={{ width:38, height:38, borderRadius:10, background:`${c}15`,
               display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:17, marginBottom:8 }}>{i}</div>
@@ -411,11 +411,11 @@ const openEdit = (a) => {
       <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))", gap:10 }}>
         {ROLES.map(role => {
           const count = accounts.filter(a=>a.role===role).length;
-          const c = ROLE_COLOR[role] || "#9333ea";
+          const c = ROLE_COLOR[role] || "var(--app-accent)";
           return (
             <div key={role} onClick={()=>setRoleFilter(roleFilter===role?"All":role)}
               style={{ background: roleFilter===role ? `${c}15` : "#fff",
-                border:`1.5px solid ${roleFilter===role ? c : "#ede9fe"}`,
+                border:`1.5px solid ${roleFilter===role ? c : "var(--app-border)"}`,
                 borderRadius:12, padding:"12px 14px", cursor:"pointer",
                 textAlign:"center", transition:"all 0.2s" }}>
               <div style={{ fontSize:20, fontWeight:800, color:c }}>{count}</div>
@@ -428,7 +428,7 @@ const openEdit = (a) => {
 
       {/* Table */}
       <div style={{ background:"#fff", borderRadius:16, padding:22,
-        boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid #ede9fe" }}>
+        boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid var(--app-border)" }}>
         <div style={{ display:"flex", justifyContent:"space-between",
           alignItems:"center", marginBottom:16, flexWrap:"wrap", gap:8 }}>
           <h3 style={{ margin:0, fontSize:15, fontWeight:700, color:T.text }}>
@@ -443,8 +443,8 @@ const openEdit = (a) => {
           <input placeholder="Search by name, email, role..."
             value={search} onChange={e=>setSearch(e.target.value)}
             style={{ width:"100%", padding:"10px 14px 10px 40px",
-              border:"1.5px solid #ede9fe", borderRadius:10, fontSize:13,
-              color:T.text, background:"#faf5ff", outline:"none", fontFamily:"inherit" }} />
+              border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13,
+              color:T.text, background:"var(--app-bg)", outline:"none", fontFamily:"inherit" }} />
         </div>
 
         {loading
@@ -457,11 +457,11 @@ const openEdit = (a) => {
             : <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, minWidth:700 }}>
                   <thead>
-                    <tr style={{ background:"linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+                    <tr style={{ background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
                       {["ID","Name","Email","Phone","Role","Status","Joined","Actions"].map(col => (
                         <th key={col} style={{ padding:"10px 14px", textAlign:"left",
-                          color:"#7c3aed", fontWeight:700, fontSize:11,
-                          borderBottom:"2px solid #ede9fe", whiteSpace:"nowrap" }}>
+                          color:"var(--app-accent)", fontWeight:700, fontSize:11,
+                          borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>
                           {col.toUpperCase()}
                         </th>
                       ))}
@@ -470,7 +470,7 @@ const openEdit = (a) => {
                   <tbody>
                     {displayed.map((a, i) => (
                       <tr key={a._id||i} style={{ borderBottom:"1px solid #f3f0ff" }}
-                        onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                        onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                         onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                         <td style={{ padding:"12px 14px", fontFamily:"monospace",
                           fontSize:11, color:"#a78bfa" }}>
@@ -479,7 +479,7 @@ const openEdit = (a) => {
                         <td style={{ padding:"12px 14px" }}>
                           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                             <div style={{ width:30, height:30, borderRadius:"50%",
-                              background:`linear-gradient(135deg,${ROLE_COLOR[a.role]||"#9333ea"},#c084fc)`,
+                              background:`linear-gradient(135deg,${ROLE_COLOR[a.role]||"var(--app-accent)"},var(--app-accent))`,
                               display:"flex", alignItems:"center", justifyContent:"center",
                               color:"#fff", fontSize:11, fontWeight:700, flexShrink:0 }}>
                               {(a.name||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase()}
@@ -500,9 +500,9 @@ const openEdit = (a) => {
                         <td style={{ padding:"12px 14px" }}>
                           <div style={{ display:"flex", gap:5 }}>
                             <button onClick={()=>openEdit(a)}
-                              style={{ background:"#f5f3ff", border:"1px solid #ede9fe",
+                              style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)",
                                 borderRadius:7, padding:"4px 10px", fontSize:12,
-                                color:"#7c3aed", cursor:"pointer", fontWeight:600 }}>Edit</button>
+                                color:"var(--app-accent)", cursor:"pointer", fontWeight:600 }}>Edit</button>
                             <button onClick={()=>del(a._id||a.id)}
                               style={{ background:"#fee2e2", border:"1px solid #fecaca",
                                 borderRadius:7, padding:"4px 10px", fontSize:12,
@@ -566,11 +566,11 @@ const openEdit = (a) => {
 
     <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:4 }}>
       <button onClick={()=>setModal(null)}
-        style={{ background:"#f5f3ff", border:"1px solid #ede9fe", color:"#1e0a3c",
+        style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)", color:"#1e0a3c",
           borderRadius:10, padding:"10px 16px", cursor:"pointer",
           fontWeight:600, fontSize:13 }}>Cancel</button>
       <button onClick={save} disabled={saving}
-        style={{ background:"linear-gradient(135deg,#7c3aed,#9333ea)", color:"#fff",
+        style={{ background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", color:"#fff",
           border:"none", borderRadius:10, padding:"10px 20px", fontWeight:700,
           fontSize:13, cursor:"pointer", opacity:saving?0.7:1 }}>
         {saving ? "Saving…" : modal==="add" ? "Save Account →" : "Update Account →"}
@@ -592,18 +592,18 @@ const EXP_STATUSES   = ["Pending","Approved","Rejected"];
 const EXP_EMPTY      = { title:"", category:"Food", expenseType:"Operational", paymentMode:"Cash", amount:"", status:"Pending" };
 
 const CATEGORY_COLOR = {
-  Food:"#f59e0b", Travel:"#3b82f6", Office:"#8b5cf6",
-  Utilities:"#06b6d4", Marketing:"#ec4899", Salary:"#22c55e", Miscellaneous:"#9333ea"
+  Food:"#f59e0b", Travel:"#3b82f6", Office:"var(--app-accent)",
+  Utilities:"#06b6d4", Marketing:"#ec4899", Salary:"#22c55e", Miscellaneous:"var(--app-accent)"
 };
 const CATEGORY_ICON = {
   Food:"🍽️", Travel:"✈️", Office:"🏢",
   Utilities:"💡", Marketing:"📣", Salary:"💰", Miscellaneous:"📦"
 };
 const EXP_STATUS_COLOR = { Pending:"#f59e0b", Approved:"#22C55E", Rejected:"#EF4444" };
-const TYPE_COLOR       = { Operational:"#9333ea", Capital:"#3b82f6", Recurring:"#06b6d4", "One-Time":"#ec4899" };
+const TYPE_COLOR       = { Operational:"var(--app-accent)", Capital:"#3b82f6", Recurring:"#06b6d4", "One-Time":"#ec4899" };
 
 function ExpBadge({ label, colorMap }) {
-  const c = (colorMap||{})[label] || "#9333ea";
+  const c = (colorMap||{})[label] || "var(--app-accent)";
   return (
     <span style={{ background:`${c}18`, color:c, border:`1px solid ${c}33`,
       padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>
@@ -696,14 +696,14 @@ const save = async () => {
   });
 
   const stats = [
-    { t:"Total Expenses", v:formatCurrency(totalAmount),    c:"#9333ea", i:"💸" },
+    { t:"Total Expenses", v:formatCurrency(totalAmount),    c:"var(--app-accent)", i:"💸" },
     { t:"Approved",       v:formatCurrency(approvedAmount), c:"#22C55E", i:"✅" },
     { t:"Pending",        v:expenses.filter(e=>e.status==="Pending").length,  c:"#f59e0b", i:"⏳" },
     { t:"Rejected",       v:expenses.filter(e=>e.status==="Rejected").length, c:"#EF4444", i:"❌" },
   ];
 
   const BtnPrimary = {
-    background:"linear-gradient(135deg,#7c3aed,#9333ea)", color:"#fff",
+    background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", color:"#fff",
     border:"none", borderRadius:10, padding:"8px 16px",
     fontWeight:700, fontSize:13, cursor:"pointer", fontFamily:"inherit"
   };
@@ -717,7 +717,7 @@ const save = async () => {
         style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
         {stats.map(({ t,v,i,c }) => (
           <div key={t} style={{ background:"#fff", borderRadius:14, padding:"16px 14px",
-            boxShadow:"0 4px 18px rgba(147,51,234,0.07)", border:"1px solid #ede9fe" }}>
+            boxShadow:"0 4px 18px rgba(147,51,234,0.07)", border:"1px solid var(--app-border)" }}>
             <div style={{ width:38, height:38, borderRadius:10, background:`${c}15`,
               display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:17, marginBottom:8 }}>{i}</div>
@@ -733,11 +733,11 @@ const save = async () => {
         {CATEGORIES.map(cat => {
           const count = expenses.filter(e=>e.category===cat).length;
           const total = expenses.filter(e=>e.category===cat).reduce((s,e)=>s+(Number(e.amount)||0),0);
-          const c = CATEGORY_COLOR[cat] || "#9333ea";
+          const c = CATEGORY_COLOR[cat] || "var(--app-accent)";
           return (
             <div key={cat} onClick={()=>setCatFilter(catFilter===cat?"All":cat)}
               style={{ background: catFilter===cat ? `${c}15` : "#fff",
-                border:`1.5px solid ${catFilter===cat ? c : "#ede9fe"}`,
+                border:`1.5px solid ${catFilter===cat ? c : "var(--app-border)"}`,
                 borderRadius:12, padding:"12px 14px", cursor:"pointer",
                 textAlign:"center", transition:"all 0.2s" }}>
               <div style={{ fontSize:18, marginBottom:4 }}>{CATEGORY_ICON[cat]}</div>
@@ -753,12 +753,12 @@ const save = async () => {
       {/* Status filter pills */}
       <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
         {["All","Pending","Approved","Rejected"].map(s => {
-          const c = s==="All" ? "#9333ea" : EXP_STATUS_COLOR[s];
+          const c = s==="All" ? "var(--app-accent)" : EXP_STATUS_COLOR[s];
           const active = statusFilter === s;
           return (
             <button key={s} onClick={()=>setStatusFilter(s)}
               style={{ background: active ? c : "#fff",
-                border:`1.5px solid ${active ? c : "#ede9fe"}`,
+                border:`1.5px solid ${active ? c : "var(--app-border)"}`,
                 color: active ? "#fff" : c, borderRadius:20, padding:"6px 16px",
                 fontSize:12, fontWeight:700, cursor:"pointer", transition:"all 0.2s",
                 fontFamily:"inherit" }}>
@@ -776,7 +776,7 @@ const save = async () => {
 
       {/* Table */}
       <div style={{ background:"#fff", borderRadius:16, padding:22,
-        boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid #ede9fe" }}>
+        boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid var(--app-border)" }}>
         <div style={{ display:"flex", justifyContent:"space-between",
           alignItems:"center", marginBottom:16, flexWrap:"wrap", gap:8 }}>
           <h3 style={{ margin:0, fontSize:15, fontWeight:700, color:T.text }}>
@@ -791,8 +791,8 @@ const save = async () => {
           <input placeholder="Search by title, category, payment mode..."
             value={search} onChange={e=>setSearch(e.target.value)}
             style={{ width:"100%", padding:"10px 14px 10px 40px",
-              border:"1.5px solid #ede9fe", borderRadius:10, fontSize:13,
-              color:T.text, background:"#faf5ff", outline:"none", fontFamily:"inherit" }} />
+              border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13,
+              color:T.text, background:"var(--app-bg)", outline:"none", fontFamily:"inherit" }} />
         </div>
 
         {loading
@@ -805,11 +805,11 @@ const save = async () => {
             : <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, minWidth:800 }}>
                   <thead>
-                    <tr style={{ background:"linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+                    <tr style={{ background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
                       {["ID","Title","Category","Type","Payment Mode","Amount","Status","Date","Actions"].map(col => (
                         <th key={col} style={{ padding:"10px 14px", textAlign:"left",
-                          color:"#7c3aed", fontWeight:700, fontSize:11,
-                          borderBottom:"2px solid #ede9fe", whiteSpace:"nowrap" }}>
+                          color:"var(--app-accent)", fontWeight:700, fontSize:11,
+                          borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>
                           {col.toUpperCase()}
                         </th>
                       ))}
@@ -818,7 +818,7 @@ const save = async () => {
                   <tbody>
                     {displayed.map((e, i) => (
                       <tr key={e._id||i} style={{ borderBottom:"1px solid #f3f0ff" }}
-                        onMouseEnter={ev=>ev.currentTarget.style.background="#faf5ff"}
+                        onMouseEnter={ev=>ev.currentTarget.style.background="var(--app-bg)"}
                         onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
                         <td style={{ padding:"12px 14px", fontFamily:"monospace", fontSize:11, color:"#a78bfa" }}>
                           {`EXP${String(i+1).padStart(3,"0")}`}
@@ -826,7 +826,7 @@ const save = async () => {
                         <td style={{ padding:"12px 14px" }}>
                           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                             <div style={{ width:30, height:30, borderRadius:10,
-                              background:`${CATEGORY_COLOR[e.category]||"#9333ea"}15`,
+                              background:`${CATEGORY_COLOR[e.category]||"var(--app-accent)"}15`,
                               display:"flex", alignItems:"center", justifyContent:"center",
                               fontSize:14, flexShrink:0 }}>
                               {CATEGORY_ICON[e.category]||"📦"}
@@ -855,9 +855,9 @@ const save = async () => {
                         <td style={{ padding:"12px 14px" }}>
                           <div style={{ display:"flex", gap:5 }}>
                             <button onClick={()=>openEdit(e)}
-                              style={{ background:"#f5f3ff", border:"1px solid #ede9fe",
+                              style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)",
                                 borderRadius:7, padding:"4px 10px", fontSize:12,
-                                color:"#7c3aed", cursor:"pointer", fontWeight:600 }}>Edit</button>
+                                color:"var(--app-accent)", cursor:"pointer", fontWeight:600 }}>Edit</button>
                             <button onClick={()=>del(e._id||e.id)}
                               style={{ background:"#fee2e2", border:"1px solid #fecaca",
                                 borderRadius:7, padding:"4px 10px", fontSize:12,
@@ -868,11 +868,11 @@ const save = async () => {
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr style={{ background:"linear-gradient(90deg,#f5f3ff,#faf5ff)", borderTop:"2px solid #ede9fe" }}>
-                      <td colSpan={5} style={{ padding:"12px 14px", fontWeight:700, color:"#7c3aed", fontSize:12 }}>
+                    <tr style={{ background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))", borderTop:"2px solid var(--app-border)" }}>
+                      <td colSpan={5} style={{ padding:"12px 14px", fontWeight:700, color:"var(--app-accent)", fontSize:12 }}>
                         SHOWING {displayed.length} OF {expenses.length} EXPENSES
                       </td>
-                      <td style={{ padding:"12px 14px", fontWeight:800, color:"#9333ea", fontSize:15 }}>
+                      <td style={{ padding:"12px 14px", fontWeight:800, color:"var(--app-accent)", fontSize:15 }}>
                         {formatCurrency(displayed.reduce((s,e)=>s+(Number(e.amount)||0),0))}
                       </td>
                       <td colSpan={3} />
@@ -910,11 +910,11 @@ const save = async () => {
           </div>
 
           {form.title && (
-            <div style={{ background:"linear-gradient(135deg,#f5f3ff,#faf5ff)",
-              borderRadius:12, padding:"14px 16px", border:"1px solid #ede9fe",
+            <div style={{ background:"linear-gradient(135deg,var(--app-bg),var(--app-bg))",
+              borderRadius:12, padding:"14px 16px", border:"1px solid var(--app-border)",
               marginBottom:14, display:"flex", alignItems:"center", gap:12 }}>
               <div style={{ width:42, height:42, borderRadius:12,
-                background:`${CATEGORY_COLOR[form.category]||"#9333ea"}20`,
+                background:`${CATEGORY_COLOR[form.category]||"var(--app-accent)"}20`,
                 display:"flex", alignItems:"center", justifyContent:"center",
                 fontSize:20, flexShrink:0 }}>
                 {CATEGORY_ICON[form.category]||"📦"}
@@ -928,7 +928,7 @@ const save = async () => {
                 </div>
               </div>
               {form.amount && (
-                <div style={{ fontWeight:800, fontSize:18, color:"#9333ea" }}>
+                <div style={{ fontWeight:800, fontSize:18, color:"var(--app-accent)" }}>
                   {formatCurrency(form.amount, form.currency)}
                 </div>
               )}
@@ -948,11 +948,11 @@ const save = async () => {
 
           <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:4 }}>
             <button onClick={()=>setModal(null)}
-              style={{ background:"#f5f3ff", border:"1px solid #ede9fe", color:T.text,
+              style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)", color:T.text,
                 borderRadius:10, padding:"10px 16px", cursor:"pointer",
                 fontWeight:600, fontSize:13 }}>Cancel</button>
             <button onClick={save} disabled={saving}
-              style={{ background:"linear-gradient(135deg,#7c3aed,#9333ea)", color:"#fff",
+              style={{ background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", color:"#fff",
                 border:"none", borderRadius:10, padding:"10px 20px", fontWeight:700,
                 fontSize:13, cursor:"pointer", opacity:saving?0.7:1 }}>
               {saving ? "Saving…" : modal==="add" ? "Save Expense →" : "Update Expense →"}
@@ -973,8 +973,8 @@ const INCOME_STATUSES = ["Received", "Pending", "Cancelled"];
 const INC_EMPTY      = { title:"", category:"Project Payment", paymentMode:"GPay", amount:"", client:"", invoiceNo:"", transactionId:"", status:"Received" };
 
 const INC_CAT_COLOR = {
-  "Project Payment":"#22c55e", Advance:"#3b82f6", "Service Fee":"#8b5cf6",
-  Maintenance:"#06b6d4", Miscellaneous:"#9333ea"
+  "Project Payment":"#22c55e", Advance:"#3b82f6", "Service Fee":"var(--app-accent)",
+  Maintenance:"#06b6d4", Miscellaneous:"var(--app-accent)"
 };
 const INC_STATUS_COLOR = { Received:"#22C55E", Pending:"#f59e0b", Cancelled:"#EF4444" };
 
@@ -1070,7 +1070,7 @@ export function IncomePage() {
     { t:"Total Income", v:formatCurrency(totalIncome),    c:"#22c55e", i:"💰" },
     { t:"Received",     v:formatCurrency(received),       c:"#16a34a", i:"✅" },
     { t:"Pending",      v:income.filter(i=>i.status==="Pending").length,   c:"#f59e0b", i:"⏳" },
-    { t:"Categories",   v:[...new Set(income.map(i=>i.category))].length, c:"#8b5cf6", i:"🏷️" },
+    { t:"Categories",   v:[...new Set(income.map(i=>i.category))].length, c:"var(--app-accent)", i:"🏷️" },
   ];
 
   return (
@@ -1079,7 +1079,7 @@ export function IncomePage() {
 
       <div className="dash-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
         {stats.map(({ t,v,i,c }) => (
-          <div key={t} style={{ background:"#fff", borderRadius:14, padding:"16px 14px", boxShadow:"0 4px 18px rgba(34,197,94,0.07)", border:"1px solid #ede9fe" }}>
+          <div key={t} style={{ background:"#fff", borderRadius:14, padding:"16px 14px", boxShadow:"0 4px 18px rgba(34,197,94,0.07)", border:"1px solid var(--app-border)" }}>
             <div style={{ width:38, height:38, borderRadius:10, background:`${c}15`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, marginBottom:8 }}>{i}</div>
             <div style={{ fontSize:10, color:c, fontWeight:700, letterSpacing:0.5, marginBottom:2 }}>{t.toUpperCase()}</div>
             <div style={{ fontSize:22, fontWeight:800, color:c }}>{v}</div>
@@ -1090,22 +1090,22 @@ export function IncomePage() {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
         <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
           {["All", ...INCOME_CATS].map(cat => (
-            <button key={cat} onClick={()=>setCatFilter(cat)} style={{ padding:"6px 14px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"1.5px solid", borderColor:catFilter===cat?"#22c55e":"#ede9fe", background:catFilter===cat?"#f0fdf4":"#fff", color:catFilter===cat?"#16a34a":"#a78bfa", fontFamily:"inherit" }}>{cat}</button>
+            <button key={cat} onClick={()=>setCatFilter(cat)} style={{ padding:"6px 14px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"1.5px solid", borderColor:catFilter===cat?"#22c55e":"var(--app-border)", background:catFilter===cat?"#f0fdf4":"#fff", color:catFilter===cat?"#16a34a":"#a78bfa", fontFamily:"inherit" }}>{cat}</button>
           ))}
         </div>
         <button onClick={openAdd} style={{ background:"linear-gradient(135deg,#16a34a,#22c55e)", color:"#fff", border:"none", borderRadius:10, padding:"8px 16px", fontWeight:700, fontSize:13, cursor:"pointer", fontFamily:"inherit" }}>+ Add Income</button>
       </div>
 
-      <div style={{ background:"#fff", borderRadius:16, padding:22, boxShadow:"0 4px 24px rgba(34,197,94,0.08)", border:"1px solid #ede9fe" }}>
+      <div style={{ background:"#fff", borderRadius:16, padding:22, boxShadow:"0 4px 24px rgba(34,197,94,0.08)", border:"1px solid var(--app-border)" }}>
         <div style={{ position:"relative", marginBottom:16 }}>
           <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", pointerEvents:"none" }}>🔍</span>
-          <input placeholder="Search by title, client, invoice, txn..." value={search} onChange={e=>setSearch(e.target.value)} style={{ width:"100%", padding:"10px 14px 10px 40px", border:"1.5px solid #ede9fe", borderRadius:10, fontSize:13, color:"#1e0a3c", background:"#f0fdf4", outline:"none", fontFamily:"inherit" }} />
+          <input placeholder="Search by title, client, invoice, txn..." value={search} onChange={e=>setSearch(e.target.value)} style={{ width:"100%", padding:"10px 14px 10px 40px", border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13, color:"#1e0a3c", background:"#f0fdf4", outline:"none", fontFamily:"inherit" }} />
         </div>
 
         {loading ? <div style={{ textAlign:"center", padding:50, color:"#a78bfa" }}>Loading...</div> : displayed.length === 0 ? <div style={{ textAlign:"center", padding:50 }}><div style={{ fontSize:40, marginBottom:12 }}>💰</div><div style={{ color:"#a78bfa", fontSize:14, fontWeight:600 }}>No income found</div></div>
           : <div style={{ overflowX:"auto" }}>
               <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, minWidth:900 }}>
-                <thead><tr style={{ background:"linear-gradient(90deg,#f0fdf4,#faf5ff)" }}>{["ID","Title","Client","Inv #","Amount","Mode","Status","Date","Actions"].map(col => (<th key={col} style={{ padding:"10px 14px", textAlign:"left", color:"#16a34a", fontWeight:700, fontSize:11, borderBottom:"2px solid #ede9fe", whiteSpace:"nowrap" }}>{col.toUpperCase()}</th>))}</tr></thead>
+                <thead><tr style={{ background:"linear-gradient(90deg,#f0fdf4,var(--app-bg))" }}>{["ID","Title","Client","Inv #","Amount","Mode","Status","Date","Actions"].map(col => (<th key={col} style={{ padding:"10px 14px", textAlign:"left", color:"#16a34a", fontWeight:700, fontSize:11, borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>{col.toUpperCase()}</th>))}</tr></thead>
                 <tbody>
                   {displayed.map((inc, i) => (
                     <tr key={inc._id||i} style={{ borderBottom:"1px solid #f3f0ff" }} onMouseEnter={ev=>ev.currentTarget.style.background="#f0fdf4"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
@@ -1141,7 +1141,7 @@ export function IncomePage() {
           </div>
           {err._general && <div style={{ background:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:10, padding:"10px 14px", marginBottom:12, display:"flex", alignItems:"center", gap:8, fontSize:13, color:"#ef4444", fontWeight:600 }}><span>⚠️</span><span style={{ flex:1 }}>{err._general}</span><button onClick={()=>setErr({})} style={{ background:"none", border:"none", color:"#ef4444", cursor:"pointer", fontSize:16, lineHeight:1 }}>✕</button></div>}
           <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:4 }}>
-            <button onClick={()=>setModal(null)} style={{ background:"#f5f3ff", border:"1px solid #ede9fe", color:"#1e0a3c", borderRadius:10, padding:"10px 16px", cursor:"pointer", fontWeight:600, fontSize:13 }}>Cancel</button>
+            <button onClick={()=>setModal(null)} style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)", color:"#1e0a3c", borderRadius:10, padding:"10px 16px", cursor:"pointer", fontWeight:600, fontSize:13 }}>Cancel</button>
             <button onClick={save} disabled={saving} style={{ background:"linear-gradient(135deg,#16a34a,#22c55e)", color:"#fff", border:"none", borderRadius:10, padding:"10px 20px", fontWeight:700, fontSize:13, cursor:"pointer", opacity:saving?0.7:1 }}>{saving ? "Saving…" : modal==="add" ? "Save Income →" : "Update Income →"}</button>
           </div>
         </Modal>

@@ -5,35 +5,35 @@ import { BASE_URL } from "../config";
 const API = `${BASE_URL}/api`;
 
 const P = {
-  accent: "#9333ea",
-  mid: "#7c3aed",
+  accent: "var(--app-accent)",
+  mid: "var(--app-accent)",
   dark: "#1e0a3c",
-  light: "#f5f3ff",
-  border: "#ede9fe",
+  light: "var(--app-bg)",
+  border: "var(--app-border)",
   text: "#1e0a3c",
   muted: "#a78bfa",
-  hover: "#faf5ff",
+  hover: "var(--app-bg)",
 };
 
 const STATUS_CFG = {
   "Done": { bg: "#00c875", fg: "#fff" },
   "Working on it": { bg: "#fdab3d", fg: "#fff" },
   "Stuck": { bg: "#e2445c", fg: "#fff" },
-  "In Review": { bg: "#9333ea", fg: "#fff" },
+  "In Review": { bg: "var(--app-accent)", fg: "#fff" },
   "Not Started": { bg: "#c4c4c4", fg: "#555" },
-  "On Hold": { bg: "#7c3aed", fg: "#fff" },
+  "On Hold": { bg: "var(--app-accent)", fg: "#fff" },
   "Manual": { bg: "#64748b", fg: "#fff" },
 };
 const STATUS_LIST = ["Not Started", "Working on it", "In Review", "Stuck", "Done", "On Hold", "Manual"];
-const GRP_COLORS = ["#e2445c", "#0073ea", "#fdab3d", "#9333ea", "#00c875", "#a25ddc", "#7c3aed", "#ff642e", "#00d4c8"];
+const GRP_COLORS = ["#e2445c", "#0073ea", "#fdab3d", "var(--app-accent)", "#00c875", "#a25ddc", "var(--app-accent)", "#ff642e", "#00d4c8"];
 
 const AVATAR_COLORS = [
-  "linear-gradient(135deg,#9333ea,#c084fc)",
+  "linear-gradient(135deg,var(--app-accent),var(--app-accent))",
   "linear-gradient(135deg,#0073ea,#60a5fa)",
   "linear-gradient(135deg,#00c875,#34d399)",
   "linear-gradient(135deg,#fdab3d,#fbbf24)",
   "linear-gradient(135deg,#e2445c,#f87171)",
-  "linear-gradient(135deg,#a25ddc,#d8b4fe)",
+  "linear-gradient(135deg,#a25ddc,var(--app-border))",
 ];
 
 function getAvatarColor(name) {
@@ -72,7 +72,7 @@ function extraColWidth(type) {
 const PRIORITY_CFG = {
   "Critical": { bg: "#e2445c", fg: "#fff" },
   "High": { bg: "#fdab3d", fg: "#fff" },
-  "Medium": { bg: "#9333ea", fg: "#fff" },
+  "Medium": { bg: "var(--app-accent)", fg: "#fff" },
   "Low": { bg: "#00c875", fg: "#fff" },
   "Manual": { bg: "#64748b", fg: "#fff" },
   "—": { bg: "#e2e8f0", fg: "#94a3b8" },
@@ -84,7 +84,7 @@ const PRIORITY_LIST = ["Critical", "High", "Medium", "Low", "Manual", "—"];
 ══════════════════════════════════════════════════════════ */
 const VIEW_LIST = [
   { id: "table", icon: "⊞", label: "Main table", color: "#0073ea" },
-  { id: "chart", icon: "◕", label: "Chart", color: "#9333ea" },
+  { id: "chart", icon: "◕", label: "Chart", color: "var(--app-accent)" },
   { id: "gantt", icon: "≡", label: "Gantt", color: "#0073ea" },
   { id: "calendar", icon: "📅", label: "Calendar", color: "#e2445c" },
   { id: "kanban", icon: "⊟", label: "Kanban", color: "#00c875" },
@@ -945,7 +945,7 @@ function SidekickPanel({ onClose, groups }) {
   const r = 26, circ = 2 * Math.PI * r, dash = (pct / 100) * circ;
   return (
     <div style={{ width: 300, flexShrink: 0, background: "#fff", borderLeft: `1.5px solid ${P.border}`, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-      <div style={{ background: `linear-gradient(150deg,${P.dark} 0%,${P.mid} 60%,#a855f7 100%)`, padding: "14px 16px 16px" }}>
+      <div style={{ background: `linear-gradient(150deg,${P.dark} 0%,${P.mid} 60%,var(--app-accent) 100%)`, padding: "14px 16px 16px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}>✨</div>
@@ -1155,7 +1155,7 @@ function FilterMenu({ anchor, onClose, groups, filters, onToggle, onClear }) {
 ══════════════════════════════════════════════════════════ */
 function HideMenu({ anchor, onClose, extraCols, hiddenCols, onToggleHide }) {
   const ref = useRef(); const [pos, setPos] = useState({ top: 0, left: 0 }); const [search, setSearch] = useState("");
-  const builtins = [{ id: "person", label: "Employee", bg: "#0073ea", icon: "👤" }, { id: "status", label: "Status", bg: "#00c875", icon: "≡" }, { id: "date", label: "Due date", bg: "#7c3aed", icon: "📅" }];
+  const builtins = [{ id: "person", label: "Employee", bg: "#0073ea", icon: "👤" }, { id: "status", label: "Status", bg: "#00c875", icon: "≡" }, { id: "date", label: "Due date", bg: "var(--app-accent)", icon: "📅" }];
   const allCols = [...builtins, ...(extraCols || []).map(ec => ({ id: ec.id, label: ec.label, bg: P.accent, icon: "📝" }))];
   const filtered = allCols.filter(c => !search || c.label.toLowerCase().includes(search.toLowerCase()));
   useEffect(() => { const calc = () => { if (anchor?.current) { const r = anchor.current.getBoundingClientRect(); let left = r.left; if (left + 290 > window.innerWidth - 8) left = window.innerWidth - 298; setPos({ top: r.bottom + 4, left }); } }; calc(); window.addEventListener('scroll', calc, true); window.addEventListener('resize', calc); return () => { window.removeEventListener('scroll', calc, true); window.removeEventListener('resize', calc); }; }, [anchor]);
@@ -1285,7 +1285,7 @@ function Cell({ col, value, onChange }) {
   if (col.type === "priority") { const v = value || "—"; const cfg = PRIORITY_CFG[v] || PRIORITY_CFG["—"]; return (<div ref={ref} style={{ height: "100%", display: "flex", alignItems: "stretch" }}><div onClick={() => setOpen(o => !o)} style={{ flex: 1, background: cfg.bg, color: cfg.fg, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{v}</div>{open && <PriorityPicker anchor={ref} currentValue={v} onSelect={v => { onChange(v); setOpen(false); }} onClose={() => setOpen(false)} />}</div>); }
   if (col.type === "rating") { const v = Number(value) || 0; return (<div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, height: "100%" }}>{[1, 2, 3, 4, 5].map(n => (<span key={n} onClick={() => onChange(v === n ? 0 : n)} style={{ fontSize: 15, cursor: "pointer", color: n <= v ? "#f59e0b" : "#e2e8f0" }}>★</span>))}</div>); }
   if (col.type === "date2") { return (<input type="date" value={localVal} onChange={e => { setLocalVal(e.target.value); onChange(e.target.value); }} style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 11, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer", textAlign: "center", padding: "0 4px" }} />); }
-  if (col.type === "status2") { const opts = ["—", "Done", "In Progress", "Blocked", "Review", "On Hold"]; const colorMap = { "Done": "#00c875", "In Progress": "#fdab3d", "Blocked": "#e2445c", "Review": "#9333ea", "On Hold": "#7c3aed", "—": "#e2e8f0" }; const v = value || "—"; return (<div ref={ref} style={{ height: "100%", display: "flex", alignItems: "stretch" }}><div onClick={() => setOpen(o => !o)} style={{ flex: 1, background: colorMap[v] || "#e2e8f0", color: v === "—" ? "#94a3b8" : "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{v}</div>{open && (<DD anchor={ref} onClose={() => setOpen(false)} w={160}>{opts.map(o => (<div key={o} onClick={() => { onChange(o); setOpen(false); }} style={{ borderRadius: 6, overflow: "hidden", marginBottom: 2, cursor: "pointer" }}><div style={{ background: colorMap[o] || "#e2e8f0", color: o === "—" ? "#94a3b8" : "#fff", padding: "6px 14px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>{o}</div></div>))}</DD>)}</div>); }
+  if (col.type === "status2") { const opts = ["—", "Done", "In Progress", "Blocked", "Review", "On Hold"]; const colorMap = { "Done": "#00c875", "In Progress": "#fdab3d", "Blocked": "#e2445c", "Review": "var(--app-accent)", "On Hold": "var(--app-accent)", "—": "#e2e8f0" }; const v = value || "—"; return (<div ref={ref} style={{ height: "100%", display: "flex", alignItems: "stretch" }}><div onClick={() => setOpen(o => !o)} style={{ flex: 1, background: colorMap[v] || "#e2e8f0", color: v === "—" ? "#94a3b8" : "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{v}</div>{open && (<DD anchor={ref} onClose={() => setOpen(false)} w={160}>{opts.map(o => (<div key={o} onClick={() => { onChange(o); setOpen(false); }} style={{ borderRadius: 6, overflow: "hidden", marginBottom: 2, cursor: "pointer" }}><div style={{ background: colorMap[o] || "#e2e8f0", color: o === "—" ? "#94a3b8" : "#fff", padding: "6px 14px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>{o}</div></div>))}</DD>)}</div>); }
   if (col.type === "tags") { const tags = Array.isArray(value) ? value : (value ? String(value).split(",").map(t => t.trim()).filter(Boolean) : []); return (<div ref={ref} style={{ display: "flex", alignItems: "center", gap: 3, padding: "0 6px", flexWrap: "wrap", height: "100%", cursor: "pointer", minHeight: 36 }} onClick={() => setOpen(o => !o)}>{tags.length === 0 ? <span style={{ fontSize: 11, color: P.muted }}>+ Add</span> : tags.slice(0, 2).map((t) => (<span key={t} style={{ fontSize: 10, background: "#e0e7ff", color: "#4338ca", borderRadius: 10, padding: "2px 6px", fontWeight: 600 }}>{t}</span>))}{open && (<DD anchor={ref} onClose={() => setOpen(false)} w={200}><div style={{ padding: "6px 8px 4px" }}><input autoFocus placeholder="Type tag + Enter" onKeyDown={e => { if (e.key === "Enter" && e.target.value.trim()) { onChange([
     
     
@@ -1812,7 +1812,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                 <div style={{ display: "flex", alignItems: "stretch", borderTop: `1px solid ${P.border}`, background: P.light, minHeight: 40, minWidth: "max-content" }}>
                   <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: P.light, borderRight: `1px solid ${P.border}`, padding: "6px 8px", display: "flex", gap: 6, alignItems: "center" }}>
                     <input autoFocus placeholder="Task name…" value={newTitle} onChange={e => setNewTitle(e.target.value)} onKeyDown={e => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setNewTitle(""); } }} style={{ flex: 1, border: `1.5px solid ${P.accent}`, borderRadius: 6, padding: "5px 9px", fontSize: 13, fontFamily: "inherit", outline: "none", color: P.text, background: "#fff" }} />
-                    <button onClick={submit} style={{ background: `linear-gradient(135deg,${P.accent},#a855f7)`, color: "#fff", border: "none", borderRadius: 6, padding: "5px 13px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Add</button>
+                    <button onClick={submit} style={{ background: `linear-gradient(135deg,${P.accent},var(--app-accent))`, color: "#fff", border: "none", borderRadius: 6, padding: "5px 13px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Add</button>
                     <button onClick={() => { setAdding(false); setNewTitle(""); }} style={{ background: "#fff", color: P.mid, border: `1px solid ${P.border}`, borderRadius: 6, padding: "5px 9px", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>✕</button>
                   </div>
                   {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
@@ -1897,9 +1897,9 @@ function DetailPanel({ task, onClose, onField, projects }) {
         <div>
           <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, letterSpacing: 0.8, marginBottom: 5, textTransform: "uppercase" }}>Assigned To</div>
           {task.assignTo && task.assignTo !== "Unassigned" ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#f5f3ff", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", width: "fit-content" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", width: "fit-content" }}>
               <div style={{ width: 24, height: 24, borderRadius: "50%", background: getAvatarColor(task.assignTo), display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{task.assignTo.slice(0, 2).toUpperCase()}</div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#7c3aed" }}>{task.assignTo}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--app-accent)" }}>{task.assignTo}</span>
               <button onClick={() => onField(id, "assignTo", "Unassigned")} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 16, padding: "0 4px", fontWeight: 700 }}>×</button>
             </div>
           ) : (
@@ -2203,7 +2203,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
         .col-hdr-wrap:hover .col-menu-btn{opacity:1!important}
         .col-hdr:hover .col-menu-btn{opacity:1!important}
         ::-webkit-scrollbar{width:5px;height:5px}
-        ::-webkit-scrollbar-thumb{background:#d8b4fe;border-radius:3px}
+        ::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:3px}
         ::-webkit-scrollbar-track{background:${P.light}}
         button,input,select,textarea{font-family:inherit}
         input[type=date]::-webkit-calendar-picker-indicator{opacity:.4;cursor:pointer;filter:invert(40%) sepia(80%) saturate(500%) hue-rotate(250deg)}
@@ -2240,7 +2240,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
 
-            {!loading && allTasks.length > 0 && (<div style={{ display: "flex", alignItems: "center", gap: 7, paddingLeft: 6, borderLeft: `1px solid ${P.border}` }}><div style={{ width: 60, height: 5, borderRadius: 3, background: P.border, overflow: "hidden" }}><div style={{ width: `${Math.round(doneCnt / allTasks.length * 100)}%`, height: "100%", background: `linear-gradient(90deg,${P.accent},#c084fc)`, borderRadius: 3 }} /></div><span style={{ fontSize: 11, color: P.muted, fontWeight: 600 }}>{doneCnt}/{allTasks.length}</span></div>)}
+            {!loading && allTasks.length > 0 && (<div style={{ display: "flex", alignItems: "center", gap: 7, paddingLeft: 6, borderLeft: `1px solid ${P.border}` }}><div style={{ width: 60, height: 5, borderRadius: 3, background: P.border, overflow: "hidden" }}><div style={{ width: `${Math.round(doneCnt / allTasks.length * 100)}%`, height: "100%", background: `linear-gradient(90deg,${P.accent},var(--app-accent))`, borderRadius: 3 }} /></div><span style={{ fontSize: 11, color: P.muted, fontWeight: 600 }}>{doneCnt}/{allTasks.length}</span></div>)}
           </div>
         </div>
 

@@ -11,14 +11,14 @@ const save = d => { try{localStorage.setItem(LS,JSON.stringify(d));}catch{} };
 
 // ─── THEMES ───────────────────────────────────────────────────────────────────
 const THEMES = [
-  { name:"Violet",  p:"#7c3aed", g:"linear-gradient(135deg,#7c3aed,#a855f7)", l:"#ede9fe", t:"#4c1d95" },
-  { name:"Cobalt",  p:"#1d4ed8", g:"linear-gradient(135deg,#1e40af,#3b82f6)", l:"#dbeafe", t:"#1e3a8a" },
-  { name:"Emerald", p:"#059669", g:"linear-gradient(135deg,#065f46,#10b981)", l:"#d1fae5", t:"#064e3b" },
-  { name:"Rose",    p:"#e11d48", g:"linear-gradient(135deg,#9f1239,#f43f5e)", l:"#ffe4e6", t:"#881337" },
-  { name:"Amber",   p:"#d97706", g:"linear-gradient(135deg,#92400e,#fbbf24)", l:"#fef3c7", t:"#78350f" },
-  { name:"Slate",   p:"#334155", g:"linear-gradient(135deg,#0f172a,#475569)", l:"#f1f5f9", t:"#0f172a" },
-  { name:"Teal",    p:"#0d9488", g:"linear-gradient(135deg,#134e4a,#2dd4bf)", l:"#ccfbf1", t:"#134e4a" },
-  { name:"Fuchsia", p:"#a21caf", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"#fae8ff", t:"#4a044e" },
+  { name:"Violet",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", l:"var(--app-border)", t:"var(--app-accent)1d95" },
+  { name:"Cobalt",  p:"#1d4ed8", g:"linear-gradient(135deg,#1e40af,#3b82f6)", l:"var(--app-border)", t:"#1e3a8a" },
+  { name:"Emerald", p:"#059669", g:"linear-gradient(135deg,#065f46,#10b981)", l:"var(--app-border)", t:"#064e3b" },
+  { name:"Rose",    p:"#e11d48", g:"linear-gradient(135deg,#9f1239,#f43f5e)", l:"var(--app-border)", t:"#881337" },
+  { name:"Amber",   p:"#d97706", g:"linear-gradient(135deg,#92400e,#fbbf24)", l:"var(--app-border)", t:"#78350f" },
+  { name:"Slate",   p:"#334155", g:"linear-gradient(135deg,#0f172a,#475569)", l:"var(--app-border)", t:"#0f172a" },
+  { name:"Teal",    p:"#0d9488", g:"linear-gradient(135deg,#134e4a,#2dd4bf)", l:"var(--app-border)", t:"#134e4a" },
+  { name:"Fuchsia", p:"#a21caf", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"var(--app-border)", t:"#4a044e" },
 ];
 // ─── COVERS ───────────────────────────────────────────────────────────────────
 const COVERS = [
@@ -125,7 +125,7 @@ function Confetti({active}) {
     const c=ref.current; if(!c) return;
     c.width=window.innerWidth; c.height=window.innerHeight;
     const ctx=c.getContext("2d");
-    const colors=["#7c3aed","#a855f7","#22c55e","#f59e0b","#3b82f6","#ec4899","#14b8a6","#f97316"];
+    const colors=["var(--app-accent)","var(--app-accent)","#22c55e","#f59e0b","#3b82f6","#ec4899","#14b8a6","#f97316"];
     const parts=Array.from({length:150},()=>({x:Math.random()*c.width,y:-20,vx:(Math.random()-.5)*5,vy:Math.random()*4+2,col:colors[Math.floor(Math.random()*colors.length)],w:Math.random()*10+4,h:Math.random()*6+3,rot:Math.random()*360,rv:(Math.random()-.5)*8}));
     let fr; const draw=()=>{ctx.clearRect(0,0,c.width,c.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.rot+=p.rv;if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;}ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.col;ctx.beginPath();ctx.ellipse(0,0,p.w/2,p.h/2,0,0,Math.PI*2);ctx.fill();ctx.restore();});fr=requestAnimationFrame(draw);};
     draw(); const t=setTimeout(()=>cancelAnimationFrame(fr),4000);
@@ -136,7 +136,7 @@ function Confetti({active}) {
 }
 
 // ─── DRAGGABLE ELEMENT ────────────────────────────────────────────────────────
-function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, children, canvasRef }) {
+function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, children, canvasRef, slideH }) {
   const [dragging, setDragging] = useState(false);
   const [resizing, setResizing] = useState(null); // 'tl', 'tr', 'bl', 'br'
   const [offset, setOffset]     = useState({ x: 0, y: 0 });
@@ -177,7 +177,7 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
         let nx = (e.clientX - rect.left) * scale - offset.x;
         let ny = (e.clientY - rect.top)  * scale - offset.y;
         nx = Math.max(0, Math.min(900 - (element.w ?? 100), nx));
-        ny = Math.max(0, Math.min(1273 - (element.h ?? 40), ny)); // Increased boundary
+        ny = Math.max(0, Math.min(slideH - (element.h ?? 40), ny)); // Use dynamic slide height
         onUpdate({ x: nx, y: ny });
       } else if (resizing) {
         const cx = (e.clientX - rect.left) * scale;
@@ -219,9 +219,9 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup",   up);
     };
-  }, [dragging, resizing, offset, canvasRef, element, onUpdate]);
+  }, [dragging, resizing, offset, canvasRef, element, onUpdate, slideH]); // added slideH dependency
 
-  const handleStyle = { position:"absolute", width:14, height:14, borderRadius:"50%", background:"#fff", border:"2px solid #7d2ae8", zIndex:2, boxShadow: "0 2px 4px rgba(0,0,0,0.2)" };
+  const handleStyle = { position:"absolute", width:14, height:14, borderRadius:"50%", background:"#fff", border:"2px solid var(--app-accent)", zIndex:2, boxShadow: "0 2px 4px rgba(0,0,0,0.2)" };
 
   return (
     <div
@@ -236,7 +236,7 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
         minHeight:  20,
         cursor:     dragging ? "grabbing" : onUpdate ? "grab" : "default",
         userSelect: "none",
-        border:     selected ? "2px solid #7d2ae8" : "2px solid transparent",
+        border:     selected ? "2px solid var(--app-accent)" : "2px solid transparent",
         borderRadius: 2,
         padding:    0, // Removed padding to keep size accurate
         zIndex:     selected ? 100 : 1,
@@ -261,29 +261,40 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
           <div onPointerDown={(e)=>{e.stopPropagation(); setResizing('l');}}  style={{ ...handleStyle, left:0, top:"50%", transform:"translate(-50%,-50%)", cursor:"ew-resize", height:24, borderRadius:6, pointerEvents:"auto" }} />
           <div onPointerDown={(e)=>{e.stopPropagation(); setResizing('r');}}  style={{ ...handleStyle, right:0, top:"50%", transform:"translate(50%,-50%)", cursor:"ew-resize", height:24, borderRadius:6, pointerEvents:"auto" }} />
           
-          {/* Toolbar Overlay (Only show when NOT dragging or resizing) */}
-          {!dragging && !resizing && (
+          {/* Toolbar Overlay (Always show when selected to avoid 'hiding' frustration) */}
+          {selected && (
             <div 
               onPointerDown={e => e.stopPropagation()}
               style={{ 
                 position:"absolute", 
-                top:-70, 
+                top: -85, // Moved up slightly for larger buttons
                 left:"50%", 
                 transform:"translateX(-50%)", 
                 background:"#fff", 
-                boxShadow:"0 12px 36px rgba(0,0,0,0.25)", 
-                borderRadius:16, 
+                boxShadow:"0 12px 48px rgba(0,0,0,0.3)", 
+                borderRadius:18, 
                 display:"flex", 
-                gap:4, 
-                padding:6, 
-                zIndex:100, 
+                gap:8, 
+                padding:8, 
+                zIndex:1000, 
                 border:"1px solid #e5e7eb",
-                pointerEvents:"auto"
+                pointerEvents:"auto",
+                opacity: 1,
+                visibility: "visible"
               }}
             >
-               <button onClick={(e)=>{e.stopPropagation(); onDelete(element.id);}} style={{ border:"none", background:"none", padding:"12px 20px", fontSize:22, cursor:"pointer", color:"#ef4444", transition:"all .2s", borderRadius:12 }} title="Delete" className="hb">🗑</button>
-               <div style={{ width:1, height:36, background:"#e5e7eb", alignSelf:"center" }} />
-               <button onClick={(e)=>{e.stopPropagation(); onUpdate({fontWeight: (element.fontWeight === 800 ? 400 : 800)});}} style={{ border:"none", background:"none", padding:"12px 20px", fontSize:20, fontWeight:800, cursor:"pointer", color:element.fontWeight===800?"#7d2ae8":"#374151", transition:"all .2s", borderRadius:12 }} title="Bold" className="hb">B</button>
+               <button 
+                 onPointerDown={(e) => { e.stopPropagation(); setDragging(true); onSelect(element.id); }}
+                 style={{ border:"none", background:"none", padding:"14px 22px", fontSize:26, cursor:"move", color:"var(--app-accent)", transition:"all .2s", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center" }} 
+                 title="Drag to Move" className="hb">✥</button>
+               <div style={{ width:1, height:44, background:"#e5e7eb", alignSelf:"center" }} />
+               <button onClick={(e)=>{e.stopPropagation(); onDelete(element.id);}} 
+                 style={{ border:"none", background:"none", padding:"14px 22px", fontSize:28, cursor:"pointer", color:"#ef4444", transition:"all .2s", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center" }} 
+                 title="Delete" className="hb">🗑️</button>
+               <div style={{ width:1, height:44, background:"#e5e7eb", alignSelf:"center" }} />
+               <button onClick={(e)=>{e.stopPropagation(); onUpdate({fontWeight: (element.fontWeight === 800 ? 400 : 800)});}} 
+                 style={{ border:"none", background:"none", padding:"14px 22px", fontSize:26, fontWeight:900, cursor:"pointer", color:element.fontWeight===800?"var(--app-accent)":"#374151", transition:"all .2s", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center" }} 
+                 title="Bold" className="hb">B</button>
             </div>
           )}
         </div>
@@ -310,7 +321,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
   const isPortrait = docFormat === "a4-portrait" || (!docFormat && (slide.type === "proposal" || slide.type === "portrait"));
   const isLandscape = docFormat === "a4-landscape" || (!docFormat && slide.type === "landscape");
   const slideH = isPortrait ? 1273 : isLandscape ? 637 : 506;
-  const W = { width:900, minHeight:slideH, background:"#ffffff", fontFamily:"'Outfit',sans-serif", position:"relative", overflow:"hidden", flexShrink:0 };
+  const W = { width:900, minHeight:slideH, background:"var(--app-bg)ff", fontFamily:"'Outfit',sans-serif", position:"relative", overflow:"hidden", flexShrink:0 };
   const accent = { width:56,height:6,background:t.g,borderRadius:3,marginBottom:20 };
   const h1 = { fontSize:36,fontWeight:800,color:"#0f172a",marginBottom:24,letterSpacing:-0.5,lineHeight:1.1 };
 
@@ -330,7 +341,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
   const elementsOverlay = (
       <div style={{position:"absolute", inset:0, pointerEvents:preview?"none":"auto", zIndex:20}}>
         {elements.map(el => (
-          <DraggableElement key={el.id} element={el} selected={selectedId===el.id} onSelect={onSelectElement} onUpdate={patch=>onUpdateElement(el.id, patch)} onDelete={deleteElement} canvasRef={canvasRef}>
+          <DraggableElement key={el.id} element={el} selected={selectedId===el.id} onSelect={onSelectElement} onUpdate={patch=>onUpdateElement(el.id, patch)} onDelete={deleteElement} canvasRef={canvasRef} slideH={slideH}>
             {el.type === "text" && (
               <div style={{
                 fontSize: el.fontSize, 
@@ -712,7 +723,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
 
       {/* Footer */}
       <div style={{position:"absolute",bottom:"40px",left:"60px",right:"60px",textAlign:"center",fontSize:"10px",color:"#666",borderTop:"2px solid #ff0000",paddingTop:"10px"}}>
-        <div style={{fontWeight: "bold", color: "#333", marginBottom: 4}}>{footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
+        <div style={{fontWeight: "bold", color: "var(--app-accent)", marginBottom: 4}}>{footerMessage || slide.footerMessage || "🙏 Thank you for considering us!"}</div>
         <Txt val={slide.companyAddress} onCh={v=>upd({companyAddress:v})}/>
       </div>
       
@@ -995,7 +1006,7 @@ const persist = useCallback(async (d) => {
   
 const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
   const createNew = () => {
-    const d = { id:pid(), title:"New Project Proposal", client:"", theme:null, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"a4-portrait", slides:[makeSlide("proposal",null, companyName)], currency: "₹" };
+    const d = { id:pid(), title:"", client:"", theme:null, status:"draft", created:new Date().toISOString(), updated:new Date().toISOString(), rejectNote:"", format:"a4-portrait", slides:[makeSlide("proposal",null, companyName)], currency: "₹" };
     setDoc(d); setPage(0); setView("editor");
   };
 
@@ -1093,7 +1104,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
       xPos = 450;
       yPos = 200;
     }
-    const elements = [...(s.elements||[]), {id:uid(), fontSize:16, fontWeight:400, x:xPos, y:yPos, ...element}];
+    const elements = [...(s.elements||[]), {id:uid(), fontSize:16, fontWeight:400, x:xPos, y:yPos, w: 400, ...element}];
     updateSlide({...s,elements});
     setSelectedElementId(elements[elements.length-1].id);
     flash("✨ Added to page!");
@@ -1155,7 +1166,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               content = `<div style="font-size:${el.fontSize}px; font-weight:${el.fontWeight}; color:${el.color||'#000'}; white-space:pre-wrap; width:${w}px;">${val}</div>`;
             } else if (el.type === "shape") {
                const br = el.borderRadius !== undefined ? (typeof el.borderRadius === 'number' ? el.borderRadius + 'px' : el.borderRadius) : (el.shape === 'circle' ? '50%' : '8px');
-               content = `<div style="width:${w === 'auto' ? 100 : w}px; height:${h === 'auto' ? 100 : h}px; background:${el.color||'#7c3aed'}; border-radius:${br};"></div>`;
+               content = `<div style="width:${w === 'auto' ? 100 : w}px; height:${h === 'auto' ? 100 : h}px; background:${el.color||'var(--app-accent)'}; border-radius:${br};"></div>`;
             } else if (el.type === "image") {
                content = `<img src="${el.src}" style="width:${w === 'auto' ? 200 : w}px; height:${h}; object-fit:contain; pointer-events:none;" />`;
             } else if (el.type === "icon") {
@@ -1462,9 +1473,9 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         ::-webkit-scrollbar{width:5px;height:5px;}
         ::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px;}
         .pgthumb{transition:all .15s;cursor:pointer;}
-        .pgthumb:hover{border-color:#7c3aed!important;}
-        .pgthumb.sel{border-color:#7c3aed!important;box-shadow:0 0 0 2px rgba(124,58,237,0.2);}
-        .sib:hover{background:#f0e9ff!important;color:#7c3aed!important;}
+        .pgthumb:hover{border-color:var(--app-accent)!important;}
+        .pgthumb.sel{border-color:var(--app-accent)!important;box-shadow:0 0 0 2px rgba(124,58,237,0.2);}
+        .sib:hover{background:#f0e9ff!important;color:var(--app-accent)!important;}
         .topbtn:hover{background:#f1f5f9!important;}
         .icobtn:hover{background:#e0d9f7!important;}
         
@@ -1507,51 +1518,36 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           <button onClick={()=>{saveDoc();setView("list");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:22,padding:"6px",borderRadius:8,transition:"background .15s"}} title="Home" className="topbtn">🏠</button>
           
           {/* 🚀 QUICK ADD PROPOSAL BUTTON */}
-          <button 
-            onClick={()=>{saveDoc(); createNew();}} 
-            style={{background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,fontWeight:800,cursor:"pointer",display:"flex",alignItems:"center",gap:6,boxShadow:"0 4px 12px rgba(124,58,237,0.25)",transition:"all 0.2s"}}
-          >
-            ✨ Add Proposal
-          </button>
+         
 
-          <button className="topbtn" style={{background:"none",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,color:"#374151",padding:"6px 10px",borderRadius:8}}>File</button>
+
           <div style={{position:"relative"}}>
             <button className="topbtn" onClick={()=>setShowResizeMenu(!showResizeMenu)} style={{background:showResizeMenu?"#f1f5f9":"none",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,color:"#374151",padding:"6px 10px",borderRadius:8}}>Resize</button>
             {showResizeMenu && (
               <div style={{position:"absolute",top:"100%",left:0,marginTop:4,background:"#fff",borderRadius:8,boxShadow:"0 10px 25px rgba(0,0,0,0.1)",overflow:"hidden",zIndex:1000,border:"1px solid #e5e7eb",width:180}}>
-                <button onClick={()=>changeFormat("a4-portrait")} style={{width:"100%",padding:"10px 16px",textAlign:"left",background:"none",border:"none",fontSize:13,fontWeight:600,color:doc?.format==="a4-portrait"?"#7d2ae8":"#374151",cursor:"pointer",display:"block",borderTop:"1px solid #f1f5f9"}} className="topbtn">📄 A4 Portrait</button>
-                <button onClick={()=>changeFormat("a4-landscape")} style={{width:"100%",padding:"10px 16px",textAlign:"left",background:"none",border:"none",fontSize:13,fontWeight:600,color:doc?.format==="a4-landscape"?"#7d2ae8":"#374151",cursor:"pointer",display:"block",borderTop:"1px solid #f1f5f9"}} className="topbtn">🖼️ A4 Landscape</button>
+                <button onClick={()=>changeFormat("a4-portrait")} style={{width:"100%",padding:"10px 16px",textAlign:"left",background:"none",border:"none",fontSize:13,fontWeight:600,color:doc?.format==="a4-portrait"?"var(--app-accent)":"#374151",cursor:"pointer",display:"block",borderTop:"1px solid #f1f5f9"}} className="topbtn">📄 A4 Portrait</button>
+                <button onClick={()=>changeFormat("a4-landscape")} style={{width:"100%",padding:"10px 16px",textAlign:"left",background:"none",border:"none",fontSize:13,fontWeight:600,color:doc?.format==="a4-landscape"?"var(--app-accent)":"#374151",cursor:"pointer",display:"block",borderTop:"1px solid #f1f5f9"}} className="topbtn">🖼️ A4 Landscape</button>
               </div>
             )}
           </div>
-          <div style={{width:1,height:24,background:"#e5e7eb",margin:"0 4px"}}/>
-          <div style={{display:"flex",gap:4,color:"#6b7280"}}>
-            <button className="topbtn" style={{background:"none",border:"none",cursor:"pointer",fontSize:18,padding:"4px 8px",borderRadius:6,display:"flex"}} title="Undo">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 14L4 9l5-5"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-            </button>
-            <button className="topbtn" style={{background:"none",border:"none",cursor:"pointer",fontSize:18,padding:"4px 8px",borderRadius:6,display:"flex"}} title="Redo">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 14l5-5-5-5"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>
-            </button>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:6,marginLeft:8,color:"#10b981",fontSize:12,fontWeight:600}}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-            <span>All changes saved</span>
-          </div>
+
+         
+      
         </div>
 
         {/* CENTER: editable title & client selector */}
         <div style={{flex:1,display:"flex",justifyContent:"center",gap:16,alignItems:"center"}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,background:"#f1f5f9",padding:"4px 12px",borderRadius:8,maxWidth:300}}>
+          <div>
             <input value={doc.title} onChange={e=>setDoc({...doc,title:e.target.value})} disabled={!canEdit}
               style={{background:"none",border:"none",fontSize:13,fontWeight:700,color:"#0f172a",outline:"none",textAlign:"center",width:"100%",fontFamily:"inherit"}}/>
           </div>
-          <div style={{display:"flex",alignItems:"center",gap:8,background:"#f3e8ff",padding:"4px 12px",borderRadius:8,border:"1px solid #c084fc"}}>
-            <span style={{fontSize:11,fontWeight:800,color:"#7c3aed"}}>FOR CLIENT:</span>
+          <div style={{display:"flex",alignItems:"center",gap:8,background:"var(--app-border)",padding:"4px 12px",borderRadius:8,border:"1px solid var(--app-accent)"}}>
+            <span style={{fontSize:11,fontWeight:800,color:"var(--app-accent)"}}>FOR CLIENT:</span>
             <select 
               value={doc.client || ""} 
               onChange={e=>{const nd={...doc,client:e.target.value}; setDoc(nd); persist(nd);}}
               disabled={!canEdit}
-              style={{background:"none",border:"none",fontSize:12,fontWeight:700,color:"#7c3aed",outline:"none",cursor:"pointer"}}
+              style={{background:"none",border:"none",fontSize:12,fontWeight:700,color:"var(--app-accent)",outline:"none",cursor:"pointer"}}
             >
               <option value="">-- Select Client --</option>
               {clientsData.map(c=>(
@@ -1583,7 +1579,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
           <button onClick={() => printProposal(doc)} style={{background:"#fff",color:"#374151",border:"1.5px solid #e2e8f0",padding:"8px 12px",borderRadius:8,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:6}}>🖨️</button>
           <button onClick={() => shareProposal()} style={{background:"#eff6ff",color:"#2563eb",border:"1.5px solid #bfdbfe",padding:"8px 12px",borderRadius:8,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:6}}>🔗</button>
           <button onClick={() => shareWhatsApp()} style={{background:"#dcfce7",color:"#16a34a",border:"1.5px solid #bbf7d0",padding:"8px 12px",borderRadius:8,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:6}}>💬</button>
-          <button onClick={()=>saveDoc()} style={{background:"#7d2ae8",color:"#fff",border:"none",padding:"8px 20px",borderRadius:8,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(125,42,232,0.2)"}}>Save</button>
+
 
         </div>
       </div>
@@ -1594,15 +1590,14 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
 
         {/* ── ICON SIDEBAR (Canva left icon rail) ── */}
         {!isViewMode && (
-          <div style={{width:72,background:"#f8f5ff",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",alignItems:"center",padding:"12px 0",gap:4,flexShrink:0}} className="no-print">
+          <div style={{width:72,background:"var(--app-bg)",borderRight:"1px solid #e5e7eb",display:"flex",flexDirection:"column",alignItems:"center",padding:"12px 0",gap:4,flexShrink:0}} className="no-print">
             {[
-              {id:"templates", icon:"🎨", label:"Design"},
-              {id:"elements",  icon:"✦",  label:"Elements"},
+
               {id:"text",      icon:"T",  label:"Text"},
               {id:"uploads",   icon:"☁️", label:"Uploads"}
             ].map(item=> (
               <button key={item.id} onClick={()=>setLeftPanel(leftPanel===item.id?"":item.id)}
-                style={{width:64,height:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:leftPanel===item.id?"rgba(124,58,237,0.15)":"none",border:"none",borderRadius:8,cursor:"pointer",transition:"all .15s",color:leftPanel===item.id?"#7c3aed":"#4b5563"}}>
+                style={{width:64,height:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:leftPanel===item.id?"rgba(124,58,237,0.15)":"none",border:"none",borderRadius:8,cursor:"pointer",transition:"all .15s",color:leftPanel===item.id?"var(--app-accent)":"#4b5563"}}>
                 <span style={{fontSize:24}}>{item.icon}</span>
                 <span style={{fontSize:9,fontWeight:600,letterSpacing:0.3,opacity:leftPanel===item.id?1:0.5,textAlign:"center",color:"#6b7280"}}>
                   {item.label}
@@ -1620,9 +1615,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
                 <div style={{fontSize:18,fontWeight:800,color:"#111827",marginBottom:16}}>Design</div>
                 <div style={{position:"relative", marginBottom:16}}>
-                   <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search elements"
-                    style={{width:"100%",boxSizing:"border-box",border:"1.5px solid #e5e7eb",borderRadius:12,padding:"12px 14px 12px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#f9fafc"}}/>
-                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:16, color:"#9ca3af"}}>🔍</span>
+                 
                 </div>
                 <div style={{display:"flex",gap:8,background:"#f3f4f6",padding:"4px",borderRadius:10}}>
                   <button style={{flex:1,padding:"8px",background:"#fff",borderRadius:8,fontSize:13,fontWeight:600,border:"none",boxShadow:"0 1px 3px rgba(0,0,0,0.1)",color:"#111827"}}>Templates</button>
@@ -1696,16 +1689,14 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               <div style={{padding:"16px", borderBottom:"1px solid #f1f5f9"}}>
                 <div style={{fontSize:18,fontWeight:800,color:"#111827",marginBottom:16}}>Elements</div>
                 <div style={{position:"relative"}}>
-                   <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search elements"
-                    style={{width:"100%",boxSizing:"border-box",border:"1.5px solid #e5e7eb",borderRadius:12,padding:"12px 14px 12px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#f9fafc"}}/>
-                   <span style={{position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:16, color:"#9ca3af"}}>🔍</span>
+
                 </div>
               </div>
 
               <div style={{flex:1, overflowY:"auto", padding:"16px", display: "flex", flexDirection: "column", gap: 20}}>
                 
                 {/* Shapes */}
-                <div>
+                {/* <div>
                   <div style={{fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 12}}>Shapes</div>
                   <div style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10}}>
                     <div onClick={() => addElement({type:"shape", shape:"circle", width:100, height:100, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:"50%", cursor:"pointer", transition:"all .2s"}} className="sib"/>
@@ -1713,7 +1704,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                     <div onClick={() => addElement({type:"shape", shape:"rounded-rectangle", width:120, height:100, borderRadius: 20, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:20, cursor:"pointer", transition:"all .2s"}} className="sib"/>
                     <div onClick={() => addElement({type:"shape", shape:"square", width:100, height:100, color:"#94a3b8"})} style={{aspectRatio:"1", background:"#e2e8f0", borderRadius:0, cursor:"pointer", transition:"all .2s"}} className="sib"/>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Photos */}
                 <div>
@@ -1746,35 +1737,28 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
 
             {/* TEXT */}
             {leftPanel==="text" && <>
-              <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
-                <div style={{fontSize:18,fontWeight:800,color:"#0f172a",marginBottom:16}}>Text</div>
-                <div style={{position:"relative"}}>
-                  <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:"#9ca3af"}}>🔍</span>
-                  <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search fonts and combinations"
-                    style={{width:"100%",boxSizing:"border-box",border:"1px solid #e2e8f0",borderRadius:12,padding:"10px 14px 10px 40px",fontSize:14,outline:"none",fontFamily:"inherit",color:"#374151",background:"#f8fafc"}}/>
-                </div>
-              </div>
+              
               <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:20}}>
                 
-                <button onClick={()=>addElement({type:"text", val:"New Text Box", fontSize:18, fontWeight:500})} style={{background:"#8b5cf6",color:"#fff",border:"none",borderRadius:8,padding:"14px",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(139,92,246,0.25)",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.2s"}} className="hb" onMouseDown={e=>e.currentTarget.style.transform="scale(0.98)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}>
+                <button onClick={()=>addElement({type:"text", val:"New Text Box", fontSize:18, fontWeight:500})} style={{background:"var(--app-accent)",color:"#fff",border:"none",borderRadius:8,padding:"14px",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(139,92,246,0.25)",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.2s"}} className="hb" onMouseDown={e=>e.currentTarget.style.transform="scale(0.98)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}>
                   <span style={{fontSize:18}}>T</span> Add a text box
                 </button>
 
-                <div onClick={()=>flash("🪄 Magic Write: Generating AI content...")} style={{background:"linear-gradient(135deg,#7d2ae8,#ff6b6b)",borderRadius:12,padding:"16px",color:"#fff",cursor:"pointer",boxShadow:"0 4px 12px rgba(125,42,232,0.15)",position:"relative",overflow:"hidden"}} className="hb">
+                {/* <div onClick={()=>flash("🪄 Magic Write: Generating AI content...")} style={{background:"linear-gradient(135deg,var(--app-accent),#ff6b6b)",borderRadius:12,padding:"16px",color:"#fff",cursor:"pointer",boxShadow:"0 4px 12px rgba(125,42,232,0.15)",position:"relative",overflow:"hidden"}} className="hb">
                   <div style={{fontSize:14,fontWeight:700,display:"flex",alignItems:"center",gap:8,position:"relative",zIndex:1}}>🪄 Magic Write</div>
                   <div style={{fontSize:11,opacity:0.9,marginTop:4,position:"relative",zIndex:1}}>Generate text with AI</div>
                   <div style={{position:"absolute",right:-10,bottom:-10,fontSize:40,opacity:0.2,transform:"rotate(-15deg)"}}>✨</div>
-                </div>
-
+                </div> */}
+{/* 
                 <div>
                   <div style={{fontSize:11,color:"#6b7280",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                     <span>Brand Kit</span>
-                    <button style={{background:"none",border:"none",color:"#8b5cf6",fontSize:11,fontWeight:700,cursor:"pointer",padding:0}}>Edit 👑</button>
+                    <button style={{background:"none",border:"none",color:"var(--app-accent)",fontSize:11,fontWeight:700,cursor:"pointer",padding:0}}>Edit 👑</button>
                   </div>
                   <button style={{width:"100%",background:"#fff",border:"1.5px dashed #d1d5db",borderRadius:8,padding:"12px",textAlign:"center",color:"#4b5563",fontSize:13,fontWeight:600,cursor:"pointer",transition:"all 0.15s"}} className="topbtn">
                     Add your brand fonts
                   </button>
-                </div>
+                </div> */}
                 
                 <div>
                   <div style={{fontSize:11,color:"#6b7280",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8}}>Default text styles</div>
@@ -1792,12 +1776,9 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
                 </div>
 
                 <div>
-                  <div style={{fontSize:11,color:"#6b7280",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:0.8}}>Dynamic text</div>
+
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                    <div onClick={()=>flash("Page number placeholder added")} style={{background:"#f9fafb",borderRadius:10,padding:"16px",textAlign:"center",cursor:"pointer",border:"1.5px solid #e5e7eb",transition:"all 0.15s"}} className="sib">
-                       <div style={{fontSize:20,marginBottom:4}}>🔟</div>
-                       <div style={{fontSize:11,fontWeight:600,color:"#374151"}}>Page numbers</div>
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -1806,11 +1787,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             {/* UPLOADS */}
             {leftPanel==="uploads" && <>
               <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
-                <div style={{fontSize:18,fontWeight:800,color:"#111827",marginBottom:16}}>Uploads</div>
+
                 <button 
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  style={{width:"100%",background:"#8b5cf6",color:"#fff",border:"none",borderRadius:8,padding:"14px",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(139,92,246,0.25)",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.2s"}}
+                  style={{width:"100%",background:"var(--app-accent)",color:"#fff",border:"none",borderRadius:8,padding:"14px",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(139,92,246,0.25)",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.2s"}}
                 >
                   {uploading ? (
                     <div style={{width:16,height:16,border:"2px solid #fff",borderTopColor:"transparent",borderRadius:"50%",animation:"spin 1s linear infinite"}} />
@@ -1845,13 +1826,13 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             {leftPanel==="brand" && <>
               <div style={{padding:"16px",borderBottom:"1px solid #f1f5f9"}}>
                 <div style={{fontSize:16,fontWeight:700,color:"#0f172a",marginBottom:16}}>Brand Kit</div>
-                <button style={{width:"100%",background:"#7d2ae8",color:"#fff",border:"none",borderRadius:8,padding:"12px",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(125,42,232,0.2)"}}>Set up your Brand Kit 👑</button>
+                <button style={{width:"100%",background:"var(--app-accent)",color:"#fff",border:"none",borderRadius:8,padding:"12px",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(125,42,232,0.2)"}}>Set up your Brand Kit 👑</button>
               </div>
               <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:24}}>
                 <div>
                   <div style={{fontSize:13,fontWeight:700,color:"#0f172a",marginBottom:12}}>Brand Colors</div>
                   <div style={{display:"flex",gap:8}}>
-                    {["#7c3aed","#10b981","#f59e0b","#ef4444","#3b82f6"].map(c=><div key={c} style={{width:40,height:40,borderRadius:"50%",background:c,cursor:"pointer",border:"2px solid transparent"}} onClick={()=>addElement({type:"shape", shape:"circle", width:100, height:100, color:c})}/>)}
+                    {["var(--app-accent)","#10b981","#f59e0b","#ef4444","#3b82f6"].map(c=><div key={c} style={{width:40,height:40,borderRadius:"50%",background:c,cursor:"pointer",border:"2px solid transparent"}} onClick={()=>addElement({type:"shape", shape:"circle", width:100, height:100, color:c})}/>)}
                     <div style={{width:40,height:40,borderRadius:"50%",background:"#f1f5f9",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",border:"2px dashed #cbd5e1",color:"#64748b"}}>+</div>
                   </div>
                 </div>
@@ -1934,7 +1915,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         )}
 
         {/* ── CENTER CANVAS ── */}
-        <div ref={canvasRef} onClick={()=>setSelectedElementId(null)}
+        <div ref={canvasRef} onPointerDown={(e)=>{if(e.target===e.currentTarget) setSelectedElementId(null);}}
           style={{
             flex: 1,
             overflow: "auto",
@@ -1996,7 +1977,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               })
             ) : (
               <div style={{display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:16, marginTop:100}}>
-                <div style={{width:40, height:40, border:"4px solid #f3f4f6", borderTopColor:"#7c3aed", borderRadius:"50%", animation:"spin 1s linear infinite"}}/>
+                <div style={{width:40, height:40, border:"4px solid #f3f4f6", borderTopColor:"var(--app-accent)", borderRadius:"50%", animation:"spin 1s linear infinite"}}/>
                 <div style={{fontSize:16, fontWeight:600, color:"#64748b"}}>Loading proposal...</div>
               </div>
             )
@@ -2037,7 +2018,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               </div>
             ) : (
               <div style={{display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:16, marginTop:100}}>
-                <div style={{width:40, height:40, border:"4px solid #f3f4f6", borderTopColor:"#7c3aed", borderRadius:"50%", animation:"spin 1s linear infinite"}}/>
+                <div style={{width:40, height:40, border:"4px solid #f3f4f6", borderTopColor:"var(--app-accent)", borderRadius:"50%", animation:"spin 1s linear infinite"}}/>
                 <div style={{fontSize:16, fontWeight:600, color:"#64748b"}}>Loading editor...</div>
               </div>
             )
@@ -2053,14 +2034,14 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               </div>
               <div style={{display:"flex",alignItems:"center",gap:12}}>
                 <span style={{fontSize:11,fontWeight:700,width:32}}>{Math.round((zoom + 40))}%</span>
-                <input type="range" min={0} max={60} value={zoom} onChange={e=>setZoom(+e.target.value)} style={{width:100,accentColor:"#7d2ae8"}}/>
+                <input type="range" min={0} max={60} value={zoom} onChange={e=>setZoom(+e.target.value)} style={{width:100,accentColor:"var(--app-accent)"}}/>
               </div>
             </div>
           ) : (
             /* Simple Zoom for Client */
             <div style={{position:"fixed",bottom:24,right:24,display:"flex",alignItems:"center",gap:12,background:"#fff",padding:"8px 16px",borderRadius:12,boxShadow:"0 4px 20px rgba(0,0,0,0.08)",zIndex:100}} className="no-print">
                <span style={{fontSize:11,fontWeight:700,width:32}}>{Math.round((zoom + 40))}%</span>
-               <input type="range" min={0} max={60} value={zoom} onChange={e=>setZoom(+e.target.value)} style={{width:80,accentColor:"#7d2ae8"}}/>
+               <input type="range" min={0} max={60} value={zoom} onChange={e=>setZoom(+e.target.value)} style={{width:80,accentColor:"var(--app-accent)"}}/>
             </div>
           )}
           
@@ -2091,11 +2072,11 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
             
             return (
             <div key={s.id} onClick={()=>setPage(i)}
-              style={{height:70,width:stripWidth,flexShrink:0,borderRadius:6,overflow:"hidden",cursor:"pointer",border:`2px solid ${i===page?"#7d2ae8":"#e2e8f0"}`,position:"relative",background:"#fff",transition:"all .2s",boxShadow:i===page?"0 0 0 2px rgba(125,42,232,0.2)":"none",transform:i===page?"scale(1.05)":"scale(1)"}}>
+              style={{height:70,width:stripWidth,flexShrink:0,borderRadius:6,overflow:"hidden",cursor:"pointer",border:`2px solid ${i===page?"var(--app-accent)":"#e2e8f0"}`,position:"relative",background:"#fff",transition:"all .2s",boxShadow:i===page?"0 0 0 2px rgba(125,42,232,0.2)":"none",transform:i===page?"scale(1.05)":"scale(1)"}}>
               <div style={{transform:`scale(${stripWidth/900})`,transformOrigin:"top left",width:900,height:h,pointerEvents:"none"}}>
                 <Slide slide={s} theme={doc.theme} docFormat={doc.format} editing={false} onChange={()=>{}} preview companyLogo={companyLogo} companyName={companyName} footerMessage={doc?.footerMessage}/>
               </div>
-              <div style={{position:"absolute",bottom:4,left:6,fontSize:10,fontWeight:800,color:i===page?"#7d2ae8":"#94a3b8",background:"rgba(255,255,255,0.8)",padding:"0 4px",borderRadius:4}}>{i+1}</div>
+              <div style={{position:"absolute",bottom:4,left:6,fontSize:10,fontWeight:800,color:i===page?"var(--app-accent)":"#94a3b8",background:"rgba(255,255,255,0.8)",padding:"0 4px",borderRadius:4}}>{i+1}</div>
               {canEdit && doc.slides.length > 1 && (
                 <button 
                   onClick={(e) => {e.stopPropagation(); delSlide(i);}} 

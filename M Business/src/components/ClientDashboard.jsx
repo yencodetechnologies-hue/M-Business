@@ -401,7 +401,7 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
             </div>
             <div>
               <div style={{ fontWeight: 800, fontSize: 13, color: "#fff", letterSpacing: -0.3, fontFamily: T.fontSyne }}>{clientUser?.company || "M Business"}</div>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{clientUser?.role || clientUser?.userRole || "COMPANY"}</div>
+              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{clientUser?.role || clientUser?.userRole || ""}</div>
             </div>
           </div>
           <button onClick={onClose} className="sidebar-close-btn" style={{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:16, cursor:"pointer", padding:"2px 4px" }}>✕</button>

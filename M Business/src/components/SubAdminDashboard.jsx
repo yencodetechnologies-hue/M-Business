@@ -20,13 +20,12 @@ import { SubAdminDocumentsPage } from "./EmployeeProfilePanel";
 import { DOC_TYPES } from "./EmployeeProfilePanel";
 import AuthPage from "./AuthPage";
 import MySubscriptions from "./MySubscriptions";
-import { T } from "../index";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
 import ImageCropModal from "./ImageCropModal";
 
 
 
-
+const T = { primary: "var(--app-primary)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)" };
 const formatCurrency = (amount, currency = "₹") => {
   const sym = currency || "₹";
   const val = Number(amount || 0).toLocaleString("en-IN");
@@ -34,9 +33,6 @@ const formatCurrency = (amount, currency = "₹") => {
 };
 const TRACKING_SEED = [{ id: "PRJ001", name: "Website Redesign", client: "TechNova Pvt Ltd", deadline: "2024-05-30", pct: 65, status: "In Progress", note: "Design done, dev ongoing" }, { id: "PRJ002", name: "Mobile App Dev", client: "Bloom Creatives", deadline: "2024-08-15", pct: 15, status: "Pending", note: "Requirements gathering" }, { id: "PRJ003", name: "ERP Integration", client: "Infra Solutions", deadline: "2024-04-30", pct: 100, status: "Completed", note: "Signed off by Company Name" }];
 const INVOICES = [{ id: "INV001", client: "TechNova Pvt Ltd", project: "Website Redesign", date: "2024-04-01", due: "2024-04-30", total: "1,47,500", status: "Paid" }, { id: "INV002", client: "Infra Solutions", project: "ERP Integration", date: "2024-05-01", due: "2024-05-15", total: "4,24,800", status: "Overdue" }, { id: "INV003", client: "Bloom Creatives", project: "Mobile App Dev", date: "2024-05-10", due: "2024-06-10", total: "1,18,000", status: "Pending" }];
-
-const notifColor = (type) => ({ danger: "#ef4444", warning: "#f59e0b", success: "#10b981", info: "#6366f1" }[type] || "#6366f1");
-const notifBg = (type) => ({ danger: "#fef2f2", warning: "#fffbeb", success: "#f0fdf4", info: "#eef2ff" }[type] || "#eef2ff");
 
 const NAV = [
   { key: "dashboard", icon: "🏠", label: "Dashboard" },
@@ -2118,7 +2114,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-              <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: "0.2px", textShadow: "0 2px 4px rgba(0,0,0,0.2)", fontFamily: T.fontSyne }}>{companyName}</div>
+              <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: "0.2px", textShadow: "0 2px 4px rgba(0,0,0,0.2)" }}>{companyName}</div>
               {roleDisplay && <div style={{ fontSize: 8, color: "rgba(255,255,255,0.45)", letterSpacing: 1.2, textTransform: "uppercase", fontWeight: 700, marginTop: -1 }}>{roleDisplay}</div>}
             </div>
           </div>
@@ -2576,46 +2572,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // ← இது மட்டும் இருக்கணும் (KEEP THIS)
   const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "purple");
   const [showThemePicker, setShowThemePicker] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-
-  const fetchNotifications = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/api/notifications/${user?._id || user?.id}`);
-      if (Array.isArray(res.data)) {
-        const mapped = res.data.map(n => ({
-          id: n._id,
-          type: n.type,
-          icon: n.icon,
-          text: n.text,
-          time: new Date(n.createdAt).toLocaleString(),
-          read: n.isRead,
-          action: n.link ? "View" : null,
-          actionPage: n.link || null
-        }));
-        setNotifications(mapped);
-      }
-    } catch (err) {
-      console.error("Error fetching notifications:", err);
-    }
-  };
-
-  const markRead = (id) => {
-    axios.patch(`${BASE_URL}/api/notifications/${id}/read`)
-      .then(() => {
-        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-      })
-      .catch(err => console.error("Error marking read:", err));
-  };
-
-  const markAllRead = () => {
-    axios.patch(`${BASE_URL}/api/notifications/read-all/${user?._id || user?.id}`)
-      .then(() => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-      })
-      .catch(err => console.error("Error marking all read:", err));
-  };
-
-  const navigateTo = (pg) => setActive(pg);
 
   const THEMES = {
     purple: { label: "Purple", sidebar: "#1e0a3c", accent: "var(--app-accent)", bg: "#f5f3ff", muted: "#7c3aed", border: "#ede9fe", dot: "var(--app-accent)" },
@@ -2757,18 +2713,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
-    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig(); fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000); // Polling for notifications
-    return () => clearInterval(interval);
+    fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
   }, []);
-
-  // Mark messaging notifications as read when on messaging page
-  useEffect(() => {
-    if (active === "messaging") {
-      const unreadMessaging = notifications.filter(n => !n.read && n.actionPage === "messaging");
-      unreadMessaging.forEach(n => markRead(n.id));
-    }
-  }, [active, notifications]);
 
   const fetchTasks = async () => {
     try {
@@ -3226,18 +3172,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const roleDisplay = user?.role || "Admin";
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: T.fontDM }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:5px}
         ::-webkit-scrollbar-thumb{background:#d8b4fe;border-radius:3px}
         button,input,select,textarea{font-family:inherit}
-        @keyframes bell-ring { 0%,85%,100%{transform:rotate(0deg);} 90%{transform:rotate(16deg);} 95%{transform:rotate(-14deg);} }
-        @keyframes badge-pop { 0%{transform:scale(0);opacity:0;} 70%{transform:scale(1.25);} 100%{transform:scale(1);opacity:1;} }
-        @keyframes notif-slide-in { 0%{opacity:0;transform:translateY(-10px) scale(0.97);} 100%{opacity:1;transform:translateY(0) scale(1);} }
-        @keyframes notif-item-in  { 0%{opacity:0;transform:translateX(8px);}  100%{opacity:1;transform:translateX(0);} }
-        @keyframes pulse-dot-color { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.4);opacity:0.6;} }
         @media(min-width:769px){.sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}}
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
       `}</style>
@@ -3283,7 +3224,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <>
               <input type="file" ref={headerLogoRef} onChange={handleHeaderLogoUpload} accept="image/*" style={{ display: "none" }} />
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo} />
                 {enforceMySubscriptions && (
                   <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "6px 12px", color: "#ef4444", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Logout</button>
                 )}
@@ -3324,7 +3264,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               {user?.email !== "admin@gmail.com" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo} />
                   {enforceMySubscriptions && (
                     <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "8px 16px", color: "#ef4444", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.15)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.1)"}>Logout</button>
                   )}
@@ -3493,7 +3432,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               )}
 
               {/* Top Section: Company Info & Stats Grid */}
-              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20, marginBottom: 20 }}>
+              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 20, marginBottom: 20 }}>
                 {/* Left Column: Company Information */}
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <SC>
@@ -3548,7 +3487,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 </div>
 
                 {/* Right Column: Statistics Grid */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
                   {[
                     { t: "Total Clients", v: clients.length, i: "👥", c: "var(--app-accent)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
                     { t: "Employees", v: employees.length, i: "👨‍💼", c: "var(--app-muted)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
@@ -3569,18 +3508,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   ))}
                 </div>
               </div>
-              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
                 <SC title="Recent Projects">
                   <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 400 }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 600 }}>
                       <thead>
                         <tr style={{ background: "var(--app-bg)" }}>
-                          {["Project", "Client", "Status", "Deadline"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
+                          {["Project", "Client", "Status", "Deadline", "View"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
                         </tr>
                       </thead>
                       <tbody>
-                        {projects.length === 0 ? <tr><td colSpan={4} style={{ padding: 20, textAlign: "center", color: "var(--app-muted)" }}>No recent projects</td></tr> : projects.slice(0, 5).map((p, i) => (
-                          <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => setViewProject(p)}>
+                        {projects.length === 0 ? <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "var(--app-muted)" }}>No recent projects</td></tr> : projects.slice(0, 5).map((p, i) => (
+                          <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => setProjectForTaskModal(p)}>
                             <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
                               <div style={{ fontSize: 13 }}>{p.name}</div>
                               <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
@@ -3588,27 +3527,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <td style={{ padding: "12px 12px", color: "var(--app-muted)" }}>{p.client}</td>
                             <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>
                             <td style={{ padding: "12px 12px", color: "#94a3b8" }}>{p.end ? new Date(p.end).toLocaleDateString() : "—"}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </SC>
-                <SC title="Recent Invoices">
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 400 }}>
-                      <thead>
-                        <tr style={{ background: "var(--app-bg)" }}>
-                          {["ID", "Client", "Total", "Status"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {invoices.length === 0 ? <tr><td colSpan={4} style={{ padding: 20, textAlign: "center", color: "var(--app-muted)" }}>No recent invoices</td></tr> : invoices.slice(0, 5).map((inv, i) => (
-                          <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)" }}>
-                            <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>{inv.invoiceId || inv.id || `INV${String(i + 1).padStart(3, "0")}`}</td>
-                            <td style={{ padding: "12px 12px", color: "var(--app-muted)" }}>{inv.clientName || inv.client}</td>
-                            <td style={{ padding: "12px 12px", fontWeight: 700, color: "var(--app-muted)" }}>{formatCurrency(inv.totalAmount || inv.total, user?.currency)}</td>
-                            <td style={{ padding: "12px 12px" }}><Badge label={inv.status} /></td>
+                            <td style={{ padding: "12px 12px" }} onClick={e => e.stopPropagation()}><button onClick={() => setViewProject(p)} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button></td>
                           </tr>
                         ))}
                       </tbody>
@@ -4345,73 +4264,4 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   );
 }
 
-// ── Notification Bell ─────────────────────────────────────────
-function NotificationBell({ notifications, onMarkRead, onMarkAllRead, onNavigate }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-  const unread = notifications.filter(n => !n.read).length;
-
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  return (
-    <div ref={ref} style={{ position: "relative" }}>
-      <button onClick={() => setOpen(v => !v)}
-        style={{ position: "relative", width: 40, height: 40, borderRadius: 12, background: open ? "var(--app-bg)" : "#fff", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, transition: "all 0.18s", outline: "none" }}>
-        <span style={{ display: "inline-block", animation: unread > 0 ? "bell-ring 2.5s ease-in-out infinite" : "none" }}>🔔</span>
-        {unread > 0 && (
-          <div style={{ position: "absolute", top: -5, right: -5, minWidth: 18, height: 18, borderRadius: 99, background: "linear-gradient(135deg,#ef4444,#dc2626)", border: "2px solid #fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#fff", padding: "0 4px", animation: "badge-pop 0.35s cubic-bezier(0.34,1.56,0.64,1)" }}>
-            {unread}
-          </div>
-        )}
-      </button>
-
-      {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 10px)", right: 0, width: 360, maxWidth: "calc(100vw - 32px)", background: "#fff", borderRadius: 18, border: "1px solid var(--app-border)", boxShadow: "0 20px 60px rgba(0,0,0,0.14),0 4px 16px rgba(147,51,234,0.1)", zIndex: 9999, overflow: "hidden", animation: "notif-slide-in 0.22s cubic-bezier(0.34,1.56,0.64,1)" }}>
-          <div style={{ padding: "14px 18px 12px", background: "linear-gradient(135deg,var(--app-sidebar),#1e293b)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(147,51,234,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>🔔</div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>Notifications</div>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>{unread > 0 ? `${unread} unread` : "All caught up!"}</div>
-              </div>
-            </div>
-            {unread > 0 && <button onClick={onMarkAllRead} style={{ background: "rgba(147,51,234,0.25)", border: "1px solid rgba(147,51,234,0.4)", borderRadius: 8, padding: "5px 10px", fontSize: 10, fontWeight: 700, color: "#a5b4fc", cursor: "pointer", fontFamily: "inherit" }}>✓ Mark all read</button>}
-          </div>
-          <div style={{ maxHeight: 380, overflowY: "auto" }}>
-            {notifications.length === 0 ? (
-              <div style={{ padding: "40px 20px", textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No notifications yet</div>
-            ) : (
-              notifications.map((n, i) => {
-                const color = notifColor(n.type), bg = notifBg(n.type);
-                return (
-                  <div key={n.id} style={{ padding: "12px 16px", display: "flex", alignItems: "flex-start", gap: 12, background: n.read ? "#fff" : "#fafafe", borderBottom: i < notifications.length - 1 ? "1px solid #f1f5f9" : "none", transition: "background 0.15s", animation: `notif-item-in 0.25s ease ${i * 0.04}s both`, cursor: "pointer" }}
-                    onClick={() => { onMarkRead(n.id); if (n.actionPage) onNavigate(n.actionPage); setOpen(false); }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#f8faff"}
-                    onMouseLeave={e => e.currentTarget.style.background = n.read ? "#fff" : "#fafafe"}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: bg, border: `1px solid ${color}20`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, position: "relative" }}>
-                      {n.icon}
-                      {!n.read && <div style={{ position: "absolute", top: -3, right: -3, width: 9, height: 9, borderRadius: "50%", background: color, border: "2px solid #fff", animation: "pulse-dot-color 1.8s ease infinite" }} />}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12.5, fontWeight: n.read ? 500 : 700, color: n.read ? "#374151" : "#0f172a", lineHeight: 1.4, marginBottom: 4 }}>{n.text}</div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 10, color: "var(--app-muted)" }}>{n.time}</span>
-                        {n.action && <span style={{ background: `${color}12`, border: `1px solid ${color}30`, borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: color }}>{n.action} →</span>}
-                      </div>
-                    </div>
-                    {!n.read && <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0, animation: "pulse-dot-color 1.8s ease infinite" }} />}
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 

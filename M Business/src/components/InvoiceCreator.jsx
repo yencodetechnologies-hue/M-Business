@@ -444,7 +444,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           {/* Header */}
           <div style={{ background: "linear-gradient(135deg,#4c1d95,#7c3aed)", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
             <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>💸</div>
-            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>PAYMENT RECEIPT</h2>
+            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>{r.status === "part_paid" ? "PART PAYMENT RECEIPT" : "PAYMENT RECEIPT"}</h2>
             <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4, fontWeight: 600 }}>{receiptNo}</div>
           </div>
 
@@ -477,6 +477,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Invoice Number</span>
                 <span style={{ fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{r.invoiceNo}</span>
               </div>
+              {r.status === "part_paid" && (
+                <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed #ede9fe" }}>
+                  <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 700 }}>Remaining Balance</span>
+                  <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 800 }}>{formatCurrency((r.total || 0) - (pd.amountPaid || 0), invData.currency)}</span>
+                </div>
+              )}
             </div>
 
             <div style={{ marginTop: 40, textAlign: "center", background: "#fdf4ff", borderRadius: 16, padding: "20px" }}>

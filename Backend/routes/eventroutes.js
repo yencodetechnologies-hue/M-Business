@@ -22,6 +22,37 @@ router.post("/", async (req, res) => {
   try {
     const event = new Event(req.body);
     await event.save();
+    
+    // Email notifications
+    try {
+      const { sendQuickEmail } = require("../config/email");
+      const creatorRole = (event.createdByRole || "").toLowerCase();
+      
+      if (creatorRole === "subadmin" || creatorRole === "sub_admin" || creatorRole === "sub-admin") {
+        if (event.client) {
+          const Client = require("../models/ClientModel");
+          const clientObj = await Client.findOne({ $or: [{ clientName: event.client }, { name: event.client }] });
+          if (clientObj && clientObj.email) {
+            const html = `Hello ${clientObj.contactPersonName || clientObj.clientName || clientObj.name},<br><br>A new ${event.type} has been scheduled with you by ${event.createdBy || "your provider"}.<br><br><b>Event:</b> ${event.name}<br><b>Date:</b> ${event.date}<br><b>Time:</b> ${event.start || "--"} to ${event.end || "--"}<br><br>Please check your client dashboard for more details.`;
+            await sendQuickEmail(clientObj.email, `New ${event.type} Scheduled: ${event.name}`, html);
+          }
+        }
+      } else if (creatorRole === "client") {
+        if (event.companyId) {
+          const User = require("../models/UserModels");
+          const subadmins = await User.find({ companyId: event.companyId, role: { $in: ["subadmin", "sub_admin", "sub-admin"] } });
+          for (const sa of subadmins) {
+            if (sa.email) {
+              const html = `Hello ${sa.name},<br><br>Your client ${event.createdBy || event.client} has scheduled a new ${event.type}.<br><br><b>Event:</b> ${event.name}<br><b>Date:</b> ${event.date}<br><b>Time:</b> ${event.start || "--"} to ${event.end || "--"}<br><br>Please check your dashboard for more details.`;
+              await sendQuickEmail(sa.email, `New ${event.type} Requested by Client`, html);
+            }
+          }
+        }
+      }
+    } catch (emailErr) {
+      console.error("Email notification error:", emailErr);
+    }
+
     res.status(201).json(event);
   } catch (err) {
     res.status(400).json({ msg: "Failed to create event", error: err.message });

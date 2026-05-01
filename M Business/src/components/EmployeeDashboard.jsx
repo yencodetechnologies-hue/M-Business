@@ -12,14 +12,14 @@ import MessagingPage from "./MessagingPage";
 const BASE = "/api/employee-dashboard";
 
 const sc = (s) => ({
-  active:"#6366f1","in progress":"#6366f1",
+  active:"var(--app-accent)","in progress":"var(--app-accent)",
   review:"#f59e0b","in review":"#f59e0b",pending:"#f59e0b",
   done:"#10b981",completed:"#10b981",
   high:"#ef4444",medium:"#f59e0b",low:"#10b981",
   present:"#10b981",absent:"#ef4444",leave:"#f59e0b",holiday:"#8b5cf6",
   approved:"#10b981",rejected:"#ef4444",overdue:"#ef4444",
   cancelled:"#94a3b8",
-}[(s||"").toLowerCase()]||"#6366f1");
+}[(s||"").toLowerCase()]||"var(--app-accent)");
 
 const NAV = [
   { key:"dashboard", icon:"⌂", label:"Dashboard" },
@@ -195,11 +195,11 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
         <div style={{ padding:"24px 20px 18px", borderBottom:"1px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
             {user?.logoUrl ? (
-              <div style={{ width:38, height:38, background:"#fff", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
-                <img src={user.logoUrl} alt="logo" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+              <div style={{ minWidth:38, height:38, background:"#fff", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden", padding:"2px" }}>
+                <img src={user.logoUrl} alt="logo" style={{ maxHeight:"100%", maxWidth:"120px", objectFit:"contain" }} />
               </div>
             ) : (
-              <div style={{ width:34, height:34, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>
+              <div style={{ width:34, height:34, background:"linear-gradient(135deg,var(--app-accent),#2563eb)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff" }}>
                 {initials[0]}
               </div>
             )}
@@ -1407,7 +1407,7 @@ const fetchSubscription = async () => {
         {profileDropdownOpen && (
           <div data-profile-menu="true" style={{ position:"fixed", top:56, right:16, zIndex:1000, background:"#fff", border:"1px solid #e2e8f0", borderRadius:12, boxShadow:"0 20px 60px rgba(0,0,0,0.12)", overflow:"hidden", minWidth:220, maxWidth:280 }}>
             {/* Current Account Header */}
-            <div style={{ padding:"12px 14px", borderBottom:"1px solid #f1f5f9", background:"linear-gradient(135deg,#f5f3ff,#faf5ff)" }}>
+            <div style={{ padding:"12px 14px", borderBottom:"1px solid #f1f5f9", background:"linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                 <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:14 }}>
                   {(empName||"E").slice(0,2).toUpperCase()}
@@ -1429,7 +1429,7 @@ const fetchSubscription = async () => {
                   return(
                     <button key={account.email||idx} onClick={()=>switchAccount(account)}
                       style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:600, fontFamily:"inherit", color:"#1e0a3c", display:"flex", alignItems:"center", gap:10, borderBottom:"1px solid #f8fafc", textAlign:"left" }}
-                      onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                      onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                       onMouseLeave={e=>e.currentTarget.style.background="transparent"}
                     >
                       <div style={{ width:32, height:32, borderRadius:8, background:"linear-gradient(135deg,#8b5cf6,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:12, flexShrink:0 }}>
@@ -1448,13 +1448,13 @@ const fetchSubscription = async () => {
             {/* Menu Options */}
             <div style={{ borderTop:"1px solid #f1f5f9" }}>
               <button onClick={()=>{setProfileDropdownOpen(false);setProfileOpen(true);}} style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", color:"#1e0a3c", display:"flex", alignItems:"center", gap:10 }}
-                onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                 onMouseLeave={e=>e.currentTarget.style.background="transparent"}
               >
                 <span style={{ fontSize:14 }}>👤</span> Profile
               </button>
               <button onClick={()=>{setProfileDropdownOpen(false);setAccountAuthOpen(true);}} style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", color:"#1e0a3c", display:"flex", alignItems:"center", gap:10, borderTop:"1px solid #f8fafc" }}
-                onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                 onMouseLeave={e=>e.currentTarget.style.background="transparent"}
               >
                 <span style={{ fontSize:14 }}>➕</span> Add account

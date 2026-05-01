@@ -22,15 +22,16 @@ router.get("/client/:clientName", async (req, res) => {
     const name = decodeURIComponent(req.params.clientName).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
     
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const safeCompany = escapeRegExp(companyName);
+
     const conditions = [];
-    if (name) conditions.push({ client: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") } });
-    if (companyName) conditions.push({ client: { $regex: new RegExp(`^\\s*${companyName}\\s*$`, "i") } });
+    if (safeName) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
+    if (safeCompany) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
     
     const filter = conditions.length > 0 ? { $or: conditions } : {};
     
-    if (companyId && companyId !== "NONE") {
-      filter.companyId = companyId;
-    }
     const projects = await Project.find(filter).sort({ createdAt: -1 });
     res.json(projects);
   } catch (err) {

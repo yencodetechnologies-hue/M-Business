@@ -6,10 +6,10 @@ import CalendarPage from "./CalendarPage";
 
 // ── Theme ──────────────────────────────────────────────────────
 const T = {
-  primary: "#0f172a", accent: "#6366f1", accent2: "#8b5cf6",
+  primary: "var(--app-primary)", accent: "var(--app-accent)", accent2: "#3b82f6",
   success: "#10b981", warning: "#f59e0b", danger: "#ef4444",
-  bg: "#f8fafc", card: "#ffffff", text: "#0f172a",
-  muted: "#64748b", border: "#e2e8f0", sidebar: "#0f172a",
+  bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)",
+  muted: "var(--app-muted)", border: "var(--app-border)", sidebar: "var(--app-sidebar)",
 };
 
 const sc = (s) => ({
@@ -30,7 +30,7 @@ const NAV = [
   { key:"payments",  icon:"◆", label:"Payments" },
   { key:"calendar",  icon:"◷", label:"Calendar" },
   { key:"reports",   icon:"▦", label:"Reports" },
-  { key:"settings",  icon:"◌", label:"Settings" },
+
 ];
 
 const notifColor = (type) => ({ danger:"#ef4444", warning:"#f59e0b", success:"#10b981", info:"#6366f1" }[type]||"#6366f1");
@@ -256,7 +256,7 @@ function NotificationBell({ notifications, onMarkRead, onMarkAllRead, onNavigate
     <div ref={ref} style={{ position:"relative" }}>
       <button onClick={()=>setOpen(v=>!v)}
         style={{ position:"relative", width:40, height:40, borderRadius:12, background:open?"#eef2ff":"#fff", border:`1.5px solid ${open?"#6366f1":"#e2e8f0"}`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, transition:"all 0.18s", outline:"none" }}
-        onMouseEnter={e=>{ if(!open){ e.currentTarget.style.background="#f5f3ff"; e.currentTarget.style.borderColor="#a5b4fc"; } }}
+        onMouseEnter={e=>{ if(!open){ e.currentTarget.style.background="var(--app-bg)"; e.currentTarget.style.borderColor="#a5b4fc"; } }}
         onMouseLeave={e=>{ if(!open){ e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor="#e2e8f0"; } }}>
         <span style={{ display:"inline-block", animation:unread>0?"bell-ring 2.5s ease-in-out infinite":"none" }}>🔔</span>
         {unread > 0 && (
@@ -346,8 +346,8 @@ function ProfileDropdown({ user, onLogout }) {
   return (
     <div ref={ref} style={{ position:"relative" }}>
       <button onClick={()=>setOpen(v=>!v)} style={{ display:"flex", alignItems:"center", gap:8, background:"none", border:"none", cursor:"pointer", padding:"2px", outline:"none" }}>
-        <div style={{ width:38, height:38, borderRadius:10, background:user?.logoUrl ? "#fff" : "linear-gradient(135deg,#6366f1,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:900, fontSize:15, border:"2px solid #fff", boxShadow:"0 2px 6px rgba(0,0,0,0.1)", overflow:"hidden" }}>
-          {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width:"100%", height:"100%", objectFit:"contain", padding:2 }} /> : (user?.name || user?.clientName || "C").slice(0,2).toUpperCase()}
+        <div style={{ minWidth:38, height:38, borderRadius:10, background:user?.logoUrl ? "#fff" : "linear-gradient(135deg,#3b82f6,#2563eb)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:900, fontSize:15, border:"2px solid #fff", boxShadow:"0 2px 6px rgba(0,0,0,0.1)", overflow:"hidden", padding: user?.logoUrl ? "2px" : 0 }}>
+          {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight:"100%", maxWidth:"120px", objectFit:"contain" }} /> : (user?.name || user?.clientName || "C").slice(0,2).toUpperCase()}
         </div>
       </button>
 
@@ -399,8 +399,8 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
       <div style={{ width:220, background:T.sidebar, color:"#fff", display:"flex", flexDirection:"column", height:"100vh", position:"fixed", top:0, left:0, zIndex:999, transform:open?"translateX(0)":"translateX(-100%)", transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)", boxShadow:"4px 0 32px rgba(0,0,0,0.18)" }} className="client-sidebar">
         <div style={{ padding:"24px 20px 18px", borderBottom:"1px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:38, height:38, background:clientUser?.logoUrl ? "#fff" : "linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff", overflow:"hidden" }}>
-              {clientUser?.logoUrl ? <img src={clientUser.logoUrl} alt="logo" style={{ width:"100%", height:"100%", objectFit:"contain", padding:2 }} /> : (clientUser?.company || "W")[0].toUpperCase()}
+            <div style={{ minWidth:38, height:38, background:clientUser?.logoUrl ? "#fff" : "linear-gradient(135deg,#3b82f6,#2563eb)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff", overflow:"hidden", padding: clientUser?.logoUrl ? "2px" : 0 }}>
+              {clientUser?.logoUrl ? <img src={clientUser.logoUrl} alt="logo" style={{ maxHeight:"100%", maxWidth:"120px", objectFit:"contain" }} /> : (clientUser?.company || "W")[0].toUpperCase()}
             </div>
             <div>
               <div style={{ fontWeight:800, fontSize:13, color:"#fff", letterSpacing:-0.3 }}>{clientUser?.company || "M Business"}</div>
@@ -546,92 +546,7 @@ function TasksFiltered({ tasks, onCommentAdded }) {
 }
 
 // ── Settings Page ─────────────────────────────────────────────
-function SettingsPage({ clientUser }) {
-  const notifKey = `client_notif_prefs_${clientUser?.name || "client"}`;
-  
-  const [form, setForm] = useState(() => {
-    const defaultForm = { name: clientUser?.name || "", email: clientUser?.email || "", phone: "", company: clientUser?.company || "", notifications: true, invoiceAlerts: true, weeklyReport: false };
-    try {
-      const saved = localStorage.getItem(notifKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return { ...defaultForm, notifications: parsed.notifications, invoiceAlerts: parsed.invoiceAlerts, weeklyReport: parsed.weeklyReport };
-      }
-    } catch {}
-    return defaultForm;
-  });
 
-  const [saved, setSaved] = useState(false);
-
-  const updateToggle = (key) => {
-    const newVal = !form[key];
-    const updatedForm = { ...form, [key]: newVal };
-    setForm(updatedForm);
-    try {
-      localStorage.setItem(notifKey, JSON.stringify({
-        notifications: updatedForm.notifications,
-        invoiceAlerts: updatedForm.invoiceAlerts,
-        weeklyReport: updatedForm.weeklyReport
-      }));
-    } catch {}
-  };
-
-  const save = () => {
-    try {
-      localStorage.setItem(notifKey, JSON.stringify({
-        notifications: form.notifications,
-        invoiceAlerts: form.invoiceAlerts,
-        weeklyReport: form.weeklyReport
-      }));
-    } catch {}
-    setSaved(true); 
-    setTimeout(() => setSaved(false), 2200); 
-  };
-  return (
-    <div style={{ maxWidth:560 }}>
-      <div style={{ background:"#fff", borderRadius:16, border:"1px solid #e2e8f0", overflow:"hidden" }}>
-        <div style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", padding:"28px 24px", display:"flex", alignItems:"center", gap:16 }}>
-          <div style={{ width:60, height:60, borderRadius:16, background:"rgba(255,255,255,0.2)", border:"2px solid rgba(255,255,255,0.4)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:800, color:"#fff" }}>{clientUser.avatar}</div>
-          <div>
-            <div style={{ fontWeight:800, fontSize:16, color:"#fff" }}>{clientUser.name}</div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,0.65)", marginTop:2 }}>{clientUser.email}</div>
-            <div style={{ display:"inline-block", marginTop:6, background:"rgba(255,255,255,0.18)", border:"1px solid rgba(255,255,255,0.3)", borderRadius:99, padding:"2px 10px", fontSize:10, fontWeight:700, color:"#fff", letterSpacing:1 }}>{clientUser.plan} PLAN</div>
-          </div>
-        </div>
-        <div style={{ padding:"20px 24px" }}>
-          {[{label:"Full Name",key:"name"},{label:"Email",key:"email",type:"email"},{label:"Phone",key:"phone"},{label:"Company",key:"company"}].map(({label,key,type="text"})=>(
-            <div key={key} style={{ marginBottom:14 }}>
-              <label style={{ display:"block", fontSize:11, color:"#64748b", fontWeight:700, letterSpacing:0.5, textTransform:"uppercase", marginBottom:5 }}>{label}</label>
-              <input 
-                type={type} 
-                value={form[key]||""} 
-                onChange={e=>{
-                  const val = e.target.value;
-                  const isNumField = ["phone", "pincode", "zip", "salary", "mobile", "accountNumber", "pancard"].some(k => key.toLowerCase().includes(k.toLowerCase()) || label.toLowerCase().includes(k.toLowerCase()));
-                  if(isNumField && val && !/^\d*$/.test(val)) return;
-                  setForm({...form,[key]:val});
-                }} 
-                style={{ width:"100%", border:"1.5px solid #e2e8f0", borderRadius:10, padding:"9px 12px", fontSize:13, color:"#0f172a", background:"#f8fafc", outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}
-              />
-            </div>
-          ))}
-          <div style={{ marginTop:20, marginBottom:4, fontSize:11, fontWeight:700, color:"#64748b", letterSpacing:0.5, textTransform:"uppercase" }}>Notification Preferences</div>
-          {[{label:"Email Notifications",key:"notifications"},{label:"Invoice Payment Alerts",key:"invoiceAlerts"},{label:"Weekly Progress Report",key:"weeklyReport"}].map(({label,key})=>(
-            <div key={key} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0", borderBottom:"1px solid #f1f5f9" }}>
-              <span style={{ fontSize:13, color:"#374151" }}>{label}</span>
-              <div onClick={() => updateToggle(key)} style={{ width:40, height:22, borderRadius:99, background:form[key]?"#6366f1":"#e2e8f0", cursor:"pointer", position:"relative", transition:"background 0.2s", flexShrink:0 }}>
-                <div style={{ position:"absolute", top:3, left:form[key]?21:3, width:16, height:16, borderRadius:"50%", background:"#fff", boxShadow:"0 1px 3px rgba(0,0,0,0.2)", transition:"left 0.2s" }}/>
-              </div>
-            </div>
-          ))}
-          <button onClick={save} style={{ marginTop:18, width:"100%", background:saved?"linear-gradient(135deg,#10b981,#34d399)":"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", border:"none", borderRadius:10, padding:"11px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", transition:"background 0.3s" }}>
-            {saved?"✓ Saved!":"Save Changes"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── Notifications Full Page ───────────────────────────────────
 function NotificationsPage({ notifications, onMarkRead, onMarkAllRead, onNavigate }) {
@@ -673,13 +588,14 @@ export default function ClientDashboard({ user, setUser }) {
   const [projects,      setProjects]      = useState([]);
   const [tasks,         setTasks]         = useState([]);
   const [payments,      setPayments]      = useState([]);
+  const [dashboardEvents, setDashboardEvents] = useState([]);
   const [loading,       setLoading]       = useState(false);
 
   const clientUser = {
     name:    user?.name || user?.clientName || "Client",
     email:   user?.email || "",
-    company: user?.companyName || user?.company || "Your Business",
-    avatar:  (user?.companyName || user?.company || "W").slice(0,2).toUpperCase(),
+    company: user?.companyName || user?.company || user?.clientName || user?.name || "Your Business",
+    avatar:  (user?.companyName || user?.company || user?.clientName || user?.name || "Y").slice(0,2).toUpperCase(),
     logoUrl: user?.logoUrl || "",
     plan:    "Pro",
   };
@@ -755,7 +671,29 @@ export default function ClientDashboard({ user, setUser }) {
           setPayments(mapped);
         }
       })
-      .catch(err => console.error("Error fetching invoices:", err))
+      .catch(err => console.error("Error fetching invoices:", err));
+
+    // Fetch Events for notifications
+    axios.get(`${BASE_URL}/api/events?companyId=${user?.companyId || ""}`)
+      .then(res => {
+        if (Array.isArray(res.data)) {
+          const clientName = String(user?.name || "").toLowerCase().trim();
+          const cName = String(user?.clientName || "").toLowerCase().trim();
+          const company = String(user?.company || "").toLowerCase().trim();
+          const companyName = String(user?.companyName || "").toLowerCase().trim();
+
+          const clientEvents = res.data.filter(e => {
+            if (!e.client) return false;
+            const c = String(e.client).toLowerCase().trim();
+            return (clientName && c === clientName) || 
+                   (cName && c === cName) || 
+                   (company && c === company) || 
+                   (companyName && c === companyName);
+          });
+          setDashboardEvents(clientEvents);
+        }
+      })
+      .catch(err => console.error("Error fetching events:", err))
       .finally(() => setLoading(false));
   };
 
@@ -763,9 +701,69 @@ export default function ClientDashboard({ user, setUser }) {
     setLoading(true);
     refreshData();
   }, [user]);
+
+  useEffect(() => {
+    // Generate some meaningful notifications locally from the data
+    const notifs = [];
+    
+    // Check pending proposals
+    proposals.forEach(p => {
+      if (p.status === "pending") {
+        notifs.push({ id: `prop-${p._id||p.id}`, type: "info", icon: "📄", text: `Proposal "${p.title}" requires your approval.`, time: "Action Required", read: false, action: "View", actionPage: "proposals" });
+      }
+    });
+
+    // Check overdue/pending payments
+    payments.forEach(p => {
+      if (p.status === "Overdue") {
+        notifs.push({ id: `pay-od-${p._id||p.id||p.invoiceId}`, type: "danger", icon: "🚨", text: `Payment Overdue for ${p.project} (${p.amount})`, time: "Urgent", read: false, action: "Pay Now", actionPage: "payments" });
+      } else if (p.status === "Pending") {
+        notifs.push({ id: `pay-pend-${p._id||p.id||p.invoiceId}`, type: "warning", icon: "⏳", text: `Pending invoice for ${p.project} (${p.amount})`, time: "Soon", read: false, action: "View", actionPage: "payments" });
+      }
+    });
+
+    // Check active tasks
+    tasks.forEach(t => {
+      if (t.status !== "Done" && t.status !== "Completed") {
+        notifs.push({ id: `task-${t._id||t.id}`, type: "info", icon: "◉", text: `Active task: ${t.title}`, time: "In Progress", read: false, action: "View", actionPage: "tasks" });
+      }
+    });
+
+    // Check upcoming events
+    const today = new Date().toISOString().slice(0, 10);
+    dashboardEvents.forEach(e => {
+      if (e.date && e.date >= today) {
+        notifs.push({ id: `evt-${e._id||e.id}`, type: "info", icon: "📅", text: `Upcoming ${e.type || "Event"}: ${e.name}`, time: e.date === today ? "Today" : "Upcoming", read: false, action: "View", actionPage: "calendar" });
+      }
+    });
+
+    setNotifications(prev => {
+      // Load saved read IDs from localStorage
+      const savedReadIds = JSON.parse(localStorage.getItem(`read_notifs_${user?._id || 'guest'}`) || "[]");
+      const readSet = new Set([...prev.filter(n => n.read).map(n => n.id), ...savedReadIds]);
+      return notifs.map(n => ({ ...n, read: readSet.has(n.id) }));
+    });
+  }, [projects, tasks, payments, proposals, dashboardEvents, user?._id]);
+
   const handleLogout = () => { localStorage.removeItem("user"); if(setUser) setUser(null); };
-  const markRead     = (id) => setNotifications(prev=>prev.map(n=>n.id===id?{...n,read:true}:n));
-  const markAllRead  = ()   => setNotifications(prev=>prev.map(n=>({...n,read:true})));
+
+  const markRead = (id) => {
+    setNotifications(prev => {
+      const updated = prev.map(n => n.id === id ? { ...n, read: true } : n);
+      const readIds = updated.filter(n => n.read).map(n => n.id);
+      localStorage.setItem(`read_notifs_${user?._id || 'guest'}`, JSON.stringify(readIds));
+      return updated;
+    });
+  };
+
+  const markAllRead = () => {
+    setNotifications(prev => {
+      const updated = prev.map(n => ({ ...n, read: true }));
+      const readIds = updated.map(n => n.id);
+      localStorage.setItem(`read_notifs_${user?._id || 'guest'}`, JSON.stringify(readIds));
+      return updated;
+    });
+  };
   const navigateTo   = (pg) => setActive(pg);
   const unread       = notifications.filter(n=>!n.read).length;
   const page         = filteredNav.find(n=>n.key===active) || { icon:"⌂", label:"Dashboard" };
@@ -895,7 +893,7 @@ export default function ClientDashboard({ user, setUser }) {
                     ...tasks.filter(t => t.date).map(t => ({ id: t._id, title: t.title, date: t.date, type: "Task", time: t.time || "All day" }))
                   ].slice(0, 4).map(e=>(
                     <div key={e.id} style={{ display:"flex", gap:10, padding:"8px 0", borderBottom:"1px solid #f8fafc", alignItems:"center" }}>
-                      <div style={{ background:"#f5f3ff", borderRadius:8, padding:"6px 8px", textAlign:"center", flexShrink:0, minWidth:36 }}>
+                      <div style={{ background:"var(--app-bg)", borderRadius:8, padding:"6px 8px", textAlign:"center", flexShrink:0, minWidth:36 }}>
                         <div style={{ fontSize:13, fontWeight:800, color:"#6366f1", lineHeight:1 }}>{e.date?.split("-")[2] || "—"}</div>
                         <div style={{ fontSize:8, color:"#94a3b8", fontWeight:700 }}>{e.date ? new Date(e.date).toLocaleString('en-US', {month:'short'}).toUpperCase() : "DATE"}</div>
                       </div>
@@ -1135,7 +1133,7 @@ export default function ClientDashboard({ user, setUser }) {
             </div>
           )}
 
-          {active==="calendar" && <CalendarPage projects={projects} tasks={tasks} user={user} onUpdateProject={refreshData} onUpdateTask={refreshData} />}
+          {active==="calendar" && <CalendarPage projects={projects} tasks={tasks} user={{...user, role: 'client'}} onUpdateProject={refreshData} onUpdateTask={refreshData} />}
 
           {active==="notifications" && (
             <NotificationsPage notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo}/>

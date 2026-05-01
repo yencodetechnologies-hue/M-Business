@@ -11,7 +11,7 @@ const TYPES  = ["Meeting","Call","Review","Planning","Handover","Other"];
 const TC = { Meeting:"#9333ea", Call:"#7c3aed", Review:"#22C55E", Planning:"#f59e0b", Handover:"#a855f7", Other:"#6b7280" };
 const EMPTY = { name:"", project:"", client:"", date:"", start:"", end:"", notes:"", type:"Meeting", category: "Event" };
 
-export default function CalendarPage({ projects=[], tasks=[], clients=[], companyId, onUpdateProject, onUpdateTask, config }) {
+export default function CalendarPage({ projects=[], tasks=[], clients=[], companyId, onUpdateProject, onUpdateTask, config, user }) {
   const [events,  setEvents]  = useState([]);
   const [loading, setLoading] = useState(true);
   const [search,  setSearch]  = useState("");
@@ -45,9 +45,21 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
     setLoading(false);
   };
 
+  const isClient = String(user?.role || user?.userRole || "").toLowerCase() === 'client';
+  const filteredEvents = isClient 
+    ? events.filter(e => {
+        if (!e.client) return false;
+        const c = String(e.client).toLowerCase().trim();
+        return (user?.name && c === String(user.name).toLowerCase().trim()) || 
+               (user?.clientName && c === String(user.clientName).toLowerCase().trim()) || 
+               (user?.company && c === String(user.company).toLowerCase().trim()) || 
+               (user?.companyName && c === String(user.companyName).toLowerCase().trim());
+      })
+    : events;
+
   // Combine real events with project/task deadlines
   const allDisplayEvents = [
-    ...events.map(e => ({ ...e, _type: "event" })),
+    ...filteredEvents.map(e => ({ ...e, _type: "event" })),
     ...projects.filter(p => p.deadline || p.end).map(p => ({
       _id: `proj-${p._id || p.id}`,
       name: `🏁 Deadline: ${p.name}`,
@@ -74,10 +86,11 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
     setErr({}); setEditId(null); setModal("add");
   };
 
-  const openEdit = (ev) => {
+  const openEdit = (ev, readOnly = false) => {
+    const finalReadOnly = readOnly || isClient;
     if (ev._type === "project" || ev._type === "task") {
       setModal(ev._type);
-      setForm(ev);
+      setForm({ ...ev, _readOnly: finalReadOnly });
       return;
     }
     setForm({
@@ -92,7 +105,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
     });
     setEditId(ev._id||ev.id);
     setErr({});
-    setModal("edit");
+    setModal(finalReadOnly ? "view" : "edit");
   };
 
   const save = async () => {
@@ -114,7 +127,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
           if (onUpdateTask) onUpdateTask();
           showToast("✅ Task added!");
         } else {
-          const r = await axios.post(API, { ...form, companyId: companyId || "" });
+          const r = await axios.post(API, { ...form, companyId: companyId || "", createdBy: user?.name || user?.clientName || "", createdByRole: user?.role || user?.userRole || "" });
           setEvents(p => [r.data, ...p]);
           showToast("✅ Event added!");
         }
@@ -126,7 +139,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
       setModal(null);
     } catch {
       if (modal === "add") {
-        setEvents(p => [{ ...form, _id: Date.now().toString() }, ...p]);
+        setEvents(p => [{ ...form, _id: Date.now().toString(), createdBy: user?.name || user?.clientName || "", createdByRole: user?.role || user?.userRole || "" }, ...p]);
         showToast("✅ Saved locally!");
       } else {
         setEvents(p => p.map(x => (x._id||x.id)===editId ? {...x,...form} : x));
@@ -383,7 +396,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                   )}
 
                   {/* Quick add on hover */}
-                  {cell.curr && (
+                  {cell.curr && !isClient && (
                     <div
                       onClick={e => { e.stopPropagation(); openAdd(ds); }}
                       title="Add event"
@@ -438,9 +451,11 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                     onChange={e=>{ setSearch(e.target.value); setSelectedDate(null); }}
                     style={{ ...inp(false), paddingLeft:30, width:150, padding:"7px 10px 7px 30px" }} />
                 </div>
-                <button onClick={() => openAdd(selectedDate||"")} style={Btn}>
-                  + Add Event
-                </button>
+                {!isClient && (
+                  <button onClick={() => openAdd(selectedDate||"")} style={Btn}>
+                    + Add Event
+                  </button>
+                )}
               </div>
             </div>
 
@@ -540,20 +555,37 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
 
                       {/* Actions */}
                       <div style={{ display:"flex", gap:5, flexShrink:0 }}>
-                        <button onClick={()=>openEdit(ev)} style={{
-                          background:"#f5f3ff", border:"1px solid #ede9fe",
-                          borderRadius:7, padding:"5px 12px", fontSize:11,
-                          color:"#7c3aed", cursor:"pointer", fontWeight:700 }}>
-                          {ev._type ? "👁️ View" : "✏️ Edit"}
-                        </button>
-                        {!ev._type && (
-                          <button onClick={()=>del(ev._id||ev.id)} style={{
-                            background:"#fee2e2", border:"1px solid #fecaca",
-                            borderRadius:7, padding:"5px 12px", fontSize:11,
-                            color:"#ef4444", cursor:"pointer", fontWeight:700 }}>
-                            🗑️
-                          </button>
-                        )}
+                        {(() => {
+                          let canEdit = true;
+                          if (!ev._type) {
+                            if (isClient) canEdit = false;
+                          }
+                          return canEdit ? (
+                            <>
+                              <button onClick={()=>openEdit(ev)} style={{
+                                background:"#f5f3ff", border:"1px solid #ede9fe",
+                                borderRadius:7, padding:"5px 12px", fontSize:11,
+                                color:"#7c3aed", cursor:"pointer", fontWeight:700 }}>
+                                {ev._type ? "👁️ View" : "✏️ Edit"}
+                              </button>
+                              {!ev._type && (
+                                <button onClick={()=>del(ev._id||ev.id)} style={{
+                                  background:"#fee2e2", border:"1px solid #fecaca",
+                                  borderRadius:7, padding:"5px 12px", fontSize:11,
+                                  color:"#ef4444", cursor:"pointer", fontWeight:700 }}>
+                                  🗑️
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <button onClick={()=>openEdit(ev, true)} style={{
+                              background:"#f5f3ff", border:"1px solid #ede9fe",
+                              borderRadius:7, padding:"5px 12px", fontSize:11,
+                              color:"#7c3aed", cursor:"pointer", fontWeight:700 }}>
+                              👁️ View
+                            </button>
+                          );
+                        })()}
                       </div>
                     </div>
                   );
@@ -583,23 +615,27 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
               value={form.date} 
               onChange={e => setForm({ ...form, date: e.target.value })}
               style={{ ...inp(false), marginBottom: 16 }}
+              disabled={form._readOnly}
             />
             <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700, marginBottom:8 }}>UPDATE STATUS</label>
             <select 
               value={form._original.status} 
               onChange={e => setForm({ ...form, _original: { ...form._original, status: e.target.value } })}
               style={inp(false)}
+              disabled={form._readOnly}
             >
               {(config?.projectStatuses || ["Pending","In Progress","Completed","On Hold"]).map(s=><option key={s}>{s}</option>)}
             </select>
             <div style={{ display:"flex", justifyContent:"flex-end", gap: 10, marginTop:20 }}>
-              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>Cancel</button>
-              <button 
-                onClick={() => updateProjectTask("project", form._original._id, { status: form._original.status, deadline: form.date })}
-                style={{ background:"linear-gradient(135deg,#9333ea,#a855f7)", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
-              >
-                Save Changes
-              </button>
+              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>{form._readOnly ? "Close" : "Cancel"}</button>
+              {!form._readOnly && (
+                <button 
+                  onClick={() => updateProjectTask("project", form._original._id, { status: form._original.status, deadline: form.date })}
+                  style={{ background:"linear-gradient(135deg,#9333ea,#a855f7)", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
+                >
+                  Save Changes
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -620,23 +656,27 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
               value={form.date} 
               onChange={e => setForm({ ...form, date: e.target.value })}
               style={{ ...inp(false), marginBottom: 16 }}
+              disabled={form._readOnly}
             />
             <label style={{ display:"block", fontSize:11, color:"#7c3aed", fontWeight:700, marginBottom:8 }}>UPDATE STATUS</label>
             <select 
               value={form._original.status} 
               onChange={e => setForm({ ...form, _original: { ...form._original, status: e.target.value } })}
               style={inp(false)}
+              disabled={form._readOnly}
             >
               {(config?.taskStatuses || ["Pending","In Progress","Completed","On Hold"]).map(s=><option key={s}>{s}</option>)}
             </select>
             <div style={{ display:"flex", justifyContent:"flex-end", gap: 10, marginTop:20 }}>
-              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>Cancel</button>
-              <button 
-                onClick={() => updateProjectTask("task", form._original._id, { status: form._original.status, date: form.date })}
-                style={{ background:"linear-gradient(135deg,#9333ea,#a855f7)", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
-              >
-                Save Changes
-              </button>
+              <button onClick={() => setModal(null)} style={{ background:"#f5f3ff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:600 }}>{form._readOnly ? "Close" : "Cancel"}</button>
+              {!form._readOnly && (
+                <button 
+                  onClick={() => updateProjectTask("task", form._original._id, { status: form._original.status, date: form.date })}
+                  style={{ background:"linear-gradient(135deg,#9333ea,#a855f7)", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
+                >
+                  Save Changes
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -656,7 +696,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
               display:"flex", justifyContent:"space-between", alignItems:"center",
               background:"linear-gradient(90deg,#f5f3ff,#faf5ff)", flexShrink:0 }}>
               <h2 style={{ margin:0, fontSize:17, fontWeight:800, color:T.text }}>
-                {modal==="add" ? "📅 Add New" : "✏️ Edit Event"}
+                {modal==="add" ? "📅 Add New" : modal==="view" ? "👁️ View Event" : "✏️ Edit Event"}
               </h2>
               <button onClick={()=>{ setModal(null); setForm(EMPTY); setErr({}); }} style={{
                 background:"none", border:"none", fontSize:20,
@@ -697,7 +737,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                     fontWeight:700, letterSpacing:0.5, marginBottom:5 }}>
                     {(form.category || "Event").toUpperCase()} NAME *
                   </label>
-                  <input value={form.name}
+                  <input value={form.name} disabled={modal==="view"}
                     onChange={e=>{setForm({...form,name:e.target.value});setErr(p=>({...p,name:""}));}}
                     placeholder={`e.g. ${form.category === "Project" ? "New Website Development" : form.category === "Task" ? "Design Homepage" : "Client Review Meeting"}`}
                     style={inp(err.name)} />
@@ -709,7 +749,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                   <label style={{ display:"block", fontSize:11, color:"#7c3aed",
                     fontWeight:700, letterSpacing:0.5, marginBottom:5 }}>TYPE</label>
                   <select value={form.type} onChange={e=>setForm({...form,type:e.target.value})}
-                    style={inp(false)}>
+                    style={inp(false)} disabled={modal==="view"}>
                     {TYPES.map(t=><option key={t}>{t}</option>)}
                   </select>
                 </div>
@@ -718,7 +758,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                 <div style={{ marginBottom:14 }}>
                   <label style={{ display:"block", fontSize:11, color:"#7c3aed",
                     fontWeight:700, letterSpacing:0.5, marginBottom:5 }}>DATE *</label>
-                  <input type="date" value={form.date}
+                  <input type="date" value={form.date} disabled={modal==="view"}
                     onChange={e=>{setForm({...form,date:e.target.value});setErr(p=>({...p,date:""}));}}
                     style={inp(err.date)} />
                   {err.date && <div style={{ fontSize:11, color:"#ef4444", marginTop:4 }}>⚠️ {err.date}</div>}
@@ -729,10 +769,10 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                   <label style={{ display:"block", fontSize:11, color:"#7c3aed",
                     fontWeight:700, letterSpacing:0.5, marginBottom:5 }}>TIME (Start – End)</label>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                    <input type="time" value={form.start}
+                    <input type="time" value={form.start} disabled={modal==="view"}
                       onChange={e=>setForm({...form,start:e.target.value})}
                       style={inp(false)} />
-                    <input type="time" value={form.end}
+                    <input type="time" value={form.end} disabled={modal==="view"}
                       onChange={e=>setForm({...form,end:e.target.value})}
                       style={inp(false)} />
                   </div>
@@ -743,7 +783,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                   <label style={{ display:"block", fontSize:11, color:"#7c3aed",
                     fontWeight:700, letterSpacing:0.5, marginBottom:5 }}>PROJECT</label>
                   <select value={form.project} onChange={e=>setForm({...form,project:e.target.value})}
-                    style={inp(false)}>
+                    style={inp(false)} disabled={modal==="view"}>
                     <option value="">-- Select Project --</option>
                     {pNames.map((n,i)=><option key={`p-${i}`}>{n}</option>)}
                   </select>
@@ -754,7 +794,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                   <label style={{ display:"block", fontSize:11, color:"#7c3aed",
                     fontWeight:700, letterSpacing:0.5, marginBottom:5 }}>CLIENT</label>
                   <select value={form.client} onChange={e=>setForm({...form,client:e.target.value})}
-                    style={inp(false)}>
+                    style={inp(false)} disabled={modal==="view"}>
                     <option value="">-- Select Client --</option>
                     {cNames.map((n,i)=><option key={`c-${i}`}>{n}</option>)}
                   </select>
@@ -766,7 +806,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                 <label style={{ display:"block", fontSize:11, color:"#7c3aed",
                   fontWeight:700, letterSpacing:0.5, marginBottom:5 }}>NOTES</label>
                 <textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}
-                  placeholder="Any additional details..."
+                  placeholder="Any additional details..." disabled={modal==="view"}
                   rows={3} style={{ ...inp(false), resize:"vertical" }} />
               </div>
 
@@ -804,10 +844,12 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                 <button onClick={()=>{ setModal(null); setForm(EMPTY); setErr({}); }} style={{
                   background:"#f5f3ff", border:"1px solid #ede9fe", color:T.text,
                   borderRadius:10, padding:"10px 18px", cursor:"pointer",
-                  fontWeight:600, fontSize:13 }}>Cancel</button>
-                <button onClick={save} disabled={saving} style={{ ...Btn, opacity:saving?0.7:1 }}>
-                  {saving ? "Saving…" : modal==="add" ? "💾 Save Event" : "✅ Update Event"}
-                </button>
+                  fontWeight:600, fontSize:13 }}>{modal==="view" ? "Close" : "Cancel"}</button>
+                {modal !== "view" && (
+                  <button onClick={save} disabled={saving} style={{ ...Btn, opacity:saving?0.7:1 }}>
+                    {saving ? "Saving…" : modal==="add" ? "💾 Save Event" : "✅ Update Event"}
+                  </button>
+                )}
               </div>
             </div>
           </div>

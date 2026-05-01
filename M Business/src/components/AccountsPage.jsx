@@ -84,7 +84,7 @@ function Fld({ label, value, onChange, options, type="text", error, placeholder,
             </select>
           : <input type={type} value={value} onChange={e => {
               const val = e.target.value;
-              const isNumericField = ['phone', 'pincode', 'zip', 'salary', 'mobile', 'account', 'pan', 'person no', 'office no'].some(keyword => label.toLowerCase().includes(keyword));
+              const isNumericField = ['phone', 'pincode', 'zip', 'salary', 'mobile', 'account', 'person no', 'office no'].some(keyword => label.toLowerCase().includes(keyword));
               if (isNumericField && val && !/^\d*$/.test(val)) return;
               onChange(val);
             }} onWheel={(e) => type === "number" && e.target.blur()}

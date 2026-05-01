@@ -15,7 +15,7 @@ const sc = (s) => ({
   Active: "#22C55E",
   Inactive: "#EF4444",
   Pending: "#F59E0B",
-}[s] || "#6366f1");
+}[s] || "var(--app-accent)");
 
 function Badge({ label }) {
   const c = sc(label);
@@ -174,12 +174,12 @@ export default function AdminDashboard({ user, setUser }) {
   const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "var(--app-bg)", fontFamily: "'Inter', sans-serif" }}>
       {/* SIDEBAR */}
-      <div style={{ width: 240, background: "#0f172a", color: "#fff", display: "flex", flexDirection: "column" }}>
+      <div style={{ width: 240, background: "var(--app-sidebar)", color: "#fff", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "24px 20px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 38, height: 38, background: user?.logoUrl ? "#fff" : "linear-gradient(135deg,#3b82f6,#2dd4bf)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, overflow: "hidden" }}>
-            {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials[0]}
+          <div style={{ minWidth: 38, height: 38, background: user?.logoUrl ? "#fff" : "linear-gradient(135deg,#3b82f6,#2dd4bf)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, overflow: "hidden", padding: user?.logoUrl ? "2px" : 0 }}>
+            {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "120px", objectFit: "contain" }} /> : initials[0]}
           </div>
           <div style={{ overflow: "hidden" }}>
             <div style={{ fontWeight: 800, fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
@@ -193,7 +193,7 @@ export default function AdminDashboard({ user, setUser }) {
             const on = active === n.key;
             return (
               <button key={n.key} onClick={() => setActive(n.key)}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: on ? "rgba(59,130,246,0.15)" : "transparent", border: "none", borderRadius: 10, color: on ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight: on ? 700 : 500, fontSize: 13, cursor: "pointer", marginBottom: 4, transition: "all 0.2s", textAlign: "left", fontFamily: "inherit" }}>
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: on ? "rgba(59,130,246,0.15)" : "transparent", border: "none", borderRadius: 10, color: on ? "var(--app-accent)" : "rgba(255,255,255,0.5)", fontWeight: on ? 700 : 500, fontSize: 13, cursor: "pointer", marginBottom: 4, transition: "all 0.2s", textAlign: "left", fontFamily: "inherit" }}>
                 <span style={{ fontSize: 16 }}>{n.icon}</span>
                 <span style={{ flex: 1 }}>{n.label}</span>
               </button>
@@ -534,10 +534,10 @@ export default function AdminDashboard({ user, setUser }) {
 // ── Dashboard Overview ──
 function OverviewPage({ subadmins, clients, employees, managers, projects, packages, invoices }) {
   const stats = [
-    { label: "Total Clients", value: clients.length, color: "#9333ea" },
-    { label: "Employees", value: employees.length, color: "#7c3aed" },
+    { label: "Total Clients", value: clients.length, color: "var(--app-accent)" },
+    { label: "Employees", value: employees.length, color: "var(--app-accent)" },
     { label: "Managers", value: managers.length, color: "#f59e0b" },
-    { label: "Projects", value: projects.length, color: "#a855f7" },
+    { label: "Projects", value: projects.length, color: "var(--app-accent)" },
     { label: "Subadmins", value: subadmins.length, color: "#3b82f6" },
     { label: "Active Packages", value: packages.length, color: "#10b981" },
   ];
@@ -793,9 +793,9 @@ function SubadminsList({ subadmins, refresh, packages }) {
                     <div style={{ fontSize: 12, color: "#64748b", marginBottom: 4 }}>Clients</div>
                     <div style={{ fontSize: 24, fontWeight: 800, color: "#f59e0b" }}>{companyData.clients?.length || 0}</div>
                   </div>
-                  <div style={{ background: "#f3e8ff", padding: 16, borderRadius: 12, border: "1px solid #d8b4fe" }}>
+                  <div style={{ background: "var(--app-border)", padding: 16, borderRadius: 12, border: "1px solid var(--app-border)" }}>
                     <div style={{ fontSize: 12, color: "#64748b", marginBottom: 4 }}>Quotations</div>
-                    <div style={{ fontSize: 24, fontWeight: 800, color: "#a855f7" }}>{companyData.quotations?.length || 0}</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: "var(--app-accent)" }}>{companyData.quotations?.length || 0}</div>
                   </div>
                 </div>
 
@@ -1001,7 +1001,7 @@ function SubadminsList({ subadmins, refresh, packages }) {
                 <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 6 }}>Billing Cycle</label>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                   {["monthly", "quarterly", "halfYearly", "annual"].map(cycle => (
-                    <label key={cycle} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", padding: "8px 12px", background: billingCycle === cycle ? "#ede9fe" : "#f3f4f6", borderRadius: 8, border: billingCycle === cycle ? "2px solid #9333ea" : "2px solid transparent" }}>
+                    <label key={cycle} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", padding: "8px 12px", background: billingCycle === cycle ? "var(--app-border)" : "#f3f4f6", borderRadius: 8, border: billingCycle === cycle ? "2px solid var(--app-accent)" : "2px solid transparent" }}>
                       <input
                         type="radio"
                         name="billingCycle"
@@ -1010,7 +1010,7 @@ function SubadminsList({ subadmins, refresh, packages }) {
                         onChange={() => setBillingCycle(cycle)}
                         style={{ cursor: "pointer" }}
                       />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: billingCycle === cycle ? "#9333ea" : "#374151", textTransform: "capitalize" }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: billingCycle === cycle ? "var(--app-accent)" : "#374151", textTransform: "capitalize" }}>
                         {cycle === "halfYearly" ? "Half-Yearly" : cycle}
                       </span>
                     </label>
@@ -1034,8 +1034,8 @@ function SubadminsList({ subadmins, refresh, packages }) {
 
               {/* Summary */}
               {selectedPackage && (
-                <div style={{ background: "linear-gradient(135deg,#f3e8ff,#faf5ff)", padding: 16, borderRadius: 12, border: "1px solid #d8b4fe" }}>
-                  <h4 style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 700, color: "#7c3aed" }}>Assignment Summary</h4>
+                <div style={{ background: "linear-gradient(135deg,var(--app-border),var(--app-bg))", padding: 16, borderRadius: 12, border: "1px solid var(--app-border)" }}>
+                  <h4 style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 700, color: "var(--app-accent)" }}>Assignment Summary</h4>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 13 }}>
                     <div><span style={{ color: "#6b7280" }}>Subadmin:</span> <strong style={{ color: "#0f172a" }}>{selectedSubadmin.name}</strong></div>
                     <div><span style={{ color: "#6b7280" }}>Package:</span> <strong style={{ color: "#0f172a" }}>{packages.find(p => p._id === selectedPackage)?.title || "—"}</strong></div>
@@ -1058,7 +1058,7 @@ function SubadminsList({ subadmins, refresh, packages }) {
                 <button
                   onClick={handleAssignPackage}
                   disabled={!selectedPackage || assignLoading}
-                  style={{ flex: 2, padding: "12px", background: "linear-gradient(135deg,#9333ea,#c084fc)", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, cursor: !selectedPackage || assignLoading ? "not-allowed" : "pointer", opacity: !selectedPackage || assignLoading ? 0.6 : 1 }}
+                  style={{ flex: 2, padding: "12px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, cursor: !selectedPackage || assignLoading ? "not-allowed" : "pointer", opacity: !selectedPackage || assignLoading ? 0.6 : 1 }}
                 >
                   {assignLoading ? "Assigning..." : "📦 Assign Package"}
                 </button>

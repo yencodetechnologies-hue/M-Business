@@ -57,8 +57,7 @@ const COL_W = {
   status: 160,
   date: 140,
   priority_col: 140,
-  addcol: 44,
-  dots: 80
+  dots: 100
 };
 function extraColWidth(type) {
   if (type === "text") return 140;
@@ -75,9 +74,10 @@ const PRIORITY_CFG = {
   "High": { bg: "#fdab3d", fg: "#fff" },
   "Medium": { bg: "#9333ea", fg: "#fff" },
   "Low": { bg: "#00c875", fg: "#fff" },
+  "Manual": { bg: "#64748b", fg: "#fff" },
   "—": { bg: "#e2e8f0", fg: "#94a3b8" },
 };
-const PRIORITY_LIST = ["Critical", "High", "Medium", "Low", "—"];
+const PRIORITY_LIST = ["Critical", "High", "Medium", "Low", "Manual", "—"];
 
 /* ══════════════════════════════════════════════════════════
    VIEW DEFINITIONS
@@ -594,74 +594,7 @@ function ProjectPicker({ anchor, projects, currentProjectId, onSelect, onClose }
     !search || (p.name || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  return (
-    <DD anchor={anchor} onClose={onClose} w={320}>
-      <div style={{ padding: "12px 12px 6px" }}>
-        <div style={{
-          display: "flex", alignItems: "center", gap: 6,
-          border: `1px solid #0073ea`, borderRadius: 6,
-          padding: "8px 12px", background: "#fff"
-        }}>
-          <span style={{ fontSize: 14, color: P.muted }}>🔍</span>
-          <input
-            ref={inputRef}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search projects..."
-            style={{
-              border: "none", outline: "none", background: "transparent",
-              fontSize: 13, color: P.text, fontFamily: "inherit", flex: 1
-            }}
-          />
-        </div>
-      </div>
-
-      <div style={{ maxHeight: 220, overflowY: "auto", padding: "4px 8px 8px" }}>
-        {filtered.length === 0 ? (
-          <div style={{ padding: "12px", textAlign: "center", color: P.muted, fontSize: 13 }}>No projects found</div>
-        ) : (
-          filtered.map(p => {
-            const isActive = currentProjectId === (p._id || p.id);
-            return (
-              <div
-                key={p._id || p.id}
-                onClick={(e) => { e.stopPropagation(); onSelect(p._id || p.id); onClose(); }}
-                style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  padding: "10px 12px", borderRadius: 8, cursor: "pointer",
-                  background: isActive ? "#f0f9ff" : "transparent"
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = "#f5f6f8"}
-                onMouseLeave={e => e.currentTarget.style.background = isActive ? "#f0f9ff" : "transparent"}
-              >
-                <div style={{
-                  width: 32, height: 32, borderRadius: 8,
-                  background: "linear-gradient(135deg,#9333ea,#c084fc)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#fff", fontSize: 16, flexShrink: 0
-                }}>📁</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: P.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
-                  {p.client && <div style={{ fontSize: 11, color: P.muted }}>{p.client}</div>}
-                </div>
-                {isActive && <span style={{ color: "#0073ea", fontSize: 13 }}>✓</span>}
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      <div
-        onClick={(e) => { e.stopPropagation(); onSelect(null); onClose(); }}
-        style={{ borderTop: `1px solid ${P.border}`, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
-        onMouseEnter={e => e.currentTarget.style.background = "#f5f6f8"}
-        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-      >
-        <div style={{ width: 24, height: 24, borderRadius: "50%", border: `1px dashed ${P.muted}`, display: "flex", alignItems: "center", justifyContent: "center", color: P.muted, fontSize: 12 }}>✕</div>
-        <span style={{ fontSize: 13, color: P.text }}>No project linked</span>
-      </div>
-    </DD>
-  );
+ 
 }
 
 function StatusPicker({ anchor, onSelect, onClose }) {
@@ -795,7 +728,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
             ref={inputRef}
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search or type a name..."
+            placeholder="Search employee..."
             onKeyDown={e => {
               if (e.key === "Enter" && search.trim()) {
                 handleSelect(search.trim(), e);
@@ -815,39 +748,11 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
         </div>
       </div>
 
-      {/* Add new person option when typing an unrecognized name */}
-      {isNewName && (
-        <div
-          onClick={(e) => handleSelect(search.trim(), e)}
-          style={{
-            display: "flex", alignItems: "center", gap: 10,
-            padding: "10px 14px", cursor: "pointer",
-            background: "#f0fdf4", borderBottom: `1px solid ${P.border}`,
-            margin: "4px 8px", borderRadius: 8
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = "#dcfce7"}
-          onMouseLeave={e => e.currentTarget.style.background = "#f0fdf4"}
-        >
-          <div style={{
-            width: 30, height: 30, borderRadius: "50%",
-            background: getAvatarColor(search.trim()),
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0
-          }}>
-            {search.trim().slice(0, 2).toUpperCase()}
-          </div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#166534" }}>
-              Assign "{search.trim()}"
-            </div>
-            <div style={{ fontSize: 11, color: "#4ade80" }}>Press Enter or click to assign</div>
-          </div>
-        </div>
-      )}
+
 
       {empList.length > 0 && (
-        <div style={{ padding: "8px 14px 4px", fontSize: 13, color: P.muted }}>
-          {search ? "Matching people" : "Suggested people"}
+        <div style={{ padding: "8px 14px 4px", fontSize: 11, fontWeight: 700, color: P.muted, textTransform: "uppercase", letterSpacing: 0.5 }}>
+          {search ? "Matching employees" : "Employees"}
         </div>
       )}
 
@@ -891,72 +796,9 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
           })
         )}
       </div>
-
-      <div
-        style={{ padding: "8px 14px 12px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
-        onClick={(e) => { e.stopPropagation(); onInvite(); onClose(); }}
-        onMouseEnter={e => e.currentTarget.style.background = "#f0f2f5"}
-        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-      >
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <span style={{ fontSize: 16 }}>👤</span>
-          <span style={{ fontSize: 10, position: 'relative', top: '2px', left: '-2px', fontWeight: 800 }}>+</span>
-        </div>
-        <span style={{ fontSize: 14, color: P.text }}>Invite a new member by email</span>
-      </div>
-
-      <div style={{
-        margin: "0 10px 8px", background: "#dbeafe", borderRadius: 8,
-        padding: "10px 14px", display: "flex", alignItems: "center",
-        justifyContent: "space-between", gap: 8
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 16 }}>🔔</span>
-          <span style={{ fontSize: 13, color: P.text }}>Assignees will be notified</span>
-        </div>
-        <button style={{
-          fontSize: 12, color: P.text, background: "transparent",
-          border: "1px solid #94a3b8", borderRadius: 4, padding: "4px 12px",
-          cursor: "pointer", fontFamily: "inherit"
-        }}>Mute</button>
-      </div>
-
-      {currentAssignee && (
-        <div
-          onClick={(e) => { e.stopPropagation(); onSelect(""); onClose(); }}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer" }}
-          onMouseEnter={e => e.currentTarget.style.background = "#fee2e2"}
-          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-        >
-          <div style={{
-            width: 24, height: 24, borderRadius: "50%",
-            border: `1px dashed #e2445c`, display: "flex",
-            alignItems: "center", justifyContent: "center",
-            color: "#e2445c", fontSize: 12
-          }}>✕</div>
-          <span style={{ fontSize: 13, color: "#e2445c", fontWeight: 500 }}>Unassign</span>
-        </div>
-      )}
-
-      <div style={{ borderTop: `1px solid ${P.border}` }}>
-        <div
-          onClick={(e) => { e.stopPropagation(); onAutoAssign(); onClose(); }}
-          style={{
-            padding: "12px", display: "flex", alignItems: "center",
-            justifyContent: "center", gap: 8, cursor: "pointer",
-            borderBottomLeftRadius: 10, borderBottomRightRadius: 10
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = "#f0f2f5"}
-          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-        >
-          <span style={{ fontSize: 16 }}>✨</span>
-          <span style={{ fontSize: 14, color: P.text }}>Auto-assign people</span>
-        </div>
-      </div>
     </DD>
   );
 }
-
 
 /* ══════════════════════════════════════════════════════════
    TOOLBAR BUTTON
@@ -1026,7 +868,8 @@ function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, on
               onFocus={e => e.target.style.borderColor = "#0073ea"}
               onBlur={e => e.target.style.borderColor = "#d0d4e4"} />
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, color: "#676879", fontWeight: 700, marginBottom: 6, letterSpacing: .4 }}>Task will be added to the first available group</div>
+
+
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
               <button onClick={() => setShowPicker(false)} style={{ background: "#f5f6f8", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 600, color: "#676879", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
@@ -1273,19 +1116,7 @@ function TabDotsMenu({ anchor, onClose, showToast, onAction }) {
     calc(); window.addEventListener("scroll", calc, true); window.addEventListener("resize", calc);
     return () => { window.removeEventListener("scroll", calc, true); window.removeEventListener("resize", calc); };
   }, [anchor]);
-  useEffect(() => { const h = e => { if (ref.current && !ref.current.contains(e.target) && !anchor?.current?.contains(e.target)) onClose(); }; document.addEventListener("mousedown", h); return () => document.removeEventListener("mousedown", h); }, [anchor, onClose]);
-  return (
-    <div ref={ref} style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 9500, background: "#fff", border: "1px solid #e6e9ef", borderRadius: 12, boxShadow: "0 8px 36px rgba(0,0,0,0.14)", fontFamily: "inherit", animation: "ddIn .12s ease", width: 250, overflow: "hidden", padding: "4px 0" }}>
-      {[{ icon: "📌", label: "Pin view", action: "pin" },
-      { icon: "✏️", label: "Rename view", action: "rename" },
-      { icon: "🔗", label: "Share view", action: "share" }].map(item => (
-        <div key={item.label} onClick={() => { onAction(item.action); onClose(); }} style={{ display: "flex", alignItems: "center", gap: 11, padding: "9px 16px", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.background = "#f5f6f8"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-          <span style={{ fontSize: 15, width: 20, textAlign: "center" }}>{item.icon}</span>
-          <span style={{ fontSize: 13, color: "#323338" }}>{item.label}</span>
-        </div>
-      ))}
-    </div>
-  );
+
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1308,7 +1139,7 @@ function FilterMenu({ anchor, onClose, groups, filters, onToggle, onClear }) {
       </div>
       <div style={{ display: "flex", gap: 0, padding: "14px 20px", overflowX: "auto" }}>
         <div style={{ minWidth: 160, flexShrink: 0, paddingRight: 14, borderRight: "1px solid #f0f1f4", marginRight: 14 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: "#9aadbd", letterSpacing: .7, textTransform: "uppercase", marginBottom: 8 }}>Owner</div>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "#9aadbd", letterSpacing: .7, textTransform: "uppercase", marginBottom: 8 }}>Employee</div>
           {owners.map(o => { const on = filters.owner.has(o); return (<div key={o} onClick={() => onToggle("owner", o)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "#0073ea" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>{on ? "✓" : ""}</div><span style={{ fontSize: 13, color: on ? "#0073ea" : "#323338", fontWeight: on ? 600 : 400 }}>{o}</span></div>); })}</div>
         <div style={{ minWidth: 160, flexShrink: 0 }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: "#9aadbd", letterSpacing: .7, textTransform: "uppercase", marginBottom: 8 }}>Status</div>
@@ -1324,7 +1155,7 @@ function FilterMenu({ anchor, onClose, groups, filters, onToggle, onClear }) {
 ══════════════════════════════════════════════════════════ */
 function HideMenu({ anchor, onClose, extraCols, hiddenCols, onToggleHide }) {
   const ref = useRef(); const [pos, setPos] = useState({ top: 0, left: 0 }); const [search, setSearch] = useState("");
-  const builtins = [{ id: "person", label: "Owner", bg: "#0073ea", icon: "👤" }, { id: "status", label: "Status", bg: "#00c875", icon: "≡" }, { id: "date", label: "Due date", bg: "#7c3aed", icon: "📅" }];
+  const builtins = [{ id: "person", label: "Employee", bg: "#0073ea", icon: "👤" }, { id: "status", label: "Status", bg: "#00c875", icon: "≡" }, { id: "date", label: "Due date", bg: "#7c3aed", icon: "📅" }];
   const allCols = [...builtins, ...(extraCols || []).map(ec => ({ id: ec.id, label: ec.label, bg: P.accent, icon: "📝" }))];
   const filtered = allCols.filter(c => !search || c.label.toLowerCase().includes(search.toLowerCase()));
   useEffect(() => { const calc = () => { if (anchor?.current) { const r = anchor.current.getBoundingClientRect(); let left = r.left; if (left + 290 > window.innerWidth - 8) left = window.innerWidth - 298; setPos({ top: r.bottom + 4, left }); } }; calc(); window.addEventListener('scroll', calc, true); window.addEventListener('resize', calc); return () => { window.removeEventListener('scroll', calc, true); window.removeEventListener('resize', calc); }; }, [anchor]);
@@ -1355,7 +1186,7 @@ function SortMenu({ anchor, sort, onSort, onClose }) {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px 10px", borderBottom: "1px solid #eef0f4" }}><span style={{ fontSize: 14, fontWeight: 800, color: "#323338" }}>Sort by</span><button onClick={onClose} style={{ background: "#fff", border: "1px solid #d0d4e4", borderRadius: 8, padding: "5px 14px", fontSize: 12, fontWeight: 600, color: "#323338", cursor: "pointer", fontFamily: "inherit" }}>Close</button></div>
       <div style={{ padding: "14px 20px" }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <select value={col} onChange={e => { setCol(e.target.value); apply(e.target.value, dir); }} style={{ flex: 1, border: "1px solid #d0d4e4", borderRadius: 7, padding: "8px 11px", fontSize: 13, fontFamily: "inherit", color: "#323338", outline: "none", background: "#fff" }}><option value="">Choose column</option>{["Name", "Owner", "Status", "Due date", "Priority"].map(o => <option key={o}>{o}</option>)}</select>
+          <select value={col} onChange={e => { setCol(e.target.value); apply(e.target.value, dir); }} style={{ flex: 1, border: "1px solid #d0d4e4", borderRadius: 7, padding: "8px 11px", fontSize: 13, fontFamily: "inherit", color: "#323338", outline: "none", background: "#fff" }}><option value="">Choose column</option>{["Name", "Employee", "Status", "Due date", "Priority"].map(o => <option key={o}>{o}</option>)}</select>
           <select value={dir} onChange={e => { setDir(e.target.value); if (col) apply(col, e.target.value); }} style={{ width: 160, border: "1px solid #d0d4e4", borderRadius: 7, padding: "8px 11px", fontSize: 13, fontFamily: "inherit", color: "#323338", outline: "none", background: "#fff" }}><option>Ascending</option><option>Descending</option></select>
         </div>
         {sort && <span onClick={() => { onSort(null); onClose(); }} style={{ fontSize: 12, color: "#e2445c", cursor: "pointer", fontWeight: 600, display: "block", marginTop: 10 }}>Clear sort</span>}
@@ -1526,8 +1357,7 @@ function ProjectCell({ task, projects, onField }) {
         alignItems: "center",
         gap: 6
       }}>
-        <span style={{ fontSize: 14 }}>{project ? "📁" : "+"}</span>
-        <span>{project ? project.name : "Link project"}</span>
+
       </div>
 
       {/* ✅ open true ஆனா மட்டும் show */}
@@ -1555,117 +1385,60 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
   const [spOpen, setSpOpen] = useState(false); const [ppOpen, setPpOpen] = useState(false);
   const [dotsOpen, setDotsOpen] = useState(false); const [personOpen, setPersonOpen] = useState(false);
   const [isCustomEditing, setIsCustomEditing] = useState(false);
+  const [isCustomPriorityEditing, setIsCustomPriorityEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
   const id = task._id || task.id;
   const sc = STATUS_CFG[task.status] || STATUS_CFG["Not Started"];
   const hcSet = hiddenCols || new Set();
   const cols = (extraCols || []).filter(c => !hcSet.has(c.id));
   const priorityVal = task.priority || "—";
-  const pc = PRIORITY_CFG[priorityVal] || PRIORITY_CFG["—"];
+  const pc = PRIORITY_CFG[priorityVal] || { bg: "#64748b", fg: "#fff" };
   const bg = selected ? "rgba(147,51,234,0.06)" : hovered ? P.hover : "#fff";
 
   return (
     <div className="trow" style={{ display: "flex", alignItems: "stretch", borderBottom: "1px solid " + P.border, minWidth: "max-content", background: bg }} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      {/* checkbox */}
-      <div style={{ width: COL_W.checkbox, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: bg, borderRight: "1px solid " + P.border, display: "flex", alignItems: "center", justifyContent: "center", transition: "background .1s" }}>
-        <div onClick={() => onCheck(id)} style={{ width: 15, height: 15, borderRadius: 4, cursor: "pointer", border: task.checked ? "none" : "1.5px solid " + P.muted, background: task.checked ? P.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700 }}>{task.checked && "✓"}</div>
-      </div>
+      {/* checkbox removed */}
       {/* task name */}
-      <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: COL_W.checkbox, zIndex: 10, background: bg, boxShadow: hovered ? "2px 0 8px rgba(0,0,0,0.07)" : "2px 0 4px rgba(0,0,0,0.04)", display: "flex", alignItems: "center", gap: 4, padding: "0 6px 0 0", transition: "background .1s" }}>
+      <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: bg, boxShadow: hovered ? "2px 0 8px rgba(0,0,0,0.07)" : "2px 0 4px rgba(0,0,0,0.04)", display: "flex", alignItems: "center", gap: 4, padding: "0 6px 0 0", transition: "background .1s" }}>
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: groupColor, flexShrink: 0 }} />
         <input key={task.title} defaultValue={task.title} onBlur={e => { const v = e.target.value.trim(); if (v && v !== task.title) onField(id, "title", v); }} style={{ background: "transparent", border: "none", outline: "none", fontSize: 13, color: P.text, fontFamily: "inherit", width: "100%", padding: "9px 4px 9px 10px", textDecoration: task.checked ? "line-through" : "none", opacity: task.checked ? .5 : 1, fontWeight: 500, cursor: "pointer" }} onFocus={e => { e.target.style.background = "#fff"; e.target.style.boxShadow = "0 0 0 2px " + P.accent + "33"; e.target.style.borderRadius = "4px"; }} onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} />
-        <button className="openBtn" onClick={e => { e.stopPropagation(); onOpen(task); }} style={{ opacity: 0, background: "#e8f4fd", border: "1px solid #c3d9f0", borderRadius: 6, cursor: "pointer", width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#0073ea", flexShrink: 0, transition: "opacity .15s", fontWeight: 700 }}>↗</button>
       </div>
-      {/* project */}
-      {!hcSet.has('project') && (
-        <ProjectCell task={task} projects={projects} onField={onField} />
-      )}
       {/* person */}
       {!hcSet.has('person') && (
-        <div
-          ref={personRef}
-          onClick={() => setPersonOpen(v => !v)}
-          style={{
-            width: COL_W.person,
-            flexShrink: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRight: "1px solid " + P.border,
-            padding: "0 8px",
-            cursor: "pointer"
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = P.light}
-          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-        >
-          {task.assignTo && task.assignTo !== "Unassigned" ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{
-                width: 28,
-                height: 28,
-                borderRadius: "50%",
-                background: getAvatarColor(task.assignTo),
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#fff",
-                fontSize: 10,
-                fontWeight: 700,
-                flexShrink: 0,
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                border: "1.5px solid #fff"
-              }}>
-                {task.assignTo.slice(0, 2).toUpperCase()}
+        <div style={{ width: COL_W.person, flexShrink: 0, display: "flex", alignItems: "stretch", borderRight: "1px solid " + P.border }}>
+          <div
+            ref={personRef}
+            onClick={() => setPersonOpen(v => !v)}
+            style={{
+              flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              cursor: "pointer", background: "transparent",
+              transition: "background 0.2s"
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.02)"}
+            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+          >
+            {task.assignee ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{
+                  width: 24, height: 24, borderRadius: "50%",
+                  background: getAvatarColor(task.assignee),
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#fff", fontSize: 9, fontWeight: 700
+                }}>{task.assignee.slice(0, 2).toUpperCase()}</div>
+                <span style={{ fontSize: 12, fontWeight: 500, color: P.text }}>{task.assignee}</span>
               </div>
-              <span style={{
-                fontSize: 12,
-                color: P.mid,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                maxWidth: 95
-              }}>
-                {task.assignTo}
-              </span>
-              <button
-                onClick={(e) => { e.stopPropagation(); onField(id, "assignTo", "Unassigned"); }}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#ef4444",
-                  fontSize: 12,
-                  cursor: "pointer",
-                  padding: "0 2px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  opacity: 0.6,
-                  transition: "opacity 0.2s"
-                }}
-                onMouseEnter={e => e.currentTarget.style.opacity = 1}
-                onMouseLeave={e => e.currentTarget.style.opacity = 0.6}
-                title="Unassign"
-              >
-                ✕
-              </button>
-            </div>
-          ) : (
-            <div style={{
-              width: 28,
-              height: 28,
-              borderRadius: "50%",
-              border: "1.5px dashed " + P.muted,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: P.muted,
-              fontSize: 14,
-              background: P.light
-            }}>+</div>
-          )}
+            ) : (
+              <div style={{
+                width: 26, height: 26, borderRadius: "50%",
+                border: "1px dashed #c5c9d6", display: "flex",
+                alignItems: "center", justifyContent: "center",
+                color: "#c5c9d6", fontSize: 14
+              }}>+</div>
+            )}
+          </div>
+          {personOpen && <PersonPicker anchor={personRef} employees={employees} currentAssignee={task.assignee} onSelect={v => onField(id, "assignee", v)} onClose={() => setPersonOpen(false)} onInvite={() => onInvite && onInvite()} onAutoAssign={() => onAutoAssign && onAutoAssign(task)} />}
         </div>
       )}
-      {personOpen && <PersonPicker anchor={personRef} onSelect={v => onField(id, "assignTo", v)} onClose={() => setPersonOpen(false)} employees={employees} currentAssignee={task.assignTo && task.assignTo !== "Unassigned" ? task.assignTo : ""} onInvite={() => onInvite(task)} onAutoAssign={() => onAutoAssign(task)} />}
       {/* status */}
       {!hcSet.has('status') && (
         <div style={{ width: COL_W.status, flexShrink: 0, display: "flex", alignItems: "stretch", borderRight: "1px solid " + P.border }}>
@@ -1772,24 +1545,74 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
         <div style={{ width: COL_W.priority_col, flexShrink: 0, display: "flex", alignItems: "stretch", borderRight: "1px solid " + P.border }}>
           <div
             ref={priorityRef}
-            onClick={() => setPpOpen(v => !v)}
+            onClick={() => { if (!isCustomPriorityEditing) setPpOpen(v => !v); }}
             style={{
               flex: 1,
               background: pc.bg,
               color: pc.fg,
               fontSize: 12,
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: isCustomPriorityEditing ? "text" : "pointer",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
+              transition: "background 0.2s"
             }}
-            onMouseEnter={e => e.currentTarget.style.opacity = ".85"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+            onMouseEnter={e => { if (!isCustomPriorityEditing) e.currentTarget.style.opacity = ".85"; }}
+            onMouseLeave={e => { if (!isCustomPriorityEditing) e.currentTarget.style.opacity = "1"; }}
           >
-            {priorityVal}
+            {isCustomPriorityEditing ? (
+              <input
+                autoFocus
+                defaultValue=""
+                placeholder="Type priority..."
+                onBlur={e => {
+                  const v = e.target.value.trim();
+                  if (v && v !== task.priority) onPriority(id, v);
+                  setIsCustomPriorityEditing(false);
+                }}
+                onKeyDown={e => {
+                  if (e.key === "Enter") e.target.blur();
+                  if (e.key === "Escape") setIsCustomPriorityEditing(false);
+                }}
+                style={{
+                  flex: 1, background: "transparent", border: "none", outline: "none",
+                  fontSize: 11, fontWeight: 800, color: "inherit", textAlign: "center",
+                  width: "100%", padding: "0 4px", fontFamily: "inherit"
+                }}
+              />
+            ) : (
+              <div style={{
+                flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 11, fontWeight: 800, padding: "0 4px", userSelect: "none"
+              }}>
+                {priorityVal}
+              </div>
+            )}
+            {!isCustomPriorityEditing && (
+              <div
+                style={{
+                  width: 18,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "rgba(0,0,0,0.1)",
+                  fontSize: 10,
+                  flexShrink: 0
+                }}
+              >
+                ▾
+              </div>
+            )}
           </div>
-          {ppOpen && <PriorityPicker anchor={priorityRef} currentValue={priorityVal} onSelect={v => { onPriority(id, v); setPpOpen(false); }} onClose={() => setPpOpen(false)} />}
+          {ppOpen && <PriorityPicker anchor={priorityRef} currentValue={priorityVal} onSelect={v => {
+            if (v === "Manual") {
+              setIsCustomPriorityEditing(true);
+            } else {
+              onPriority(id, v);
+            }
+            setPpOpen(false);
+          }} onClose={() => setPpOpen(false)} />}
         </div>
       )}
       {/* extra cols */}
@@ -1812,47 +1635,44 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
           />
         </div>
       ))}
-      {/* + col placeholder */}
-      <div style={{ width: COL_W.addcol, flexShrink: 0, borderRight: "1px solid " + P.border }} />
       {/* dots */}
-      <div style={{ width: COL_W.dots, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+      <div style={{ width: COL_W.dots, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         <button
           onClick={e => { e.stopPropagation(); onDel(id); }}
           style={{
-            background: "linear-gradient(135deg,#ef4444,#dc2626)",
-            border: "none",
-            borderRadius: 4,
-            padding: "2px 8px",
-            height: 22,
+            background: "#ffefef",
+            border: "1px solid #ffcfcf",
+            borderRadius: 6,
+            padding: "4px 10px",
+            height: 26,
             cursor: "pointer",
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
-            color: "#fff",
+            color: "#e2445c",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             gap: 4,
-            boxShadow: "0 2px 6px rgba(239,68,68,0.3)",
             transition: "all 0.2s",
             opacity: hovered ? 1 : 0.6
           }}
           onMouseEnter={e => {
-            e.currentTarget.style.transform = "scale(1.1)";
+            e.currentTarget.style.background = "#ffe0e0";
             e.currentTarget.style.opacity = "1";
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.background = "#ffefef";
             e.currentTarget.style.opacity = hovered ? "1" : "0.6";
           }}
         >
-          🗑 Delete
+           Delete
         </button>
         <div ref={dotsRef} onClick={e => { e.stopPropagation(); setDotsOpen(v => !v); }} style={{ width: 26, height: 26, borderRadius: 5, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: P.muted, letterSpacing: 1, userSelect: "none" }} onMouseEnter={e => e.currentTarget.style.background = P.border} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>···</div>
         {dotsOpen && (<DD anchor={dotsRef} onClose={() => setDotsOpen(false)} w={180}>
           <MI icon="⎘" title="Duplicate" onClick={() => { onDup(task); setDotsOpen(false); }} />
           <MI icon="💬" title="Share WhatsApp" onClick={() => { shareTask(task); setDotsOpen(false); }} />
           <Sep />
-          <MI icon="🗑" title="Delete task" danger onClick={() => { onDel(id); setDotsOpen(false); }} />
+          <MI title="Delete task" danger onClick={() => { onDel(id); setDotsOpen(false); }} />
         </DD>)}
       </div>
     </div>
@@ -1875,7 +1695,7 @@ function TaskUpdatePanel({ task, onClose, onField }) {
           </div>
         </div>
         <div style={{ display: "flex", gap: 0 }}>
-          {["updates", "files", "activity"].map(t => (<div key={t} onClick={() => setTab(t)} style={{ padding: "8px 14px", fontSize: 13, fontWeight: tab === t ? 700 : 500, color: tab === t ? P.text : P.muted, borderBottom: tab === t ? `2px solid ${P.accent}` : "2px solid transparent", cursor: "pointer", textTransform: "capitalize" }}>{t}</div>))}
+          {["updates", "", ""].map(t => (<div key={t} onClick={() => setTab(t)} style={{ padding: "8px 14px", fontSize: 13, fontWeight: tab === t ? 700 : 500, color: tab === t ? P.text : P.muted, borderBottom: tab === t ? `2px solid ${P.accent}` : "2px solid transparent", cursor: "pointer", textTransform: "capitalize" }}>{t}</div>))}
         </div>
       </div>
       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
@@ -1937,7 +1757,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
   const hcSet = hiddenCols || new Set();
   const visibleExtraCols = (extraCols || []).filter(c => !hcSet.has(c.id));
   const submit = () => { if (!newTitle.trim()) { setAdding(false); return; } onAddTask(gid, newTitle.trim()); setNewTitle(""); setAdding(false); };
-  const totalW = COL_W.checkbox + COL_W.task + (!hcSet.has('project') ? COL_W.project : 0) + (!hcSet.has('person') ? COL_W.person : 0) + (!hcSet.has('status') ? COL_W.status : 0) + (!hcSet.has('date') ? COL_W.date : 0) + (!hcSet.has('priority_col') ? COL_W.priority_col : 0) + visibleExtraCols.reduce((s, c) => s + extraColWidth(c.type), 0) + COL_W.addcol + COL_W.dots;
+  const totalW = COL_W.task + (!hcSet.has('person') ? COL_W.person : 0) + (!hcSet.has('status') ? COL_W.status : 0) + (!hcSet.has('date') ? COL_W.date : 0) + (!hcSet.has('priority_col') ? COL_W.priority_col : 0) + visibleExtraCols.reduce((s, c) => s + extraColWidth(c.type), 0) + COL_W.dots;
 
   return (
     <div style={{ marginBottom: 16 }}>
@@ -1948,7 +1768,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
           <span style={{ fontSize: 14, fontWeight: 700, color: group.color, flex: 1 }}>{group.label}</span>
           <span style={{ fontSize: 11, color: P.muted, background: "#fff", border: `1px solid ${P.border}`, borderRadius: 10, padding: "1px 8px", fontWeight: 600 }}>{tasks.length} items</span>
           <span style={{ fontSize: 11, color: "#00c875", fontWeight: 600 }}>{done} done</span>
-          {!isVirtual && (<button onClick={e => { e.stopPropagation(); onDelGroup(gid); }} style={{ background: "#fee2e2", border: "1px solid #fecaca", cursor: "pointer", color: "#ef4444", fontSize: 11, padding: "4px 8px", borderRadius: 6, fontWeight: 700, display: "flex", gap: 4, alignItems: "center", transition: "all .15s" }} onMouseEnter={e => { e.currentTarget.style.background = "#fecaca" }} onMouseLeave={e => { e.currentTarget.style.background = "#fee2e2" }}>🗑 Delete</button>)}
+          {!isVirtual && (<button onClick={e => { e.stopPropagation(); onDelGroup(gid); }} style={{ background: "#fee2e2", border: "1px solid #fecaca", cursor: "pointer", color: "#ef4444", fontSize: 11, padding: "4px 8px", borderRadius: 6, fontWeight: 700, display: "flex", gap: 4, alignItems: "center", transition: "all .15s" }} onMouseEnter={e => { e.currentTarget.style.background = "#fecaca" }} onMouseLeave={e => { e.currentTarget.style.background = "#fee2e2" }}>Delete</button>)}
         </div>
       </div>
 
@@ -1959,10 +1779,10 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
 
               {/* Column headers */}
               <div style={{ display: "flex", alignItems: "stretch", background: P.light, borderBottom: `1.5px solid ${P.border}`, minWidth: "max-content" }}>
-                <div style={{ width: COL_W.checkbox, flexShrink: 0, position: "sticky", left: 0, zIndex: 20, background: P.light, borderRight: `1px solid ${P.border}` }} />
-                <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: COL_W.checkbox, zIndex: 20, background: P.light, borderRight: `1px solid ${P.border}`, boxShadow: "2px 0 4px rgba(0,0,0,0.04)", fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, letterSpacing: 0.3, display: "flex", alignItems: "center" }}>Task</div>
-                {!hcSet.has('project') && <div style={{ width: COL_W.project, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Project</div>}
+                <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 20, background: P.light, borderRight: `1px solid ${P.border}`, boxShadow: "2px 0 4px rgba(0,0,0,0.04)", fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, letterSpacing: 0.3, display: "flex", alignItems: "center" }}>Task</div>
+
                 {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Employee</div>}
+
                 {!hcSet.has('status') && <div style={{ width: COL_W.status, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Status <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
 
                 {!hcSet.has('date') && <div style={{ width: COL_W.date, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Due date <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
@@ -1972,7 +1792,6 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                     <ColHeader col={col} onRename={onRenameCol} onDelete={onDeleteCol} onMoveLeft={() => onMoveCol && onMoveCol(col.id, "left")} onMoveRight={() => onMoveCol && onMoveCol(col.id, "right")} canMoveLeft={(extraCols || []).findIndex(x => x.id === col.id) > 0} canMoveRight={(extraCols || []).findIndex(x => x.id === col.id) < (extraCols || []).length - 1} />
                   </div>
                 ))}
-                <div onClick={onAddCol} style={{ width: COL_W.addcol, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", borderRight: `1px solid ${P.border}`, cursor: "pointer", color: P.muted, fontSize: 16, fontWeight: 300 }} onMouseEnter={e => { e.currentTarget.style.background = P.hover; e.currentTarget.style.color = P.accent; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = P.muted; }}>+</div>
                 <div style={{ width: COL_W.dots, flexShrink: 0 }} />
               </div>
 
@@ -1991,19 +1810,17 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
 
               {!isVirtual && (adding ? (
                 <div style={{ display: "flex", alignItems: "stretch", borderTop: `1px solid ${P.border}`, background: P.light, minHeight: 40, minWidth: "max-content" }}>
-                  <div style={{ width: COL_W.checkbox, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: P.light, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ width: 15, height: 15, borderRadius: 4, border: `1.5px solid ${P.muted}` }} /></div>
-                  <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: COL_W.checkbox, zIndex: 10, background: P.light, borderRight: `1px solid ${P.border}`, padding: "6px 8px", display: "flex", gap: 6, alignItems: "center" }}>
+                  <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: P.light, borderRight: `1px solid ${P.border}`, padding: "6px 8px", display: "flex", gap: 6, alignItems: "center" }}>
                     <input autoFocus placeholder="Task name…" value={newTitle} onChange={e => setNewTitle(e.target.value)} onKeyDown={e => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setNewTitle(""); } }} style={{ flex: 1, border: `1.5px solid ${P.accent}`, borderRadius: 6, padding: "5px 9px", fontSize: 13, fontFamily: "inherit", outline: "none", color: P.text, background: "#fff" }} />
                     <button onClick={submit} style={{ background: `linear-gradient(135deg,${P.accent},#a855f7)`, color: "#fff", border: "none", borderRadius: 6, padding: "5px 13px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Add</button>
                     <button onClick={() => { setAdding(false); setNewTitle(""); }} style={{ background: "#fff", color: P.mid, border: `1px solid ${P.border}`, borderRadius: 6, padding: "5px 9px", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>✕</button>
                   </div>
-                  {!hcSet.has('project') && <div style={{ width: COL_W.project, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {!hcSet.has('status') && <div style={{ width: COL_W.status, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {!hcSet.has('date') && <div style={{ width: COL_W.date, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {!hcSet.has('priority_col') && <div style={{ width: COL_W.priority_col, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                   {visibleExtraCols.map(c => <div key={c.id} style={{ width: extraColWidth(c.type), flexShrink: 0, borderRight: `1px solid ${P.border}` }} />)}
-                  <div style={{ width: COL_W.addcol, flexShrink: 0, borderRight: `1px solid ${P.border}` }} /><div style={{ width: COL_W.dots, flexShrink: 0 }} />
+                  <div style={{ width: COL_W.dots, flexShrink: 0 }} />
                 </div>
               ) : (
                 <div onClick={() => setAdding(true)} className="add-task-row" style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 10px", cursor: "pointer", color: "#676879", fontSize: 13, borderTop: `1px solid ${P.border}`, background: "#fff", minWidth: "max-content" }} onMouseEnter={e => e.currentTarget.style.background = "#f0f7ff"} onMouseLeave={e => e.currentTarget.style.background = "#fff"}>
@@ -2023,12 +1840,10 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                 const priorityFilled = tasks.filter(t => t.priority && t.priority !== "—").length;
                 return (
                   <div style={{ display: "flex", alignItems: "stretch", borderTop: `1.5px solid ${P.border}`, background: "#fafafa", minWidth: "max-content", minHeight: 38 }}>
-                    <div style={{ width: COL_W.checkbox, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: "#fafafa", borderRight: `1px solid ${P.border}` }} />
-                    <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: COL_W.checkbox, zIndex: 10, background: "#fafafa", borderRight: `1px solid ${P.border}`, boxShadow: "2px 0 4px rgba(0,0,0,0.04)", padding: "0 10px", display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: "#fafafa", borderRight: `1px solid ${P.border}`, boxShadow: "2px 0 4px rgba(0,0,0,0.04)", padding: "0 10px", display: "flex", alignItems: "center", gap: 6 }}>
                       <StatusBarWithTooltip statusCounts={statusCounts} total={total} />
                       <span style={{ fontSize: 11, color: "#9aadbd", fontWeight: 600, flexShrink: 0 }}>{doneCnt}/{total}</span>
                     </div>
-                    {!hcSet.has('project') && <div style={{ width: COL_W.project, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                     {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />}
                     {!hcSet.has('status') && (<div style={{ width: COL_W.status, flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 8px", gap: 6 }}><StatusBarWithTooltip statusCounts={statusCounts} total={total} /><span style={{ fontSize: 11, color: "#9aadbd", fontWeight: 600, flexShrink: 0 }}>{doneCnt}/{total}</span></div>)}
                     {!hcSet.has('date') && (<div style={{ width: COL_W.date, flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2px 8px" }}>{!earliestFmt ? <span style={{ fontSize: 10, color: "#c5c9d6" }}>–</span> : sameDate ? <><span style={{ fontSize: 13, color: "#323338", fontWeight: 700, lineHeight: 1.3 }}>{latestFmt}</span><span style={{ fontSize: 10, color: "#9aadbd" }}>latest</span></> : <><div style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ fontSize: 12, color: "#323338", fontWeight: 700 }}>{earliestFmt}</span><span style={{ fontSize: 10, color: "#c5c9d6" }}>–</span><span style={{ fontSize: 12, color: "#323338", fontWeight: 700 }}>{latestFmt}</span></div><div style={{ display: "flex", alignItems: "center", gap: 3 }}><span style={{ fontSize: 9, color: "#9aadbd" }}>earliest</span><span style={{ fontSize: 9, color: "#c5c9d6" }}>to</span><span style={{ fontSize: 9, color: "#9aadbd" }}>latest</span></div></>}</div>)}
@@ -2045,7 +1860,6 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                       if (col.type === "rating") { const rated = tasks.filter(t => Number((t.extraData || {})[col.id]) > 0); const avg = rated.length ? Math.round(rated.reduce((a, t) => a + Number((t.extraData || {})[col.id] || 0), 0) / rated.length) : 0; return (<div key={col.id} style={{ width: extraColWidth(col.type), flexShrink: 0, borderRight: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", gap: 3 }}>{avg > 0 && <><span style={{ fontSize: 12, color: "#f59e0b" }}>{"★".repeat(avg)}</span><span style={{ fontSize: 10, color: "#9aadbd" }}>{rated.length}</span></>}</div>); }
                       return <div key={col.id} style={{ width: extraColWidth(col.type), flexShrink: 0, borderRight: `1px solid ${P.border}` }} />;
                     })}
-                    <div style={{ width: COL_W.addcol, flexShrink: 0, borderRight: `1px solid ${P.border}` }} />
                     <div style={{ width: COL_W.dots, flexShrink: 0 }} />
                   </div>
                 );
@@ -2260,6 +2074,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
         assignTo: "Unassigned", 
         groupId, 
         status: "Not Started",
+        priority: "—",
         projectId: projId
       }); 
       setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === tmp._id ? r.data : t) } : g)); 
@@ -2293,7 +2108,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
 
   const importTasks = async (tasks) => { const first = groups[0]; if (!first) { showToast("Add a group first", "error"); return; } const gid = first._id || first.id; for (const t of tasks) await addTask(gid, t.title || "Imported task"); showToast(`${tasks.length} tasks imported!`); };
 
-  const delGroup = async (id) => { const snap = groups; setGroups(p => p.filter(g => (g._id || g.id) !== id)); onUpdate?.(); try { await axios.delete(`${API}/groups/${id}`); showToast("Group deleted"); } catch { setGroups(snap); showToast("Failed", "error"); } };
+  const delGroup = async (id) => { const snap = groups; setGroups(p => p.filter(g => (g._id || g.id) !== id)); onUpdate?.(); try { await axios.delete(`${API}/groups/${id}`); showToast("Task deleted"); } catch { setGroups(snap); showToast("Failed", "error"); } };
 
   const handleAutoAssign = async (task) => {
     try {
@@ -2401,7 +2216,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
         <div style={{ background: "#fff", borderBottom: `1px solid ${P.border}`, padding: "8px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 4px rgba(124,58,237,0.05)", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 22, fontWeight: 800, color: P.text, letterSpacing: -0.5 }}>Task</span>
-            <span style={{ fontSize: 13, color: P.muted }}>▾</span>
+
             <div style={{ display: "flex", alignItems: "center", gap: 0, marginLeft: 8 }}>
 
               {/* ── VIEW SWITCHER BUTTON ── */}
@@ -2420,13 +2235,6 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
                   onClose={() => setViewOpen(false)}
                 />
               )}
-
-              <div ref={tabDotsRef} onClick={() => { closeAll(); setTabDotsOpen(v => !v); }}
-                style={{ padding: "5px 8px", fontSize: 14, color: tabDotsOpen ? "#0073ea" : P.muted, cursor: "pointer", marginLeft: 2, borderRadius: 7, background: tabDotsOpen ? "#e8f4fd" : "transparent", border: `1px solid ${tabDotsOpen ? "#c3d9f0" : "transparent"}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>···</div>
-              {tabDotsOpen && <TabDotsMenu anchor={tabDotsRef} onClose={() => setTabDotsOpen(false)} showToast={showToast} onAction={handleViewAction} />}
-
-              <div ref={addViewRef} onClick={() => { closeAll(); setAddViewOpen(v => !v); }}
-                style={{ width: 30, height: 30, borderRadius: 7, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 400, background: addViewOpen ? "#e8f4fd" : "transparent", border: `1px solid ${addViewOpen ? "#c3d9f0" : "transparent"}`, color: addViewOpen ? "#0073ea" : P.muted }}>+</div>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -2442,9 +2250,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
             <NewTaskBtn onAddTask={addNewTask} onTriggerGroup={() => addGroupTrigger.current?.trigger()} showToast={showToast} onImport={() => setShowImport(true)} groups={groups} onAddTaskToGroup={addTask} setGroups={setGroups} />
             <div style={{ width: 1, height: 22, background: P.border, margin: "0 4px", flexShrink: 0 }} />
             <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: P.text, marginRight: 8, background: P.light, padding: "4px 10px", borderRadius: 8, border: `1px solid ${P.border}` }}>
-                {selectedProjectName ? `📂 Project: ${selectedProjectName}` : "🌐 All Tasks"}
-              </div>
+           
               
               <div style={{ position: "relative", flexShrink: 0 }}>
                 <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, pointerEvents: "none", color: P.muted }}>🔍</span>
@@ -2457,7 +2263,6 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
             {personOpen && <PersonFilterPanel anchor={personRef} onClose={() => setPersonOpen(false)} groups={groups} filters={filters} onToggle={toggleFilter} onClear={() => setFilters(p => ({ ...p, owner: new Set() }))} />}
             <TB ref={filterRef} icon="▽" label="Filter" active={filters.status.size > 0} badge={filters.status.size > 0 ? filters.status.size : null} onClick={() => { closeAll(); setFilterOpen(v => !v); }} />
             {filterOpen && <FilterMenu anchor={filterRef} groups={groups} filters={filters} onToggle={toggleFilter} onClear={clearFilters} onClose={() => setFilterOpen(false)} />}
-            <TB ref={sortRef} icon="↕" label="Sort" active={!!sort} onClick={() => { closeAll(); setSortOpen(v => !v); }} />
             {sortOpen && <SortMenu anchor={sortRef} sort={sort} onSort={setSort} onClose={() => setSortOpen(false)} />}
             <TB ref={hideRef} icon="👁" label="Hide" active={hiddenCols.size > 0} badge={hiddenCols.size > 0 ? hiddenCols.size : null} onClick={() => { closeAll(); setHideOpen(v => !v); }} />
             {hideOpen && <HideMenu anchor={hideRef} onClose={() => setHideOpen(false)} extraCols={extraCols} hiddenCols={hiddenCols} onToggleHide={toggleHideCol} />}
@@ -2510,7 +2315,6 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
                     onInvite={setInviteTask} onAutoAssign={handleAutoAssign} projects={projects}
                     shareTask={shareTask} />
                 ))}
-                {groupBy === "default" && <AddGroupRow onAdd={addGroup} triggerRef={addGroupTrigger} />}
               </div>
             )
           )}

@@ -1270,7 +1270,7 @@ function ColHeader({ col, onRename, onDelete, onMoveLeft, onMoveRight, canMoveLe
       <span style={{ fontSize: 11 }}>{ct.icon}</span>
       <span style={{ fontSize: 11, color: P.muted, fontWeight: 700, letterSpacing: 0.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 70 }}>{col.label}</span>
       <div ref={menuRef} onClick={e => { e.stopPropagation(); setMenuOpen(v => !v); }} className="col-menu-btn" style={{ width: 13, height: 13, borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 9, color: P.muted, opacity: 0, transition: "opacity .1s", flexShrink: 0 }}>▾</div>
-      {menuOpen && (<DD anchor={menuRef} onClose={() => setMenuOpen(false)} w={160}><MI icon="✏️" title="Rename" onClick={() => { setEditing(true); setMenuOpen(false); }} />{canMoveLeft && <MI icon="‹" title="Move left" onClick={() => { onMoveLeft(); setMenuOpen(false); }} />}{canMoveRight && <MI icon="›" title="Move right" onClick={() => { onMoveRight(); setMenuOpen(false); }} />}<Sep /><MI icon="🗑" title="Delete column" danger onClick={() => { onDelete(col.id); setMenuOpen(false); }} /></DD>)}
+      {menuOpen && (<DD anchor={menuRef} onClose={() => setMenuOpen(false)} w={160}><MI icon="✏️" title="Rename" onClick={() => { setEditing(true); setMenuOpen(false); }} />{canMoveLeft && <MI icon="‹" title="Move left" onClick={() => { onMoveLeft(); setMenuOpen(false); }} />}{canMoveRight && <MI icon="›" title="Move right" onClick={() => { onMoveRight(); setMenuOpen(false); }} />}<Sep /><MI icon="   🗑️️️️️️️️️️️️️️️" title="Delete column" danger onClick={() => { onDelete(col.id); setMenuOpen(false); }} /></DD>)}
     </div>
   );
 }

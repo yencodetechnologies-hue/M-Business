@@ -14,10 +14,9 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST add employee
 router.post("/add", async (req, res) => {
   try {
-    const { name, email, phone, role, department, salary, status, password } = req.body;
+    const { name, email, phone, role, department, salary, status, password, profilePhoto, bankDetails } = req.body;
 
     if (!name || !email) {
       return res.status(400).json({ msg: "Name and Email required" });
@@ -42,7 +41,9 @@ router.post("/add", async (req, res) => {
       salary:     salary     || "",
       status:     status     || "Active",
       password:   hashedPassword,
-      companyId:  req.companyId || "",
+      companyId:  req.body.companyId || req.companyId || "",
+      profilePhoto: profilePhoto || "",
+      bankDetails: bankDetails || { bankName: "", accountNumber: "", ifscCode: "" }
     });
 
     await employee.save();

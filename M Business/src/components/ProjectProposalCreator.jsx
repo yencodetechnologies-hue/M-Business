@@ -292,7 +292,7 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
               <div style={{ width: 1, height: 44, background: "#e5e7eb", alignSelf: "center" }} />
               <button onClick={(e) => { e.stopPropagation(); onDelete(element.id); }}
                 style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 28, cursor: "pointer", color: "#ef4444", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
-                title="Delete" className="hb">🗑️</button>
+                title="Delete" className="hb"> 🗑️️️️️️</button>
               <div style={{ width: 1, height: 44, background: "#e5e7eb", alignSelf: "center" }} />
               <button onClick={(e) => { e.stopPropagation(); onUpdate({ fontWeight: (element.fontWeight === 800 ? 400 : 800) }); }}
                 style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 26, fontWeight: 900, cursor: "pointer", color: element.fontWeight === 800 ? "var(--app-accent)" : "#374151", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
@@ -1129,7 +1129,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const elements = s.elements.filter(e => e.id !== elId);
     updateSlide({ ...s, elements });
     setSelectedElementId(null);
-    flash("🗑 Removed");
+    flash("  🗑️️️️️️️️️️ Removed");
   };
   const addSlide = (type) => {
     const s = makeSlide(type, doc.theme);
@@ -1158,7 +1158,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       if (dbId) await axios.delete(`${BASE_URL}/api/proposals/${dbId}`);
       const d = proposals.filter(p => p.id !== id);
       setProposals(d);
-      flash("🗑 Proposal deleted");
+      flash("  🗑️️️️️️️️️️ Proposal deleted");
     } catch (err) {
       console.error("Error deleting:", err);
       flash("❌ Error deleting from server", "err");
@@ -1458,7 +1458,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                       <button onClick={e => { e.stopPropagation(); shareProposal(p); }} style={{ background: "#eff6ff", border: "none", color: "#3b82f6", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Share Link">🔗</button>
                       <button onClick={e => { e.stopPropagation(); shareWhatsApp(p); }} style={{ background: "#dcfce7", border: "none", color: "#16a34a", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="WhatsApp">💬</button>
                       <button onClick={e => { e.stopPropagation(); printProposal(p); }} style={{ background: "#f1f5f9", border: "none", color: "#475569", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Print">🖨️</button>
-                      <button onClick={e => deleteProposal(p.id, p._id, e)} style={{ background: "#fef2f2", border: "none", color: "#ef4444", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Delete">🗑️</button>
+                      <button onClick={e => deleteProposal(p.id, p._id, e)} style={{ background: "#fef2f2", border: "none", color: "#ef4444", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Delete"> 🗑️️️️️️</button>
                     </div>
                   </div>
                 </div>

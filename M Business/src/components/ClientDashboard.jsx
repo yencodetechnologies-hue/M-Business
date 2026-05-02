@@ -972,13 +972,23 @@ export default function ClientDashboard({ user, setUser }) {
                       <MilestoneLine tasks={p.tasks||10} completedTasks={p.completedTasks||0}/>
                       <div style={{ display:"flex", justifyContent:"space-between", marginTop:10, paddingTop:10, borderTop:"1px solid #f1f5f9", fontSize:11 }}>
                         <span style={{ color:"#64748b" }}>Budget: <strong style={{ color:"#0f172a" }}>{p.budget}</strong></span>
-                        <span style={{ color:"#64748b" }}>{p.completedTasks||0}/{p.tasks||0} tasks</span>
+                        <span onClick={(e) => { e.stopPropagation(); setActive("tasks"); }} style={{ color:"#6366f1", fontWeight: 700, cursor: "pointer" }}>{p.completedTasks||0}/{p.tasks||0} tasks →</span>
                       </div>
                       {p.notes && (
                         <div style={{ marginTop: 10, padding: "10px 12px", background: "#f8fafc", borderRadius: 10, fontSize: 11, color: "#475569", fontStyle: "italic", borderLeft: "3px solid #e2e8f0", lineHeight: 1.4 }}>
                           "{p.notes}"
                         </div>
                       )}
+                      <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
+                        <button onClick={(e) => {
+                          e.stopPropagation();
+                          const text = `📁 *Project Update*\n\nProject: ${p.name}\nStatus: ${p.status}\nProgress: ${p.progress || 0}%\nTasks: ${p.completedTasks || 0}/${p.tasks || 0}`;
+                          const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                          window.open(wpUrl, "_blank");
+                        }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                          <span>🔗</span>
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

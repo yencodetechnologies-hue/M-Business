@@ -180,7 +180,7 @@ function ConfirmModal({title,message,onConfirm,onCancel,confirmLabel="Delete",da
     <div style={{position:"fixed",inset:0,background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.6)",backdropFilter:"blur(8px)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
       <div style={{background:"#fff",borderRadius:18,width:"100%",maxWidth:400,padding:"28px 28px 22px",boxShadow:"0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)"}}>
         <div style={{width:52,height:52,borderRadius:"50%",background:danger?"#fee2e2":"#f0fdf4",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,margin:"0 auto 14px"}}>
-          {danger?"🗑️":"✅"}
+          {danger?"   🗑️️️️️️️️️️️️️️️️":"✅"}
         </div>
         <h3 style={{textAlign:"center",margin:"0 0 8px",fontSize:16,fontWeight:800,color:T.text}}>{title}</h3>
         <p style={{textAlign:"center",color:"#6b7280",fontSize:13,margin:"0 0 22px"}}>{message}</p>
@@ -198,9 +198,9 @@ function ConfirmModal({title,message,onConfirm,onCancel,confirmLabel="Delete",da
 function ActionBtns({onView,onEdit,onDelete}){
   return(
     <div style={{display:"flex",gap:5,flexWrap:"nowrap"}}>
-      {onView&&<button onClick={onView} title="View" style={{background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)",border:"1px solid rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"var(--app-accent)",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>👁 View</button>}
-      <button onClick={onEdit} title="Edit" style={{background:"rgba(var(--app-accent-rgb, 124, 58, 237),0.1)",border:"1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"var(--app-accent)",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>✏️ Edit</button>
-      <button onClick={onDelete} title="Delete" style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>🗑 Delete</button>
+      {onView&&<button onClick={onView} title="View" style={{background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)",border:"1px solid rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"var(--app-accent)",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>👁</button>}
+      <button onClick={onEdit} title="Edit" style={{background:"rgba(var(--app-accent-rgb, 124, 58, 237),0.1)",border:"1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"var(--app-accent)",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>✏️</button>
+      <button onClick={onDelete} title="Delete" style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>   🗑️️️️️️️️️️️️️️️</button>
     </div>
   );
 }
@@ -311,7 +311,7 @@ function ClientsPage({clients,setClients,projects=[],onAddClient}){
     }catch{}
     setClients(prev=>prev.filter(c=>c._id!==deleteTarget._id));
     setDeleteTarget(null);
-    showToast("🗑️ Client deleted!");
+    showToast("   🗑️️️️️️️️️️️️️️️️ Client deleted!");
   };
 
   return(
@@ -405,8 +405,8 @@ function ClientsPage({clients,setClients,projects=[],onAddClient}){
             })()}
           </div>
           <div style={{display:"flex",gap:10,marginTop:16}}>
-            <button onClick={()=>{setViewClient(null);openEdit(viewClient);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
-            <button onClick={()=>{setViewClient(null);setDeleteTarget(viewClient);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
+            <button onClick={()=>{setViewClient(null);openEdit(viewClient);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️</button>
+            <button onClick={()=>{setViewClient(null);setDeleteTarget(viewClient);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>   🗑️️️️️️️️️️️️️️️</button>
           </div>
         </Mdl>
       )}
@@ -538,7 +538,7 @@ const loadEmpDocs = async (emp) => {
     }catch{}
     setEmployees(prev=>prev.filter(e=>e._id!==deleteTarget._id));
     setDeleteTarget(null);
-    showToast("🗑️ Employee deleted!");
+    showToast("   🗑️️️️️️️️️️️️️️️️ Employee deleted!");
   };
 
   return(
@@ -641,7 +641,7 @@ const loadEmpDocs = async (emp) => {
               <div style={{display:"flex",gap:6,marginTop:8}}>
                 <button onClick={()=>window.open(doc.url,"_blank")}
                   style={{flex:1,padding:"6px 10px",background:`${dt.color}10`,border:`1px solid ${dt.color}30`,borderRadius:7,fontSize:11,fontWeight:700,color:dt.color,cursor:"pointer",fontFamily:"inherit"}}>
-                  👁 View
+                  👁
                 </button>
                 <a href={doc.url} download style={{flex:1,padding:"6px 10px",background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,fontSize:11,fontWeight:700,color:"#475569",textDecoration:"none",display:"flex",alignItems:"center",justifyContent:"center"}}>
                   ⬇ Download
@@ -655,8 +655,8 @@ const loadEmpDocs = async (emp) => {
   </div>
 </div>
           <div style={{display:"flex",gap:10,marginTop:16}}>
-            <button onClick={()=>{setViewEmp(null);openEdit(viewEmp);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
-            <button onClick={()=>{setViewEmp(null);setDeleteTarget(viewEmp);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
+            <button onClick={()=>{setViewEmp(null);openEdit(viewEmp);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️</button>
+            <button onClick={()=>{setViewEmp(null);setDeleteTarget(viewEmp);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>   🗑️️️️️️️️️️️️️️️</button>
           </div>
         </Mdl>
       )}
@@ -735,7 +735,7 @@ function ManagersPage({managers,setManagers}){
     }catch{}
     setManagers(prev=>prev.filter(m=>m._id!==deleteTarget._id));
     setDeleteTarget(null);
-    showToast("🗑️ Manager deleted!");
+    showToast("   🗑️️️️️️️️️️️️️️️️ Manager deleted!");
   };
 
   return(
@@ -805,8 +805,8 @@ function ManagersPage({managers,setManagers}){
           <InfoRow icon="📅" label="Joined" value={viewMgr.createdAt?new Date(viewMgr.createdAt).toLocaleDateString():"—"}/>
          
           <div style={{display:"flex",gap:10,marginTop:16}}>
-            <button onClick={()=>{setViewMgr(null);openEdit(viewMgr);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
-            <button onClick={()=>{setViewMgr(null);setDeleteTarget(viewMgr);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
+            <button onClick={()=>{setViewMgr(null);openEdit(viewMgr);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️</button>
+            <button onClick={()=>{setViewMgr(null);setDeleteTarget(viewMgr);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑️</button>
           </div>
         </Mdl>
       )}
@@ -886,7 +886,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
     try{await axios.delete(`${BASE_URL}/api/projects/${deleteTarget._id}`);}catch{}
     setProjects(prev=>prev.filter(p=>p._id!==deleteTarget._id));
     setDeleteTarget(null);
-    showToast("🗑️ Project deleted!");
+    showToast("  🗑️️️️️️️️️️️ Project deleted!");
   };
 
   const doAssign=async()=>{
@@ -989,9 +989,9 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
           <InfoRow icon="👥" label="Team" value={viewProj.team}/>
           <InfoRow icon="📝" label="Description" value={viewProj.description}/>
           <div style={{display:"flex",gap:10,marginTop:16}}>
-            <button onClick={()=>{setViewProj(null);openEdit(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
+            <button onClick={()=>{setViewProj(null);openEdit(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️</button>
             <button onClick={()=>{setViewProj(null);setAssignModal(viewProj);setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : []));}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,var(--app-accent),#8b5cf6)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>👤 Assign</button>
-            <button onClick={()=>{setViewProj(null);setDeleteTarget(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
+            <button onClick={()=>{setViewProj(null);setDeleteTarget(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>  🗑️️️️️️️️️️</button>
           </div>
         </Mdl>
       )}
@@ -1213,7 +1213,7 @@ function ProjectStatusPage({clients,employees,managers,config}){
   const openAdd=()=>{setTsForm(EMPTY);setTsErr({});setTsEditId(null);setTsModal("add");};
   const openEdit=(p)=>{setTsForm({projectId:p.projectId||p.id||"",name:p.name||"",client:p.client||"",manager:p.manager||"",employee:p.employee||"",deadline:p.deadline||"",status:p.status||"In Progress",progress:p.progress||p.pct||0,notes:p.notes||p.note||""});setTsErr({});setTsEditId(p._id||p.id);setTsModal("edit");};
   const saveTs=async()=>{const errs={};if(!tsForm.name.trim())errs.name="Project name required";if(!tsForm.client.trim())errs.client="Company name required";if(!tsForm.deadline)errs.deadline="Deadline required";const pv=Number(tsForm.progress);if(isNaN(pv)||pv<0||pv>100)errs.progress="0–100 only";if(Object.keys(errs).length){setTsErr(errs);return;}try{setTsSaving(true);const payload={...tsForm,progress:Number(tsForm.progress)};if(tsModal==="add"){if(!payload.projectId){const maxId=Math.max(...trackList.map(p=>{const match=(p.projectId||p.id||"").match(/PRJ(\d+)/);return match?parseInt(match[1]):0;}),0);payload.projectId=`PRJ${String(maxId+1).padStart(3,"0")}`;}const res=await axios.post(BASE_URL + "/api/project-status",payload);setTrackList(prev=>[res.data,...prev]);}else{const res=await axios.put(`https://mbusiness.octosofttechnologies.in/api/project-status/${tsEditId}`,payload);setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?res.data:p));}showToast(tsModal==="add"?"✅ Project added!":"✅ Project updated!");setTsModal(null);}catch{if(tsModal==="add"){const local={...tsForm,_id:Date.now().toString(),projectId:tsForm.projectId||`PRJ${String(trackList.length+1).padStart(3,"0")}`,progress:Number(tsForm.progress)};setTrackList(prev=>[local,...prev]);}else{setTrackList(prev=>prev.map(p=>(p._id||p.id)===tsEditId?{...p,...tsForm,progress:Number(tsForm.progress)}:p));}showToast("✅ Saved locally!");setTsModal(null);}finally{setTsSaving(false);}};
-  const deleteTs=async(id)=>{if(!window.confirm("Delete?"))return;try{await axios.delete(`https://mbusiness.octosofttechnologies.in/api/project-status/${id}`);}catch{}setTrackList(prev=>prev.filter(p=>(p._id||p.id)!==id));showToast("🗑️ Deleted!");};
+  const deleteTs=async(id)=>{if(!window.confirm("Delete?"))return;try{await axios.delete(`https://mbusiness.octosofttechnologies.in/api/project-status/${id}`);}catch{}setTrackList(prev=>prev.filter(p=>(p._id||p.id)!==id));showToast("   🗑️️️️️️️️️️️️️️️️ Deleted!");};
   const B2=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
   return(
     <div style={{display:"flex",flexDirection:"column",gap:14}}>
@@ -1331,7 +1331,7 @@ function InterviewPage({companyId,companyName}){
   }
 };
   const updateStatus=(idx,val)=>{const updated=[...candidates];updated[idx]={...updated[idx],status:val};persist(updated);const c=updated[idx];const id=c._id||c.id;if(id)axios.patch(`${API_URL}/api/interviews/${id}/status`,{status:val},{headers:{"Content-Type":"application/json"}}).catch(()=>{});showToast(`✅ Status → "${val}"`);if(viewModal&&(viewModal._id||viewModal.id)===id)setViewModal(updated[idx]);};
-  const deleteCandidate=(idx)=>{if(!window.confirm("Delete this candidate?"))return;const c=candidates[idx];const id=c._id||c.id;if(id)axios.delete(`${API_URL}/api/interviews/${id}`).catch(()=>{});persist(candidates.filter((_,i)=>i!==idx));showToast("🗑️ Deleted");setViewModal(null);};
+  const deleteCandidate=(idx)=>{if(!window.confirm("Delete this candidate?"))return;const c=candidates[idx];const id=c._id||c.id;if(id)axios.delete(`${API_URL}/api/interviews/${id}`).catch(()=>{});persist(candidates.filter((_,i)=>i!==idx));showToast("   🗑️️️️️️️️️️️️️️️️ Deleted");setViewModal(null);};
   const fmt=(iso)=>iso?new Date(iso).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}):"—";
   const displayed=candidates.filter(c=>{const okF=filter==="all"||(c.status||"pending").toLowerCase()===filter;const q=search.toLowerCase();const okS=!q||(c.name||"").toLowerCase().includes(q)||(c.role||"").toLowerCase().includes(q)||(c.email||"").toLowerCase().includes(q)||(c.mobile||"").includes(q);return okF&&okS;});
   const counts={total:candidates.length,pending:candidates.filter(c=>(c.status||"pending").toLowerCase()==="pending").length,hired:candidates.filter(c=>(c.status||"").toLowerCase()==="hired").length,rejected:candidates.filter(c=>(c.status||"").toLowerCase()==="rejected").length};
@@ -1374,7 +1374,7 @@ const finalResumeUrl=resumeUrl;return(
                     <td style={{padding:"12px 12px",fontSize:12,color:"var(--app-muted)",fontFamily:"monospace",whiteSpace:"nowrap"}}>{fmt(c.date||c.createdAt)}</td>
                     <td style={{padding:"12px 12px"}}><select value={status} onChange={e=>updateStatus(idx,e.target.value)} style={{background:status==="hired"?"rgba(34,197,94,0.1)":status==="rejected"?"rgba(239,68,68,0.1)":"rgba(245,158,11,0.1)",border:`1.5px solid ${sC(status)}44`,borderRadius:8,padding:"5px 10px",color:sC(status),fontSize:12,fontWeight:700,cursor:"pointer",outline:"none",fontFamily:"inherit"}}><option value="pending">⏳ Pending</option><option value="hired">✅ Hired</option><option value="rejected">❌ Rejected</option></select></td>
                     <td style={{padding:"12px 12px"}}>{finalResumeUrl?<button onClick={()=>setViewModal({...c,_resolvedResumeUrl:finalResumeUrl})} style={{background:"rgba(var(--app-accent-rgb, 124, 58, 237),0.1)",border:"1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",borderRadius:8,padding:"6px 12px",fontSize:12,color:"var(--app-accent)",cursor:"pointer",fontWeight:700,fontFamily:"inherit",whiteSpace:"nowrap"}}>📄 View</button>:<span style={{fontSize:11,color:"#ddd"}}>—</span>}</td>
-                    <td style={{padding:"12px 12px"}}><div style={{display:"flex",gap:5}}><button onClick={()=>setViewModal({...c,_resolvedResumeUrl:finalResumeUrl})} style={{background:"var(--app-bg)",border:"1px solid var(--app-border)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"var(--app-accent)",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>👤</button><button onClick={()=>deleteCandidate(idx)} style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>🗑</button></div></td>
+                    <td style={{padding:"12px 12px"}}><div style={{display:"flex",gap:5}}><button onClick={()=>setViewModal({...c,_resolvedResumeUrl:finalResumeUrl})} style={{background:"var(--app-bg)",border:"1px solid var(--app-border)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"var(--app-accent)",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>👤</button><button onClick={()=>deleteCandidate(idx)} style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit"}}>   🗑️️️️️️️️️️️️️️️</button></div></td>
                   </tr>
                 );})}
               </tbody>
@@ -1831,23 +1831,36 @@ export default function Dashboard({setUser,user,fixedLogo}){
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 300 }}>
                     <thead>
                       <tr style={{ background: "var(--app-bg)" }}>
-                        {["Project", "Company Name", "Status", "View"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
+                        {["Project", "Company Name", "Status", "Share", "View"].map(c => <th key={c} style={{ padding: "8px 10px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
                       </tr>
                     </thead>
                     <tbody>
-                      {projects.slice(0, 5).map((p, i) => (
-                        <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)" }}>
+                      {projects.slice(0, 5).map((p, i) => {
+                        const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
+                        const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
+                        return (
+                        <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { if(typeof setSelectedProjectForTasks === "function") setSelectedProjectForTasks(p); setActive("tasks"); }}>
                           <td style={{ padding: "9px 10px", fontWeight: 600, color: T.text }}>
                             <div style={{ fontSize: 13 }}>{p.name}</div>
                             <div style={{ fontSize: 11, color: "#22C55E" }}>{p.currency || "₹"} {p.budget || "0"}</div>
+                            <div style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 4 }}>
+                              📋 {pTasks.length > 0 ? `${doneTasks}/${pTasks.length} Tasks` : "No Tasks"}
+                            </div>
                           </td>
                           <td style={{ padding: "9px 10px", color: "var(--app-muted)" }}>{p.client}</td>
                           <td style={{ padding: "9px 10px" }}><Badge label={p.status} /></td>
+                          <td style={{ padding: "9px 10px" }} onClick={e => e.stopPropagation()}>
+                            <button onClick={() => {
+                              const text = `📁 *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${p.currency || "₹"} ${p.budget || "0"}`;
+                              const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                              window.open(wpUrl, "_blank");
+                            }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Share</button>
+                          </td>
                           <td style={{ padding: "9px 10px" }}>
                             <button onClick={() => setViewProject(p)} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button>
                           </td>
                         </tr>
-                      ))}
+                      );})}
                     </tbody>
                   </table>
                 </div>

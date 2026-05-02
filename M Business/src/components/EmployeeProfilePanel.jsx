@@ -129,9 +129,9 @@ function DocCard({ doc, empName, onUploaded, notify }) {
                 </div>}
             {existing?.uploadedAt && <div style={{ fontSize:10, color:"#94a3b8" }}>Uploaded: {new Date(existing.uploadedAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</div>}
             <div style={{ display:"flex", gap:6 }}>
-              <button onClick={()=>window.open(viewUrl,"_blank")} style={{ flex:1, padding:"7px 10px", background:`${doc.color}10`, border:`1px solid ${doc.color}30`, borderRadius:8, fontSize:11, fontWeight:700, color:doc.color, cursor:"pointer", fontFamily:"inherit" }}>👁 View</button>
+              <button onClick={()=>window.open(viewUrl,"_blank")} style={{ flex:1, padding:"7px 10px", background:`${doc.color}10`, border:`1px solid ${doc.color}30`, borderRadius:8, fontSize:11, fontWeight:700, color:doc.color, cursor:"pointer", fontFamily:"inherit" }}>👁</button>
               <button onClick={()=>inputRef.current?.click()} style={{ flex:1, padding:"7px 10px", background:"#f1f5f9", border:"1px solid #e2e8f0", borderRadius:8, fontSize:11, fontWeight:700, color:"#475569", cursor:"pointer", fontFamily:"inherit" }}>🔄 Replace</button>
-              <button onClick={handleDelete} style={{ padding:"7px 10px", background:"#fef2f2", border:"1px solid #fecaca", borderRadius:8, fontSize:11, fontWeight:700, color:"#ef4444", cursor:"pointer", fontFamily:"inherit" }}>🗑</button>
+              <button onClick={handleDelete} style={{ padding:"7px 10px", background:"#fef2f2", border:"1px solid #fecaca", borderRadius:8, fontSize:11, fontWeight:700, color:"#ef4444", cursor:"pointer", fontFamily:"inherit" }}>   🗑️️️️️️️️️️️️️️️</button>
             </div>
           </div>
         ) : (
@@ -371,7 +371,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                         <td style={{ padding:"11px 12px" }}>
                           <button onClick={() => loadEmployeeDocs(emp)}
                             style={{ padding:"5px 12px", background: isSel ? "var(--app-accent)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border:`1px solid ${isSel ? "var(--app-accent)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)"}`, borderRadius:8, fontSize:11, fontWeight:700, color: isSel ? "#fff" : "var(--app-accent)", cursor:"pointer", fontFamily:"inherit" }}>
-                            {isSel ? "Viewing" : "👁 View"}
+                            {isSel ? "Viewing" : "👁"}
                           </button>
                         </td>
                       </tr>
@@ -416,7 +416,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                               </div>
                             </div>}
                         <div style={{ display:"flex", gap:6, marginTop:8 }}>
-                          <button onClick={() => window.open(doc.url,"_blank")} style={{ flex:1, padding:"6px 10px", background:`${dt.color}10`, border:`1px solid ${dt.color}30`, borderRadius:7, fontSize:11, fontWeight:700, color:dt.color, cursor:"pointer", fontFamily:"inherit" }}>👁 View</button>
+                          <button onClick={() => window.open(doc.url,"_blank")} style={{ flex:1, padding:"6px 10px", background:`${dt.color}10`, border:`1px solid ${dt.color}30`, borderRadius:7, fontSize:11, fontWeight:700, color:dt.color, cursor:"pointer", fontFamily:"inherit" }}>👁</button>
                           <a href={doc.url} download style={{ flex:1, padding:"6px 10px", background:"#f1f5f9", border:"1px solid #e2e8f0", borderRadius:7, fontSize:11, fontWeight:700, color:"#475569", textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center" }}>⬇ Download</a>
                         </div>
                       </div>

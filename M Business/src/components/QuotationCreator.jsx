@@ -424,7 +424,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
         </div>
 
-    
+
       </>
     );
   }
@@ -742,11 +742,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         <div className="f3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
           <div>
             <label style={lbl}>Amount Paid (Advance)</label>
-            <input type="number" 
-              value={qt.amountPaid === 0 ? "" : qt.amountPaid} 
-              onChange={(e) => upd("amountPaid", e.target.value === "" ? 0 : Number(e.target.value))} 
+            <input type="number"
+              value={qt.amountPaid === 0 ? "" : qt.amountPaid}
+              onChange={(e) => upd("amountPaid", e.target.value === "" ? 0 : Number(e.target.value))}
               onWheel={(e) => e.target.blur()}
-              placeholder="0" 
+              placeholder="0"
               style={inp()} />
           </div>
           <div>
@@ -863,7 +863,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         </div>
       </div>
 
-    
+
 
       {/* Bottom buttons */}
       <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>

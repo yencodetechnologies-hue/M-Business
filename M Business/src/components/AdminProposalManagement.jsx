@@ -1070,7 +1070,7 @@ export default function AdminProposalManagement() {
                               whiteSpace: "nowrap"
                             }}
                           >
-                            ✏️ Edit
+                            ✏️
                           </button>
                         )}
 
@@ -1252,7 +1252,7 @@ export default function AdminProposalManagement() {
                   fontFamily: "inherit"
                 }}
               >
-                ✏️ Edit Proposal
+                ✏️
               </button>
             )}
 
@@ -1315,7 +1315,7 @@ export default function AdminProposalManagement() {
               fontSize: 22,
               margin: "0 auto 14px"
             }}>
-              🗑️
+                      🗑️️️️️
             </div>
             <h3 style={{
               textAlign: "center",

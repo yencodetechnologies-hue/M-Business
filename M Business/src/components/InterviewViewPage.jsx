@@ -216,7 +216,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
     const c = candidates[idx]; const id = c._id || c.id;
     if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => {});
     persist(candidates.filter((_, i) => i !== idx));
-    showToast("🗑️ Deleted");
+    showToast("  🗑️️️️️️️️️️️ Deleted");
   };
 
   const copyLink = () => {
@@ -402,7 +402,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
                             👤 Profile
                           </button>
                           <button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
-                            🗑
+                              🗑️️️️️️️️️️
                           </button>
                         </div>
                       </td>

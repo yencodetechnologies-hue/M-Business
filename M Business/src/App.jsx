@@ -16,6 +16,7 @@ import ReportsPage        from "./components/ReportsPage";
 import QuotationCreator   from "./components/QuotationCreator";
 import ProjectProposalCreator from "./components/ProjectProposalCreator";
 import InterviewApplyForm from "./components/InterviewApplyForm";
+import EmployeeOnboarding from "./components/EmployeeOnboarding";
 import CanvasPage         from "./components/CanvasPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -125,6 +126,7 @@ const getRootPage = () => {
         <Route path="/quotation-creator" element={<QuotationCreator />} />
         <Route path="/project-proposal" element={<ProjectProposalCreator />} />
         <Route path="/interview-apply/:companySlug" element={<InterviewApplyForm />} />
+        <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

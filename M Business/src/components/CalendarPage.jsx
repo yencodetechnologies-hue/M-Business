@@ -566,7 +566,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                                 background:"var(--app-bg)", border:"1px solid var(--app-border)",
                                 borderRadius:7, padding:"5px 12px", fontSize:11,
                                 color:"var(--app-accent)", cursor:"pointer", fontWeight:700 }}>
-                                {ev._type ? "👁️ View" : "✏️ Edit"}
+                                {ev._type ? "👁️ View" : "✏️"}
                               </button>
                               {!ev._type && (
                                 <button onClick={()=>del(ev._id||ev.id)} style={{
@@ -696,7 +696,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
               display:"flex", justifyContent:"space-between", alignItems:"center",
               background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink:0 }}>
               <h2 style={{ margin:0, fontSize:17, fontWeight:800, color:T.text }}>
-                {modal==="add" ? "📅 Add New" : modal==="view" ? "👁️ View Event" : "✏️ Edit Event"}
+                {modal==="add" ? "📅 Add New" : modal==="view" ? "👁️ View Event" : "✏️"}
               </h2>
               <button onClick={()=>{ setModal(null); setForm(EMPTY); setErr({}); }} style={{
                 background:"none", border:"none", fontSize:20,

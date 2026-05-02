@@ -1167,7 +1167,7 @@ function ProposalsPage({ proposals }) {
                 <button
                    onClick={() => window.location.href = `/project-proposal?edit=${p.id || p._id}`}
                    style={{ background: "var(--app-accent)15", color: "var(--app-accent)", border: "1px solid var(--app-accent)30", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-                  ✏️ Edit Proposal
+                  ✏️
                 </button>
                 <button 
                    onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")}

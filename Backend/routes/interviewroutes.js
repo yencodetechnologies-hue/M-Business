@@ -127,10 +127,11 @@ router.post("/apply", upload.single("resume"), async (req, res) => {
 //    Query: ?search= &status= &experience= &page=1 &limit=20
 router.get("/", async (req, res) => {
   try {
-    const { search = "", status = "", experience = "", page = 1, limit = 20 } = req.query;
+    const { search = "", status = "", experience = "", page = 1, limit = 20, companyId } = req.query;
 
     const query = {};
-    if (req.companyId) query.companyId = req.companyId;
+    const cid = companyId || req.companyId;
+    if (cid) query.companyId = cid;
     if (status)     query.status     = status;
     if (experience) query.experience = experience;
     if (search) {

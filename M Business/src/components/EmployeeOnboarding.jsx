@@ -26,6 +26,11 @@ export default function EmployeeOnboarding() {
     role: "employee",
     status: "Active"
   });
+  const [docs, setDocs] = useState({
+    aadhaar: null,
+    pan: null,
+    passbook: null
+  });
   const [err, setErr] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -49,6 +54,10 @@ export default function EmployeeOnboarding() {
     }
   };
 
+  const handleFileChange = (field, file) => {
+    setDocs(prev => ({ ...prev, [field]: file }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = {};
@@ -67,7 +76,6 @@ export default function EmployeeOnboarding() {
 
     try {
       setLoading(true);
-      // Construct payload compatible with existing employee API
       const payload = {
         name: form.name,
         email: form.email,
@@ -76,7 +84,6 @@ export default function EmployeeOnboarding() {
         role: form.role,
         department: form.department,
         status: form.status,
-        // Custom fields for onboarding
         bankDetails: {
           bankName: form.bankName,
           accountNumber: form.accountNumber,
@@ -87,6 +94,23 @@ export default function EmployeeOnboarding() {
       };
 
       await axios.post(`${BASE_URL}/api/employees/add`, payload);
+
+      // Upload documents if any
+      const uploadDoc = async (type, file) => {
+        if (!file) return;
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("employeeName", form.name);
+        fd.append("docType", type);
+        await axios.post(`${BASE_URL}/api/employee-dashboard/documents/upload`, fd);
+      };
+
+      await Promise.all([
+        uploadDoc("aadhaar", docs.aadhaar),
+        uploadDoc("pan", docs.pan),
+        uploadDoc("passbook", docs.passbook)
+      ]);
+
       setSuccess(true);
     } catch (err) {
       console.error(err);
@@ -151,6 +175,13 @@ export default function EmployeeOnboarding() {
             <div style={{ gridColumn: "1 / -1" }}>
               <Input label="Account Number" value={form.accountNumber} onChange={v => handleChange("accountNumber", v)} error={err.accountNumber} placeholder="123456789012" />
             </div>
+          </div>
+
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#94a3b8", letterSpacing: 1, marginBottom: 16, borderBottom: "1px solid #f1f5f9", paddingBottom: 8, marginTop: 32 }}>DOCUMENTS</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
+            <DocInput label="Aadhaar Card" icon="🪪" file={docs.aadhaar} onChange={f => handleFileChange("aadhaar", f)} />
+            <DocInput label="PAN Card" icon="💳" file={docs.pan} onChange={f => handleFileChange("pan", f)} />
+            <DocInput label="Bank Passbook" icon="🏦" file={docs.passbook} onChange={f => handleFileChange("passbook", f)} />
           </div>
 
           <button
@@ -220,6 +251,22 @@ function Input({ label, value, onChange, error, type = "text", placeholder }) {
         }}
       />
       {error && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 500 }}>⚠️ {error}</div>}
+    </div>
+  );
+}
+
+function DocInput({ label, icon, file, onChange }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#f8fafc", borderRadius: 12, border: "1.5px solid #e2e8f0" }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: "#fff", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{icon}</div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>{label}</div>
+        <div style={{ fontSize: 11, color: file ? "#7c3aed" : "#94a3b8", fontWeight: 600 }}>{file ? file.name : "Missing"}</div>
+      </div>
+      <label style={{ background: file ? "#dcfce7" : "#7c3aed", color: file ? "#166534" : "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none" }}>
+        {file ? "Change" : "Upload"}
+        <input type="file" style={{ display: "none" }} onChange={e => onChange(e.target.files[0])} />
+      </label>
     </div>
   );
 }

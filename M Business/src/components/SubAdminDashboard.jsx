@@ -244,12 +244,13 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
 }
 
 // ── Action Buttons (View / Edit / Delete) ────────────────────
-function ActionBtns({ onView, onEdit, onDelete }) {
+function ActionBtns({ onView, onEdit, onDelete, onShare }) {
   return (
     <div style={{ display: "flex", gap: 6, flexWrap: "nowrap" }}>
       {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>👁</button>}
-      <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f59e0b", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>✏️</button>
-      <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>  🗑️️️️️️️️️️</button>
+      {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span>🔗</span></button>}
+      {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f59e0b", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>✏️</button>}
+      {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>  🗑️️️️️️️️️️</button>}
     </div>
   );
 }
@@ -675,6 +676,10 @@ function EmployeesPage({ employees, setEmployees }) {
                         onView={() => { setViewEmp(e); loadEmpDocs(e); }}
                         onEdit={() => openEdit(e)}
                         onDelete={() => setDeleteTarget(e)}
+                        onShare={() => {
+                          const text = `Hi ${e.name || ""},\n\nPlease fill in your onboarding details at the following link to join our team:\n\n${onboardingLink}`;
+                          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+                        }}
                       />
                     </td>
                   </tr>
@@ -700,6 +705,26 @@ function EmployeesPage({ employees, setEmployees }) {
           <InfoRow icon="🏢" label="Department" value={viewEmp.department} />
           <InfoRow icon="💰" label="Salary" value={viewEmp.salary} />
           <InfoRow icon="📅" label="Joined" value={viewEmp.createdAt ? new Date(viewEmp.createdAt).toLocaleDateString() : "—"} />
+
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              🏦 Bank Details
+            </div>
+            <div style={{ background: "#f8fafc", borderRadius: 12, padding: "12px 14px", border: "1px solid var(--app-border)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase" }}>Bank Name</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.text }}>{viewEmp.bankDetails?.bankName || "—"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase" }}>IFSC Code</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.text }}>{viewEmp.bankDetails?.ifscCode || "—"}</div>
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase" }}>Account Number</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.text }}>{viewEmp.bankDetails?.accountNumber || "—"}</div>
+              </div>
+            </div>
+          </div>
 
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
@@ -1765,7 +1790,15 @@ function InterviewPage({ companyId, companyName }) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const appLink = `http://${window.location.host}/interview-apply/${CNAME.replace(/\s+/g, "-")}-${CID}`;
-  useEffect(() => { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); if (saved.length) { setCandidates(saved); setLoading(false); } axios.get(`${BASE_URL}/api/interviews?companyId=${CID}`).then(r => { const list = r.data?.data || (Array.isArray(r.data) ? r.data : []); if (list.length) { setCandidates(list); localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } }).catch(() => { }).finally(() => setLoading(false)); }, [CID]);
+  useEffect(() => { 
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); 
+    if (saved.length) { setCandidates(saved); setLoading(false); } 
+    axios.get(`${BASE_URL}/api/interviews?companyId=${CID}`).then(r => { 
+      const list = r.data?.data || (Array.isArray(r.data) ? r.data : []); 
+      setCandidates(list); 
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); 
+    }).catch(() => { }).finally(() => setLoading(false)); 
+  }, [CID]);
   const persist = (list) => { setCandidates(list); localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); };
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
@@ -1852,7 +1885,7 @@ function InterviewPage({ companyId, companyName }) {
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)" }}>{c.interviewerName || <span style={{ color: "#ddd" }}>—</span>}</td>
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
                       <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">⏳ Pending</option><option value="hired">✅ Hired</option><option value="rejected">❌ Rejected</option></select></td>
-                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄 View</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
+                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
                       <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> 🗑️️️️️</button></div></td>
                     </tr>
                   );

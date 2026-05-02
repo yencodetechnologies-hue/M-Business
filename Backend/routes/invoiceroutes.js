@@ -50,6 +50,8 @@ router.get("/", async (req, res) => {
         dueDate:   doc.dueDate   || null,
         status:    doc.status    || "draft",
         total,
+        amountPaid: doc.amountPaid || 0,
+        currency:   doc.currency   || "₹",
         savedAt:   doc.createdAt || Date.now(),
         inv,
         items:     doc.items || [],

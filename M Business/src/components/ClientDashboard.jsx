@@ -579,17 +579,42 @@ function NotificationsPage({ notifications, onMarkRead, onMarkAllRead, onNavigat
 
 // ── WORKSPACE PAGE ───────────────────────────────────────────
 function WorkspacePage({ user }) {
-  const [notes, setNotes] = useState(() => localStorage.getItem(`client_notes_${user?._id}`) || "");
-  const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem(`client_todos_${user?._id}`) || "[]"));
+  const [notes, setNotes] = useState("");
+  const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
+  const isLoaded = useRef(false);
 
   useEffect(() => {
-    if (user?._id) localStorage.setItem(`client_notes_${user?._id}`, notes);
-  }, [notes, user?._id]);
+    const uid = user?._id || user?.id;
+    if (uid && !isLoaded.current) {
+      const savedNotes = localStorage.getItem(`client_notes_${uid}`);
+      if (savedNotes !== null) setNotes(savedNotes);
+      
+      const savedTodos = localStorage.getItem(`client_todos_${uid}`);
+      if (savedTodos !== null) {
+        try {
+          setTodos(JSON.parse(savedTodos));
+        } catch (e) {
+          setTodos([]);
+        }
+      }
+      isLoaded.current = true;
+    }
+  }, [user?._id, user?.id]);
 
   useEffect(() => {
-    if (user?._id) localStorage.setItem(`client_todos_${user?._id}`, JSON.stringify(todos));
-  }, [todos, user?._id]);
+    const uid = user?._id || user?.id;
+    if (uid && isLoaded.current) {
+      localStorage.setItem(`client_notes_${uid}`, notes);
+    }
+  }, [notes, user?._id, user?.id]);
+
+  useEffect(() => {
+    const uid = user?._id || user?.id;
+    if (uid && isLoaded.current) {
+      localStorage.setItem(`client_todos_${uid}`, JSON.stringify(todos));
+    }
+  }, [todos, user?._id, user?.id]);
 
   const addTodo = () => {
     if (!newTodo.trim()) return;
@@ -706,7 +731,7 @@ export default function ClientDashboard({ user, setUser }) {
 
   // Filter NAV based on permissions (show all if permissions not loaded yet)
   const filteredNav = NAV.filter(item => {
-    if (item.key === 'dashboard' || item.key === 'settings') return true; // Always show
+    if (item.key === 'dashboard' || item.key === 'settings' || item.key === 'workspace') return true; // Always show
     if (Object.keys(permissions).length === 0) return true; // Show all until permissions load
     return permissions[item.key] === true;
   });

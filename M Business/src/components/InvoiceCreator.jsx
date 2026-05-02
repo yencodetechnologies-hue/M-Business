@@ -691,9 +691,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #f3f4f6", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
 
           {/* Table header */}
-          <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 0.8fr 0.8fr 0.8fr 1.2fr 1fr 0.8fr", padding: "12px 20px", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}>
-            {["Invoice No", "Company Name", "Project", "Date", "Due Date", "Amount", "Status", "Actions"].map((h) => (
-              <div key={h} style={{ fontSize: 11, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 0.5, textTransform: "uppercase" }}>{h}</div>
+          <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr", padding: "12px 20px", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", borderBottom: "2px solid var(--app-border)", alignItems: "center" }}>
+            {["Invoice No", "Company Name", "Project", "Date", "Due Date", "Amount", "Paid", "Status", "Actions"].map((h) => (
+              <div key={h} style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", letterSpacing: 0.5, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h}</div>
             ))}
           </div>
 
@@ -720,26 +720,26 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
             return (
               <div key={entry.id || idx} className="inv-row"
-                style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 0.8fr 0.8fr 0.8fr 1.2fr 1fr 0.8fr", padding: "14px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff" }}>
+                style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr", padding: "14px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff" }}>
 
                 {/* Invoice No */}
-                <div onClick={() => setViewEntry(entry)}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{entry.invoiceNo || "—"}</div>
+                <div onClick={() => setViewEntry(entry)} style={{ overflow: "hidden" }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{entry.invoiceNo || "—"}</div>
                   <div style={{ fontSize: 10, color: "#d1d5db", marginTop: 1, fontFamily: "monospace" }}>{formatDateTime(entry.savedAt || entry.createdAt)}</div>
                 </div>
 
                 {/* Client */}
-                <div onClick={() => setViewEntry(entry)} style={{ fontSize: 13, fontWeight: 600, color: "#111827" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <div onClick={() => setViewEntry(entry)} style={{ fontSize: 13, fontWeight: 600, color: "#111827", overflow: "hidden" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, overflow: "hidden" }}>
                     <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
                       {(entry.client || "?")[0].toUpperCase()}
                     </div>
-                    <span>{entry.client || "—"}</span>
+                    <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{entry.client || "—"}</span>
                   </div>
                 </div>
 
                 {/* Project */}
-                <div className="inv-col-hide" onClick={() => setViewEntry(entry)} style={{ fontSize: 12, color: "#6b7280" }}>
+                <div className="inv-col-hide" onClick={() => setViewEntry(entry)} style={{ fontSize: 12, color: "#6b7280", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {invD.project || entry.project || <span style={{ color: "#e5e7eb" }}>—</span>}
                 </div>
 
@@ -754,8 +754,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 </div>
 
                 {/* Amount */}
-                <div onClick={() => setViewEntry(entry)} style={{ fontSize: 15, fontWeight: 800, color: "#111827" }}>
+                <div onClick={() => setViewEntry(entry)} style={{ fontSize: 14, fontWeight: 700, color: "#111827", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {formatCurrency(entry.total, entry.inv?.currency || inv.currency)}
+                </div>
+
+                {/* Paid Amount */}
+                <div onClick={() => setViewEntry(entry)} style={{ fontSize: 14, fontWeight: 700, color: "#22c55e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {formatCurrency(entry.amountPaid || 0, entry.currency || inv.currency)}
                 </div>
 
                 {/* Status dropdown */}

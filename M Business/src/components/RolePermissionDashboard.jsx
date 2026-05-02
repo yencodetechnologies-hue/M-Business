@@ -67,10 +67,7 @@ const RolePermissionDashboard = () => {
         <h2 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 800, color: T.text, display: "flex", alignItems: "center", gap: 10 }}>
           🛡️ Role & Permission Management
         </h2>
-        <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 24 }}>
-          Define accessibility for different user roles in the system. Changes will apply to all users with the selected role.
-        </p>
-
+   
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 10px" }}>
             <thead>

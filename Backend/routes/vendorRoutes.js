@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const vendorController = require('../controllers/vendorController');
 
-// Debug middleware
-router.use((req, res, next) => {
-  console.log('Vendor route accessed:', req.method, req.originalUrl);
-  next();
-});
+// // Debug middleware
+// router.use((req, res, next) => {
+//   console.log('Vendor route accessed:', req.method, req.originalUrl);
+//   next();
+// });
 
 // Test route
 router.get('/test', (req, res) => {
@@ -15,7 +15,7 @@ router.get('/test', (req, res) => {
 
 // Root test route
 router.get('/', (req, res) => {
-  console.log('GET /api/vendors called');
+  // console.log('GET /api/vendors called');
   vendorController.getVendors(req, res);
 });
 

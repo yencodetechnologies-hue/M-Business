@@ -82,14 +82,15 @@ export default function EmployeeOnboarding() {
           accountNumber: form.accountNumber,
           ifscCode: form.ifscCode
         },
-        profilePhoto: form.photo
+        profilePhoto: form.photo,
+        companyId: queryParams.get("companyId") || ""
       };
 
       await axios.post(`${BASE_URL}/api/employees/add`, payload);
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      setErr({ submit: err.response?.data?.message || "Failed to submit. Please try again." });
+      setErr({ submit: err.response?.data?.msg || err.response?.data?.message || "Failed to submit. Please try again." });
     } finally {
       setLoading(false);
     }

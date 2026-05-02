@@ -603,7 +603,9 @@ function EmployeesPage({ employees, setEmployees }) {
     showToast("  🗑️️️️️️️️️️️ Employee deleted!");
   };
 
-  const onboardingLink = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).companyName : "Our Company")}`;
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
+  const onboardingLink = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(user.companyName || "Our Company")}&companyId=${companyId}`;
   const [linkCopied, setLinkCopied] = useState(false);
   const copyLink = () => {
     navigator.clipboard.writeText(onboardingLink);
@@ -1766,10 +1768,23 @@ function InterviewPage({ companyId, companyName }) {
   useEffect(() => { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); if (saved.length) { setCandidates(saved); setLoading(false); } axios.get(`${BASE_URL}/api/interviews?companyId=${CID}`).then(r => { const list = r.data?.data || (Array.isArray(r.data) ? r.data : []); if (list.length) { setCandidates(list); localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } }).catch(() => { }).finally(() => setLoading(false)); }, [CID]);
   const persist = (list) => { setCandidates(list); localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); };
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
-  // ✅ Fix — works in HTTP + HTTPS + all browsers
+
+  const updateStatus = (idx, val) => {
+    const updated = [...candidates];
+    // Convert to capitalized for backend
+    const finalVal = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
+    updated[idx] = { ...updated[idx], status: finalVal };
+    persist(updated);
+    const c = updated[idx];
+    const id = c._id || c.id;
+    if (id) axios.patch(`${API_URL}/api/interviews/${id}/status`, { status: finalVal }).catch(() => { });
+    showToast(`✅ Status → "${finalVal}"`);
+    if (viewModal && (viewModal._id || viewModal.id) === id) setViewModal(updated[idx]);
+  };
+
   const copyLink = async () => {
     try {
-      const companySlug = `${companyName}-${companyId}`.replace(/\s+/g, "-");
+      const companySlug = `${CNAME}-${CID}`.replace(/\s+/g, "-");
       const link = `http://${window.location.host}/interview-apply/${companySlug}`;
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(link);
@@ -1781,13 +1796,12 @@ function InterviewPage({ companyId, companyName }) {
         document.execCommand("copy");
         document.body.removeChild(el);
       }
-      showToast("✅ Link copied!");          // ← toast.success பதிலா
+      showToast("✅ Link copied!");
     } catch (err) {
       console.error("Copy failed:", err);
-      showToast("❌ Copy failed. Please copy manually.");  // ← toast.error பதிலா
+      showToast("❌ Copy failed. Please copy manually.");
     }
   };
-  const updateStatus = (idx, val) => { const updated = [...candidates]; updated[idx] = { ...updated[idx], status: val }; persist(updated); const c = updated[idx]; const id = c._id || c.id; if (id) axios.patch(`${API_URL}/api/interviews/${id}/status`, { status: val }, { headers: { "Content-Type": "application/json" } }).catch(() => { }); showToast(`✅ Status → "${val}"`); if (viewModal && (viewModal._id || viewModal.id) === id) setViewModal(updated[idx]); };
   const deleteCandidate = (idx) => { if (!window.confirm("Delete this candidate?")) return; const c = candidates[idx]; const id = c._id || c.id; if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { }); persist(candidates.filter((_, i) => i !== idx)); showToast(" 🗑️️️️️️ Deleted"); setViewModal(null); };
   const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
   const [currentPage, setCurrentPage] = useState(1);
@@ -1798,7 +1812,7 @@ function InterviewPage({ companyId, companyName }) {
   useEffect(() => { setCurrentPage(1); }, [search, filter, candidates.length]);
   const paginated = displayed.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  const counts = { total: candidates.length, pending: candidates.filter(c => (c.status || "pending").toLowerCase() === "pending").length, hired: candidates.filter(c => (c.status || "").toLowerCase() === "hired").length, rejected: candidates.filter(c => (c.status || "").toLowerCase() === "rejected").length };
+  const counts = { total: candidates.length, pending: candidates.filter(c => (c.status || "Pending").toLowerCase() === "pending").length, hired: candidates.filter(c => (c.status || "").toLowerCase() === "hired").length, rejected: candidates.filter(c => (c.status || "").toLowerCase() === "rejected").length };
   const sColor = { pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" };
   const sC = (s = "pending") => sColor[s.toLowerCase()] || "var(--app-accent)";
   return (
@@ -1865,8 +1879,8 @@ function InterviewPage({ companyId, companyName }) {
                   <div style={{ fontSize: 17, fontWeight: 800, color: "var(--app-sidebar)" }}>{viewModal.name}</div>
                   <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{viewModal.role || "—"}</div>
                 </div>
-                <span style={{ background: `${sC(viewModal.status || "pending")}18`, color: sC(viewModal.status || "pending"), border: `1px solid ${sC(viewModal.status || "pending")}33`, padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
-                  {(viewModal.status || "pending") === "pending" ? "⏳ Pending" : (viewModal.status || "") === "hired" ? "✅ Hired" : "❌ Rejected"}
+                <span style={{ background: `${sC(viewModal.status || "Pending")}18`, color: sC(viewModal.status || "Pending"), border: `1px solid ${sC(viewModal.status || "Pending")}33`, padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                  {viewModal.status?.toLowerCase() === "hired" ? "✅ Hired" : viewModal.status?.toLowerCase() === "rejected" ? "❌ Rejected" : "⏳ Pending"}
                 </span>
               </div>
 

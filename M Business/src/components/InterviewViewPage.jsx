@@ -20,7 +20,7 @@ function Badge({ label = "pending" }) {
       padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
       textTransform: "capitalize", whiteSpace: "nowrap",
     }}>
-      {label === "pending" ? "⏳ Pending" : label === "hired" ? "✅ Hired" : "❌ Rejected"}
+      {label?.toLowerCase() === "hired" ? "✅ Hired" : label?.toLowerCase() === "rejected" ? "❌ Rejected" : "⏳ Pending"}
     </span>
   );
 }
@@ -65,16 +65,15 @@ function StatusPicker({ current = "pending", onChange }) {
   return (
     <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: "var(--app-accent)", marginBottom: 10 }}>UPDATE STATUS</div>
-      <div style={{ display: "flex", gap: 10 }}>
-        {["pending", "hired", "rejected"].map(s => (
+        {["Pending", "Hired", "Rejected"].map(s => (
           <button key={s} onClick={() => onChange(s)} style={{
             flex: 1, padding: "10px", borderRadius: 10,
-            border: `2px solid ${current === s ? sc(s) : "var(--app-border)"}`,
-            background: current === s ? `${sc(s)}15` : "#fff",
-            color: current === s ? sc(s) : "var(--app-muted)",
+            border: `2px solid ${current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-border)"}`,
+            background: current?.toLowerCase() === s.toLowerCase() ? `${sc(s)}15` : "#fff",
+            color: current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-muted)",
             fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
           }}>
-            {s === "pending" ? "⏳ Pending" : s === "hired" ? "✅ Hired" : "❌ Rejected"}
+            {s === "Pending" ? "⏳ Pending" : s === "Hired" ? "✅ Hired" : "❌ Rejected"}
           </button>
         ))}
       </div>
@@ -83,7 +82,7 @@ function StatusPicker({ current = "pending", onChange }) {
 }
 
 function ResumeModal({ candidate, onClose, onStatusChange }) {
-  const [status, setStatus] = useState(candidate.status || "pending");
+  const [status, setStatus] = useState(candidate.status || "Pending");
   const isPDF = (candidate.resumeName || "").toLowerCase().endsWith(".pdf");
   const resumeUrl = candidate.resumeData || candidate.resumeUrl;
 
@@ -138,7 +137,7 @@ function ResumeModal({ candidate, onClose, onStatusChange }) {
 }
 
 function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
-  const [status, setStatus] = useState(candidate.status || "pending");
+  const [status, setStatus] = useState(candidate.status || "Pending");
   const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
   return (
@@ -168,7 +167,7 @@ function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
       </div>
 
       {(candidate.resumeData || candidate.resumeUrl) && (
-        <button onClick={onViewResume} style={btnStyle("var(--app-accent)")}>📄 View Resume</button>
+        <button onClick={onViewResume} style={btnStyle("var(--app-accent)")}>📄 </button>
       )}
     </Modal>
   );
@@ -376,9 +375,12 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
                       </td>
 
                       <td style={{ padding: "12px 12px" }}>
-                        <select value={status} onChange={e => updateStatus(idx, e.target.value)}
+                        <select value={status?.toLowerCase()} onChange={e => {
+                          const val = e.target.value === "pending" ? "Pending" : e.target.value === "hired" ? "Hired" : "Rejected";
+                          updateStatus(idx, val);
+                        }}
                           style={{
-                            background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)",
+                            background: status?.toLowerCase() === "hired" ? "rgba(34,197,94,0.1)" : status?.toLowerCase() === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)",
                             border: `1.5px solid ${sc(status)}44`, borderRadius: 8, padding: "5px 10px",
                             color: sc(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit",
                           }}>
@@ -391,7 +393,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
                       <td style={{ padding: "12px 12px" }}>
                         {(c.resumeData || c.resumeUrl) ? (
                           <button onClick={() => setViewResume(c)} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 14px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>
-                            📄 View
+                            📄
                           </button>
                         ) : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}
                       </td>

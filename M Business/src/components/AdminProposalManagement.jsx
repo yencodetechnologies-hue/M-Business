@@ -851,27 +851,27 @@ export default function AdminProposalManagement() {
           <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
             <Search value={search} onChange={setSearch} placeholder="Search proposals..." />
             <div style={{ display: "flex", gap: 8 }}>
-              <button 
-                onClick={createNewProposal}
-                style={{
-                  background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",
-                  color:"#fff",
-                  border:"none",
-                  borderRadius:10,
-                  padding:"10px 16px",
-                  fontSize:13,
-                  fontWeight:700,
-                  cursor:"pointer",
-                  fontFamily:"inherit",
-                  display:"flex",
-                  alignItems:"center",
-                  gap:8,
-                  boxShadow:"0 4px 12px rgba(var(--app-accent-rgb, 124,58,237),0.3)",
-                  transition:"all .2s"
-                }}
-              >
-                ✨ Add Proposal
-              </button>
+                <button 
+                  onClick={createNewProposal}
+                  style={{
+                    background:"var(--app-accent-gradient, linear-gradient(135deg,var(--app-accent),var(--app-muted)))",
+                    color:"#fff",
+                    border:"none",
+                    borderRadius:10,
+                    padding:"10px 16px",
+                    fontSize:13,
+                    fontWeight:700,
+                    cursor:"pointer",
+                    fontFamily:"inherit",
+                    display:"flex",
+                    alignItems:"center",
+                    gap:8,
+                    boxShadow:"0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",
+                    transition:"all .2s"
+                  }}
+                >
+                  ✨ Add Proposal
+                </button>
              
             </div>
           </div>
@@ -1061,8 +1061,8 @@ export default function AdminProposalManagement() {
                           <button
                             onClick={() => openCanvasEditor(proposal._id)}
                             style={{
-                              background: "rgba(124,58,237,0.1)",
-                              border: "1px solid rgba(124,58,237,0.3)",
+                              background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)",
+                              border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)",
                               borderRadius: 7,
                               padding: "5px 10px",
                               fontSize: 12,

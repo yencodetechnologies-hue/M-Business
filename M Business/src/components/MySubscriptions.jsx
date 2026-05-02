@@ -139,9 +139,105 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
     }
   }, [userId]);
 
+  const handlePrint = (type = "invoice") => {
+    if (!viewInvoice) return;
+    
+    const printWindow = window.open('', '_blank');
+    const content = `
+      <html>
+        <head>
+          <title>${type === 'invoice' ? 'Invoice' : 'Receipt'} - ${viewInvoice.invoiceNo}</title>
+          <style>
+            body { font-family: 'Inter', -apple-system, sans-serif; padding: 40px; color: #1e293b; line-height: 1.5; }
+            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px; }
+            .title { font-size: 24px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 1px; }
+            .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+            .section-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 8px; }
+            .value { font-size: 14px; font-weight: 600; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+            th { text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+            td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+            .totals { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+            .total-row { display: flex; width: 250px; justify-content: space-between; }
+            .grand-total { font-size: 20px; font-weight: 800; color: var(--app-accent, #6366f1); margin-top: 10px; padding-top: 10px; border-top: 2px solid #e2e8f0; }
+            .footer { margin-top: 60px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+            @media print { .no-print { display: none; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="title">${type === 'invoice' ? 'Invoice' : 'Receipt'}</div>
+              <div style="font-size: 14px; color: #64748b; margin-top: 4px;"># ${viewInvoice.invoiceNo}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 800; font-size: 18px;">M Business</div>
+              <div style="font-size: 12px; color: #64748b;">Billing Support</div>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div>
+              <div class="section-title">Billed To</div>
+              <div class="value">${user?.companyName || user?.name || "Customer"}</div>
+              <div style="font-size: 12px; color: #64748b;">${user?.email || ""}</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="section-title">Payment Details</div>
+              <div class="value">Date: ${formatDate(viewInvoice.paymentDate)}</div>
+              <div class="value">Method: ${viewInvoice.paymentMethod?.toUpperCase() || "CREDIT CARD"}</div>
+              <div class="value">Status: PAID</div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th style="text-align: right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div style="font-weight: 700;">${viewInvoice.planName || "Subscription Plan"}</div>
+                  <div style="font-size: 12px; color: #64748b;">${viewInvoice.planDuration || "Monthly"} subscription</div>
+                </td>
+                <td style="text-align: right; font-weight: 700;">${formatCurrency(viewInvoice.amount, viewInvoice.currency)}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="totals">
+            <div class="total-row">
+              <span style="color: #64748b;">Subtotal</span>
+              <span style="font-weight: 700;">${formatCurrency(viewInvoice.amount, viewInvoice.currency)}</span>
+            </div>
+            <div class="total-row">
+              <span style="color: #64748b;">Tax (GST 0%)</span>
+              <span style="font-weight: 700;">${formatCurrency(0, viewInvoice.currency)}</span>
+            </div>
+            <div class="total-row grand-total">
+              <span>Total Paid</span>
+              <span>${formatCurrency(viewInvoice.amount, viewInvoice.currency)}</span>
+            </div>
+          </div>
+
+          <div class="footer">
+            <p>Thank you for choosing M Business. For support, contact billing@m-business.com</p>
+            <p style="font-size: 10px;">Computer generated ${type}. No signature required.</p>
+          </div>
+          <script>window.onload = function() { window.print(); window.close(); }</script>
+        </body>
+      </html>
+    `;
+    printWindow.document.write(content);
+    printWindow.document.close();
+  };
+
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [userId]);
 
   // ── Success Redirect Timer ──
   useEffect(() => {
@@ -644,20 +740,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
       {activeTab === "payments" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           {/* Payment Method Section (Same as Invoices for consistency) */}
-          <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: T.text }}>Active Payment Method</h3>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ fontSize: 24 }}>💳</div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>
-                    {subscription.paymentMethod?.toUpperCase() || "Mastercard"} •••• {user?.last4 || "3867"}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <button style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid var(--app-border)", background: "#fff", color: T.text, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Update</button>
-          </div>
+       
 
           <Card title={`Payment History`} icon="💰">
             {payments.length === 0 ? (
@@ -706,21 +789,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
       {/* ── Invoices Tab ── */}
       {activeTab === "invoices" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {/* Payment Method Section */}
-          <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: T.text }}>Payment</h3>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ fontSize: 24 }}>💳</div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>
-                    {subscription.paymentMethod?.toUpperCase() || "Mastercard"} •••• {user?.last4 || "3867"}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <button style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid var(--app-border)", background: "#fff", color: T.text, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Update</button>
-          </div>
+    
 
           <Card title={`Invoices`} icon="🧾">
             {invoices.length === 0 ? (
@@ -920,6 +989,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
               <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
                 <button 
+                  onClick={() => handlePrint("receipt")}
                   style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#1e293b", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "0.2s" }}
                   onMouseEnter={e => e.currentTarget.style.background = "#0f172a"}
                   onMouseLeave={e => e.currentTarget.style.background = "#1e293b"}
@@ -927,6 +997,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                   Download receipt
                 </button>
                 <button 
+                  onClick={() => handlePrint("invoice")}
                   style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#fff", color: "#1e293b", border: "1.5px solid #e2e8f0", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "0.2s" }}
                   onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"}
                   onMouseLeave={e => e.currentTarget.style.background = "#fff"}

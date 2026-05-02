@@ -4,25 +4,25 @@ import { BASE_URL } from "../config";
 
 // ─── THEMES ───────────────────────────────────────────────────────────────────
 const THEMES = [
-  { name:"Violet",  p:"#7c3aed", g:"linear-gradient(135deg,#7c3aed,#a855f7)", l:"#ede9fe", t:"#4c1d95" },
+  { name:"Violet",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"#4c1d95" },
   { name:"Cobalt",  p:"#1d4ed8", g:"linear-gradient(135deg,#1e40af,#3b82f6)", l:"#dbeafe", t:"#1e3a8a" },
   { name:"Emerald", p:"#059669", g:"linear-gradient(135deg,#065f46,#10b981)", l:"#d1fae5", t:"#064e3b" },
   { name:"Rose",    p:"#e11d48", g:"linear-gradient(135deg,#9f1239,#f43f5e)", l:"#ffe4e6", t:"#881337" },
   { name:"Amber",   p:"#d97706", g:"linear-gradient(135deg,#92400e,#fbbf24)", l:"#fef3c7", t:"#78350f" },
   { name:"Slate",   p:"#334155", g:"linear-gradient(135deg,#0f172a,#475569)", l:"#f1f5f9", t:"#0f172a" },
   { name:"Teal",    p:"#0d9488", g:"linear-gradient(135deg,#134e4a,#2dd4bf)", l:"#ccfbf1", t:"#134e4a" },
-  { name:"Fuchsia", p:"#a21caf", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"#fae8ff", t:"#4a044e" },
+  { name:"Fuchsia", p:"var(--app-accent)", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"var(--app-border)", t:"#4a044e" },
 ];
 
 const P = {
-  accent: "#9333ea",
-  mid: "#7c3aed",
-  dark: "#1e0a3c",
-  light: "#f5f3ff",
-  border: "#ede9fe",
-  text: "#1e0a3c",
-  muted: "#a78bfa",
-  hover: "#faf5ff",
+  accent: "var(--app-accent)",
+  mid: "var(--app-accent)",
+  dark: "var(--app-text)",
+  light: "var(--app-bg)",
+  border: "var(--app-border)",
+  text: "var(--app-text)",
+  muted: "var(--app-muted)",
+  hover: "var(--app-bg)",
 };
 
 const A4_WIDTH = 794;
@@ -935,3 +935,5 @@ export default function CanvasProposalEditor({ proposalId, onSave, onClose }) {
     </div>
   );
 }
+
+

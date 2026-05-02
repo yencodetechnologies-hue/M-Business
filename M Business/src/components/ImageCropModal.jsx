@@ -106,7 +106,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Zoom</span>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#7c3aed' }}>{Math.round(zoom * 100)}%</span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--app-accent)' }}>{Math.round(zoom * 100)}%</span>
           </div>
           <input
             type="range"
@@ -118,7 +118,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
             onChange={(e) => setZoom(parseFloat(e.target.value))}
             style={{ 
               width: '100%',
-              accentColor: '#7c3aed',
+              accentColor: 'var(--app-accent)',
               cursor: 'pointer'
             }}
           />
@@ -140,9 +140,9 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
                   flex: 1,
                   padding: '8px',
                   borderRadius: '8px',
-                  border: aspect === opt.value ? '2px solid #7c3aed' : '1px solid #e2e8f0',
-                  background: aspect === opt.value ? '#f5f3ff' : '#fff',
-                  color: aspect === opt.value ? '#7c3aed' : '#64748b',
+                  border: aspect === opt.value ? '2px solid var(--app-accent)' : '1px solid #e2e8f0',
+                  background: aspect === opt.value ? 'var(--app-bg)' : '#fff',
+                  color: aspect === opt.value ? 'var(--app-accent)' : '#64748b',
                   fontSize: '12px',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -178,7 +178,7 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
             style={{
               flex: 2,
               padding: '12px',
-              backgroundColor: '#7c3aed',
+              backgroundColor: 'var(--app-accent)',
               border: 'none',
               borderRadius: '12px',
               color: '#fff',
@@ -199,3 +199,5 @@ const ImageCropModal = ({ image, onCropComplete, onCancel, aspect: initialAspect
 
 
 export default ImageCropModal;
+
+

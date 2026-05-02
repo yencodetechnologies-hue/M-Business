@@ -8,25 +8,25 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 const API = `${BASE_URL}/api/reports`;
-const T   = { text:"#1e0a3c" };
+const T   = { text:"var(--app-text)" };
 
 const RPT_ICONS   = { "Monthly Revenue":"💰", "Project Summary":"📁", "Client Activity":"👥", "Team Overview":"👨‍💼" };
-const RPT_COLORS  = ["#9333ea","#7c3aed","#a855f7","#f59e0b"];
+const RPT_COLORS  = ["var(--app-accent)","var(--app-accent)","var(--app-muted)","#f59e0b"];
 
 function StatCard({ icon, label, value, color, sub }) {
   return (
     <div style={{ background:"#fff", borderRadius:14, padding:"18px 16px",
-      boxShadow:"0 4px 18px rgba(147,51,234,0.07)", border:"1px solid #ede9fe",
+      boxShadow:"0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border:"1px solid var(--app-border)",
       position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", top:-15, right:-15, width:70, height:70,
         borderRadius:"50%", background:`radial-gradient(circle,${color}20,transparent)` }}/>
       <div style={{ width:40, height:40, borderRadius:11, background:`${color}15`,
         display:"flex", alignItems:"center", justifyContent:"center",
         fontSize:19, marginBottom:10 }}>{icon}</div>
-      <div style={{ fontSize:10, color:"#a78bfa", fontWeight:700,
+      <div style={{ fontSize:10, color:"var(--app-muted)", fontWeight:700,
         letterSpacing:0.5, marginBottom:3 }}>{label.toUpperCase()}</div>
       <div style={{ fontSize:26, fontWeight:800, color, lineHeight:1 }}>{value}</div>
-      {sub && <div style={{ fontSize:11, color:"#a78bfa", marginTop:4 }}>{sub}</div>}
+      {sub && <div style={{ fontSize:11, color:"var(--app-muted)", marginTop:4 }}>{sub}</div>}
     </div>
   );
 }
@@ -38,7 +38,7 @@ function ReportCard({ r, idx }) {
 
   return (
     <div style={{ background:"#fff", borderRadius:16, padding:22,
-      boxShadow:"0 4px 18px rgba(147,51,234,0.07)", border:"1px solid #ede9fe",
+      boxShadow:"0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border:"1px solid var(--app-border)",
       position:"relative", overflow:"hidden" }}>
 
       {/* BG decoration */}
@@ -51,11 +51,11 @@ function ReportCard({ r, idx }) {
           display:"flex", alignItems:"center", justifyContent:"center",
           fontSize:20, flexShrink:0 }}>{icon}</div>
         <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:10, color:"#a78bfa", fontWeight:700, letterSpacing:0.5 }}>
+          <div style={{ fontSize:10, color:"var(--app-muted)", fontWeight:700, letterSpacing:0.5 }}>
             {r.id}
           </div>
           <div style={{ fontSize:16, fontWeight:800, color:T.text, marginTop:1 }}>{r.type}</div>
-          <div style={{ fontSize:12, color:"#a78bfa", marginTop:2 }}>📅 {r.range}</div>
+          <div style={{ fontSize:12, color:"var(--app-muted)", marginTop:2 }}>📅 {r.range}</div>
         </div>
         {/* Revenue badge */}
         <div style={{ background:`${color}15`, border:`1px solid ${color}30`,
@@ -69,11 +69,11 @@ function ReportCard({ r, idx }) {
       {/* Progress bar */}
       <div style={{ marginBottom:16 }}>
         <div style={{ display:"flex", justifyContent:"space-between",
-          fontSize:11, color:"#a78bfa", fontWeight:600, marginBottom:5 }}>
+          fontSize:11, color:"var(--app-muted)", fontWeight:600, marginBottom:5 }}>
           <span>Completion</span>
           <span style={{ color, fontWeight:800 }}>{donePct}%</span>
         </div>
-        <div style={{ background:"#ede9fe", borderRadius:6, height:8 }}>
+        <div style={{ background:"var(--app-border)", borderRadius:6, height:8 }}>
           <div style={{ width:`${donePct}%`,
             background:`linear-gradient(90deg,${color},${color}99)`,
             borderRadius:6, height:"100%", transition:"width 0.6s ease" }}/>
@@ -83,14 +83,14 @@ function ReportCard({ r, idx }) {
       {/* 4-metric grid */}
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:9 }}>
         {[
-          { k:"Total",    v:r.total,   c:"#9333ea" },
+          { k:"Total",    v:r.total,   c:"var(--app-accent)" },
           { k:"Revenue",  v:r.revenue, c:color      },
           { k:"Done ✅",  v:r.done,    c:"#22C55E"  },
           { k:"Pending ⏳",v:r.pending, c:"#f59e0b" },
         ].map(({ k, v, c }) => (
-          <div key={k} style={{ background:"#faf5ff", borderRadius:10,
-            padding:"10px 12px", border:"1px solid #ede9fe" }}>
-            <div style={{ fontSize:10, color:"#a78bfa", fontWeight:700,
+          <div key={k} style={{ background:"var(--app-bg)", borderRadius:10,
+            padding:"10px 12px", border:"1px solid var(--app-border)" }}>
+            <div style={{ fontSize:10, color:"var(--app-muted)", fontWeight:700,
               letterSpacing:0.5, marginBottom:4 }}>{k.toUpperCase()}</div>
             <div style={{ fontSize: typeof v === "number" ? 20 : 14,
               fontWeight:800, color:c, wordBreak:"break-word" }}>{v}</div>
@@ -179,7 +179,7 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
       <div style={{ display:"flex", justifyContent:"space-between",
         alignItems:"center", flexWrap:"wrap", gap:10 }}>
         <div>
-          <p style={{ margin:0, fontSize:13, color:"#a78bfa" }}>
+          <p style={{ margin:0, fontSize:13, color:"var(--app-muted)" }}>
             📊 Auto-generated from live database · {" "}
             {lastSync && (
               <span style={{ fontSize:11 }}>
@@ -189,7 +189,7 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
           </p>
         </div>
         <button onClick={fetchReports} disabled={loading}
-          style={{ background:"linear-gradient(135deg,#9333ea,#7c3aed)", color:"#fff",
+          style={{ background:"var(--app-accent-gradient)", color:"#fff",
             border:"none", borderRadius:10, padding:"8px 18px", fontWeight:700,
             fontSize:13, cursor:"pointer", fontFamily:"inherit",
             opacity:loading?0.7:1, display:"flex", alignItems:"center", gap:6 }}>
@@ -200,8 +200,8 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
       {/* ── Summary stat row ── */}
       <div className="dash-stats"
         style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
-        <StatCard icon="💰" label="Total Revenue"  value={totalRevStr}      color="#9333ea" />
-        <StatCard icon="📁" label="Total Projects" value={totalProj}        color="#7c3aed" sub={`${totalDone} completed`} />
+        <StatCard icon="💰" label="Total Revenue"  value={totalRevStr}      color="var(--app-accent)" />
+        <StatCard icon="📁" label="Total Projects" value={totalProj}        color="var(--app-accent)" sub={`${totalDone} completed`} />
         <StatCard icon="✅" label="Completed"      value={totalDone}        color="#22C55E" />
         <StatCard icon="⏳" label="In Progress"    value={totalPending}     color="#f59e0b" />
       </div>
@@ -210,9 +210,9 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
       {loading
         ? (
           <div style={{ textAlign:"center", padding:70, background:"#fff",
-            borderRadius:16, border:"1px solid #ede9fe" }}>
+            borderRadius:16, border:"1px solid var(--app-border)" }}>
             <div style={{ fontSize:40, marginBottom:14 }}>⏳</div>
-            <div style={{ fontSize:14, fontWeight:600, color:"#a78bfa" }}>
+            <div style={{ fontSize:14, fontWeight:600, color:"var(--app-muted)" }}>
               Generating reports from database...
             </div>
           </div>
@@ -220,16 +220,16 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
         : reports.length === 0
           ? (
             <div style={{ textAlign:"center", padding:70, background:"#fff",
-              borderRadius:16, border:"1px solid #ede9fe" }}>
+              borderRadius:16, border:"1px solid var(--app-border)" }}>
               <div style={{ fontSize:48, marginBottom:14 }}>📈</div>
-              <div style={{ fontSize:15, fontWeight:700, color:"#1e0a3c" }}>
+              <div style={{ fontSize:15, fontWeight:700, color:"var(--app-text)" }}>
                 No report data yet
               </div>
-              <div style={{ fontSize:13, color:"#a78bfa", marginTop:6 }}>
+              <div style={{ fontSize:13, color:"var(--app-muted)", marginTop:6 }}>
                 Add projects, clients & employees to see live reports
               </div>
               <button onClick={fetchReports}
-                style={{ marginTop:16, background:"linear-gradient(135deg,#9333ea,#7c3aed)",
+                style={{ marginTop:16, background:"var(--app-accent-gradient)",
                   color:"#fff", border:"none", borderRadius:10, padding:"10px 20px",
                   fontWeight:700, fontSize:13, cursor:"pointer" }}>
                 Try Again
@@ -249,18 +249,18 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
       {/* ── Quick summary table ── */}
       {reports.length > 0 && (
         <div style={{ background:"#fff", borderRadius:16, padding:22,
-          boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid #ede9fe" }}>
-          <h3 style={{ margin:"0 0 16px", fontSize:15, fontWeight:700, color:"#1e0a3c" }}>
+          boxShadow:"0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border:"1px solid var(--app-border)" }}>
+          <h3 style={{ margin:"0 0 16px", fontSize:15, fontWeight:700, color:"var(--app-text)" }}>
             📋 Summary Table
           </h3>
           <div style={{ overflowX:"auto" }}>
             <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
               <thead>
-                <tr style={{ background:"linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+                <tr style={{ background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
                   {["Report","Period","Total","Revenue","Done","Pending"].map(col => (
                     <th key={col} style={{ padding:"10px 14px", textAlign:"left",
-                      color:"#7c3aed", fontWeight:700, fontSize:11,
-                      borderBottom:"2px solid #ede9fe", whiteSpace:"nowrap" }}>
+                      color:"var(--app-accent)", fontWeight:700, fontSize:11,
+                      borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>
                       {col.toUpperCase()}
                     </th>
                   ))}
@@ -271,16 +271,16 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
                   const color = RPT_COLORS[i % RPT_COLORS.length];
                   return (
                     <tr key={r.id}
-                      style={{ borderBottom:"1px solid #f3f0ff" }}
-                      onMouseEnter={e=>e.currentTarget.style.background="#faf5ff"}
+                      style={{ borderBottom:"1px solid var(--app-border)" }}
+                      onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                       onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                       <td style={{ padding:"12px 14px" }}>
                         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                           <span style={{ fontSize:16 }}>{RPT_ICONS[r.type]||"📊"}</span>
-                          <span style={{ fontWeight:700, color:"#1e0a3c" }}>{r.type}</span>
+                          <span style={{ fontWeight:700, color:"var(--app-text)" }}>{r.type}</span>
                         </div>
                       </td>
-                      <td style={{ padding:"12px 14px", color:"#a78bfa" }}>{r.range}</td>
+                      <td style={{ padding:"12px 14px", color:"var(--app-muted)" }}>{r.range}</td>
                       <td style={{ padding:"12px 14px", fontWeight:700, color }}>
                         {r.total}
                       </td>
@@ -304,3 +304,5 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
     </div>
   );
 }
+
+

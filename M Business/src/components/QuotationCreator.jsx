@@ -51,7 +51,7 @@ function saveLocal(qt, items) {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
 }
 
-const T = { primary: "#3b0764", sidebar: "#1e0a3c", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "#FFFFFF", text: "#1e0a3c", muted: "var(--app-accent)", border: "var(--app-border)" };
+const T = { primary: "var(--app-sidebar)", sidebar: "var(--app-text)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "#FFFFFF", text: "var(--app-text)", muted: "var(--app-accent)", border: "var(--app-border)" };
 
 function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
   const [search, setSearch] = useState("");
@@ -60,17 +60,17 @@ function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative" }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#a78bfa", transition: "0.2s" }}>▼</span>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(147,51,234,0.15)", zIndex: 999, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No companies found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No companies found</div>
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
       )}
@@ -85,16 +85,16 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
   const filtered = projects.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()));
   return (
     <div style={{ position: "relative" }}>
-      <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
+      <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
         {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#10b981)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#a78bfa", transition: "0.2s" }}>▼</span>
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(5,150,105,0.15)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#f0fdf4,#f7fffe)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#10b981)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No projects found</div>
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No projects found</div>
               : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f0fdf4" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "#f7fffe"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f0fdf4" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),#10b981)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
@@ -362,7 +362,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #f3f4f6", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
-            <div className="qt-th" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr 0.8fr 1fr 0.9fr 0.9fr 1.1fr auto", padding: "11px 20px", background: "#fafafa", borderBottom: "1px solid #f3f4f6", gap: 8 }}>
+            <div className="qt-th" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr 0.8fr 1fr 0.9fr 0.9fr 1.1fr auto", padding: "11px 20px", background: "var(--app-bg)", borderBottom: "1px solid #f3f4f6", gap: 8 }}>
               {["Quote No", "Company Name", "Project", "Amount", "Date", "Expiry", "Status", "Actions"].map((h) => (
                 <div key={h} style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af", letterSpacing: 0.5 }}>{h.toUpperCase()}</div>
               ))}
@@ -429,10 +429,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.5)", backdropFilter: "blur(6px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 640, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 24px 60px rgba(0,0,0,0.2)" }}>
               {/* Modal Header */}
-              <div style={{ padding: "16px 24px", borderBottom: "1px solid #f3f0ff", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,#f9f8ff,#fff)" }}>
+              <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),#fff)" }}>
                 <div>
                   <div style={{ fontSize: 10, color: "var(--app-accent)", fontWeight: 800, letterSpacing: 1.5, marginBottom: 2 }}>QUOTATION DETAILS</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "#1e0a3c" }}>{viewEntry.quoteNo}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-text)" }}>{viewEntry.quoteNo}</div>
                 </div>
                 <button onClick={() => setViewEntry(null)} style={{ background: "var(--app-bg)", border: "none", width: 32, height: 32, borderRadius: "50%", color: "var(--app-accent)", cursor: "pointer", fontSize: 18, fontWeight: 700 }}>✕</button>
               </div>
@@ -440,12 +440,12 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               <div style={{ overflowY: "auto", padding: 24, flex: 1 }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
                   <div>
-                    <div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>COMPANY NAME</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#1e0a3c" }}>{viewEntry.client}</div>
+                    <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>COMPANY NAME</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-text)" }}>{viewEntry.client}</div>
                     <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>{viewEntry.qt?.companyName}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>STATUS</div>
+                    <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>STATUS</div>
                     <StatusBadge status={viewEntry.status} />
                   </div>
                 </div>
@@ -455,15 +455,15 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
-                        <th style={{ textAlign: "left", fontSize: 10, color: "#a78bfa", paddingBottom: 10 }}>DESCRIPTION</th>
-                        <th style={{ textAlign: "right", fontSize: 10, color: "#a78bfa", paddingBottom: 10 }}>TOTAL</th>
+                        <th style={{ textAlign: "left", fontSize: 10, color: "var(--app-muted)", paddingBottom: 10 }}>DESCRIPTION</th>
+                        <th style={{ textAlign: "right", fontSize: 10, color: "var(--app-muted)", paddingBottom: 10 }}>TOTAL</th>
                       </tr>
                     </thead>
                     <tbody>
                       {(viewEntry.items || []).map((item, i) => (
-                        <tr key={i} style={{ borderTop: "1px solid #f3f0ff" }}>
-                          <td style={{ padding: "10px 0", fontSize: 13, color: "#1e0a3c", fontWeight: 600 }}>{item.description}</td>
-                          <td style={{ padding: "10px 0", textAlign: "right", fontSize: 13, color: "#1e0a3c", fontWeight: 700 }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), viewEntry.qt?.currency)}</td>
+                        <tr key={i} style={{ borderTop: "1px solid var(--app-border)" }}>
+                          <td style={{ padding: "10px 0", fontSize: 13, color: "var(--app-text)", fontWeight: 600 }}>{item.description}</td>
+                          <td style={{ padding: "10px 0", textAlign: "right", fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), viewEntry.qt?.currency)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -496,9 +496,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                         ["Total Amount", formatCurrency(vTot, vQt.currency)],
                         ["Advance Paid", formatCurrency(vQt.amountPaid || 0, vQt.currency)]
                       ].map(([l, v]) => (
-                        <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #f3f0ff" }}>
+                        <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid var(--app-border)" }}>
                           <span style={{ fontSize: 13, color: "#6b7280" }}>{l}</span>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>{v}</span>
                         </div>
                       ));
                     })()}
@@ -514,26 +514,26 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                           {viewEntry.qt?.upiId && (
                             <div>
                               <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>UPI ID</div>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c" }}>{viewEntry.qt?.upiId}</div>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)" }}>{viewEntry.qt?.upiId}</div>
                             </div>
                           )}
                           {viewEntry.qt?.bankName && (
                             <>
                               <div>
                                 <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>BANK</div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c" }}>{viewEntry.qt?.bankName}</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)" }}>{viewEntry.qt?.bankName}</div>
                               </div>
                               <div>
                                 <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>ACC NAME</div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c" }}>{viewEntry.qt?.accountName}</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)" }}>{viewEntry.qt?.accountName}</div>
                               </div>
                               <div>
                                 <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>ACC NO</div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c", fontFamily: "monospace" }}>{viewEntry.qt?.accountNumber}</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", fontFamily: "monospace" }}>{viewEntry.qt?.accountNumber}</div>
                               </div>
                               <div>
                                 <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700 }}>IFSC</div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "#1e0a3c", fontFamily: "monospace" }}>{viewEntry.qt?.ifscCode}</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", fontFamily: "monospace" }}>{viewEntry.qt?.ifscCode}</div>
                               </div>
                             </>
                           )}
@@ -545,7 +545,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               </div>
 
               {/* Modal Footer */}
-              <div style={{ padding: "16px 24px", borderTop: "1px solid #f3f0ff", background: "#f9f8ff", display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <div style={{ padding: "16px 24px", borderTop: "1px solid var(--app-border)", background: "var(--app-bg)", display: "flex", gap: 10, justifyContent: "flex-end" }}>
                 <button onClick={() => setViewEntry(null)} style={{ padding: "10px 20px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 10, color: "#6b7280", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Close</button>
                 <button onClick={() => { loadEntry(viewEntry); setViewEntry(null); }} style={{ padding: "10px 20px", background: "var(--app-border)", border: "1px solid var(--app-border)", borderRadius: 10, color: "var(--app-accent)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Edit Quotation</button>
                 <button onClick={() => { setQt(viewEntry.qt); setItems(viewEntry.items); setStep("preview"); setViewEntry(null); }} style={{ padding: "10px 20px", background: "linear-gradient(135deg,var(--app-accent),#10b981)", border: "none", borderRadius: 10, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Print / PDF</button>
@@ -1057,3 +1057,5 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     </div>
   );
 }
+
+

@@ -230,7 +230,7 @@ const handleClose = () => {
               <span style={{ fontSize:10, color:"#a5b4fc", fontWeight:800 }}>{uploadedCount}/{DOC_TYPES.length}</span>
             </div>
             <div style={{ background:"rgba(255,255,255,0.1)", borderRadius:99, height:5 }}>
-              <div style={{ width:`${(uploadedCount/DOC_TYPES.length)*100}%`, background:uploadedCount===DOC_TYPES.length?"linear-gradient(90deg,#10b981,#34d399)":"linear-gradient(90deg,#6366f1,#a78bfa)", borderRadius:99, height:"100%", transition:"width 0.5s" }}/>
+              <div style={{ width:`${(uploadedCount/DOC_TYPES.length)*100}%`, background:uploadedCount===DOC_TYPES.length?"linear-gradient(90deg,#10b981,#34d399)":"linear-gradient(90deg,#6366f1,var(--app-muted))", borderRadius:99, height:"100%", transition:"width 0.5s" }}/>
             </div>
           </div>
         </div>
@@ -323,38 +323,38 @@ export function SubAdminDocumentsPage({ employees = [] }) {
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-      <div style={{ background:"#fff", borderRadius:16, border:"1px solid #ede9fe", padding:"16px 18px" }}>
-        <div style={{ fontSize:14, fontWeight:800, color:"#1e0a3c", marginBottom:14 }}>📂 Employee Documents</div>
+      <div style={{ background:"#fff", borderRadius:16, border:"1px solid var(--app-border)", padding:"16px 18px" }}>
+        <div style={{ fontSize:14, fontWeight:800, color:"var(--app-text)", marginBottom:14 }}>📂 Employee Documents</div>
         <div style={{ position:"relative", marginBottom:14 }}>
           <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)" }}>🔍</span>
           <input placeholder="Search employee..." value={search} onChange={e => setSearch(e.target.value)}
-            style={{ width:"100%", padding:"9px 12px 9px 34px", border:"1.5px solid #ede9fe", borderRadius:10, fontSize:13, outline:"none", fontFamily:"inherit", background:"#faf5ff", boxSizing:"border-box" }}/>
+            style={{ width:"100%", padding:"9px 12px 9px 34px", border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13, outline:"none", fontFamily:"inherit", background:"var(--app-bg)", boxSizing:"border-box" }}/>
         </div>
         <div style={{ overflowX:"auto" }}>
           <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
             <thead>
-              <tr style={{ background:"#f5f3ff" }}>
+              <tr style={{ background:"var(--app-bg)" }}>
                 {["Employee","Aadhaar","PAN Card","Bank Passbook","ITR","Action"].map(h => (
-                  <th key={h} style={{ padding:"9px 12px", textAlign:"left", fontSize:10, fontWeight:700, color:"#7c3aed", borderBottom:"2px solid #ede9fe", whiteSpace:"nowrap" }}>{h.toUpperCase()}</th>
+                  <th key={h} style={{ padding:"9px 12px", textAlign:"left", fontSize:10, fontWeight:700, color:"var(--app-accent)", borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>{h.toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0
-                ? <tr><td colSpan={5} style={{ padding:30, textAlign:"center", color:"#a78bfa" }}>No employees found</td></tr>
+                ? <tr><td colSpan={5} style={{ padding:30, textAlign:"center", color:"var(--app-muted)" }}>No employees found</td></tr>
                 : filtered.map((emp, i) => {
                     const uploaded = docStatusMap[emp.name] || [];
                     const isSel = selected?.name === emp.name;
                     return (
-                      <tr key={i} style={{ borderBottom:"1px solid #f5f3ff", background: isSel ? "#f3e8ff" : "transparent" }}>
+                      <tr key={i} style={{ borderBottom:"1px solid var(--app-bg)", background: isSel ? "#f3e8ff" : "transparent" }}>
                         <td style={{ padding:"11px 12px" }}>
                           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                            <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#9333ea,#c084fc)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:700 }}>
+                            <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:700 }}>
                               {(emp.name||"?")[0].toUpperCase()}
                             </div>
                             <div>
-                              <div style={{ fontWeight:700, color:"#1e0a3c", fontSize:12 }}>{emp.name}</div>
-                              <div style={{ fontSize:10, color:"#a78bfa" }}>{emp.department||emp.role||""}</div>
+                              <div style={{ fontWeight:700, color:"var(--app-text)", fontSize:12 }}>{emp.name}</div>
+                              <div style={{ fontSize:10, color:"var(--app-muted)" }}>{emp.department||emp.role||""}</div>
                             </div>
                           </div>
                         </td>
@@ -370,7 +370,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                         })}
                         <td style={{ padding:"11px 12px" }}>
                           <button onClick={() => loadEmployeeDocs(emp)}
-                            style={{ padding:"5px 12px", background: isSel ? "#9333ea" : "rgba(147,51,234,0.08)", border:`1px solid ${isSel ? "#9333ea" : "rgba(147,51,234,0.25)"}`, borderRadius:8, fontSize:11, fontWeight:700, color: isSel ? "#fff" : "#9333ea", cursor:"pointer", fontFamily:"inherit" }}>
+                            style={{ padding:"5px 12px", background: isSel ? "var(--app-accent)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border:`1px solid ${isSel ? "var(--app-accent)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)"}`, borderRadius:8, fontSize:11, fontWeight:700, color: isSel ? "#fff" : "var(--app-accent)", cursor:"pointer", fontFamily:"inherit" }}>
                             {isSel ? "Viewing" : "👁 View"}
                           </button>
                         </td>
@@ -383,13 +383,13 @@ export function SubAdminDocumentsPage({ employees = [] }) {
       </div>
 
       {selected && (
-        <div style={{ background:"#fff", borderRadius:16, border:"1px solid #ede9fe", padding:"16px 18px" }}>
+        <div style={{ background:"#fff", borderRadius:16, border:"1px solid var(--app-border)", padding:"16px 18px" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
-            <div style={{ fontSize:14, fontWeight:800, color:"#1e0a3c" }}>📄 {selected.name} — Documents</div>
-            <button onClick={() => setSelected(null)} style={{ background:"none", border:"none", fontSize:16, cursor:"pointer", color:"#a78bfa" }}>✕</button>
+            <div style={{ fontSize:14, fontWeight:800, color:"var(--app-text)" }}>📄 {selected.name} — Documents</div>
+            <button onClick={() => setSelected(null)} style={{ background:"none", border:"none", fontSize:16, cursor:"pointer", color:"var(--app-muted)" }}>✕</button>
           </div>
           {loadingDocs ? (
-            <div style={{ textAlign:"center", padding:"2rem", color:"#a78bfa" }}>Loading...</div>
+            <div style={{ textAlign:"center", padding:"2rem", color:"var(--app-muted)" }}>Loading...</div>
           ) : (
             <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
               {DOC_TYPES.map(dt => {
@@ -399,7 +399,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                   <div key={dt.key} style={{ border:`1.5px solid ${hasDoc ? dt.color+"35" : "#f1f5f9"}`, borderRadius:12, padding:"12px 14px", background: hasDoc ? `${dt.color}04` : "#f8fafc" }}>
                     <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom: hasDoc ? 10 : 0 }}>
                       <span style={{ fontSize:18 }}>{dt.icon}</span>
-                      <div style={{ flex:1, fontWeight:700, fontSize:13, color:"#1e0a3c" }}>{dt.label}</div>
+                      <div style={{ flex:1, fontWeight:700, fontSize:13, color:"var(--app-text)" }}>{dt.label}</div>
                       {hasDoc
                         ? <span style={{ background:`${dt.color}15`, border:`1px solid ${dt.color}30`, borderRadius:20, padding:"3px 10px", fontSize:10, fontWeight:700, color:dt.color }}>✓ Uploaded</span>
                         : <span style={{ background:"#fef2f2", border:"1px solid #fecaca", borderRadius:20, padding:"3px 10px", fontSize:10, fontWeight:700, color:"#ef4444" }}>✗ Missing</span>}
@@ -411,7 +411,7 @@ export function SubAdminDocumentsPage({ employees = [] }) {
                           : <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", background:"#fff", borderRadius:8, border:"1px solid #f1f5f9" }}>
                               <span style={{ fontSize:22 }}>📄</span>
                               <div style={{ flex:1 }}>
-                                <div style={{ fontSize:11, fontWeight:700, color:"#1e0a3c" }}>{doc.fileName || `${dt.label}.pdf`}</div>
+                                <div style={{ fontSize:11, fontWeight:700, color:"var(--app-text)" }}>{doc.fileName || `${dt.label}.pdf`}</div>
                                 {doc.fileSize && <div style={{ fontSize:10, color:"#94a3b8" }}>{fmtSize(doc.fileSize)}</div>}
                               </div>
                             </div>}
@@ -431,3 +431,5 @@ export function SubAdminDocumentsPage({ employees = [] }) {
     </div>
   );
 }
+
+

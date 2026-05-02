@@ -18,7 +18,7 @@ const THEMES = [
   { name:"Amber",   p:"#d97706", g:"linear-gradient(135deg,#92400e,#fbbf24)", l:"var(--app-border)", t:"#78350f" },
   { name:"Slate",   p:"#334155", g:"linear-gradient(135deg,#0f172a,#475569)", l:"var(--app-border)", t:"#0f172a" },
   { name:"Teal",    p:"#0d9488", g:"linear-gradient(135deg,#134e4a,#2dd4bf)", l:"var(--app-border)", t:"#134e4a" },
-  { name:"Fuchsia", p:"#a21caf", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"var(--app-border)", t:"#4a044e" },
+  { name:"Fuchsia", p:"var(--app-accent)", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"var(--app-border)", t:"#4a044e" },
 ];
 // ─── COVERS ───────────────────────────────────────────────────────────────────
 const COVERS = [
@@ -524,7 +524,7 @@ function Slide({ slide, theme:tn, docFormat, editing, onChange, selectedId, onSe
         </tr></thead>
         <tbody>
           {(slide.rows || []).map((r,i)=>(
-            <tr key={i} style={{borderBottom:`1px solid ${t.p}12`,background:i%2?"#fafafa":"#fff"}}>
+            <tr key={i} style={{borderBottom:`1px solid ${t.p}12`,background:i%2?"var(--app-bg)":"#fff"}}>
               <td style={{padding:"12px 22px",fontSize:14,color:"#374151"}}><Txt val={r.item} onCh={v=>{const a=[...slide.rows];a[i]={...a[i],item:v};upd({rows:a});}}/></td>
               <td style={{padding:"12px 22px",textAlign:"right",fontSize:14,fontWeight:700,color:"#1e293b"}}><Txt val={r.cost} onCh={v=>{const a=[...slide.rows];a[i]={...a[i],cost:v};upd({rows:a});}}/></td>
             </tr>
@@ -2097,3 +2097,5 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
     </div>
   );
 }
+
+

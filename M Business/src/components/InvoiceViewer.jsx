@@ -72,17 +72,17 @@ export default function InvoiceViewer() {
   }, []);
 
   if (error) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f3ff", fontFamily: "sans-serif", padding: 24 }}>
-      <div style={{ textAlign: "center", color: "#7c3aed" }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", fontFamily: "sans-serif", padding: 24 }}>
+      <div style={{ textAlign: "center", color: "var(--app-accent)" }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#1e0a3c" }}>{error}</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "var(--app-text)" }}>{error}</div>
       </div>
     </div>
   );
 
   if (!data) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f3ff", fontFamily: "sans-serif" }}>
-      <div style={{ textAlign: "center", color: "#7c3aed", fontSize: 14 }}>Loading invoice...</div>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", fontFamily: "sans-serif" }}>
+      <div style={{ textAlign: "center", color: "var(--app-accent)", fontSize: 14 }}>Loading invoice...</div>
     </div>
   );
 
@@ -90,21 +90,21 @@ export default function InvoiceViewer() {
   const upiLink = inv.upiId ? `upi://pay?pa=${inv.upiId}&pn=${encodeURIComponent(inv.companyName)}&am=${balanceDue.toFixed(2)}&cu=INR&tn=${encodeURIComponent("Invoice " + inv.invoiceNo)}` : "";
 
   return (
-    <div style={{ fontFamily: "'Segoe UI', sans-serif", background: "#ede9fe", minHeight: "100vh", padding: "0 0 40px" }}>
+    <div style={{ fontFamily: "'Segoe UI', sans-serif", background: "var(--app-border)", minHeight: "100vh", padding: "0 0 40px" }}>
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #ede9fe; }
+        body { background: var(--app-border); }
         .inv-card { background: #fff; border-radius: 16px; margin: 0 12px 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(109,40,217,0.10); }
-        .label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #a78bfa; text-transform: uppercase; margin-bottom: 4px; }
-        .value { font-size: 14px; font-weight: 700; color: #1e0a3c; }
+        .label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--app-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .value { font-size: 14px; font-weight: 700; color: var(--app-text); }
         .value-sm { font-size: 12px; color: #4b5563; }
         table { width: 100%; border-collapse: collapse; }
-        th { font-size: 9px; color: #7c3aed; font-weight: 700; letter-spacing: 1px; padding: 8px 10px; border-bottom: 2px solid #ede9fe; text-align: left; background: #faf5ff; }
+        th { font-size: 9px; color: var(--app-accent); font-weight: 700; letter-spacing: 1px; padding: 8px 10px; border-bottom: 2px solid var(--app-border); text-align: left; background: var(--app-bg); }
         th.r, td.r { text-align: right; }
-        td { font-size: 12px; padding: 10px 10px; border-bottom: 1px solid #f5f3ff; color: #1e0a3c; }
+        td { font-size: 12px; padding: 10px 10px; border-bottom: 1px solid var(--app-bg); color: var(--app-text); }
         td.desc { font-weight: 600; }
         td.amt { font-weight: 700; }
-        .pill { display: inline-block; background: #f5f3ff; border-radius: 20px; padding: 2px 10px; font-size: 11px; color: #7c3aed; font-weight: 600; }
+        .pill { display: inline-block; background: var(--app-bg); border-radius: 20px; padding: 2px 10px; font-size: 11px; color: var(--app-accent); font-weight: 600; }
         @media print {
           body { background: white !important; }
           .no-print { display: none !important; }
@@ -118,7 +118,7 @@ export default function InvoiceViewer() {
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>INVOICE</div>
           <div style={{ fontSize: 22, fontWeight: 900, color: "#c4b5fd", marginBottom: 2 }}>{inv.invoiceNo}</div>
           <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{inv.companyName}</div>
-          <button onClick={() => setShowScanner(true)} style={{ marginTop: 10, padding: '8px 16px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Scan QR Code</button>
+          <button onClick={() => setShowScanner(true)} style={{ marginTop: 10, padding: '8px 16px', background: 'var(--app-accent)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Scan QR Code</button>
           {inv.companyEmail && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 3 }}>{inv.companyEmail}</div>}
           {inv.companyPhone && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{inv.companyPhone}</div>}
 
@@ -141,14 +141,14 @@ export default function InvoiceViewer() {
       </div>
 
       {inv.upiId && balanceDue > 0 && (
-        <div className="inv-card" style={{ padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", background: "#f5f3ff", border: "2px solid #ddd6fe" }}>
+        <div className="inv-card" style={{ padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", border: "2px solid #ddd6fe" }}>
           <div style={{ fontSize: 12, fontWeight: 800, color: "#5b21b6", marginBottom: 12, letterSpacing: 1 }}>SCAN TO PAY (UPI)</div>
           <div style={{ background: "#fff", padding: 12, borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
             <QRCodeSVG value={upiLink} size={160} />
           </div>
           <div style={{ marginTop: 12, textAlign: "center" }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#1e0a3c" }}>{inv.upiId}</div>
-            <a href={upiLink} style={{ display: "inline-block", marginTop: 10, padding: "8px 20px", background: "#7c3aed", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 700 }}>Pay Now →</a>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-text)" }}>{inv.upiId}</div>
+            <a href={upiLink} style={{ display: "inline-block", marginTop: 10, padding: "8px 20px", background: "var(--app-accent)", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 700 }}>Pay Now →</a>
           </div>
         </div>
       )}
@@ -171,7 +171,7 @@ export default function InvoiceViewer() {
       </div>
 
       <div className="inv-card" style={{ padding: "16px 0" }}>
-        <div style={{ padding: "0 18px 10px", fontSize: 11, fontWeight: 700, color: "#1e0a3c" }}>📦 Items / Services</div>
+        <div style={{ padding: "0 18px 10px", fontSize: 11, fontWeight: 700, color: "var(--app-text)" }}>📦 Items / Services</div>
         <table>
           <thead>
             <tr>
@@ -185,7 +185,7 @@ export default function InvoiceViewer() {
           <tbody>
             {items.map((item, idx) => (
               <tr key={item.id || idx}>
-                <td style={{ color: "#a78bfa", fontWeight: 700, fontSize: 11 }}>{String(idx + 1).padStart(2, "0")}</td>
+                <td style={{ color: "var(--app-muted)", fontWeight: 700, fontSize: 11 }}>{String(idx + 1).padStart(2, "0")}</td>
                 <td className="desc">{item.description || "—"}</td>
                 <td className="r">{item.quantity}</td>
                 <td className="r">{formatCurrency(item.rate, inv.currency)}</td>
@@ -195,16 +195,16 @@ export default function InvoiceViewer() {
           </tbody>
         </table>
 
-        <div style={{ padding: "14px 18px 2px", borderTop: "2px solid #f3f0ff", marginTop: 4 }}>
+        <div style={{ padding: "14px 18px 2px", borderTop: "2px solid var(--app-border)", marginTop: 4 }}>
           {[
             ["Subtotal", formatCurrency(subtotal, inv.currency)],
             [`GST (${inv.gstRate}%)`, formatCurrency(gstAmt, inv.currency)],
             ["Total", formatCurrency(total, inv.currency)],
             ["Amount Paid", formatCurrency(inv.amountPaid, inv.currency)]
           ].map(([l, v]) => (
-            <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #f5f3ff" }}>
+            <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--app-bg)" }}>
               <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#1e0a3c" }}>{v}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-text)" }}>{v}</span>
             </div>
           ))}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 12, padding: "12px 14px" }}>
@@ -247,3 +247,5 @@ export default function InvoiceViewer() {
     </div>
   );
 }
+
+

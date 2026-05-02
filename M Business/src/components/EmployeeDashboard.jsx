@@ -1413,7 +1413,7 @@ const fetchSubscription = async () => {
                   {(empName||"E").slice(0,2).toUpperCase()}
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#1e0a3c", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{resolvedUser?.name||"Employee"}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:"var(--app-sidebar)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{resolvedUser?.name||"Employee"}</div>
                   <div style={{ fontSize:11, color:"#6366f1", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{resolvedUser?.email}</div>
                 </div>
                 <span style={{ fontSize:12 }}>✓</span>
@@ -1428,15 +1428,15 @@ const fetchSubscription = async () => {
                   const accInitials=accName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
                   return(
                     <button key={account.email||idx} onClick={()=>switchAccount(account)}
-                      style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:600, fontFamily:"inherit", color:"#1e0a3c", display:"flex", alignItems:"center", gap:10, borderBottom:"1px solid #f8fafc", textAlign:"left" }}
+                      style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:600, fontFamily:"inherit", color:"var(--app-sidebar)", display:"flex", alignItems:"center", gap:10, borderBottom:"1px solid #f8fafc", textAlign:"left" }}
                       onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                       onMouseLeave={e=>e.currentTarget.style.background="transparent"}
                     >
-                      <div style={{ width:32, height:32, borderRadius:8, background:"linear-gradient(135deg,#8b5cf6,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:12, flexShrink:0 }}>
+                      <div style={{ width:32, height:32, borderRadius:8, background:"linear-gradient(135deg,#8b5cf6,var(--app-muted))", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:12, flexShrink:0 }}>
                         {account?.logoUrl?<img src={account.logoUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"contain", padding:2, background:"#fff" }}/>:<span>{accInitials}</span>}
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontSize:12, fontWeight:700, color:"#1e0a3c", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{accName}</div>
+                        <div style={{ fontSize:12, fontWeight:700, color:"var(--app-sidebar)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{accName}</div>
                         <div style={{ fontSize:10, color:"#94a3b8", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{account?.email}</div>
                       </div>
                     </button>
@@ -1447,13 +1447,13 @@ const fetchSubscription = async () => {
 
             {/* Menu Options */}
             <div style={{ borderTop:"1px solid #f1f5f9" }}>
-              <button onClick={()=>{setProfileDropdownOpen(false);setProfileOpen(true);}} style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", color:"#1e0a3c", display:"flex", alignItems:"center", gap:10 }}
+              <button onClick={()=>{setProfileDropdownOpen(false);setProfileOpen(true);}} style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", color:"var(--app-sidebar)", display:"flex", alignItems:"center", gap:10 }}
                 onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                 onMouseLeave={e=>e.currentTarget.style.background="transparent"}
               >
                 <span style={{ fontSize:14 }}>👤</span> Profile
               </button>
-              <button onClick={()=>{setProfileDropdownOpen(false);setAccountAuthOpen(true);}} style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", color:"#1e0a3c", display:"flex", alignItems:"center", gap:10, borderTop:"1px solid #f8fafc" }}
+              <button onClick={()=>{setProfileDropdownOpen(false);setAccountAuthOpen(true);}} style={{ width:"100%", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", color:"var(--app-sidebar)", display:"flex", alignItems:"center", gap:10, borderTop:"1px solid #f8fafc" }}
                 onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                 onMouseLeave={e=>e.currentTarget.style.background="transparent"}
               >
@@ -1516,3 +1516,5 @@ const fetchSubscription = async () => {
     </div>
   );
 }
+
+

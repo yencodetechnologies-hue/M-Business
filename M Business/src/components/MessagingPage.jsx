@@ -74,8 +74,8 @@ export default function MessagingPage({ user }) {
   return (
     <div style={{ display: "flex", gap: 16, height: "calc(100vh - 120px)", minHeight: 500 }}>
       {/* Users List */}
-      <div style={{ width: 280, background: "#fff", borderRadius: 16, border: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 20px rgba(147,51,234,0.05)" }}>
-        <div style={{ padding: 16, borderBottom: `1px solid ${T.border}`, background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+      <div style={{ width: 280, background: "#fff", borderRadius: 16, border: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)" }}>
+        <div style={{ padding: 16, borderBottom: `1px solid ${T.border}`, background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
           <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: T.text }}>Members</h3>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: 8 }}>
@@ -88,7 +88,7 @@ export default function MessagingPage({ user }) {
                 borderRadius: 12, 
                 cursor: "pointer", 
                 marginBottom: 4,
-                background: selectedUser?._id === u._id ? "rgba(147,51,234,0.1)" : "transparent",
+                background: selectedUser?._id === u._id ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "transparent",
                 border: `1px solid ${selectedUser?._id === u._id ? T.primary : "transparent"}`,
                 display: "flex",
                 alignItems: "center",
@@ -96,7 +96,7 @@ export default function MessagingPage({ user }) {
                 transition: "all 0.2s"
               }}
             >
-              <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 700 }}>
+              <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 700 }}>
                 {u.name[0].toUpperCase()}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -109,11 +109,11 @@ export default function MessagingPage({ user }) {
       </div>
 
       {/* Chat Area */}
-      <div style={{ flex: 1, background: "#fff", borderRadius: 16, border: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 20px rgba(147,51,234,0.05)" }}>
+      <div style={{ flex: 1, background: "#fff", borderRadius: 16, border: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)" }}>
         {selectedUser ? (
           <>
-            <div style={{ padding: "12px 20px", borderBottom: `1px solid ${T.border}`, background: "linear-gradient(90deg,#f5f3ff,#faf5ff)", display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#9333ea,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, fontWeight: 800 }}>
+            <div style={{ padding: "12px 20px", borderBottom: `1px solid ${T.border}`, background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, fontWeight: 800 }}>
                 {selectedUser.name[0].toUpperCase()}
               </div>
               <div>
@@ -139,7 +139,7 @@ export default function MessagingPage({ user }) {
                       alignItems: isMe ? "flex-end" : "flex-start"
                     }}>
                       <div style={{ 
-                        background: isMe ? "linear-gradient(135deg,#9333ea,#7c3aed)" : "#fff",
+                        background: isMe ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#fff",
                         color: isMe ? "#fff" : T.text,
                         padding: "10px 14px",
                         borderRadius: isMe ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
@@ -171,7 +171,7 @@ export default function MessagingPage({ user }) {
                   padding: "12px 16px", 
                   borderRadius: 12, 
                   border: `1.5px solid ${T.border}`, 
-                  background: "#faf5ff", 
+                  background: "var(--app-bg)", 
                   fontSize: 13, 
                   outline: "none", 
                   fontFamily: "inherit" 
@@ -181,7 +181,7 @@ export default function MessagingPage({ user }) {
                 onClick={sendMessage}
                 disabled={sending || !content.trim()}
                 style={{ 
-                  background: "linear-gradient(135deg,#9333ea,#7c3aed)", 
+                  background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", 
                   color: "#fff", 
                   border: "none", 
                   borderRadius: 12, 
@@ -207,3 +207,5 @@ export default function MessagingPage({ user }) {
     </div>
   );
 }
+
+

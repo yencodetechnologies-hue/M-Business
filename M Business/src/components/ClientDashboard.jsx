@@ -357,7 +357,7 @@ function ProfileDropdown({ user, onLogout }) {
                 <div key={acc.email} onClick={()=>switchAccount(acc)} style={{ display:"flex", alignItems:"center", gap:12, padding:"8px 10px", borderRadius:10, background: activeEmail === acc.email ? "#eef2ff" : "transparent", cursor: activeEmail === acc.email ? "default" : "pointer", transition:"all 0.15s" }}
                   onMouseEnter={e=>{ if(activeEmail !== acc.email) e.currentTarget.style.background="#f8fafc"; }}
                   onMouseLeave={e=>{ if(activeEmail !== acc.email) e.currentTarget.style.background="transparent"; }}>
-                  <div style={{ width:32, height:32, borderRadius:10, background:"linear-gradient(135deg,#6366f1,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12, flexShrink:0 }}>
+                  <div style={{ width:32, height:32, borderRadius:10, background:"linear-gradient(135deg,#6366f1,var(--app-muted))", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12, flexShrink:0 }}>
                     {(acc.name || acc.clientName || "A").slice(0,2).toUpperCase()}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
@@ -1142,3 +1142,5 @@ export default function ClientDashboard({ user, setUser }) {
     </div>
   );
 }
+
+

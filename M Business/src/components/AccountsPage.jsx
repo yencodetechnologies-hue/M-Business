@@ -16,7 +16,7 @@ const EXPENSES_API = `${BASE_URL}/api/expenses`;
 const INCOME_API   = `${BASE_URL}/api/income`;
 
 // ── Shared theme ─────────────────────────────────────────────
-const T = { text:"#1e0a3c", muted:"var(--app-accent)", border:"var(--app-border)" };
+const T = { text:"var(--app-text)", muted:"var(--app-accent)", border:"var(--app-border)" };
 
 const formatCurrency = (amount, symbol = "₹") => {
   const num = Number(amount) || 0;
@@ -31,7 +31,7 @@ function Modal({ title, onClose, children }) {
       alignItems:"center", justifyContent:"center", padding:16 }}>
       <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:720,
         maxHeight:"90vh", overflow:"hidden", display:"flex", flexDirection:"column",
-        boxShadow:"0 32px 80px rgba(147,51,234,0.25)" }}>
+        boxShadow:"0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
         <div style={{ padding:"16px 22px", borderBottom:"1px solid var(--app-border)",
           display:"flex", justifyContent:"space-between", alignItems:"center",
           background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink:0 }}>
@@ -74,7 +74,7 @@ function Fld({ label, value, onChange, options, type="text", error, placeholder,
       <div style={{ position:"relative" }}>
         {prefix && (
           <span style={{ position:"absolute", left:10, top:"50%",
-            transform:"translateY(-50%)", color:"#a78bfa", fontWeight:700, fontSize:13 }}>
+            transform:"translateY(-50%)", color:"var(--app-muted)", fontWeight:700, fontSize:13 }}>
             {prefix}
           </span>
         )}
@@ -131,17 +131,17 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative" }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#a78bfa", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#a78bfa", transition: "0.2s" }}>▼</span>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(147,51,234,0.15)", zIndex: 999, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>No company names found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No company names found</div>
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
       )}
@@ -165,7 +165,7 @@ export default function AccountsPage({ initialTab = "overview" }) {
     cursor: "pointer",
     border: "none",
     background: active ? "#fff" : "transparent",
-    color: active ? "var(--app-accent)" : "#a78bfa",
+    color: active ? "var(--app-accent)" : "var(--app-muted)",
     transition: "all 0.3s",
     borderBottom: active ? "3px solid var(--app-accent)" : "none",
     fontFamily: "inherit"
@@ -230,7 +230,7 @@ function FinancialOverview() {
     { t: "Net Balance", v: formatCurrency(netBalance), c: netBalance >= 0 ? "var(--app-accent)" : "#f43f5e", i: "🏦", desc: "Overall Profit/Loss" },
   ];
 
-  if (loading) return <div style={{ textAlign: "center", padding: 50, color: "#a78bfa" }}>Loading overview...</div>;
+  if (loading) return <div style={{ textAlign: "center", padding: 50, color: "var(--app-muted)" }}>Loading overview...</div>;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -247,7 +247,7 @@ function FinancialOverview() {
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{i}</div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#a78bfa", letterSpacing: 1 }}>{t.toUpperCase()}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--app-muted)", letterSpacing: 1 }}>{t.toUpperCase()}</div>
                 <div style={{ fontSize: 12, color: "#94a3b8" }}>{desc}</div>
               </div>
             </div>
@@ -422,11 +422,11 @@ const openEdit = (a) => {
         style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
         {stats.map(({ t,v,i,c }) => (
           <div key={t} style={{ background:"#fff", borderRadius:14, padding:"16px 14px",
-            boxShadow:"0 4px 18px rgba(147,51,234,0.07)", border:"1px solid var(--app-border)" }}>
+            boxShadow:"0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border:"1px solid var(--app-border)" }}>
             <div style={{ width:38, height:38, borderRadius:10, background:`${c}15`,
               display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:17, marginBottom:8 }}>{i}</div>
-            <div style={{ fontSize:10, color:"#a78bfa", fontWeight:700,
+            <div style={{ fontSize:10, color:"var(--app-muted)", fontWeight:700,
               letterSpacing:0.5, marginBottom:2 }}>{t.toUpperCase()}</div>
             <div style={{ fontSize:24, fontWeight:800, color:c }}>{v}</div>
           </div>
@@ -445,7 +445,7 @@ const openEdit = (a) => {
                 borderRadius:12, padding:"12px 14px", cursor:"pointer",
                 textAlign:"center", transition:"all 0.2s" }}>
               <div style={{ fontSize:20, fontWeight:800, color:c }}>{count}</div>
-              <div style={{ fontSize:11, color: roleFilter===role ? c : "#a78bfa",
+              <div style={{ fontSize:11, color: roleFilter===role ? c : "var(--app-muted)",
                 fontWeight:700, marginTop:2 }}>{role}s</div>
             </div>
           );
@@ -454,7 +454,7 @@ const openEdit = (a) => {
 
       {/* Table */}
       <div style={{ background:"#fff", borderRadius:16, padding:22,
-        boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid var(--app-border)" }}>
+        boxShadow:"0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border:"1px solid var(--app-border)" }}>
         <div style={{ display:"flex", justifyContent:"space-between",
           alignItems:"center", marginBottom:16, flexWrap:"wrap", gap:8 }}>
           <h3 style={{ margin:0, fontSize:15, fontWeight:700, color:T.text }}>
@@ -474,11 +474,11 @@ const openEdit = (a) => {
         </div>
 
         {loading
-          ? <div style={{ textAlign:"center", padding:50, color:"#a78bfa" }}>Loading...</div>
+          ? <div style={{ textAlign:"center", padding:50, color:"var(--app-muted)" }}>Loading...</div>
           : displayed.length === 0
             ? <div style={{ textAlign:"center", padding:50 }}>
                 <div style={{ fontSize:40, marginBottom:12 }}>👤</div>
-                <div style={{ color:"#a78bfa", fontSize:14, fontWeight:600 }}>No accounts found</div>
+                <div style={{ color:"var(--app-muted)", fontSize:14, fontWeight:600 }}>No accounts found</div>
               </div>
             : <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, minWidth:700 }}>
@@ -495,11 +495,11 @@ const openEdit = (a) => {
                   </thead>
                   <tbody>
                     {displayed.map((a, i) => (
-                      <tr key={a._id||i} style={{ borderBottom:"1px solid #f3f0ff" }}
+                      <tr key={a._id||i} style={{ borderBottom:"1px solid var(--app-border)" }}
                         onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                         onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                         <td style={{ padding:"12px 14px", fontFamily:"monospace",
-                          fontSize:11, color:"#a78bfa" }}>
+                          fontSize:11, color:"var(--app-muted)" }}>
                           {`ACC${String(i+1).padStart(3,"0")}`}
                         </td>
                         <td style={{ padding:"12px 14px" }}>
@@ -512,15 +512,15 @@ const openEdit = (a) => {
                             </div>
                             <div>
                               <div style={{ fontWeight:700, color:T.text }}>{a.name}</div>
-                              {a.notes && <div style={{ fontSize:11, color:"#a78bfa" }}>{a.notes}</div>}
+                              {a.notes && <div style={{ fontSize:11, color:"var(--app-muted)" }}>{a.notes}</div>}
                             </div>
                           </div>
                         </td>
                         <td style={{ padding:"12px 14px", color:T.text }}>{a.email}</td>
-                        <td style={{ padding:"12px 14px", color:"#a78bfa" }}>{a.phone||"—"}</td>
+                        <td style={{ padding:"12px 14px", color:"var(--app-muted)" }}>{a.phone||"—"}</td>
                         <td style={{ padding:"12px 14px" }}><RoleBadge label={a.role||"Client"} /></td>
                         <td style={{ padding:"12px 14px" }}><RoleBadge label={a.status||"Active"} /></td>
-                        <td style={{ padding:"12px 14px", color:"#a78bfa", fontSize:12 }}>
+                        <td style={{ padding:"12px 14px", color:"var(--app-muted)", fontSize:12 }}>
                           {a.createdAt ? new Date(a.createdAt).toLocaleDateString() : "—"}
                         </td>
                         <td style={{ padding:"12px 14px" }}>
@@ -592,7 +592,7 @@ const openEdit = (a) => {
 
     <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:4 }}>
       <button onClick={()=>setModal(null)}
-        style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)", color:"#1e0a3c",
+        style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)", color:"var(--app-text)",
           borderRadius:10, padding:"10px 16px", cursor:"pointer",
           fontWeight:600, fontSize:13 }}>Cancel</button>
       <button onClick={save} disabled={saving}
@@ -743,11 +743,11 @@ const save = async () => {
         style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
         {stats.map(({ t,v,i,c }) => (
           <div key={t} style={{ background:"#fff", borderRadius:14, padding:"16px 14px",
-            boxShadow:"0 4px 18px rgba(147,51,234,0.07)", border:"1px solid var(--app-border)" }}>
+            boxShadow:"0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border:"1px solid var(--app-border)" }}>
             <div style={{ width:38, height:38, borderRadius:10, background:`${c}15`,
               display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:17, marginBottom:8 }}>{i}</div>
-            <div style={{ fontSize:10, color:"#a78bfa", fontWeight:700,
+            <div style={{ fontSize:10, color:"var(--app-muted)", fontWeight:700,
               letterSpacing:0.5, marginBottom:2 }}>{t.toUpperCase()}</div>
             <div style={{ fontSize:22, fontWeight:800, color:c }}>{v}</div>
           </div>
@@ -768,9 +768,9 @@ const save = async () => {
                 textAlign:"center", transition:"all 0.2s" }}>
               <div style={{ fontSize:18, marginBottom:4 }}>{CATEGORY_ICON[cat]}</div>
               <div style={{ fontSize:18, fontWeight:800, color:c }}>{count}</div>
-              <div style={{ fontSize:10, color: catFilter===cat ? c : "#a78bfa",
+              <div style={{ fontSize:10, color: catFilter===cat ? c : "var(--app-muted)",
                 fontWeight:700, marginTop:2 }}>{cat}</div>
-              {total > 0 && <div style={{ fontSize:10, color:"#a78bfa", marginTop:2 }}>{formatCurrency(total)}</div>}
+              {total > 0 && <div style={{ fontSize:10, color:"var(--app-muted)", marginTop:2 }}>{formatCurrency(total)}</div>}
             </div>
           );
         })}
@@ -802,7 +802,7 @@ const save = async () => {
 
       {/* Table */}
       <div style={{ background:"#fff", borderRadius:16, padding:22,
-        boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid var(--app-border)" }}>
+        boxShadow:"0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border:"1px solid var(--app-border)" }}>
         <div style={{ display:"flex", justifyContent:"space-between",
           alignItems:"center", marginBottom:16, flexWrap:"wrap", gap:8 }}>
           <h3 style={{ margin:0, fontSize:15, fontWeight:700, color:T.text }}>
@@ -822,11 +822,11 @@ const save = async () => {
         </div>
 
         {loading
-          ? <div style={{ textAlign:"center", padding:50, color:"#a78bfa" }}>Loading...</div>
+          ? <div style={{ textAlign:"center", padding:50, color:"var(--app-muted)" }}>Loading...</div>
           : displayed.length === 0
             ? <div style={{ textAlign:"center", padding:50 }}>
                 <div style={{ fontSize:40, marginBottom:12 }}>💸</div>
-                <div style={{ color:"#a78bfa", fontSize:14, fontWeight:600 }}>No expenses found</div>
+                <div style={{ color:"var(--app-muted)", fontSize:14, fontWeight:600 }}>No expenses found</div>
               </div>
             : <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, minWidth:800 }}>
@@ -843,10 +843,10 @@ const save = async () => {
                   </thead>
                   <tbody>
                     {displayed.map((e, i) => (
-                      <tr key={e._id||i} style={{ borderBottom:"1px solid #f3f0ff" }}
+                      <tr key={e._id||i} style={{ borderBottom:"1px solid var(--app-border)" }}
                         onMouseEnter={ev=>ev.currentTarget.style.background="var(--app-bg)"}
                         onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
-                        <td style={{ padding:"12px 14px", fontFamily:"monospace", fontSize:11, color:"#a78bfa" }}>
+                        <td style={{ padding:"12px 14px", fontFamily:"monospace", fontSize:11, color:"var(--app-muted)" }}>
                           {`EXP${String(i+1).padStart(3,"0")}`}
                         </td>
                         <td style={{ padding:"12px 14px" }}>
@@ -866,16 +866,16 @@ const save = async () => {
                         <td style={{ padding:"12px 14px" }}>
                           <ExpBadge label={e.expenseType||"Operational"} colorMap={TYPE_COLOR} />
                         </td>
-                        <td style={{ padding:"12px 14px", color:"#a78bfa" }}>{e.paymentMode||"—"}</td>
+                        <td style={{ padding:"12px 14px", color:"var(--app-muted)" }}>{e.paymentMode||"—"}</td>
                         <td style={{ padding:"12px 14px" }}>
-                          <span style={{ fontWeight:800, color:"#1e0a3c", fontSize:14 }}>
+                          <span style={{ fontWeight:800, color:"var(--app-text)", fontSize:14 }}>
                             {formatCurrency(e.amount, e.currency)}
                           </span>
                         </td>
                         <td style={{ padding:"12px 14px" }}>
                           <ExpBadge label={e.status||"Pending"} colorMap={EXP_STATUS_COLOR} />
                         </td>
-                        <td style={{ padding:"12px 14px", color:"#a78bfa", fontSize:12 }}>
+                        <td style={{ padding:"12px 14px", color:"var(--app-muted)", fontSize:12 }}>
                           {e.createdAt ? new Date(e.createdAt).toLocaleDateString() : "—"}
                         </td>
                         <td style={{ padding:"12px 14px" }}>
@@ -947,7 +947,7 @@ const save = async () => {
               </div>
               <div style={{ flex:1 }}>
                 <div style={{ fontWeight:700, color:T.text }}>{form.title}</div>
-                <div style={{ fontSize:12, color:"#a78bfa", marginTop:2, display:"flex", gap:6, flexWrap:"wrap" }}>
+                <div style={{ fontSize:12, color:"var(--app-muted)", marginTop:2, display:"flex", gap:6, flexWrap:"wrap" }}>
                   <ExpBadge label={form.category} colorMap={CATEGORY_COLOR} />
                   <ExpBadge label={form.expenseType} colorMap={TYPE_COLOR} />
                   <ExpBadge label={form.status} colorMap={EXP_STATUS_COLOR} />
@@ -1127,7 +1127,7 @@ export function IncomePage() {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
         <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
           {["All", ...INCOME_CATS].map(cat => (
-            <button key={cat} onClick={()=>setCatFilter(cat)} style={{ padding:"6px 14px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"1.5px solid", borderColor:catFilter===cat?"#22c55e":"var(--app-border)", background:catFilter===cat?"#f0fdf4":"#fff", color:catFilter===cat?"#16a34a":"#a78bfa", fontFamily:"inherit" }}>{cat}</button>
+            <button key={cat} onClick={()=>setCatFilter(cat)} style={{ padding:"6px 14px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"1.5px solid", borderColor:catFilter===cat?"#22c55e":"var(--app-border)", background:catFilter===cat?"#f0fdf4":"#fff", color:catFilter===cat?"#16a34a":"var(--app-muted)", fontFamily:"inherit" }}>{cat}</button>
           ))}
         </div>
         <button onClick={openAdd} style={{ background:"linear-gradient(135deg,#16a34a,#22c55e)", color:"#fff", border:"none", borderRadius:10, padding:"8px 16px", fontWeight:700, fontSize:13, cursor:"pointer", fontFamily:"inherit" }}>+ Add Income</button>
@@ -1136,24 +1136,24 @@ export function IncomePage() {
       <div style={{ background:"#fff", borderRadius:16, padding:22, boxShadow:"0 4px 24px rgba(34,197,94,0.08)", border:"1px solid var(--app-border)" }}>
         <div style={{ position:"relative", marginBottom:16 }}>
           <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", pointerEvents:"none" }}>🔍</span>
-          <input placeholder="Search by title, company, invoice, txn..." value={search} onChange={e=>setSearch(e.target.value)} style={{ width:"100%", padding:"10px 14px 10px 40px", border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13, color:"#1e0a3c", background:"#f0fdf4", outline:"none", fontFamily:"inherit" }} />
+          <input placeholder="Search by title, company, invoice, txn..." value={search} onChange={e=>setSearch(e.target.value)} style={{ width:"100%", padding:"10px 14px 10px 40px", border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13, color:"var(--app-text)", background:"#f0fdf4", outline:"none", fontFamily:"inherit" }} />
         </div>
 
-        {loading ? <div style={{ textAlign:"center", padding:50, color:"#a78bfa" }}>Loading...</div> : displayed.length === 0 ? <div style={{ textAlign:"center", padding:50 }}><div style={{ fontSize:40, marginBottom:12 }}>💰</div><div style={{ color:"#a78bfa", fontSize:14, fontWeight:600 }}>No income found</div></div>
+        {loading ? <div style={{ textAlign:"center", padding:50, color:"var(--app-muted)" }}>Loading...</div> : displayed.length === 0 ? <div style={{ textAlign:"center", padding:50 }}><div style={{ fontSize:40, marginBottom:12 }}>💰</div><div style={{ color:"var(--app-muted)", fontSize:14, fontWeight:600 }}>No income found</div></div>
           : <div style={{ overflowX:"auto" }}>
               <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, minWidth:900 }}>
                 <thead><tr style={{ background:"linear-gradient(90deg,#f0fdf4,var(--app-bg))" }}>{["ID","Title","Company Name","Inv #","Amount","Mode","Status","Date","Actions"].map(col => (<th key={col} style={{ padding:"10px 14px", textAlign:"left", color:"#16a34a", fontWeight:700, fontSize:11, borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>{col.toUpperCase()}</th>))}</tr></thead>
                 <tbody>
                   {displayed.map((inc, i) => (
-                    <tr key={inc._id||i} style={{ borderBottom:"1px solid #f3f0ff" }} onMouseEnter={ev=>ev.currentTarget.style.background="#f0fdf4"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
-                      <td style={{ padding:"12px 14px", fontFamily:"monospace", fontSize:11, color:"#a78bfa" }}>{`INC${String(i+1).padStart(3,"0")}`}</td>
-                      <td style={{ padding:"12px 14px" }}><div style={{ fontWeight:600, color:"#64748b", fontSize: 12 }}>{inc.title}</div>{inc.transactionId && <div style={{ fontSize:10, color:"#a78bfa" }}>Txn: {inc.transactionId}</div>}</td>
-                      <td style={{ padding:"12px 14px", color:"#1e0a3c", fontWeight:800, fontSize: 15 }}>{inc.client}</td>
+                    <tr key={inc._id||i} style={{ borderBottom:"1px solid var(--app-border)" }} onMouseEnter={ev=>ev.currentTarget.style.background="#f0fdf4"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
+                      <td style={{ padding:"12px 14px", fontFamily:"monospace", fontSize:11, color:"var(--app-muted)" }}>{`INC${String(i+1).padStart(3,"0")}`}</td>
+                      <td style={{ padding:"12px 14px" }}><div style={{ fontWeight:600, color:"#64748b", fontSize: 12 }}>{inc.title}</div>{inc.transactionId && <div style={{ fontSize:10, color:"var(--app-muted)" }}>Txn: {inc.transactionId}</div>}</td>
+                      <td style={{ padding:"12px 14px", color:"var(--app-text)", fontWeight:800, fontSize: 15 }}>{inc.client}</td>
                       <td style={{ padding:"12px 14px", color:"#16a34a", fontWeight:700 }}>{inc.invoiceNo||"—"}</td>
                       <td style={{ padding:"12px 14px" }}><span style={{ fontWeight:800, color:"#16a34a", fontSize:14 }}>{formatCurrency(inc.amount, inc.currency)}</span></td>
-                      <td style={{ padding:"12px 14px", color:"#a78bfa" }}>{inc.paymentMode}</td>
+                      <td style={{ padding:"12px 14px", color:"var(--app-muted)" }}>{inc.paymentMode}</td>
                       <td style={{ padding:"12px 14px" }}><ExpBadge label={inc.status||"Received"} colorMap={INC_STATUS_COLOR} /></td>
-                      <td style={{ padding:"12px 14px", color:"#a78bfa", fontSize:12 }}>{inc.date || (inc.createdAt ? new Date(inc.createdAt).toLocaleDateString() : "—")}</td>
+                      <td style={{ padding:"12px 14px", color:"var(--app-muted)", fontSize:12 }}>{inc.date || (inc.createdAt ? new Date(inc.createdAt).toLocaleDateString() : "—")}</td>
                       <td style={{ padding:"12px 14px" }}><div style={{ display:"flex", gap:5 }}><button onClick={()=>openEdit(inc)} style={{ background:"#f0fdf4", border:"1px solid #dcfce7", borderRadius:7, padding:"4px 10px", fontSize:12, color:"#16a34a", cursor:"pointer", fontWeight:600 }}>Edit</button><button onClick={()=>del(inc._id||inc.id)} style={{ background:"#fee2e2", border:"1px solid #fecaca", borderRadius:7, padding:"4px 10px", fontSize:12, color:"#ef4444", cursor:"pointer", fontWeight:600 }}>Del</button></div></td>
                     </tr>
                   ))}
@@ -1182,7 +1182,7 @@ export function IncomePage() {
           </div>
           {err._general && <div style={{ background:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:10, padding:"10px 14px", marginBottom:12, display:"flex", alignItems:"center", gap:8, fontSize:13, color:"#ef4444", fontWeight:600 }}><span>⚠️</span><span style={{ flex:1 }}>{err._general}</span><button onClick={()=>setErr({})} style={{ background:"none", border:"none", color:"#ef4444", cursor:"pointer", fontSize:16, lineHeight:1 }}>✕</button></div>}
           <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:4 }}>
-            <button onClick={()=>setModal(null)} style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)", color:"#1e0a3c", borderRadius:10, padding:"10px 16px", cursor:"pointer", fontWeight:600, fontSize:13 }}>Cancel</button>
+            <button onClick={()=>setModal(null)} style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)", color:"var(--app-text)", borderRadius:10, padding:"10px 16px", cursor:"pointer", fontWeight:600, fontSize:13 }}>Cancel</button>
             <button onClick={save} disabled={saving} style={{ background:"linear-gradient(135deg,#16a34a,#22c55e)", color:"#fff", border:"none", borderRadius:10, padding:"10px 20px", fontWeight:700, fontSize:13, cursor:"pointer", opacity:saving?0.7:1 }}>{saving ? "Saving…" : modal==="add" ? "Save Income →" : "Update Income →"}</button>
           </div>
         </Modal>
@@ -1190,3 +1190,5 @@ export function IncomePage() {
     </div>
   );
 }
+
+

@@ -6,7 +6,7 @@ import { BASE_URL } from '../config';
 
 
 const SC = ({ title, children }) => (
-  <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(147,51,234,0.08)", border: "1px solid var(--app-border)", marginBottom: 20 }}>
+  <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)", marginBottom: 20 }}>
     <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: T.text }}>{title}</h3>
     {children}
   </div>
@@ -14,7 +14,7 @@ const SC = ({ title, children }) => (
 
 const Inp = ({ label, value, onChange, type = "text", placeholder }) => (
   <div style={{ marginBottom: 14 }}>
-    <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", marginBottom: 5 }}>{label}</label>
+    <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", marginBottom: 5 }}>{label}</label>
     <input
       type={type}
       value={value || ""}
@@ -34,7 +34,7 @@ const Toggle = ({ label, desc, checked, onChange }) => (
   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 0", borderBottom: "1px solid var(--app-bg)" }}>
     <div>
       <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{label}</div>
-      {desc && <div style={{ fontSize: 11, color: "#a78bfa", marginTop: 1 }}>{desc}</div>}
+      {desc && <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 1 }}>{desc}</div>}
     </div>
     <div
       onClick={() => onChange(!checked)}
@@ -141,13 +141,13 @@ export default function SettingsPage({ user }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {toast && (
-        <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid var(--app-accent)", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "var(--app-accent)", boxShadow: "0 8px 24px rgba(147,51,234,0.15)" }}>
+        <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid var(--app-accent)", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "var(--app-accent)", boxShadow: "0 8px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)" }}>
           {toast}
         </div>
       )}
 
       {/* ── Profile Card ── */}
-      <div style={{ background: "#fff", borderRadius: 16, border: "1px solid var(--app-border)", overflow: "hidden", boxShadow: "0 4px 24px rgba(147,51,234,0.08)" }}>
+      <div style={{ background: "#fff", borderRadius: 16, border: "1px solid var(--app-border)", overflow: "hidden", boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)" }}>
         {/* Gradient Header */}
         <div style={{ background: "var(--app-accent-gradient)", padding: "28px 24px 22px", display: "flex", alignItems: "center", gap: 16 }}>
           <div style={{ width: 62, height: 62, borderRadius: 16, background: "rgba(255,255,255,0.2)", border: "2px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
@@ -172,7 +172,7 @@ export default function SettingsPage({ user }) {
           </div>
 
           {/* Notification Preferences */}
-          <div style={{ marginTop: 8, marginBottom: 8, fontSize: 11, fontWeight: 700, color: "#7c3aed", letterSpacing: 0.5, textTransform: "uppercase" }}>Notification Preferences</div>
+          <div style={{ marginTop: 8, marginBottom: 8, fontSize: 11, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 0.5, textTransform: "uppercase" }}>Notification Preferences</div>
           <Toggle label="Email Notifications" desc="Receive email alerts for important events" checked={notifs.emailNotifications} onChange={v => updateNotif('emailNotifications', v)} />
           <Toggle label="Invoice Payment Alerts" desc="Get notified when invoices are paid or overdue" checked={notifs.invoiceAlerts} onChange={v => updateNotif('invoiceAlerts', v)} />
           <Toggle label="Task Reminders" desc="Receive reminders for upcoming task deadlines" checked={notifs.taskReminders} onChange={v => updateNotif('taskReminders', v)} />
@@ -198,7 +198,7 @@ export default function SettingsPage({ user }) {
       ) : (
         <>
           <SC title="🗂 Project Status Options">
-            <p style={{ fontSize: 12, color: "#a78bfa", marginBottom: 12 }}>Define the statuses available for projects across the platform.</p>
+            <p style={{ fontSize: 12, color: "var(--app-muted)", marginBottom: 12 }}>Define the statuses available for projects across the platform.</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
               {config.projectStatuses.map((s, i) => (
                 <div key={i} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 8, padding: "5px 12px", display: "flex", alignItems: "center", gap: 8 }}>
@@ -211,7 +211,7 @@ export default function SettingsPage({ user }) {
           </SC>
 
           <SC title="✅ Task Status Options">
-            <p style={{ fontSize: 12, color: "#a78bfa", marginBottom: 12 }}>Define the statuses available for tasks.</p>
+            <p style={{ fontSize: 12, color: "var(--app-muted)", marginBottom: 12 }}>Define the statuses available for tasks.</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
               {config.taskStatuses.map((s, i) => (
                 <div key={i} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 8, padding: "5px 12px", display: "flex", alignItems: "center", gap: 8 }}>
@@ -224,7 +224,7 @@ export default function SettingsPage({ user }) {
           </SC>
 
           <SC title="🎯 Task Priority Options">
-            <p style={{ fontSize: 12, color: "#a78bfa", marginBottom: 12 }}>Define the priority levels available for tasks.</p>
+            <p style={{ fontSize: 12, color: "var(--app-muted)", marginBottom: 12 }}>Define the priority levels available for tasks.</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
               {config.taskPriorities.map((s, i) => (
                 <div key={i} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 8, padding: "5px 12px", display: "flex", alignItems: "center", gap: 8 }}>
@@ -261,3 +261,5 @@ function AddInput({ onAdd, placeholder }) {
     </div>
   );
 }
+
+

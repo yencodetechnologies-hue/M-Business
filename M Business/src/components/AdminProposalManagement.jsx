@@ -5,14 +5,14 @@ import { BASE_URL } from "../config";
 import CanvasProposalEditor from "./CanvasProposalEditor";
 
 const THEMES = [
-  { name:"Violet",  p:"#7c3aed", g:"linear-gradient(135deg,#7c3aed,#a855f7)", l:"#ede9fe", t:"#4c1d95" },
+  { name:"Violet",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"#4c1d95" },
   { name:"Cobalt",  p:"#1d4ed8", g:"linear-gradient(135deg,#1e40af,#3b82f6)", l:"#dbeafe", t:"#1e3a8a" },
   { name:"Emerald", p:"#059669", g:"linear-gradient(135deg,#065f46,#10b981)", l:"#d1fae5", t:"#064e3b" },
   { name:"Rose",    p:"#e11d48", g:"linear-gradient(135deg,#9f1239,#f43f5e)", l:"#ffe4e6", t:"#881337" },
   { name:"Amber",   p:"#d97706", g:"linear-gradient(135deg,#92400e,#fbbf24)", l:"#fef3c7", t:"#78350f" },
   { name:"Slate",   p:"#334155", g:"linear-gradient(135deg,#0f172a,#475569)", l:"#f1f5f9", t:"#0f172a" },
   { name:"Teal",    p:"#0d9488", g:"linear-gradient(135deg,#134e4a,#2dd4bf)", l:"#ccfbf1", t:"#134e4a" },
-  { name:"Fuchsia", p:"#a21caf", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"#fae8ff", t:"#4a044e" },
+  { name:"Fuchsia", p:"var(--app-accent)", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"var(--app-border)", t:"#4a044e" },
 ];
 
 const printProposal = (proposal) => {
@@ -31,7 +31,7 @@ const printProposal = (proposal) => {
             content = `<div style="font-size:${fs}px; font-weight:${fw}; color:${el.color||'#000'}; white-space:pre-wrap; width:${el.width||el.w}px;">${val}</div>`;
           } else if (el.type === "shape") {
              const br = el.borderRadius !== undefined ? (typeof el.borderRadius === 'number' ? el.borderRadius + 'px' : el.borderRadius) : (el.shape === 'circle' ? '50%' : '4px');
-             content = `<div style="width:${el.width||el.w||60}px; height:${el.height||el.h||60}px; background:${el.color||'#7c3aed'}; border-radius:${br};"></div>`;
+             content = `<div style="width:${el.width||el.w||60}px; height:${el.height||el.h||60}px; background:${el.color||'var(--app-accent)'}; border-radius:${br};"></div>`;
           } else if (el.type === "image") {
              content = `<img src="${el.src}" style="width:${el.width||el.w||200}px; height:${el.height||el.h||'auto'}; object-fit:contain; pointer-events:none;" />`;
           } else if (el.type === "icon") {
@@ -191,11 +191,11 @@ function Search({ value, onChange, placeholder }) {
         style={{
           width: "100%",
           padding: "10px 14px 10px 40px",
-          border: "1.5px solid #ede9fe",
+          border: "1.5px solid var(--app-border)",
           borderRadius: 10,
           fontSize: 13,
           color: T.text,
-          background: "#faf5ff",
+          background: "var(--app-bg)",
           outline: "none",
           fontFamily: "inherit"
         }}
@@ -217,12 +217,12 @@ function CompanyDropdown({ clients, value, onChange, error }) {
     <div style={{ position: "relative" }}>
       <div onClick={() => setOpen(!open)} style={{
         width: "100%",
-        border: `1.5px solid ${error ? "#EF4444" : open ? "#9333ea" : "#ede9fe"}`,
+        border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`,
         borderRadius: 10,
         padding: "10px 36px 10px 14px",
         fontSize: 13,
-        color: value ? T.text : "#a78bfa",
-        background: "#faf5ff",
+        color: value ? T.text : "var(--app-muted)",
+        background: "var(--app-bg)",
         cursor: "pointer",
         userSelect: "none",
         boxSizing: "border-box",
@@ -235,7 +235,7 @@ function CompanyDropdown({ clients, value, onChange, error }) {
               width: 22,
               height: 22,
               borderRadius: "50%",
-              background: "linear-gradient(135deg,#9333ea,#c084fc)",
+              background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -248,7 +248,7 @@ function CompanyDropdown({ clients, value, onChange, error }) {
             </div>
             <span>{value}</span>
             {selected?.companyName && (
-              <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>
+              <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>
             )}
           </div>
         ) : "-- Select Company Name --"}
@@ -258,7 +258,7 @@ function CompanyDropdown({ clients, value, onChange, error }) {
           top: "50%",
           transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`,
           fontSize: 10,
-          color: "#a78bfa",
+          color: "var(--app-muted)",
           transition: "0.2s"
         }}>▼</span>
       </div>
@@ -269,9 +269,9 @@ function CompanyDropdown({ clients, value, onChange, error }) {
           left: 0,
           right: 0,
           background: "#fff",
-          border: "1.5px solid #ede9fe",
+          border: "1.5px solid var(--app-border)",
           borderRadius: 12,
-          boxShadow: "0 8px 32px rgba(147,51,234,0.15)",
+          boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)",
           zIndex: 999,
           overflow: "hidden"
         }}>
@@ -293,10 +293,10 @@ function CompanyDropdown({ clients, value, onChange, error }) {
                 style={{
                   width: "100%",
                   padding: "7px 10px 7px 30px",
-                  border: "1.5px solid #ede9fe",
+                  border: "1.5px solid var(--app-border)",
                   borderRadius: 8,
                   fontSize: 12,
-                  background: "#faf5ff",
+                  background: "var(--app-bg)",
                   outline: "none",
                   fontFamily: "inherit",
                   boxSizing: "border-box"
@@ -306,7 +306,7 @@ function CompanyDropdown({ clients, value, onChange, error }) {
           </div>
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? (
-              <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>
+              <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>
                 No companies found
               </div>
             ) : (
@@ -329,16 +329,16 @@ function CompanyDropdown({ clients, value, onChange, error }) {
                       padding: "10px 14px",
                       cursor: "pointer",
                       background: isSel ? "#f3e8ff" : "transparent",
-                      borderBottom: "1px solid #f5f3ff"
+                      borderBottom: "1px solid var(--app-bg)"
                     }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"}
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
                     onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}
                   >
                     <div style={{
                       width: 28,
                       height: 28,
                       borderRadius: "50%",
-                      background: "linear-gradient(135deg,#9333ea,#c084fc)",
+                      background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -352,10 +352,10 @@ function CompanyDropdown({ clients, value, onChange, error }) {
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>
                       {company && (
-                        <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}</div>
+                        <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>
                       )}
                     </div>
-                    {isSel && <span style={{ fontSize: 14, color: "#9333ea" }}>✓</span>}
+                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}
                   </div>
                 );
               })
@@ -386,12 +386,12 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
     <div style={{ position: "relative" }}>
       <div onClick={() => setOpen(!open)} style={{
         width: "100%",
-        border: `1.5px solid ${error ? "#EF4444" : open ? "#9333ea" : "#ede9fe"}`,
+        border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`,
         borderRadius: 10,
         padding: "10px 36px 10px 14px",
         fontSize: 13,
-        color: value ? T.text : "#a78bfa",
-        background: "#faf5ff",
+        color: value ? T.text : "var(--app-muted)",
+        background: "var(--app-bg)",
         cursor: "pointer",
         userSelect: "none",
         boxSizing: "border-box",
@@ -424,7 +424,7 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
           top: "50%",
           transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`,
           fontSize: 10,
-          color: "#a78bfa",
+          color: "var(--app-muted)",
           transition: "0.2s"
         }}>▼</span>
       </div>
@@ -435,9 +435,9 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
           left: 0,
           right: 0,
           background: "#fff",
-          border: "1.5px solid #ede9fe",
+          border: "1.5px solid var(--app-border)",
           borderRadius: 12,
-          boxShadow: "0 8px 32px rgba(147,51,234,0.15)",
+          boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)",
           zIndex: 999,
           overflow: "hidden"
         }}>
@@ -459,10 +459,10 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
                 style={{
                   width: "100%",
                   padding: "7px 10px 7px 30px",
-                  border: "1.5px solid #ede9fe",
+                  border: "1.5px solid var(--app-border)",
                   borderRadius: 8,
                   fontSize: 12,
-                  background: "#faf5ff",
+                  background: "var(--app-bg)",
                   outline: "none",
                   fontFamily: "inherit",
                   boxSizing: "border-box"
@@ -472,7 +472,7 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
           </div>
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? (
-              <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>
+              <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>
                 No employees found
               </div>
             ) : (
@@ -494,9 +494,9 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
                       padding: "10px 14px",
                       cursor: "pointer",
                       background: isSel ? "#f3e8ff" : "transparent",
-                      borderBottom: "1px solid #f5f3ff"
+                      borderBottom: "1px solid var(--app-bg)"
                     }}
-                    onMouseEnter={ev => ev.currentTarget.style.background = "#faf5ff"}
+                    onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"}
                     onMouseLeave={ev => ev.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}
                   >
                     <div style={{
@@ -517,7 +517,7 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>
                     </div>
-                    {isSel && <span style={{ fontSize: 14, color: "#9333ea" }}>✓</span>}
+                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}
                   </div>
                 );
               })
@@ -559,15 +559,15 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        boxShadow: "0 32px 80px rgba(147,51,234,0.25)"
+        boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)"
       }}>
         <div style={{
           padding: "16px 22px",
-          borderBottom: "1px solid #ede9fe",
+          borderBottom: "1px solid var(--app-border)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          background: "linear-gradient(90deg,#f5f3ff,#faf5ff)",
+          background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))",
           flexShrink: 0
         }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
@@ -578,7 +578,7 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
               border: "none",
               fontSize: 20,
               cursor: "pointer",
-              color: "#7c3aed",
+              color: "var(--app-accent)",
               padding: "4px 8px"
             }}
           >
@@ -788,7 +788,7 @@ export default function AdminProposalManagement() {
         gap: 12 
       }}>
         {[
-          { t: "Total Proposals", v: proposals.length, i: "📋", c: "#9333ea" },
+          { t: "Total Proposals", v: proposals.length, i: "📋", c: "var(--app-accent)" },
           { t: "Draft", v: proposals.filter(p => p.status === "draft").length, i: "✏️", c: "#6b7280" },
           { t: "Pending", v: proposals.filter(p => p.status === "pending").length, i: "⏳", c: "#f59e0b" },
           { t: "Approved", v: proposals.filter(p => p.status === "approved").length, i: "✅", c: "#22c55e" }
@@ -797,8 +797,8 @@ export default function AdminProposalManagement() {
             background: "#fff",
             borderRadius: 14,
             padding: "16px 14px",
-            boxShadow: "0 4px 18px rgba(147,51,234,0.07)",
-            border: "1px solid #ede9fe",
+            boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)",
+            border: "1px solid var(--app-border)",
             display: "flex",
             alignItems: "center",
             gap: 12
@@ -816,7 +816,7 @@ export default function AdminProposalManagement() {
               {i}
             </div>
             <div>
-              <div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5 }}>
+              <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>
                 {t.toUpperCase()}
               </div>
               <div style={{ fontSize: 24, fontWeight: 800, color: c }}>
@@ -831,8 +831,8 @@ export default function AdminProposalManagement() {
         background: "#fff",
         borderRadius: 16,
         padding: 22,
-        boxShadow: "0 4px 24px rgba(147,51,234,0.08)",
-        border: "1px solid #ede9fe"
+        boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)",
+        border: "1px solid var(--app-border)"
       }}>
         <div style={{
           display: "flex",
@@ -851,7 +851,7 @@ export default function AdminProposalManagement() {
               <button 
                 onClick={createNewProposal}
                 style={{
-                  background:"linear-gradient(135deg,#7c3aed,#a855f7)",
+                  background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",
                   color:"#fff",
                   border:"none",
                   borderRadius:10,
@@ -882,15 +882,15 @@ export default function AdminProposalManagement() {
             minWidth: 700
           }}>
              <thead>
-              <tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+              <tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
                 {["#", "Title", "Company Name", "Assigned To", "Slides", "Status", "Updated", "Actions"].map(c => (
                   <th key={c} style={{
                     padding: "10px 14px",
                     textAlign: "left",
-                    color: "#7c3aed",
+                    color: "var(--app-accent)",
                     fontWeight: 700,
                     fontSize: 11,
-                    borderBottom: "2px solid #ede9fe",
+                    borderBottom: "2px solid var(--app-border)",
                     whiteSpace: "nowrap"
                   }}>
                     {c.toUpperCase()}
@@ -904,7 +904,7 @@ export default function AdminProposalManagement() {
                   <td colSpan={6} style={{
                     padding: 30,
                     textAlign: "center",
-                    color: "#a78bfa"
+                    color: "var(--app-muted)"
                   }}>
                     No proposals found
                   </td>
@@ -912,11 +912,11 @@ export default function AdminProposalManagement() {
               ) : (
                 filtered.map((proposal, i) => (
                   <tr key={proposal._id || i} style={{
-                    borderBottom: "1px solid #f3f0ff"
+                    borderBottom: "1px solid var(--app-border)"
                   }}>
                     <td style={{
                       padding: "12px 14px",
-                      color: "#a78bfa",
+                      color: "var(--app-muted)",
                       fontSize: 11,
                       fontFamily: "monospace"
                     }}>
@@ -931,7 +931,7 @@ export default function AdminProposalManagement() {
                     </td>
                      <td style={{
                       padding: "12px 14px",
-                      color: "#7c3aed"
+                      color: "var(--app-accent)"
                     }}>
                       {proposal.client || "No company name"}
                     </td>
@@ -958,7 +958,7 @@ export default function AdminProposalManagement() {
                           <span>{proposal.assignedEmployee}</span>
                         </div>
                       ) : (
-                        <span style={{ color: "#a78bfa", fontStyle: "italic" }}>Not assigned</span>
+                        <span style={{ color: "var(--app-muted)", fontStyle: "italic" }}>Not assigned</span>
                       )}
                     </td>
                     <td style={{
@@ -1013,12 +1013,12 @@ export default function AdminProposalManagement() {
                         <button
                           onClick={() => printProposal(proposal)}
                           style={{
-                            background: "rgba(147,51,234,0.1)",
-                            border: "1px solid rgba(147,51,234,0.3)",
+                            background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)",
+                            border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",
                             borderRadius: 7,
                             padding: "5px 10px",
                             fontSize: 12,
-                            color: "#9333ea",
+                            color: "var(--app-accent)",
                             cursor: "pointer",
                             fontWeight: 600,
                             fontFamily: "inherit",
@@ -1063,7 +1063,7 @@ export default function AdminProposalManagement() {
                               borderRadius: 7,
                               padding: "5px 10px",
                               fontSize: 12,
-                              color: "#7c3aed",
+                              color: "var(--app-accent)",
                               cursor: "pointer",
                               fontWeight: 600,
                               fontFamily: "inherit",
@@ -1141,7 +1141,7 @@ export default function AdminProposalManagement() {
                 <h4 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700, color: T.text }}>
                   {selectedProposal.title || "Untitled Proposal"}
                 </h4>
-                 <p style={{ margin: 0, fontSize: 13, color: "#7c3aed" }}>
+                 <p style={{ margin: 0, fontSize: 13, color: "var(--app-accent)" }}>
                   Company Name: {selectedProposal.client || "No company name"}
                 </p>
                 <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10 }}>
@@ -1241,7 +1241,7 @@ export default function AdminProposalManagement() {
               <button
                 onClick={() => handleSubmitForApproval(selectedProposal._id)}
                 style={{
-                  background: "linear-gradient(135deg,#7c3aed,#a855f7)",
+                  background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
                   border: "none",
                   borderRadius: 10,
                   padding: "10px 20px",
@@ -1259,8 +1259,8 @@ export default function AdminProposalManagement() {
             <button
               onClick={() => setSelectedProposal(null)}
               style={{
-                background: "#f5f3ff",
-                border: "1px solid #ede9fe",
+                background: "var(--app-bg)",
+                border: "1px solid var(--app-border)",
                 color: T.text,
                 borderRadius: 10,
                 padding: "10px 16px",
@@ -1320,8 +1320,8 @@ export default function AdminProposalManagement() {
                 style={{
                   flex: 1,
                   padding: "10px",
-                  background: "#f5f3ff",
-                  border: "1px solid #ede9fe",
+                  background: "var(--app-bg)",
+                  border: "1px solid var(--app-border)",
                   borderRadius: 10,
                   fontSize: 13,
                   fontWeight: 600,
@@ -1398,7 +1398,7 @@ export default function AdminProposalManagement() {
               display: "block",
               fontSize: 12,
               fontWeight: 700,
-              color: "#7c3aed",
+              color: "var(--app-accent)",
               marginBottom: 8
             }}>
               Rejection Reason :
@@ -1411,7 +1411,7 @@ export default function AdminProposalManagement() {
                 width: "100%",
                 minHeight: 80,
                 padding: "10px 14px",
-                border: "1.5px solid #ede9fe",
+                border: "1.5px solid var(--app-border)",
                 borderRadius: 10,
                 fontSize: 13,
                 fontFamily: "inherit",
@@ -1425,8 +1425,8 @@ export default function AdminProposalManagement() {
               style={{
                 flex: 1,
                 padding: "10px",
-                background: "#f5f3ff",
-                border: "1px solid #ede9fe",
+                background: "var(--app-bg)",
+                border: "1px solid var(--app-border)",
                 borderRadius: 10,
                 fontSize: 13,
                 fontWeight: 600,
@@ -1470,7 +1470,7 @@ export default function AdminProposalManagement() {
               <label style={{
                 display: "block",
                 fontSize: 11,
-                color: "#7c3aed",
+                color: "var(--app-accent)",
                 fontWeight: 700,
                 letterSpacing: 0.5,
                 marginBottom: 5
@@ -1488,7 +1488,7 @@ export default function AdminProposalManagement() {
               <label style={{
                 display: "block",
                 fontSize: 11,
-                color: "#7c3aed",
+                color: "var(--app-accent)",
                 fontWeight: 700,
                 letterSpacing: 0.5,
                 marginBottom: 5
@@ -1506,7 +1506,7 @@ export default function AdminProposalManagement() {
               <label style={{
                 display: "block",
                 fontSize: 11,
-                color: "#7c3aed",
+                color: "var(--app-accent)",
                 fontWeight: 700,
                 letterSpacing: 0.5,
                 marginBottom: 5
@@ -1521,11 +1521,11 @@ export default function AdminProposalManagement() {
                 style={{
                   width: "100%",
                   padding: "10px 14px",
-                  border: "1.5px solid #ede9fe",
+                  border: "1.5px solid var(--app-border)",
                   borderRadius: 10,
                   fontSize: 13,
                   color: T.text,
-                  background: "#faf5ff",
+                  background: "var(--app-bg)",
                   outline: "none",
                   fontFamily: "inherit",
                   boxSizing: "border-box"
@@ -1539,8 +1539,8 @@ export default function AdminProposalManagement() {
                 style={{
                   flex: 1,
                   padding: "10px",
-                  background: "#f5f3ff",
-                  border: "1px solid #ede9fe",
+                  background: "var(--app-bg)",
+                  border: "1px solid var(--app-border)",
                   color: T.text,
                   borderRadius: 10,
                   fontSize: 13,
@@ -1557,7 +1557,7 @@ export default function AdminProposalManagement() {
                 style={{
                   flex: 1,
                   padding: "10px",
-                  background: "linear-gradient(135deg,#7c3aed,#a855f7)",
+                  background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
                   border: "none",
                   borderRadius: 10,
                   fontSize: 13,
@@ -1595,17 +1595,17 @@ export default function AdminProposalManagement() {
             maxWidth: "1400px",
             height: "90vh",
             overflow: "hidden",
-            boxShadow: "0 32px 80px rgba(147,51,234,0.25)",
+            boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)",
             display: "flex",
             flexDirection: "column"
           }}>
             <div style={{
               padding: "12px 20px",
-              borderBottom: "1px solid #ede9fe",
+              borderBottom: "1px solid var(--app-border)",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              background: "linear-gradient(90deg,#f5f3ff,#faf5ff)"
+              background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))"
             }}>
               <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: T.text }}>
                 {editingProposalId ? "Edit Proposal" : "Create New Proposal"}
@@ -1617,7 +1617,7 @@ export default function AdminProposalManagement() {
                   border: "none",
                   fontSize: 20,
                   cursor: "pointer",
-                  color: "#7c3aed",
+                  color: "var(--app-accent)",
                   padding: "4px 8px"
                 }}
               >
@@ -1640,3 +1640,4 @@ export default function AdminProposalManagement() {
     </div>
   );
 }
+

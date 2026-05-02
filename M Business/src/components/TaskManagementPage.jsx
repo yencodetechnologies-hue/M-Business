@@ -5,14 +5,14 @@ import { BASE_URL } from "../config";
 const API = `${BASE_URL}/api`;
 
 const P = {
-  accent:  "#9333ea",
-  mid:     "#7c3aed",
-  dark:    "#1e0a3c",
-  light:   "#f5f3ff",
-  border:  "#ede9fe",
-  text:    "#1e0a3c",
-  muted:   "#a78bfa",
-  hover:   "#faf5ff",
+  accent:  "var(--app-accent)",
+  mid:     "var(--app-accent)",
+  dark:    "var(--app-sidebar)",
+  light:   "var(--app-bg)",
+  border:  "var(--app-border)",
+  text:    "var(--app-sidebar)",
+  muted:   "var(--app-muted)",
+  hover:   "var(--app-bg)",
 };
 
 const INTEGRATIONS = [
@@ -510,3 +510,5 @@ function TaskManagementPage() {
 }
 
 export default TaskManagementPage;
+
+

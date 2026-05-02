@@ -152,7 +152,7 @@ const AdminPaymentManagement = () => {
             </div>
             
             <div style={{
-              background: 'linear-gradient(135deg, #8B5CF6, #7c3aed)',
+              background: 'linear-gradient(135deg, #8B5CF6, var(--app-accent))',
               color: 'white',
               padding: 20,
               borderRadius: 12,
@@ -588,3 +588,5 @@ const AdminPaymentManagement = () => {
 };
 
 export default AdminPaymentManagement;
+
+

@@ -40,3 +40,4 @@ export default function QRScanner({ onScanSuccess, onScanError }) {
     </div>
   );
 }
+

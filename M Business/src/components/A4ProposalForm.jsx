@@ -3,31 +3,31 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 
 const THEMES = [
-  { name:"Violet",  p:"#7c3aed", g:"linear-gradient(135deg,#7c3aed,#a855f7)", l:"#ede9fe", t:"#4c1d95" },
+  { name:"Violet",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"#4c1d95" },
   { name:"Cobalt",  p:"#1d4ed8", g:"linear-gradient(135deg,#1e40af,#3b82f6)", l:"#dbeafe", t:"#1e3a8a" },
   { name:"Emerald", p:"#059669", g:"linear-gradient(135deg,#065f46,#10b981)", l:"#d1fae5", t:"#064e3b" },
 ];
 
 const T = {
-  primary: "#3b0764",
-  sidebar: "#1e0a3c", 
-  accent: "#9333ea",
-  bg: "#f5f3ff",
+  primary: "var(--app-sidebar)",
+  sidebar: "var(--app-text)", 
+  accent: "var(--app-accent)",
+  bg: "var(--app-bg)",
   card: "#FFFFFF",
-  text: "#1e0a3c",
-  muted: "#7c3aed",
-  border: "#ede9fe"
+  text: "var(--app-text)",
+  muted: "var(--app-accent)",
+  border: "var(--app-border)"
 };
 
 function Fld({ label, value, onChange, type = "text", error, placeholder, disabled }) {
   const s = { 
     width: "100%", 
-    border: `1.5px solid ${error ? "#EF4444" : "#ede9fe"}`, 
+    border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, 
     borderRadius: 10, 
     padding: "10px 14px", 
     fontSize: 13, 
     color: T.text, 
-    background: disabled ? "#f3f0ff" : "#faf5ff", 
+    background: disabled ? "var(--app-border)" : "var(--app-bg)", 
     boxSizing: "border-box", 
     outline: "none", 
     fontFamily: "inherit", 
@@ -35,7 +35,7 @@ function Fld({ label, value, onChange, type = "text", error, placeholder, disabl
   };
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>
+      <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>
         {label.toUpperCase()}
       </label>
       <input 
@@ -62,17 +62,17 @@ function ClientDropdown({ clients, value, onChange, error }) {
   
   return (
     <div style={{ position: "relative", marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>
+      <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>
         COMPANY NAME *
       </label>
       <div onClick={() => setOpen(!open)} style={{
         width: "100%",
-        border: `1.5px solid ${error ? "#EF4444" : open ? "#9333ea" : "#ede9fe"}`,
+        border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`,
         borderRadius: 10,
         padding: "10px 36px 10px 14px",
         fontSize: 13,
-        color: value ? T.text : "#a78bfa",
-        background: "#faf5ff",
+        color: value ? T.text : "var(--app-muted)",
+        background: "var(--app-bg)",
         cursor: "pointer",
         userSelect: "none",
         boxSizing: "border-box",
@@ -85,7 +85,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
               width: 22,
               height: 22,
               borderRadius: "50%",
-              background: "linear-gradient(135deg,#9333ea,#c084fc)",
+              background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -98,7 +98,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
             </div>
             <span>{value}</span>
             {selected?.companyName && (
-              <span style={{ fontSize: 11, color: "#a78bfa" }}>({selected.companyName})</span>
+              <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>
             )}
           </div>
         ) : "-- Select Client --"}
@@ -108,7 +108,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
           top: "50%",
           transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`,
           fontSize: 10,
-          color: "#a78bfa",
+          color: "var(--app-muted)",
           transition: "0.2s"
         }}>▼</span>
       </div>
@@ -119,9 +119,9 @@ function ClientDropdown({ clients, value, onChange, error }) {
           left: 0,
           right: 0,
           background: "#fff",
-          border: "1.5px solid #ede9fe",
+          border: "1.5px solid var(--app-border)",
           borderRadius: 12,
-          boxShadow: "0 8px 32px rgba(147,51,234,0.15)",
+          boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)",
           zIndex: 999,
           overflow: "hidden"
         }}>
@@ -143,10 +143,10 @@ function ClientDropdown({ clients, value, onChange, error }) {
                 style={{
                   width: "100%",
                   padding: "7px 10px 7px 30px",
-                  border: "1.5px solid #ede9fe",
+                  border: "1.5px solid var(--app-border)",
                   borderRadius: 8,
                   fontSize: 12,
-                  background: "#faf5ff",
+                  background: "var(--app-bg)",
                   outline: "none",
                   fontFamily: "inherit",
                   boxSizing: "border-box"
@@ -156,7 +156,7 @@ function ClientDropdown({ clients, value, onChange, error }) {
           </div>
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? (
-              <div style={{ padding: 14, textAlign: "center", color: "#a78bfa", fontSize: 13 }}>
+              <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>
                 No clients found
               </div>
             ) : (
@@ -179,16 +179,16 @@ function ClientDropdown({ clients, value, onChange, error }) {
                       padding: "10px 14px",
                       cursor: "pointer",
                       background: isSel ? "#f3e8ff" : "transparent",
-                      borderBottom: "1px solid #f5f3ff"
+                      borderBottom: "1px solid var(--app-bg)"
                     }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"}
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
                     onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f3e8ff" : "transparent"}
                   >
                     <div style={{
                       width: 28,
                       height: 28,
                       borderRadius: "50%",
-                      background: "linear-gradient(135deg,#9333ea,#c084fc)",
+                      background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -202,10 +202,10 @@ function ClientDropdown({ clients, value, onChange, error }) {
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>
                       {company && (
-                        <div style={{ fontSize: 11, color: "#a78bfa" }}>{company}</div>
+                        <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>
                       )}
                     </div>
-                    {isSel && <span style={{ fontSize: 14, color: "#9333ea" }}>✓</span>}
+                    {isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}
                   </div>
                 );
               })
@@ -527,8 +527,8 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
       background: "#fff",
       borderRadius: 16,
       padding: 24,
-      boxShadow: "0 4px 24px rgba(147,51,234,0.08)",
-      border: "1px solid #ede9fe",
+      boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)",
+      border: "1px solid var(--app-border)",
       maxHeight: "80vh",
       overflowY: "auto"
     }}>
@@ -538,7 +538,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
         alignItems: "center",
         marginBottom: 20,
         paddingBottom: 16,
-        borderBottom: "1px solid #ede9fe"
+        borderBottom: "1px solid var(--app-border)"
       }}>
         <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: T.text }}>
           A4 Project Proposal Form
@@ -597,8 +597,8 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
           <button
             onClick={onCancel}
             style={{
-              background: "#f5f3ff",
-              border: "1px solid #ede9fe",
+              background: "var(--app-bg)",
+              border: "1px solid var(--app-border)",
               color: T.text,
               borderRadius: 8,
               padding: "8px 16px",
@@ -633,11 +633,11 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
           onChange={v => updateFormData("date", v)} 
         />
         <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CURRENCY</label>
+          <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CURRENCY</label>
           <select 
             value={formData.currency} 
             onChange={e => updateFormData("currency", e.target.value)}
-            style={{ width: "100%", border: "1.5px solid #ede9fe", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "#faf5ff", outline: "none" }}
+            style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
           >
             <option value="₹">INR (₹)</option>
             <option value="$">USD ($)</option>
@@ -671,7 +671,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
       />
 
       <div style={{ marginBottom: 20 }}>
-        <label style={{ display: "block", fontSize: 11, color: "#7c3aed", fontWeight: 700, letterSpacing: 0.5, marginBottom: 10 }}>
+        <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 10 }}>
           SCOPE OF WORK
         </label>
         {formData.scopeOfWork.map((item, index) => (
@@ -683,10 +683,10 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
               style={{
                 flex: 1,
                 padding: "8px 12px",
-                border: "1.5px solid #ede9fe",
+                border: "1.5px solid var(--app-border)",
                 borderRadius: 8,
                 fontSize: 12,
-                background: "#faf5ff",
+                background: "var(--app-bg)",
                 outline: "none",
                 fontFamily: "inherit"
               }}
@@ -714,7 +714,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
         <button
           onClick={addScopeOfWork}
           style={{
-            background: "linear-gradient(135deg,#7c3aed,#a855f7)",
+            background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
             color: "#fff",
             border: "none",
             borderRadius: 8,
@@ -742,8 +742,8 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
         <button
           onClick={onCancel}
           style={{
-            background: "#f5f3ff",
-            border: "1px solid #ede9fe",
+            background: "var(--app-bg)",
+            border: "1px solid var(--app-border)",
             color: T.text,
             borderRadius: 10,
             padding: "10px 20px",
@@ -759,7 +759,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
           onClick={handleSubmit}
           disabled={saving}
           style={{
-            background: "linear-gradient(135deg,#7c3aed,#a855f7)",
+            background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
             border: "none",
             borderRadius: 10,
             padding: "10px 20px",
@@ -777,3 +777,5 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
     </div>
   );
 }
+
+

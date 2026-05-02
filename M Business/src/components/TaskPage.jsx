@@ -7,11 +7,11 @@ const API = `${BASE_URL}/api`;
 const P = {
   accent: "var(--app-accent)",
   mid: "var(--app-accent)",
-  dark: "#1e0a3c",
+  dark: "var(--app-sidebar)",
   light: "var(--app-bg)",
   border: "var(--app-border)",
-  text: "#1e0a3c",
-  muted: "#a78bfa",
+  text: "var(--app-sidebar)",
+  muted: "var(--app-muted)",
   hover: "var(--app-bg)",
 };
 
@@ -271,7 +271,7 @@ function GanttView({ groups, config }) {
                   return (
                     <div key={i} style={{
                       width: dayW, flexShrink: 0, textAlign: "center", padding: "5px 0",
-                      background: isToday ? "#fff8f0" : isWknd ? "#fafafa" : "transparent",
+                      background: isToday ? "#fff8f0" : isWknd ? "var(--app-bg)" : "transparent",
                       borderRight: `1px solid ${P.border}`,
                       borderBottom: isToday ? "2px solid #fdab3d" : "none"
                     }}>
@@ -369,7 +369,7 @@ function CalendarView({ groups, config }) {
             const tasks = getT(day);
             const isWknd = i % 7 === 0 || i % 7 === 6;
             return (
-              <div key={i} style={{ minHeight: 90, padding: 6, borderRight: `1px solid ${P.border}`, borderBottom: `1px solid ${P.border}`, background: isToday(day) ? "#fffbeb" : isWknd ? "#fafafa" : "#fff" }}>
+              <div key={i} style={{ minHeight: 90, padding: 6, borderRight: `1px solid ${P.border}`, borderBottom: `1px solid ${P.border}`, background: isToday(day) ? "#fffbeb" : isWknd ? "var(--app-bg)" : "#fff" }}>
                 {day && (
                   <>
                     <div style={{ width: 24, height: 24, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: isToday(day) ? "#fdab3d" : "transparent", color: isToday(day) ? "#fff" : P.text, fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{day}</div>
@@ -511,10 +511,10 @@ const MI = ({ onClick, icon, title, sub, active, danger }) => (
     display: "flex", alignItems: "center", gap: 9, padding: "8px 10px",
     borderRadius: 7, cursor: "pointer", fontSize: 13, fontFamily: "inherit",
     color: danger ? "#e2445c" : active ? P.accent : P.text,
-    background: active ? "rgba(147,51,234,0.08)" : "transparent", transition: "background .1s"
+    background: active ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)" : "transparent", transition: "background .1s"
   }}
-    onMouseEnter={e => e.currentTarget.style.background = active ? "rgba(147,51,234,0.13)" : P.light}
-    onMouseLeave={e => e.currentTarget.style.background = active ? "rgba(147,51,234,0.08)" : "transparent"}>
+    onMouseEnter={e => e.currentTarget.style.background = active ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.13)" : P.light}
+    onMouseLeave={e => e.currentTarget.style.background = active ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)" : "transparent"}>
     {icon && <span style={{ fontSize: 15, lineHeight: 1, flexShrink: 0 }}>{icon}</span>}
     <div style={{ flex: 1 }}>
       <div style={{ fontWeight: active || sub ? 600 : 400 }}>{title}</div>
@@ -806,7 +806,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
 const TB = React.forwardRef(({ icon, label, active, onClick, badge }, ref) => (
   <button ref={ref} onClick={onClick} style={{
     display: "flex", alignItems: "center", gap: 5, padding: "5px 10px",
-    background: active ? "rgba(147,51,234,0.1)" : "transparent",
+    background: active ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "transparent",
     border: `1.5px solid ${active ? P.accent : "transparent"}`,
     borderRadius: 8, cursor: "pointer", fontSize: 12, fontFamily: "inherit",
     color: active ? P.accent : P.mid, fontWeight: active ? 700 : 500,
@@ -957,7 +957,7 @@ function SidekickPanel({ onClose, groups }) {
           <div style={{ position: "relative", flexShrink: 0 }}>
             <svg width={70} height={70}>
               <circle cx={35} cy={35} r={r} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={7} />
-              <circle cx={35} cy={35} r={r} fill="none" stroke="#a78bfa" strokeWidth={7} strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" transform="rotate(-90 35 35)" />
+              <circle cx={35} cy={35} r={r} fill="none" stroke="var(--app-muted)" strokeWidth={7} strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" transform="rotate(-90 35 35)" />
             </svg>
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
               <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{pct}%</span>
@@ -1393,7 +1393,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
   const cols = (extraCols || []).filter(c => !hcSet.has(c.id));
   const priorityVal = task.priority || "—";
   const pc = PRIORITY_CFG[priorityVal] || { bg: "#64748b", fg: "#fff" };
-  const bg = selected ? "rgba(147,51,234,0.06)" : hovered ? P.hover : "#fff";
+  const bg = selected ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.06)" : hovered ? P.hover : "#fff";
 
   return (
     <div className="trow" style={{ display: "flex", alignItems: "stretch", borderBottom: "1px solid " + P.border, minWidth: "max-content", background: bg }} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
@@ -1702,7 +1702,7 @@ function TaskUpdatePanel({ task, onClose, onField }) {
         {tab === "updates" && (<>
           <div style={{ margin: "12px 18px", border: `1.5px solid ${P.border}`, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
             <textarea value={updateText} onChange={e => setUpdateText(e.target.value)} placeholder="Write an update..." style={{ width: "100%", minHeight: 100, border: "none", outline: "none", resize: "none", padding: "12px 14px", fontSize: 13, fontFamily: "inherit", color: P.text, boxSizing: "border-box" }} />
-            <div style={{ display: "flex", justifyContent: "flex-end", padding: "8px 10px", borderTop: `1px solid ${P.border}`, background: "#fafafa" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", padding: "8px 10px", borderTop: `1px solid ${P.border}`, background: "var(--app-bg)" }}>
               <button onClick={postUpdate} style={{ background: updateText.trim() ? "#0073ea" : "#e2e8f0", color: updateText.trim() ? "#fff" : "#94a3b8", border: "none", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 700, cursor: updateText.trim() ? "pointer" : "default", fontFamily: "inherit" }}>Update</button>
             </div>
           </div>
@@ -1839,8 +1839,8 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                 const priorityCounts = PRIORITY_LIST.slice(0, 4).map(p => ({ p, bg: PRIORITY_CFG[p].bg, n: tasks.filter(t => (t.priority || "—") === p).length })).filter(x => x.n > 0);
                 const priorityFilled = tasks.filter(t => t.priority && t.priority !== "—").length;
                 return (
-                  <div style={{ display: "flex", alignItems: "stretch", borderTop: `1.5px solid ${P.border}`, background: "#fafafa", minWidth: "max-content", minHeight: 38 }}>
-                    <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: "#fafafa", borderRight: `1px solid ${P.border}`, boxShadow: "2px 0 4px rgba(0,0,0,0.04)", padding: "0 10px", display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ display: "flex", alignItems: "stretch", borderTop: `1.5px solid ${P.border}`, background: "var(--app-bg)", minWidth: "max-content", minHeight: 38 }}>
+                    <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: "var(--app-bg)", borderRight: `1px solid ${P.border}`, boxShadow: "2px 0 4px rgba(0,0,0,0.04)", padding: "0 10px", display: "flex", alignItems: "center", gap: 6 }}>
                       <StatusBarWithTooltip statusCounts={statusCounts} total={total} />
                       <span style={{ fontSize: 11, color: "#9aadbd", fontWeight: 600, flexShrink: 0 }}>{doneCnt}/{total}</span>
                     </div>
@@ -2363,6 +2363,8 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
     </div>
   );
 }
+
+
 
 
 

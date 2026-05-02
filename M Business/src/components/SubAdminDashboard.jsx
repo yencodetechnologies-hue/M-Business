@@ -113,7 +113,7 @@ function Badge({ label }) { const c = sc(label); return <span style={{ backgroun
 
 function SC({ title, children, action }) {
   return (
-    <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(147,51,234,0.08)", border: "1px solid var(--app-border)" }}>
+    <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
         <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: T.text }}>{title}</h3>
         {action}
@@ -136,7 +136,7 @@ function Search({ value, onChange, placeholder }) {
 function Mdl({ title, onClose, children, maxWidth = 820 }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-      <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
+      <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
         <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
@@ -227,7 +227,7 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onIte
 function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Delete", danger = true }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
+      <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "#fee2e2" : "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
           {danger ? "🗑️" : "✅"}
         </div>
@@ -257,7 +257,7 @@ function InfoRow({ icon, label, value }) {
   if (!value) return null;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
-      <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(147,51,234,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{icon}</div>
+      <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{icon}</div>
       <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{label}</div><div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", marginTop: 1 }}>{value}</div></div>
     </div>
   );
@@ -275,7 +275,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(147,51,234,0.15)", zIndex: 999, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
@@ -369,7 +369,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[{ t: "Total Clients", v: clients.length, i: "👥", c: "var(--app-accent)" }, { t: "Active", v: clients.filter(c => c.status === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: clients.filter(c => c.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
           </div>
@@ -458,7 +458,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                         <Badge label={p.status || "Pending"} />
                         <button
                           onClick={() => onViewProject && onViewProject(p)}
-                          style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700 }}
+                          style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700 }}
                         >
                           View →
                         </button>
@@ -608,7 +608,7 @@ function EmployeesPage({ employees, setEmployees }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[{ t: "Total", v: employees.length, i: "👨‍💼", c: "var(--app-muted)" }, { t: "Active", v: employees.filter(e => e.status === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: employees.filter(e => e.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
           </div>
@@ -805,7 +805,7 @@ function ManagersPage({ managers, setManagers }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[{ t: "Total Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
           </div>
@@ -993,7 +993,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[{ t: "Total Subadmins", v: subadmins.length, i: "🛡️", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
           </div>
@@ -1248,7 +1248,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
         {[{ t: "Total", v: projects.length, i: "📁", c: "var(--app-accent)" }, { t: "Active", v: projects.filter(p => p.status === "In Progress").length, i: "⚡", c: "var(--app-accent)" }, { t: "Completed", v: projects.filter(p => p.status === "Completed").length, i: "✅", c: "#22C55E" }, { t: "Pending", v: projects.filter(p => p.status === "Pending").length, i: "⏳", c: "#F59E0B" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
+          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
           </div>
@@ -1556,7 +1556,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(147,51,234,0.15)", zIndex: 999, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "8px 10px" }}><input autoFocus placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div>
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No results</div>
@@ -1605,12 +1605,12 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {tsToast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{tsToast}</div>}
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12 }}>
-        {tsStats.map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {tsStats.map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ width: 38, height: 38, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>))}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
-          {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(147,51,234,0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
+          {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
         </div>
         <button onClick={openAdd} style={B2("var(--app-accent)")}>+ Add Project Status</button>
       </div>
@@ -1747,17 +1747,17 @@ function InterviewPage({ companyId, companyName }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
       <div style={{ background: "linear-gradient(135deg,var(--app-sidebar),#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.25)" }}>
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(147,51,234,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "var(--app-accent)", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(147,51,234,0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(147,51,234,0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
           <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>👁 Preview Form</button>
         </div>
       </div>
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✅", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✅", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
       </div>
-      <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(147,51,234,0.08)", border: "1px solid var(--app-border)" }}>
+      <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
         <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)" }}>All Candidates ({displayed.length})</h3>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
@@ -1775,12 +1775,12 @@ function InterviewPage({ companyId, companyName }) {
                       <td style={{ padding: "12px 12px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}</td>
                       <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "var(--app-sidebar)" }}>{c.name || "—"}</span></div></td>
                       <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "var(--app-muted)" }}>{c.email || "—"}</div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile || ""}</div></td>
-                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>🎓 Fresher</span> : <span style={{ background: "rgba(147,51,234,0.12)", color: "var(--app-accent)", border: "1px solid rgba(147,51,234,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>💼 {c.years || "?"}yrs</span>}</td>
+                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>🎓 Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>💼 {c.years || "?"}yrs</span>}</td>
                       <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-sidebar)", fontSize: 12 }}>{c.role || "—"}</td>
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)" }}>{c.interviewerName || <span style={{ color: "#ddd" }}>—</span>}</td>
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
                       <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">⏳ Pending</option><option value="hired">✅ Hired</option><option value="rejected">❌ Rejected</option></select></td>
-                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄 View</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
+                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄 View</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
                       <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>🗑</button></div></td>
                     </tr>
                   );
@@ -1793,7 +1793,7 @@ function InterviewPage({ companyId, companyName }) {
       </div>
       {viewModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
+          <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
             <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
               <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-sidebar)" }}>👤 Candidate Profile</h2>
               <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
@@ -1892,7 +1892,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
   };
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
-      <div style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 650, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(147,51,234,0.3)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
+      <div style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 650, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
         <div style={{ background: "linear-gradient(135deg,var(--app-muted),var(--app-accent),var(--app-accent))", padding: "28px 28px 22px", textAlign: "center", flexShrink: 0, position: "relative" }}>
           <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>✕</button>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 8, margin: "0 auto 12px", position: "relative", width: "fit-content" }}>
@@ -1922,7 +1922,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
             <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-muted)", marginBottom: 12, letterSpacing: 1 }}>PERSONAL DETAILS</div>
             {[{ icon: "👤", label: "Full Name", value: displayName }, { icon: "📧", label: "Email", value: user?.email || "—" }, { icon: "📱", label: "Phone", value: user?.phone || "—" }, { icon: "🎭", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
-                <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(147,51,234,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{icon}</div>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{icon}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase" }}>{label}</div>
                   <div style={{ fontSize: 12, fontWeight: 600, color: "var(--app-sidebar)", marginTop: 1 }}>{value}</div>
@@ -2074,12 +2074,12 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
           alignItems: "center",
           gap: 9,
           padding: isSub ? "8px 12px 8px 32px" : "9px 12px",
-          background: on ? "linear-gradient(90deg,rgba(147,51,234,0.35),rgba(168,85,247,0.15))" : "transparent",
+          background: on ? "linear-gradient(90deg,rgba(var(--app-accent-rgb, 124, 58, 237),0.35),rgba(168,85,247,0.15))" : "transparent",
           border: on ? "1px solid rgba(168,85,247,0.35)" : "1px solid transparent",
           borderRadius: 11,
-          color: on ? "#e9d5ff" : "rgba(255,255,255,0.45)",
-          fontWeight: on ? 700 : 400,
-          fontSize: isSub ? 12 : 12.5,
+          color: on ? "#fff" : "rgba(255,255,255,0.75)",
+          fontWeight: on ? 800 : 700,
+          fontSize: isSub ? 12.5 : 13,
           cursor: "pointer",
           marginBottom: 2,
           textAlign: "left",
@@ -2115,7 +2115,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
             </div>
             <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
               <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: "0.2px", textShadow: "0 2px 4px rgba(0,0,0,0.2)" }}>{companyName}</div>
-              {roleDisplay && <div style={{ fontSize: 8, color: "rgba(255,255,255,0.45)", letterSpacing: 1.2, textTransform: "uppercase", fontWeight: 700, marginTop: -1 }}>{roleDisplay}</div>}
+              {roleDisplay && <div style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", letterSpacing: 1.2, textTransform: "uppercase", fontWeight: 800, marginTop: -1 }}>{roleDisplay}</div>}
             </div>
           </div>
           <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#fff", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }} className="sidebar-close">✕</button>
@@ -2137,14 +2137,14 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                       padding: "10px 12px",
                       background: "transparent",
                       border: "none",
-                      color: hasActive || isExpanded ? "#e9d5ff" : "rgba(255,255,255,0.45)",
-                      fontWeight: 700,
-                      fontSize: 11,
+                      color: hasActive || isExpanded ? "#fff" : "rgba(255,255,255,0.65)",
+                      fontWeight: 800,
+                      fontSize: 11.5,
                       cursor: "pointer",
                       textAlign: "left",
                       fontFamily: "inherit",
                       textTransform: "uppercase",
-                      letterSpacing: 0.5
+                      letterSpacing: 0.8
                     }}
                   >
                     <span style={{ flex: 1 }}>{n.label}</span>
@@ -2179,7 +2179,7 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
   if (displayedPackages.length === 0) {
     return (
       <div style={{ flex: 1, padding: "0 20px" }}>
-        <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 24, border: "2px dashed var(--app-border)", boxShadow: "0 4px 20px rgba(147,51,234,0.05)" }}>
+        <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 24, border: "2px dashed var(--app-border)", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)" }}>
           <div style={{ fontSize: 64, marginBottom: 24 }}>📦</div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 12 }}>No Packages Assigned</h2>
           <p style={{ fontSize: 15, color: "var(--app-muted)", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>
@@ -2572,7 +2572,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // ← இது மட்டும் இருக்கணும் (KEEP THIS)
   const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "purple");
   const [showThemePicker, setShowThemePicker] = useState(false);
-  const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "#7c3aed");
+  const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "var(--app-accent)");
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Helper: hex to HSL
@@ -2593,11 +2593,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // Generate full theme from a single hex color
   const generateThemeFromColor = (hex) => {
     const [h, s, l] = hexToHsl(hex);
+    // Ensure accent is rich and dark enough for white text
+    const accentL = Math.min(l, 50); // Lowered lightness for better visibility
+    const accentS = Math.max(s, 70); // Higher saturation for "punchy" color
+    const accentColor = hslToHex(h, accentS, accentL);
+    
     return {
-      label: "Custom", sidebar: hslToHex(h, Math.min(s+10,100), 12),
-      accent: hex, bg: hslToHex(h, Math.min(s,40), 97),
-      muted: hslToHex(h, Math.min(s,80), Math.max(l-15,25)),
-      border: hslToHex(h, Math.min(s,30), 90), dot: hex
+      label: "Custom", 
+      sidebar: hslToHex(h, Math.min(s + 20, 100), 12), // Very deep color for sidebar
+      accent: accentColor, 
+      bg: hslToHex(h, 30, 95), // Clearer tinted background
+      muted: hslToHex(h, 60, 30), // Much darker muted text (30% vs 35%)
+      border: hslToHex(h, 40, 85), // Stronger borders
+      dot: accentColor
     };
   };
 
@@ -3196,7 +3204,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const displayName = companyNameStr;
   const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-  const B = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
+  const B = (color) => ({ 
+    background: `linear-gradient(135deg,${color},${color}ee)`, 
+    color: "#fff", 
+    border: "none", 
+    borderRadius: 12, 
+    padding: "9px 18px", 
+    fontWeight: 800, // Bolder font
+    fontSize: 13, 
+    cursor: "pointer", 
+    fontFamily: "inherit",
+    boxShadow: `0 4px 12px ${color}40`, // Add shadow to button
+    textShadow: "0 1px 2px rgba(0,0,0,0.2)" // ADDED: Ensures white text is visible
+  });
 
   const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
 
@@ -3242,7 +3262,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         {/* Mobile Topbar */}
-        <div className="mob-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(147,51,234,0.07)" }}>
+        <div className="mob-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
           {!enforceMySubscriptions ? (
             <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
           ) : (
@@ -3298,7 +3318,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   {enforceMySubscriptions && (
                     <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "8px 16px", color: "#ef4444", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.15)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.1)"}>Logout</button>
                   )}
-                  <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", boxShadow: "0 2px 10px rgba(147,51,234,0.08)", flexShrink: 0 }}>
+                  <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", boxShadow: "0 2px 10px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", flexShrink: 0 }}>
                     <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ cursor: "pointer" }} title="Click to upload logo">
                       {companyLogo ? (
                         <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "cover", background: "#fff", display: "block", borderRadius: 10, border: "1px solid var(--app-border)" }} onError={() => setCompanyLogo(null)} />
@@ -3397,7 +3417,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       {/* Quick custom color presets */}
                       <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-                        {["#7c3aed","#2563eb","#0891b2","#059669","#d97706","#dc2626","#db2777","#7c2d12","#4f46e5","#0f766e","#b91c1c","#9333ea"].map(c => (
+                        {["var(--app-accent)","#2563eb","#0891b2","#059669","#d97706","#dc2626","#db2777","#7c2d12","#4f46e5","#0f766e","#b91c1c","var(--app-accent)"].map(c => (
                           <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); }}
                             style={{
                               width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
@@ -3418,7 +3438,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
                       : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
                     border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
-                    boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "#7c3aed")}60`,
+                    boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     transition: "all 0.2s"
                   }}>
@@ -3534,11 +3554,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <SC>
                     <div style={{ display: "flex", flexDirection: "column", gap: 20, padding: 4 }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center", background: "linear-gradient(180deg,#ffffff,#fdfbff)", borderRadius: 20, padding: "24px 16px", border: "1.5px solid var(--app-border)", boxShadow: "0 4px 20px rgba(147,51,234,0.03)", textAlign: "center" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center", background: "linear-gradient(180deg,#ffffff,#fdfbff)", borderRadius: 20, padding: "24px 16px", border: "1.5px solid var(--app-border)", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.03)", textAlign: "center" }}>
                         <div style={{ position: "relative", width: "fit-content", height: "auto", flexShrink: 0, marginBottom: 4 }}>
                           <div onClick={() => headerLogoRef.current?.click()} style={{ cursor: "pointer" }} title="Update Company Logo">
                             {companyLogo ? (
-                              <img src={companyLogo} alt="logo" style={{ width: "auto", height: "auto", maxWidth: "280px", maxHeight: "160px", objectFit: "cover", display: "block", borderRadius: 24, background: "#fff", border: "2px solid var(--app-border)", boxShadow: "0 8px 16px rgba(147,51,234,0.12)" }} />
+                              <img src={companyLogo} alt="logo" style={{ width: "auto", height: "auto", maxWidth: "280px", maxHeight: "160px", objectFit: "cover", display: "block", borderRadius: 24, background: "#fff", border: "2px solid var(--app-border)", boxShadow: "0 8px 16px rgba(var(--app-accent-rgb, 124, 58, 237),0.12)" }} />
                             ) : (
                               <div style={{ width: 90, height: 90, borderRadius: 24, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 36, fontWeight: 800 }}>{initials}</div>
                             )}
@@ -3594,7 +3614,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     { t: "Total Income", v: formatCurrency(income.reduce((s, x) => s + (Number(x.amount) || 0), 0), user?.currency), i: "💰", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
                     { t: "Total Expenses", v: formatCurrency(expenses.reduce((s, x) => s + (Number(x.amount) || 0), 0), user?.currency), i: "💸", c: "#EF4444", bg: "linear-gradient(135deg,#fee2e2,#fff1f1)" }
                   ].map(({ t, v, i, c, bg }) => (
-                    <div key={t} style={{ background: "#fff", borderRadius: 16, padding: "16px", boxShadow: "0 4px 20px rgba(147,51,234,0.05)", border: "1.5px solid var(--app-border)", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div key={t} style={{ background: "#fff", borderRadius: 16, padding: "16px", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)", border: "1.5px solid var(--app-border)", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: 8 }}>
                       <div style={{ position: "absolute", top: 0, right: 0, width: 30, height: 30, background: bg, borderBottomLeftRadius: 20, opacity: 0.6 }} />
                       <div style={{ width: 36, height: 36, borderRadius: 10, background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, boxShadow: `0 4px 10px ${c}15` }}>{i}</div>
                       <div>
@@ -4360,5 +4380,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     </div>
   );
 }
+
 
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 
 const API = `${BASE_URL}/api/events`;
-const T = { text:"#1e0a3c", muted:"var(--app-accent)", border:"var(--app-border)" };
+const T = { text:"var(--app-text)", muted:"var(--app-accent)", border:"var(--app-border)" };
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const FULL_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -278,11 +278,11 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
         {stats.map(({t,v,c,i}) => (
           <div key={t} style={{ background:"#fff", borderRadius:14, padding:"16px 14px",
-            boxShadow:"0 4px 18px rgba(147,51,234,0.07)", border:"1px solid var(--app-border)" }}>
+            boxShadow:"0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border:"1px solid var(--app-border)" }}>
             <div style={{ width:38, height:38, borderRadius:10, background:`${c}18`,
               display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:18, marginBottom:8 }}>{i}</div>
-            <div style={{ fontSize:10, color:"#a78bfa", fontWeight:700,
+            <div style={{ fontSize:10, color:"var(--app-muted)", fontWeight:700,
               letterSpacing:0.5, marginBottom:3 }}>{t.toUpperCase()}</div>
             <div style={{ fontSize:26, fontWeight:800, color:c }}>{v}</div>
           </div>
@@ -294,7 +294,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
 
         {/* ── LEFT: CALENDAR ──────────────────────────────────────── */}
         <div style={{ background:"#fff", borderRadius:16, padding:20,
-          boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid var(--app-border)",
+          boxShadow:"0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border:"1px solid var(--app-border)",
           position:"sticky", top:16 }}>
 
           {/* Month navigation */}
@@ -309,7 +309,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                 {FULL_MONTHS[calMonth]} {calYear}
               </div>
               {selectedDate && (
-                <div style={{ fontSize:10, color:"#a78bfa", marginTop:2 }}>
+                <div style={{ fontSize:10, color:"var(--app-muted)", marginTop:2 }}>
                   {selectedDate}
                   <span onClick={() => setSelectedDate(null)}
                     style={{ marginLeft:6, cursor:"pointer", color:"var(--app-accent)",
@@ -333,7 +333,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
           <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2, marginBottom:4 }}>
             {DAYS.map(d => (
               <div key={d} style={{ textAlign:"center", fontSize:9, fontWeight:700,
-                color:"#a78bfa", letterSpacing:0.5, padding:"3px 0" }}>
+                color:"var(--app-muted)", letterSpacing:0.5, padding:"3px 0" }}>
                 {d.toUpperCase()}
               </div>
             ))}
@@ -360,7 +360,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                     borderRadius:9,
                     padding:"5px 4px 4px",
                     cursor: cell.curr ? "pointer" : "default",
-                    background: isSelected ? "var(--app-border)" : isToday ? "var(--app-bg)" : cell.curr ? "#fff" : "#fafafa",
+                    background: isSelected ? "var(--app-border)" : isToday ? "var(--app-bg)" : cell.curr ? "#fff" : "var(--app-bg)",
                     border: isSelected ? "2px solid var(--app-accent)" : isToday ? "1.5px solid #c4b5fd" : "1px solid #f0edff",
                     opacity: cell.curr ? 1 : 0.4,
                     transition:"all 0.15s",
@@ -389,7 +389,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                         }}>{ev.name}</div>
                       ))}
                       {dayEvents.length > 2 && (
-                        <div style={{ fontSize:8, color:"#a78bfa", fontWeight:600,
+                        <div style={{ fontSize:8, color:"var(--app-muted)", fontWeight:600,
                           paddingLeft:2 }}>+{dayEvents.length - 2}</div>
                       )}
                     </div>
@@ -421,7 +421,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
           <div style={{ display:"flex", gap:10, marginTop:12, flexWrap:"wrap" }}>
             {Object.entries(TC).map(([type, color]) => (
               <div key={type} style={{ display:"flex", alignItems:"center", gap:4,
-                fontSize:9, color:"#a78bfa", fontWeight:600 }}>
+                fontSize:9, color:"var(--app-muted)", fontWeight:600 }}>
                 <div style={{ width:7, height:7, borderRadius:2, background:color }} />
                 {type}
               </div>
@@ -434,7 +434,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
 
           {/* ── EVENT LIST ───────────────────────────────────────── */}
           <div style={{ background:"#fff", borderRadius:16, padding:20,
-            boxShadow:"0 4px 24px rgba(147,51,234,0.08)", border:"1px solid var(--app-border)" }}>
+            boxShadow:"0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border:"1px solid var(--app-border)" }}>
 
             {/* Toolbar */}
             <div style={{ display:"flex", justifyContent:"space-between",
@@ -469,13 +469,13 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                     cursor:"pointer", border:"1.5px solid",
                     borderColor: !selectedDate && filter===fil ? "var(--app-accent)" : "var(--app-border)",
                     background:  !selectedDate && filter===fil ? "var(--app-border)"  : "#fff",
-                    color:       !selectedDate && filter===fil ? "var(--app-accent)"  : "#a78bfa"
+                    color:       !selectedDate && filter===fil ? "var(--app-accent)"  : "var(--app-muted)"
                   }}>{fil}</button>
               ))}
             </div>
 
             {loading ? (
-              <div style={{ textAlign:"center", padding:40, color:"#a78bfa" }}>
+              <div style={{ textAlign:"center", padding:40, color:"var(--app-muted)" }}>
                 <div style={{ fontSize:28, marginBottom:8 }}>⏳</div>
                 <div style={{ fontWeight:600, fontSize:13 }}>Loading events...</div>
               </div>
@@ -485,7 +485,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                 <div style={{ fontSize:14, fontWeight:700, color:T.text }}>
                   {search || selectedDate ? "No events found" : "No events yet!"}
                 </div>
-                <div style={{ fontSize:12, color:"#a78bfa", marginTop:4 }}>
+                <div style={{ fontSize:12, color:"var(--app-muted)", marginTop:4 }}>
                   {search || selectedDate
                     ? "Try a different filter or click a date on the calendar"
                     : "Add your first event using the form above"}
@@ -503,19 +503,19 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
 
                   return (
                     <div key={ev._id||idx} style={{
-                      background: past ? "#fafafa" : "#fff",
+                      background: past ? "var(--app-bg)" : "#fff",
                       borderRadius:12, padding:"12px 14px",
                       border:`1px solid ${past?"#f0edff":"var(--app-border)"}`,
                       display:"flex", gap:12, alignItems:"center",
                       flexWrap:"wrap", opacity: past ? 0.8 : 1,
-                      boxShadow:"0 2px 10px rgba(147,51,234,0.05)"
+                      boxShadow:"0 2px 10px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)"
                     }}>
                       {/* Date badge */}
                       <div style={{ background:`${c}15`, border:`2px solid ${c}30`,
                         borderRadius:10, padding:"8px 12px", textAlign:"center",
                         minWidth:50, flexShrink:0 }}>
                         <div style={{ fontSize:20, fontWeight:800, color:c, lineHeight:1 }}>{day}</div>
-                        <div style={{ fontSize:8, color:"#a78bfa", fontWeight:700,
+                        <div style={{ fontSize:8, color:"var(--app-muted)", fontWeight:700,
                           letterSpacing:1, marginTop:2 }}>{mon.toUpperCase()}</div>
                       </div>
 
@@ -532,23 +532,23 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                             {ev.type||"Meeting"}
                           </span>
                           {past && (
-                            <span style={{ background:"#f3f0ff", color:"#a78bfa",
+                            <span style={{ background:"var(--app-border)", color:"var(--app-muted)",
                               padding:"2px 7px", borderRadius:20, fontSize:9, fontWeight:600 }}>
                               Past
                             </span>
                           )}
                         </div>
                         <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-                          {ev.project && <span style={{ color:"#a78bfa", fontSize:11 }}>📁 {ev.project}</span>}
-                          {ev.client  && <span style={{ color:"#a78bfa", fontSize:11 }}>👤 {ev.client}</span>}
+                          {ev.project && <span style={{ color:"var(--app-muted)", fontSize:11 }}>📁 {ev.project}</span>}
+                          {ev.client  && <span style={{ color:"var(--app-muted)", fontSize:11 }}>👤 {ev.client}</span>}
                           {(ev.start||ev.end) && (
-                            <span style={{ color:"#a78bfa", fontSize:11 }}>
+                            <span style={{ color:"var(--app-muted)", fontSize:11 }}>
                               🕐 {ev.start||"--"} – {ev.end||"--"}
                             </span>
                           )}
                         </div>
                         {ev.notes && (
-                          <div style={{ color:"#a78bfa", fontSize:10,
+                          <div style={{ color:"var(--app-muted)", fontSize:10,
                             marginTop:3, fontStyle:"italic" }}>📝 {ev.notes}</div>
                         )}
                       </div>
@@ -602,7 +602,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
       {/* ── MODALS ───────────────────────────────────────────────── */}
       {modal === "project" && (
         <div style={{ position:"fixed", inset:0, background:"rgba(59,7,100,0.55)", backdropFilter:"blur(8px)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
-          <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:450, padding:24, boxShadow:"0 32px 80px rgba(147,51,234,0.28)" }}>
+          <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:450, padding:24, boxShadow:"0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.28)" }}>
             <h2 style={{ margin:"0 0 16px", fontSize:18, fontWeight:800, color:T.text }}>🏗️ Project Deadline</h2>
             <div style={{ background:"var(--app-bg)", padding:16, borderRadius:12, marginBottom:20 }}>
               <div style={{ fontSize:16, fontWeight:700, color:T.text }}>{form._original.name}</div>
@@ -643,7 +643,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
 
       {modal === "task" && (
         <div style={{ position:"fixed", inset:0, background:"rgba(59,7,100,0.55)", backdropFilter:"blur(8px)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
-          <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:450, padding:24, boxShadow:"0 32px 80px rgba(147,51,234,0.28)" }}>
+          <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:450, padding:24, boxShadow:"0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.28)" }}>
             <h2 style={{ margin:"0 0 16px", fontSize:18, fontWeight:800, color:T.text }}>📝 Task Details</h2>
             <div style={{ background:"var(--app-bg)", padding:16, borderRadius:12, marginBottom:20 }}>
               <div style={{ fontSize:16, fontWeight:700, color:T.text }}>{form._original.title || form._original.name}</div>
@@ -689,7 +689,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
           onClick={(e)=>{ if(e.target===e.currentTarget){ setModal(null); setForm(EMPTY); setErr({}); } }}>
           <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:740,
             maxHeight:"90vh", overflow:"hidden", display:"flex",
-            flexDirection:"column", boxShadow:"0 32px 80px rgba(147,51,234,0.28)" }}>
+            flexDirection:"column", boxShadow:"0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.28)" }}>
 
             {/* Modal header */}
             <div style={{ padding:"16px 22px", borderBottom:"1px solid var(--app-border)",
@@ -824,13 +824,13 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                       color:TC[form.type]||"var(--app-accent)", lineHeight:1 }}>
                       {new Date(form.date+"T00:00:00").getDate()}
                     </div>
-                    <div style={{ fontSize:8, color:"#a78bfa", fontWeight:700 }}>
+                    <div style={{ fontSize:8, color:"var(--app-muted)", fontWeight:700 }}>
                       {MONTHS[new Date(form.date+"T00:00:00").getMonth()]?.toUpperCase()}
                     </div>
                   </div>
                   <div>
                     <div style={{ fontWeight:700, color:T.text, fontSize:13 }}>{form.name}</div>
-                    <div style={{ fontSize:12, color:"#a78bfa", marginTop:2 }}>
+                    <div style={{ fontSize:12, color:"var(--app-muted)", marginTop:2 }}>
                       {form.type}
                       {form.start ? ` · ${form.start}${form.end?` – ${form.end}`:""}` : ""}
                       {form.client ? ` · 👤 ${form.client}` : ""}
@@ -859,3 +859,5 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
     </div>
   );
 }
+
+

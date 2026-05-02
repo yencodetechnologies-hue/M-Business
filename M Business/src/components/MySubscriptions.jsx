@@ -4,9 +4,9 @@ import { BASE_URL } from "../config";
 
 // ─── Theme ──────────────────────────────────────────────────────────────────
 const T = {
-  primary: "#3b0764", sidebar: "#1e0a3c", accent: "#9333ea",
-  bg: "#f5f3ff", card: "#FFFFFF", text: "#1e0a3c", muted: "#7c3aed",
-  border: "#ede9fe", success: "#22C55E", warning: "#F59E0B", danger: "#EF4444"
+  primary: "var(--app-sidebar)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)",
+  bg: "var(--app-bg)", card: "#FFFFFF", text: "var(--app-sidebar)", muted: "var(--app-accent)",
+  border: "var(--app-border)", success: "#22C55E", warning: "#F59E0B", danger: "#EF4444"
 };
 
 // ─── Load Razorpay Script ────────────────────────────────────────────────────
@@ -31,7 +31,7 @@ const Badge = ({ label, color }) => {
 };
 
 const Card = ({ title, children, icon }) => (
-  <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(147,51,234,0.08)", border: "1px solid #ede9fe" }}>
+  <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
       {icon && <span style={{ fontSize: 18 }}>{icon}</span>}
       <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: T.text }}>{title}</h3>
@@ -43,8 +43,8 @@ const Card = ({ title, children, icon }) => (
 const InfoRow = ({ label, value, icon }) => {
   if (!value && value !== 0) return null;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "#faf5ff", borderRadius: 9, border: "1px solid #ede9fe", marginBottom: 7 }}>
-      {icon && <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(147,51,234,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{icon}</div>}
+    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
+      {icon && <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{icon}</div>}
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 10, color: T.muted, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{label}</div>
         <div style={{ fontSize: 13, fontWeight: 600, color: T.text, marginTop: 1 }}>{value}</div>
@@ -66,12 +66,12 @@ const PLANS = [
     btnLabel: "Get Started"
   },
   {
-    name: "Professional", price: 2999, icon: "🚀", color: "#9333ea", popular: true,
+    name: "Professional", price: 2999, icon: "🚀", color: "var(--app-accent)", popular: true,
     features: ["Unlimited Projects", "Unlimited Invoices", "Advanced Reports", "Priority Support", "Team Management"],
     btnLabel: "Get Started"
   },
   {
-    name: "Enterprise", price: null, icon: "🏢", color: "#1e0a3c",
+    name: "Enterprise", price: null, icon: "🏢", color: "var(--app-sidebar)",
     features: ["Custom Branding", "API Access", "Dedicated Manager", "White-label Solution"],
     btnLabel: "Contact Sales"
   }
@@ -241,7 +241,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
         },
         prefill: { name: userName, email: userEmail, contact: "" },
         notes: { userId, planName: plan.name },
-        theme: { color: "#9333ea" },
+        theme: { color: "var(--app-accent)" },
         modal: { ondismiss: () => setPayLoading(null) }
       };
 
@@ -268,7 +268,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           Your <strong>{paymentSuccessData.name}</strong> plan is now active. Your dashboard is ready!
         </p>
         <div style={{ marginTop: 32, display: "flex", alignItems: "center", gap: 10, color: "#94a3b8", fontSize: 13, fontWeight: 700, background: "#f8fafc", padding: "10px 20px", borderRadius: 20 }}>
-          <div style={{ width: 14, height: 14, border: "2px solid #cbd5e1", borderTopColor: "#9333ea", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+          <div style={{ width: 14, height: 14, border: "2px solid #cbd5e1", borderTopColor: "var(--app-accent)", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
           Waiting {onSubscriptionSuccess ? "for Dashboard..." : "for Home..."}
         </div>
       </div>
@@ -279,7 +279,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
   if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: 80, flexDirection: "column", gap: 16 }}>
-        <div style={{ width: 48, height: 48, border: "4px solid #ede9fe", borderTop: "4px solid #9333ea", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+        <div style={{ width: 48, height: 48, border: "4px solid var(--app-border)", borderTop: "4px solid var(--app-accent)", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         <div style={{ color: T.muted, fontSize: 14, fontWeight: 600 }}>Loading subscription data...</div>
       </div>
@@ -290,7 +290,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
   if (!subscription) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 28, padding: "4px 0" }}>
-        {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#1e0a3c", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)", animation: "slideIn 0.3s ease" }}>{toast}<style>{`@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }`}</style></div>}
+        {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)", animation: "slideIn 0.3s ease" }}>{toast}<style>{`@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }`}</style></div>}
 
         {/* Header */}
         <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
@@ -306,16 +306,16 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
             return (
               <div key={plan.name} style={{
                 background: "#fff", borderRadius: 24, padding: "32px 28px",
-                border: plan.popular ? `2px solid ${T.accent}` : "1.5px solid #ede9fe",
+                border: plan.popular ? `2px solid ${T.accent}` : "1.5px solid var(--app-border)",
                 position: "relative", display: "flex", flexDirection: "column",
-                boxShadow: plan.popular ? "0 20px 40px rgba(147,51,234,0.14)" : "0 4px 20px rgba(0,0,0,0.04)",
+                boxShadow: plan.popular ? "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237),0.14)" : "0 4px 20px rgba(0,0,0,0.04)",
                 transition: "transform 0.25s, box-shadow 0.25s"
               }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-8px)"; e.currentTarget.style.boxShadow = plan.popular ? "0 28px 50px rgba(147,51,234,0.2)" : "0 12px 32px rgba(0,0,0,0.1)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = plan.popular ? "0 20px 40px rgba(147,51,234,0.14)" : "0 4px 20px rgba(0,0,0,0.04)"; }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-8px)"; e.currentTarget.style.boxShadow = plan.popular ? "0 28px 50px rgba(var(--app-accent-rgb, 124, 58, 237),0.2)" : "0 12px 32px rgba(0,0,0,0.1)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = plan.popular ? "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237),0.14)" : "0 4px 20px rgba(0,0,0,0.04)"; }}
               >
                 {plan.popular && (
-                  <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", background: `linear-gradient(135deg,${T.accent},#a855f7)`, color: "#fff", fontSize: 11, fontWeight: 800, padding: "5px 16px", borderRadius: 20, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap", boxShadow: "0 4px 12px rgba(147,51,234,0.3)" }}>
+                  <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", background: `linear-gradient(135deg,${T.accent},var(--app-muted))`, color: "#fff", fontSize: 11, fontWeight: 800, padding: "5px 16px", borderRadius: 20, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>
                     ⭐ Most Popular
                   </div>
                 )}
@@ -341,7 +341,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
                 {/* Payment info for paid plans */}
                 {plan.price > 0 && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "8px 12px", background: "#f5f3ff", borderRadius: 10, border: "1px solid #ede9fe" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
                     <span style={{ fontSize: 12 }}>🔒</span>
                     <span style={{ fontSize: 11, color: T.muted, fontWeight: 700, letterSpacing: 0.3 }}>Razorpay Secured • UPI · Card · Net Banking</span>
                   </div>
@@ -355,10 +355,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                     background: isProcessing
                       ? "#e5e7eb"
                       : plan.popular
-                        ? `linear-gradient(135deg,${T.accent},#a855f7)`
+                        ? `linear-gradient(135deg,${T.accent},var(--app-muted))`
                         : plan.isTrial
                           ? "linear-gradient(135deg,#10b981,#059669)"
-                          : "#f5f3ff",
+                          : "var(--app-bg)",
                     color: (plan.popular || plan.isTrial || isProcessing) ? "#fff" : T.accent,
                     border: (plan.popular || plan.isTrial || isProcessing) ? "none" : `2.5px solid ${T.accent}`,
                     fontSize: 15, fontWeight: 800, cursor: payLoading ? "wait" : "pointer",
@@ -378,7 +378,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
         </div>
 
         {/* Security Badge */}
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 24, padding: "16px 24px", background: "#f5f3ff", borderRadius: 16, border: "1.5px solid #ede9fe", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 24, padding: "16px 24px", background: "var(--app-bg)", borderRadius: 16, border: "1.5px solid var(--app-border)", flexWrap: "wrap" }}>
           {["🔒 SSL Encrypted", "💳 Razorpay Secured", "🏦 RBI Compliant", "📞 +91 98765 43210"].map(t => (
             <span key={t} style={{ fontSize: 12, color: T.muted, fontWeight: 600 }}>{t}</span>
           ))}
@@ -391,7 +391,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
               <style>{`@keyframes slideUp { from { transform: translateY(40px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }`}</style>
 
               {/* Header */}
-              <div style={{ background: "linear-gradient(135deg,#1e0a3c,#3b0764)", padding: "32px 24px", color: "#fff", position: "relative" }}>
+              <div style={{ background: "linear-gradient(135deg,var(--app-sidebar),var(--app-sidebar))", padding: "32px 24px", color: "#fff", position: "relative" }}>
                 <button onClick={() => setMockGatewayOpen(null)} style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1, opacity: 0.8 }}>M BUSINESS</div>
@@ -406,10 +406,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
               <div style={{ padding: 24 }}>
                 <div style={{ marginBottom: 24 }}>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Simulated Card Details</label>
-                  <div style={{ border: "2px solid #ede9fe", borderRadius: 12, overflow: "hidden" }}>
-                    <input readOnly value="4242 4242 4242 4242" style={{ width: "100%", padding: "14px 16px", border: "none", borderBottom: "2px solid #ede9fe", fontSize: 14, fontWeight: 600, color: "#1e293b", background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
+                  <div style={{ border: "2px solid var(--app-border)", borderRadius: 12, overflow: "hidden" }}>
+                    <input readOnly value="4242 4242 4242 4242" style={{ width: "100%", padding: "14px 16px", border: "none", borderBottom: "2px solid var(--app-border)", fontSize: 14, fontWeight: 600, color: "#1e293b", background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
                     <div style={{ display: "flex" }}>
-                      <input readOnly value="12/28" style={{ width: "50%", padding: "14px 16px", border: "none", borderRight: "2px solid #ede9fe", fontSize: 14, fontWeight: 600, color: "#1e293b", background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
+                      <input readOnly value="12/28" style={{ width: "50%", padding: "14px 16px", border: "none", borderRight: "2px solid var(--app-border)", fontSize: 14, fontWeight: 600, color: "#1e293b", background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
                       <input readOnly value="123" style={{ width: "50%", padding: "14px 16px", border: "none", fontSize: 14, fontWeight: 600, color: "#1e293b", background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
                     </div>
                   </div>
@@ -492,10 +492,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           Your subscription expired {daysSinceExpiry} days ago. Access has been restricted. Please contact your administrator to renew your plan.
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-          <a href={`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`} style={{ display: "inline-block", background: "linear-gradient(135deg,#9333ea,#7c3aed)", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>
+          <a href={`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`} style={{ display: "inline-block", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>
             📧 Contact Administrator
           </a>
-          <a href="tel:+919876543210" style={{ display: "inline-block", background: "#f1f5f9", color: "#1e0a3c", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "1.5px solid #e2e8f0" }}>
+          <a href="tel:+919876543210" style={{ display: "inline-block", background: "#f1f5f9", color: "var(--app-sidebar)", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "1.5px solid #e2e8f0" }}>
             📞 Call Support
           </a>
         </div>
@@ -505,7 +505,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#1e0a3c", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
 
       {/* ── 10-day warning banner ── */}
       {subscription.status === "active" && daysLeft !== null && daysLeft <= 10 && daysLeft > 0 && (
@@ -522,10 +522,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
       {/* ── Stats Row ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
         {[
-          { label: "CURRENT PLAN", value: subscription.planName + (subscription.isTrial ? " (Trial)" : ""), sub: `₹${subscription.planPrice?.toLocaleString() || "0"}/${subscription.billingCycle}`, bg: "linear-gradient(135deg,#9333ea,#a855f7)" },
+          { label: "CURRENT PLAN", value: subscription.planName + (subscription.isTrial ? " (Trial)" : ""), sub: `₹${subscription.planPrice?.toLocaleString() || "0"}/${subscription.billingCycle}`, bg: "linear-gradient(135deg,var(--app-accent),var(--app-muted))" },
           { label: "PAYMENT STATUS", value: subscription.isFullyPaid ? "✅ Fully Paid" : "⏳ Pending", sub: subscription.isFullyPaid ? "All payments cleared" : "Payment required", bg: subscription.isFullyPaid ? "linear-gradient(135deg,#22C55E,#16a34a)" : "linear-gradient(135deg,#F59E0B,#d97706)" },
           { label: "STATUS", value: subscription.status?.toUpperCase(), sub: `Valid till ${formatDate(subscription.endDate)} · ${daysLeft || 0} days left`, bg: subscription.status === "active" ? "linear-gradient(135deg,#3b82f6,#2563eb)" : "linear-gradient(135deg,#6b7280,#4b5563)" },
-          { label: "USAGE REMAINING", value: usageRemaining.toLocaleString("en-IN"), sub: `Used: ${subscription.usageCount || 0} / ${subscription.usageLimit || 999}`, bg: "linear-gradient(135deg,#1e0a3c,#3b0764)" }
+          { label: "USAGE REMAINING", value: usageRemaining.toLocaleString("en-IN"), sub: `Used: ${subscription.usageCount || 0} / ${subscription.usageLimit || 999}`, bg: "linear-gradient(135deg,var(--app-sidebar),var(--app-sidebar))" }
         ].map(s => (
           <div key={s.label} style={{ background: s.bg, borderRadius: 14, padding: "16px 14px", color: "#fff" }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, opacity: 0.85, marginBottom: 4 }}>{s.label}</div>
@@ -536,19 +536,19 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
       </div>
 
       {/* ── Usage Progress Bar ── */}
-      <div style={{ background: "#fff", borderRadius: 14, padding: "16px 20px", border: "1px solid #ede9fe", boxShadow: "0 2px 12px rgba(147,51,234,0.06)" }}>
+      <div style={{ background: "#fff", borderRadius: 14, padding: "16px 20px", border: "1px solid var(--app-border)", boxShadow: "0 2px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.06)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>📊 Usage Limit</div>
           <div style={{ fontSize: 13, fontWeight: 700, color: usagePct >= 80 ? T.warning : T.success }}>{usageRemaining} remaining of {subscription.usageLimit || 999}</div>
         </div>
         <div style={{ background: "#f3f4f6", borderRadius: 8, height: 10, overflow: "hidden" }}>
-          <div style={{ width: `${usagePct}%`, height: "100%", borderRadius: 8, background: usagePct >= 80 ? "linear-gradient(90deg,#f59e0b,#ef4444)" : "linear-gradient(90deg,#9333ea,#22c55e)", transition: "width 0.6s ease" }} />
+          <div style={{ width: `${usagePct}%`, height: "100%", borderRadius: 8, background: usagePct >= 80 ? "linear-gradient(90deg,#f59e0b,#ef4444)" : "linear-gradient(90deg,var(--app-accent),#22c55e)", transition: "width 0.6s ease" }} />
         </div>
         <div style={{ fontSize: 11, color: T.muted, marginTop: 6 }}>{usagePct}% used {usagePct >= 80 && "⚠️ Approaching limit"}</div>
       </div>
 
       {/* ── Tabs ── */}
-      <div style={{ display: "flex", gap: 4, borderBottom: "2px solid #ede9fe", paddingBottom: 0, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 4, borderBottom: "2px solid var(--app-border)", paddingBottom: 0, flexWrap: "wrap" }}>
         {[
           { key: "overview", label: "📋 Overview" },
           { key: "payments", label: `💳 Payments (${payments.length})` },
@@ -557,8 +557,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           { key: "upgrade", label: "⬆️ Upgrade" }
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
-            padding: "10px 16px", background: activeTab === tab.key ? "#f5f3ff" : "transparent",
-            border: "none", borderBottom: activeTab === tab.key ? "2px solid #9333ea" : "2px solid transparent",
+            padding: "10px 16px", background: activeTab === tab.key ? "var(--app-bg)" : "transparent",
+            border: "none", borderBottom: activeTab === tab.key ? "2px solid var(--app-accent)" : "2px solid transparent",
             borderRadius: "8px 8px 0 0", color: activeTab === tab.key ? T.accent : "#94a3b8",
             fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: -2
           }}>
@@ -609,7 +609,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
               <div style={{ marginBottom: 12 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Invoices</div>
                 {subscription.invoiceRefs.map((r, i) => (
-                  <div key={i} style={{ padding: "7px 12px", background: "#faf5ff", borderRadius: 8, fontSize: 13, fontWeight: 600, color: T.accent, marginBottom: 4, border: "1px solid #ede9fe" }}>🧾 {r}</div>
+                  <div key={i} style={{ padding: "7px 12px", background: "var(--app-bg)", borderRadius: 8, fontSize: 13, fontWeight: 600, color: T.accent, marginBottom: 4, border: "1px solid var(--app-border)" }}>🧾 {r}</div>
                 ))}
               </div>
             )}
@@ -640,15 +640,15 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                 <thead>
-                  <tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+                  <tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
                     {["Payment ID", "Date", "Description", "Amount", "Method", "Status", ""].map(h => (
-                      <th key={h} style={{ padding: "11px 14px", textAlign: "left", color: T.muted, fontWeight: 700, fontSize: 11, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>
+                      <th key={h} style={{ padding: "11px 14px", textAlign: "left", color: T.muted, fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {payments.map((p, i) => (
-                    <tr key={p._id || i} style={{ borderBottom: "1px solid #f3f0ff" }}>
+                    <tr key={p._id || i} style={{ borderBottom: "1px solid var(--app-border)" }}>
                       <td style={{ padding: "11px 14px", fontFamily: "monospace", fontSize: 11, color: T.muted }}>{(p.paymentId || "").slice(0, 20)}…</td>
                       <td style={{ padding: "11px 14px", color: T.text, fontSize: 12 }}>{formatDate(p.paymentDate)}</td>
                       <td style={{ padding: "11px 14px", color: T.text }}>{p.description}</td>
@@ -656,7 +656,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                       <td style={{ padding: "11px 14px", color: T.muted, fontSize: 12, textTransform: "uppercase" }}>{p.paymentMethod}</td>
                       <td style={{ padding: "11px 14px" }}><Badge label={p.status} color={getStatusColor(p.status)} /></td>
                       <td style={{ padding: "11px 14px" }}>
-                        <button onClick={() => setViewPayment(p)} style={{ background: "rgba(147,51,234,0.08)", border: "1px solid rgba(147,51,234,0.2)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: T.accent, cursor: "pointer", fontWeight: 600 }}>View</button>
+                        <button onClick={() => setViewPayment(p)} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.2)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: T.accent, cursor: "pointer", fontWeight: 600 }}>View</button>
                       </td>
                     </tr>
                   ))}
@@ -678,9 +678,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           ) : (
             <div style={{ display: "grid", gap: 12 }}>
               {invoices.map((inv, i) => (
-                <div key={inv._id || i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: "#faf5ff", borderRadius: 12, border: "1px solid #ede9fe" }}>
+                <div key={inv._id || i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                    <div style={{ width: 46, height: 46, borderRadius: 12, background: "linear-gradient(135deg,#9333ea,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧾</div>
+                    <div style={{ width: 46, height: 46, borderRadius: 12, background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧾</div>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>Invoice #{inv.invoiceNo}</div>
                       <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>{inv.description} • {formatDate(inv.paymentDate)}</div>
@@ -741,15 +741,15 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
               const isProcessing = payLoading === plan.name;
               const isCurrent = subscription.planName === plan.name;
               return (
-                <div key={plan.name} style={{ background: "#fff", borderRadius: 20, padding: "24px 22px", border: isCurrent ? `2px solid ${T.accent}` : "1.5px solid #ede9fe", boxShadow: isCurrent ? "0 12px 32px rgba(147,51,234,0.15)" : "0 4px 16px rgba(0,0,0,0.04)" }}>
+                <div key={plan.name} style={{ background: "#fff", borderRadius: 20, padding: "24px 22px", border: isCurrent ? `2px solid ${T.accent}` : "1.5px solid var(--app-border)", boxShadow: isCurrent ? "0 12px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)" : "0 4px 16px rgba(0,0,0,0.04)" }}>
                   <div style={{ fontSize: 28, marginBottom: 12 }}>{plan.icon}</div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 4 }}>{plan.name}{isCurrent && <span style={{ marginLeft: 10, fontSize: 11, background: "#f5f3ff", color: T.accent, padding: "3px 10px", borderRadius: 20, fontWeight: 800 }}>CURRENT</span>}</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 4 }}>{plan.name}{isCurrent && <span style={{ marginLeft: 10, fontSize: 11, background: "var(--app-bg)", color: T.accent, padding: "3px 10px", borderRadius: 20, fontWeight: 800 }}>CURRENT</span>}</div>
                   <div style={{ fontSize: 26, fontWeight: 800, color: plan.color, marginBottom: 16 }}>₹{plan.price?.toLocaleString("en-IN")}<span style={{ fontSize: 14, color: T.muted, fontWeight: 600 }}>/mo</span></div>
-                  <div style={{ marginBottom: 16, background: "#f5f3ff", borderRadius: 10, padding: "8px 12px", display: "flex", gap: 8, alignItems: "center" }}>
+                  <div style={{ marginBottom: 16, background: "var(--app-bg)", borderRadius: 10, padding: "8px 12px", display: "flex", gap: 8, alignItems: "center" }}>
                     <span style={{ fontSize: 12 }}>🔒</span>
                     <span style={{ fontSize: 11, color: T.muted, fontWeight: 700 }}>Secure Payment Gateway</span>
                   </div>
-                  <button onClick={() => startRazorpayPayment(plan)} disabled={!!payLoading} style={{ width: "100%", padding: "14px", borderRadius: 12, background: isCurrent ? "linear-gradient(135deg,#9333ea,#a855f7)" : "#f5f3ff", color: isCurrent ? "#fff" : T.accent, border: isCurrent ? "none" : `2px solid ${T.accent}`, fontSize: 14, fontWeight: 800, cursor: payLoading ? "wait" : "pointer", transition: "0.2s" }}>
+                  <button onClick={() => startRazorpayPayment(plan)} disabled={!!payLoading} style={{ width: "100%", padding: "14px", borderRadius: 12, background: isCurrent ? "linear-gradient(135deg,var(--app-accent),var(--app-muted))" : "var(--app-bg)", color: isCurrent ? "#fff" : T.accent, border: isCurrent ? "none" : `2px solid ${T.accent}`, fontSize: 14, fontWeight: 800, cursor: payLoading ? "wait" : "pointer", transition: "0.2s" }}>
                     {isProcessing ? "Processing..." : isCurrent ? "🔄 Renew Plan" : "⬆️ Switch to " + plan.name}
                   </button>
                 </div>
@@ -762,8 +762,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
       {/* ── Payment Detail Modal ── */}
       {viewPayment && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 480, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(147,51,234,0.25)" }}>
-            <div style={{ padding: "18px 24px", borderBottom: "1px solid #ede9fe", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+          <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 480, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
+            <div style={{ padding: "18px 24px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
               <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: T.text }}>Payment Details</h2>
               <button onClick={() => setViewPayment(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: T.muted }}>✕</button>
             </div>
@@ -779,7 +779,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
               <InfoRow label="Method" value={viewPayment.paymentMethod} icon="💳" />
               {viewPayment.invoiceNo && <InfoRow label="Invoice No" value={viewPayment.invoiceNo} icon="🧾" />}
               {viewPayment.quotationNo && <InfoRow label="Quotation No" value={viewPayment.quotationNo} icon="📄" />}
-              <div style={{ marginTop: 16, padding: 14, background: "#faf5ff", borderRadius: 12 }}>
+              <div style={{ marginTop: 16, padding: 14, background: "var(--app-bg)", borderRadius: 12 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Provider — {user?.companyName || ""}</div>
                 <InfoRow label="Company" value={viewPayment.providerCompany} icon="🏢" />
                 <InfoRow label="GST" value={viewPayment.providerGst} icon="📋" />
@@ -792,3 +792,5 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
     </div>
   );
 }
+
+

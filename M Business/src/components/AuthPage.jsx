@@ -216,7 +216,7 @@ const handleResetPassword = async () => {
   return (
     <div style={{
       minHeight: "100vh", width: "100%",
-      background: "linear-gradient(135deg,#0f0528 0%,#1e0a3c 40%,#3b0764 75%,#1e0a3c 100%)",
+      background: "linear-gradient(135deg,#0f0528 0%,var(--app-text) 40%,var(--app-sidebar) 75%,var(--app-text) 100%)",
       fontFamily: "'DM Sans', sans-serif",
       position: "relative", overflow: "hidden",
       display: "flex", alignItems: "stretch",
@@ -258,7 +258,7 @@ const handleResetPassword = async () => {
 
       {/* Blobs */}
       <div style={{ position:"absolute", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle,rgba(192,132,252,0.4),transparent 70%)", top:-160, left:-120, animation:"float1 7s ease-in-out infinite", pointerEvents:"none" }}/>
-      <div style={{ position:"absolute", width:380, height:380, borderRadius:"50%", background:"radial-gradient(circle,rgba(147,51,234,0.45),transparent 70%)", bottom:-100, left:"20%", animation:"float2 9s ease-in-out infinite", pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", width:380, height:380, borderRadius:"50%", background:"radial-gradient(circle,rgba(var(--app-accent-rgb, 124, 58, 237),0.45),transparent 70%)", bottom:-100, left:"20%", animation:"float2 9s ease-in-out infinite", pointerEvents:"none" }}/>
       <div style={{ position:"absolute", width:280, height:280, borderRadius:"50%", background:"radial-gradient(circle,rgba(216,180,254,0.25),transparent 70%)", top:"-5%", left:"50%", animation:"float2 8s ease-in-out infinite 1s", pointerEvents:"none" }}/>
 
       <div className="auth-layout">
@@ -319,7 +319,7 @@ const handleResetPassword = async () => {
                     <button onClick={()=>{setTab("forgot");setError("");setSuccess("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.6)", fontSize:11, cursor:"pointer", fontFamily:"inherit" }}>Forgot Password?</button>
                   </div>
                 </div>
-                <button onClick={handleLogin} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
+                <button onClick={handleLogin} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"var(--app-text)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
                   <span>{loading ? "Signing in..." : "Proceed to my Account"}</span>
                   {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
                 </button>
@@ -340,7 +340,7 @@ const handleResetPassword = async () => {
                     <input type="text" value={otp} onChange={e=>setOtp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleVerifyOTP()} placeholder="123456" style={{ ...iStyle(false), paddingLeft:38, letterSpacing:4, fontWeight:700 }} maxLength={6}/>
                   </div>
                 </div>
-                <button onClick={handleVerifyOTP} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
+                <button onClick={handleVerifyOTP} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"var(--app-text)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
                   <span>{loading ? "Verifying..." : "Verify & Continue"}</span>
                   {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
                 </button>
@@ -360,7 +360,7 @@ const handleResetPassword = async () => {
                     <input type="email" value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleForgotPassword()} placeholder="you@email.com" style={{ ...iStyle(false), paddingLeft:38 }}/>
                   </div>
                 </div>
-                <button onClick={handleForgotPassword} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
+                <button onClick={handleForgotPassword} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"var(--app-text)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
                   <span>{loading ? "Sending..." : "Send Reset OTP"}</span>
                   {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
                 </button>
@@ -385,7 +385,7 @@ const handleResetPassword = async () => {
                   <label style={lStyle}>Confirm Password</label>
                   <input type="password" value={resetData.confirm} onChange={e=>setResetData(p=>({...p,confirm:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&handleResetPassword()} placeholder="Repeat password" style={{ ...iStyle(false) }}/>
                 </div>
-                <button onClick={handleResetPassword} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
+                <button onClick={handleResetPassword} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"var(--app-text)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
                   <span>{loading ? "Updating..." : "Reset Password"}</span>
                   {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
                 </button>
@@ -454,11 +454,11 @@ const handleResetPassword = async () => {
                           onChange={e=>setRegData(p=>({...p,companyType:e.target.value}))}
                           style={{ ...iStyle(false), paddingLeft:12, cursor:"pointer" }}
                         >
-                          <option value="IT" style={{background:"#1e0a3c",color:"#fff"}}>IT</option>
-                          <option value="Software" style={{background:"#1e0a3c",color:"#fff"}}>Software</option>
-                          <option value="Services" style={{background:"#1e0a3c",color:"#fff"}}>Services</option>
-                          <option value="Consulting" style={{background:"#1e0a3c",color:"#fff"}}>Consulting</option>
-                          <option value="Other" style={{background:"#1e0a3c",color:"#fff"}}>Other</option>
+                          <option value="IT" style={{background:"var(--app-text)",color:"#fff"}}>IT</option>
+                          <option value="Software" style={{background:"var(--app-text)",color:"#fff"}}>Software</option>
+                          <option value="Services" style={{background:"var(--app-text)",color:"#fff"}}>Services</option>
+                          <option value="Consulting" style={{background:"var(--app-text)",color:"#fff"}}>Consulting</option>
+                          <option value="Other" style={{background:"var(--app-text)",color:"#fff"}}>Other</option>
                         </select>
                       </div>
                       <div style={{ marginBottom:13 }}>
@@ -469,7 +469,7 @@ const handleResetPassword = async () => {
                           style={{ ...iStyle(false), paddingLeft:12, cursor:"pointer" }}
                         >
                           {["0-10","11-50","51-100","100+"].map(ec => (
-                            <option key={ec} value={ec} style={{background:"#1e0a3c",color:"#fff"}}>{ec}</option>
+                            <option key={ec} value={ec} style={{background:"var(--app-text)",color:"#fff"}}>{ec}</option>
                           ))}
                         </select>
                       </div>
@@ -486,7 +486,7 @@ const handleResetPassword = async () => {
                     {regErr.confirm && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {regErr.confirm}</div>}
                   </div>
                 </div>
-                <button onClick={handleRegister} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e0a3c", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)" }}>
+                <button onClick={handleRegister} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"var(--app-text)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)" }}>
                   <span>{loading ? "Creating account..." : "Create My Account"}</span>
                   {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
                 </button>
@@ -502,3 +502,5 @@ const handleResetPassword = async () => {
     </div>
   );
 }
+
+

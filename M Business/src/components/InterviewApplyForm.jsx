@@ -78,15 +78,15 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
         left: pos.left,
         width: pos.width,
         background: "#fff",
-        border: "1.5px solid #9333ea",
+        border: "1.5px solid var(--app-accent)",
         borderRadius: 12,
         zIndex: 999999,
-        boxShadow: "0 16px 48px rgba(147,51,234,0.28)",
+        boxShadow: "0 16px 48px rgba(var(--app-accent-rgb, 124, 58, 237),0.28)",
         overflow: "hidden",
       }}
     >
       {/* Search */}
-      <div style={{ padding: "8px 10px", borderBottom: "1px solid #ede9fe", background: "#faf5ff" }}>
+      <div style={{ padding: "8px 10px", borderBottom: "1px solid var(--app-border)", background: "var(--app-bg)" }}>
         <input
           ref={searchRef}
           type="text"
@@ -95,9 +95,9 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
           onChange={e => setSearch(e.target.value)}
           style={{
             width: "100%", padding: "8px 12px",
-            border: "1.5px solid #ede9fe", borderRadius: 8,
+            border: "1.5px solid var(--app-border)", borderRadius: 8,
             fontSize: 13, background: "#fff",
-            fontFamily: "'DM Sans',sans-serif", color: "#1e0a3c",
+            fontFamily: "'DM Sans',sans-serif", color: "var(--app-text)",
             outline: "none", boxSizing: "border-box",
           }}
         />
@@ -110,18 +110,18 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
             onMouseDown={(e) => { e.preventDefault(); handleSelect(r); }}
             style={{
               padding: "10px 16px", fontSize: 13, cursor: "pointer",
-              borderBottom: "1px solid #f3f0ff",
-              background: role === r ? "#f5f3ff" : "#fff",
-              color: role === r ? "#9333ea" : "#1e0a3c",
+              borderBottom: "1px solid var(--app-border)",
+              background: role === r ? "var(--app-bg)" : "#fff",
+              color: role === r ? "var(--app-accent)" : "var(--app-text)",
               fontWeight: role === r ? 700 : 400,
             }}
-            onMouseEnter={e => e.currentTarget.style.background = "#f5f3ff"}
-            onMouseLeave={e => e.currentTarget.style.background = role === r ? "#f5f3ff" : "#fff"}
+            onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
+            onMouseLeave={e => e.currentTarget.style.background = role === r ? "var(--app-bg)" : "#fff"}
           >
             {r}
           </div>
         )) : (
-          <div style={{ padding: "14px 16px", color: "#a78bfa", fontSize: 13, textAlign: "center" }}>
+          <div style={{ padding: "14px 16px", color: "var(--app-muted)", fontSize: 13, textAlign: "center" }}>
             No roles found
           </div>
         )}
@@ -144,14 +144,14 @@ function RoleDropdown({ role, setRole, error, setErrors }) {
           ...sty.input(error),
           display: "flex", alignItems: "center", justifyContent: "space-between",
           cursor: "pointer", userSelect: "none",
-          borderColor: open ? "#9333ea" : error ? "#ef4444" : "#ede9fe",
-          boxShadow: open ? "0 0 0 3px rgba(147,51,234,0.12)" : "none",
+          borderColor: open ? "var(--app-accent)" : error ? "#ef4444" : "var(--app-border)",
+          boxShadow: open ? "0 0 0 3px rgba(var(--app-accent-rgb, 124, 58, 237),0.12)" : "none",
         }}
       >
-        <span style={{ color: role ? "#1e0a3c" : "#a78bfa", fontWeight: role ? 500 : 400 }}>
+        <span style={{ color: role ? "var(--app-text)" : "var(--app-muted)", fontWeight: role ? 500 : 400 }}>
           {role || "Select a role..."}
         </span>
-        <span style={{ fontSize: 10, color: "#a78bfa", transform: `rotate(${open ? 180 : 0}deg)`, transition: "0.2s", flexShrink: 0 }}>▼</span>
+        <span style={{ fontSize: 10, color: "var(--app-muted)", transform: `rotate(${open ? 180 : 0}deg)`, transition: "0.2s", flexShrink: 0 }}>▼</span>
       </div>
 
       {error && <p style={sty.err}>{error}</p>}
@@ -262,16 +262,16 @@ export default function InterviewApplyForm() {
         <style>{css}</style>
         <div style={{ ...sty.card, maxWidth: 460, textAlign: "center", padding: "52px 40px" }}>
           <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 24, fontWeight: 800, color: "#1e0a3c", marginBottom: 10 }}>
+          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 24, fontWeight: 800, color: "var(--app-text)", marginBottom: 10 }}>
             Application Submitted!
           </h2>
-          <p style={{ color: "#7c3aed", fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>
+          <p style={{ color: "var(--app-accent)", fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>
             Thank You🙏
           </p>
-          <div style={{ background: "#f5f3ff", borderRadius: 12, padding: "12px 16px", border: "1px solid #ede9fe", fontSize: 13, color: "#7c3aed" }}>
+          <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "12px 16px", border: "1px solid var(--app-border)", fontSize: 13, color: "var(--app-accent)" }}>
             <strong>{form.name}</strong> · {role} · {companyName}
           </div>
-          <p style={{ color: "#a78bfa", fontSize: 12, marginTop: 20 }}>You may safely close this tab.</p>
+          <p style={{ color: "var(--app-muted)", fontSize: 12, marginTop: 20 }}>You may safely close this tab.</p>
         </div>
       </div>
     );
@@ -286,12 +286,12 @@ export default function InterviewApplyForm() {
         {/* Header */}
         <div style={{ textAlign: "center", padding: "32px 32px 20px" }}>
           <div style={sty.logoBox}>🏢</div>
-          <div style={{ fontSize: 19, fontWeight: 800, color: "#1e0a3c", fontFamily: "'Syne',sans-serif", textTransform: "capitalize" }}>
+          <div style={{ fontSize: 19, fontWeight: 800, color: "var(--app-text)", fontFamily: "'Syne',sans-serif", textTransform: "capitalize" }}>
             {companyName}
           </div>
-          <div style={{ fontSize: 12, color: "#a78bfa", marginTop: 4, marginBottom: 10 }}>Job Application Form</div>
+          <div style={{ fontSize: 12, color: "var(--app-muted)", marginTop: 4, marginBottom: 10 }}>Job Application Form</div>
           <span style={sty.idBadge}>ID: {companyId}</span>
-          <div style={{ height: 1, background: "#ede9fe", marginTop: 18 }} />
+          <div style={{ height: 1, background: "var(--app-border)", marginTop: 18 }} />
         </div>
 
         {/* Fields */}
@@ -326,9 +326,9 @@ export default function InterviewApplyForm() {
                 <button key={val} type="button" onClick={() => setExp(val)} style={{
                   flex: 1, padding: "11px 0", borderRadius: 12, fontSize: 13, fontWeight: 700,
                   cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", border: "1.5px solid",
-                  borderColor: exp === val ? "#9333ea" : "#ede9fe",
-                  background: exp === val ? "#f5f3ff" : "#faf5ff",
-                  color: exp === val ? "#9333ea" : "#a78bfa",
+                  borderColor: exp === val ? "var(--app-accent)" : "var(--app-border)",
+                  background: exp === val ? "var(--app-bg)" : "var(--app-bg)",
+                  color: exp === val ? "var(--app-accent)" : "var(--app-muted)",
                 }}>
                   {val === "Fresher" ? "🎓 Fresher" : "💼 Experienced"}
                 </button>
@@ -357,7 +357,7 @@ export default function InterviewApplyForm() {
           <div className="fade-up d6">
             <label style={sty.label}>
               Interviewer Name{" "}
-              <span style={{ fontSize: 10, color: "#a78bfa", fontWeight: 400, textTransform: "none" }}></span>
+              <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400, textTransform: "none" }}></span>
             </label>
             <input
               type="text"
@@ -384,23 +384,23 @@ export default function InterviewApplyForm() {
               onKeyDown={e => e.key === "Enter" && openFilePicker(e)}
               onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={onDrop}
               style={{
-                border: `2px ${resumeFile ? "solid" : "dashed"} ${drag ? "#9333ea" : resumeFile ? "#9333ea" : errors.resume ? "#ef4444" : "#c4b5fd"}`,
+                border: `2px ${resumeFile ? "solid" : "dashed"} ${drag ? "var(--app-accent)" : resumeFile ? "var(--app-accent)" : errors.resume ? "#ef4444" : "var(--app-border)"}`,
                 borderRadius: 14, padding: "22px 16px", textAlign: "center", cursor: "pointer",
-                background: drag || resumeFile ? "#f5f3ff" : "#faf5ff",
+                background: drag || resumeFile ? "var(--app-bg)" : "var(--app-bg)",
                 transition: "all 0.2s", userSelect: "none",
               }}>
               <div style={{ fontSize: 30, marginBottom: 6, pointerEvents: "none" }}>📄</div>
               {resumePreview ? (
                 <>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: "#9333ea", pointerEvents: "none" }}>✅ {resumePreview.name}</p>
-                  <p style={{ fontSize: 11, color: "#a78bfa", marginTop: 4, pointerEvents: "none" }}>{resumePreview.size} · Click to change</p>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", pointerEvents: "none" }}>✅ {resumePreview.name}</p>
+                  <p style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 4, pointerEvents: "none" }}>{resumePreview.size} · Click to change</p>
                 </>
               ) : (
                 <>
-                  <p style={{ fontSize: 13, color: "#a78bfa", pointerEvents: "none" }}>
-                    <span style={{ color: "#9333ea", fontWeight: 700 }}>Click to upload</span> or drag & drop
+                  <p style={{ fontSize: 13, color: "var(--app-muted)", pointerEvents: "none" }}>
+                    <span style={{ color: "var(--app-accent)", fontWeight: 700 }}>Click to upload</span> or drag & drop
                   </p>
-                  <p style={{ fontSize: 11, color: "#c4b5fd", marginTop: 4, pointerEvents: "none" }}>PDF, DOC, DOCX — max 5MB</p>
+                  <p style={{ fontSize: 11, color: "var(--app-border)", marginTop: 4, pointerEvents: "none" }}>PDF, DOC, DOCX — max 5MB</p>
                 </>
               )}
             </div>
@@ -411,7 +411,7 @@ export default function InterviewApplyForm() {
           <div className="fade-up d8">
             <label style={sty.label}>
               Additional Notes{" "}
-              <span style={{ fontSize: 10, color: "#a78bfa", fontWeight: 400, textTransform: "none" }}></span>
+              <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400, textTransform: "none" }}></span>
             </label>
             <textarea
               rows={3} placeholder="Any additional info..."
@@ -433,12 +433,12 @@ export default function InterviewApplyForm() {
             type="button" onClick={handleSubmit} disabled={loading}
             style={{
               width: "100%", padding: "14px", borderRadius: 14, border: "none",
-              background: "linear-gradient(135deg,#9333ea,#a855f7)",
+              background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
               color: "#fff", fontSize: 15, fontWeight: 800,
               fontFamily: "'Syne',sans-serif", letterSpacing: 0.3,
               cursor: loading ? "not-allowed" : "pointer",
               opacity: loading ? 0.7 : 1,
-              boxShadow: loading ? "none" : "0 6px 20px rgba(147,51,234,0.35)",
+              boxShadow: loading ? "none" : "0 6px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.35)",
               transition: "all 0.2s",
             }}>
             {loading ? "⏳ Submitting..." : "Submit Application →"}
@@ -458,7 +458,7 @@ const css = `
   .d1{animation-delay:0.05s}.d2{animation-delay:0.10s}.d3{animation-delay:0.15s}
   .d4{animation-delay:0.20s}.d5{animation-delay:0.25s}.d6{animation-delay:0.30s}
   .d7{animation-delay:0.35s}.d8{animation-delay:0.40s}
-  input:focus, textarea:focus { outline: none !important; border-color: #9333ea !important; box-shadow: 0 0 0 3px rgba(147,51,234,0.12) !important; }
+  input:focus, textarea:focus { outline: none !important; border-color: var(--app-accent) !important; box-shadow: 0 0 0 3px rgba(var(--app-accent-rgb, 124, 58, 237),0.12) !important; }
   button { transition: all 0.18s ease; }
 `;
 
@@ -466,40 +466,42 @@ const css = `
 const sty = {
   page: {
     minHeight: "100vh",
-    background: "radial-gradient(ellipse at 20% 20%,rgba(147,51,234,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(59,7,100,0.06) 0%,transparent 50%),#f5f3ff",
+    background: "radial-gradient(ellipse at 20% 20%,rgba(var(--app-accent-rgb, 124, 58, 237),0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(59,7,100,0.06) 0%,transparent 50%),var(--app-bg)",
     display: "flex", alignItems: "center", justifyContent: "center",
     padding: "32px 16px", fontFamily: "'DM Sans',sans-serif",
   },
   card: {
     width: "100%", maxWidth: 540,
     background: "#fff", borderRadius: 24,
-    border: "1px solid #ede9fe",
-    boxShadow: "0 24px 60px rgba(147,51,234,0.10),0 4px 16px rgba(147,51,234,0.06)",
+    border: "1px solid var(--app-border)",
+    boxShadow: "0 24px 60px rgba(var(--app-accent-rgb, 124, 58, 237),0.10),0 4px 16px rgba(var(--app-accent-rgb, 124, 58, 237),0.06)",
   },
   logoBox: {
     width: 56, height: 56, borderRadius: 14,
-    background: "linear-gradient(135deg,#3b0764,#9333ea)",
+    background: "linear-gradient(135deg,var(--app-sidebar),var(--app-accent))",
     display: "flex", alignItems: "center", justifyContent: "center",
     fontSize: 26, margin: "0 auto 12px",
-    boxShadow: "0 8px 24px rgba(147,51,234,0.3)",
+    boxShadow: "0 8px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",
   },
   idBadge: {
     display: "inline-block", fontSize: 11, fontWeight: 700,
-    color: "#7c3aed", background: "#f5f3ff", border: "1px solid #ddd6fe",
+    color: "var(--app-accent)", background: "var(--app-bg)", border: "1px solid var(--app-border)",
     borderRadius: 20, padding: "3px 12px",
   },
   label: {
-    display: "block", fontSize: 11, fontWeight: 700, color: "#7c3aed",
+    display: "block", fontSize: 11, fontWeight: 700, color: "var(--app-accent)",
     textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6,
   },
   input: (hasError) => ({
     width: "100%", padding: "11px 14px",
-    background: "#faf5ff",
-    border: `1.5px solid ${hasError ? "#ef4444" : "#ede9fe"}`,
-    borderRadius: 10, fontSize: 13, color: "#1e0a3c",
+    background: "var(--app-bg)",
+    border: `1.5px solid ${hasError ? "#ef4444" : "var(--app-border)"}`,
+    borderRadius: 10, fontSize: 13, color: "var(--app-text)",
     fontFamily: "'DM Sans',sans-serif",
     boxSizing: "border-box", transition: "border 0.2s,box-shadow 0.2s",
     display: "block",
   }),
   err: { color: "#ef4444", fontSize: 11, marginTop: 5, fontWeight: 500, margin: "5px 0 0" },
 };
+
+

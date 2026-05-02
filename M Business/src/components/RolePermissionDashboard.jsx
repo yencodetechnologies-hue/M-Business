@@ -79,14 +79,14 @@ const RolePermissionDashboard = () => {
                 {roles.map(r => (
                   <th key={r.role} style={{ padding: "10px 15px", textAlign: "center" }}>
                     <div style={{ 
-                      background: "linear-gradient(135deg, #9333ea, #7c3aed)", 
+                      background: "linear-gradient(135deg, var(--app-accent), var(--app-accent))", 
                       color: "#fff", 
                       padding: "6px 16px", 
                       borderRadius: 10, 
                       fontSize: 12, 
                       fontWeight: 800,
                       textTransform: "uppercase",
-                      boxShadow: "0 4px 12px rgba(147,51,234,0.2)"
+                      boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.2)"
                     }}>
                       {r.role}
                     </div>
@@ -158,7 +158,7 @@ const RolePermissionDashboard = () => {
                       disabled={saving}
                       style={{ 
                         padding: "8px 16px", 
-                        background: "linear-gradient(135deg, #3b0764, #1e0a3c)", 
+                        background: "linear-gradient(135deg, var(--app-sidebar), var(--app-text))", 
                         color: "#fff", 
                         border: "none", 
                         borderRadius: 8, 
@@ -185,3 +185,5 @@ const RolePermissionDashboard = () => {
 };
 
 export default RolePermissionDashboard;
+
+

@@ -10,7 +10,7 @@ import { BASE_URL } from "../config";
 const API_URL = import.meta.env.VITE_API_URL || BASE_URL;
 
 const statusColor = { pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" };
-const sc = (s = "pending") => statusColor[s.toLowerCase()] || "#a855f7";
+const sc = (s = "pending") => statusColor[s.toLowerCase()] || "var(--app-muted)";
 
 function Badge({ label = "pending" }) {
   const c = sc(label);
@@ -36,15 +36,15 @@ function Modal({ title, onClose, children, wide }) {
         background: "#fff", borderRadius: 20, width: "100%",
         maxWidth: wide ? 860 : 520, maxHeight: "90vh", overflow: "hidden",
         display: "flex", flexDirection: "column",
-        boxShadow: "0 32px 80px rgba(147,51,234,0.25)",
+        boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)",
       }}>
         <div style={{
-          padding: "16px 22px", borderBottom: "1px solid #ede9fe", flexShrink: 0,
+          padding: "16px 22px", borderBottom: "1px solid var(--app-border)", flexShrink: 0,
           display: "flex", justifyContent: "space-between", alignItems: "center",
-          background: "linear-gradient(90deg,#f5f3ff,#faf5ff)",
+          background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))",
         }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e0a3c" }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#7c3aed", padding: "4px 8px" }}>✕</button>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-text)" }}>{title}</h2>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
         </div>
         <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>{children}</div>
       </div>
@@ -54,24 +54,24 @@ function Modal({ title, onClose, children, wide }) {
 
 function InfoCell({ icon, label, value }) {
   return (
-    <div style={{ background: "#faf5ff", borderRadius: 10, padding: "10px 14px", border: "1px solid #ede9fe" }}>
-      <div style={{ fontSize: 10, color: "#7c3aed", fontWeight: 700, marginBottom: 3 }}>{icon} {label.toUpperCase()}</div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#1e0a3c" }}>{value || "—"}</div>
+    <div style={{ background: "var(--app-bg)", borderRadius: 10, padding: "10px 14px", border: "1px solid var(--app-border)" }}>
+      <div style={{ fontSize: 10, color: "var(--app-accent)", fontWeight: 700, marginBottom: 3 }}>{icon} {label.toUpperCase()}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>{value || "—"}</div>
     </div>
   );
 }
 
 function StatusPicker({ current = "pending", onChange }) {
   return (
-    <div style={{ background: "#faf5ff", borderRadius: 12, padding: "14px 16px", border: "1px solid #ede9fe" }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "#7c3aed", marginBottom: 10 }}>UPDATE STATUS</div>
+    <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--app-accent)", marginBottom: 10 }}>UPDATE STATUS</div>
       <div style={{ display: "flex", gap: 10 }}>
         {["pending", "hired", "rejected"].map(s => (
           <button key={s} onClick={() => onChange(s)} style={{
             flex: 1, padding: "10px", borderRadius: 10,
-            border: `2px solid ${current === s ? sc(s) : "#ede9fe"}`,
+            border: `2px solid ${current === s ? sc(s) : "var(--app-border)"}`,
             background: current === s ? `${sc(s)}15` : "#fff",
-            color: current === s ? sc(s) : "#a78bfa",
+            color: current === s ? sc(s) : "var(--app-muted)",
             fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
           }}>
             {s === "pending" ? "⏳ Pending" : s === "hired" ? "✅ Hired" : "❌ Rejected"}
@@ -114,22 +114,22 @@ function ResumeModal({ candidate, onClose, onStatusChange }) {
       {resumeUrl ? (
         <>
           {isPDF ? (
-            <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid #ede9fe", height: 400, marginBottom: 12 }}>
+            <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid var(--app-border)", height: 400, marginBottom: 12 }}>
               <iframe src={resumeUrl} style={{ width: "100%", height: "100%", border: "none" }} title="Resume Preview" />
             </div>
           ) : (
-            <div style={{ background: "#faf5ff", borderRadius: 12, padding: 24, textAlign: "center", border: "1px solid #ede9fe", marginBottom: 12 }}>
+            <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: 24, textAlign: "center", border: "1px solid var(--app-border)", marginBottom: 12 }}>
               <div style={{ fontSize: 48, marginBottom: 8 }}>📄</div>
-              <div style={{ fontSize: 13, color: "#9333ea", fontWeight: 600 }}>{candidate.resumeName}</div>
-              <div style={{ fontSize: 12, color: "#a78bfa", marginTop: 4 }}>Preview not available — download below</div>
+              <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600 }}>{candidate.resumeName}</div>
+              <div style={{ fontSize: 12, color: "var(--app-muted)", marginTop: 4 }}>Preview not available — download below</div>
             </div>
           )}
-          <button onClick={downloadResume} style={btnStyle("#9333ea")}>
+          <button onClick={downloadResume} style={btnStyle("var(--app-accent)")}>
             ⬇️ Download Resume — {candidate.resumeName || "file"}
           </button>
         </>
       ) : (
-        <div style={{ textAlign: "center", padding: 30, color: "#a78bfa", background: "#faf5ff", borderRadius: 12, border: "1px solid #ede9fe" }}>
+        <div style={{ textAlign: "center", padding: 30, color: "var(--app-muted)", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
           <div style={{ fontSize: 40, marginBottom: 8 }}>📭</div>No resume uploaded
         </div>
       )}
@@ -143,11 +143,11 @@ function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
 
   return (
     <Modal title="👤 Candidate Profile" onClose={onClose}>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,#f5f3ff,#faf5ff)", borderRadius: 14, border: "1px solid #ede9fe", marginBottom: 18 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
         <div style={avatarStyle(56, 22)}>{(candidate.name || "?")[0].toUpperCase()}</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#1e0a3c" }}>{candidate.name}</div>
-          <div style={{ fontSize: 13, color: "#9333ea", fontWeight: 600 }}>{candidate.role}</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-text)" }}>{candidate.name}</div>
+          <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600 }}>{candidate.role}</div>
         </div>
         <Badge label={status} />
       </div>
@@ -168,7 +168,7 @@ function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
       </div>
 
       {(candidate.resumeData || candidate.resumeUrl) && (
-        <button onClick={onViewResume} style={btnStyle("#9333ea")}>📄 View Resume</button>
+        <button onClick={onViewResume} style={btnStyle("var(--app-accent)")}>📄 View Resume</button>
       )}
     </Modal>
   );
@@ -253,17 +253,17 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
       )}
 
       {/* Link Banner */}
-      <div style={{ background: "linear-gradient(135deg,#1e0a3c,#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.22)" }}>
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(147,51,234,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🔗</div>
+      <div style={{ background: "linear-gradient(135deg,var(--app-text),#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.22)" }}>
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🔗</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link — share with applicants</div>
-          <div style={{ fontSize: 12, color: "#c084fc", fontFamily: "monospace", wordBreak: "break-all" }}>{applyLink}</div>
+          <div style={{ fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", wordBreak: "break-all" }}>{applyLink}</div>
         </div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(147,51,234,0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(147,51,234,0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#c084fc", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "var(--app-muted)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
             {linkCopied ? "✅ Copied!" : "📋 Copy Link"}
           </button>
-          <button onClick={() => window.open(applyLink, "_blank")} style={{ background: "linear-gradient(135deg,#9333ea,#a855f7)", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+          <button onClick={() => window.open(applyLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
             👁 Preview Form
           </button>
         </div>
@@ -272,38 +272,38 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
         {[
-          { label: "Total",    val: counts.total,    icon: "🎯", c: "#9333ea" },
+          { label: "Total",    val: counts.total,    icon: "🎯", c: "var(--app-accent)" },
           { label: "Pending",  val: counts.pending,  icon: "⏳", c: "#F59E0B" },
           { label: "Hired",    val: counts.hired,    icon: "✅", c: "#22C55E" },
           { label: "Rejected", val: counts.rejected, icon: "❌", c: "#EF4444" },
         ].map(({ label, val, icon, c }) => (
-          <div key={label} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(147,51,234,0.07)", border: "1px solid #ede9fe", position: "relative", overflow: "hidden" }}>
+          <div key={label} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} />
             <div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{icon}</div>
-            <div style={{ fontSize: 10, color: "#a78bfa", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{label.toUpperCase()}</div>
+            <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{label.toUpperCase()}</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: c }}>{val}</div>
           </div>
         ))}
       </div>
 
       {/* Table Card */}
-      <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(147,51,234,0.08)", border: "1px solid #ede9fe" }}>
-        <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "#1e0a3c" }}>All Candidates ({displayed.length})</h3>
+      <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
+        <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--app-text)" }}>All Candidates ({displayed.length})</h3>
 
         {/* Filters */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
           <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
             <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span>
             <input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)}
-              style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid #ede9fe", borderRadius: 10, fontSize: 13, background: "#faf5ff", outline: "none", fontFamily: "inherit", color: "#1e0a3c", boxSizing: "border-box" }} />
+              style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-text)", boxSizing: "border-box" }} />
           </div>
           {["all","pending","hired","rejected"].map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: "7px 16px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
               border: "1.5px solid",
-              borderColor: filter === f ? (f === "all" ? "#9333ea" : sc(f)) : "#ede9fe",
-              background: filter === f ? `${f === "all" ? "#9333ea" : sc(f)}15` : "#fff",
-              color: filter === f ? (f === "all" ? "#9333ea" : sc(f)) : "#a78bfa",
+              borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sc(f)) : "var(--app-border)",
+              background: filter === f ? `${f === "all" ? "var(--app-accent)" : sc(f)}15` : "#fff",
+              color: filter === f ? (f === "all" ? "var(--app-accent)" : sc(f)) : "var(--app-muted)",
               transition: "all 0.15s",
             }}>
               {f === "all" ? "🎯 All" : f === "pending" ? "⏳ Pending" : f === "hired" ? "✅ Hired" : "❌ Rejected"}
@@ -312,11 +312,11 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
         </div>
 
         {loading ? (
-          <div style={{ textAlign: "center", padding: 50, color: "#a78bfa" }}>Loading candidates...</div>
+          <div style={{ textAlign: "center", padding: 50, color: "var(--app-muted)" }}>Loading candidates...</div>
         ) : displayed.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "50px 20px", color: "#a78bfa" }}>
+          <div style={{ textAlign: "center", padding: "50px 20px", color: "var(--app-muted)" }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: "#1e0a3c", marginBottom: 6 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--app-text)", marginBottom: 6 }}>
               {candidates.length === 0 ? "No applications yet" : "No results found"}
             </div>
             <div style={{ fontSize: 13 }}>
@@ -327,9 +327,9 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 980 }}>
               <thead>
-                <tr style={{ background: "linear-gradient(90deg,#f5f3ff,#faf5ff)" }}>
+                <tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
                   {["#","Candidate","Contact","Experience","Role","Interviewer","Applied Date","Status","Resume","Actions"].map(h => (
-                    <th key={h} style={{ padding: "10px 12px", textAlign: "left", color: "#7c3aed", fontWeight: 700, fontSize: 10, borderBottom: "2px solid #ede9fe", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>
+                    <th key={h} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-accent)", fontWeight: 700, fontSize: 10, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>
                   ))}
                 </tr>
               </thead>
@@ -339,39 +339,39 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
                   const status = (c.status || "pending").toLowerCase();
                   return (
                     <tr key={c._id || c.id || i}
-                      style={{ borderBottom: "1px solid #f3f0ff", transition: "background 0.15s" }}
-                      onMouseEnter={e => e.currentTarget.style.background = "#faf5ff"}
+                      style={{ borderBottom: "1px solid var(--app-border)", transition: "background 0.15s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
 
-                      <td style={{ padding: "12px 12px", color: "#a78bfa", fontSize: 11, fontFamily: "monospace" }}>{String(i+1).padStart(3,"0")}</td>
+                      <td style={{ padding: "12px 12px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{String(i+1).padStart(3,"0")}</td>
 
                       <td style={{ padding: "12px 12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <div style={avatarStyle(32,12)}>{(c.name||"?")[0].toUpperCase()}</div>
-                          <div style={{ fontWeight: 700, color: "#1e0a3c" }}>{c.name||"—"}</div>
+                          <div style={{ fontWeight: 700, color: "var(--app-text)" }}>{c.name||"—"}</div>
                         </div>
                       </td>
 
                       <td style={{ padding: "12px 12px" }}>
-                        <div style={{ fontSize: 12, color: "#7c3aed" }}>{c.email||"—"}</div>
-                        <div style={{ fontSize: 11, color: "#a78bfa", marginTop: 2 }}>{c.mobile||""}</div>
+                        <div style={{ fontSize: 12, color: "var(--app-accent)" }}>{c.email||"—"}</div>
+                        <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile||""}</div>
                       </td>
 
                       <td style={{ padding: "12px 12px" }}>
                         {c.experience === "Fresher"
                           ? <span style={expBadge("#22C55E")}>🎓 Fresher</span>
-                          : <span style={expBadge("#9333ea")}>💼 {c.years||"?"}yrs</span>}
+                          : <span style={expBadge("var(--app-accent)")}>💼 {c.years||"?"}yrs</span>}
                       </td>
 
-                      <td style={{ padding: "12px 12px", fontWeight: 600, color: "#1e0a3c", fontSize: 12, maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-text)", fontSize: 12, maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {c.role||"—"}
                       </td>
 
-                      <td style={{ padding: "12px 12px", fontSize: 12, color: "#7c3aed" }}>
+                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-accent)" }}>
                         {c.interviewerName || <span style={{ color: "#ddd" }}>—</span>}
                       </td>
 
-                      <td style={{ padding: "12px 12px", fontSize: 12, color: "#a78bfa", fontFamily: "monospace", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>
                         {fmt(c.date || c.createdAt)}
                       </td>
 
@@ -390,7 +390,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
 
                       <td style={{ padding: "12px 12px" }}>
                         {(c.resumeData || c.resumeUrl) ? (
-                          <button onClick={() => setViewResume(c)} style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)", borderRadius: 8, padding: "6px 14px", fontSize: 12, color: "#9333ea", cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>
+                          <button onClick={() => setViewResume(c)} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 14px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>
                             📄 View
                           </button>
                         ) : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}
@@ -398,7 +398,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
 
                       <td style={{ padding: "12px 12px" }}>
                         <div style={{ display: "flex", gap: 6 }}>
-                          <button onClick={() => setViewProfile(c)} style={{ background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#7c3aed", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
+                          <button onClick={() => setViewProfile(c)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
                             👤 Profile
                           </button>
                           <button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
@@ -443,7 +443,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
 
 const avatarStyle = (size, fontSize) => ({
   width: size, height: size, borderRadius: "50%",
-  background: "linear-gradient(135deg,#9333ea,#c084fc)",
+  background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
   display: "flex", alignItems: "center", justifyContent: "center",
   color: "#fff", fontSize, fontWeight: 700, flexShrink: 0,
 });
@@ -458,3 +458,5 @@ const btnStyle = (color) => ({
   border: "none", borderRadius: 12, padding: 13,
   color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
 });
+
+

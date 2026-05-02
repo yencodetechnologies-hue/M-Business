@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 const P = {
-  accent: "#9333ea",
-  mid: "#7c3aed",
-  dark: "#1e0a3c",
-  light: "#f5f3ff",
-  border: "#ede9fe",
-  text: "#1e0a3c",
-  muted: "#a78bfa",
-  hover: "#faf5ff",
+  accent: "var(--app-accent)",
+  mid: "var(--app-accent)",
+  dark: "var(--app-text)",
+  light: "var(--app-bg)",
+  border: "var(--app-border)",
+  text: "var(--app-text)",
+  muted: "var(--app-muted)",
+  hover: "var(--app-bg)",
 };
 
 const A4_WIDTH = 794;
@@ -105,7 +105,7 @@ function DraggableItem({ id, x, y, width, height, content, onDrag, onResize, onD
         borderRadius: 8,
         background: '#fff',
         cursor: isDragging ? 'grabbing' : 'grab',
-        boxShadow: isSelected ? '0 4px 12px rgba(147,51,234,0.25)' : '0 2px 8px rgba(0,0,0,0.08)',
+        boxShadow: isSelected ? '0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)' : '0 2px 8px rgba(0,0,0,0.08)',
         padding: 12,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 14, color: P.text, userSelect: 'none',
@@ -437,3 +437,5 @@ export default function CanvasPage() {
     </div>
   );
 }
+
+

@@ -1000,7 +1000,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       }
     } catch (err) {
       console.error("Error persisting proposal:", err);
-      flash("❌ Error saving to server", "err");
+     
       return null;
     }
   }, []);
@@ -1042,7 +1042,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         currentDoc.title = t.trim();
       }
       
-      if (!window.confirm("Are you sure you want to submit this proposal to the client? You won't be able to edit it until the client responds.")) return;
+      
       
       try {
         // Ensure doc is saved and has _id before submitting

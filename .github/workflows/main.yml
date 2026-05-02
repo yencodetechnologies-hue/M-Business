@@ -20,7 +20,7 @@ steps:
     with:
       node-version: 18
 
-  # 3. Install dependencies (optional check)
+  # 3. Install dependencies
   - name: Install Dependencies
     run: npm install
 

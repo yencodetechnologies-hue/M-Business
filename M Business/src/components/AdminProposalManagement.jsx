@@ -5,7 +5,10 @@ import { BASE_URL } from "../config";
 import CanvasProposalEditor from "./CanvasProposalEditor";
 
 const THEMES = [
-  { name:"Violet",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"#4c1d95" },
+  { name:"Modern",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
+  { name:"Royal",   p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
+  { name:"Corporate",p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
+  { name:"Violet",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
   { name:"Cobalt",  p:"#1d4ed8", g:"linear-gradient(135deg,#1e40af,#3b82f6)", l:"#dbeafe", t:"#1e3a8a" },
   { name:"Emerald", p:"#059669", g:"linear-gradient(135deg,#065f46,#10b981)", l:"#d1fae5", t:"#064e3b" },
   { name:"Rose",    p:"#e11d48", g:"linear-gradient(135deg,#9f1239,#f43f5e)", l:"#ffe4e6", t:"#881337" },
@@ -404,7 +407,7 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
               width: 22,
               height: 22,
               borderRadius: "50%",
-              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+              background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -503,7 +506,7 @@ function EmployeeDropdown({ employees, value, onChange, error }) {
                       width: 28,
                       height: 28,
                       borderRadius: "50%",
-                      background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                      background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -863,7 +866,7 @@ export default function AdminProposalManagement() {
                   display:"flex",
                   alignItems:"center",
                   gap:8,
-                  boxShadow:"0 4px 12px rgba(124,58,237,0.25)",
+                  boxShadow:"0 4px 12px rgba(var(--app-accent-rgb, 124,58,237),0.3)",
                   transition:"all .2s"
                 }}
               >
@@ -945,7 +948,7 @@ export default function AdminProposalManagement() {
                             width: 20,
                             height: 20,
                             borderRadius: "50%",
-                            background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                            background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -991,7 +994,7 @@ export default function AdminProposalManagement() {
                         <button
                           onClick={() => setSelectedProposal(proposal)}
                           style={{
-                            background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+                            background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
                             border: "none",
                             borderRadius: 8,
                             padding: "6px 12px",

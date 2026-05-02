@@ -1313,13 +1313,13 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                           ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                             {assignedEmployees.slice(0, 2).map((emp, idx) => (
                               <div key={idx} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <div style={{ width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
-                                <span style={{ color: "#6366f1", fontWeight: 600, fontSize: 11 }}>{emp}</span>
+                                <div style={{ width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
+                                <span style={{ color: "var(--app-accent)", fontWeight: 600, fontSize: 11 }}>{emp}</span>
                               </div>
                             ))}
                             {assignedEmployees.length > 2 && <div style={{ fontSize: 10, color: "var(--app-muted)", fontStyle: "italic" }}>+{assignedEmployees.length - 2} more</div>}
                           </div>
-                          : <button onClick={(e) => { e.stopPropagation(); setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#6366f1", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
+                          : <button onClick={(e) => { e.stopPropagation(); setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
                       })()}
                     </td>
                     <td style={{ padding: "12px 14px" }}>
@@ -1366,7 +1366,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                   const assignedEmployees = Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : []);
                   return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
                     <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f8f7ff", borderRadius: 12, border: "1px solid #f3efff" }}>
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
                       <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
                     </div>
                   )) : <div style={{ color: "var(--app-muted)", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
@@ -1375,8 +1375,8 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             </div>
 
             {/* Purpose Row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "#f8f7ff", borderRadius: 16, border: "1px solid #f3efff", marginBottom: 24 }}>
-              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(124,58,237,0.08)" }}>🎯</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
+              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
               <div>
                 <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProj.purpose || "—"}</div>
@@ -1386,7 +1386,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             {/* Bottom Buttons */}
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>✏️ Edit</button>
-              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#6366f1,var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>👤 Assign</button>
+              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>👤 Assign</button>
               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#ef4444,#dc2626)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>🗑 Delete</button>
             </div>
           </div>
@@ -1531,7 +1531,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button onClick={() => setAssignModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,#6366f1,var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment →</button>
+            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment →</button>
           </div>
         </Mdl>
       )}
@@ -2590,6 +2590,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return `#${[f(0),f(8),f(4)].map(x=>x.toString(16).padStart(2,'0')).join('')}`;
   };
 
+  const hexToRgb = (hex) => {
+    if (!hex || hex.startsWith("var")) return "124, 58, 237"; // Default purple if invalid
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r}, ${g}, ${b}`;
+  };
+
   // Generate full theme from a single hex color
   const generateThemeFromColor = (hex) => {
     const [h, s, l] = hexToHsl(hex);
@@ -2626,6 +2634,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (!t) return;
     document.documentElement.style.setProperty("--app-sidebar", t.sidebar);
     document.documentElement.style.setProperty("--app-accent", t.accent);
+    document.documentElement.style.setProperty("--app-accent-rgb", hexToRgb(t.accent));
     document.documentElement.style.setProperty("--app-accent-gradient", `linear-gradient(135deg, ${t.accent}, ${t.dot})`);
     document.documentElement.style.setProperty("--app-bg", t.bg);
     document.documentElement.style.setProperty("--app-muted", t.muted);
@@ -3228,7 +3237,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:5px}
-        ::-webkit-scrollbar-thumb{background:#d8b4fe;border-radius:3px}
+        ::-webkit-scrollbar-thumb{background:rgba(var(--app-accent-rgb, 124, 58, 237), 0.3);border-radius:3px}
         button,input,select,textarea{font-family:inherit}
         @media(min-width:769px){.sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}}
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
@@ -3584,14 +3593,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </div>
 
                       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#fcfaff", borderRadius: 16, border: "1.5px solid #f3efff" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#fcfaff", borderRadius: 16, border: "1.5px solid var(--app-border)" }}>
                           <div style={{ width: 36, height: 36, borderRadius: 10, background: "#fff", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📧</div>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase", marginBottom: 2 }}>Official Email</div>
                             <div style={{ fontSize: 13, fontWeight: 600, color: T.text, wordBreak: "break-all" }}>{user?.email}</div>
                           </div>
                         </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#fcfaff", borderRadius: 16, border: "1.5px solid #f3efff" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#fcfaff", borderRadius: 16, border: "1.5px solid var(--app-border)" }}>
                           <div style={{ width: 36, height: 36, borderRadius: 10, background: "#fff", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📞</div>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase", marginBottom: 2 }}>Contact Number</div>
@@ -3781,7 +3790,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,#6366f1,var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
                       {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{accInitials}</span>}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -4327,7 +4336,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <Mdl title="Project Details" onClose={() => setViewProject(null)} maxWidth={550}>
           <div style={{ background: "#fff", borderRadius: 16 }}>
             {/* Header Info */}
-            <div style={{ background: "#f8f7ff", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid #f3efff" }}>
+            <div style={{ background: "var(--app-bg)", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid var(--app-border)" }}>
               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProject.name}</h2>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Badge label={viewProject.status || "Pending"} />
@@ -4338,8 +4347,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
 
             {/* Budget Row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "#f8f7ff", borderRadius: 16, border: "1px solid #f3efff", marginBottom: 18 }}>
-              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(124,58,237,0.08)" }}>💰</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
+              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
               <div>
                 <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
                 <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)" }}>{formatCurrency(viewProject.budget, viewProject.currency)}</div>
@@ -4353,8 +4362,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 {(() => {
                   const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
                   return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f8f7ff", borderRadius: 12, border: "1px solid #f3efff" }}>
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
                       <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
                     </div>
                   )) : <div style={{ color: "var(--app-muted)", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
@@ -4363,8 +4372,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
 
             {/* Purpose Row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "#f8f7ff", borderRadius: 16, border: "1px solid #f3efff", marginBottom: 24 }}>
-              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(124,58,237,0.08)" }}>🎯</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
+              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
               <div>
                 <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "—"}</div>

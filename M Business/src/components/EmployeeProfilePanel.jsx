@@ -11,9 +11,9 @@ const BASE = `${BASE_URL}/api/employee-dashboard`;
 
 export const DOC_TYPES = [
   { key:"aadhaar",  label:"Aadhaar Card",   icon:"🪪", desc:"Government issued identity card", color:"#f97316", accept:"image/*,application/pdf", maxMB:5  },
-  { key:"pan",      label:"PAN Card",        icon:"💳", desc:"Permanent Account Number card",   color:"#6366f1", accept:"image/*,application/pdf", maxMB:5  },
+  { key:"pan",      label:"PAN Card",        icon:"💳", desc:"Permanent Account Number card",   color:"var(--app-accent)", accept:"image/*,application/pdf", maxMB:5  },
   { key:"passbook", label:"Bank Passbook",   icon:"🏦", desc:"First page of bank passbook",     color:"#10b981", accept:"image/*,application/pdf", maxMB:10 },
-  { key:"itr",      label:"ITR",             icon:"📄", desc:"Income Tax Return document",      color:"#8b5cf6", accept:"image/*,application/pdf", maxMB:10 },
+  { key:"itr",      label:"ITR",             icon:"📄", desc:"Income Tax Return document",      color:"var(--app-muted)", accept:"image/*,application/pdf", maxMB:10 },
 ];
 
 const fmtSize = (bytes) => {
@@ -197,7 +197,7 @@ const handleClose = () => {
     <>
       {/* Floating trigger */}
       <button onClick={()=>setOpen(true)} title="My Profile & Documents"
-        style={{ position:"fixed", top:16, right:16, zIndex:200, width:48, height:48, borderRadius:"50%", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 18px rgba(99,102,241,0.45)", transition:"transform 0.2s", flexDirection:"column" }}
+        style={{ position:"fixed", top:16, right:16, zIndex:200, width:48, height:48, borderRadius:"50%", background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 18px rgba(99,102,241,0.45)", transition:"transform 0.2s", flexDirection:"column" }}
         onMouseEnter={e=>e.currentTarget.style.transform="scale(1.08)"}
         onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
         <span style={{ color:"#fff", fontWeight:800, fontSize:14, lineHeight:1 }}>{initials}</span>
@@ -218,7 +218,7 @@ const handleClose = () => {
             <button onClick={()=>setOpen(false)} style={{ background:"rgba(255,255,255,0.1)", border:"none", borderRadius:8, width:28, height:28, cursor:"pointer", color:"rgba(255,255,255,0.6)", fontSize:14, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-            <div style={{ width:52, height:52, borderRadius:14, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:800, color:"#fff", flexShrink:0, border:"2px solid rgba(255,255,255,0.2)" }}>{initials}</div>
+            <div style={{ width:52, height:52, borderRadius:14, background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:800, color:"#fff", flexShrink:0, border:"2px solid rgba(255,255,255,0.2)" }}>{initials}</div>
             <div>
               <div style={{ fontSize:16, fontWeight:800, color:"#fff" }}>{empName||"Employee"}</div>
               <div style={{ fontSize:11, color:"rgba(255,255,255,0.45)", marginTop:2 }}>{user?.department||"Employee"} · {user?.role||"Staff"}</div>
@@ -230,7 +230,7 @@ const handleClose = () => {
               <span style={{ fontSize:10, color:"#a5b4fc", fontWeight:800 }}>{uploadedCount}/{DOC_TYPES.length}</span>
             </div>
             <div style={{ background:"rgba(255,255,255,0.1)", borderRadius:99, height:5 }}>
-              <div style={{ width:`${(uploadedCount/DOC_TYPES.length)*100}%`, background:uploadedCount===DOC_TYPES.length?"linear-gradient(90deg,#10b981,#34d399)":"linear-gradient(90deg,#6366f1,var(--app-muted))", borderRadius:99, height:"100%", transition:"width 0.5s" }}/>
+              <div style={{ width:`${(uploadedCount/DOC_TYPES.length)*100}%`, background:uploadedCount===DOC_TYPES.length?"linear-gradient(90deg,#10b981,#34d399)":"linear-gradient(90deg,var(--app-accent),var(--app-muted))", borderRadius:99, height:"100%", transition:"width 0.5s" }}/>
             </div>
           </div>
         </div>

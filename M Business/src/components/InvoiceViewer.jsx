@@ -112,7 +112,7 @@ export default function InvoiceViewer() {
         }
       `}</style>
 
-      <div style={{ background: "linear-gradient(135deg,#0f0528 0%,#2d0a6e 60%,#4c1d95 100%)", padding: "28px 20px 24px", position: "relative", overflow: "hidden" }}>
+      <div style={{ background: "linear-gradient(135deg,var(--app-sidebar) 0%,var(--app-text) 60%,var(--app-accent) 100%)", padding: "28px 20px 24px", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(167,139,250,0.18),transparent)", top: -60, right: -40 }} />
         <div style={{ position: "relative", zIndex: 1 }}>
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>INVOICE</div>
@@ -135,7 +135,7 @@ export default function InvoiceViewer() {
         </div>
       </div>
 
-      <div style={{ background: "linear-gradient(135deg,#4c1d95,#6d28d9)", margin: "0 12px", borderRadius: "0 0 16px 16px", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+      <div style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", margin: "0 12px", borderRadius: "0 0 16px 16px", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <span style={{ fontSize: 12, fontWeight: 700, color: "#e9d5ff" }}>{balanceDue > 0 ? "BALANCE DUE" : "TOTAL AMOUNT"}</span>
         <span style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{formatCurrency(balanceDue > 0 ? balanceDue : total, inv.currency)}</span>
       </div>
@@ -207,7 +207,7 @@ export default function InvoiceViewer() {
               <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-text)" }}>{v}</span>
             </div>
           ))}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 12, padding: "12px 14px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", borderRadius: 12, padding: "12px 14px" }}>
             <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>BALANCE DUE</span>
             <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(data.balanceDue, inv.currency)}</span>
           </div>

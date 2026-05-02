@@ -26,7 +26,7 @@ const formatCurrency = (amount, symbol = "₹") => {
 // ── Shared UI components ──────────────────────────────────────
 function Modal({ title, onClose, children }) {
   return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(59,7,100,0.55)",
+    <div style={{ position:"fixed", inset:0, background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.45)",
       backdropFilter:"blur(8px)", zIndex:1000, display:"flex",
       alignItems:"center", justifyContent:"center", padding:16 }}>
       <div style={{ background:"#fff", borderRadius:20, width:"100%", maxWidth:720,
@@ -239,7 +239,7 @@ function FinancialOverview() {
         {stats.map(({ t, v, i, c, desc }) => (
           <div key={t} style={{
             background: "#fff", borderRadius: 20, padding: 24,
-            boxShadow: "0 10px 30px rgba(124, 58, 237, 0.08)",
+            boxShadow: "0 10px 30px rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)",
             border: `1px solid var(--app-border)`,
             position: "relative", overflow: "hidden"
           }}>
@@ -1104,8 +1104,8 @@ export function IncomePage() {
   });
 
   const stats = [
-    { t:"Total Income", v:formatCurrency(totalIncome),    c:"#22c55e", i:"💰" },
-    { t:"Received",     v:formatCurrency(received),       c:"#16a34a", i:"✅" },
+    { t:"Total Income", v:formatCurrency(totalIncome),    c:"var(--app-accent)", i:"💰" },
+    { t:"Received",     v:formatCurrency(received),       c:"var(--app-accent)", i:"✅" },
     { t:"Pending",      v:income.filter(i=>i.status==="Pending").length,   c:"#f59e0b", i:"⏳" },
     { t:"Categories",   v:[...new Set(income.map(i=>i.category))].length, c:"var(--app-accent)", i:"🏷️" },
   ];
@@ -1127,34 +1127,34 @@ export function IncomePage() {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
         <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
           {["All", ...INCOME_CATS].map(cat => (
-            <button key={cat} onClick={()=>setCatFilter(cat)} style={{ padding:"6px 14px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"1.5px solid", borderColor:catFilter===cat?"#22c55e":"var(--app-border)", background:catFilter===cat?"#f0fdf4":"#fff", color:catFilter===cat?"#16a34a":"var(--app-muted)", fontFamily:"inherit" }}>{cat}</button>
+            <button key={cat} onClick={()=>setCatFilter(cat)} style={{ padding:"6px 14px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"1.5px solid", borderColor:catFilter===cat?"var(--app-accent)":"var(--app-border)", background:catFilter===cat?"var(--app-bg)":"#fff", color:catFilter===cat?"var(--app-accent)":"var(--app-muted)", fontFamily:"inherit" }}>{cat}</button>
           ))}
         </div>
-        <button onClick={openAdd} style={{ background:"linear-gradient(135deg,#16a34a,#22c55e)", color:"#fff", border:"none", borderRadius:10, padding:"8px 16px", fontWeight:700, fontSize:13, cursor:"pointer", fontFamily:"inherit" }}>+ Add Income</button>
+        <button onClick={openAdd} style={{ background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", color:"#fff", border:"none", borderRadius:10, padding:"8px 16px", fontWeight:700, fontSize:13, cursor:"pointer", fontFamily:"inherit" }}>+ Add Income</button>
       </div>
 
-      <div style={{ background:"#fff", borderRadius:16, padding:22, boxShadow:"0 4px 24px rgba(34,197,94,0.08)", border:"1px solid var(--app-border)" }}>
+      <div style={{ background:"#fff", borderRadius:16, padding:22, boxShadow:"0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)", border:"1px solid var(--app-border)" }}>
         <div style={{ position:"relative", marginBottom:16 }}>
           <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", pointerEvents:"none" }}>🔍</span>
-          <input placeholder="Search by title, company, invoice, txn..." value={search} onChange={e=>setSearch(e.target.value)} style={{ width:"100%", padding:"10px 14px 10px 40px", border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13, color:"var(--app-text)", background:"#f0fdf4", outline:"none", fontFamily:"inherit" }} />
+          <input placeholder="Search by title, company, invoice, txn..." value={search} onChange={e=>setSearch(e.target.value)} style={{ width:"100%", padding:"10px 14px 10px 40px", border:"1.5px solid var(--app-border)", borderRadius:10, fontSize:13, color:"var(--app-text)", background:"var(--app-bg)", outline:"none", fontFamily:"inherit" }} />
         </div>
 
         {loading ? <div style={{ textAlign:"center", padding:50, color:"var(--app-muted)" }}>Loading...</div> : displayed.length === 0 ? <div style={{ textAlign:"center", padding:50 }}><div style={{ fontSize:40, marginBottom:12 }}>💰</div><div style={{ color:"var(--app-muted)", fontSize:14, fontWeight:600 }}>No income found</div></div>
           : <div style={{ overflowX:"auto" }}>
               <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13, minWidth:900 }}>
-                <thead><tr style={{ background:"linear-gradient(90deg,#f0fdf4,var(--app-bg))" }}>{["ID","Title","Company Name","Inv #","Amount","Mode","Status","Date","Actions"].map(col => (<th key={col} style={{ padding:"10px 14px", textAlign:"left", color:"#16a34a", fontWeight:700, fontSize:11, borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>{col.toUpperCase()}</th>))}</tr></thead>
+                <thead><tr style={{ background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>{["ID","Title","Company Name","Inv #","Amount","Mode","Status","Date","Actions"].map(col => (<th key={col} style={{ padding:"10px 14px", textAlign:"left", color:"var(--app-accent)", fontWeight:700, fontSize:11, borderBottom:"2px solid var(--app-border)", whiteSpace:"nowrap" }}>{col.toUpperCase()}</th>))}</tr></thead>
                 <tbody>
                   {displayed.map((inc, i) => (
-                    <tr key={inc._id||i} style={{ borderBottom:"1px solid var(--app-border)" }} onMouseEnter={ev=>ev.currentTarget.style.background="#f0fdf4"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
+                    <tr key={inc._id||i} style={{ borderBottom:"1px solid var(--app-border)" }} onMouseEnter={ev=>ev.currentTarget.style.background="var(--app-bg)"} onMouseLeave={ev=>ev.currentTarget.style.background="transparent"}>
                       <td style={{ padding:"12px 14px", fontFamily:"monospace", fontSize:11, color:"var(--app-muted)" }}>{`INC${String(i+1).padStart(3,"0")}`}</td>
                       <td style={{ padding:"12px 14px" }}><div style={{ fontWeight:600, color:"#64748b", fontSize: 12 }}>{inc.title}</div>{inc.transactionId && <div style={{ fontSize:10, color:"var(--app-muted)" }}>Txn: {inc.transactionId}</div>}</td>
                       <td style={{ padding:"12px 14px", color:"var(--app-text)", fontWeight:800, fontSize: 15 }}>{inc.client}</td>
-                      <td style={{ padding:"12px 14px", color:"#16a34a", fontWeight:700 }}>{inc.invoiceNo||"—"}</td>
-                      <td style={{ padding:"12px 14px" }}><span style={{ fontWeight:800, color:"#16a34a", fontSize:14 }}>{formatCurrency(inc.amount, inc.currency)}</span></td>
+                      <td style={{ padding:"12px 14px", color:"var(--app-accent)", fontWeight:700 }}>{inc.invoiceNo||"—"}</td>
+                      <td style={{ padding:"12px 14px" }}><span style={{ fontWeight:800, color:"var(--app-accent)", fontSize:14 }}>{formatCurrency(inc.amount, inc.currency)}</span></td>
                       <td style={{ padding:"12px 14px", color:"var(--app-muted)" }}>{inc.paymentMode}</td>
                       <td style={{ padding:"12px 14px" }}><ExpBadge label={inc.status||"Received"} colorMap={INC_STATUS_COLOR} /></td>
                       <td style={{ padding:"12px 14px", color:"var(--app-muted)", fontSize:12 }}>{inc.date || (inc.createdAt ? new Date(inc.createdAt).toLocaleDateString() : "—")}</td>
-                      <td style={{ padding:"12px 14px" }}><div style={{ display:"flex", gap:5 }}><button onClick={()=>openEdit(inc)} style={{ background:"#f0fdf4", border:"1px solid #dcfce7", borderRadius:7, padding:"4px 10px", fontSize:12, color:"#16a34a", cursor:"pointer", fontWeight:600 }}>Edit</button><button onClick={()=>del(inc._id||inc.id)} style={{ background:"#fee2e2", border:"1px solid #fecaca", borderRadius:7, padding:"4px 10px", fontSize:12, color:"#ef4444", cursor:"pointer", fontWeight:600 }}>Del</button></div></td>
+                      <td style={{ padding:"12px 14px" }}><div style={{ display:"flex", gap:5 }}><button onClick={()=>openEdit(inc)} style={{ background:"var(--app-bg)", border:"1px solid #dcfce7", borderRadius:7, padding:"4px 10px", fontSize:12, color:"var(--app-accent)", cursor:"pointer", fontWeight:600 }}>Edit</button><button onClick={()=>del(inc._id||inc.id)} style={{ background:"#fee2e2", border:"1px solid #fecaca", borderRadius:7, padding:"4px 10px", fontSize:12, color:"#ef4444", cursor:"pointer", fontWeight:600 }}>Del</button></div></td>
                     </tr>
                   ))}
                 </tbody>
@@ -1183,7 +1183,7 @@ export function IncomePage() {
           {err._general && <div style={{ background:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:10, padding:"10px 14px", marginBottom:12, display:"flex", alignItems:"center", gap:8, fontSize:13, color:"#ef4444", fontWeight:600 }}><span>⚠️</span><span style={{ flex:1 }}>{err._general}</span><button onClick={()=>setErr({})} style={{ background:"none", border:"none", color:"#ef4444", cursor:"pointer", fontSize:16, lineHeight:1 }}>✕</button></div>}
           <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:4 }}>
             <button onClick={()=>setModal(null)} style={{ background:"var(--app-bg)", border:"1px solid var(--app-border)", color:"var(--app-text)", borderRadius:10, padding:"10px 16px", cursor:"pointer", fontWeight:600, fontSize:13 }}>Cancel</button>
-            <button onClick={save} disabled={saving} style={{ background:"linear-gradient(135deg,#16a34a,#22c55e)", color:"#fff", border:"none", borderRadius:10, padding:"10px 20px", fontWeight:700, fontSize:13, cursor:"pointer", opacity:saving?0.7:1 }}>{saving ? "Saving…" : modal==="add" ? "Save Income →" : "Update Income →"}</button>
+            <button onClick={save} disabled={saving} style={{ background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", color:"#fff", border:"none", borderRadius:10, padding:"10px 20px", fontWeight:700, fontSize:13, cursor:"pointer", opacity:saving?0.7:1 }}>{saving ? "Saving…" : modal==="add" ? "Save Income →" : "Update Income →"}</button>
           </div>
         </Modal>
       )}

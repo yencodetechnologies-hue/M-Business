@@ -85,7 +85,7 @@ function Search({value,onChange,placeholder}){
 
 function Mdl({title,onClose,children,maxWidth=820}){
   return(
-    <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}}>
+    <div style={{position:"fixed",inset:0,background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}}>
       <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth,maxHeight:"90vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)"}}>
         <div style={{padding:"16px 22px",borderBottom:"1px solid var(--app-border)",display:"flex",justifyContent:"space-between",alignItems:"center",background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))",flexShrink:0}}>
           <h2 style={{margin:0,fontSize:17,fontWeight:800,color:T.text}}>{title}</h2>
@@ -177,7 +177,7 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onIte
 
 function ConfirmModal({title,message,onConfirm,onCancel,confirmLabel="Delete",danger=true}){
   return(
-    <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.6)",backdropFilter:"blur(8px)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+    <div style={{position:"fixed",inset:0,background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.6)",backdropFilter:"blur(8px)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
       <div style={{background:"#fff",borderRadius:18,width:"100%",maxWidth:400,padding:"28px 28px 22px",boxShadow:"0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)"}}>
         <div style={{width:52,height:52,borderRadius:"50%",background:danger?"#fee2e2":"#f0fdf4",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,margin:"0 auto 14px"}}>
           {danger?"🗑️":"✅"}
@@ -198,7 +198,7 @@ function ConfirmModal({title,message,onConfirm,onCancel,confirmLabel="Delete",da
 function ActionBtns({onView,onEdit,onDelete}){
   return(
     <div style={{display:"flex",gap:5,flexWrap:"nowrap"}}>
-      {onView&&<button onClick={onView} title="View" style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.3)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#6366f1",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>👁 View</button>}
+      {onView&&<button onClick={onView} title="View" style={{background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)",border:"1px solid rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"var(--app-accent)",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>👁 View</button>}
       <button onClick={onEdit} title="Edit" style={{background:"rgba(var(--app-accent-rgb, 124, 58, 237),0.1)",border:"1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",borderRadius:7,padding:"5px 10px",fontSize:12,color:"var(--app-accent)",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>✏️ Edit</button>
       <button onClick={onDelete} title="Delete" style={{background:"#fee2e2",border:"1px solid #fecaca",borderRadius:7,padding:"5px 10px",fontSize:12,color:"#ef4444",cursor:"pointer",fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>🗑 Delete</button>
     </div>
@@ -937,13 +937,13 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
                           ?<div style={{display:"flex",flexDirection:"column",gap:4}}>
                              {assignedEmployees.slice(0,2).map((emp, idx)=>(
                                <div key={idx} style={{display:"flex",alignItems:"center",gap:6}}>
-                                 <div style={{width:20,height:20,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,var(--app-muted))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:8,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
-                                 <span style={{color:"#6366f1",fontWeight:600,fontSize:11}}>{emp}</span>
+                                 <div style={{width:20,height:20,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:8,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
+                                 <span style={{color:"var(--app-accent)",fontWeight:600,fontSize:11}}>{emp}</span>
                                </div>
                              ))}
                              {assignedEmployees.length > 2 && <div style={{fontSize:10,color:"var(--app-muted)",fontStyle:"italic"}}>+{assignedEmployees.length - 2} more</div>}
                            </div>
-                          :<button onClick={()=>{setAssignModal(p);setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []));}} style={{background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)",borderRadius:7,padding:"4px 10px",fontSize:11,color:"#6366f1",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Assign</button>
+                          :<button onClick={()=>{setAssignModal(p);setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []));}} style={{background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)",border:"1px solid rgba(99,102,241,0.25)",borderRadius:7,padding:"4px 10px",fontSize:11,color:"var(--app-accent)",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Assign</button>
                       })()}
                     </td>
                     <td style={{padding:"12px 14px"}}>
@@ -975,7 +975,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
                 ?<div style={{display:"flex",flexDirection:"column",gap:6}}>
                    {assignedEmployees.map((emp, idx)=>(
                      <div key={idx} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:"#f8fafc",borderRadius:8,border:"1px solid #e2e8f0"}}>
-                       <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,var(--app-muted))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
+                       <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
                        <span style={{color:"var(--app-sidebar)",fontWeight:600,fontSize:12}}>{emp}</span>
                      </div>
                    ))}
@@ -990,7 +990,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
           <InfoRow icon="📝" label="Description" value={viewProj.description}/>
           <div style={{display:"flex",gap:10,marginTop:16}}>
             <button onClick={()=>{setViewProj(null);openEdit(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>✏️ Edit</button>
-            <button onClick={()=>{setViewProj(null);setAssignModal(viewProj);setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : []));}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>👤 Assign</button>
+            <button onClick={()=>{setViewProj(null);setAssignModal(viewProj);setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : []));}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,var(--app-accent),#8b5cf6)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>👤 Assign</button>
             <button onClick={()=>{setViewProj(null);setDeleteTarget(viewProj);}} style={{flex:1,padding:"10px",background:"linear-gradient(135deg,#EF4444,#dc2626)",border:"none",borderRadius:10,fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>🗑 Delete</button>
           </div>
         </Mdl>
@@ -1134,7 +1134,7 @@ function ProjectsPage({projects,setProjects,clients,employees,config}){
           </div>
           <div style={{display:"flex",justifyContent:"flex-end",gap:10}}>
             <button onClick={()=>setAssignModal(null)} style={{background:"var(--app-bg)",border:"1px solid var(--app-border)",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13,fontFamily:"inherit"}}>Cancel</button>
-            <button onClick={doAssign} style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)",color:"#fff",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Save Assignment →</button>
+            <button onClick={doAssign} style={{background:"linear-gradient(135deg,var(--app-accent),#8b5cf6)",color:"#fff",border:"none",borderRadius:10,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Save Assignment →</button>
           </div>
         </Mdl>
       )}
@@ -1384,7 +1384,7 @@ const finalResumeUrl=resumeUrl;return(
         <Pagination totalItems={displayed.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </div>
       {viewModal && (
-        <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+        <div style={{position:"fixed",inset:0,background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.55)",backdropFilter:"blur(8px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
           <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:820,maxHeight:"90vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)"}}>
             <div style={{padding:"16px 22px",borderBottom:"1px solid var(--app-border)",display:"flex",justifyContent:"space-between",alignItems:"center",background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))",flexShrink:0}}>
               <h2 style={{margin:0,fontSize:16,fontWeight:800,color:"var(--app-sidebar)"}}>👤 Candidate Profile</h2>
@@ -1493,7 +1493,7 @@ function ProfileModal({user,setUser,onClose,onLogout,companyLogo,onLogoChange}){
   };
 
   return(
-    <div style={{position:"fixed",inset:0,background:"rgba(59,7,100,0.6)",backdropFilter:"blur(10px)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:16}} onClick={onClose}>
+    <div style={{position:"fixed",inset:0,background:"rgba(var(--app-accent-rgb, 124, 58, 237), 0.6)",backdropFilter:"blur(10px)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:16}} onClick={onClose}>
       <div style={{background:"#fff",borderRadius:22,width:"100%",maxWidth:420,maxHeight:"90vh",boxShadow:"0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",display:"flex",flexDirection:"column",overflow:"hidden"}} onClick={e=>e.stopPropagation()}>
         <div style={{background:"linear-gradient(135deg,var(--app-accent),var(--app-muted),var(--app-muted))",padding:"28px 28px 22px",textAlign:"center",flexShrink:0}}>
           <button onClick={onClose} style={{position:"absolute",top:14,right:14,background:"rgba(255,255,255,0.2)",border:"none",width:30,height:30,borderRadius:8,color:"#fff",fontSize:16,cursor:"pointer"}}>✕</button>
@@ -2125,7 +2125,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
                 ?<div style={{display:"flex",flexDirection:"column",gap:6}}>
                    {assignedEmployees.map((emp, idx)=>(
                      <div key={idx} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",background:"#f8fafc",borderRadius:8,border:"1px solid #e2e8f0"}}>
-                       <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,var(--app-muted))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
+                       <div style={{width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{emp[0].toUpperCase()}</div>
                        <span style={{color:"var(--app-sidebar)",fontWeight:600,fontSize:12}}>{emp}</span>
                      </div>
                    ))}

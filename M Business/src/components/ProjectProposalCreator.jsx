@@ -1351,9 +1351,9 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');.pc{transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);cursor:pointer;}.pc:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 25px 60px rgba(0,0,0,0.15)!important;}.pc:hover .pci{transform:scale(1.08);}.pci{transition:transform .5s cubic-bezier(0.4, 0, 0.2, 1);}.hb:hover{opacity:.9;transform:translateY(-2px) scale(1.05);}.hb:active{transform:translateY(0) scale(0.98);}@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}.fade-in{animation:fadeIn 0.6s ease-out;}`}</style>
       
       {/* Header Section */}
-      <div style={{background:"linear-gradient(135deg,#667eea 0%,#764ba2 100%)",borderRadius:"24px",padding:"32px",marginBottom:"32px",boxShadow:"0 20px 40px rgba(102,126,234,0.2)",position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",top:"0",right:"0",width:"200px",height:"200px",background:"rgba(255,255,255,0.1)",borderRadius:"50%",transform:"translate(50px,-50px)"}}/>
-        <div style={{position:"absolute",bottom:"0",left:"0",width:"150px",height:"150px",background:"rgba(255,255,255,0.08)",borderRadius:"50%",transform:"translate(-30px,30px)"}}/>
+      <div style={{background:`linear-gradient(135deg,var(--app-accent) 0%,var(--app-muted) 100%)`,borderRadius:"24px",padding:"32px",marginBottom:"32px",boxShadow:"0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237),0.2)",position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",top:"0",right:"0",width:"200px",height:"200px",background:"rgba(255,255,255,0.15)",borderRadius:"50%",transform:"translate(50px,-50px)"}}/>
+        <div style={{position:"absolute",bottom:"0",left:"0",width:"150px",height:"150px",background:"rgba(255,255,255,0.1)",borderRadius:"50%",transform:"translate(-30px,30px)"}}/>
         
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",position:"relative",zIndex:1,flexWrap:"wrap",gap:20}}>
           <div style={{flex:1,minWidth:"250px"}}>
@@ -1374,7 +1374,7 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
               </div>
             </div>
           </div>
-          <button className="hb" onClick={createNew} style={{background:"rgba(255,255,255,0.2)",backdropFilter:"blur(10px)",color:"#fff",border:"2px solid rgba(255,255,255,0.3)",borderRadius:16,padding:"16px 32px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:12,boxShadow:"0 8px 32px rgba(0,0,0,0.1)",transition:"all .3s",minWidth:"180px",justifyContent:"center"}}>
+          <button className="hb" onClick={createNew} style={{background:"#fff", color:"var(--app-accent)", border:"none", borderRadius:16, padding:"16px 32px", fontSize:16, fontWeight:900, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:12, boxShadow:"0 12px 32px rgba(0,0,0,0.2)", transition:"all .3s", minWidth:"180px", justifyContent:"center"}}>
             <span style={{fontSize:20}}>✨</span>
             <span>Add Proposal</span>
           </button>
@@ -1389,10 +1389,10 @@ const openDoc = (d) => { setDoc({...d}); setPage(0); setView("editor"); };
         </div>
       ) : proposals.length===0 ? (
         <div style={{textAlign:"center",padding:"100px 40px",background:"#fff",borderRadius:24,border:"2px dashed #e2e8f0",boxShadow:"0 10px 30px rgba(0,0,0,0.05)"}}>
-          <div style={{fontSize:80,marginBottom:24,background:"linear-gradient(135deg,#667eea,#764ba2)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>✨</div>
+          <div style={{fontSize:80,marginBottom:24,background:`linear-gradient(135deg,var(--app-accent),var(--app-muted))`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>✨</div>
           <div style={{fontSize:24,fontWeight:800,color:"#0f172a",marginBottom:12}}>No proposals yet</div>
           <div style={{fontSize:16,color:"#64748b",marginBottom:24,maxWidth:"400px",marginLeft:"auto",marginRight:"auto"}}>Start by creating your first professional proposal. It's quick and easy!</div>
-          <button onClick={createNew} style={{background:"linear-gradient(135deg,#667eea,#764ba2)",color:"#fff",border:"none",borderRadius:16,padding:"16px 32px",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 8px 24px rgba(102,126,234,0.3)",transition:"all .3s",display:"inline-flex",alignItems:"center",gap:10}}>
+          <button onClick={createNew} style={{background:`linear-gradient(135deg,var(--app-accent),var(--app-muted))`,color:"#fff",border:"none",borderRadius:16,padding:"16px 32px",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:`0 8px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)`,transition:"all .3s",display:"inline-flex",alignItems:"center",gap:10}}>
             <span>🚀</span>
             <span>Create Your First Proposal</span>
           </button>

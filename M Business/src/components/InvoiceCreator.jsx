@@ -442,7 +442,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "#fff", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", overflow: "hidden", border: "1px solid var(--app-border)" }}>
           {/* Header */}
-          <div style={{ background: "linear-gradient(135deg,#4c1d95,var(--app-accent))", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
+          <div style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
             <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>💸</div>
             <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>{r.status === "part_paid" ? "PART PAYMENT RECEIPT" : "PAYMENT RECEIPT"}</h2>
             <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4, fontWeight: 600 }}>{receiptNo}</div>
@@ -637,7 +637,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         {/* Summary cards */}
         <div className="inv-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
           {[
-            { label: "Total Invoiced", value: formatCurrency(totalAmt, inv.currency), color: "#4c1d95", icon: "📊" },
+            { label: "Total Invoiced", value: formatCurrency(totalAmt, inv.currency), color: "var(--app-accent)", icon: "📊" },
             { label: "Collected", value: formatCurrency(paidAmt, inv.currency), color: "#16a34a", icon: "✅" },
             { label: "Awaiting", value: `${unpaidCnt}`, color: "#ea580c", icon: "⏳" },
             { label: "Drafts", value: `${draftCnt}`, color: "#6b7280", icon: "📝" },
@@ -904,7 +904,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                               <span style={{ fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>{v}</span>
                             </div>
                           ))}
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,#4c1d95,var(--app-accent))", borderRadius: 10, marginTop: 8 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", borderRadius: 10, marginTop: 8 }}>
                             <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>BALANCE DUE</span>
                             <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(vTot - (viewEntry.amountPaid || vInv.amountPaid || 0), vInv.currency || inv.currency)}</span>
                           </div>
@@ -1008,11 +1008,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // ════════════════════════════════════════════════════════════
   if (step === "preview") {
     return (
-      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#e8e0f5", minHeight: "100vh", padding: "20px 12px" }}>
+      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "20px 12px" }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
-          .invoice-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(100,60,200,0.18); overflow: hidden; }
+          .invoice-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25); overflow: hidden; }
           @media print {
             @page { size: A4 portrait; margin: 0; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
@@ -1434,7 +1434,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <span style={{ fontSize: 13, color: "#6b7280" }}>GST ({inv.gstRate}%){inv.isGstIncluded ? " (Incl.)" : ""}</span>
                 <span style={{ fontSize: 13, fontWeight: 600 }}>{formatCurrency(gstAmt, inv.currency)}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,#4c1d95,#6d28d9)", borderRadius: 10, marginTop: 8 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", borderRadius: 10, marginTop: 8 }}>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#e9d5ff" }}>Total</span>
                 <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{formatCurrency(total, inv.currency)}</span>
               </div>
@@ -1526,7 +1526,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           )}
 
           <button onClick={handleSavePreview} disabled={!!saving}
-            style={{ flex: 2, padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#4c1d95,var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+            style={{ flex: 2, padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
             {saving === "preview" ? "Saving…" : "Preview & Print →"}
           </button>
         </div>

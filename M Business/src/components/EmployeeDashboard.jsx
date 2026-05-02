@@ -16,7 +16,7 @@ const sc = (s) => ({
   review:"#f59e0b","in review":"#f59e0b",pending:"#f59e0b",
   done:"#10b981",completed:"#10b981",
   high:"#ef4444",medium:"#f59e0b",low:"#10b981",
-  present:"#10b981",absent:"#ef4444",leave:"#f59e0b",holiday:"#8b5cf6",
+  present:"#10b981",absent:"#ef4444",leave:"#f59e0b",holiday:"var(--app-muted)",
   approved:"#10b981",rejected:"#ef4444",overdue:"#ef4444",
   cancelled:"#94a3b8",
 }[(s||"").toLowerCase()]||"var(--app-accent)");
@@ -112,7 +112,7 @@ function Badge({ label }) {
 }
 
 function ProgressBar({ pct }) {
-  const p=pct||0, c=p===100?"#10b981":"#6366f1";
+  const p=pct||0, c=p===100?"#10b981":"var(--app-accent)";
   return (
     <div style={{ background:"#f1f5f9", borderRadius:99, height:5, overflow:"hidden", minWidth:80 }}>
       <div style={{ width:`${p}%`, background:c, height:"100%", borderRadius:99, transition:"width 1s" }}/>
@@ -154,7 +154,7 @@ function TabBar({ tabs, active, onChange }) {
     <div style={{ display:"flex", borderBottom:"1px solid #f1f5f9", marginBottom:16, overflowX:"auto" }}>
       {tabs.map(t=>(
         <button key={t.key} onClick={()=>onChange(t.key)}
-          style={{ padding:"8px 16px", fontSize:12.5, cursor:"pointer", background:"none", border:"none", borderBottom:active===t.key?"2px solid #6366f1":"2px solid transparent", color:active===t.key?"#6366f1":"#94a3b8", fontWeight:active===t.key?700:400, fontFamily:"inherit", marginBottom:-1, whiteSpace:"nowrap" }}>
+          style={{ padding:"8px 16px", fontSize:12.5, cursor:"pointer", background:"none", border:"none", borderBottom:active===t.key?"2px solid var(--app-accent)":"2px solid transparent", color:active===t.key?"var(--app-accent)":"#94a3b8", fontWeight:active===t.key?700:400, fontFamily:"inherit", marginBottom:-1, whiteSpace:"nowrap" }}>
           {t.label}
         </button>
       ))}
@@ -163,7 +163,7 @@ function TabBar({ tabs, active, onChange }) {
 }
 
 function Toast({ msg, type }) {
-  const c=type==="error"?"#ef4444":"#6366f1";
+  const c=type==="error"?"#ef4444":"var(--app-accent)";
   return (
     <div style={{ position:"fixed", bottom:24, right:24, zIndex:9999, background:"#0f172a", border:`1px solid ${c}50`, borderRadius:12, padding:"11px 18px", fontSize:13, color:type==="error"?"#fca5a5":"#a5b4fc", opacity:msg?1:0, transition:"opacity 0.3s", pointerEvents:"none" }}>
       {msg}
@@ -249,7 +249,7 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
       action={
         <button
           onClick={onOpenProfile}
-          style={{ background:"none", border:"none", color:"#6366f1", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+          style={{ background:"none", border:"none", color:"var(--app-accent)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
           Manage →
         </button>
       }>
@@ -358,16 +358,16 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
 
       {/* Stat cards */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }} className="stat-grid">
-         <StatCard icon="◈" label="My Projects"   value={projects.length}  sub="Assigned to you" color="#6366f1" onClick={()=>setPage("projects")}/>
+         <StatCard icon="◈" label="My Projects"   value={projects.length}  sub="Assigned to you" color="var(--app-accent)" onClick={()=>setPage("projects")}/>
         <StatCard icon="📄" label="Proposals"     value={proposals.length} sub="Assigned to you" color="#ec4899" onClick={()=>setPage("proposals")}/>
         <StatCard icon="◉" label="Pending Tasks" value={pendingTasks}      sub="Need attention"  color="#f59e0b" onClick={()=>setPage("tasks")}/>
         <StatCard icon="◷" label="Present Days"  value={presentDays}       sub="This month"      color="#10b981" onClick={()=>setPage("attendance")}/>
-        <StatCard icon="◆" label="Last Payment"  value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month||"Not yet"} color="#8b5cf6" onClick={()=>setPage("salary")}/>
+        <StatCard icon="◆" label="Last Payment"  value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month||"Not yet"} color="var(--app-muted)" onClick={()=>setPage("salary")}/>
       </div>
 
       {/* Projects + Tasks row */}
       <div style={{ display:"grid", gridTemplateColumns:"3fr 2fr", gap:16 }} className="two-col">
-        <Card title="My Projects" action={<button onClick={()=>setPage("projects")} style={{ background:"none", border:"none", color:"#6366f1", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>View all →</button>}>
+        <Card title="My Projects" action={<button onClick={()=>setPage("projects")} style={{ background:"none", border:"none", color:"var(--app-accent)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>View all →</button>}>
           {projects.slice(0,4).map((p,i)=>(
             <div key={p._id||i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom:i<3?"1px solid #f8fafc":"none" }}>
               <div style={{ width:8, height:8, borderRadius:"50%", background:sc(p.status), flexShrink:0 }}/>
@@ -383,7 +383,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
           ))}
           {projects.length===0 && <div style={{ textAlign:"center", padding:"1.5rem", color:"#94a3b8", fontSize:13 }}>No projects assigned</div>}
         </Card>
-        <Card title="My Tasks" action={<button onClick={()=>setPage("tasks")} style={{ background:"none", border:"none", color:"#6366f1", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>View all →</button>}>
+        <Card title="My Tasks" action={<button onClick={()=>setPage("tasks")} style={{ background:"none", border:"none", color:"var(--app-accent)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>View all →</button>}>
           {tasks.slice(0,5).map((t,i)=>{
             const isDone = ["done","completed"].includes((t.status||"").toLowerCase());
             const projectName = t.projectId?.name || t.project || "—";
@@ -457,7 +457,7 @@ function ProjectsPage({ projects }) {
   if(selected) return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
       <Card>
-        <button onClick={()=>setSelected(null)} style={{ background:"none", border:"none", color:"#6366f1", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", marginBottom:16 }}>← Back</button>
+        <button onClick={()=>setSelected(null)} style={{ background:"none", border:"none", color:"var(--app-accent)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", marginBottom:16 }}>← Back</button>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20, flexWrap:"wrap", gap:10 }}>
           <div><h2 style={{ fontSize:18, fontWeight:800, color:"#0f172a", margin:0 }}>{selected.name}</h2>
             <div style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>Client: {selected.client||"—"} · Deadline: {selected.deadline||"—"}</div></div>
@@ -473,9 +473,9 @@ function ProjectsPage({ projects }) {
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
           <div style={{ flex:1, background:"#f1f5f9", borderRadius:99, height:10, overflow:"hidden" }}>
-            <div style={{ width:`${selected.progress||0}%`, background:"linear-gradient(90deg,#6366f1,#8b5cf6)", height:"100%", borderRadius:99 }}/>
+            <div style={{ width:`${selected.progress||0}%`, background:"linear-gradient(90deg,var(--app-accent),var(--app-muted))", height:"100%", borderRadius:99 }}/>
           </div>
-          <span style={{ fontSize:14, fontWeight:800, color:"#6366f1" }}>{selected.progress||0}%</span>
+          <span style={{ fontSize:14, fontWeight:800, color:"var(--app-accent)" }}>{selected.progress||0}%</span>
         </div>
         {selected.description && <p style={{ marginTop:16, fontSize:13, color:"#374151", lineHeight:1.7 }}>{selected.description}</p>}
       </Card>
@@ -498,7 +498,7 @@ function ProjectsPage({ projects }) {
                 <Badge label={p.status||"active"}/>
               </div>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                <ProgressBar pct={p.progress||0}/><span style={{ fontSize:12, fontWeight:700, color:"#6366f1", minWidth:36 }}>{p.progress||0}%</span>
+                <ProgressBar pct={p.progress||0}/><span style={{ fontSize:12, fontWeight:700, color:"var(--app-accent)", minWidth:36 }}>{p.progress||0}%</span>
               </div>
             </div>
           ))}
@@ -732,11 +732,11 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
   const calDays=getCalDays();
 
   const filterChips=[
-    {key:"all",     label:"All",     color:"#6366f1", count:attendance.length},
+    {key:"all",     label:"All",     color:"var(--app-accent)", count:attendance.length},
     {key:"present", label:"Present", color:"#10b981", count:attendance.filter(a=>a.status==="present").length},
     {key:"absent",  label:"Absent",  color:"#ef4444", count:attendance.filter(a=>a.status==="absent").length},
     {key:"leave",   label:"Leave",   color:"#f59e0b", count:attendance.filter(a=>a.status==="leave").length},
-    {key:"holiday", label:"Holiday", color:"#8b5cf6", count:attendance.filter(a=>a.status==="holiday").length},
+    {key:"holiday", label:"Holiday", color:"var(--app-muted)", count:attendance.filter(a=>a.status==="holiday").length},
   ];
 
   return (
@@ -752,11 +752,11 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
             ➕ Add Attendance
           </button>
           <button onClick={()=>{setPermForm(v=>!v);setLeaveForm(false);setAddForm(false);setActiveTab("attendance");}}
-            style={{ background:"linear-gradient(135deg,#0ea5e9,#6366f1)", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+            style={{ background:"linear-gradient(135deg,#0ea5e9,var(--app-accent))", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
             🔑 Request Permission
           </button>
           <button onClick={()=>{setLeaveForm(v=>!v);setPermForm(false);setAddForm(false);setActiveTab("attendance");}}
-            style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+            style={{ background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", color:"#fff", border:"none", borderRadius:10, padding:"10px 18px", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
             🌴 Apply Leave
           </button>
         </div>
@@ -768,7 +768,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
             <InputField label="Date *"><input type="date" value={addDate} onChange={e=>setAddDate(e.target.value)} style={inputStyle}/></InputField>
             <InputField label="Status">
               <div style={{ display:"flex", gap:8 }}>
-                {[{val:"present",label:"Present",color:"#10b981",icon:"✅"},{val:"absent",label:"Absent",color:"#ef4444",icon:"❌"},{val:"leave",label:"Leave",color:"#f59e0b",icon:"🌴"},{val:"holiday",label:"Holiday",color:"#8b5cf6",icon:"🎉"}].map(opt=>(
+                {[{val:"present",label:"Present",color:"#10b981",icon:"✅"},{val:"absent",label:"Absent",color:"#ef4444",icon:"❌"},{val:"leave",label:"Leave",color:"#f59e0b",icon:"🌴"},{val:"holiday",label:"Holiday",color:"var(--app-muted)",icon:"🎉"}].map(opt=>(
                   <button key={opt.val} onClick={()=>setAddStatus(opt.val)}
                     style={{ flex:1, padding:"8px 4px", borderRadius:10, border:`2px solid ${addStatus===opt.val?opt.color:"#e2e8f0"}`, background:addStatus===opt.val?`${opt.color}15`:"#f8fafc", color:addStatus===opt.val?opt.color:"#94a3b8", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
                     <span style={{ fontSize:14 }}>{opt.icon}</span>{opt.label}
@@ -794,9 +794,9 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
             <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }} className="perm-type-grid">
               {PERMISSION_TYPES.map(pt=>(
                 <div key={pt.value} onClick={()=>setPermType(pt.value)}
-                  style={{ padding:"10px 12px", borderRadius:12, border:`2px solid ${permType===pt.value?"#6366f1":"#e2e8f0"}`, background:permType===pt.value?"#eef2ff":"#f8fafc", cursor:"pointer", transition:"all 0.15s" }}>
+                  style={{ padding:"10px 12px", borderRadius:12, border:`2px solid ${permType===pt.value?"var(--app-accent)":"#e2e8f0"}`, background:permType===pt.value?"var(--app-border)":"#f8fafc", cursor:"pointer", transition:"all 0.15s" }}>
                   <div style={{ fontSize:18, marginBottom:4 }}>{pt.icon}</div>
-                  <div style={{ fontSize:12, fontWeight:700, color:permType===pt.value?"#6366f1":"#374151" }}>{pt.label}</div>
+                  <div style={{ fontSize:12, fontWeight:700, color:permType===pt.value?"var(--app-accent)":"#374151" }}>{pt.label}</div>
                   <div style={{ fontSize:10, color:"#94a3b8", marginTop:2 }}>{pt.desc}</div>
                 </div>
               ))}
@@ -810,7 +810,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
           <InputField label="Reason *"><textarea value={permReason} onChange={e=>setPermReason(e.target.value)} rows={3} placeholder="Briefly explain your reason…" style={{ ...inputStyle, resize:"vertical" }}/></InputField>
           <div style={{ display:"flex", gap:10, justifyContent:"flex-end", marginTop:14 }}>
             <button onClick={()=>setPermForm(false)} style={{ padding:"9px 20px", border:"1.5px solid #e2e8f0", borderRadius:10, background:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", color:"#374151" }}>Cancel</button>
-            <button onClick={submitPermission} disabled={permSubmitting} style={{ padding:"9px 20px", background:"linear-gradient(135deg,#0ea5e9,#6366f1)", border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:permSubmitting?0.7:1 }}>
+            <button onClick={submitPermission} disabled={permSubmitting} style={{ padding:"9px 20px", background:"linear-gradient(135deg,#0ea5e9,var(--app-accent))", border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:permSubmitting?0.7:1 }}>
               {permSubmitting?"Submitting…":"Submit Request"}
             </button>
           </div>
@@ -834,7 +834,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
           </div>
           <div style={{ display:"flex", gap:10, justifyContent:"flex-end", marginTop:14 }}>
             <button onClick={()=>setLeaveForm(false)} style={{ padding:"9px 20px", border:"1.5px solid #e2e8f0", borderRadius:10, background:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", color:"#374151" }}>Cancel</button>
-            <button onClick={submitLeave} disabled={leaveSubmitting} style={{ padding:"9px 20px", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:leaveSubmitting?0.7:1 }}>
+            <button onClick={submitLeave} disabled={leaveSubmitting} style={{ padding:"9px 20px", background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:leaveSubmitting?0.7:1 }}>
               {leaveSubmitting?"Submitting…":"Submit"}
             </button>
           </div>
@@ -847,7 +847,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         {activeTab==="attendance" && (
           <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
             <div style={{ background:"#f8fafc", borderRadius:12, padding:"14px 16px", display:"flex", gap:12, alignItems:"center", flexWrap:"wrap" }}>
-              <div style={{ fontSize:13, color:"#374151", fontWeight:600 }}>Today — <span style={{ color:"#6366f1" }}>{today}</span></div>
+              <div style={{ fontSize:13, color:"#374151", fontWeight:600 }}>Today — <span style={{ color:"var(--app-accent)" }}>{today}</span></div>
               {todayRec ? (
                 <div style={{ background:`${sc(todayRec.status)}18`, border:`1px solid ${sc(todayRec.status)}30`, borderRadius:10, padding:"8px 16px", fontSize:13, fontWeight:700, color:sc(todayRec.status) }}>
                   ✓ Marked as {todayRec.status}
@@ -862,14 +862,14 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
             <div style={{ display:"grid", gridTemplateColumns:"340px 1fr", gap:16, alignItems:"start" }} className="att-split">
               <div style={{ background:"#f8fafc", borderRadius:14, padding:16, border:"1px solid #f1f5f9", position:"sticky", top:16 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
-                  <button onClick={prevCalMonth} style={{ background:"#fff", border:"1px solid #e2e8f0", borderRadius:8, width:30, height:30, cursor:"pointer", fontSize:14, color:"#6366f1", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
+                  <button onClick={prevCalMonth} style={{ background:"#fff", border:"1px solid #e2e8f0", borderRadius:8, width:30, height:30, cursor:"pointer", fontSize:14, color:"var(--app-accent)", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
                   <div style={{ textAlign:"center" }}>
                     <div style={{ fontSize:13, fontWeight:800, color:"#0f172a" }}>{FULL_MONTHS[calMonth]} {calYear}</div>
-                    {selectedDate && <div style={{ fontSize:10, color:"#6366f1", marginTop:2 }}>{selectedDate}<span onClick={()=>setSelectedDate(null)} style={{ marginLeft:6, cursor:"pointer", textDecoration:"underline", color:"#94a3b8" }}>✕ Clear</span></div>}
+                    {selectedDate && <div style={{ fontSize:10, color:"var(--app-accent)", marginTop:2 }}>{selectedDate}<span onClick={()=>setSelectedDate(null)} style={{ marginLeft:6, cursor:"pointer", textDecoration:"underline", color:"#94a3b8" }}>✕ Clear</span></div>}
                   </div>
                   <div style={{ display:"flex", gap:5 }}>
-                    <button onClick={()=>{setCalYear(new Date().getFullYear());setCalMonth(new Date().getMonth());setSelectedDate(null);}} style={{ background:"#fff", border:"1px solid #e2e8f0", borderRadius:7, padding:"3px 8px", cursor:"pointer", fontSize:9, color:"#6366f1", fontWeight:700 }}>Today</button>
-                    <button onClick={nextCalMonth} style={{ background:"#fff", border:"1px solid #e2e8f0", borderRadius:8, width:30, height:30, cursor:"pointer", fontSize:14, color:"#6366f1", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
+                    <button onClick={()=>{setCalYear(new Date().getFullYear());setCalMonth(new Date().getMonth());setSelectedDate(null);}} style={{ background:"#fff", border:"1px solid #e2e8f0", borderRadius:7, padding:"3px 8px", cursor:"pointer", fontSize:9, color:"var(--app-accent)", fontWeight:700 }}>Today</button>
+                    <button onClick={nextCalMonth} style={{ background:"#fff", border:"1px solid #e2e8f0", borderRadius:8, width:30, height:30, cursor:"pointer", fontSize:14, color:"var(--app-accent)", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
                   </div>
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2, marginBottom:4 }}>
@@ -880,11 +880,11 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                     const ds=cell.curr?calDateStr(cell.day):null;
                     const rec=cell.curr?attendance.find(a=>a.date===ds):null;
                     const isToday=ds===today, isSelected=ds===selectedDate;
-                    const bg=isSelected?"#6366f1":isToday?"#eef2ff":rec?`${sc(rec.status)}20`:"#fff";
-                    const textColor=isSelected?"#fff":isToday?"#6366f1":rec?sc(rec.status):cell.curr?"#374151":"#cbd5e1";
+                    const bg=isSelected?"var(--app-accent)":isToday?"var(--app-border)":rec?`${sc(rec.status)}20`:"#fff";
+                    const textColor=isSelected?"#fff":isToday?"var(--app-accent)":rec?sc(rec.status):cell.curr?"#374151":"#cbd5e1";
                     return (
                       <div key={idx} onClick={()=>{if(!cell.curr)return;setSelectedDate(prev=>prev===ds?null:ds);}}
-                        style={{ aspectRatio:"1", borderRadius:8, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:bg, border:isSelected?"2px solid #6366f1":isToday?"1.5px solid #c7d2fe":rec?`1px solid ${sc(rec.status)}30`:"1px solid transparent", cursor:cell.curr?"pointer":"default", opacity:cell.curr?1:0.3, transition:"all 0.12s", fontSize:11, fontWeight:isToday||isSelected?800:600, color:textColor, position:"relative" }} title={rec?`${ds}: ${rec.status}`:""}>
+                        style={{ aspectRatio:"1", borderRadius:8, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:bg, border:isSelected?"2px solid var(--app-accent)":isToday?"1.5px solid #c7d2fe":rec?`1px solid ${sc(rec.status)}30`:"1px solid transparent", cursor:cell.curr?"pointer":"default", opacity:cell.curr?1:0.3, transition:"all 0.12s", fontSize:11, fontWeight:isToday||isSelected?800:600, color:textColor, position:"relative" }} title={rec?`${ds}: ${rec.status}`:""}>
                         {cell.day}
                         {rec&&!isSelected&&<div style={{ width:4, height:4, borderRadius:"50%", background:sc(rec.status), position:"absolute", bottom:3 }}/>}
                       </div>
@@ -892,7 +892,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                   })}
                 </div>
                 <div style={{ display:"flex", gap:10, marginTop:12, flexWrap:"wrap" }}>
-                  {[["#10b981","Present"],["#ef4444","Absent"],["#f59e0b","Leave"],["#8b5cf6","Holiday"],["#6366f1","Today"]].map(([c,l])=>(
+                  {[["#10b981","Present"],["#ef4444","Absent"],["#f59e0b","Leave"],["var(--app-muted)","Holiday"],["var(--app-accent)","Today"]].map(([c,l])=>(
                     <div key={l} style={{ display:"flex", alignItems:"center", gap:4, fontSize:9, color:"#64748b" }}><div style={{ width:8, height:8, borderRadius:2, background:c }}/>{l}</div>
                   ))}
                 </div>
@@ -922,7 +922,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                       <option value="">All Months</option>
                       {availableMonths.map(m=><option key={m} value={m}>{m}</option>)}
                     </select>
-                    <button onClick={()=>setShowAdvFilter(v=>!v)} style={{ padding:"7px 12px", borderRadius:10, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit", border:`1.5px solid ${showAdvFilter?"#6366f1":"#e2e8f0"}`, background:showAdvFilter?"#eef2ff":"#fff", color:showAdvFilter?"#6366f1":"#94a3b8", whiteSpace:"nowrap", display:"flex", alignItems:"center", gap:5 }}>
+                    <button onClick={()=>setShowAdvFilter(v=>!v)} style={{ padding:"7px 12px", borderRadius:10, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit", border:`1.5px solid ${showAdvFilter?"var(--app-accent)":"#e2e8f0"}`, background:showAdvFilter?"var(--app-border)":"#fff", color:showAdvFilter?"var(--app-accent)":"#94a3b8", whiteSpace:"nowrap", display:"flex", alignItems:"center", gap:5 }}>
                       ⚙️ {showAdvFilter?"Hide":"Date Range"}
                     </button>
                     {hasActiveFilter && <button onClick={resetAllFilters} style={{ padding:"7px 12px", borderRadius:10, fontSize:11, fontWeight:700, cursor:"pointer", border:"1px solid #fecaca", background:"#fef2f2", color:"#ef4444", fontFamily:"inherit", whiteSpace:"nowrap" }}>✕ Reset All</button>}
@@ -941,7 +941,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                   <div style={{ fontSize:13, fontWeight:700, color:"#0f172a" }}>
                     {selectedDate?`📅 ${selectedDate} (${filteredHistory.length} record${filteredHistory.length!==1?"s":""})`:`Attendance History (${filteredHistory.length}${hasActiveFilter?" filtered":""})`}
                   </div>
-                  {hasActiveFilter && <span style={{ fontSize:11, color:"#6366f1", fontWeight:600 }}>Filtered from {attendance.length} total</span>}
+                  {hasActiveFilter && <span style={{ fontSize:11, color:"var(--app-accent)", fontWeight:600 }}>Filtered from {attendance.length} total</span>}
                 </div>
                 {filteredHistory.length===0 ? (
                   <div style={{ textAlign:"center", padding:"2rem", color:"#94a3b8", fontSize:13, background:"#f8fafc", borderRadius:12, border:"1px solid #f1f5f9" }}>
@@ -982,7 +982,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         {activeTab==="leaves" && (
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
             <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-              {[{label:"Total",val:leaveHistory.length,color:"#6366f1"},{label:"Pending",val:leaveHistory.filter(l=>(l.status||"pending").toLowerCase()==="pending").length,color:"#f59e0b"},{label:"Approved",val:leaveHistory.filter(l=>(l.status||"").toLowerCase()==="approved").length,color:"#10b981"},{label:"Rejected",val:leaveHistory.filter(l=>(l.status||"").toLowerCase()==="rejected").length,color:"#ef4444"}].map(({label,val,color})=>(
+              {[{label:"Total",val:leaveHistory.length,color:"var(--app-accent)"},{label:"Pending",val:leaveHistory.filter(l=>(l.status||"pending").toLowerCase()==="pending").length,color:"#f59e0b"},{label:"Approved",val:leaveHistory.filter(l=>(l.status||"").toLowerCase()==="approved").length,color:"#10b981"},{label:"Rejected",val:leaveHistory.filter(l=>(l.status||"").toLowerCase()==="rejected").length,color:"#ef4444"}].map(({label,val,color})=>(
                 <div key={label} style={{ background:`${color}10`, border:`1px solid ${color}25`, borderRadius:12, padding:"10px 18px", display:"flex", flexDirection:"column", gap:2, minWidth:90 }}>
                   <div style={{ fontSize:20, fontWeight:800, color }}>{val}</div>
                   <div style={{ fontSize:11, color:"#64748b", fontWeight:600 }}>{label}</div>
@@ -1027,7 +1027,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         {activeTab==="permissions" && (
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
             <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-              {[{label:"Total",val:permHistory.length,color:"#6366f1"},{label:"Pending",val:permHistory.filter(p=>(p.status||"pending").toLowerCase()==="pending").length,color:"#f59e0b"},{label:"Approved",val:permHistory.filter(p=>(p.status||"").toLowerCase()==="approved").length,color:"#10b981"},{label:"Rejected",val:permHistory.filter(p=>(p.status||"").toLowerCase()==="rejected").length,color:"#ef4444"}].map(({label,val,color})=>(
+              {[{label:"Total",val:permHistory.length,color:"var(--app-accent)"},{label:"Pending",val:permHistory.filter(p=>(p.status||"pending").toLowerCase()==="pending").length,color:"#f59e0b"},{label:"Approved",val:permHistory.filter(p=>(p.status||"").toLowerCase()==="approved").length,color:"#10b981"},{label:"Rejected",val:permHistory.filter(p=>(p.status||"").toLowerCase()==="rejected").length,color:"#ef4444"}].map(({label,val,color})=>(
                 <div key={label} style={{ background:`${color}10`, border:`1px solid ${color}25`, borderRadius:12, padding:"10px 18px", display:"flex", flexDirection:"column", gap:2, minWidth:90 }}>
                   <div style={{ fontSize:20, fontWeight:800, color }}>{val}</div>
                   <div style={{ fontSize:11, color:"#64748b", fontWeight:600 }}>{label}</div>
@@ -1098,7 +1098,7 @@ function SalaryPage({ salary, user }) {
         </Card>
         {selected ? (
           <Card>
-            <div style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:12, padding:"20px 22px", marginBottom:20, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div style={{ background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", borderRadius:12, padding:"20px 22px", marginBottom:20, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div><div style={{ fontSize:16, fontWeight:800, color:"#fff" }}>Payment Slip</div>
                 <div style={{ fontSize:13, color:"rgba(255,255,255,0.7)", marginTop:2 }}>{selected.month}</div></div>
               <div style={{ textAlign:"right" }}>
@@ -1126,12 +1126,12 @@ function SalaryPage({ salary, user }) {
                 <span style={{ fontSize:13, fontWeight:600, color:"#ef4444" }}>- ₹{fmt(selected.deductions)}</span>
               </div>
             </div>
-            <div style={{ background:"linear-gradient(135deg,#6366f1,#8b5cf6)", borderRadius:12, padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div style={{ background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", borderRadius:12, padding:"16px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div><div style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:600 }}>NET PAYMENT</div>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,0.5)", marginTop:2 }}>Paid on {selected.paidOn||"—"}</div></div>
               <div style={{ fontSize:26, fontWeight:800, color:"#fff" }}>₹{fmt(selected.net)}</div>
             </div>
-            <button onClick={()=>window.print()} style={{ marginTop:14, width:"100%", padding:"10px", background:"rgba(99,102,241,0.08)", border:"1px solid rgba(99,102,241,0.2)", borderRadius:10, fontSize:13, color:"#6366f1", fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+            <button onClick={()=>window.print()} style={{ marginTop:14, width:"100%", padding:"10px", background:"rgba(99,102,241,0.08)", border:"1px solid rgba(99,102,241,0.2)", borderRadius:10, fontSize:13, color:"var(--app-accent)", fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
               🖨️ Print / Download Slip
             </button>
           </Card>
@@ -1166,7 +1166,7 @@ function ProposalsPage({ proposals }) {
                            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                 <button
                    onClick={() => window.location.href = `/project-proposal?edit=${p.id || p._id}`}
-                   style={{ background: "#6366f115", color: "#6366f1", border: "1px solid #6366f130", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                   style={{ background: "var(--app-accent)15", color: "var(--app-accent)", border: "1px solid var(--app-accent)30", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                   ✏️ Edit Proposal
                 </button>
                 <button 
@@ -1385,12 +1385,12 @@ const fetchSubscription = async () => {
 
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
         <div className="emp-mob-bar" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background:"#fff", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
-          <button onClick={()=>setSidebarOpen(true)} style={{ background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#6366f1" }}>☰</button>
+          <button onClick={()=>setSidebarOpen(true)} style={{ background:"none", border:"none", fontSize:22, cursor:"pointer", color:"var(--app-accent)" }}>☰</button>
 
           {/* Notifications */}
           <div style={{ position:"relative", display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ position:"relative" }}>
-              <button style={{ background:"none", border:"none", fontSize:18, cursor:"pointer", color:"#6366f1", position:"relative" }}>
+              <button style={{ background:"none", border:"none", fontSize:18, cursor:"pointer", color:"var(--app-accent)", position:"relative" }}>
                 🔔
                 <span style={{ position:"absolute", top:"-2px", right:"-2px", background:"#ef4444", color:"#fff", borderRadius:"50%", width:"16px", height:"16px", fontSize:"10px", fontWeight:"700", display:"flex", alignItems:"center", justifyContent:"center" }}>3</span>
               </button>
@@ -1399,7 +1399,7 @@ const fetchSubscription = async () => {
 
           {/* Profile Avatar with Dropdown */}
           <div data-profile-anchor="true" onClick={(e)=>{e.stopPropagation();setProfileDropdownOpen(v=>!v);}} style={{ position:"relative" }}>
-            <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12, cursor:"pointer" }}>{(empName||"E").slice(0,2).toUpperCase()}</div>
+            <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:12, cursor:"pointer" }}>{(empName||"E").slice(0,2).toUpperCase()}</div>
           </div>
         </div>
 
@@ -1409,12 +1409,12 @@ const fetchSubscription = async () => {
             {/* Current Account Header */}
             <div style={{ padding:"12px 14px", borderBottom:"1px solid #f1f5f9", background:"linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:14 }}>
+                <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:14 }}>
                   {(empName||"E").slice(0,2).toUpperCase()}
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>
                   <div style={{ fontSize:13, fontWeight:700, color:"var(--app-sidebar)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{resolvedUser?.name||"Employee"}</div>
-                  <div style={{ fontSize:11, color:"#6366f1", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{resolvedUser?.email}</div>
+                  <div style={{ fontSize:11, color:"var(--app-accent)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{resolvedUser?.email}</div>
                 </div>
                 <span style={{ fontSize:12 }}>✓</span>
               </div>
@@ -1432,7 +1432,7 @@ const fetchSubscription = async () => {
                       onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                       onMouseLeave={e=>e.currentTarget.style.background="transparent"}
                     >
-                      <div style={{ width:32, height:32, borderRadius:8, background:"linear-gradient(135deg,#8b5cf6,var(--app-muted))", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:12, flexShrink:0 }}>
+                      <div style={{ width:32, height:32, borderRadius:8, background:"linear-gradient(135deg,var(--app-muted),var(--app-muted))", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:12, flexShrink:0 }}>
                         {account?.logoUrl?<img src={account.logoUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"contain", padding:2, background:"#fff" }}/>:<span>{accInitials}</span>}
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>

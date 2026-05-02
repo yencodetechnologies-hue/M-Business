@@ -249,7 +249,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
   const cNames = clients.map(c=>c.clientName||c.name||"");
 
   const Btn = {
-    background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", color:"#fff",
+    background:"var(--app-accent-gradient, linear-gradient(135deg, var(--app-accent), var(--app-muted)))", color:"#fff",
     border:"none", borderRadius:10, padding:"9px 18px",
     fontWeight:700, fontSize:13, cursor:"pointer", whiteSpace:"nowrap"
   };
@@ -361,7 +361,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                     padding:"5px 4px 4px",
                     cursor: cell.curr ? "pointer" : "default",
                     background: isSelected ? "var(--app-border)" : isToday ? "var(--app-bg)" : cell.curr ? "#fff" : "var(--app-bg)",
-                    border: isSelected ? "2px solid var(--app-accent)" : isToday ? "1.5px solid #c4b5fd" : "1px solid #f0edff",
+                    border: isSelected ? "2px solid var(--app-accent)" : isToday ? "1.5px solid var(--app-border)" : "1px solid var(--app-bg)",
                     opacity: cell.curr ? 1 : 0.4,
                     transition:"all 0.15s",
                     position:"relative",
@@ -372,7 +372,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                     width:22, height:22, borderRadius:"50%",
                     display:"flex", alignItems:"center", justifyContent:"center",
                     fontSize:11, fontWeight: isToday || isSelected ? 800 : 600,
-                    color: isSelected ? "var(--app-accent)" : isToday ? "var(--app-accent)" : cell.curr ? T.text : "#c4b5fd",
+                    color: isSelected ? "var(--app-accent)" : isToday ? "var(--app-accent)" : cell.curr ? T.text : "var(--app-border)",
                     background: isToday && !isSelected ? "var(--app-border)" : "transparent",
                     marginBottom:3,
                   }}>{cell.day}</div>
@@ -505,7 +505,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
                     <div key={ev._id||idx} style={{
                       background: past ? "var(--app-bg)" : "#fff",
                       borderRadius:12, padding:"12px 14px",
-                      border:`1px solid ${past?"#f0edff":"var(--app-border)"}`,
+                      border:`1px solid ${past?"var(--app-bg)":"var(--app-border)"}`,
                       display:"flex", gap:12, alignItems:"center",
                       flexWrap:"wrap", opacity: past ? 0.8 : 1,
                       boxShadow:"0 2px 10px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)"
@@ -631,7 +631,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
               {!form._readOnly && (
                 <button 
                   onClick={() => updateProjectTask("project", form._original._id, { status: form._original.status, deadline: form.date })}
-                  style={{ background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
+                  style={{ background:"var(--app-accent-gradient, linear-gradient(135deg, var(--app-accent), var(--app-muted)))", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
                 >
                   Save Changes
                 </button>
@@ -672,7 +672,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
               {!form._readOnly && (
                 <button 
                   onClick={() => updateProjectTask("task", form._original._id, { status: form._original.status, date: form.date })}
-                  style={{ background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
+                  style={{ background:"var(--app-accent-gradient, linear-gradient(135deg, var(--app-accent), var(--app-muted)))", color: "#fff", border:"none", borderRadius:10, padding:"10px 20px", cursor:"pointer", fontWeight:700 }}
                 >
                   Save Changes
                 </button>

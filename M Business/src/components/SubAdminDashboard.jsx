@@ -3213,19 +3213,22 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const displayName = companyNameStr;
   const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-  const B = (color) => ({ 
-    background: `linear-gradient(135deg,${color},${color}ee)`, 
-    color: "#fff", 
-    border: "none", 
-    borderRadius: 12, 
-    padding: "9px 18px", 
-    fontWeight: 800, // Bolder font
-    fontSize: 13, 
-    cursor: "pointer", 
-    fontFamily: "inherit",
-    boxShadow: `0 4px 12px ${color}40`, // Add shadow to button
-    textShadow: "0 1px 2px rgba(0,0,0,0.2)" // ADDED: Ensures white text is visible
-  });
+  const B = (color) => {
+    const isVar = color && color.startsWith("var");
+    return { 
+      background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}ee)`, 
+      color: "#fff", 
+      border: "none", 
+      borderRadius: 12, 
+      padding: "9px 18px", 
+      fontWeight: 800,
+      fontSize: 13, 
+      cursor: "pointer", 
+      fontFamily: "inherit",
+      boxShadow: isVar ? `0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)` : `0 4px 12px ${color}40`,
+      textShadow: "0 1px 2px rgba(0,0,0,0.2)"
+    };
+  };
 
   const companyId = user?.companyId || user?.company || user?._id || user?.id || "default";
 
@@ -3310,15 +3313,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
             <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
               {validActive === "clients" && <button onClick={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} style={B("var(--app-accent)")}>+ Add Client</button>}
-              {validActive === "employees" && <button onClick={() => { setNeError({}); setModal("employee"); }} style={B("var(--app-muted)")}>+ Add Employee</button>}
+              {validActive === "employees" && <button onClick={() => { setNeError({}); setModal("employee"); }} style={B("var(--app-accent)")}>+ Add Employee</button>}
               {validActive === "projects" && (
                 <>
                   <button onClick={() => { setNpError({}); setModal("project"); }} style={B("var(--app-accent)")}>+ New Project</button>
                 </>
               )}
 
-              {validActive === "managers" && <button onClick={() => { setNmError({}); setShowMgrPass(false); setModal("manager"); }} style={B("#f59e0b")}>+ Add Manager</button>}
-              {validActive === "subadmins" && <button onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }} style={B("#3b82f6")}>+ Add Partner</button>}
+              {validActive === "managers" && <button onClick={() => { setNmError({}); setShowMgrPass(false); setModal("manager"); }} style={B("var(--app-accent)")}>+ Add Manager</button>}
+              {validActive === "subadmins" && <button onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }} style={B("var(--app-accent)")}>+ Add Partner</button>}
 
               {validActive === "vendors" && <button onClick={() => { setNvError({}); setModal("vendor_add"); }} style={B("var(--app-accent)")}>+ Add Vendor</button>}
 
@@ -4044,7 +4047,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-muted)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Save Employee →"}</button>
+          <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Save Employee →"}</button>
         </div>
       </Mdl>}
 
@@ -4171,7 +4174,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("#f59e0b"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager →"}</button>
+          <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager →"}</button>
         </div>
       </Mdl>}
 
@@ -4196,7 +4199,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("#3b82f6"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin →"}</button>
+          <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin →"}</button>
         </div>
       </Mdl>}
 
@@ -4231,7 +4234,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("#0ea5e9"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package →"}</button>
+          <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package →"}</button>
         </div>
       </Mdl>}
 
@@ -4327,7 +4330,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-            <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("#0ea5e9"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
+            <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
           </div>
         </Mdl>
       )}

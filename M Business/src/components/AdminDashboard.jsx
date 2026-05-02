@@ -173,6 +173,22 @@ export default function AdminDashboard({ user, setUser }) {
   const displayName = user?.companyName || "M Business";
   const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
+  const B = (color) => {
+    const isVar = color && color.startsWith("var");
+    return {
+      background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}cc)`,
+      color: "#fff",
+      border: "none",
+      borderRadius: 10,
+      padding: "9px 18px",
+      fontWeight: 700,
+      fontSize: 13,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      boxShadow: isVar ? `0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)` : "none"
+    };
+  };
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--app-bg)", fontFamily: "'Inter', sans-serif" }}>
       {/* SIDEBAR */}
@@ -218,18 +234,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "packages" && (
             <button
               onClick={() => { setPkgError({}); setModal("package_add"); }}
-              style={{
-                background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
-                color: "#fff",
-                border: "none",
-                borderRadius: 10,
-                padding: "10px 20px",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: "pointer",
-                fontFamily: "inherit",
-                boxShadow: "0 4px 12px rgba(14,165,233,0.25)"
-              }}
+              style={B("var(--app-accent)")}
             >
               + Add Package
             </button>
@@ -504,22 +509,7 @@ export default function AdminDashboard({ user, setUser }) {
                 >
                   Cancel
                 </button>
-                <button
-                  onClick={createPackage}
-                  disabled={pkgSaveLoading}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
-                    border: "none",
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: "#fff",
-                    cursor: pkgSaveLoading ? "not-allowed" : "pointer",
-                    opacity: pkgSaveLoading ? 0.7 : 1
-                  }}
-                >
+                  <button onClick={createPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), flex: 1, padding: "12px" }}>
                   {pkgSaveLoading ? "Creating..." : "Create Package"}
                 </button>
               </div>
@@ -700,7 +690,7 @@ function SubadminsList({ subadmins, refresh, packages }) {
     <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Registered Subadmins ({subadmins.length})</h3>
-        <button onClick={() => setModalOpen(true)} style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Subadmin</button>
+        <button onClick={() => setModalOpen(true)} style={B("var(--app-accent)")}>+ Add Subadmin</button>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>

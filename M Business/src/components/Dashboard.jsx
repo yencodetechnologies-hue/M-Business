@@ -1719,7 +1719,21 @@ export default function Dashboard({setUser,user,fixedLogo}){
 
   const displayName = user?.companyName || "Your Business";
   const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-  const B=(color)=>({background:`linear-gradient(135deg,${color},${color}cc)`,color:"#fff",border:"none",borderRadius:10,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"});
+  const B = (color) => {
+    const isVar = color && color.startsWith("var");
+    return {
+      background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}cc)`,
+      color: "#fff",
+      border: "none",
+      borderRadius: 10,
+      padding: "8px 16px",
+      fontWeight: 700,
+      fontSize: 13,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      boxShadow: isVar ? `0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)` : "none"
+    };
+  };
 
   const companyId=user?.companyId||user?.company||user?._id||user?.id||"default";
   const companyNameStr = user?.companyName || "Your Business";

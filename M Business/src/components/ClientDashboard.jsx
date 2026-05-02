@@ -653,7 +653,7 @@ function WorkspacePage({ user }) {
       <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", minHeight: "500px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
           <span style={{ fontSize: 24 }}>✅</span>
-          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Personal To-do List</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0f172a" }}>List</h2>
         </div>
         
         <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>

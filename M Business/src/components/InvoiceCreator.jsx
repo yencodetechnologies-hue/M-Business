@@ -580,7 +580,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               </div>
 
               <div style={{ marginBottom: 16 }}>
-                <label style={lbl}>Transaction ID (Optional)</label>
+                <label style={lbl}>Transaction ID </label>
                 <input type="text" value={paymentData.transactionId} onChange={e => setPaymentData(p => ({ ...p, transactionId: e.target.value }))} style={inp()} placeholder="e.g. UTR123456789" />
               </div>
 
@@ -1483,7 +1483,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <label style={lbl}>UPI ID for Payment</label>
               <input value={inv.upiId} onChange={(e) => upd("upiId", e.target.value)} placeholder="e.g. business@okaxis" style={inp()} />
             </div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", marginTop: 10, gridColumn: "1 / -1", textTransform: "uppercase", letterSpacing: 1 }}>Bank Transfer Details (Optional)</div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", marginTop: 10, gridColumn: "1 / -1", textTransform: "uppercase", letterSpacing: 1 }}>Bank Transfer Details</div>
             <div>
               <label style={lbl}>Bank Name</label>
               <input value={inv.bankName} onChange={(e) => upd("bankName", e.target.value)} placeholder="e.g. HDFC Bank" style={inp()} />

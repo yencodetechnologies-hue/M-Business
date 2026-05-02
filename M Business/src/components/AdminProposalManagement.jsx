@@ -707,11 +707,28 @@ export default function AdminProposalManagement() {
     }
   };
 
-  const handleSubmitForApproval = async (proposalId) => {
+  const handleSubmitForApproval = async (proposal) => {
+    let currentTitle = proposal.title;
+    if (!currentTitle || !currentTitle.trim()) {
+      const newTitle = window.prompt("Please enter a title for this proposal before submitting:");
+      if (!newTitle || !newTitle.trim()) return;
+      currentTitle = newTitle.trim();
+      
+      // Update title on server first
+      try {
+        await axios.put(`${BASE_URL}/api/proposals/${proposal._id}`, { title: currentTitle });
+        setProposals(prev => prev.map(p => p._id === proposal._id ? { ...p, title: currentTitle } : p));
+      } catch (err) {
+        console.error("Error updating title before submission:", err);
+        alert("Failed to update title. Please try again.");
+        return;
+      }
+    }
+
     try {
-      await axios.put(`${BASE_URL}/api/proposals/${proposalId}/submit`);
+      await axios.put(`${BASE_URL}/api/proposals/${proposal._id}/submit`);
       setProposals(prev => 
-        prev.map(p => p._id === proposalId ? { ...p, status: "pending" } : p)
+        prev.map(p => p._id === proposal._id ? { ...p, status: "pending", title: currentTitle } : p)
       );
     } catch (error) {
       console.error("Error submitting proposal for approval:", error);
@@ -1079,7 +1096,7 @@ export default function AdminProposalManagement() {
 
                         {proposal.status === "draft" && (
                           <button
-                            onClick={() => handleSubmitForApproval(proposal._id)}
+                            onClick={() => handleSubmitForApproval(proposal)}
                             style={{
                               background: "rgba(245,158,11,0.1)",
                               border: "1px solid rgba(245,158,11,0.3)",
@@ -1099,7 +1116,7 @@ export default function AdminProposalManagement() {
 
                         {proposal.status === "rejected" && (
                           <button
-                            onClick={() => handleSubmitForApproval(proposal._id)}
+                            onClick={() => handleSubmitForApproval(proposal)}
                             style={{
                               background: "rgba(16,185,129,0.1)",
                               border: "1px solid rgba(16,185,129,0.3)",
@@ -1202,7 +1219,7 @@ export default function AdminProposalManagement() {
             {/* Submit for Approval - only for draft */}
             {selectedProposal.status === "draft" && (
               <button
-                onClick={() => handleSubmitForApproval(selectedProposal._id)}
+                onClick={() => handleSubmitForApproval(selectedProposal)}
                 style={{
                   background: "linear-gradient(135deg,#f59e0b,#d97706)",
                   border: "none",
@@ -1242,7 +1259,7 @@ export default function AdminProposalManagement() {
             {/* Resubmit for Approval - for rejected proposals (after client rejection, admin edits and resubmits) */}
             {selectedProposal.status === "rejected" && (
               <button
-                onClick={() => handleSubmitForApproval(selectedProposal._id)}
+                onClick={() => handleSubmitForApproval(selectedProposal)}
                 style={{
                   background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
                   border: "none",

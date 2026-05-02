@@ -96,6 +96,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
   const [payLoading, setPayLoading] = useState(null); // plan name being processed
   const [activeTab, setActiveTab] = useState("overview");
   const [viewPayment, setViewPayment] = useState(null);
+  const [viewInvoice, setViewInvoice] = useState(null);
   const [toast, setToast] = useState("");
   const [mockGatewayOpen, setMockGatewayOpen] = useState(null);
   const [paymentSuccessData, setPaymentSuccessData] = useState(null);
@@ -630,72 +631,128 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
       {/* ── Payments Tab ── */}
       {activeTab === "payments" && (
-        <Card title={`Payment History (${payments.length})`} icon="💰">
-          {payments.length === 0 ? (
-            <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>💳</div>
-              <p style={{ margin: 0 }}>No payment history found</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          {/* Payment Method Section (Same as Invoices for consistency) */}
+          <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: T.text }}>Active Payment Method</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ fontSize: 24 }}>💳</div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>
+                    {subscription.paymentMethod?.toUpperCase() || "Mastercard"} •••• {user?.last4 || "3867"}
+                  </div>
+                </div>
+              </div>
             </div>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-                <thead>
-                  <tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
-                    {["Payment ID", "Date", "Description", "Amount", "Method", "Status", ""].map(h => (
-                      <th key={h} style={{ padding: "11px 14px", textAlign: "left", color: T.muted, fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {payments.map((p, i) => (
-                    <tr key={p._id || i} style={{ borderBottom: "1px solid var(--app-border)" }}>
-                      <td style={{ padding: "11px 14px", fontFamily: "monospace", fontSize: 11, color: T.muted }}>{(p.paymentId || "").slice(0, 20)}…</td>
-                      <td style={{ padding: "11px 14px", color: T.text, fontSize: 12 }}>{formatDate(p.paymentDate)}</td>
-                      <td style={{ padding: "11px 14px", color: T.text }}>{p.description}</td>
-                      <td style={{ padding: "11px 14px", color: T.accent, fontWeight: 700 }}>{formatCurrency(p.amount, p.currency)}</td>
-                      <td style={{ padding: "11px 14px", color: T.muted, fontSize: 12, textTransform: "uppercase" }}>{p.paymentMethod}</td>
-                      <td style={{ padding: "11px 14px" }}><Badge label={p.status} color={getStatusColor(p.status)} /></td>
-                      <td style={{ padding: "11px 14px" }}>
-                        <button onClick={() => setViewPayment(p)} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.2)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: T.accent, cursor: "pointer", fontWeight: 600 }}>View</button>
-                      </td>
+            <button style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid var(--app-border)", background: "#fff", color: T.text, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Update</button>
+          </div>
+
+          <Card title={`Payment History`} icon="💰">
+            {payments.length === 0 ? (
+              <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>💳</div>
+                <p style={{ margin: 0 }}>No payment history found</p>
+              </div>
+            ) : (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      {["ID", "Date", "Description", "Amount", "Status", "Actions"].map(h => (
+                        <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 13, fontWeight: 700, color: T.muted, borderBottom: "1px solid var(--app-border)" }}>{h}</th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
+                  </thead>
+                  <tbody>
+                    {payments.map((p, i) => (
+                      <tr key={p._id || i} style={{ borderBottom: "1px solid #f8fafc" }}>
+                        <td style={{ padding: "16px", fontSize: 12, fontFamily: "monospace", color: T.muted }}>{(p.paymentId || "").slice(0, 10)}...</td>
+                        <td style={{ padding: "16px", fontSize: 14, color: T.text }}>{formatDate(p.paymentDate)}</td>
+                        <td style={{ padding: "16px", fontSize: 14, color: T.text }}>{p.description}</td>
+                        <td style={{ padding: "16px", fontSize: 14, fontWeight: 600, color: T.text }}>{formatCurrency(p.amount, p.currency)}</td>
+                        <td style={{ padding: "16px" }}>
+                          <Badge label={p.status} color={getStatusColor(p.status)} />
+                        </td>
+                        <td style={{ padding: "16px" }}>
+                          <button 
+                            onClick={() => p.invoiceNo ? setViewInvoice(p) : setViewPayment(p)}
+                            style={{ background: "none", border: "none", color: "var(--app-accent)", fontWeight: 600, cursor: "pointer", fontSize: 14, padding: 0, textDecoration: "underline" }}
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </div>
       )}
 
       {/* ── Invoices Tab ── */}
       {activeTab === "invoices" && (
-        <Card title={`Invoices from ${user?.companyName || ""} (${invoices.length})`} icon="🧾">
-          {invoices.length === 0 ? (
-            <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
-              <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
-              <p style={{ margin: 0 }}>No invoices yet. Invoices are provided by M Business upon payment.</p>
-            </div>
-          ) : (
-            <div style={{ display: "grid", gap: 12 }}>
-              {invoices.map((inv, i) => (
-                <div key={inv._id || i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                    <div style={{ width: 46, height: 46, borderRadius: 12, background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🧾</div>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>Invoice #{inv.invoiceNo}</div>
-                      <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>{inv.description} • {formatDate(inv.paymentDate)}</div>
-                      <div style={{ fontSize: 11, color: "#10b981", marginTop: 2, fontWeight: 600 }}>From: {inv.providerCompany || "M Business"}</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: T.accent }}>{formatCurrency(inv.amount, inv.currency)}</div>
-                    <div style={{ marginTop: 4 }}><Badge label={inv.status} color={getStatusColor(inv.status)} /></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          {/* Payment Method Section */}
+          <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: T.text }}>Payment</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ fontSize: 24 }}>💳</div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>
+                    {subscription.paymentMethod?.toUpperCase() || "Mastercard"} •••• {user?.last4 || "3867"}
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          )}
-        </Card>
+            <button style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid var(--app-border)", background: "#fff", color: T.text, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Update</button>
+          </div>
+
+          <Card title={`Invoices`} icon="🧾">
+            {invoices.length === 0 ? (
+              <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
+                <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
+                <p style={{ margin: 0 }}>No invoices yet. Invoices are provided by M Business upon payment.</p>
+              </div>
+            ) : (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      {["Date", "Total", "Status", "Actions"].map(h => (
+                        <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 13, fontWeight: 700, color: T.muted, borderBottom: "1px solid var(--app-border)" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invoices.map((inv, i) => (
+                      <tr key={inv._id || i} style={{ borderBottom: "1px solid #f8fafc" }}>
+                        <td style={{ padding: "16px", fontSize: 14, color: T.text }}>{formatDate(inv.paymentDate)}</td>
+                        <td style={{ padding: "16px", fontSize: 14, fontWeight: 600, color: T.text }}>{formatCurrency(inv.amount, inv.currency)}</td>
+                        <td style={{ padding: "16px" }}>
+                          <span style={{ padding: "4px 12px", borderRadius: 12, fontSize: 12, fontWeight: 600, background: "#f0fdf4", color: "#16a34a", textTransform: "capitalize" }}>
+                            {inv.status || "Paid"}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px" }}>
+                          <button 
+                            onClick={() => setViewInvoice(inv)}
+                            style={{ background: "none", border: "none", color: "var(--app-accent)", fontWeight: 600, cursor: "pointer", fontSize: 14, padding: 0, textDecoration: "underline" }}
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </div>
       )}
 
       {/* ── Quotations Tab ── */}
@@ -784,6 +841,97 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                 <InfoRow label="Company" value={viewPayment.providerCompany} icon="🏢" />
                 <InfoRow label="GST" value={viewPayment.providerGst} icon="📋" />
                 <InfoRow label="Address" value={viewPayment.providerAddress} icon="📍" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Stripe-style Invoice Modal ── */}
+      {viewInvoice && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setViewInvoice(null)}>
+          <div 
+            style={{ 
+              background: "#fff", 
+              width: "100%", 
+              maxWidth: 440, 
+              borderRadius: 24, 
+              padding: 40, 
+              position: "relative",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+              animation: "modalFadeIn 0.3s ease-out"
+            }} 
+            onClick={e => e.stopPropagation()}
+          >
+            <style>{`
+              @keyframes modalFadeIn {
+                from { opacity: 0; transform: scale(0.95) translateY(10px); }
+                to { opacity: 1; transform: scale(1) translateY(0); }
+              }
+            `}</style>
+            
+            <button 
+              onClick={() => setViewInvoice(null)} 
+              style={{ position: "absolute", top: 20, right: 20, background: "#f1f5f9", border: "none", color: "#64748b", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#e2e8f0"}
+              onMouseLeave={e => e.currentTarget.style.background = "#f1f5f9"}
+            >✕</button>
+
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+              <div style={{ position: "relative", marginBottom: 20 }}>
+                <div style={{ width: 80, height: 80, background: "#f8fafc", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: "1px solid #e2e8f0" }}>
+                  📄
+                </div>
+                <div style={{ position: "absolute", bottom: -5, right: -5, width: 24, height: 24, background: "#22c55e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, border: "3px solid #fff" }}>✓</div>
+              </div>
+
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>Invoice paid</div>
+              <div style={{ fontSize: 48, fontWeight: 800, color: "#1e293b", marginBottom: 12 }}>{formatCurrency(viewInvoice.amount, viewInvoice.currency)}</div>
+              
+              <button style={{ background: "none", border: "none", color: "#64748b", fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, marginBottom: 40 }}>
+                View invoice and payment details <span style={{ fontSize: 18 }}>›</span>
+              </button>
+
+              <div style={{ width: "100%", textAlign: "left", display: "flex", flexDirection: "column", gap: 16, marginBottom: 40 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#94a3b8", fontSize: 14 }}>Invoice number</span>
+                  <span style={{ color: "#1e293b", fontSize: 14, fontWeight: 600 }}>{viewInvoice.invoiceNo || "LDBG06TE-0001"}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#94a3b8", fontSize: 14 }}>Payment date</span>
+                  <span style={{ color: "#1e293b", fontSize: 14, fontWeight: 600 }}>{formatDate(viewInvoice.paymentDate)}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#94a3b8", fontSize: 14 }}>Payment method</span>
+                  <span style={{ color: "#1e293b", fontSize: 14, fontWeight: 600 }}>{viewInvoice.paymentMethod?.toUpperCase() || "Mastercard"} •••• {user?.last4 || "3867"}</span>
+                </div>
+              </div>
+
+              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
+                <button 
+                  style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#1e293b", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "0.2s" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#0f172a"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#1e293b"}
+                >
+                  Download receipt
+                </button>
+                <button 
+                  style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#fff", color: "#1e293b", border: "1.5px solid #e2e8f0", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "0.2s" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#fff"}
+                >
+                  Download invoice
+                </button>
+              </div>
+
+              <div style={{ marginTop: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, color: "#94a3b8", fontSize: 12, fontWeight: 600 }}>
+                  Powered by <span style={{ color: "#64748b", fontWeight: 800 }}>M Business</span>
+                </div>
+                <div style={{ display: "flex", gap: 16 }}>
+                  <span style={{ color: "#94a3b8", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Terms</span>
+                  <span style={{ color: "#94a3b8", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Privacy</span>
+                </div>
               </div>
             </div>
           </div>

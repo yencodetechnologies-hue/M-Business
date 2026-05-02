@@ -1015,7 +1015,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             <label style={lbl}>UPI ID for Payment</label>
             <input value={qt.upiId} onChange={(e) => upd("upiId", e.target.value)} placeholder="e.g. business@okaxis" style={inp()} />
           </div>
-          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", marginTop: 10, gridColumn: "1 / -1", textTransform: "uppercase", letterSpacing: 1 }}>Bank Transfer Details (Optional)</div>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", marginTop: 10, gridColumn: "1 / -1", textTransform: "uppercase", letterSpacing: 1 }}>Bank Transfer Details</div>
           <div>
             <label style={lbl}>Bank Name</label>
             <input value={qt.bankName} onChange={(e) => upd("bankName", e.target.value)} placeholder="e.g. HDFC Bank" style={inp()} />

@@ -8,6 +8,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
+
 class PaymentController {
 
   static async createPaymentOrder(req, res) {
@@ -83,6 +84,7 @@ class PaymentController {
         }
       }
 
+      const ts = Date.now();
       const payment = await PaymentHistory.findOneAndUpdate(
         { paymentId: razorpay_order_id },
         {
@@ -90,7 +92,10 @@ class PaymentController {
           paymentMethod: req.body.paymentMethod || "card",
           paymentDetails: req.body.paymentDetails || {},
           receiptUrl: `https://razorpay.com/payment/${razorpay_payment_id}`,
-          paymentDate: new Date()
+          paymentDate: new Date(),
+          invoiceNo: `INV-SUB-${ts}`,
+          quotationNo: `QUO-SUB-${ts}`,
+          updatedAt: new Date()
         },
         { returnDocument: 'after' }
       );

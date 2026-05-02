@@ -15,6 +15,39 @@ router.get("/current/:id", async (req, res) => {
     }).sort({ createdAt: -1 });
 
     if (!subscription) return res.json({ hasSubscription: false, message: "No subscription found" });
+
+    // Retroactive fix: If trial but no payment history exists, create one
+    if (subscription.isTrial || subscription.planName === "Trial" || subscription.planName === "Free") {
+      const targetUserId = subscription.userId || id;
+      console.log(`[DEBUG] Checking retroactive trial invoice for userId: ${targetUserId}`);
+      const existingPayment = await PaymentHistory.findOne({ userId: targetUserId, type: "subscription" });
+      if (!existingPayment) {
+        console.log(`[DEBUG] No trial invoice found. Creating one...`);
+        const ts = Date.now();
+        const trialPayment = new PaymentHistory({
+          userId: targetUserId,
+          userEmail: subscription.userEmail,
+          subscriptionId: subscription._id,
+          paymentId: `TRIAL-FIX-${ts}`,
+          amount: 0,
+          currency: "INR",
+          type: "subscription",
+          invoiceNo: `INV-TRIAL-${ts}`,
+          description: "Free 30-day trial registration",
+          status: "completed",
+          paymentMethod: "other",
+          paymentDate: subscription.startDate || new Date(),
+          planName: "Free Trial",
+          planDuration: "trial",
+          providerCompany: "M Business"
+        });
+        await trialPayment.save();
+        console.log(`[DEBUG] Retroactive trial invoice created: ${trialPayment.invoiceNo}`);
+      } else {
+        console.log(`[DEBUG] Existing trial invoice found: ${existingPayment.invoiceNo}`);
+      }
+    }
+
     res.json({ hasSubscription: true, subscription });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -78,7 +111,28 @@ router.post("/start-trial", async (req, res) => {
       notes: "Free 30-day trial"
     });
 
-    await subscription.save();
+    const subRecord = await subscription.save();
+
+    // Create a $0 "Trial" Invoice record in PaymentHistory
+    const ts = Date.now();
+    const trialPayment = new PaymentHistory({
+      userId,
+      userEmail,
+      subscriptionId: subRecord._id,
+      paymentId: `TRIAL-${ts}`,
+      amount: 0,
+      currency: "INR",
+      type: "subscription",
+      invoiceNo: `INV-TRIAL-${ts}`,
+      description: "Free 30-day trial registration",
+      status: "completed",
+      paymentMethod: "other",
+      paymentDate: new Date(),
+      planName: "Free Trial",
+      planDuration: "trial",
+      providerCompany: "M Business"
+    });
+    await trialPayment.save();
 
     // Update user mySubscriptions
     await User.findByIdAndUpdate(userId, { mySubscriptions: true, numberOfSubscriptions: 1 }).catch(() => {});
@@ -90,7 +144,7 @@ router.post("/start-trial", async (req, res) => {
       console.log("Trial welcome email failed:", mailErr.message);
     }
 
-    res.status(201).json({ success: true, message: "30-day free trial started!", subscription });
+    res.status(201).json({ success: true, message: "30-day free trial started!", subscription: subRecord, payment: trialPayment });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -430,6 +484,45 @@ router.post("/seed/:userId", async (req, res) => {
     await p1.save();
 
     res.json({ success: true, subscription: sub, payment: p1 });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Manual fix for missing trial invoices ───────────────────────────────────
+router.post("/fix-invoices/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const subscription = await Subscription.findOne({
+      $or: [{ userId }, { companyId: userId }],
+      status: { $in: ["active", "trial"] }
+    }).sort({ createdAt: -1 });
+
+    if (!subscription) return res.status(404).json({ error: "No active subscription found" });
+
+    const existingPayment = await PaymentHistory.findOne({ userId, type: "subscription" });
+    if (existingPayment) return res.json({ success: true, message: "Invoice already exists", payment: existingPayment });
+
+    const ts = Date.now();
+    const trialPayment = new PaymentHistory({
+      userId: userId,
+      userEmail: subscription.userEmail,
+      subscriptionId: subscription._id,
+      paymentId: `TRIAL-MANUAL-${ts}`,
+      amount: 0,
+      currency: "INR",
+      type: "subscription",
+      invoiceNo: `INV-TRIAL-${ts}`,
+      description: "Free 30-day trial registration",
+      status: "completed",
+      paymentMethod: "other",
+      paymentDate: subscription.startDate || new Date(),
+      planName: "Free Trial",
+      planDuration: "trial",
+      providerCompany: "M Business"
+    });
+    await trialPayment.save();
+    res.json({ success: true, message: "Trial invoice generated!", payment: trialPayment });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

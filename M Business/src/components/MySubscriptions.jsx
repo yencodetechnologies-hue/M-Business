@@ -111,13 +111,24 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
     if (!userId) return;
     try {
       setLoading(true);
-      const [subRes, payRes] = await Promise.all([
-        axios.get(`${BASE_URL}/api/subscriptions/current/${userId}`),
-        axios.get(`${BASE_URL}/api/subscriptions/payments/${userId}`),
-      ]);
+      // Fetch subscription first (this triggers retroactive trial invoice creation if needed)
+      const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${userId}`);
       if (subRes.data.hasSubscription) setSubscription(subRes.data.subscription);
       else setSubscription(null);
-      const all = payRes.data || [];
+
+      // Now fetch payments
+      let payRes = await axios.get(`${BASE_URL}/api/subscriptions/payments/${userId}`);
+      let all = payRes.data || [];
+
+      // AUTOMATIC FIX: If no payments found but subscription exists, try to generate one
+      if (all.length === 0 && subRes.data.hasSubscription) {
+        try {
+          await axios.post(`${BASE_URL}/api/subscriptions/fix-invoices/${userId}`);
+          payRes = await axios.get(`${BASE_URL}/api/subscriptions/payments/${userId}`);
+          all = payRes.data || [];
+        } catch (fixErr) { console.error("Auto-fix failed:", fixErr); }
+      }
+
       setPayments(all);
       setInvoices(all.filter(p => p.invoiceNo));
       setQuotations(all.filter(p => p.quotationNo));

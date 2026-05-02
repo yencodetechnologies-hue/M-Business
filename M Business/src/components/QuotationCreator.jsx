@@ -316,7 +316,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
     return (
       <>
-        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: 1100 }}>
+        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 }}>
           <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
@@ -767,7 +767,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   // ══════════ FORM ══════════
   const hasErrors = Object.keys(errors).length > 0;
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: 720, margin: "0 auto" }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }

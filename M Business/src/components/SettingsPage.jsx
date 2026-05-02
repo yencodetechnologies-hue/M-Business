@@ -139,7 +139,7 @@ export default function SettingsPage({ user }) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 680 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {toast && (
         <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid var(--app-accent)", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "var(--app-accent)", boxShadow: "0 8px 24px rgba(147,51,234,0.15)" }}>
           {toast}

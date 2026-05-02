@@ -422,7 +422,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
       {/* View Modal */}
       {viewClient && (
-        <Mdl title="Client Profile" onClose={() => setViewClient(null)} maxWidth={500}>
+        <Mdl title="Company Profile" onClose={() => setViewClient(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
             {viewClient.logoUrl ? (
               <img src={viewClient.logoUrl} alt="logo" style={{ height: 52, width: "auto", maxWidth: "120px", borderRadius: 10, objectFit: "cover", border: "1px solid var(--app-border)", background: "#fff", display: "block" }} />
@@ -445,7 +445,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             {(() => {
               const clientProjects = projects.filter(p => (p.client || "").toLowerCase() === (viewClient.clientName || viewClient.name || "").toLowerCase());
               return clientProjects.length === 0 ? (
-                <div style={{ padding: "12px", background: "#f8fafc", borderRadius: 10, border: "1px solid #f1f5f9", textAlign: "center", color: "var(--app-muted)", fontSize: 12 }}>No projects found for this client</div>
+                <div style={{ padding: "12px", background: "#f8fafc", borderRadius: 10, border: "1px solid #f1f5f9", textAlign: "center", color: "var(--app-muted)", fontSize: 12 }}>No projects found for this company</div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {clientProjects.slice(0, 3).map((p, idx) => (
@@ -478,7 +478,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
       {/* Edit Modal */}
       {editClient && (
-        <Mdl title="Edit Client" onClose={() => setEditClient(null)}>
+        <Mdl title="Edit Company" onClose={() => setEditClient(null)}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
               <div style={{ position: "relative", width: 100, height: 100 }}>
                 {editForm.logoUrl ? (
@@ -522,7 +522,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
         </Mdl>
       )}
 
-      {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
+      {deleteTarget && <ConfirmModal title="Delete Company" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
     </div>
   );
 }
@@ -2178,7 +2178,7 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
 
   if (displayedPackages.length === 0) {
     return (
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
+      <div style={{ flex: 1, padding: "0 20px" }}>
         <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 24, border: "2px dashed var(--app-border)", boxShadow: "0 4px 20px rgba(147,51,234,0.05)" }}>
           <div style={{ fontSize: 64, marginBottom: 24 }}>📦</div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 12 }}>No Packages Assigned</h2>
@@ -2191,9 +2191,9 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
   }
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
+    <div style={{ flex: 1, padding: "0 20px" }}>
       {/* Cards Grid - 3 columns like the design */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0, marginBottom: 40, background: "#f8fafc", borderRadius: 16, overflow: "hidden" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: 0, marginBottom: 40, background: "#f8fafc", borderRadius: 16, overflow: "hidden" }}>
         {displayedPackages.map((p, idx) => {
           const isPro = p.id === "pro" || p.title === "PRO";
           return (
@@ -2572,9 +2572,37 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // ← இது மட்டும் இருக்கணும் (KEEP THIS)
   const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "purple");
   const [showThemePicker, setShowThemePicker] = useState(false);
+  const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "#7c3aed");
+  const [showColorPicker, setShowColorPicker] = useState(false);
+
+  // Helper: hex to HSL
+  const hexToHsl = (hex) => {
+    let r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
+    let h = 0, s = 0, l = (max+min)/2;
+    if (d !== 0) { s = l > 0.5 ? d/(2-max-min) : d/(max+min); h = max===r ? ((g-b)/d+(g<b?6:0))*60 : max===g ? ((b-r)/d+2)*60 : ((r-g)/d+4)*60; }
+    return [Math.round(h), Math.round(s*100), Math.round(l*100)];
+  };
+  const hslToHex = (h,s,l) => {
+    s/=100; l/=100;
+    const a = s*Math.min(l,1-l);
+    const f = n => { const k=(n+h/30)%12; return Math.round(255*(l-a*Math.max(Math.min(k-3,9-k,1),-1))); };
+    return `#${[f(0),f(8),f(4)].map(x=>x.toString(16).padStart(2,'0')).join('')}`;
+  };
+
+  // Generate full theme from a single hex color
+  const generateThemeFromColor = (hex) => {
+    const [h, s, l] = hexToHsl(hex);
+    return {
+      label: "Custom", sidebar: hslToHex(h, Math.min(s+10,100), 12),
+      accent: hex, bg: hslToHex(h, Math.min(s,40), 97),
+      muted: hslToHex(h, Math.min(s,80), Math.max(l-15,25)),
+      border: hslToHex(h, Math.min(s,30), 90), dot: hex
+    };
+  };
 
   const THEMES = {
-    purple: { label: "Purple", sidebar: "#1e0a3c", accent: "var(--app-accent)", bg: "#f5f3ff", muted: "#7c3aed", border: "#ede9fe", dot: "var(--app-accent)" },
+    purple: { label: "Purple", sidebar: "#1e0a3c", accent: "#7c3aed", bg: "#f5f3ff", muted: "#7c3aed", border: "#ede9fe", dot: "#7c3aed" },
     ocean: { label: "Ocean", sidebar: "#0a3552", accent: "#0284c7", bg: "#f0f9ff", muted: "#0369a1", border: "#bae6fd", dot: "#0284c7" },
     forest: { label: "Forest", sidebar: "#0f3d22", accent: "#16a34a", bg: "#f0fdf4", muted: "#15803d", border: "#bbf7d0", dot: "#16a34a" },
     sunset: { label: "Sunset", sidebar: "#5c1f0a", accent: "#ea580c", bg: "#fff7ed", muted: "#c2410c", border: "#fed7aa", dot: "#ea580c" },
@@ -2584,16 +2612,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     candy: { label: "Candy", sidebar: "#4a0d4e", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f0abfc", dot: "#c026d3" },
   };
 
+  // Apply theme whenever appTheme or customColor changes
   useEffect(() => {
-    const t = THEMES[appTheme];
+    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : THEMES[appTheme];
     if (!t) return;
     document.documentElement.style.setProperty("--app-sidebar", t.sidebar);
     document.documentElement.style.setProperty("--app-accent", t.accent);
+    document.documentElement.style.setProperty("--app-accent-gradient", `linear-gradient(135deg, ${t.accent}, ${t.dot})`);
     document.documentElement.style.setProperty("--app-bg", t.bg);
     document.documentElement.style.setProperty("--app-muted", t.muted);
     document.documentElement.style.setProperty("--app-border", t.border);
     localStorage.setItem("appTheme", appTheme);
-  }, [appTheme]);
+    if (appTheme === "custom") localStorage.setItem("appCustomColor", customColor);
+  }, [appTheme, customColor]);
 
   const headerLogoRef = useRef();
 
@@ -3293,14 +3324,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     position: "absolute", bottom: 56, right: 0,
                     background: "#fff", borderRadius: 18, padding: 20,
                     boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
-                    width: 280
+                    width: 300, maxHeight: "70vh", overflowY: "auto"
                   }}>
                     <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
                       🎨 Choose Theme
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
                       {Object.entries(THEMES).map(([key, t]) => (
-                        <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
+                        <button key={key} onClick={() => { setAppTheme(key); setShowColorPicker(false); }}
                           style={{
                             border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
                             borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
@@ -3314,14 +3345,80 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </button>
                       ))}
                     </div>
+
+                    {/* Custom Color Picker Section */}
+                    <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                        🎯 Custom Color
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ position: "relative", flexShrink: 0 }}>
+                          <div style={{
+                            width: 42, height: 42, borderRadius: 12,
+                            background: customColor,
+                            border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
+                            boxShadow: `0 4px 12px ${customColor}40`,
+                            cursor: "pointer", transition: "all 0.2s",
+                            display: "flex", alignItems: "center", justifyContent: "center"
+                          }}
+                          onClick={() => document.getElementById("customColorInput")?.click()}
+                          >
+                            <span style={{ fontSize: 16 }}>🎨</span>
+                          </div>
+                          <input
+                            id="customColorInput"
+                            type="color"
+                            value={customColor}
+                            onChange={(e) => {
+                              setCustomColor(e.target.value);
+                              setAppTheme("custom");
+                            }}
+                            style={{
+                              position: "absolute", top: 0, left: 0, width: 42, height: 42,
+                              opacity: 0, cursor: "pointer", border: "none"
+                            }}
+                          />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
+                            {appTheme === "custom" ? "Custom Active" : "Pick any color"}
+                          </div>
+                          <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                            {customColor.toUpperCase()}
+                          </div>
+                        </div>
+                        {appTheme === "custom" && (
+                          <div style={{
+                            width: 8, height: 8, borderRadius: "50%",
+                            background: "#22c55e", boxShadow: "0 0 6px #22c55e80"
+                          }} />
+                        )}
+                      </div>
+
+                      {/* Quick custom color presets */}
+                      <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+                        {["#7c3aed","#2563eb","#0891b2","#059669","#d97706","#dc2626","#db2777","#7c2d12","#4f46e5","#0f766e","#b91c1c","#9333ea"].map(c => (
+                          <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); }}
+                            style={{
+                              width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
+                              border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
+                              boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
+                              transition: "all 0.15s"
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
                 <button onClick={() => setShowThemePicker(v => !v)}
                   style={{
                     width: 48, height: 48, borderRadius: "50%",
-                    background: `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
+                    background: appTheme === "custom"
+                      ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
+                      : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
                     border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
-                    boxShadow: `0 6px 20px ${THEMES[appTheme]?.dot}60`,
+                    boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "#7c3aed")}60`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     transition: "all 0.2s"
                   }}>
@@ -3432,7 +3529,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               )}
 
               {/* Top Section: Company Info & Stats Grid */}
-              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 20, marginBottom: 20 }}>
+              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(450px, 1fr))", gap: 20, marginBottom: 20 }}>
                 {/* Left Column: Company Information */}
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <SC>
@@ -3487,9 +3584,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 </div>
 
                 {/* Right Column: Statistics Grid */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 }}>
                   {[
-                    { t: "Total Clients", v: clients.length, i: "👥", c: "var(--app-accent)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
+                    { t: "Total Company Names", v: clients.length, i: "👥", c: "var(--app-accent)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
                     { t: "Employees", v: employees.length, i: "👨‍💼", c: "var(--app-muted)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
                     { t: "Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b", bg: "linear-gradient(135deg,#fef3c7,#fffbeb)" },
                     { t: "Projects", v: projects.length, i: "📁", c: "var(--app-accent)", bg: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" },
@@ -3508,13 +3605,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   ))}
                 </div>
               </div>
-              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
+              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))", gap: 20 }}>
                 <SC title="Recent Projects">
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 600 }}>
                       <thead>
                         <tr style={{ background: "var(--app-bg)" }}>
-                          {["Project", "Client", "Status", "Deadline", "View"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
+                          {["Project", "Company Name", "Status", "Deadline", "View"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
                         </tr>
                       </thead>
                       <tbody>

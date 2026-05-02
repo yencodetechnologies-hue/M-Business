@@ -19,8 +19,8 @@ const sc = (s) => ({
 }[s] || "#6366f1");
 
 // ── NAV ───────────────────────────────────────────────────────
-const NAV = [
-  { key:"dashboard", icon:"⌂", label:"Dashboard" },
+ const NAV=[{ key:"dashboard", icon:"⌂", label:"Dashboard" },
+  { key:"workspace", icon:"📝", label:"Workspace" },
   { key:"projects",  icon:"◈", label:"My Projects" },
   { key:"proposals", icon:"📄", label:"Proposals" },
   { key:"tasks",     icon:"◉", label:"Active Tasks" },
@@ -577,6 +577,99 @@ function NotificationsPage({ notifications, onMarkRead, onMarkAllRead, onNavigat
   );
 }
 
+// ── WORKSPACE PAGE ───────────────────────────────────────────
+function WorkspacePage({ user }) {
+  const [notes, setNotes] = useState(() => localStorage.getItem(`client_notes_${user?._id}`) || "");
+  const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem(`client_todos_${user?._id}`) || "[]"));
+  const [newTodo, setNewTodo] = useState("");
+
+  useEffect(() => {
+    if (user?._id) localStorage.setItem(`client_notes_${user?._id}`, notes);
+  }, [notes, user?._id]);
+
+  useEffect(() => {
+    if (user?._id) localStorage.setItem(`client_todos_${user?._id}`, JSON.stringify(todos));
+  }, [todos, user?._id]);
+
+  const addTodo = () => {
+    if (!newTodo.trim()) return;
+    setTodos([...todos, { id: Date.now(), text: newTodo, done: false }]);
+    setNewTodo("");
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(todos.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  };
+
+  const deleteTodo = (id) => {
+    setTodos(todos.filter(t => t.id !== id));
+  };
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.2fr)", gap: 24, animation: "slide-in 0.3s ease" }}>
+      {/* Notes Section */}
+      <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", minHeight: "500px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
+          <span style={{ fontSize: 24 }}>📝</span>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0f172a" }}>My Notes</h2>
+        </div>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Jot down your ideas, requirements, or meeting notes here..."
+          style={{ flex: 1, width: "100%", border: "1.5px solid #f1f5f9", borderRadius: 12, padding: 18, fontSize: 14, color: "#334155", background: "#f8fafc", resize: "none", outline: "none", fontFamily: "inherit", lineHeight: 1.6 }}
+        />
+        <div style={{ marginTop: 12, fontSize: 11, color: "#94a3b8", textAlign: "right" }}>
+          Autosaved locally
+        </div>
+      </div>
+
+      {/* To-do List Section */}
+      <div style={{ background: "#fff", borderRadius: 20, padding: 24, border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", minHeight: "500px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
+          <span style={{ fontSize: 24 }}>✅</span>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Personal To-do List</h2>
+        </div>
+        
+        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+          <input
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && addTodo()}
+            placeholder="What needs to be done?"
+            style={{ flex: 1, padding: "12px 16px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 14, outline: "none" }}
+          />
+          <button onClick={addTodo} style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 10, padding: "0 20px", fontWeight: 700, cursor: "pointer" }}>Add</button>
+        </div>
+
+        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
+          {todos.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px 20px", color: "#94a3b8" }}>
+              <div style={{ fontSize: 32, marginBottom: 10 }}>🎉</div>
+              <div style={{ fontSize: 13 }}>No personal tasks yet!</div>
+            </div>
+          ) : (
+            todos.map(todo => (
+              <div key={todo.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: todo.done ? "#f8fafc" : "#fff", border: "1.5px solid #f1f5f9", borderRadius: 12, transition: "0.2s" }}>
+                <input
+                  type="checkbox"
+                  checked={todo.done}
+                  onChange={() => toggleTodo(todo.id)}
+                  style={{ width: 18, height: 18, cursor: "pointer" }}
+                />
+                <span style={{ flex: 1, fontSize: 14, color: todo.done ? "#94a3b8" : "#334155", textDecoration: todo.done ? "line-through" : "none" }}>
+                  {todo.text}
+                </span>
+                <button onClick={() => deleteTodo(todo.id)} style={{ background: "none", border: "none", color: "#cbd5e1", cursor: "pointer", fontSize: 16 }}>✕</button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── MAIN CLIENT DASHBOARD ─────────────────────────────────────
 export default function ClientDashboard({ user, setUser }) {
   const [active,        setActive]        = useState("dashboard");
@@ -753,10 +846,15 @@ export default function ClientDashboard({ user, setUser }) {
   const page         = filteredNav.find(n=>n.key===active) || { icon:"⌂", label:"Dashboard" };
 
   // Live payment totals
-  const parseAmt = (s) => parseFloat((s||"0").replace(/[^0-9.]/g,"")) || 0;
-  const totalPaid    = payments.filter(p=>p.status==="Paid").reduce((s,p)=>s+parseAmt(p.amount),0);
+  const parseAmt = (s) => parseFloat(String(s||"0").replace(/[^0-9.]/g,"")) || 0;
+  const totalInvoiced = payments.reduce((s,p)=>s+parseAmt(p.amount),0);
+  const totalPaid    = payments.filter(p=>p.status==="Paid" || p.status==="part_paid").reduce((s,p)=>{
+    const paidAmt = p.paymentHistory?.reduce((sum, h)=>sum+parseAmt(h.amountPaid), 0) || (p.status==="Paid" ? parseAmt(p.amount) : 0);
+    return s + paidAmt;
+  }, 0);
   const totalPending = payments.filter(p=>p.status==="Pending").reduce((s,p)=>s+parseAmt(p.amount),0);
   const totalOverdue = payments.filter(p=>p.status==="Overdue").reduce((s,p)=>s+parseAmt(p.amount),0);
+  const balanceDue   = totalInvoiced - totalPaid;
   const fmt = (n) => n>=100000?`₹${(n/100000).toFixed(2)}L`:`₹${n.toLocaleString("en-IN")}`;
 
   return (
@@ -851,6 +949,11 @@ export default function ClientDashboard({ user, setUser }) {
                         <span style={{ color:"#64748b" }}>Budget: <strong style={{ color:"#0f172a" }}>{p.budget}</strong></span>
                         <span style={{ color:"#64748b" }}>{p.completedTasks||0}/{p.tasks||0} tasks</span>
                       </div>
+                      {p.notes && (
+                        <div style={{ marginTop: 10, padding: "10px 12px", background: "#f8fafc", borderRadius: 10, fontSize: 11, color: "#475569", fontStyle: "italic", borderLeft: "3px solid #e2e8f0", lineHeight: 1.4 }}>
+                          "{p.notes}"
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1086,10 +1189,11 @@ export default function ClientDashboard({ user, setUser }) {
           {/* ── PAYMENTS — live state + PaymentTimeline ── */}
           {active==="payments" && (
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-              <div className="stat-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
-                <StatCard icon="✅" label="Total Paid" value={fmt(totalPaid)}    sub={`${payments.filter(p=>p.status==="Paid").length} invoices`}   color="#10b981"/>
-                <StatCard icon="⏳" label="Pending"    value={fmt(totalPending)} sub={`${payments.filter(p=>p.status==="Pending").length} invoices`} color="#f59e0b"/>
-                <StatCard icon="🚨" label="Overdue"    value={fmt(totalOverdue)} sub={`${payments.filter(p=>p.status==="Overdue").length} invoices`} color="#ef4444"/>
+              <div className="stat-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
+                <StatCard icon="📊" label="Total Invoiced" value={fmt(totalInvoiced)} sub={`${payments.length} invoices`} color="#6366f1"/>
+                <StatCard icon="✅" label="Total Paid" value={fmt(totalPaid)}    sub={`Received`}   color="#10b981"/>
+                <StatCard icon="🚨" label="Balance Due"    value={fmt(balanceDue)} sub={`Outstanding`} color="#ef4444"/>
+                <StatCard icon="⏳" label="Pending/Overdue" value={fmt(totalPending+totalOverdue)} sub={`${payments.filter(p=>p.status!=="Paid").length} items`} color="#f59e0b"/>
               </div>
               {payments.map(inv=>(
                 <div key={inv.id||inv._id||inv.invoiceId} style={{ background:"#fff", borderRadius:14, border:`1px solid ${inv.status==="Overdue"?"#fecaca":"#e2e8f0"}`, padding:"16px 18px" }}>
@@ -1134,6 +1238,8 @@ export default function ClientDashboard({ user, setUser }) {
               </div>
             </div>
           )}
+
+          {active==="workspace" && <WorkspacePage user={user} />}
 
           {active==="settings" && <SettingsPage clientUser={clientUser}/>}
 

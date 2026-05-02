@@ -1173,7 +1173,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks }) {
+function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee }) {
   const [search, setSearch] = useState("");
   const [viewProj, setViewProj] = useState(null);
   const [editProj, setEditProj] = useState(null);
@@ -1428,7 +1428,12 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
           </div>
           <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES</label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 0 }}>ASSIGN EMPLOYEES</label>
+              <button onClick={() => onAddEmployee && onAddEmployee()} style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ fontSize: 14 }}>+</span> Add Employee
+              </button>
+            </div>
             <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "12px", background: "var(--app-bg)", maxHeight: 200, overflowY: "auto" }}>
               {employees.length === 0 ? <div style={{ color: "var(--app-muted)", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
                 : employees.map(emp => (
@@ -1600,7 +1605,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
   const openEdit = (p) => { setTsForm({ projectId: p.projectId || p.id || "", name: p.name || "", client: p.client || "", manager: p.manager || "", employee: p.employee || "", deadline: p.deadline || "", status: p.status || "In Progress", progress: p.progress || p.pct || 0, notes: p.notes || p.note || "" }); setTsErr({}); setTsEditId(p._id || p.id); setTsModal("edit"); };
   const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0–100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "✅ Project added!" : "✅ Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("✅ Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
   const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast("🗑️ Deleted!"); };
-  const B2 = (color) => ({ background: `linear-gradient(135deg,${color},${color}cc)`, color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" });
+  const B2 = (color) => ({ background: "var(--app-accent-gradient)", color: "#ffffff", border: "none", borderRadius: 12, padding: "12px 22px", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)" });
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {tsToast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{tsToast}</div>}
@@ -1612,7 +1617,9 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
           <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
           {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
         </div>
-        <button onClick={openAdd} style={B2("var(--app-accent)")}>+ Add Project Status</button>
+        <button onClick={openAdd} style={B2("var(--app-accent)")}>
+          <span style={{ fontSize: 16, marginRight: 6 }}>+</span> Add Project Status
+        </button>
       </div>
       <SC title={`Project Status (${displayed.length})`}>
         <div style={{ overflowX: "auto" }}>
@@ -1640,17 +1647,19 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                           showToast("❌ Update failed");
                         }
                       }}
-                      style={{
-                        background: `${sc(p.status)}18`,
-                        color: sc(p.status),
-                        border: `1px solid ${sc(p.status)}33`,
-                        padding: "3px 8px",
-                        borderRadius: 20,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        outline: "none",
-                        cursor: "pointer"
-                      }}
+                        style={{
+                          background: `${sc(p.status)}15`,
+                          color: sc(p.status) === "var(--app-muted)" ? "var(--app-sidebar)" : sc(p.status),
+                          border: `1.5px solid ${sc(p.status)}40`,
+                          padding: "4px 10px",
+                          borderRadius: 20,
+                          fontSize: 11,
+                          fontWeight: 800,
+                          outline: "none",
+                          cursor: "pointer",
+                          appearance: "none",
+                          textAlign: "center"
+                        }}
                     >
                       {(config?.projectStatuses || ["In Progress", "Pending", "Completed", "On Hold"]).map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -2574,6 +2583,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "var(--app-accent)");
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [returnToModal, setReturnToModal] = useState(null);
 
   // Helper: hex to HSL
   const hexToHsl = (hex) => {
@@ -3010,7 +3020,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
       setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "" });
       setNcError({});
-      // Don't close modal yet - show success screen
+      if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
+      // Don't close modal yet if no return - show success screen (this depends on existing logic)
     } catch (err) {
       setNcError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
     } finally {
@@ -3019,7 +3030,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const addEmployee = async () => {
-    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email is required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNeError(errors); return; } try { setEmpSaveLoading(true); const payload = { ...ne, role: ne.role || "employee" }; const res = await axios.post(BASE_URL + "/api/employees/add", payload); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Active", password: "" }); setShowEmpPass(false); setNeError({}); setModal(null); } catch (err) {
+    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email is required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNeError(errors); return; } try { setEmpSaveLoading(true); const payload = { ...ne, role: ne.role || "employee" }; const res = await axios.post(BASE_URL + "/api/employees/add", payload); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Active", password: "" }); setShowEmpPass(false); setNeError({}); if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); } } catch (err) {
       const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
       const isPasswordError = errMsg.toLowerCase().includes("password");
       setNeError(isPasswordError ? { password: errMsg } : { email: errMsg });
@@ -3700,11 +3711,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} />}
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => { setReturnToModal(null); setModal("employee"); }} />}
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
-          {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
+          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { setReturnToModal(modal); setModal("client"); }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+          {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { setReturnToModal(modal); setModal("client"); }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} />}
@@ -4047,7 +4058,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Save Employee →"}</button>
+          <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Add Employee"}</button>
         </div>
       </Mdl>}
 
@@ -4070,7 +4081,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 });
               }}
               error={npError.client}
-              onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }}
+              onAddClient={() => { setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false); }}
             />
             {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}
           </div>
@@ -4102,7 +4113,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Status" value={np.status} onChange={v => setNp({ ...np, status: v })} options={["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
         </div>
         <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400 }}>(select multiple)</span></label>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 0 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400 }}></span></label>
+            <button onClick={() => { setReturnToModal(modal); setModal("employee"); }} style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ fontSize: 14 }}>+</span> Add Employee
+            </button>
+          </div>
           <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "12px", background: "var(--app-bg)", maxHeight: 200, overflowY: "auto" }}>
             {employees.length === 0 ? <div style={{ color: "var(--app-muted)", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
               : employees.map(e => (

@@ -362,9 +362,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #f3f4f6", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
-            <div className="qt-th" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr 0.8fr 1fr 0.9fr 0.9fr 1.1fr auto", padding: "11px 20px", background: "var(--app-bg)", borderBottom: "1px solid #f3f4f6", gap: 8 }}>
+            <div className="qt-th" style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 0.8fr 1.6fr 0.8fr 0.8fr 1fr 120px", padding: "12px 20px", background: "var(--app-bg)", borderBottom: "2px solid #f3f4f6", gap: 12, alignItems: "center" }}>
               {["Quote No", "Company Name", "Project", "Amount", "Date", "Expiry", "Status", "Actions"].map((h) => (
-                <div key={h} style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af", letterSpacing: 0.5 }}>{h.toUpperCase()}</div>
+                <div key={h} style={{ fontSize: 11, fontWeight: 800, color: "#64748b", letterSpacing: 0.5, textAlign: h === "Amount" ? "right" : (h === "Date" || h === "Expiry") ? "center" : "left" }}>{h.toUpperCase()}</div>
               ))}
             </div>
 
@@ -385,38 +385,38 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               const qtD = entry.qt || {};
               return (
                 <div key={entry.id || idx} className="qt-row" onClick={() => setViewEntry(entry)}
-                  style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr 0.8fr 1fr 0.9fr 0.9fr 1.1fr auto", padding: "13px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff", gap: 8 }}>
+                  style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 0.8fr 1.6fr 0.8fr 0.8fr 1fr 120px", padding: "14px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff", gap: 12 }}>
                   <div style={{ cursor: "pointer" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{entry.quoteNo || "—"}</div>
-                    <div style={{ fontSize: 11, color: "#d1d5db", marginTop: 1 }}>{formatDateTime(entry.savedAt)}</div>
+                    <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2, fontFamily: "monospace" }}>{formatDateTime(entry.savedAt)}</div>
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-accent)", cursor: "pointer" }}>{entry.client || "—"}</div>
-                  <div className="qt-hide" style={{ fontSize: 12, color: "#6b7280" }}>{qtD.project || entry.project || "—"}</div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: "#111827", cursor: "pointer" }}>{formatCurrency(entry.total, qtD.currency || "₹")}</div>
-                  <div className="qt-hide" style={{ fontSize: 12, color: "#374151" }}>{formatDate(qtD.date || entry.date)}</div>
-                  <div className="qt-hide" style={{ fontSize: 12, color: "#d97706", fontWeight: 600 }}>{formatDate(qtD.expiryDate || entry.expiryDate)}</div>
+                  <div className="qt-hide" style={{ fontSize: 12, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{qtD.project || entry.project || "—"}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#111827", cursor: "pointer", textAlign: "right", fontFamily: "monospace", letterSpacing: -0.5 }}>{formatCurrency(entry.total, qtD.currency || "₹")}</div>
+                  <div className="qt-hide" style={{ fontSize: 12, color: "#475569", textAlign: "center" }}>{formatDate(qtD.date || entry.date)}</div>
+                  <div className="qt-hide" style={{ fontSize: 12, color: "#ea580c", fontWeight: 700, textAlign: "center" }}>{formatDate(qtD.expiryDate || entry.expiryDate)}</div>
                   <div onClick={(e) => e.stopPropagation()}>
                     <select value={entry.status} onChange={(e) => handleStatusChange(entry, e.target.value)}
-                      style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "5px 8px", fontSize: 12, fontWeight: 600, color: "#374151", background: "#fff", cursor: "pointer", fontFamily: "inherit", width: "100%" }}>
+                      style={{ border: "1px solid #e2e8f0", borderRadius: 8, padding: "5px 8px", fontSize: 11, fontWeight: 700, color: "#374151", background: "#fff", cursor: "pointer", fontFamily: "inherit", width: "100%" }}>
                       {["draft", "sent", "approved", "rejected", "expired", "converted"].map((s) => (
                         <option key={s} value={s}>{s === "converted" ? "Invoiced" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
                       ))}
                     </select>
                   </div>
-                  <div style={{ display: "flex", gap: 6 }} onClick={(e) => e.stopPropagation()}>
-                    <button onClick={() => shareQuotation(entry)} style={{ padding: "5px 10px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗</button>
-                    <button onClick={() => shareWhatsApp(entry)} style={{ padding: "5px 10px", background: "#dcfce7", border: "1px solid #bbf7d0", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬</button>
+                  <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }} onClick={(e) => e.stopPropagation()}>
+                    <button onClick={() => shareQuotation(entry)} title="Share link" style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>🔗</button>
+                    <button onClick={() => shareWhatsApp(entry)} title="Share on WhatsApp" style={{ padding: "6px", background: "#dcfce7", border: "1px solid #bbf7d0", borderRadius: 7, cursor: "pointer", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center" }}>💬</button>
                     {entry.status === "approved" && (
                       <button onClick={() => handleConvert(entry)} disabled={convertingId === entry.id}
-                        style={{ padding: "5px 10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#fff", fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                        {convertingId === entry.id ? "…" : "→ Invoice"}
+                        style={{ padding: "6px 10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 7, fontWeight: 800, fontSize: 10, cursor: "pointer", color: "#fff", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                        {convertingId === entry.id ? "…" : "INV"}
                       </button>
                     )}
                     {entry.status === "converted" && (
-                      <span style={{ fontSize: 10, fontWeight: 800, color: "var(--app-accent)", padding: "5px 10px", background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", borderRadius: 7 }}>✓ Invoiced</span>
+                      <span title="Converted to Invoice" style={{ fontSize: 10, fontWeight: 800, color: "#16a34a", padding: "6px", background: "#f0fdf4", borderRadius: 7, border: "1px solid #bbf7d0" }}>✓</span>
                     )}
-                    <button onClick={() => loadEntry(entry)}
-                      style={{ padding: "5px 10px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 7, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "var(--app-accent)", fontFamily: "inherit" }}>✏️</button>
+                    <button onClick={() => loadEntry(entry)} title="Edit"
+                      style={{ padding: "6px", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 7, cursor: "pointer", color: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center" }}>✏️</button>
                   </div>
                 </div>
               );

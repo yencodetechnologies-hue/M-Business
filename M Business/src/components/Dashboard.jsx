@@ -2006,7 +2006,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
         </div>
         <div style={{display:"flex",justifyContent:"flex-end",gap:10,marginTop:6}}>
           <button onClick={()=>setModal(null)} style={{background:"var(--app-bg)",border:"1px solid var(--app-border)",color:T.text,borderRadius:10,padding:"10px 16px",cursor:"pointer",fontWeight:600,fontSize:13}}>Cancel</button>
-          <button onClick={addEmployee} disabled={empSaveLoading} style={{...B("var(--app-accent)"),opacity:empSaveLoading?0.7:1}}>{empSaveLoading?"Saving...":"Save Employee →"}</button>
+          <button onClick={addEmployee} disabled={empSaveLoading} style={{...B("var(--app-accent)"),opacity:empSaveLoading?0.7:1}}>{empSaveLoading?"Saving...":"Add Employee"}</button>
         </div>
       </Mdl>}
 
@@ -2045,7 +2045,7 @@ export default function Dashboard({setUser,user,fixedLogo}){
           <Fld label="Status" value={np.status} onChange={v=>setNp({...np,status:v})} options={["Pending","In Progress","Completed","On Hold"]} allowCustom={true}/>
         </div>
         <div style={{marginBottom:14}}>
-          <label style={{display:"block",fontSize:11,color:"var(--app-accent)",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEES <span style={{fontSize:10,color:"var(--app-muted)",fontWeight:400}}>(select multiple)</span></label>
+          <label style={{display:"block",fontSize:11,color:"var(--app-accent)",fontWeight:700,letterSpacing:0.5,marginBottom:5}}>ASSIGN EMPLOYEES <span style={{fontSize:10,color:"var(--app-muted)",fontWeight:400}}></span></label>
           <div style={{border:"1.5px solid var(--app-border)",borderRadius:10,padding:"12px",background:"var(--app-bg)",maxHeight:200,overflowY:"auto"}}>
             {employees.length===0?<div style={{color:"var(--app-muted)",fontSize:13,textAlign:"center",padding:"20px"}}>No employees available</div>
               :employees.map(e=>(

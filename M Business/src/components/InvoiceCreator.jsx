@@ -163,6 +163,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [paymentData, setPaymentData] = useState({ amountPaid: 0, paymentMode: "GPay", paymentDate: new Date().toISOString().split("T")[0], transactionId: "" });
   const [sendReceipt, setSendReceipt] = useState(false);
   const [receiptEntry, setReceiptEntry] = useState(null);
+  const [editingReceipt, setEditingReceipt] = useState(false);
   const [listSearch, setListSearch] = useState("");
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
@@ -318,13 +319,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   // ── Delete invoice ──────────────────────────────────────────
   const handleDelete = async (entry) => {
-    const id = entry.id;
+    const id = entry._id || entry.id;
     // Try backend
     try { await axios.delete(`${BASE_URL}/api/invoices/${id}`); } catch { }
     // Remove locally
     deleteDraftLocal(entry.invoiceNo);
     setInvoiceList(prev => prev.filter(e => (e.id || e.invoiceNo) !== (id || entry.invoiceNo)));
     setDeleteTarget(null);
+    setStep("list");
     showToast("🗑️ Invoice deleted!");
   };
 
@@ -345,7 +347,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   };
 
   const updateStatusBackend = async (entry, newStatus, paymentDetails = {}) => {
-    const id = entry.id;
+    const id = entry._id || entry.id;
     setStatusUpdating(id);
     try {
       await axios.patch(`${BASE_URL}/api/invoices/${id}/status`, { status: newStatus, ...paymentDetails });
@@ -436,8 +438,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         `}</style>
 
         <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
-          <button onClick={() => setStep("list")} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Back to List</button>
-          <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>🖨️ Print Receipt</button>
+          <button onClick={() => { setEditingReceipt(false); setStep("list"); }} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Back to List</button>
+          {!editingReceipt && <button onClick={() => setEditingReceipt(true)} style={{ padding: "12px 24px", background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#ea580c", fontFamily: "inherit" }}>✏️ Edit Receipt</button>}
+          {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>🖨️ Print Receipt</button>}
         </div>
 
         <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "#fff", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", overflow: "hidden", border: "1px solid var(--app-border)" }}>
@@ -455,33 +458,66 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
 
             <div style={{ display: "grid", gap: 20 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Received From</span>
-                <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{r.client}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Date</span>
-                <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{formatDate(pd.paymentDate)}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Mode</span>
-                <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{pd.paymentMode}</span>
-              </div>
-              {pd.transactionId && (
-                <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                  <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Transaction ID</span>
-                  <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700, fontFamily: "monospace" }}>{pd.transactionId}</span>
-                </div>
-              )}
-              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Invoice Number</span>
-                <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{r.invoiceNo}</span>
-              </div>
-              {r.status === "part_paid" && (
-                <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
-                  <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 700 }}>Remaining Balance</span>
-                  <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 800 }}>{formatCurrency((r.total || 0) - (pd.amountPaid || 0), invData.currency)}</span>
-                </div>
+              {editingReceipt ? (
+                <>
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={lbl}>Amount Paid</label>
+                    <input type="number" value={pd.amountPaid} onChange={e => setReceiptEntry(prev => ({ ...prev, paymentData: { ...prev.paymentData, amountPaid: Number(e.target.value) } }))} style={inp()} />
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={lbl}>Payment Date</label>
+                    <input type="date" value={pd.paymentDate ? pd.paymentDate.split('T')[0] : ""} onChange={e => setReceiptEntry(prev => ({ ...prev, paymentData: { ...prev.paymentData, paymentDate: e.target.value } }))} style={inp()} />
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={lbl}>Payment Mode</label>
+                    <select value={pd.paymentMode} onChange={e => setReceiptEntry(prev => ({ ...prev, paymentData: { ...prev.paymentData, paymentMode: e.target.value } }))} style={inp()}>
+                      {["GPay", "PhonePe", "NEFT", "RTGS", "UPI", "Net Banking", "Cash", "Other"].map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={lbl}>Transaction ID</label>
+                    <input type="text" value={pd.transactionId} onChange={e => setReceiptEntry(prev => ({ ...prev, paymentData: { ...prev.paymentData, transactionId: e.target.value } }))} style={inp()} />
+                  </div>
+                  <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                    <button onClick={() => setEditingReceipt(false)} style={{ flex: 1, padding: "10px", background: "#f3f4f6", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+                    <button onClick={async () => {
+                      await updateStatusBackend(r, r.status, receiptEntry.paymentData);
+                      setEditingReceipt(false);
+                      showToast("✅ Receipt updated!");
+                    }} style={{ flex: 1, padding: "10px", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Save Changes</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
+                    <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Received From</span>
+                    <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{r.client}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
+                    <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Date</span>
+                    <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{formatDate(pd.paymentDate)}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
+                    <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Mode</span>
+                    <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{pd.paymentMode}</span>
+                  </div>
+                  {pd.transactionId && (
+                    <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
+                      <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Transaction ID</span>
+                      <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700, fontFamily: "monospace" }}>{pd.transactionId}</span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
+                    <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Invoice Number</span>
+                    <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{r.invoiceNo}</span>
+                  </div>
+                  {r.status === "part_paid" && (
+                    <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
+                      <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 700 }}>Remaining Balance</span>
+                      <span style={{ fontSize: 13, color: "#ea580c", fontWeight: 800 }}>{formatCurrency((r.total || 0) - (pd.amountPaid || 0), invData.currency)}</span>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
@@ -516,7 +552,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     });
 
     const totalAmt = enriched.reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
-    const paidAmt = enriched.filter(e => e.status === "paid").reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
+    const paidAmt = enriched.reduce((s, e) => s + (parseFloat(e.amountPaid) || 0), 0);
     const unpaidCnt = enriched.filter(e => ["unpaid", "overdue"].includes(e.status)).length;
     const draftCnt = enriched.filter(e => e.status === "draft").length;
 
@@ -689,7 +725,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 {/* Invoice No */}
                 <div onClick={() => setViewEntry(entry)}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{entry.invoiceNo || "—"}</div>
-                  <div style={{ fontSize: 10, color: "#d1d5db", marginTop: 1, fontFamily: "monospace" }}>{formatDateTime(entry.savedAt)}</div>
+                  <div style={{ fontSize: 10, color: "#d1d5db", marginTop: 1, fontFamily: "monospace" }}>{formatDateTime(entry.savedAt || entry.createdAt)}</div>
                 </div>
 
                 {/* Client */}
@@ -753,6 +789,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700 }}>🧾 Receipt</button>
                   )}
 
+                  <button onClick={() => setDeleteTarget(entry)} style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#ef4444", cursor: "pointer", fontWeight: 700 }}>🗑 Delete</button>
                 </div>
               </div>
             );
@@ -788,6 +825,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             .inv-btgrid { grid-template-columns:1fr!important; }
           }
         `}</style>
+
+        {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
 
         {/* Toolbar */}
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>

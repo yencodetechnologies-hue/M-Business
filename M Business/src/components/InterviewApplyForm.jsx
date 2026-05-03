@@ -271,7 +271,7 @@ export default function InterviewApplyForm() {
           <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "12px 16px", border: "1px solid var(--app-border)", fontSize: 13, color: "var(--app-accent)" }}>
             <strong>{form.name}</strong> · {role} · {companyName}
           </div>
-          <p style={{ color: "var(--app-muted)", fontSize: 12, marginTop: 20 }}>You may safely close this tab.</p>
+
         </div>
       </div>
     );
@@ -429,10 +429,11 @@ export default function InterviewApplyForm() {
           )}
 
           {/* Submit */}
+          <div style={{ display: "flex", justifyContent: "center" }}></div>
           <button
             type="button" onClick={handleSubmit} disabled={loading}
             style={{
-              width: "100%", padding: "14px", borderRadius: 14, border: "none",
+              width: "70%",margin: "0 auto",   padding: "14px", borderRadius: 14, border: "none",
               background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))",
               color: "#fff", fontSize: 15, fontWeight: 800,
               fontFamily: "'Syne',sans-serif", letterSpacing: 0.3,

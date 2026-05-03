@@ -120,18 +120,7 @@ export default function EmployeeOnboarding() {
     }
   };
 
-  if (success) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", padding: 20 }}>
-        <div style={{ background: "#fff", padding: 40, borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", textAlign: "center", maxWidth: 450, width: "100%" }}>
-          <div style={{ width: 80, height: 80, background: "#dcfce7", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, margin: "0 auto 24px" }}>✓</div>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: "#1e293b", margin: "0 0 12px" }}>Registration Successful!</h2>
-          <p style={{ color: "#64748b", lineHeight: 1.6, margin: "0 0 24px" }}>Welcome to {companyName}! Your details have been submitted successfully. You can now login to your dashboard using your email and password.</p>
-          <button onClick={() => window.location.href = "/"} style={{ width: "100%", background: "linear-gradient(135deg, #7c3aed, #6d28d9)", color: "#fff", border: "none", borderRadius: 12, padding: "14px", fontWeight: 700, cursor: "pointer", fontSize: 15 }}>Go to Login →</button>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", padding: "40px 20px", display: "flex", justifyContent: "center" }}>
@@ -163,6 +152,7 @@ export default function EmployeeOnboarding() {
           <div style={{ fontSize: 12, fontWeight: 800, color: "#94a3b8", letterSpacing: 1, marginBottom: 16, borderBottom: "1px solid #f1f5f9", paddingBottom: 8 }}>PERSONAL INFORMATION</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: 24 }}>
             <Input label="Full Name" value={form.name} onChange={v => handleChange("name", v)} error={err.name} placeholder="John Doe" />
+            
             <Input label="Email Address" value={form.email} onChange={v => handleChange("email", v)} error={err.email} type="email" placeholder="john@company.com" />
             <Input label="Phone Number" value={form.phone} onChange={v => handleChange("phone", v)} error={err.phone} placeholder="+91 98765 43210" />
             <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type="password" placeholder="Set your password" />
@@ -183,12 +173,12 @@ export default function EmployeeOnboarding() {
             <DocInput label="PAN Card" icon="💳" file={docs.pan} onChange={f => handleFileChange("pan", f)} />
             <DocInput label="Bank Passbook" icon="🏦" file={docs.passbook} onChange={f => handleFileChange("passbook", f)} />
           </div>
-
+<div style={{ display: "flex", justifyContent: "center" }}>
           <button
             type="submit"
             disabled={loading}
             style={{
-              width: "100%",
+              width: "50%",
               background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
               color: "#fff",
               border: "none",
@@ -203,6 +193,7 @@ export default function EmployeeOnboarding() {
               alignItems: "center",
               justifyContent: "center",
               gap: 10
+ 
             }}
           >
             {loading ? (
@@ -213,7 +204,7 @@ export default function EmployeeOnboarding() {
             ) : (
               <span>Complete Registration →</span>
             )}
-          </button>
+          </button></div>
         </form>
 
         <p style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: "#64748b" }}>
@@ -240,7 +231,9 @@ function Input({ label, value, onChange, error, type = "text", placeholder }) {
         placeholder={placeholder}
         style={{
           width: "100%",
-          padding: "12px 14px",
+            height: 46,
+          padding: "0px 14px",
+            boxSizing: "border-box", display: "block",
           borderRadius: 12,
           border: `1.5px solid ${error ? "#ef4444" : "#e2e8f0"}`,
           fontSize: 14,
@@ -261,7 +254,7 @@ function DocInput({ label, icon, file, onChange }) {
       <div style={{ width: 36, height: 36, borderRadius: 10, background: "#fff", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{icon}</div>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>{label}</div>
-        <div style={{ fontSize: 11, color: file ? "#7c3aed" : "#94a3b8", fontWeight: 600 }}>{file ? file.name : "Missing"}</div>
+        <div style={{ fontSize: 11, color: file ? "#7c3aed" : "#94a3b8", fontWeight: 600 }}>{file ? file.name : ""}</div>
       </div>
       <label style={{ background: file ? "#dcfce7" : "#7c3aed", color: file ? "#166534" : "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none" }}>
         {file ? "Change" : "Upload"}

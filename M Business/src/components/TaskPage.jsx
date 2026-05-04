@@ -1417,15 +1417,15 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.02)"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
           >
-            {task.assignee ? (
+            {task.assignTo && task.assignTo !== "Unassigned" ? (
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <div style={{
                   width: 24, height: 24, borderRadius: "50%",
-                  background: getAvatarColor(task.assignee),
+                  background: getAvatarColor(task.assignTo),
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: "#fff", fontSize: 9, fontWeight: 700
-                }}>{task.assignee.slice(0, 2).toUpperCase()}</div>
-                <span style={{ fontSize: 12, fontWeight: 500, color: P.text }}>{task.assignee}</span>
+                }}>{task.assignTo.slice(0, 2).toUpperCase()}</div>
+                <span style={{ fontSize: 12, fontWeight: 500, color: P.text }}>{task.assignTo}</span>
               </div>
             ) : (
               <div style={{
@@ -1436,7 +1436,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
               }}>+</div>
             )}
           </div>
-          {personOpen && <PersonPicker anchor={personRef} employees={employees} currentAssignee={task.assignee} onSelect={v => onField(id, "assignee", v)} onClose={() => setPersonOpen(false)} onInvite={() => onInvite && onInvite()} onAutoAssign={() => onAutoAssign && onAutoAssign(task)} />}
+          {personOpen && <PersonPicker anchor={personRef} employees={employees} currentAssignee={task.assignTo} onSelect={v => onField(id, "assignTo", v)} onClose={() => setPersonOpen(false)} onInvite={() => onInvite && onInvite()} onAutoAssign={() => onAutoAssign && onAutoAssign(task)} />}
         </div>
       )}
       {/* status */}

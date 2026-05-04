@@ -8,6 +8,8 @@ const path = require("path");
 const Employee = require("../models/EmployeeModel");
 const Project = require("../models/ProjectModel");
 const Task = require("../models/TaskModels");
+const User = require("../models/UserModels");
+
 
 // Attendance, Leave, Permission, Salary models are not in separate files yet, so we'll keep them here or move them later if needed.
 // For now, let's keep the redefinitions for those but use the proper ones for Project/Task/Employee.
@@ -125,21 +127,19 @@ router.get("/projects/:name", async (req, res) => {
     if (!name) return res.json([]);
     
     const companyId = req.headers['x-company-id'] || "";
-    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
-    
-    // Exact name match in array or field
     const nameRegex = new RegExp(`^${name}$`, "i");
     
     const query = {
       companyId,
       $or: [
-        { assignedTo: name },
-        { manager: name }
+        { assignedTo: nameRegex },
+        { manager: nameRegex }
       ]
     };
     
     const projects = await Project.find(query).sort({ createdAt: -1 });
     res.json(projects);
+
   } catch (err) {
     console.error("GET Projects Error:", err);
     res.status(500).json({ msg: "Server error" });
@@ -158,17 +158,28 @@ router.get("/tasks/:name", async (req, res) => {
     const companyId = req.headers['x-company-id'] || "";
     if (!companyId) return res.status(400).json({ msg: "Company ID required" });
 
-    const nameRegex = new RegExp(`^${name}$`, "i");
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
+    
+    // Find identities in both User and Employee collections
+    const [user, employee] = await Promise.all([
+      User.findOne({ name: nameRegex, companyId }),
+      Employee.findOne({ name: nameRegex, companyId })
+    ]);
     
     const query = {
       companyId,
       $or: [
-        { assignTo: name },
-        { assignedTo: name }
+        { assignTo: nameRegex },
+        { assignedTo: nameRegex } 
       ],
       isDeleted: false
     };
 
+    if (user) query.$or.push({ assignedTo: user._id });
+    if (employee) query.$or.push({ assignedTo: employee._id });
+    
     const tasks = await Task.find(query)
       .populate("projectId", "name color")
       .sort({ createdAt: -1 });
@@ -479,21 +490,30 @@ router.get("/summary/:name", async (req, res) => {
     const name = decodeURIComponent(req.params.name).trim();
     const companyId = req.headers['x-company-id'] || "";
     const nameRegex = new RegExp(`^${name}$`, "i");
+    const user = await User.findOne({ name: nameRegex, companyId });
 
-    const query = { $or: [{ assignedTo: nameRegex }, { manager: nameRegex }] };
-    if (companyId) query.companyId = companyId;
+    const query = { 
+      companyId,
+      $or: [{ assignedTo: nameRegex }, { manager: nameRegex }] 
+    };
+    if (user) query.$or.push({ assignedTo: user._id });
 
     const taskQuery = { 
+      companyId,
       $or: [{ assignTo: nameRegex }, { assignedTo: nameRegex }], 
       isDeleted: false 
     };
-    if (companyId) taskQuery.companyId = companyId;
+    if (user) taskQuery.$or.push({ assignedTo: user._id });
 
-    const attQuery = { employeeName: nameRegex };
-    if (companyId) attQuery.companyId = companyId;
+    const attQuery = { 
+      companyId,
+      employeeName: nameRegex 
+    };
 
-    const salQuery = { employeeName: nameRegex };
-    if (companyId) salQuery.companyId = companyId;
+    const salQuery = { 
+      companyId,
+      employeeName: nameRegex 
+    };
 
     const [projects, tasks, attendance, salary] = await Promise.all([
       Project.find(query),
@@ -501,6 +521,7 @@ router.get("/summary/:name", async (req, res) => {
       Attendance.find(attQuery),
       Salary.find(salQuery).sort({ createdAt: -1 }).limit(1),
     ]);
+
     const thisMonth = new Date().toISOString().slice(0, 7);
     const monthAttend = attendance.filter(a => a.date.startsWith(thisMonth));
     res.json({

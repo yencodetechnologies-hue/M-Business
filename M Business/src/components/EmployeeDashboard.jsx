@@ -288,6 +288,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
     const s = (t.status || "").toLowerCase();
     return !["done", "completed"].includes(s);
   }).length;
+  const activeProjectsCount = projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase())).length;
   const latestSalary = salary[0];
 
   return (
@@ -310,9 +311,10 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
 
       {/* Stat cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }} className="stat-grid">
-        <StatCard icon="◈" label="My Projects" value={projects.length} sub="Assigned to you" color="var(--app-accent)" onClick={() => setPage("projects")} />
+        <StatCard icon="◈" label="Active Projects" value={activeProjectsCount} sub="Assigned to you" color="var(--app-accent)" onClick={() => setPage("projects")} />
         <StatCard icon="📄" label="Proposals" value={proposals.length} sub="Assigned to you" color="#ec4899" onClick={() => setPage("proposals")} />
         <StatCard icon="◉" label="Pending Tasks" value={pendingTasks} sub="Need attention" color="#f59e0b" onClick={() => setPage("tasks")} />
+
         <StatCard icon="◷" label="Present Days" value={presentDays} sub="This month" color="#10b981" onClick={() => setPage("attendance")} />
         <StatCard icon="◆" label="Last Payment" value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month || "Not yet"} color="var(--app-muted)" onClick={() => setPage("salary")} />
       </div>
@@ -320,37 +322,49 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
       {/* Projects + Tasks row */}
       <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: 16 }} className="two-col">
         <Card title="My Projects" action={<button onClick={() => setPage("projects")} style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View all →</button>}>
-          {projects.slice(0, 4).map((p, i) => (
-            <div key={p._id || i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < 3 ? "1px solid #f8fafc" : "none" }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
-                <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{p.client || "—"} · Due {p.deadline || "—"}</div>
-                <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
-                  <ProgressBar pct={p.progress || 0} /><span style={{ fontSize: 11, color: "#94a3b8" }}>{p.progress || 0}%</span>
-                </div>
-              </div>
-              <Badge label={p.status || "active"} />
-            </div>
-          ))}
-          {projects.length === 0 && <div style={{ textAlign: "center", padding: "1.5rem", color: "#94a3b8", fontSize: 13 }}>No projects assigned</div>}
-        </Card>
-        <Card title="My Tasks" action={<button onClick={() => setPage("tasks")} style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View all →</button>}>
-          {tasks.slice(0, 5).map((t, i) => {
-            const isDone = ["done", "completed"].includes((t.status || "").toLowerCase());
-            const projectName = t.projectId?.name || t.project || "—";
-            const dueDate = t.date || t.dueDate || "—";
-            return (
-              <div key={t._id || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "9px 0", borderBottom: i < 4 ? "1px solid #f8fafc" : "none" }}>
+          {projects
+            .filter(p => !["done", "completed"].includes((p.status || "").toLowerCase()))
+            .slice(0, 4)
+            .map((p, i, arr) => (
+              <div key={p._id || i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < arr.length - 1 ? "1px solid #f8fafc" : "none" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: isDone ? "#94a3b8" : "#0f172a", textDecoration: isDone ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</div>
-                  <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>{projectName} · Due {dueDate}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{p.client || "—"} · Due {p.deadline || "—"}</div>
+                  <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
+                    <ProgressBar pct={p.progress || 0} /><span style={{ fontSize: 11, color: "#94a3b8" }}>{p.progress || 0}%</span>
+                  </div>
                 </div>
-                <Badge label={t.priority || "medium"} />
+                <Badge label={p.status || "active"} />
               </div>
-            );
-          })}
-          {tasks.length === 0 && <div style={{ textAlign: "center", padding: "1.5rem", color: "#94a3b8", fontSize: 13 }}>No tasks assigned</div>}
+            ))}
+          {projects.filter(p => !["done", "completed"].includes((p.status || "").toLowerCase())).length === 0 && (
+            <div style={{ textAlign: "center", padding: "1.5rem", color: "#94a3b8", fontSize: 13 }}>No active projects assigned</div>
+          )}
         </Card>
+
+        <Card title="Active Tasks" action={<button onClick={() => setPage("tasks")} style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View all →</button>}>
+          {tasks
+            .filter(t => !["done", "completed"].includes((t.status || "").toLowerCase()))
+            .slice(0, 5)
+            .map((t, i, arr) => {
+              const isDone = ["done", "completed"].includes((t.status || "").toLowerCase());
+              const projectName = t.projectId?.name || t.project || "—";
+              const dueDate = t.date || t.dueDate || "—";
+              return (
+                <div key={t._id || i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "9px 0", borderBottom: i < arr.length - 1 ? "1px solid #f8fafc" : "none" }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: isDone ? "#94a3b8" : "#0f172a", textDecoration: isDone ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</div>
+                    <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>{projectName} · Due {dueDate}</div>
+                  </div>
+                  <Badge label={t.priority || "medium"} />
+                </div>
+              );
+            })}
+          {tasks.filter(t => !["done", "completed"].includes((t.status || "").toLowerCase())).length === 0 && (
+            <div style={{ textAlign: "center", padding: "1.5rem", color: "#94a3b8", fontSize: 13 }}>No active tasks assigned</div>
+          )}
+        </Card>
+
       </div>
 
       {/* ── NEW: Documents Card + Attendance Calendar row ── */}

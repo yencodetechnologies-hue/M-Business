@@ -109,7 +109,7 @@ const sendUsageLimitAlert = async (userEmail, userName, planName, usageCount, us
           </div>
         </div>
         <p style="color:#4b5563;">You are approaching your subscription limit. Consider upgrading your plan to avoid service disruption.</p>
-        <a href="${process.env.FRONTEND_URL || ''}" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Upgrade Plan</a>
+        <a href="${process.env.FRONTEND_URL || 'https://mbusiness.octosofttechnologies.in'}" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Upgrade Plan</a>
         ${mbFooter}
       </div>
     </div>
@@ -135,9 +135,7 @@ const sendSubscriptionSuccess = async (userEmail, userName, planName, startDate,
           </table>
         </div>
         <p style="color:#4b5563;">You can now access all management tools from your dashboard. If you have any questions, our support team is here to help.</p>
-        <div style="text-align:center;margin-top:28px;">
-          <a href="${process.env.FRONTEND_URL || 'https://mbusiness.octosofttechnologies.in'}" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Go to Dashboard</a>
-        </div>
+ 
         ${mbFooter}
       </div>
     </div>

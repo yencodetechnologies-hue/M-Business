@@ -3836,7 +3836,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     { t: "Total Expenses", v: formatCurrency(expenses.reduce((s, x) => s + (Number(x.amount) || 0), 0), user?.currency), i: "💸", c: "#EF4444", bg: "linear-gradient(135deg,#fee2e2,#fff1f1)" }
                   ].map(({ t, v, i, c, bg }) => (
                     <div key={t} style={{ background: "#fff", borderRadius: 16, padding: "16px", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)", border: "1.5px solid var(--app-border)", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: 8 }}>
-                      <div style={{ position: "absolute", top: 0, right: 0, width: 30, height: 30, background: bg, borderBottomLeftRadius: 20, opacity: 0.6 }} />
+                      <div   key={t}
+   />
                       <div style={{ width: 36, height: 36, borderRadius: 10, background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, boxShadow: `0 4px 10px ${c}15` }}>{i}</div>
                       <div>
                         <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 }}>{t}</div>

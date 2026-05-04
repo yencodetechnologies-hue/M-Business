@@ -14,13 +14,14 @@ const transporter = nodemailer.createTransport({
 const mbHeader = `
   <div style="background:linear-gradient(135deg,#9333ea 0%,#7c3aed 100%);padding:28px 32px;border-radius:12px 12px 0 0;text-align:center;">
     <h2 style="color:#fff;margin:0;font-size:22px;font-family:Arial,sans-serif;letter-spacing:1px;">M Business</h2>
-    <p style="color:#e9d5ff;margin:4px 0 0;font-size:12px;">Automated Business Workflow</p>
+    <p style="color:#e9d5ff;margin:4px 0 0;font-size:12px;">Workspace Management Suite</p>
   </div>
 `;
 
 const mbFooter = `
   <p style="color:#9ca3af;font-size:12px;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:16px;font-family:Arial,sans-serif;">
-    This is an automated message. Please do not reply directly.
+    This is an automated message from M Business. Please do not reply directly.<br/>
+    For support: <a href="mailto:support@m-business.com" style="color:#7c3aed;text-decoration:none;">support@m-business.com</a>
   </p>
 `;
 
@@ -57,7 +58,7 @@ const sendRenewalReminder = async (userEmail, userName, planName, endDate, daysL
           </table>
         </div>
         <p style="color:#4b5563;">Please renew your subscription to avoid service interruption. Contact your administrator or visit your dashboard to renew.</p>
-        <a href="#" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Renew Now</a>
+        <a href="${process.env.FRONTEND_URL || 'https://mbusiness.octosofttechnologies.in'}" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Renew Now</a>
         ${mbFooter}
       </div>
     </div>
@@ -108,7 +109,7 @@ const sendUsageLimitAlert = async (userEmail, userName, planName, usageCount, us
           </div>
         </div>
         <p style="color:#4b5563;">You are approaching your subscription limit. Consider upgrading your plan to avoid service disruption.</p>
-        <a href="#" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Upgrade Plan</a>
+        <a href="${process.env.FRONTEND_URL || ''}" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Upgrade Plan</a>
         ${mbFooter}
       </div>
     </div>
@@ -135,7 +136,7 @@ const sendSubscriptionSuccess = async (userEmail, userName, planName, startDate,
         </div>
         <p style="color:#4b5563;">You can now access all management tools from your dashboard. If you have any questions, our support team is here to help.</p>
         <div style="text-align:center;margin-top:28px;">
-          <a href="#" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Go to Dashboard</a>
+          <a href="${process.env.FRONTEND_URL || 'https://mbusiness.octosofttechnologies.in'}" style="display:inline-block;background:linear-gradient(135deg,#9333ea,#7c3aed);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;">Go to Dashboard</a>
         </div>
         ${mbFooter}
       </div>

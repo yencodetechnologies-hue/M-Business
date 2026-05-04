@@ -213,9 +213,6 @@ const sendEmployeeStatusUpdateEmail = async (userEmail, userName, companyName, s
           </p>
         </div>
 
-        ${isApproved ? `
-   
-        ` : ""}
 
         <p style="color:#4b5563;">Thank you,<br/>${companyName} Team</p>
         ${mbFooter}

@@ -572,7 +572,21 @@ function EmployeesPage({ employees, setEmployees }) {
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (e) => {
-    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "", department: e.department || "", salary: e.salary || "", status: e.status || "Active" });
+    setEditForm({ 
+      name: e.name || "", 
+      email: e.email || "", 
+      phone: e.phone || "", 
+      role: e.role || "Employee", 
+      department: e.department || "", 
+      salary: e.salary || "", 
+      status: e.status || "Pending",
+      dateOfBirth: e.dateOfBirth || "",
+      maritalStatus: e.maritalStatus || "Unmarried",
+      address: e.address || "",
+      bankName: e.bankDetails?.bankName || "",
+      ifscCode: e.bankDetails?.ifscCode || "",
+      accountNumber: e.bankDetails?.accountNumber || ""
+    });
     setEditErr({});
     setEditEmp(e);
   };
@@ -588,10 +602,11 @@ function EmployeesPage({ employees, setEmployees }) {
       setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...(res.data || editForm) } : e));
       setEditEmp(null);
       showToast("✅ Employee updated!");
-    } catch {
-      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...editForm } : e));
-      setEditEmp(null);
-      showToast("✅ Updated locally!");
+    } catch (err) {
+      const errMsg = err.response?.data?.msg || err.response?.data?.message || "Failed to update on server";
+      showToast("❌ " + errMsg);
+      // Fallback local update if needed, or just let the user know it failed
+      console.error("Save Error:", err);
     } finally { setSaving(false); }
   };
 
@@ -754,7 +769,10 @@ function EmployeesPage({ employees, setEmployees }) {
           <InfoRow icon="📱" label="Phone" value={viewEmp.phone} />
           <InfoRow icon="🏢" label="Department" value={viewEmp.department} />
           <InfoRow icon="💰" label="Salary" value={viewEmp.salary} />
-          <InfoRow icon="📅" label="Joined" value={viewEmp.createdAt ? new Date(viewEmp.createdAt).toLocaleDateString() : "—"} />
+          <InfoRow icon="📅" label="Date of Birth" value={viewEmp.dateOfBirth} />
+          <InfoRow icon="💍" label="Marital Status" value={viewEmp.maritalStatus} />
+          <InfoRow icon="📍" label="Address" value={viewEmp.address} />
+          <InfoRow icon="🕒" label="Joined" value={viewEmp.createdAt ? new Date(viewEmp.createdAt).toLocaleDateString() : "—"} />
 
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
@@ -835,7 +853,19 @@ function EmployeesPage({ employees, setEmployees }) {
             <Fld label="Role" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={["Employee", "Manager", "Admin"]} />
             <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
             <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
+            <Fld label="Date of Birth" value={editForm.dateOfBirth} onChange={v => setEditForm(p => ({ ...p, dateOfBirth: v }))} type="date" />
+            <Fld label="Marital Status" value={editForm.maritalStatus} onChange={v => setEditForm(p => ({ ...p, maritalStatus: v }))} options={["Unmarried", "Married"]} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
+          </div>
+          <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
+          
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              <Fld label="Bank Name" value={editForm.bankName} onChange={v => setEditForm(p => ({ ...p, bankName: v }))} />
+              <Fld label="IFSC Code" value={editForm.ifscCode} onChange={v => setEditForm(p => ({ ...p, ifscCode: v }))} />
+              <Fld label="Account Number" value={editForm.accountNumber} onChange={v => setEditForm(p => ({ ...p, accountNumber: v }))} />
+            </div>
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
@@ -3176,7 +3206,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const addEmployee = async () => {
-    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNeError(errors); return; } try { setEmpSaveLoading(true); const payload = { ...ne, role: ne.role || "employee" }; const res = await axios.post(BASE_URL + "/api/employees/add", payload); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "" }); setShowEmpPass(false); setNeError({}); if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); } } catch (err) {
+    const errors = {}; 
+    if (!ne.name.trim()) errors.name = "Name is required"; 
+    if (!ne.email.trim()) errors.email = "Email required"; 
+    if (!ne.password.trim()) errors.password = "Password is required"; 
+    if (Object.keys(errors).length > 0) { setNeError(errors); return; } 
+    try { 
+      setEmpSaveLoading(true); 
+      const payload = { 
+        ...ne, 
+        role: ne.role || "employee",
+        bankDetails: {
+          bankName: ne.bankName,
+          ifscCode: ne.ifscCode,
+          accountNumber: ne.accountNumber
+        }
+      }; 
+      const res = await axios.post(BASE_URL + "/api/employees/add", payload); 
+      setEmployees(prev => [res.data.employee, ...prev]); 
+      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" }); 
+      setShowEmpPass(false); 
+      setNeError({}); 
+      if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); } 
+    } catch (err) {
       const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
       const isPasswordError = errMsg.toLowerCase().includes("password");
       setNeError(isPasswordError ? { password: errMsg } : { email: errMsg });
@@ -4202,7 +4254,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={["Manager", "Developer", "Tech", "Others"]} />
           <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
           <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
+          <Fld label="Date of Birth" value={ne.dateOfBirth} onChange={v => setNe({ ...ne, dateOfBirth: v })} type="date" />
+          <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
           <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Pending", "Approved", "Rejected"]} />
+        </div>
+        <Fld label="Address" value={ne.address} onChange={v => setNe({ ...ne, address: v })} />
+        
+        <div style={{ marginTop: 14 }}>
+          <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+          <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+            <Fld label="Bank Name" value={ne.bankName} onChange={v => setNe({ ...ne, bankName: v })} />
+            <Fld label="IFSC Code" value={ne.ifscCode} onChange={v => setNe({ ...ne, ifscCode: v })} />
+            <Fld label="Account Number" value={ne.accountNumber} onChange={v => setNe({ ...ne, accountNumber: v })} />
+          </div>
         </div>
         <div style={{ marginBottom: 14, marginTop: 4 }}>
           <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>

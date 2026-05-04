@@ -36,12 +36,8 @@ const notifBg    = (type) => ({ danger:"#fef2f2", warning:"#fffbeb", success:"#f
 
 // ── NEW: ProjectTimeline — startDate → progress → deadline ─────
 function ProjectTimeline({ project }) {
-  const { status, progress = 0, startDate, deadline, budget, spent } = project;
-  const spentNum  = parseFloat((spent  || "0").replace(/[^0-9.]/g, "")) || 0;
-  const budgetNum = parseFloat((budget || "1").replace(/[^0-9.]/g, "")) || 1;
-  const paidPct   = Math.min(100, Math.round((spentNum / budgetNum) * 100));
+  const { status, progress = 0, startDate, deadline } = project;
   
-  // Date-based overdue check
   const today = new Date();
   today.setHours(0,0,0,0);
   const deadDate = new Date(deadline);
@@ -51,24 +47,38 @@ function ProjectTimeline({ project }) {
   const isActuallyOverdue = !isComplete && deadDate < today;
   const isOverdue  = project.paymentStatus === "Overdue" || isActuallyOverdue;
   
-  const fillColor  = isComplete ? "linear-gradient(90deg,#10b981,#34d399)" : isOverdue ? "linear-gradient(90deg,#ef4444,#dc2626)" : status === "Pending" ? "linear-gradient(90deg,#f59e0b,#fbbf24)" : "linear-gradient(90deg,#6366f1,#8b5cf6)";
+  const fillColor  = isComplete ? "linear-gradient(90deg, #10b981, #34d399)" : isOverdue ? "linear-gradient(90deg, #ef4444, #f87171)" : status === "Pending" ? "linear-gradient(90deg, #f59e0b, #fbbf24)" : "linear-gradient(90deg, #6366f1, #818cf8)";
   const dotColor   = isComplete ? "#10b981" : isOverdue ? "#ef4444" : status === "Pending" ? "#f59e0b" : "#6366f1";
-  const payColor   = project.paymentStatus === "Overdue" ? "#ef4444" : "#10b981";
-  const paySize    = isComplete ? 20 : 13;
+  
   return (
-    <div style={{ margin:"14px 0 6px", position:"relative" }}>
-      <div style={{ position:"relative", height:6, background:"#f1f5f9", borderRadius:99, overflow:"visible" }}>
-        <div style={{ width:`${progress}%`, height:"100%", background:fillColor, borderRadius:99, transition:"width 1.2s cubic-bezier(0.4,0,0.2,1)", overflow:"hidden", position:"relative" }}>
-          {!isComplete && <div style={{ position:"absolute", top:0, left:0, bottom:0, width:40, background:"linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent)", animation:"shimmer 2s ease-in-out infinite" }}/>}
+    <div style={{ margin: "20px 0 8px", position: "relative" }}>
+      <div style={{ position: "relative", height: 8, background: "#f1f5f9", borderRadius: 99, border: "1px solid #e2e8f0" }}>
+        <div style={{ 
+          width: `${progress}%`, 
+          height: "100%", 
+          background: fillColor, 
+          borderRadius: 99, 
+          transition: "width 1.2s cubic-bezier(0.4, 0, 0.2, 1)", 
+          position: "relative",
+          boxShadow: `0 0 10px ${dotColor}30`
+        }}>
+          {!isComplete && <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: 60, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)", animation: "shimmer 2.5s infinite" }} />}
         </div>
-        <div style={{ position:"absolute", top:"50%", left:0, transform:"translate(-50%,-50%)", width:12, height:12, borderRadius:"50%", background:dotColor, border:"2px solid #fff", boxShadow:`0 0 0 3px ${dotColor}35`, zIndex:2 }}/>
-        <div style={{ position:"absolute", top:"50%", left:isComplete?"50%":`${paidPct}%`, transform:"translate(-50%,-50%)", width:paySize, height:paySize, borderRadius:"50%", background:payColor, border:`${isComplete?3:2}px solid #fff`, boxShadow:`0 0 0 ${isComplete?5:3}px ${payColor}40`, zIndex:3 }}/>
-        <div style={{ position:"absolute", top:"50%", right:0, transform:"translate(50%,-50%)", width:12, height:12, borderRadius:"50%", background:isComplete?"#10b981":"#e2e8f0", border:`2px solid ${isComplete?"#fff":dotColor}`, opacity:isComplete?1:0.5, zIndex:2 }}/>
+        <div style={{ position: "absolute", top: "50%", left: 0, transform: "translate(-50%,-50%)", width: 14, height: 14, borderRadius: "50%", background: dotColor, border: "3px solid #fff", boxShadow: `0 0 0 4px ${dotColor}20`, zIndex: 2 }} />
+        <div style={{ position: "absolute", top: "50%", right: 0, transform: "translate(50%,-50%)", width: 14, height: 14, borderRadius: "50%", background: isComplete ? "#10b981" : "#fff", border: `3px solid ${isComplete ? "#fff" : "#e2e8f0"}`, boxShadow: isComplete ? "0 0 0 4px #10b98120" : "none", zIndex: 2 }} />
       </div>
-      <div style={{ display:"flex", justifyContent:"space-between", marginTop:8 }}>
-        <span style={{ fontSize:10, color:"#94a3b8", fontFamily:"monospace" }}>📅 {startDate || "—"}</span>
-        <span style={{ fontSize:11, fontWeight:700, color:dotColor }}>{isComplete?"✓ Done":isOverdue?`⚠️ Overdue (${progress}%)`:`${progress}%`}</span>
-        <span style={{ fontSize:10, color:isOverdue?"#ef4444":"#94a3b8", fontFamily:"monospace", fontWeight:isOverdue?700:400 }}>{isComplete?"✅":isOverdue?"🚨":"⏱"} {deadline}</span>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontSize: 10, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>Started</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#475569" }}>{startDate || "—"}</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <span style={{ fontSize: 13, fontWeight: 900, color: dotColor }}>{isComplete ? "COMPLETED" : `${progress}%`}</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+          <span style={{ fontSize: 10, color: isOverdue ? "#ef4444" : "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>Deadline</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: isOverdue ? "#ef4444" : "#475569" }}>{deadline || "—"}</span>
+        </div>
       </div>
     </div>
   );
@@ -256,19 +266,49 @@ function Badge({ label, size="sm" }) {
 // ── Stat Card ─────────────────────────────────────────────────
 function StatCard({ icon, label, value, sub, color, onClick }) {
   return (
-    <div onClick={onClick} style={{ background:"#fff", borderRadius:16, padding:"20px 18px", border:"1px solid #e2e8f0", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", cursor:onClick?"pointer":"default", transition:"transform 0.2s,box-shadow 0.2s", position:"relative", overflow:"hidden" }}
-      onMouseEnter={e=>{ if(onClick){ e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 8px 24px rgba(99,102,241,0.12)"; } }}
-      onMouseLeave={e=>{ e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"; }}>
-      <div style={{ position:"absolute", top:-20, right:-20, width:80, height:80, borderRadius:"50%", background:`radial-gradient(circle,${color}18,transparent)` }}/>
-      <div style={{ width:40, height:40, borderRadius:12, background:`${color}15`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, marginBottom:12 }}>{icon}</div>
-      <div style={{ fontSize:11, color:"#94a3b8", fontWeight:600, letterSpacing:0.5, textTransform:"uppercase", marginBottom:4 }}>{label}</div>
-      <div style={{ fontSize:26, fontWeight:800, color:color, lineHeight:1 }}>{value}</div>
-      {sub && <div style={{ fontSize:11, color:"#94a3b8", marginTop:4 }}>{sub}</div>}
+    <div onClick={onClick} style={{ 
+      background: "#fff", 
+      borderRadius: 24, 
+      padding: "24px 22px", 
+      border: "1px solid #f1f5f9", 
+      boxShadow: "0 4px 12px rgba(0,0,0,0.03)", 
+      cursor: onClick ? "pointer" : "default", 
+      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)", 
+      position: "relative", 
+      overflow: "hidden" 
+    }}
+      onMouseEnter={e => { 
+        if (onClick) { 
+          e.currentTarget.style.transform = "translateY(-6px)"; 
+          e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.08)"; 
+          e.currentTarget.style.borderColor = `${color}30`;
+        } 
+      }}
+      onMouseLeave={e => { 
+        e.currentTarget.style.transform = ""; 
+        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.03)"; 
+        e.currentTarget.style.borderColor = "#f1f5f9";
+      }}>
+      <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: `radial-gradient(circle, ${color}10, transparent)` }} />
+      <div style={{ 
+        width: 48, 
+        height: 48, 
+        borderRadius: 16, 
+        background: `linear-gradient(135deg, ${color}12, ${color}22)`, 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        fontSize: 22, 
+        marginBottom: 16,
+        border: `1px solid ${color}15`
+      }}>{icon}</div>
+      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 32, fontWeight: 900, color: "#0f172a", lineHeight: 1, letterSpacing: "-1px" }}>{value}</div>
+      {sub && <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 10, fontWeight: 500 }}>{sub}</div>}
     </div>
   );
 }
 
-// ── Notification Bell ─────────────────────────────────────────
 function NotificationBell({ notifications, onMarkRead, onMarkAllRead, onNavigate }) {
   const [open, setOpen] = useState(false);
   const ref  = useRef(null);
@@ -281,56 +321,70 @@ function NotificationBell({ notifications, onMarkRead, onMarkAllRead, onNavigate
   }, []);
 
   return (
-    <div ref={ref} style={{ position:"relative" }}>
-      <button onClick={()=>setOpen(v=>!v)}
-        style={{ position:"relative", width:40, height:40, borderRadius:12, background:open?"#eef2ff":"#fff", border:`1.5px solid ${open?"#6366f1":"#e2e8f0"}`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, transition:"all 0.18s", outline:"none" }}
-        onMouseEnter={e=>{ if(!open){ e.currentTarget.style.background="var(--app-bg)"; e.currentTarget.style.borderColor="#a5b4fc"; } }}
-        onMouseLeave={e=>{ if(!open){ e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor="#e2e8f0"; } }}>
-        <span style={{ display:"inline-block", animation:unread>0?"bell-ring 2.5s ease-in-out infinite":"none" }}>🔔</span>
+    <div ref={ref} style={{ position: "relative" }}>
+      <button onClick={() => setOpen(v => !v)}
+        style={{ 
+          position: "relative", 
+          width: 44, 
+          height: 44, 
+          borderRadius: 14, 
+          background: open ? "#fff" : "#f8fafc", 
+          border: `1.5px solid ${open ? "#6366f1" : "#e2e8f0"}`, 
+          cursor: "pointer", 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          fontSize: 20, 
+          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)", 
+          outline: "none",
+          boxShadow: open ? "0 4px 12px rgba(99, 102, 241, 0.15)" : "none"
+        }}
+        onMouseEnter={e => { if (!open) { e.currentTarget.style.background = "#fff"; e.currentTarget.style.borderColor = "#6366f1"; } }}
+        onMouseLeave={e => { if (!open) { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#e2e8f0"; } }}>
+        <span style={{ display: "inline-block", animation: unread > 0 ? "bell-ring 2.5s ease-in-out infinite" : "none" }}>🔔</span>
         {unread > 0 && (
-          <div style={{ position:"absolute", top:-5, right:-5, minWidth:18, height:18, borderRadius:99, background:"linear-gradient(135deg,#ef4444,#dc2626)", border:"2px solid #fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, color:"#fff", padding:"0 4px", animation:"badge-pop 0.35s cubic-bezier(0.34,1.56,0.64,1)" }}>
+          <div style={{ position: "absolute", top: -6, right: -6, minWidth: 20, height: 20, borderRadius: 99, background: "linear-gradient(135deg,#ef4444,#dc2626)", border: "2.5px solid #fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900, color: "#fff", padding: "0 4px", boxShadow: "0 2px 6px rgba(239, 68, 68, 0.3)" }}>
             {unread}
           </div>
         )}
       </button>
 
       {open && (
-        <div style={{ position:"absolute", top:"calc(100% + 10px)", right:0, width:360, maxWidth:"calc(100vw - 32px)", background:"#fff", borderRadius:18, border:"1px solid #e2e8f0", boxShadow:"0 20px 60px rgba(0,0,0,0.14),0 4px 16px rgba(99,102,241,0.1)", zIndex:9999, overflow:"hidden", animation:"notif-slide-in 0.22s cubic-bezier(0.34,1.56,0.64,1)" }}>
-          <div style={{ padding:"14px 18px 12px", background:"linear-gradient(135deg,#0f172a,#1e293b)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <div style={{ width:32, height:32, borderRadius:10, background:"rgba(99,102,241,0.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:15 }}>🔔</div>
+        <div style={{ position: "absolute", top: "calc(100% + 12px)", right: 0, width: 380, maxWidth: "calc(100vw - 32px)", background: "rgba(255, 255, 255, 0.95)", backdropFilter: "blur(20px)", borderRadius: 24, border: "1px solid rgba(226, 232, 240, 0.8)", boxShadow: "0 24px 64px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.05)", zIndex: 9999, overflow: "hidden", animation: "notif-slide-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)" }}>
+          <div style={{ padding: "20px 24px", background: "linear-gradient(135deg, #1e293b, #0f172a)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 12, background: "rgba(99, 102, 241, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🔔</div>
               <div>
-                <div style={{ fontSize:13, fontWeight:800, color:"#fff" }}>Notifications</div>
-                <div style={{ fontSize:10, color:"rgba(255,255,255,0.4)", marginTop:1 }}>{unread>0?`${unread} unread`:"All caught up!"}</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: "#fff", letterSpacing: "-0.3px" }}>Notifications</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>{unread > 0 ? `${unread} new alerts` : "No new alerts"}</div>
               </div>
             </div>
-            {unread > 0 && <button onClick={onMarkAllRead} style={{ background:"rgba(99,102,241,0.25)", border:"1px solid rgba(99,102,241,0.4)", borderRadius:8, padding:"5px 10px", fontSize:10, fontWeight:700, color:"#a5b4fc", cursor:"pointer", fontFamily:"inherit" }}>✓ Mark all read</button>}
+            {unread > 0 && <button onClick={onMarkAllRead} style={{ background: "rgba(99, 102, 241, 0.2)", border: "1px solid rgba(99, 102, 241, 0.3)", borderRadius: 10, padding: "6px 12px", fontSize: 11, fontWeight: 800, color: "#a5b4fc", cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(99, 102, 241, 0.3)"}>Clear all</button>}
           </div>
-          <div style={{ maxHeight:380, overflowY:"auto" }}>
-            {notifications.map((n,i) => {
-              const color=notifColor(n.type), bg=notifBg(n.type);
+          <div style={{ maxHeight: 420, overflowY: "auto" }}>
+            {notifications.map((n, i) => {
+              const color = notifColor(n.type), bg = notifBg(n.type);
               return (
-                <div key={n.id} style={{ padding:"12px 16px", display:"flex", alignItems:"flex-start", gap:12, background:n.read?"#fff":"#fafafe", borderBottom:i<notifications.length-1?"1px solid #f1f5f9":"none", transition:"background 0.15s", animation:`notif-item-in 0.25s ease ${i*0.04}s both` }}
-                  onMouseEnter={e=>e.currentTarget.style.background="#f8faff"}
-                  onMouseLeave={e=>e.currentTarget.style.background=n.read?"#fff":"#fafafe"}>
-                  <div style={{ width:36, height:36, borderRadius:10, background:bg, border:`1px solid ${color}20`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0, position:"relative" }}>
+                <div key={n.id} style={{ padding: "16px 24px", display: "flex", alignItems: "flex-start", gap: 16, background: n.read ? "transparent" : "rgba(99, 102, 241, 0.03)", borderBottom: i < notifications.length - 1 ? "1px solid #f1f5f9" : "none", transition: "all 0.2s" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "rgba(248, 250, 252, 0.8)"}
+                  onMouseLeave={e => e.currentTarget.style.background = n.read ? "transparent" : "rgba(99, 102, 241, 0.03)"}>
+                  <div style={{ width: 42, height: 42, borderRadius: 14, background: bg, border: `1px solid ${color}20`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, position: "relative", boxShadow: `0 4px 10px ${color}15` }}>
                     {n.icon}
-                    {!n.read && <div style={{ position:"absolute", top:-3, right:-3, width:9, height:9, borderRadius:"50%", background:color, border:"2px solid #fff", animation:"pulse-dot-color 1.8s ease infinite" }}/>}
+                    {!n.read && <div style={{ position: "absolute", top: -2, right: -2, width: 10, height: 10, borderRadius: "50%", background: color, border: "2.5px solid #fff", animation: "pulse-dot-color 1.8s ease infinite" }} />}
                   </div>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:12.5, fontWeight:n.read?500:700, color:n.read?"#374151":"#0f172a", lineHeight:1.4, marginBottom:4 }}>{n.text}</div>
-                    <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
-                      <span style={{ fontSize:10, color:"#94a3b8" }}>{n.time}</span>
-                      {n.action && <button onClick={()=>{ onMarkRead(n.id); if(n.actionPage) onNavigate(n.actionPage); setOpen(false); }} style={{ background:`${color}12`, border:`1px solid ${color}30`, borderRadius:6, padding:"2px 8px", fontSize:10, fontWeight:700, color:color, cursor:"pointer", fontFamily:"inherit" }}>{n.action} →</button>}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: n.read ? 600 : 800, color: n.read ? "#475569" : "#0f172a", lineHeight: 1.5, marginBottom: 6 }}>{n.text}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{n.time}</span>
+                      {n.action && <button onClick={() => { onMarkRead(n.id); if (n.actionPage) onNavigate(n.actionPage); setOpen(false); }} style={{ background: "transparent", border: "none", padding: 0, fontSize: 11, fontWeight: 800, color: color, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline", textUnderlineOffset: "3px" }}>{n.action}</button>}
                     </div>
                   </div>
-                  {!n.read && <div onClick={()=>onMarkRead(n.id)} style={{ width:8, height:8, borderRadius:"50%", background:color, cursor:"pointer", flexShrink:0, animation:"pulse-dot-color 1.8s ease infinite" }}/>}
                 </div>
               );
             })}
           </div>
-          <div style={{ padding:"10px 16px", background:"#f8fafc", borderTop:"1px solid #e2e8f0", display:"flex", justifyContent:"center" }}>
-            <button onClick={()=>{ onNavigate("notifications"); setOpen(false); }} style={{ background:"none", border:"none", color:"#6366f1", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>View all notifications →</button>
+          <div style={{ padding: "14px 24px", background: "#f8fafc", borderTop: "1px solid #f1f5f9", display: "flex", justifyContent: "center" }}>
+            <button onClick={() => { onNavigate("notifications"); setOpen(false); }} style={{ background: "none", border: "none", color: "#6366f1", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>View History →</button>
           </div>
         </div>
       )}
@@ -423,43 +477,42 @@ function ProfileDropdown({ user, onLogout }) {
 function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser, navItems }) {
   return (
     <>
-      {open && <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)", zIndex:998 }}/>}
-      <div style={{ width:220, background:T.sidebar, color:"#fff", display:"flex", flexDirection:"column", height:"100vh", position:"fixed", top:0, left:0, zIndex:999, transform:open?"translateX(0)":"translateX(-100%)", transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)", boxShadow:"4px 0 32px rgba(0,0,0,0.18)" }} className="client-sidebar">
-        <div style={{ padding:"24px 20px 18px", borderBottom:"1px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ minWidth:38, height:38, background:clientUser?.logoUrl ? "#fff" : "linear-gradient(135deg,#3b82f6,#2563eb)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff", overflow:"hidden", padding: clientUser?.logoUrl ? "2px" : 0 }}>
-              {clientUser?.logoUrl ? <img src={clientUser.logoUrl} alt="logo" style={{ maxHeight:"100%", maxWidth:"120px", objectFit:"contain" }} /> : (clientUser?.company || "W")[0].toUpperCase()}
+      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)", zIndex: 998 }} />}
+      <div style={{ width: 260, background: "#0f172a", color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)", boxShadow: "20px 0 60px rgba(0,0,0,0.2)", borderRight: "1px solid rgba(255,255,255,0.05)" }} className="client-sidebar">
+        <div style={{ padding: "32px 24px 24px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ minWidth: 42, height: 42, background: clientUser?.logoUrl ? "#fff" : "linear-gradient(135deg, #3b82f6, #2563eb)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: "#fff", overflow: "hidden", padding: clientUser?.logoUrl ? "4px" : 0, boxShadow: "0 8px 16px rgba(59, 130, 246, 0.3)" }}>
+              {clientUser?.logoUrl ? <img src={clientUser.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} /> : (clientUser?.company || "W")[0].toUpperCase()}
             </div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 13, color: "#fff", letterSpacing: -0.3, fontFamily: T.fontSyne }}>{clientUser?.company || "M Business"}</div>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,0.3)", letterSpacing:1.5 }}>{clientUser?.role || clientUser?.userRole || ""}</div>
+              <div style={{ fontWeight: 900, fontSize: 16, color: "#fff", letterSpacing: "-0.5px", fontFamily: "inherit" }}>{clientUser?.company || "M Business"}</div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", letterSpacing: 1.2, fontWeight: 700, textTransform: "uppercase", marginTop: 2 }}>CLIENT PORTAL</div>
             </div>
           </div>
-          <button onClick={onClose} className="sidebar-close-btn" style={{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:16, cursor:"pointer", padding:"2px 4px" }}>✕</button>
+          <button onClick={onClose} className="sidebar-close-btn" style={{ background: "rgba(255,255,255,0.05)", border: "none", color: "rgba(255,255,255,0.4)", width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}>✕</button>
         </div>
-        <nav style={{ flex:1, padding:"10px", overflowY:"auto", marginTop:10 }}>
+        <nav style={{ flex: 1, padding: "16px", overflowY: "auto", marginTop: 8 }}>
           {(navItems || NAV).map(n => {
-            const on = active===n.key;
+            const on = active === n.key;
             return (
-              <button key={n.key} onClick={()=>{ setActive(n.key); onClose(); }}
-                style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"9px 12px", background:on?"rgba(99,102,241,0.2)":"transparent", border:on?"1px solid rgba(99,102,241,0.35)":"1px solid transparent", borderRadius:10, color:on?"#a5b4fc":"rgba(255,255,255,0.4)", fontWeight:on?700:400, fontSize:12.5, cursor:"pointer", marginBottom:2, textAlign:"left", fontFamily:"inherit", transition:"all 0.15s" }}
-                onMouseEnter={e=>{ if(!on) e.currentTarget.style.background="rgba(255,255,255,0.05)"; }}
-                onMouseLeave={e=>{ if(!on) e.currentTarget.style.background="transparent"; }}>
-                <span style={{ fontSize:14, opacity:on?1:0.6 }}>{n.icon}</span>
-                <span style={{ flex:1 }}>{n.label}</span>
-                {on && <div style={{ width:4, height:4, borderRadius:"50%", background:"#818cf8" }}/>}
+              <button key={n.key} onClick={() => { setActive(n.key); onClose(); }}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: on ? "rgba(99, 102, 241, 0.15)" : "transparent", border: "none", borderRadius: 12, color: on ? "#a5b4fc" : "rgba(255,255,255,0.5)", fontWeight: on ? 800 : 500, fontSize: 14, cursor: "pointer", marginBottom: 6, textAlign: "left", fontFamily: "inherit", transition: "all 0.2s" }}
+                onMouseEnter={e => { if (!on) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)"; } }}
+                onMouseLeave={e => { if (!on) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; } }}>
+                <span style={{ fontSize: 18, opacity: on ? 1 : 0.6 }}>{n.icon}</span>
+                <span style={{ flex: 1 }}>{n.label}</span>
+                {on && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#6366f1", boxShadow: "0 0 10px #6366f1" }} />}
               </button>
             );
           })}
         </nav>
-        <div style={{ padding:"12px 10px 20px", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:8 }}>
-       
-          <button onClick={onLogout} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"10px 12px", background:"rgba(239,68,68,0.15)", border:"1px solid rgba(239,68,68,0.35)", borderRadius:10, color:"#fca5a5", fontSize:12.5, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+        <div style={{ padding: "24px 16px", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 8 }}>
+          <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "14px", background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: 14, color: "#fca5a5", fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)"}>
             🚪 Logout
           </button>
         </div>
       </div>
-      <div className="client-sidebar-spacer" style={{ width:220, flexShrink:0 }}/>
+      <div className="client-sidebar-spacer" style={{ width: 260, flexShrink: 0 }} />
     </>
   );
 }

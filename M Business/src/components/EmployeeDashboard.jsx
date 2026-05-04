@@ -12,14 +12,14 @@ import MessagingPage from "./MessagingPage";
 const BASE = "/api/employee-dashboard";
 
 const sc = (s) => ({
-  active: "var(--app-accent)", "in progress": "var(--app-accent)",
+  active: "#6366f1", "in progress": "#6366f1",
   review: "#f59e0b", "in review": "#f59e0b", pending: "#f59e0b",
   done: "#10b981", completed: "#10b981",
   high: "#ef4444", medium: "#f59e0b", low: "#10b981",
-  present: "#10b981", absent: "#ef4444", leave: "#f59e0b", holiday: "var(--app-muted)",
+  present: "#10b981", absent: "#ef4444", leave: "#f59e0b", holiday: "#94a3b8",
   approved: "#10b981", rejected: "#ef4444", overdue: "#ef4444",
   cancelled: "#94a3b8",
-}[(s || "").toLowerCase()] || "var(--app-accent)");
+}[(s || "").toLowerCase()] || "#6366f1");
 
 const NAV = [
   { key: "dashboard", icon: "⌂", label: "Dashboard" },
@@ -58,17 +58,36 @@ const statusIcon = (s) => {
 function Badge({ label }) {
   const c = sc(label);
   return (
-    <span style={{ background: `${c}18`, color: c, border: `1px solid ${c}30`, padding: "2px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", fontFamily: "monospace" }}>
+    <span style={{ 
+      background: `${c}12`, 
+      color: c, 
+      border: `1px solid ${c}30`, 
+      padding: "3px 12px", 
+      borderRadius: 20, 
+      fontSize: 10, 
+      fontWeight: 800, 
+      whiteSpace: "nowrap", 
+      fontFamily: "'Inter', sans-serif",
+      textTransform: "uppercase",
+      letterSpacing: "0.5px"
+    }}>
       {label}
     </span>
   );
 }
 
 function ProgressBar({ pct }) {
-  const p = pct || 0, c = p === 100 ? "#10b981" : "var(--app-accent)";
+  const p = pct || 0, c = p === 100 ? "#10b981" : "#6366f1";
   return (
-    <div style={{ background: "#f1f5f9", borderRadius: 99, height: 5, overflow: "hidden", minWidth: 80 }}>
-      <div style={{ width: `${p}%`, background: c, height: "100%", borderRadius: 99, transition: "width 1s" }} />
+    <div style={{ background: "#f1f5f9", borderRadius: 99, height: 6, overflow: "hidden", minWidth: 80, border: "1px solid #e2e8f0" }}>
+      <div style={{ 
+        width: `${p}%`, 
+        background: `linear-gradient(90deg, ${c}, ${c}dd)`, 
+        height: "100%", 
+        borderRadius: 99, 
+        transition: "width 1s cubic-bezier(0.4, 0, 0.2, 1)",
+        boxShadow: `0 0 8px ${c}40`
+      }} />
     </div>
   );
 }
@@ -76,23 +95,61 @@ function ProgressBar({ pct }) {
 function StatCard({ icon, label, value, sub, color, onClick }) {
   return (
     <div onClick={onClick}
-      style={{ background: "#fff", borderRadius: 16, padding: "20px 18px", border: "1px solid #e2e8f0", cursor: onClick ? "pointer" : "default", position: "relative", overflow: "hidden", transition: "transform 0.2s" }}
-      onMouseEnter={e => { if (onClick) e.currentTarget.style.transform = "translateY(-2px)"; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = ""; }}>
-      <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>{icon}</div>
-      <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase", marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 24, fontWeight: 800, color, lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>{sub}</div>}
+      style={{ 
+        background: "#fff", 
+        borderRadius: 20, 
+        padding: "24px 20px", 
+        border: "1px solid #eef2f6", 
+        cursor: onClick ? "pointer" : "default", 
+        position: "relative", 
+        overflow: "hidden", 
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)"
+      }}
+      onMouseEnter={e => { 
+        if (onClick) {
+          e.currentTarget.style.transform = "translateY(-4px)"; 
+          e.currentTarget.style.boxShadow = "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
+          e.currentTarget.style.borderColor = `${color}40`;
+        }
+      }}
+      onMouseLeave={e => { 
+        e.currentTarget.style.transform = ""; 
+        e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)";
+        e.currentTarget.style.borderColor = "#eef2f6";
+      }}>
+      <div style={{ 
+        width: 44, 
+        height: 44, 
+        borderRadius: 14, 
+        background: `linear-gradient(135deg, ${color}15, ${color}25)`, 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        fontSize: 20, 
+        marginBottom: 16,
+        border: `1px solid ${color}20`
+      }}>{icon}</div>
+      <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 28, fontWeight: 900, color: "#0f172a", lineHeight: 1, letterSpacing: "-0.5px" }}>{value}</div>
+      {sub && <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 8, fontWeight: 500 }}>{sub}</div>}
+      <div style={{ position: "absolute", top: -10, right: -10, width: 60, height: 60, borderRadius: "50%", background: `${color}05`, zIndex: 0 }} />
     </div>
   );
 }
 
 function Card({ children, title, action }) {
   return (
-    <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #e2e8f0", padding: "18px 20px" }}>
+    <div style={{ 
+      background: "#fff", 
+      borderRadius: 24, 
+      border: "1px solid #f1f5f9", 
+      padding: "24px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04)"
+    }}>
       {(title || action) && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          {title && <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>{title}</div>}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          {title && <div style={{ fontSize: 16, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.3px" }}>{title}</div>}
           {action}
         </div>
       )}
@@ -103,13 +160,29 @@ function Card({ children, title, action }) {
 
 function TabBar({ tabs, active, onChange }) {
   return (
-    <div style={{ display: "flex", borderBottom: "1px solid #f1f5f9", marginBottom: 16, overflowX: "auto" }}>
-      {tabs.map(t => (
-        <button key={t.key} onClick={() => onChange(t.key)}
-          style={{ padding: "8px 16px", fontSize: 12.5, cursor: "pointer", background: "none", border: "none", borderBottom: active === t.key ? "2px solid var(--app-accent)" : "2px solid transparent", color: active === t.key ? "var(--app-accent)" : "#94a3b8", fontWeight: active === t.key ? 700 : 400, fontFamily: "inherit", marginBottom: -1, whiteSpace: "nowrap" }}>
-          {t.label}
-        </button>
-      ))}
+    <div style={{ display: "flex", gap: 8, background: "#f8fafc", padding: "4px", borderRadius: 14, marginBottom: 20, border: "1px solid #f1f5f9" }}>
+      {tabs.map(t => {
+        const on = active === t.key;
+        return (
+          <button key={t.key} onClick={() => onChange(t.key)}
+            style={{ 
+              padding: "8px 16px", 
+              fontSize: 13, 
+              cursor: "pointer", 
+              background: on ? "#fff" : "transparent", 
+              border: "none", 
+              borderRadius: 10,
+              color: on ? "#6366f1" : "#64748b", 
+              fontWeight: on ? 800 : 500, 
+              fontFamily: "inherit", 
+              whiteSpace: "nowrap",
+              boxShadow: on ? "0 4px 6px -1px rgba(0,0,0,0.05)" : "none",
+              transition: "all 0.2s"
+            }}>
+            {t.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -132,58 +205,55 @@ function InputField({ label, children }) {
   );
 }
 
-const inputStyle = {
-  padding: "9px 12px", border: "1.5px solid #e2e8f0", borderRadius: 10,
-  fontSize: 13, color: "#0f172a", background: "#f8fafc", outline: "none", fontFamily: "inherit",
-};
+const inputStyle = { width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 10, padding: "9px 12px", fontSize: 13, color: "#0f172a", background: "#fff", outline: "none", fontFamily: "inherit" };
 
 function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems }) {
   const displayName = user?.name || "Employee";
   const initials = (displayName || "E").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   return (
     <>
-      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 998 }} />}
-      <div className="emp-sidebar" style={{ width: 220, background: "#0f172a", color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s ease" }}>
-        <div style={{ padding: "24px 20px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)", zIndex: 998 }} />}
+      <div className="emp-sidebar" style={{ width: 260, background: "#0f172a", color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)", borderRight: "1px solid rgba(255,255,255,0.05)" }}>
+        <div style={{ padding: "32px 24px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             {user?.logoUrl ? (
-              <div style={{ minWidth: 38, height: 38, background: "#fff", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "2px" }}>
-                <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "120px", objectFit: "contain" }} />
+              <div style={{ minWidth: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "4px", boxShadow: "0 0 20px rgba(99, 102, 241, 0.3)" }}>
+                <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
               </div>
             ) : (
-              <div style={{ width: 34, height: 34, background: "linear-gradient(135deg,var(--app-accent),#2563eb)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 900, color: "#fff" }}>
+              <div style={{ width: 42, height: 42, background: "linear-gradient(135deg, #6366f1, #4f46e5)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: "#fff", boxShadow: "0 8px 16px rgba(99, 102, 241, 0.3)" }}>
                 {initials[0]}
               </div>
             )}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 800, fontSize: 13, color: "#fff" }}>{displayName}</div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", letterSpacing: 1.5 }}>{user?.role || user?.userRole || "EMPLOYEE"}</div>
+              <div style={{ fontWeight: 900, fontSize: 15, color: "#fff", letterSpacing: "-0.3px" }}>{displayName}</div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", letterSpacing: 1.2, fontWeight: 600, textTransform: "uppercase", marginTop: 2 }}>{user?.role || user?.userRole || "EMPLOYEE"}</div>
             </div>
           </div>
-          <button onClick={onClose} className="emp-sb-close" style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} className="emp-sb-close" style={{ background: "rgba(255,255,255,0.05)", border: "none", color: "rgba(255,255,255,0.4)", width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}>✕</button>
         </div>
-        <nav style={{ flex: 1, padding: "10px", marginTop: 10 }}>
+        <nav style={{ flex: 1, padding: "16px", marginTop: 8 }}>
           {(navItems || NAV).map(n => {
             const on = active === n.key;
             return (
               <button key={n.key} onClick={() => { setActive(n.key); onClose(); }}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: on ? "rgba(99,102,241,0.2)" : "transparent", border: on ? "1px solid rgba(99,102,241,0.35)" : "1px solid transparent", borderRadius: 10, color: on ? "#a5b4fc" : "rgba(255,255,255,0.4)", fontWeight: on ? 700 : 400, fontSize: 12.5, cursor: "pointer", marginBottom: 2, textAlign: "left", fontFamily: "inherit" }}
-                onMouseEnter={e => { if (!on) e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
-                onMouseLeave={e => { if (!on) e.currentTarget.style.background = "transparent"; }}>
-                <span style={{ fontSize: 14 }}>{n.icon}</span>
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: on ? "rgba(99,102,241,0.15)" : "transparent", border: "none", borderRadius: 12, color: on ? "#a5b4fc" : "rgba(255,255,255,0.5)", fontWeight: on ? 800 : 500, fontSize: 14, cursor: "pointer", marginBottom: 6, textAlign: "left", fontFamily: "inherit", transition: "all 0.2s" }}
+                onMouseEnter={e => { if (!on) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)"; } }}
+                onMouseLeave={e => { if (!on) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; } }}>
+                <span style={{ fontSize: 18, opacity: on ? 1 : 0.6 }}>{n.icon}</span>
                 <span style={{ flex: 1 }}>{n.label}</span>
-                {on && <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#818cf8" }} />}
+                {on && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#6366f1", boxShadow: "0 0 10px #6366f1" }} />}
               </button>
             );
           })}
         </nav>
-        <div style={{ padding: "12px 10px 20px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 12px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 10, color: "#fca5a5", fontSize: 12.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+        <div style={{ padding: "24px 16px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 14, color: "#fca5a5", fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.2)"}>
             🚪 Logout
           </button>
         </div>
       </div>
-      <div className="emp-sb-spacer" style={{ width: 220, flexShrink: 0 }} />
+      <div className="emp-sb-spacer" style={{ width: 260, flexShrink: 0 }} />
     </>
   );
 }
@@ -201,65 +271,70 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
       action={
         <button
           onClick={onOpenProfile}
-          style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+          style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "4px 10px", color: "#6366f1", fontSize: 11, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}
+          onMouseEnter={e => e.currentTarget.style.background = "#fff"}>
           Manage →
         </button>
       }>
       {/* Progress bar */}
-      <div style={{ marginBottom: 14 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-          <span style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+          <span style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>
             {uploadedCount}/{total} documents uploaded
           </span>
-          <span style={{ fontSize: 12, fontWeight: 800, color: allDone ? "#10b981" : "#f59e0b" }}>
+          <span style={{ fontSize: 14, fontWeight: 900, color: allDone ? "#10b981" : "#f59e0b", letterSpacing: "-0.5px" }}>
             {Math.round((uploadedCount / total) * 100)}%
           </span>
         </div>
-        <div style={{ background: "#f1f5f9", borderRadius: 99, height: 7, overflow: "hidden" }}>
+        <div style={{ background: "#f1f5f9", borderRadius: 99, height: 10, overflow: "hidden", border: "1px solid #e2e8f0" }}>
           <div style={{
             width: `${(uploadedCount / total) * 100}%`,
             background: allDone
-              ? "linear-gradient(90deg,#10b981,#34d399)"
-              : "linear-gradient(90deg,#f59e0b,#fbbf24)",
-            height: "100%", borderRadius: 99, transition: "width 0.6s"
+              ? "linear-gradient(90deg, #10b981, #34d399)"
+              : "linear-gradient(90deg, #f59e0b, #fbbf24)",
+            height: "100%", borderRadius: 99, transition: "width 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
+            boxShadow: `0 0 10px ${allDone ? "#10b98140" : "#f59e0b40"}`
           }} />
         </div>
       </div>
 
       {/* Doc rows */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {DOC_TYPES.map(dt => {
           const doc = docStatus[dt.key];
           const hasDoc = !!doc;
           return (
             <div key={dt.key}
               style={{
-                display: "flex", alignItems: "center", gap: 12,
-                padding: "10px 12px", borderRadius: 12,
-                background: hasDoc ? `${dt.color}08` : "#f8fafc",
-                border: `1px solid ${hasDoc ? dt.color + "30" : "#f1f5f9"}`,
-              }}>
+                display: "flex", alignItems: "center", gap: 14,
+                padding: "12px 14px", borderRadius: 16,
+                background: hasDoc ? `${dt.color}05` : "#f8fafc",
+                border: `1px solid ${hasDoc ? dt.color + "20" : "#f1f5f9"}`,
+                transition: "all 0.2s"
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = hasDoc ? dt.color : "#cbd5e1"; e.currentTarget.style.transform = "translateX(4px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = hasDoc ? dt.color + "20" : "#f1f5f9"; e.currentTarget.style.transform = ""; }}>
               {/* Icon */}
-              <div style={{ width: 34, height: 34, borderRadius: 10, background: `${dt.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: `${dt.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0, border: `1px solid ${dt.color}20` }}>
                 {dt.icon}
               </div>
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{dt.label}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{dt.label}</div>
                 {hasDoc && doc.uploadedAt
-                  ? <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 1 }}>
+                  ? <div style={{ fontSize: 11, color: "#64748b", marginTop: 2, fontWeight: 500 }}>
                     Uploaded {new Date(doc.uploadedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
-                    {doc.fileName ? ` · ${doc.fileName}` : ""}
                   </div>
-                  : <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 1 }}>{dt.desc}</div>}
+                  : <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>{dt.desc}</div>}
               </div>
               {/* Status badge */}
               {hasDoc
-                ? <div style={{ display: "flex", alignItems: "center", gap: 4, background: `${dt.color}15`, border: `1px solid ${dt.color}30`, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, color: dt.color, whiteSpace: "nowrap" }}>
-                  ✓ Uploaded
+                ? <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 20, padding: "4px 12px", fontSize: 10, fontWeight: 800, color: "#10b981", whiteSpace: "nowrap", textTransform: "uppercase" }}>
+                  <span style={{ fontSize: 12 }}>✓</span> Uploaded
                 </div>
                 : <button onClick={onOpenProfile}
-                  style={{ background: "#fef3c7", border: "1px solid #fde68a", borderRadius: 20, padding: "3px 12px", fontSize: 11, fontWeight: 700, color: "#d97706", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                  style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 20, padding: "4px 14px", fontSize: 10, fontWeight: 800, color: "#d97706", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap", textTransform: "uppercase", transition: "all 0.2s" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#fef3c7"; }}>
                   ⚠️ Upload
                 </button>}
             </div>
@@ -294,29 +369,33 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Welcome row */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, marginBottom: 10 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", margin: 0 }}>Dashboard</h1>
-          <p style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>Here's your work summary for today</p>
+          <h1 style={{ fontSize: 32, fontWeight: 900, color: "#0f172a", margin: 0, letterSpacing: "-1px" }}>Welcome back, {name.split(' ')[0]}!</h1>
+          <p style={{ fontSize: 15, color: "#64748b", marginTop: 6, fontWeight: 500 }}>Here's what's happening with your projects today.</p>
         </div>
         {!todayAtt ? (
-          <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 12, padding: "10px 16px", fontSize: 13, color: "#ef4444", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
-            ⚠️ Mark today's attendance →
-            <button onClick={() => setPage("attendance")} style={{ background: "#ef4444", border: "none", borderRadius: 8, padding: "5px 12px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Mark Now</button>
+          <div style={{ background: "#fff1f2", border: "1px solid #fecaca", borderRadius: 20, padding: "12px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 4px 12px rgba(239, 68, 68, 0.1)" }}>
+            <span style={{ fontSize: 18 }}>⏰</span>
+            <span style={{ fontSize: 14, color: "#be123c", fontWeight: 700 }}>Attendance not marked!</span>
+            <button onClick={() => setPage("attendance")} style={{ background: "#ef4444", border: "none", borderRadius: 10, padding: "8px 16px", color: "#fff", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 10px rgba(239, 68, 68, 0.3)" }}>Mark Now</button>
           </div>
         ) : (
-          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 12, padding: "10px 16px", fontSize: 13, color: "#10b981", fontWeight: 600 }}>✅ Today: {todayAtt.status}</div>
+          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 20, padding: "12px 20px", fontSize: 14, color: "#166534", fontWeight: 800, display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 12px rgba(16, 185, 129, 0.1)" }}>
+            <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#10b981", animation: "pulse 2s infinite" }} />
+            Today's Status: {todayAtt.status.toUpperCase()}
+          </div>
         )}
       </div>
 
       {/* Stat cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }} className="stat-grid">
-        <StatCard icon="◈" label="Active Projects" value={activeProjectsCount} sub="Assigned to you" color="var(--app-accent)" onClick={() => setPage("projects")} />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }} className="stat-grid">
+        <StatCard icon="◈" label="Active Projects" value={activeProjectsCount} sub="Assigned to you" color="#6366f1" onClick={() => setPage("projects")} />
         <StatCard icon="📄" label="Proposals" value={proposals.length} sub="Assigned to you" color="#ec4899" onClick={() => setPage("proposals")} />
         <StatCard icon="◉" label="Pending Tasks" value={pendingTasks} sub="Need attention" color="#f59e0b" onClick={() => setPage("tasks")} />
 
         <StatCard icon="◷" label="Present Days" value={presentDays} sub="This month" color="#10b981" onClick={() => setPage("attendance")} />
-        <StatCard icon="◆" label="Last Payment" value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month || "Not yet"} color="var(--app-muted)" onClick={() => setPage("salary")} />
+        <StatCard icon="◆" label="Last Payment" value={latestSalary ? fmt(latestSalary.net, latestSalary.currency) : "—"} sub={latestSalary?.month || "No records"} color="#64748b" onClick={() => setPage("salary")} />
       </div>
 
       {/* Projects + Tasks row */}

@@ -155,18 +155,26 @@ router.get("/tasks/:name", async (req, res) => {
     const name = decodeURIComponent(req.params.name).trim();
     if (!name) return res.json([]);
     
-    const companyId = req.headers['x-company-id'] || "";
-    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
-
+    let companyId = req.headers['x-company-id'] || "";
+    
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
     
     // Find identities in both User and Employee collections
+    // If companyId is missing, find by name only to "recover" the company context
+    const idFilter = companyId ? { name: nameRegex, companyId } : { name: nameRegex };
     const [user, employee] = await Promise.all([
-      User.findOne({ name: nameRegex, companyId }),
-      Employee.findOne({ name: nameRegex, companyId })
+      User.findOne(idFilter),
+      Employee.findOne(idFilter)
     ]);
+    
+    // If companyId was missing, use the one from the found identity
+    if (!companyId) {
+      companyId = user?.companyId || employee?.companyId || "";
+    }
+    
+    if (!companyId) return res.status(400).json({ msg: "Company ID required or could not be resolved" });
     
     const query = {
       companyId,

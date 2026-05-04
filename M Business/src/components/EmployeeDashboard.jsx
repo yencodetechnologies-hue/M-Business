@@ -24,9 +24,9 @@ const sc = (s) => ({
 const NAV = [
   { key:"dashboard", icon:"⌂", label:"Dashboard" },
   { key:"projects",  icon:"◈", label:"My Projects" },
-  { key:"proposals", icon:"📄", label:"Proposals" },   // ← ADD THIS
+
   { key:"tasks",     icon:"◉", label:"Active Tasks" },
-  { key:"payments",  icon:"◆", label:"Payments" },
+
   { key:"calendar",  icon:"◷", label:"Calendar" },
   { key:"messaging", icon:"💬", label:"Messages" },
   { key:"reports",   icon:"▦", label:"Reports" },
@@ -1199,6 +1199,9 @@ export default function EmployeeDashboard({ user, setUser }) {
   const [subscription, setSubscription] = useState(null);
   const [subLoading,   setSubLoading]   = useState(true);
   const [subscriptionNotification, setSubscriptionNotification] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  const [hasNotifiedLogin, setHasNotifiedLogin] = useState(false);
 
   // ── NEW: doc status state (shared between panel & dashboard) ──
   const [docStatus,   setDocStatus]   = useState({});
@@ -1299,20 +1302,108 @@ export default function EmployeeDashboard({ user, setUser }) {
     axios.get(`${BASE}/salary/${enc}`).then(r => { if (r.data?.length) setSalary(r.data); else setSalary([]); }).catch(() => {});
   }, [empName]);
 
-useEffect(()=>{
-  // empName மாறும்போது docs reset பண்ணு
-  setDocStatus({});
-  setProfileOpen(false);
-  
-  if(!empName) return;
-  const enc=encodeURIComponent(empName);
-   axios.get(`${BASE}/projects/${enc}`).then(r=>{ if(r.data?.length) setProjects(r.data); else setProjects([]); }).catch(()=>{});
-  axios.get(`${BASE}/tasks/${enc}`).then(r=>{ if(r.data?.length) setTasks(r.data); else setTasks([]); }).catch(()=>{});
-  axios.get(`${BASE_URL}/api/proposals/employee/${enc}`).then(r=>{ if(r.data?.length) setProposals(r.data); else setProposals([]); }).catch(()=>{});
-  axios.get(`${BASE}/attendance/${enc}`).then(r=>{ if(r.data) setAttendance(r.data); }).catch(()=>{});
-  axios.get(`${BASE}/salary/${enc}`).then(r=>{ if(r.data?.length) setSalary(r.data); else setSalary([]); }).catch(()=>{});
-  fetchSubscription();
-}, [empName]);
+  useEffect(()=>{
+    // empName மாறும்போது docs reset பண்ணு
+    setDocStatus({});
+    setProfileOpen(false);
+    
+    if(!empName) return;
+    const enc=encodeURIComponent(empName);
+     axios.get(`${BASE}/projects/${enc}`).then(r=>{ 
+       if(r.data?.length) {
+         setProjects(r.data); 
+         // Check for new projects
+         const savedProjects = JSON.parse(sessionStorage.getItem(`projects_${empName}`) || "[]");
+         if (savedProjects.length > 0 && r.data.length > savedProjects.length) {
+            const newProjs = r.data.filter(p => !savedProjects.find(sp => sp._id === p._id));
+            newProjs.forEach(p => {
+              addNotification({
+                id: `proj_${p._id}`,
+                type: "project",
+                title: "New Project Assigned",
+                msg: `You have been assigned to "${p.name}"`,
+                icon: "◈",
+                color: "var(--app-accent)",
+                time: new Date().toISOString()
+              });
+            });
+         }
+         sessionStorage.setItem(`projects_${empName}`, JSON.stringify(r.data));
+       } else {
+         setProjects([]); 
+       }
+     }).catch(()=>{});
+    axios.get(`${BASE}/tasks/${enc}`).then(r=>{ if(r.data?.length) setTasks(r.data); else setTasks([]); }).catch(()=>{});
+    axios.get(`${BASE_URL}/api/proposals/employee/${enc}`).then(r=>{ if(r.data?.length) setProposals(r.data); else setProposals([]); }).catch(()=>{});
+    axios.get(`${BASE}/attendance/${enc}`).then(r=>{ if(r.data) setAttendance(r.data); }).catch(()=>{});
+    axios.get(`${BASE}/salary/${enc}`).then(r=>{ if(r.data?.length) setSalary(r.data); else setSalary([]); }).catch(()=>{});
+    fetchSubscription();
+  }, [empName]);
+
+  const addNotification = useCallback((n) => {
+    setNotifications(prev => {
+      if (prev.find(x => x.id === n.id)) return prev;
+      return [{ ...n, isRead: false }, ...prev];
+    });
+  }, []);
+
+  // Mark all as read when dropdown opens
+  useEffect(() => {
+    if (notifDropdownOpen && notifications.some(n => !n.isRead)) {
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    }
+  }, [notifDropdownOpen, notifications]);
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  // Notifications logic
+  useEffect(() => {
+    if (!resolvedUser || !empName) return;
+
+    // 1. Login Notification
+    if (!hasNotifiedLogin) {
+      addNotification({
+        id: 'login_success',
+        type: 'login',
+        title: 'Login Successful',
+        msg: `Welcome back, ${resolvedUser.name}!`,
+        icon: '🔐',
+        color: '#10b981',
+        time: new Date().toISOString()
+      });
+      setHasNotifiedLogin(true);
+    }
+
+    // 2. Birthday Notification
+    const dob = resolvedUser.dob || resolvedUser.dateOfBirth;
+    if (dob) {
+      const today = new Date();
+      const birthDate = new Date(dob);
+      if (today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth()) {
+        addNotification({
+          id: 'birthday_wish',
+          type: 'birthday',
+          title: 'Happy Birthday! 🎂',
+          msg: `Wishing you a fantastic day ahead, ${resolvedUser.name}!`,
+          icon: '🎉',
+          color: '#ec4899',
+          time: new Date().toISOString()
+        });
+      }
+    }
+  }, [resolvedUser, empName, hasNotifiedLogin, addNotification]);
+
+  // Close notifications on outside click
+  useEffect(() => {
+    if (!notifDropdownOpen) return;
+    const onDown = (e) => {
+      if (e.target.closest('[data-notif-anchor="true"]')) return;
+      if (e.target.closest('[data-notif-menu="true"]')) return;
+      setNotifDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [notifDropdownOpen]);
 
 const fetchSubscription = async () => {
     try {
@@ -1370,6 +1461,7 @@ const fetchSubscription = async () => {
         @media(min-width:769px){
           .emp-sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;height:100vh!important;}
           .emp-sb-close{display:none!important;} .emp-sb-spacer{display:none!important;} .emp-mob-bar{display:none!important;}
+          .emp-desktop-header{display:flex!important;}
         }
         @media(max-width:900px){.two-col{grid-template-columns:1fr!important;} .att-split{grid-template-columns:1fr!important;}}
         @media(max-width:768px){
@@ -1384,16 +1476,110 @@ const fetchSubscription = async () => {
       <Sidebar active={page} setActive={setPage} open={sidebarOpen} onClose={()=>setSidebarOpen(false)} onLogout={handleLogout} user={resolvedUser} navItems={filteredNav}/>
 
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
+        {/* Desktop Header */}
+        <div className="emp-desktop-header" style={{ display:"none", alignItems:"center", justifyContent:"flex-end", padding:"16px 28px", background:"#fff", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100, gap:20 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:20 }}>
+             {/* Notification Bell (Desktop) */}
+             <div style={{ position:"relative" }} data-notif-anchor="true">
+              <button onClick={() => setNotifDropdownOpen(!notifDropdownOpen)} style={{ background:"#f8fafc", border:"1px solid #e2e8f0", borderRadius:10, width:40, height:40, fontSize:18, cursor:"pointer", color:"var(--app-accent)", position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                🔔
+                {unreadCount > 0 && (
+                  <span style={{ position:"absolute", top:"-2px", right:"-2px", background:"#ef4444", color:"#fff", borderRadius:"50%", width:"18px", height:"18px", fontSize:"10px", fontWeight:"700", display:"flex", alignItems:"center", justifyContent:"center", border:"2px solid #fff" }}>
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              
+              {notifDropdownOpen && (
+                <div data-notif-menu="true" style={{ position:"absolute", top:45, right:0, width:320, background:"#fff", border:"1px solid #e2e8f0", borderRadius:14, boxShadow:"0 15px 35px rgba(0,0,0,0.12)", zIndex:1000, overflow:"hidden" }}>
+                  <div style={{ padding:"14px 18px", borderBottom:"1px solid #f1f5f9", display:"flex", justifyContent:"space-between", alignItems:"center", background:"#f8fafc" }}>
+                    <span style={{ fontWeight:800, fontSize:14, color:"#0f172a" }}>Notifications</span>
+                    {notifications.length > 0 && (
+                      <button onClick={() => setNotifications([])} style={{ background:"none", border:"none", color:"var(--app-accent)", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Clear all</button>
+                    )}
+                  </div>
+                  <div style={{ maxHeight:400, overflowY:"auto" }}>
+                    {notifications.length === 0 ? (
+                      <div style={{ padding:"50px 20px", textAlign:"center", color:"#94a3b8" }}>
+                        <div style={{ fontSize:36, marginBottom:12 }}>🔔</div>
+                        <div style={{ fontSize:13, fontWeight:500 }}>No new notifications</div>
+                      </div>
+                    ) : (
+                      notifications.map((n, i) => (
+                        <div key={n.id || i} style={{ padding:"14px 18px", borderBottom:i < notifications.length - 1 ? "1px solid #f8fafc" : "none", display:"flex", gap:14, alignItems:"flex-start", background: i===0 ? "#f0f9ff" : "#fff", transition:"background 0.2s" }} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background=i===0?"#f0f9ff":"#fff"}>
+                          <div style={{ width:36, height:36, borderRadius:10, background:`${n.color}15`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{n.icon}</div>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ fontSize:13, fontWeight:800, color:"#0f172a" }}>{n.title}</div>
+                            <div style={{ fontSize:12, color:"#475569", marginTop:3, lineHeight:1.5 }}>{n.msg}</div>
+                            <div style={{ fontSize:10, color:"#94a3b8", marginTop:6, fontWeight:600 }}>{new Date(n.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                          </div>
+                          <button onClick={() => setNotifications(prev => prev.filter(x => x.id !== n.id))} style={{ background:"none", border:"none", color:"#cbd5e1", cursor:"pointer", fontSize:14, padding:4 }} onMouseEnter={e=>e.currentTarget.style.color="#ef4444"}>✕</button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Profile Info (Desktop) */}
+            <div data-profile-anchor="true" onClick={(e)=>{e.stopPropagation();setProfileDropdownOpen(v=>!v);}} style={{ display:"flex", alignItems:"center", gap:12, cursor:"pointer", padding:"4px 8px", borderRadius:12, transition:"background 0.2s" }} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+               <div style={{ textAlign:"right" }}>
+                 <div style={{ fontSize:13, fontWeight:800, color:"#0f172a" }}>{resolvedUser?.name || "Employee"}</div>
+                 <div style={{ fontSize:10, color:"#94a3b8", fontWeight:600, textTransform:"uppercase", letterSpacing:0.5 }}>{resolvedUser?.role || "Employee"}</div>
+               </div>
+               <div style={{ width:38, height:38, borderRadius:12, background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:14, border:"2px solid #fff", boxShadow:"0 4px 12px rgba(0,0,0,0.08)" }}>
+                 {(empName||"E").slice(0,2).toUpperCase()}
+               </div>
+            </div>
+          </div>
+        </div>
+
         <div className="emp-mob-bar" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background:"#fff", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
           <button onClick={()=>setSidebarOpen(true)} style={{ background:"none", border:"none", fontSize:22, cursor:"pointer", color:"var(--app-accent)" }}>☰</button>
 
           {/* Notifications */}
           <div style={{ position:"relative", display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ position:"relative" }}>
-              <button style={{ background:"none", border:"none", fontSize:18, cursor:"pointer", color:"var(--app-accent)", position:"relative" }}>
+            <div style={{ position:"relative" }} data-notif-anchor="true">
+              <button onClick={() => setNotifDropdownOpen(!notifDropdownOpen)} style={{ background:"none", border:"none", fontSize:18, cursor:"pointer", color:"var(--app-accent)", position:"relative" }}>
                 🔔
-                <span style={{ position:"absolute", top:"-2px", right:"-2px", background:"#ef4444", color:"#fff", borderRadius:"50%", width:"16px", height:"16px", fontSize:"10px", fontWeight:"700", display:"flex", alignItems:"center", justifyContent:"center" }}>3</span>
+                {unreadCount > 0 && (
+                  <span style={{ position:"absolute", top:"-2px", right:"-2px", background:"#ef4444", color:"#fff", borderRadius:"50%", width:"16px", height:"16px", fontSize:"10px", fontWeight:"700", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    {unreadCount}
+                  </span>
+                )}
               </button>
+              
+              {notifDropdownOpen && (
+                <div data-notif-menu="true" style={{ position:"absolute", top:35, right:-60, width:300, background:"#fff", border:"1px solid #e2e8f0", borderRadius:12, boxShadow:"0 10px 25px rgba(0,0,0,0.1)", zIndex:1000, overflow:"hidden" }}>
+                  <div style={{ padding:"12px 16px", borderBottom:"1px solid #f1f5f9", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                    <span style={{ fontWeight:800, fontSize:13, color:"#0f172a" }}>Notifications</span>
+                    {notifications.length > 0 && (
+                      <button onClick={() => setNotifications([])} style={{ background:"none", border:"none", color:"var(--app-accent)", fontSize:11, fontWeight:700, cursor:"pointer" }}>Clear all</button>
+                    )}
+                  </div>
+                  <div style={{ maxHeight:350, overflowY:"auto" }}>
+                    {notifications.length === 0 ? (
+                      <div style={{ padding:"40px 20px", textAlign:"center", color:"#94a3b8" }}>
+                        <div style={{ fontSize:30, marginBottom:10 }}>🔔</div>
+                        <div style={{ fontSize:12 }}>No new notifications</div>
+                      </div>
+                    ) : (
+                      notifications.map((n, i) => (
+                        <div key={n.id || i} style={{ padding:"12px 16px", borderBottom:i < notifications.length - 1 ? "1px solid #f8fafc" : "none", display:"flex", gap:12, alignItems:"flex-start", background: i===0 ? "#f0f9ff" : "#fff" }}>
+                          <div style={{ width:32, height:32, borderRadius:8, background:`${n.color}15`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0 }}>{n.icon}</div>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ fontSize:12, fontWeight:800, color:"#0f172a" }}>{n.title}</div>
+                            <div style={{ fontSize:11, color:"#475569", marginTop:2, lineHeight:1.4 }}>{n.msg}</div>
+                            <div style={{ fontSize:9, color:"#94a3b8", marginTop:4 }}>{new Date(n.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                          </div>
+                          <button onClick={() => setNotifications(prev => prev.filter(x => x.id !== n.id))} style={{ background:"none", border:"none", color:"#cbd5e1", cursor:"pointer", fontSize:12 }}>✕</button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

@@ -189,4 +189,41 @@ const sendQuickEmail = async (to, subject, message) => {
   return await sendEmail(to, subject, html);
 };
 
-module.exports = { sendEmail, sendRenewalReminder, sendExpiryNotification, sendUsageLimitAlert, sendTrialWelcome, sendOTPEmail, sendQuickEmail, sendSubscriptionSuccess };
+// Employee Status Update Email (Approved/Rejected)
+const sendEmployeeStatusUpdateEmail = async (userEmail, userName, companyName, status) => {
+  const isApproved = status === "Approved";
+  const statusColor = isApproved ? "#22c55e" : "#ef4444";
+  const statusBg = isApproved ? "#f0fdf4" : "#fef2f2";
+  const statusBorder = isApproved ? "#bbf7d0" : "#fecaca";
+  
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+      ${mbHeader}
+      <div style="background:#fff;padding:32px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
+        <h3 style="color:${statusColor};margin-top:0;">${isApproved ? "✅ Account Approved!" : "❌ Registration Update"}</h3>
+        <p style="color:#4b5563;">Hello <strong>${userName}</strong>,</p>
+        <p style="color:#4b5563;">Your registration for <strong>${companyName}</strong> has been <strong>${status}</strong>.</p>
+        
+        <div style="background:${statusBg};border:1.5px solid ${statusBorder};border-radius:10px;padding:20px;margin:24px 0;">
+          <p style="margin:0;color:${statusColor};font-weight:700;font-size:16px;">Status: ${status.toUpperCase()}</p>
+          <p style="margin:8px 0 0;color:#4b5563;font-size:14px;">
+            ${isApproved 
+              ? "You can now log in to your dashboard and start using the platform. Welcome aboard!" 
+              : "Unfortunately, your registration could not be approved at this time. Please contact your administrator for more information."}
+          </p>
+        </div>
+
+        ${isApproved ? `
+   
+        ` : ""}
+
+        <p style="color:#4b5563;">Thank you,<br/>${companyName} Team</p>
+        ${mbFooter}
+      </div>
+    </div>
+  `;
+  const subject = isApproved ? `✅ Congratulations! Your account at ${companyName} is approved` : `❌ Registration Update - ${companyName}`;
+  return await sendEmail(userEmail, subject, html);
+};
+
+module.exports = { sendEmail, sendRenewalReminder, sendExpiryNotification, sendUsageLimitAlert, sendTrialWelcome, sendOTPEmail, sendQuickEmail, sendSubscriptionSuccess, sendEmployeeStatusUpdateEmail };

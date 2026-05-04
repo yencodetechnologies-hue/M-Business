@@ -28,7 +28,6 @@ function Badge({ label }) {
 
 const NAV = [
   { key: "dashboard", icon: "", label: "Dashboard" },
-  { key: "subadmins", icon: "", label: "Subadmins" },
   { key: "proposals", icon: "", label: "Project Proposals" },
   { key: "reports", icon: "", label: "Reports" },
   { key: "subscriptions", icon: "", label: "Subscriptions" },

@@ -24,7 +24,9 @@ export default function EmployeeOnboarding() {
     photo: null,
     department: "",
     role: "employee",
-    status: "Active"
+    status: "Pending",
+    dateOfBirth: "",
+    maritalStatus: "Unmarried"
   });
   const [docs, setDocs] = useState({
     aadhaar: null,
@@ -90,7 +92,10 @@ export default function EmployeeOnboarding() {
           ifscCode: form.ifscCode
         },
         profilePhoto: form.photo,
-        companyId: queryParams.get("companyId") || ""
+        companyId: queryParams.get("companyId") || "",
+          dateOfBirth: form.dateOfBirth,
+  maritalStatus: form.maritalStatus,
+
       };
 
       await axios.post(`${BASE_URL}/api/employees/add`, payload);
@@ -112,6 +117,9 @@ export default function EmployeeOnboarding() {
       ]);
 
       setSuccess(true);
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 3000);
     } catch (err) {
       console.error(err);
       setErr({ submit: err.response?.data?.msg || err.response?.data?.message || "Failed to submit. Please try again." });
@@ -119,6 +127,19 @@ export default function EmployeeOnboarding() {
       setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ maxWidth: 450, width: "100%", background: "#fff", padding: 40, borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", textAlign: "center" }}>
+          <div style={{ width: 80, height: 80, background: "#dcfce7", color: "#22c55e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, margin: "0 auto 24px" }}>✓</div>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: "#1e293b", marginBottom: 12 }}>Registration Successful!</h2>
+          <p style={{ color: "#64748b", lineHeight: 1.6, marginBottom: 24 }}>Thank you for joining <strong>{companyName}</strong>. Your details have been submitted for approval. You will receive an email once your account is activated.</p>
+          <div style={{ fontSize: 13, color: "#94a3b8" }}>Redirecting you to dashboard...</div>
+        </div>
+      </div>
+    );
+  }
 
   
 
@@ -155,6 +176,40 @@ export default function EmployeeOnboarding() {
             
             <Input label="Email Address" value={form.email} onChange={v => handleChange("email", v)} error={err.email} type="email" placeholder="john@company.com" />
             <Input label="Phone Number" value={form.phone} onChange={v => handleChange("phone", v)} error={err.phone} placeholder="+91 98765 43210" />
+            <Input
+  label="Date of Birth"
+  value={form.dateOfBirth}
+  onChange={v => handleChange("dateOfBirth", v)}
+  type="date"
+  placeholder=""
+/>
+
+{/* Marital Status - Select */}
+<div style={{ marginBottom: 4 }}>
+  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+    Marital Status *
+  </label>
+  <select
+    value={form.maritalStatus}
+    onChange={e => handleChange("maritalStatus", e.target.value)}
+    style={{
+      width: "100%",
+      height: 46,
+      padding: "0px 14px",
+      boxSizing: "border-box",
+      borderRadius: 12,
+      border: "1.5px solid #e2e8f0",
+      fontSize: 14,
+      color: "#1e293b",
+      outline: "none",
+      background: "#f8fafc",
+      cursor: "pointer"
+    }}
+  >
+    <option value="Unmarried">Unmarried</option>
+    <option value="Married">Married</option>
+  </select>
+</div>
             <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type="password" placeholder="Set your password" />
           </div>
 

@@ -2,6 +2,8 @@ const express  = require("express");
 const router   = express.Router();
 const bcrypt   = require("bcryptjs");
 const Employee = require("../models/EmployeeModel");
+const { sendEmployeeStatusUpdateEmail } = require("../config/email");
+const SubAdmin = require("../models/SubAdminModels");
 
 // GET all employees
 router.get("/", async (req, res) => {
@@ -16,18 +18,30 @@ router.get("/", async (req, res) => {
 
 router.post("/add", async (req, res) => {
   try {
-    const { name, email, phone, role, department, salary, status, password, profilePhoto, bankDetails } = req.body;
+    const { name, email, phone, role, department, salary, status, password, profilePhoto, bankDetails ,    dateOfBirth, maritalStatus} = req.body;
 
+    console.log("Adding employee payload:", req.body);
     if (!name || !email) {
+      console.log("Missing name or email");
       return res.status(400).json({ msg: "Name and Email required" });
     }
     if (!password || password.trim().length < 4) {
+      console.log("Password invalid:", password);
       return res.status(400).json({ msg: "Password required (min 4 chars)" });
     }
 
-    const existing = await Employee.findOne({ email });
+    const cleanEmail = email.toLowerCase().trim();
+    const existing = await Employee.findOne({ email: cleanEmail });
     if (existing) {
-      return res.status(400).json({ msg: "Employee already exists" });
+      console.log("Duplicate Employee found:", existing);
+      return res.status(400).json({ msg: `[DB-EMP] Employee with email ${cleanEmail} already exists` });
+    }
+
+    const User = require("../models/UserModels");
+    const existingUser = await User.findOne({ email: cleanEmail });
+    if (existingUser) {
+      console.log("Duplicate User found:", existingUser);
+      return res.status(400).json({ msg: `[DB-USR] An account with email ${cleanEmail} already exists as an Admin/SubAdmin` });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,18 +53,24 @@ router.post("/add", async (req, res) => {
       role:       role       || "Employee",
       department: department || "",
       salary:     salary     || "",
-      status:     status     || "Active",
+status: "Pending",
+
       password:   hashedPassword,
       companyId:  req.body.companyId || req.companyId || "",
       profilePhoto: profilePhoto || "",
-      bankDetails: bankDetails || { bankName: "", accountNumber: "", ifscCode: "" }
+      bankDetails: bankDetails || { bankName: "", accountNumber: "", ifscCode: "" },
+      dateOfBirth:   dateOfBirth   || "",
+maritalStatus: maritalStatus || "Unmarried"
     });
 
     await employee.save();
+
+    // Email skipped for Pending status as per requirement
+
     res.status(201).json({ msg: "Employee added", employee });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ msg: "Server error" });
+    console.log("Error in /add:", err);
+    res.status(500).json({ msg: err.message || "Server error" });
   }
 });
 
@@ -105,6 +125,41 @@ router.post("/login", async (req, res) => {
 });
 
 // DELETE employee 
+
+// UPDATE employee status (Approve/Reject)
+router.put("/status/:id", async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!["Pending", "Approved", "Rejected"].includes(status)) {
+      return res.status(400).json({ msg: "Invalid status" });
+    }
+
+    const employee = await Employee.findByIdAndUpdate(
+      req.params.id,
+      { $set: { status } },
+      { new: true }
+    );
+    if (!employee) return res.status(404).json({ msg: "Employee not found" });
+
+    // Send Status Update Email
+    if (status === "Approved" || status === "Rejected") {
+      try {
+        let companyName = "Our Company";
+        if (employee.companyId) {
+          const sa = await SubAdmin.findById(employee.companyId);
+          if (sa && sa.companyName) companyName = sa.companyName;
+        }
+        await sendEmployeeStatusUpdateEmail(employee.email, employee.name, companyName, status);
+      } catch (emailErr) {
+        console.error("Status update email failed:", emailErr);
+      }
+    }
+
+    res.json({ msg: `Employee ${status}`, employee });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
 
 router.delete("/:id", async (req, res) => {
   try {

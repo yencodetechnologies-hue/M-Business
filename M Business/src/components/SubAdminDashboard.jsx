@@ -604,6 +604,17 @@ function EmployeesPage({ employees, setEmployees }) {
     showToast("  🗑️️️️️️️️️️️ Employee deleted!");
   };
 
+  const handleStatusUpdate = async (id, newStatus) => {
+    try {
+      await axios.put(`${BASE_URL}/api/employees/status/${id}`, { status: newStatus });
+      setEmployees(prev => prev.map(e => e._id === id ? { ...e, status: newStatus } : e));
+      showToast(`✅ Employee ${newStatus} successfully!`);
+    } catch (err) {
+      console.error("Status update error:", err);
+      showToast("❌ Failed to update status");
+    }
+  };
+
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
   const onboardingLink = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(user.companyName || "Our Company")}&companyId=${companyId}`;
@@ -637,7 +648,7 @@ function EmployeesPage({ employees, setEmployees }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-        {[{ t: "Total", v: employees.length, i: "👨‍💼", c: "var(--app-muted)" }, { t: "Active", v: employees.filter(e => e.status === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: employees.filter(e => e.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total", v: employees.length, i: "👨‍💼", c: "var(--app-muted)" }, { t: "Approved", v: employees.filter(e => e.status === "Approved").length, i: "✅", c: "#22C55E" }, { t: "Rejected", v: employees.filter(e => e.status === "Rejected").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
@@ -670,7 +681,46 @@ function EmployeesPage({ employees, setEmployees }) {
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12, fontWeight: 600 }}>{e.role || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{e.department || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#22C55E", fontSize: 12, fontWeight: 600 }}>{e.salary || "—"}</td>
-                    <td style={{ padding: "12px 14px" }}><Badge label={e.status || "Active"} /></td>
+                    <td style={{ padding: "12px 14px" }}>
+                      <div style={{ position: "relative", display: "inline-block" }}>
+                        <select
+                          value={e.status || "Pending"}
+                          onChange={(ev) => handleStatusUpdate(e._id, ev.target.value)}
+                          style={{
+                            background: `${sc(e.status || "Pending")}18`,
+                            color: sc(e.status || "Pending"),
+                            border: `1px solid ${sc(e.status || "Pending")}33`,
+                            padding: "4px 24px 4px 12px",
+                            borderRadius: 20,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            outline: "none",
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                            WebkitAppearance: "none",
+                            MozAppearance: "none",
+                            appearance: "none",
+                            textAlign: "left",
+                            minWidth: 100,
+                            transition: "all 0.2s"
+                          }}
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Approved">Approved</option>
+                          <option value="Rejected">Rejected</option>
+                        </select>
+                        <span style={{ 
+                          position: "absolute", 
+                          right: "10px", 
+                          top: "50%", 
+                          transform: "translateY(-50%)", 
+                          fontSize: "10px", 
+                          color: sc(e.status || "Pending"), 
+                          pointerEvents: "none",
+                          fontWeight: "bold"
+                        }}>▼</span>
+                      </div>
+                    </td>
                     <td style={{ padding: "12px 14px" }}>
                       <ActionBtns
                         onView={() => { setViewEmp(e); loadEmpDocs(e); }}
@@ -785,7 +835,7 @@ function EmployeesPage({ employees, setEmployees }) {
             <Fld label="Role" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={["Employee", "Manager", "Admin"]} />
             <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
             <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
+            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
@@ -2815,7 +2865,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [clientSuccessData, setClientSuccessData] = useState(null);
 
   const [employees, setEmployees] = useState([]);
-  const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Active", password: "" });
+  const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "" });
   const [showEmpPass, setShowEmpPass] = useState(false);
   const [neError, setNeError] = useState({});
   const [empSaveLoading, setEmpSaveLoading] = useState(false);
@@ -3126,7 +3176,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const addEmployee = async () => {
-    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email is required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNeError(errors); return; } try { setEmpSaveLoading(true); const payload = { ...ne, role: ne.role || "employee" }; const res = await axios.post(BASE_URL + "/api/employees/add", payload); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Active", password: "" }); setShowEmpPass(false); setNeError({}); if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); } } catch (err) {
+    const errors = {}; if (!ne.name.trim()) errors.name = "Name is required"; if (!ne.email.trim()) errors.email = "Email required"; if (!ne.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNeError(errors); return; } try { setEmpSaveLoading(true); const payload = { ...ne, role: ne.role || "employee" }; const res = await axios.post(BASE_URL + "/api/employees/add", payload); setEmployees(prev => [res.data.employee, ...prev]); setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "" }); setShowEmpPass(false); setNeError({}); if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); } } catch (err) {
       const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
       const isPasswordError = errMsg.toLowerCase().includes("password");
       setNeError(isPasswordError ? { password: errMsg } : { email: errMsg });
@@ -4152,7 +4202,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={["Manager", "Developer", "Tech", "Others"]} />
           <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
           <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
-          <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Active", "Inactive"]} />
+          <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Pending", "Approved", "Rejected"]} />
         </div>
         <div style={{ marginBottom: 14, marginTop: 4 }}>
           <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>

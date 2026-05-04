@@ -1358,17 +1358,21 @@ export default function EmployeeDashboard({ user, setUser }) {
 
     // 1. Login Notification
     if (!hasNotifiedLogin) {
-      addNotification({
-        id: `login_${Date.now()}`,
-        type: 'login',
-        title: 'Login Successful',
-        msg: `Welcome back, ${resolvedUser.name}!`,
-        icon: '🔐',
-        color: '#10b981',
-        time: new Date().toISOString()
-      });
-      setHasNotifiedLogin(true);
-      sessionStorage.setItem(`login_notified_${empName}`, "true");
+      // Use a session-stable key to prevent double dispatch in some React versions
+      const isAlreadyNotified = sessionStorage.getItem(`login_notified_${empName}`) === "true";
+      if (!isAlreadyNotified) {
+        addNotification({
+          id: `login_${Date.now()}`,
+          type: 'login',
+          title: 'Login Successful',
+          msg: `Welcome back, ${resolvedUser.name}!`,
+          icon: '🔐',
+          color: '#10b981',
+          time: new Date().toISOString()
+        });
+        setHasNotifiedLogin(true);
+        sessionStorage.setItem(`login_notified_${empName}`, "true");
+      }
     }
 
     // 2. Birthday Notification

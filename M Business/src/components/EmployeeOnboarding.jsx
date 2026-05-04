@@ -36,6 +36,7 @@ export default function EmployeeOnboarding() {
   const [err, setErr] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showPass, setShowPass] = useState(false);
 
   const queryParams = new URLSearchParams(window.location.search);
   const companyName = queryParams.get("company") || "Our Company";
@@ -210,7 +211,12 @@ export default function EmployeeOnboarding() {
     <option value="Married">Married</option>
   </select>
 </div>
-            <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type="password" placeholder="Set your password" />
+            <div style={{ position: "relative" }}>
+              <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type={showPass ? "text" : "password"} placeholder="Set your password" />
+              <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: 32, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#94a3b8" }}>
+                {showPass ? "👁️" : "👁️‍🗨️"}
+              </button>
+            </div>
           </div>
 
           <div style={{ fontSize: 12, fontWeight: 800, color: "#94a3b8", letterSpacing: 1, marginBottom: 16, borderBottom: "1px solid #f1f5f9", paddingBottom: 8, marginTop: 32 }}>BANK ACCOUNT DETAILS</div>

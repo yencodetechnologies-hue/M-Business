@@ -75,34 +75,43 @@ function ProjectTimeline({ project }) {
 }
 
 // ── NEW: PaymentTimeline — issued → due → paid ─────────────────
-// ── PaymentTimeline — 3 step visual timeline ──────────────────
 function PaymentTimeline({ inv }) {
-  // Days diff helper - normalized to date only for accuracy
-  const daysDiff = (dateStr) => {
+  const fmt = (n) => n >= 100000 ? `₹${(n / 100000).toFixed(2)}L` : `₹${n.toLocaleString("en-IN")}`;
+  
+  const parseLocalDate = (dateStr) => {
     if (!dateStr) return null;
-    const d = new Date(dateStr);
-    d.setHours(0,0,0,0);
-    const now = new Date();
-    now.setHours(0,0,0,0);
-    return Math.round((now - d) / (1000 * 60 * 60 * 24));
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d);
   };
 
-  const isPaid    = inv.status?.toLowerCase() === "paid";
-  const overdueDaysVal = daysDiff(inv.due);
+  const isPaid = inv.status?.toLowerCase() === "paid";
+  const isPartPaid = inv.status?.toLowerCase() === "part_paid" || inv.status?.toLowerCase() === "partial" || (inv.status?.toLowerCase() === "draft" && (inv.amountPaid || 0) > 0);
+  
+  const dueD = parseLocalDate(inv.due);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let overdueDaysVal = 0;
+  if (dueD) {
+    overdueDaysVal = Math.round((today - dueD) / (1000 * 60 * 60 * 24));
+  }
+
   const isActuallyOverdue = !isPaid && overdueDaysVal > 0;
   const isOverdue = inv.status?.toLowerCase() === "overdue" || isActuallyOverdue;
   const isDueToday = !isPaid && !isOverdue && overdueDaysVal === 0;
-  const isPending = !isPaid && !isOverdue && !isDueToday && ["pending", "unpaid", "sent", "part_paid", "partial"].includes(inv.status?.toLowerCase());
+  const isPending = !isPaid && !isOverdue && !isDueToday;
 
-  // Fill % for the track line
-  // 35% = before due date, 50% = due today, 55% = overdue, 100% = paid
-  const fillPct  = isPaid ? 100 : isOverdue ? 55 : isDueToday ? 50 : 35;
-  const fillColor = isPaid ? "#16a34a" : isOverdue ? "#dc2626" : isDueToday ? "#f59e0b" : "#6366f1";
+  let fillPct = 35;
+  if (isPaid) fillPct = 100;
+  else if (isPartPaid) fillPct = 75;
+  else if (isOverdue) fillPct = 55;
+  else if (isDueToday) fillPct = 50;
+
+  const fillColor = isPaid ? "#16a34a" : isPartPaid ? "#6366f1" : isOverdue ? "#dc2626" : isDueToday ? "#f59e0b" : "#6366f1";
 
   const overdueDays = isOverdue ? overdueDaysVal : null;
-  const dueDiff     = (isPending || isDueToday) ? -overdueDaysVal : null; // 0 = today, positive = future
+  const dueDiff = (isPending || isDueToday) ? -overdueDaysVal : null; 
 
-  // Step config
   const steps = [
     {
       label: "Invoice\nCreated",
@@ -114,32 +123,33 @@ function PaymentTimeline({ inv }) {
     {
       label: "Due\nDate",
       date: inv.due,
-      done: isPaid || isOverdue || isDueToday,
-      color: isPaid ? "#16a34a" : isOverdue ? "#dc2626" : "#f59e0b",
+      done: isPaid || isOverdue || isDueToday || isPartPaid,
+      color: isPaid ? "#16a34a" : isOverdue ? "#dc2626" : isDueToday ? "#f59e0b" : isPartPaid ? "#6366f1" : "#f59e0b",
       glow: isPaid ? "#dcfce7" : isOverdue ? "#fee2e2" : "#fef9c3",
-      pulse: isOverdue || isDueToday || isPending,
+      pulse: isOverdue || isDueToday || (isPending && !isPartPaid),
       isOverdue,
       isDueToday,
-      isPending,
     },
     {
-      label: isPaid ? "Payment\nReceived" : "Payment\nPending",
-      date: isPaid ? (inv.paymentDate || inv.paid || "—") : "—",
-      done: isPaid,
-      color: isPaid ? "#16a34a" : null,
-      glow: isPaid ? "#dcfce7" : null,
-      dashed: !isPaid,
+      label: isPaid ? "Payment\nCompleted" : isPartPaid ? "Partial\nPayment" : "Payment\nPending",
+      date: (isPaid || isPartPaid) ? (inv.paymentDate || inv.paid || "—") : "—",
+      done: isPaid || isPartPaid,
+      color: isPaid ? "#16a34a" : isPartPaid ? "#6366f1" : null,
+      glow: isPaid ? "#dcfce7" : isPartPaid ? "#eef2ff" : null,
+      dashed: !isPaid && !isPartPaid,
     },
   ];
 
   const statusMsg = isPaid
     ? (() => {
         const paidDate = inv.paymentDate || inv.paid || inv.due;
-        const d = daysDiff(paidDate);
-        const diff = new Date(inv.due) - new Date(paidDate);
-        const early = Math.round(diff / (1000 * 60 * 60 * 24));
+        const d = parseLocalDate(paidDate);
+        if (!d || !dueD) return "Payment completed";
+        const early = Math.round((dueD - d) / (1000 * 60 * 60 * 24));
         return early > 0 ? `Payment completed ${early} days early` : early === 0 ? "Payment completed on due date" : `Payment completed ${Math.abs(early)} days late`;
       })()
+    : isPartPaid
+    ? `Partially paid — ${fmt(inv.amountPaid || 0)} received. Balance: ${fmt((inv.total || 0) - (inv.amountPaid || 0))}`
     : isOverdue
     ? `Overdue by ${overdueDays || 0} days — immediate action required`
     : dueDiff === 0
@@ -152,7 +162,6 @@ function PaymentTimeline({ inv }) {
 
   return (
     <div style={{ marginTop:14, paddingTop:14, borderTop:"1px solid #f1f5f9" }}>
-      {/* Steps */}
       <div style={{ display:"flex", alignItems:"flex-start", position:"relative", paddingBottom:8 }}>
         {/* Track */}
         <div style={{ position:"absolute", top:14, left:14, right:14, height:3, background:"#f1f5f9", borderRadius:99, zIndex:0 }}/>
@@ -1263,7 +1272,11 @@ export default function ClientDashboard({ user, setUser }) {
                       <div style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace" }}>Issued {inv.date} · Due {inv.due}{inv.method&&inv.method!=="—"?` · Paid via ${inv.method}`:""}</div>
                     </div>
                     <div style={{ textAlign:"right", flexShrink:0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
-                      {/* Removed duplicate total amount display as requested */}
+                      {(inv.amountPaid || 0) > 0 && (
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "#10b981" }}>
+                          Paid: {inv.currency || "₹"}{(inv.amountPaid || 0).toLocaleString("en-IN")}
+                        </div>
+                      )}
                       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                         <Badge label={(inv.status?.toLowerCase()==="draft" && (inv.amountPaid||0)>0) ? "part_paid" : inv.status}/>
                         <button 

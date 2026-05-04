@@ -327,45 +327,51 @@ router.patch("/:id/status", async (req, res) => {
     }
 
     const updateData = { status };
-    if (amountPaid !== undefined) updateData.amountPaid = parseFloat(amountPaid) || 0;
     if (paymentMode !== undefined) updateData.paymentMode = paymentMode;
     if (paymentDate !== undefined) updateData.paymentDate = paymentDate;
     if (transactionId !== undefined) updateData.transactionId = transactionId;
 
-    const invoice = await Invoice.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { returnDocument: "after" }
-    );
+    let invoice;
+    if (amountPaid !== undefined && (status === "paid" || status === "part_paid")) {
+      // Use $inc to add the new payment to the existing total
+      invoice = await Invoice.findByIdAndUpdate(
+        req.params.id,
+        { ...updateData, $inc: { amountPaid: parseFloat(amountPaid) || 0 } },
+        { returnDocument: "after" }
+      );
+    } else {
+      // Standard status update
+      if (amountPaid !== undefined) updateData.amountPaid = parseFloat(amountPaid) || 0;
+      invoice = await Invoice.findByIdAndUpdate(
+        req.params.id,
+        updateData,
+        { returnDocument: "after" }
+      );
+    }
 
     if (!invoice) {
       return res.status(404).json({ success: false, msg: "Invoice not found" });
     }
 
     // Sync Income if status is Paid or Part Paid
-    if (status === "paid" || status === "part_paid") {
-      // If they marked it paid, use the updated amountPaid. If it is 0, assume full payment.
-      const syncAmount = invoice.amountPaid > 0 ? invoice.amountPaid : invoice.total;
-      const query = { invoiceNo: invoice.invoiceNo };
-      if (invoice.transactionId) query.transactionId = invoice.transactionId;
-
-      await Income.findOneAndUpdate(
-        query,
-        {
-          title: syncAmount < invoice.total ? `Part Payment for Invoice ${invoice.invoiceNo}` : `Full Payment for Invoice ${invoice.invoiceNo}`,
-          category: syncAmount < invoice.total ? "Advance" : "Project Payment",
-          paymentMode: invoice.paymentMode || "GPay",
-          amount: syncAmount,
-          client: invoice.client,
-          invoiceNo: invoice.invoiceNo,
-          transactionId: invoice.transactionId || "",
-          date: invoice.paymentDate || invoice.date || new Date().toISOString().split("T")[0],
-          status: "Received",
-          currency: invoice.currency || "₹",
-          companyId: invoice.companyId || req.companyId || "",
-        },
-        { upsert: true }
-      );
+    if ((status === "paid" || status === "part_paid") && amountPaid !== undefined && parseFloat(amountPaid) > 0) {
+      const syncAmount = parseFloat(amountPaid);
+      
+      // Always create a NEW Income record for each payment action to maintain history
+      const newIncome = new Income({
+        title: syncAmount < invoice.total ? `Part Payment for Invoice ${invoice.invoiceNo}` : `Full Payment for Invoice ${invoice.invoiceNo}`,
+        category: syncAmount < invoice.total ? "Advance" : "Project Payment",
+        paymentMode: invoice.paymentMode || "GPay",
+        amount: syncAmount,
+        client: invoice.client,
+        invoiceNo: invoice.invoiceNo,
+        transactionId: invoice.transactionId || "",
+        date: invoice.paymentDate || invoice.date || new Date().toISOString().split("T")[0],
+        status: "Received",
+        currency: invoice.currency || "₹",
+        companyId: invoice.companyId || req.companyId || "",
+      });
+      await newIncome.save();
     }
 
     return res.json({ success: true, invoice });

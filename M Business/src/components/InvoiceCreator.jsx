@@ -341,15 +341,16 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // ── Update status inline ────────────────────────────────────
   const handleStatusChange = async (entry, newStatus) => {
     if (newStatus === "paid" || newStatus === "part_paid") {
+      const remaining = Math.max(0, (entry.total || 0) - (entry.amountPaid || 0));
       setPaymentData({
-        amountPaid: newStatus === "paid" ? (entry.total || 0) : (entry.amountPaid || 0),
+        amountPaid: newStatus === "paid" ? remaining : 0,
         paymentMode: "GPay",
         paymentDate: new Date().toISOString().split("T")[0],
         transactionId: ""
       });
       setPaymentModalStatus(newStatus);
       setPaymentModalEntry(entry);
-      return; // Wait for modal confirmation
+      return; 
     }
     await updateStatusBackend(entry, newStatus);
   };
@@ -358,21 +359,22 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     const id = entry._id || entry.id;
     setStatusUpdating(id);
     try {
-      await axios.patch(`${BASE_URL}/api/invoices/${id}/status`, { status: newStatus, ...paymentDetails });
-    } catch { }
-    // update local list
-    setInvoiceList(prev => prev.map(e =>
-      (e.id || e.invoiceNo) === (id || entry.invoiceNo) ? { ...e, status: newStatus, ...(e.inv ? { inv: { ...e.inv, ...paymentDetails } } : {}), ...paymentDetails } : e
-    ));
-    // update localStorage
-    const drafts = loadAllDrafts();
-    const idx = drafts.findIndex(d => (d.id || d.invoiceNo) === (id || entry.invoiceNo));
-    if (idx >= 0) { 
-      drafts[idx].status = newStatus; 
-      if (drafts[idx].inv) Object.assign(drafts[idx].inv, paymentDetails); 
-      Object.assign(drafts[idx], paymentDetails);
-      localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts)); 
+      const res = await axios.patch(`${BASE_URL}/api/invoices/${id}/status`, { status: newStatus, ...paymentDetails });
+      if (res.data.success && res.data.invoice) {
+        const updated = res.data.invoice;
+        // The backend returns the full doc, but we need to normalize it for the list if needed
+        // Actually, the list expects the structure returned by GET /api/invoices
+        // For simplicity, let's just update the specific fields we know changed
+        setInvoiceList(prev => prev.map(e =>
+          (e.id || e.invoiceNo) === (id || entry.invoiceNo) 
+            ? { ...e, status: updated.status, amountPaid: updated.amountPaid, inv: { ...(e.inv || {}), amountPaid: updated.amountPaid, status: updated.status } } 
+            : e
+        ));
+      }
+    } catch (err) {
+      console.error("Update status failed", err);
     }
+    
     setStatusUpdating(null);
     if (newStatus === "paid" || newStatus === "part_paid") {
       const isPartial = (paymentDetails.amountPaid || 0) < (entry.total || 0);
@@ -556,7 +558,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   if (step === "list") {
     const enriched = invoiceList.map((e) => {
       const dueDate = e.inv?.dueDate || e.dueDate;
-      const status = e.status || (dueDate && new Date(dueDate) < new Date() ? "overdue" : "unpaid");
+      const dDate = dueDate ? new Date(dueDate + "T00:00:00") : null;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const isOverdue = dDate && dDate < today;
+      const status = e.status || (isOverdue ? "overdue" : "unpaid");
       return { ...e, status };
     });
 
@@ -593,16 +599,35 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
               </div>
               
+              <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "14px", marginBottom: 20, border: "1.5px solid var(--app-border)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Total Amount:</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "var(--app-text)" }}>{formatCurrency(paymentModalEntry.total, paymentModalEntry.currency || inv.currency)}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Previously Paid:</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#16a34a" }}>{formatCurrency(paymentModalEntry.amountPaid || 0, paymentModalEntry.currency || inv.currency)}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, borderTop: "1px dashed var(--app-border)" }}>
+                  <span style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>Balance Due:</span>
+                  <span style={{ fontSize: 14, fontWeight: 900, color: "#ea580c" }}>{formatCurrency(Math.max(0, (paymentModalEntry.total || 0) - (paymentModalEntry.amountPaid || 0)), paymentModalEntry.currency || inv.currency)}</span>
+                </div>
+              </div>
+
               <div style={{ marginBottom: 16 }}>
-                <label style={lbl}>Amount Paid {paymentModalStatus === "part_paid" ? "(Advance / Part)" : ""} <span style={{color:"#ef4444"}}>*</span></label>
+                <label style={lbl}>
+                  {paymentModalStatus === "paid" ? "Final Payment Amount" : "New Payment Amount (Advance)"} 
+                  <span style={{color:"#ef4444"}}> *</span>
+                </label>
                 <div style={{position:"relative"}}>
-                  <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"#6b7280",fontSize:14,fontWeight:600}}>{inv.currency}</span>
+                  <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"#6b7280",fontSize:14,fontWeight:600}}>{paymentModalEntry.currency || inv.currency}</span>
                   <input type="number" 
                     value={paymentData.amountPaid === 0 ? "" : paymentData.amountPaid} 
                     onChange={e => setPaymentData(p => ({ ...p, amountPaid: e.target.value === "" ? 0 : Number(e.target.value) }))} 
-                    placeholder="0"
-                    style={{...inp(), paddingLeft:30}} />
+                    placeholder="Enter amount"
+                    style={{...inp(), paddingLeft:30, fontWeight: 700, fontSize: 16}} />
                 </div>
+                <p style={{fontSize: 10, color: "#9ca3af", marginTop: 4}}>This amount will be added to the total paid.</p>
               </div>
               
               <div style={{ marginBottom: 16 }}>

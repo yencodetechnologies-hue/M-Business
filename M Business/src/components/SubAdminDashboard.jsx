@@ -3762,10 +3762,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
                               <div style={{ fontSize: 13 }}>{p.name}</div>
                               <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
-                              <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: "var(--app-accent)", display: "flex", alignItems: "center", gap: 4 }}>
-                                📋 {pTasks.length > 0 ? `${doneTasks}/${pTasks.length} Tasks Done` : "No Tasks"}
-                                <span style={{ fontSize: 10 }}>→</span>
-                              </div>
+                           
                             </td>
                             <td style={{ padding: "12px 12px", color: "var(--app-muted)" }}>{p.client}</td>
                             <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>

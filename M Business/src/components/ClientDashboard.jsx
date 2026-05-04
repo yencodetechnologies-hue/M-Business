@@ -39,11 +39,20 @@ function ProjectTimeline({ project }) {
   const spentNum  = parseFloat((spent  || "0").replace(/[^0-9.]/g, "")) || 0;
   const budgetNum = parseFloat((budget || "1").replace(/[^0-9.]/g, "")) || 1;
   const paidPct   = Math.min(100, Math.round((spentNum / budgetNum) * 100));
+  
+  // Date-based overdue check
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const deadDate = new Date(deadline);
+  deadDate.setHours(0,0,0,0);
+  
   const isComplete = status === "Completed";
-  const isOverdue  = project.paymentStatus === "Overdue";
-  const fillColor  = isComplete ? "linear-gradient(90deg,#10b981,#34d399)" : status === "Pending" ? "linear-gradient(90deg,#f59e0b,#fbbf24)" : "linear-gradient(90deg,#6366f1,#8b5cf6)";
-  const dotColor   = isComplete ? "#10b981" : status === "Pending" ? "#f59e0b" : "#6366f1";
-  const payColor   = isOverdue  ? "#ef4444" : "#10b981";
+  const isActuallyOverdue = !isComplete && deadDate < today;
+  const isOverdue  = project.paymentStatus === "Overdue" || isActuallyOverdue;
+  
+  const fillColor  = isComplete ? "linear-gradient(90deg,#10b981,#34d399)" : isOverdue ? "linear-gradient(90deg,#ef4444,#dc2626)" : status === "Pending" ? "linear-gradient(90deg,#f59e0b,#fbbf24)" : "linear-gradient(90deg,#6366f1,#8b5cf6)";
+  const dotColor   = isComplete ? "#10b981" : isOverdue ? "#ef4444" : status === "Pending" ? "#f59e0b" : "#6366f1";
+  const payColor   = project.paymentStatus === "Overdue" ? "#ef4444" : "#10b981";
   const paySize    = isComplete ? 20 : 13;
   return (
     <div style={{ margin:"14px 0 6px", position:"relative" }}>
@@ -57,8 +66,8 @@ function ProjectTimeline({ project }) {
       </div>
       <div style={{ display:"flex", justifyContent:"space-between", marginTop:8 }}>
         <span style={{ fontSize:10, color:"#94a3b8", fontFamily:"monospace" }}>📅 {startDate || "—"}</span>
-        <span style={{ fontSize:11, fontWeight:700, color:dotColor }}>{isComplete?"✓ Done":`${progress}%`}</span>
-        <span style={{ fontSize:10, color:"#94a3b8", fontFamily:"monospace" }}>{isComplete?"✅":"⏱"} {deadline}</span>
+        <span style={{ fontSize:11, fontWeight:700, color:dotColor }}>{isComplete?"✓ Done":isOverdue?`⚠️ Overdue (${progress}%)`:`${progress}%`}</span>
+        <span style={{ fontSize:10, color:isOverdue?"#ef4444":"#94a3b8", fontFamily:"monospace", fontWeight:isOverdue?700:400 }}>{isComplete?"✅":isOverdue?"🚨":"⏱"} {deadline}</span>
       </div>
     </div>
   );
@@ -67,23 +76,30 @@ function ProjectTimeline({ project }) {
 // ── NEW: PaymentTimeline — issued → due → paid ─────────────────
 // ── PaymentTimeline — 3 step visual timeline ──────────────────
 function PaymentTimeline({ inv }) {
-  const isPaid    = inv.status === "Paid";
-  const isOverdue = inv.status === "Overdue";
-  const isPending = inv.status === "Pending";
-
-  // Fill % for the track line
-  const fillPct  = isPaid ? 100 : isOverdue ? 55 : 35;
-  const fillColor = isPaid ? "#16a34a" : isOverdue ? "#dc2626" : "#6366f1";
-
-  // Days diff helper
+  // Days diff helper - normalized to date only for accuracy
   const daysDiff = (dateStr) => {
     if (!dateStr) return null;
     const d = new Date(dateStr);
+    d.setHours(0,0,0,0);
     const now = new Date();
+    now.setHours(0,0,0,0);
     return Math.round((now - d) / (1000 * 60 * 60 * 24));
   };
-  const overdueDays = isOverdue ? daysDiff(inv.due) : null;
-  const dueDiff     = isPending ? -daysDiff(inv.due) : null; // negative = future
+
+  const isPaid    = inv.status?.toLowerCase() === "paid";
+  const overdueDaysVal = daysDiff(inv.due);
+  const isActuallyOverdue = !isPaid && overdueDaysVal > 0;
+  const isOverdue = inv.status?.toLowerCase() === "overdue" || isActuallyOverdue;
+  const isDueToday = !isPaid && !isOverdue && overdueDaysVal === 0;
+  const isPending = !isPaid && !isOverdue && !isDueToday && ["pending", "unpaid", "sent", "part_paid", "partial"].includes(inv.status?.toLowerCase());
+
+  // Fill % for the track line
+  // 35% = before due date, 50% = due today, 55% = overdue, 100% = paid
+  const fillPct  = isPaid ? 100 : isOverdue ? 55 : isDueToday ? 50 : 35;
+  const fillColor = isPaid ? "#16a34a" : isOverdue ? "#dc2626" : isDueToday ? "#f59e0b" : "#6366f1";
+
+  const overdueDays = isOverdue ? overdueDaysVal : null;
+  const dueDiff     = (isPending || isDueToday) ? -overdueDaysVal : null; // 0 = today, positive = future
 
   // Step config
   const steps = [
@@ -97,16 +113,17 @@ function PaymentTimeline({ inv }) {
     {
       label: "Due\nDate",
       date: inv.due,
-      done: isPaid || isOverdue,
+      done: isPaid || isOverdue || isDueToday,
       color: isPaid ? "#16a34a" : isOverdue ? "#dc2626" : "#f59e0b",
       glow: isPaid ? "#dcfce7" : isOverdue ? "#fee2e2" : "#fef9c3",
-      pulse: isOverdue || isPending,
+      pulse: isOverdue || isDueToday || isPending,
       isOverdue,
+      isDueToday,
       isPending,
     },
     {
       label: isPaid ? "Payment\nReceived" : "Payment\nPending",
-      date: isPaid ? (inv.paid || "—") : "—",
+      date: isPaid ? (inv.paymentDate || inv.paid || "—") : "—",
       done: isPaid,
       color: isPaid ? "#16a34a" : null,
       glow: isPaid ? "#dcfce7" : null,
@@ -116,13 +133,16 @@ function PaymentTimeline({ inv }) {
 
   const statusMsg = isPaid
     ? (() => {
-        const d = daysDiff(inv.paid || inv.due);
-        const diff = new Date(inv.due) - new Date(inv.paid || inv.due);
+        const paidDate = inv.paymentDate || inv.paid || inv.due;
+        const d = daysDiff(paidDate);
+        const diff = new Date(inv.due) - new Date(paidDate);
         const early = Math.round(diff / (1000 * 60 * 60 * 24));
         return early > 0 ? `Payment completed ${early} days early` : early === 0 ? "Payment completed on due date" : `Payment completed ${Math.abs(early)} days late`;
       })()
     : isOverdue
     ? `Overdue by ${overdueDays || 0} days — immediate action required`
+    : dueDiff === 0
+    ? "Due today"
     : dueDiff > 0
     ? `Due in ${dueDiff} days`
     : "Due soon";
@@ -873,12 +893,12 @@ export default function ClientDashboard({ user, setUser }) {
   // Live payment totals
   const parseAmt = (s) => parseFloat(String(s||"0").replace(/[^0-9.]/g,"")) || 0;
   const totalInvoiced = payments.reduce((s,p)=>s+parseAmt(p.amount),0);
-  const totalPaid    = payments.filter(p=>p.status==="Paid" || p.status==="part_paid").reduce((s,p)=>{
-    const paidAmt = p.paymentHistory?.reduce((sum, h)=>sum+parseAmt(h.amountPaid), 0) || (p.status==="Paid" ? parseAmt(p.amount) : 0);
+  const totalPaid    = payments.filter(p=>p.status?.toLowerCase()==="paid" || p.status?.toLowerCase()==="part_paid").reduce((s,p)=>{
+    const paidAmt = p.paymentHistory?.reduce((sum, h)=>sum+parseAmt(h.amountPaid), 0) || (p.status?.toLowerCase()==="paid" ? parseAmt(p.amount) : 0);
     return s + paidAmt;
   }, 0);
-  const totalPending = payments.filter(p=>p.status==="Pending").reduce((s,p)=>s+parseAmt(p.amount),0);
-  const totalOverdue = payments.filter(p=>p.status==="Overdue").reduce((s,p)=>s+parseAmt(p.amount),0);
+  const totalPending = payments.filter(p=>p.status?.toLowerCase()==="pending").reduce((s,p)=>s+parseAmt(p.amount),0);
+  const totalOverdue = payments.filter(p=>p.status?.toLowerCase()==="overdue").reduce((s,p)=>s+parseAmt(p.amount),0);
   const balanceDue   = totalInvoiced - totalPaid;
   const fmt = (n) => n>=100000?`₹${(n/100000).toFixed(2)}L`:`₹${n.toLocaleString("en-IN")}`;
 
@@ -1228,7 +1248,7 @@ export default function ClientDashboard({ user, setUser }) {
                 <StatCard icon="📊" label="Total Invoiced" value={fmt(totalInvoiced)} sub={`${payments.length} invoices`} color="#6366f1"/>
                 <StatCard icon="✅" label="Total Paid" value={fmt(totalPaid)}    sub={`Received`}   color="#10b981"/>
                 <StatCard icon="🚨" label="Balance Due"    value={fmt(balanceDue)} sub={`Outstanding`} color="#ef4444"/>
-                <StatCard icon="⏳" label="Pending/Overdue" value={fmt(totalPending+totalOverdue)} sub={`${payments.filter(p=>p.status!=="Paid").length} items`} color="#f59e0b"/>
+                <StatCard icon="⏳" label="Pending/Overdue" value={fmt(totalPending+totalOverdue)} sub={`${payments.filter(p=>p.status?.toLowerCase()!=="paid").length} items`} color="#f59e0b"/>
               </div>
               {payments.map(inv=>(
                 <div key={inv.id||inv._id||inv.invoiceId} style={{ background:"#fff", borderRadius:14, border:`1px solid ${inv.status==="Overdue"?"#fecaca":"#e2e8f0"}`, padding:"16px 18px" }}>
@@ -1240,15 +1260,41 @@ export default function ClientDashboard({ user, setUser }) {
                       <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:2 }}>{inv.id||inv.invoiceId||inv._id} · {inv.project}</div>
                       <div style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace" }}>Issued {inv.date} · Due {inv.due}{inv.method&&inv.method!=="—"?` · Paid via ${inv.method}`:""}</div>
                     </div>
-                    <div style={{ textAlign:"right", flexShrink:0 }}>
-                      <div style={{ fontSize:16, fontWeight:800, color:"#0f172a", fontFamily:"'DM Mono',monospace", marginBottom:4 }}>{inv.amount}</div>
-                      <Badge label={inv.status}/>
+                    <div style={{ textAlign:"right", flexShrink:0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+                      <div style={{ fontSize:16, fontWeight:800, color:"#0f172a", fontFamily:"'DM Mono',monospace" }}>{inv.amount}</div>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <Badge label={inv.status}/>
+                        <button 
+                          onClick={() => {
+                            const slimPayload = {
+                              no: inv.invoiceNo || inv.id || inv._id,
+                              date: inv.date,
+                              due: inv.due || inv.dueDate,
+                              co: inv.companyName || inv.inv?.companyName,
+                              email: inv.companyEmail || inv.inv?.companyEmail,
+                              phone: inv.companyPhone || inv.inv?.companyPhone,
+                              addr: inv.companyAddress || inv.inv?.companyAddress,
+                              cl: inv.client,
+                              proj: inv.project,
+                              gst: inv.gstRate || 0,
+                              notes: inv.notes,
+                              terms: inv.terms,
+                              incGst: inv.isGstIncluded,
+                              paid: inv.amountPaid || 0,
+                              upi: inv.upiId || "",
+                              cur: inv.currency || "₹",
+                              items: (inv.items || []).map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
+                            };
+                            const d = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
+                            window.open(`/invoice-view?d=${d}`, "_blank");
+                          }}
+                          style={{ background: "none", border: "1px solid #e2e8f0", borderRadius: 8, padding: "2px 8px", fontSize: 10, color: "#6366f1", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                        >
+                          View 🧾
+                        </button>
+                      </div>
                     </div>
-                    {inv.status!=="Paid" && (
-                      <button style={{ background:inv.status==="Overdue"?"linear-gradient(135deg,#ef4444,#dc2626)":"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", border:"none", borderRadius:9, padding:"8px 14px", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", flexShrink:0 }}>
-                        Pay Now
-                      </button>
-                    )}
+                    
                   </div>
                   <PaymentTimeline inv={inv}/>
                 </div>

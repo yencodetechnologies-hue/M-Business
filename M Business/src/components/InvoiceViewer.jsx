@@ -118,7 +118,7 @@ export default function InvoiceViewer() {
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>INVOICE</div>
           <div style={{ fontSize: 22, fontWeight: 900, color: "#c4b5fd", marginBottom: 2 }}>{inv.invoiceNo}</div>
           <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{inv.companyName}</div>
-          <button onClick={() => setShowScanner(true)} style={{ marginTop: 10, padding: '8px 16px', background: 'var(--app-accent)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Scan QR Code</button>
+
           {inv.companyEmail && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 3 }}>{inv.companyEmail}</div>}
           {inv.companyPhone && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{inv.companyPhone}</div>}
 

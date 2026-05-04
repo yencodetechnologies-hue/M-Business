@@ -5,43 +5,12 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 
-// ── Try to reuse existing Employee model ─────────────────────────────────────
-let Employee;
-try { Employee = mongoose.model("Employee"); } catch {
-  Employee = mongoose.model("Employee", new mongoose.Schema({
-    name: String, email: String, phone: String,
-    role: String, department: String, salary: String, status: String,
-  }, { timestamps: true }));
-}
+const Employee = require("../models/EmployeeModel");
+const Project = require("../models/ProjectModel");
+const Task = require("../models/TaskModels");
 
-// ── Models ───────────────────────────────────────────────────────────────────
-let Project;
-try { Project = mongoose.model("Project"); } catch {
-  Project = mongoose.model("Project", new mongoose.Schema({
-    name: { type: String, required: true },
-    client: { type: String, default: "" },
-    budget: { type: String, default: "" },
-    deadline: { type: String, default: "" },
-    status: { type: String, default: "active" },
-    progress: { type: Number, default: 0 },
-    assignedTo: { type: String, default: "" },
-    manager: { type: String, default: "" },
-    description: { type: String, default: "" },
-  }, { timestamps: true }));
-}
-
-let Task;
-try { Task = mongoose.model("Task"); } catch {
-  Task = mongoose.model("Task", new mongoose.Schema({
-    title: { type: String, required: true },
-    description: { type: String, default: "" },
-    project: { type: String, default: "" },
-    assignedTo: { type: String, default: "" },
-    priority: { type: String, enum: ["High", "Medium", "Low"], default: "Medium" },
-    status: { type: String, enum: ["pending", "in progress", "done", "completed"], default: "pending" },
-    dueDate: { type: String, default: "" },
-  }, { timestamps: true }));
-}
+// Attendance, Leave, Permission, Salary models are not in separate files yet, so we'll keep them here or move them later if needed.
+// For now, let's keep the redefinitions for those but use the proper ones for Project/Task/Employee.
 
 let Attendance;
 try { Attendance = mongoose.model("Attendance"); } catch {
@@ -136,8 +105,12 @@ const docUpload = multer({ storage: docStorage, limits: { fileSize: 10 * 1024 * 
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/profile/:name", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
-    const emp = await Employee.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
+    const name = decodeURIComponent(req.params.name).trim();
+    const companyId = req.headers['x-company-id'] || "";
+    const query = { name: new RegExp(`^${name}$`, "i") };
+    if (companyId) query.companyId = companyId;
+    
+    const emp = await Employee.findOne(query);
     if (!emp) return res.status(404).json({ msg: "Employee not found" });
     res.json(emp);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
@@ -148,31 +121,62 @@ router.get("/profile/:name", async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/projects/:name", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
-    const projects = await Project.find({
+    const name = decodeURIComponent(req.params.name).trim();
+    if (!name) return res.json([]);
+    
+    const companyId = req.headers['x-company-id'] || "";
+    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
+    
+    // Exact name match in array or field
+    const nameRegex = new RegExp(`^${name}$`, "i");
+    
+    const query = {
+      companyId,
       $or: [
-        { assignedTo: { $regex: new RegExp(name, "i") } },
-        { manager: { $regex: new RegExp(name, "i") } }
+        { assignedTo: name },
+        { manager: name }
       ]
-    }).sort({ createdAt: -1 });
+    };
+    
+    const projects = await Project.find(query).sort({ createdAt: -1 });
     res.json(projects);
-  } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
+  } catch (err) {
+    console.error("GET Projects Error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
 });
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TASKS
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/tasks/:name", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
-    const tasks = await Task.find({
-      assignTo: { $regex: new RegExp(name, "i") },
+    const name = decodeURIComponent(req.params.name).trim();
+    if (!name) return res.json([]);
+    
+    const companyId = req.headers['x-company-id'] || "";
+    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
+
+    const nameRegex = new RegExp(`^${name}$`, "i");
+    
+    const query = {
+      companyId,
+      $or: [
+        { assignTo: name },
+        { assignedTo: name }
+      ],
       isDeleted: false
-    })
-    .populate("projectId", "name color")
-    .sort({ createdAt: -1 });
+    };
+
+    const tasks = await Task.find(query)
+      .populate("projectId", "name color")
+      .sort({ createdAt: -1 });
     res.json(tasks);
-  } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
+  } catch (err) {
+    console.error("GET Tasks Error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -180,8 +184,16 @@ router.get("/tasks/:name", async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/attendance/:name", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
-    const records = await Attendance.find({ employeeName: { $regex: new RegExp(name, "i") } }).sort({ date: -1 });
+    const name = decodeURIComponent(req.params.name).trim();
+    const companyId = req.headers['x-company-id'] || "";
+    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
+    
+    const query = { 
+      companyId,
+      employeeName: { $regex: new RegExp(`^${name}$`, "i") }
+    };
+    
+    const records = await Attendance.find(query).sort({ date: -1 });
     res.json(records);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
 });
@@ -239,8 +251,12 @@ router.get("/leave/all/list", async (req, res) => {
 
 router.get("/leave/:name", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
-    const leaves = await Leave.find({ employeeName: { $regex: new RegExp(name, "i") } }).sort({ createdAt: -1 });
+    const name = decodeURIComponent(req.params.name).trim();
+    const companyId = req.headers['x-company-id'] || "";
+    const query = { employeeName: new RegExp(`^${name}$`, "i") };
+    if (companyId) query.companyId = companyId;
+    
+    const leaves = await Leave.find(query).sort({ from: -1 });
     res.json(leaves);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
 });
@@ -325,8 +341,12 @@ router.get("/permission/all/list", async (req, res) => {
 
 router.get("/permission/:name", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
-    const perms = await Permission.find({ employeeName: { $regex: new RegExp(name, "i") } }).sort({ createdAt: -1 });
+    const name = decodeURIComponent(req.params.name).trim();
+    const companyId = req.headers['x-company-id'] || "";
+    const query = { employeeName: new RegExp(`^${name}$`, "i") };
+    if (companyId) query.companyId = companyId;
+    
+    const perms = await Permission.find(query).sort({ createdAt: -1 });
     res.json(perms);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
 });
@@ -378,8 +398,12 @@ router.patch("/permission/:id/reject", async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/salary/:name", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
-    const slips = await Salary.find({ employeeName: { $regex: new RegExp(name, "i") } }).sort({ createdAt: -1 });
+    const name = decodeURIComponent(req.params.name).trim();
+    const companyId = req.headers['x-company-id'] || "";
+    const query = { employeeName: new RegExp(`^${name}$`, "i") };
+    if (companyId) query.companyId = companyId;
+    
+    const slips = await Salary.find(query).sort({ createdAt: -1 });
     res.json(slips);
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
 });
@@ -417,16 +441,20 @@ router.post("/documents/upload", docUpload.single("file"), async (req, res) => {
 // GET /api/employee-dashboard/documents/:name/:docType — single doc
 router.get("/documents/:name/:docType", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
+    const name = decodeURIComponent(req.params.name).trim();
+    const companyId = req.headers['x-company-id'] || "";
     const { docType } = req.params;
+    
+    const query = { employeeName: new RegExp(`^${name}$`, "i") };
+    if (companyId) query.companyId = companyId;
+
     if (docType === "all") {
-      const docs = await EmployeeDoc.find({ employeeName: { $regex: new RegExp(name, "i") } });
+      const docs = await EmployeeDoc.find(query);
       return res.json(docs);
     }
-    const doc = await EmployeeDoc.findOne({
-      employeeName: { $regex: new RegExp(name, "i") },
-      docType
-    });
+    
+    query.docType = docType;
+    const doc = await EmployeeDoc.findOne(query);
     res.json(doc || {});
   } catch (err) { res.status(500).json({ msg: "Error", error: err.message }); }
 });
@@ -448,12 +476,30 @@ router.delete("/documents/:name/:docType", async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/summary/:name", async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
+    const name = decodeURIComponent(req.params.name).trim();
+    const companyId = req.headers['x-company-id'] || "";
+    const nameRegex = new RegExp(`^${name}$`, "i");
+
+    const query = { $or: [{ assignedTo: nameRegex }, { manager: nameRegex }] };
+    if (companyId) query.companyId = companyId;
+
+    const taskQuery = { 
+      $or: [{ assignTo: nameRegex }, { assignedTo: nameRegex }], 
+      isDeleted: false 
+    };
+    if (companyId) taskQuery.companyId = companyId;
+
+    const attQuery = { employeeName: nameRegex };
+    if (companyId) attQuery.companyId = companyId;
+
+    const salQuery = { employeeName: nameRegex };
+    if (companyId) salQuery.companyId = companyId;
+
     const [projects, tasks, attendance, salary] = await Promise.all([
-      Project.find({ $or: [{ assignedTo: { $regex: new RegExp(name, "i") } }, { manager: { $regex: new RegExp(name, "i") } }] }),
-      Task.find({ assignTo: { $regex: new RegExp(name, "i") }, isDeleted: false }),
-      Attendance.find({ employeeName: { $regex: new RegExp(name, "i") } }),
-      Salary.find({ employeeName: { $regex: new RegExp(name, "i") } }).sort({ createdAt: -1 }).limit(1),
+      Project.find(query),
+      Task.find(taskQuery),
+      Attendance.find(attQuery),
+      Salary.find(salQuery).sort({ createdAt: -1 }).limit(1),
     ]);
     const thisMonth = new Date().toISOString().slice(0, 7);
     const monthAttend = attendance.filter(a => a.date.startsWith(thisMonth));

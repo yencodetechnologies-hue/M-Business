@@ -6,10 +6,28 @@ const Event = require("../models/EventModels");
 // GET all events
 router.get("/", async (req, res) => {
   try {
+    const { companyId, employeeName, projectNames } = req.query;
     const filter = {};
-    if (req.query.companyId && req.query.companyId !== "admin-company-id" && req.query.companyId !== "default") {
-      filter.companyId = req.query.companyId;
+    
+    if (companyId && companyId !== "admin-company-id" && companyId !== "default") {
+      filter.companyId = companyId;
     }
+
+    // If employeeName is provided, we filter to show:
+    // 1. Events created by this employee
+    // 2. Events linked to projects this employee is assigned to (passed via projectNames array/string)
+    if (employeeName) {
+      const nameRegex = new RegExp(`^${employeeName}$`, "i");
+      const orConditions = [{ createdBy: { $regex: nameRegex } }];
+      
+      if (projectNames) {
+        const pList = Array.isArray(projectNames) ? projectNames : projectNames.split(",");
+        orConditions.push({ project: { $in: pList } });
+      }
+      
+      filter.$or = orConditions;
+    }
+
     const events = await Event.find(filter).sort({ date: 1 });
     res.json(events);
   } catch (err) {

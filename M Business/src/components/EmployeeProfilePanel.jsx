@@ -195,20 +195,7 @@ const handleClose = () => {
 
   return (
     <>
-      {/* Floating trigger */}
-      <button onClick={()=>setOpen(true)} title="My Profile & Documents"
-        style={{ position:"fixed", top:16, right:16, zIndex:200, width:48, height:48, borderRadius:"50%", background:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 18px rgba(99,102,241,0.45)", transition:"transform 0.2s", flexDirection:"column" }}
-        onMouseEnter={e=>e.currentTarget.style.transform="scale(1.08)"}
-        onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
-        <span style={{ color:"#fff", fontWeight:800, fontSize:14, lineHeight:1 }}>{initials}</span>
-        {uploadedCount < DOC_TYPES.length && (
-          <span style={{ position:"absolute", top:-3, right:-3, width:16, height:16, borderRadius:"50%", background:"#ef4444", border:"2px solid #fff", fontSize:8, fontWeight:800, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            {DOC_TYPES.length - uploadedCount}
-          </span>
-        )}
-      </button>
-
-      {open && <div onClick={()=>setOpen(false)} style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.4)", zIndex:997, backdropFilter:"blur(2px)" }}/>}
+      {open && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.4)", zIndex: 997, backdropFilter: "blur(2px)" }} />}
 
       <div style={{ position:"fixed", top:0, right:0, bottom:0, width:340, background:"#fff", zIndex:998, boxShadow:"-8px 0 40px rgba(99,102,241,0.18)", transform:open?"translateX(0)":"translateX(100%)", transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1)", display:"flex", flexDirection:"column", overflowY:"auto" }}>
         {/* Header */}

@@ -37,7 +37,18 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
   const load = async () => {
     setLoading(true);
     try {
-      const r = await axios.get(`${API}?companyId=${companyId || ""}`);
+      const isEmp = String(user?.role || user?.userRole || "").toLowerCase() === 'employee';
+      let url = `${API}?companyId=${companyId || ""}`;
+      
+      if (isEmp && user?.name) {
+        url += `&employeeName=${encodeURIComponent(user.name)}`;
+        if (projects.length > 0) {
+          const pNames = projects.map(p => p.name).join(",");
+          url += `&projectNames=${encodeURIComponent(pNames)}`;
+        }
+      }
+
+      const r = await axios.get(url);
       setEvents(Array.isArray(r.data) ? r.data : []);
     } catch {
       setEvents([]);
@@ -45,7 +56,10 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
     setLoading(false);
   };
 
-  const isClient = String(user?.role || user?.userRole || "").toLowerCase() === 'client';
+  const role = String(user?.role || user?.userRole || "").toLowerCase();
+  const isClient = role === 'client';
+  const isEmployee = role === 'employee';
+
   const filteredEvents = isClient 
     ? events.filter(e => {
         if (!e.client) return false;

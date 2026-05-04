@@ -15,7 +15,8 @@ const sc = (s) => ({
   Paid:"#10b981", Overdue:"#ef4444", High:"#ef4444",
   Medium:"#f59e0b", Low:"#10b981", Todo:"#64748b", Done:"#10b981",
   draft: "#64748b", pending: "#f59e0b", approved: "#10b981", rejected: "#ef4444",
-  "Pending Approval": "#f59e0b", "Approved": "#10b981", "Rejected": "#ef4444", "Draft": "#64748b"
+  "Pending Approval": "#f59e0b", "Approved": "#10b981", "Rejected": "#ef4444", "Draft": "#64748b",
+  part_paid: "#6366f1", partial: "#6366f1"
 }[s] || "#6366f1");
 
 // ── NAV ───────────────────────────────────────────────────────
@@ -235,9 +236,10 @@ function ProgressBar({ pct, color }) {
 // ── Badge ─────────────────────────────────────────────────────
 function Badge({ label, size="sm" }) {
   const c = sc(label);
+  const displayLabel = (label === "part_paid" || label === "partial") ? "Part Payment" : label;
   return (
-    <span style={{ background:`${c}15`, color:c, border:`1px solid ${c}30`, padding:size==="sm"?"2px 8px":"4px 12px", borderRadius:20, fontSize:size==="sm"?11:12, fontWeight:700, letterSpacing:0.3, whiteSpace:"nowrap", fontFamily:"'DM Mono',monospace" }}>
-      {label}
+    <span style={{ background:`${c}15`, color:c, border:`1px solid ${c}30`, padding:size==="sm"?"2px 8px":"4px 12px", borderRadius:20, fontSize:size==="sm"?11:12, fontWeight:700, letterSpacing:0.3, whiteSpace:"nowrap", fontFamily:"'DM Mono',monospace", textTransform: (label === "part_paid" || label === "partial") ? "none" : "capitalize" }}>
+      {displayLabel}
     </span>
   );
 }
@@ -1261,9 +1263,9 @@ export default function ClientDashboard({ user, setUser }) {
                       <div style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace" }}>Issued {inv.date} · Due {inv.due}{inv.method&&inv.method!=="—"?` · Paid via ${inv.method}`:""}</div>
                     </div>
                     <div style={{ textAlign:"right", flexShrink:0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
-                      <div style={{ fontSize:16, fontWeight:800, color:"#0f172a", fontFamily:"'DM Mono',monospace" }}>{inv.amount}</div>
+                      {/* Removed duplicate total amount display as requested */}
                       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <Badge label={inv.status}/>
+                        <Badge label={(inv.status?.toLowerCase()==="draft" && (inv.amountPaid||0)>0) ? "part_paid" : inv.status}/>
                         <button 
                           onClick={() => {
                             const slimPayload = {
@@ -1284,6 +1286,7 @@ export default function ClientDashboard({ user, setUser }) {
                               upi: inv.upiId || "",
                               cur: inv.currency || "₹",
                               items: (inv.items || []).map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
+                              history: inv.paymentHistory || [],
                             };
                             const d = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
                             window.open(`/invoice-view?d=${d}`, "_blank");

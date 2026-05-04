@@ -279,10 +279,18 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const apiSave = async (status = "draft") => {
     try {
       if (editingId) {
-        const res = await axios.put(`${BASE_URL}/api/invoices/${editingId}`, { inv, items, status });
+        let newStatus = status;
+        if (newStatus === "draft" && parseFloat(inv.amountPaid) > 0) {
+          newStatus = parseFloat(inv.amountPaid) < total ? "part_paid" : "paid";
+        }
+        const res = await axios.put(`${BASE_URL}/api/invoices/${editingId}`, { inv, items, status: newStatus });
         return res.data;
       } else {
-        const res = await axios.post(`${BASE_URL}/api/invoices`, { inv, items, status });
+        let newStatus = status;
+        if (newStatus === "draft" && parseFloat(inv.amountPaid) > 0) {
+          newStatus = parseFloat(inv.amountPaid) < total ? "part_paid" : "paid";
+        }
+        const res = await axios.post(`${BASE_URL}/api/invoices`, { inv, items, status: newStatus });
         return res.data;
       }
     } catch {
@@ -384,6 +392,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     upi: inv.upiId,
     cur: inv.currency,
     items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
+    history: inv.paymentHistory || [],
   };
   const qrData = `${FRONTEND_URL}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 

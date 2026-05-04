@@ -47,6 +47,7 @@ export default function InvoiceViewer() {
         gstRate: slim.gst, notes: slim.notes, terms: slim.terms,
         isGstIncluded: slim.incGst, amountPaid: slim.paid || 0,
         upiId: slim.upi || "", currency: slim.cur || "₹",
+        paymentHistory: slim.history || [],
       };
       const items = (slim.items || []).map((i, idx) => ({
         id: idx + 1, description: i.d, quantity: i.q, rate: i.r,
@@ -64,8 +65,10 @@ export default function InvoiceViewer() {
         total = subtotal + gstAmt;
       }
       
-      const balanceDue = total - inv.amountPaid;
-      setData({ inv, items, subtotal, gstAmt, total, balanceDue });
+      const historyTotal = inv.paymentHistory?.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0) || 0;
+      const finalPaid = Math.max(inv.amountPaid, historyTotal);
+      const balanceDue = total - finalPaid;
+      setData({ inv, items, subtotal, gstAmt, total, balanceDue, finalPaid });
     } catch (e) {
       setError("Could not read invoice data. The QR code may be invalid or expired.");
     }
@@ -200,13 +203,25 @@ export default function InvoiceViewer() {
             ["Subtotal", formatCurrency(subtotal, inv.currency)],
             [`GST (${inv.gstRate}%)`, formatCurrency(gstAmt, inv.currency)],
             ["Total", formatCurrency(total, inv.currency)],
-            ["Amount Paid", formatCurrency(inv.amountPaid, inv.currency)]
+            ["Amount Paid", formatCurrency(data.finalPaid, inv.currency)]
           ].map(([l, v]) => (
             <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--app-bg)" }}>
               <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
               <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-text)" }}>{v}</span>
             </div>
           ))}
+
+          {inv.paymentHistory?.length > 0 && (
+            <div style={{ marginTop: 12, padding: "10px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
+              <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-accent)", marginBottom: 8, letterSpacing: 0.5, textTransform: "uppercase" }}>💳 Payment History</div>
+              {inv.paymentHistory.map((p, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0", borderBottom: i < inv.paymentHistory.length - 1 ? "1px solid #f1f5f9" : "none" }}>
+                  <span style={{ color: "#64748b" }}>{formatDate(p.date)} {p.category === "Advance" ? "(Advance)" : ""}</span>
+                  <span style={{ fontWeight: 700, color: "var(--app-text)" }}>{formatCurrency(p.amount, inv.currency)}</span>
+                </div>
+              ))}
+            </div>
+          )}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", borderRadius: 12, padding: "12px 14px" }}>
             <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>BALANCE DUE</span>
             <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(data.balanceDue, inv.currency)}</span>

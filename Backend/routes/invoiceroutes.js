@@ -11,13 +11,16 @@ router.get("/", async (req, res) => {
     const filter = req.companyId ? { companyId: req.companyId } : {};
     const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
-    const normalised = invoices.map((doc) => {
+    const normalised = await Promise.all(invoices.map(async (doc) => {
       const subtotal = (doc.items || []).reduce(
         (s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0),
         0
       );
       const gstRate = parseFloat(doc.gstRate) || 0;
       const total   = doc.total || subtotal * (1 + gstRate / 100);
+
+      // Fetch payment history for this invoice
+      const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
 
       // Rebuild nested `inv` object that the frontend InvoiceCreator expects
       const inv = {
@@ -39,6 +42,7 @@ router.get("/", async (req, res) => {
         transactionId:  doc.transactionId  || "",
         currency:       doc.currency       || "₹",
         upiId:          doc.upiId          || "",
+        paymentHistory: history,
       };
 
       return {
@@ -55,8 +59,9 @@ router.get("/", async (req, res) => {
         savedAt:   doc.createdAt || Date.now(),
         inv,
         items:     doc.items || [],
+        paymentHistory: history,
       };
-    });
+    }));
 
     return res.json({ success: true, invoices: normalised });
   } catch (err) {
@@ -82,10 +87,13 @@ router.get("/client/:clientName", async (req, res) => {
     const filter = conditions.length > 0 ? { $or: conditions } : {};
     const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
-    const normalised = invoices.map((doc) => {
+    const normalised = await Promise.all(invoices.map(async (doc) => {
       const subtotal = (doc.items || []).reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
       const gstRate = parseFloat(doc.gstRate) || 0;
       const total = doc.total || subtotal * (1 + gstRate / 100);
+      
+      const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
+
       return {
         id: doc._id.toString(),
         invoiceNo: doc.invoiceNo || "—",
@@ -99,8 +107,18 @@ router.get("/client/:clientName", async (req, res) => {
         currency: doc.currency || "₹",
         savedAt: doc.createdAt || Date.now(),
         items: doc.items || [],
+        paymentHistory: history,
+        companyName: doc.companyName,
+        companyEmail: doc.companyEmail,
+        companyPhone: doc.companyPhone,
+        companyAddress: doc.companyAddress,
+        notes: doc.notes,
+        terms: doc.terms,
+        isGstIncluded: doc.isGstIncluded,
+        gstRate: doc.gstRate,
+        upiId: doc.upiId,
       };
-    });
+    }));
     res.json(normalised);
   } catch (err) {
     res.status(500).json({ msg: err.message });
@@ -178,11 +196,22 @@ router.post("/", async (req, res) => {
     if (existing) {
       // If updating, preserve existing status if not provided
       const updateData = { ...flatData };
-      updateData.status = status || existing.status || "draft";
+      let newStatus = status || existing.status || "draft";
+      
+      // Auto-transition from draft to part_paid if money is paid
+      if (newStatus === "draft" && flatData.amountPaid > 0) {
+        newStatus = flatData.amountPaid < total ? "part_paid" : "paid";
+      }
+      
+      updateData.status = newStatus;
       await Invoice.updateOne({ _id: existing._id }, { $set: updateData });
       savedInvoice = await Invoice.findById(existing._id).lean();
     } else {
-      const newInvoice = new Invoice({ ...flatData, status: status || "draft" });
+      let newStatus = status || "draft";
+      if (newStatus === "draft" && flatData.amountPaid > 0) {
+        newStatus = flatData.amountPaid < total ? "part_paid" : "paid";
+      }
+      const newInvoice = new Invoice({ ...flatData, status: newStatus });
       await newInvoice.save();
       savedInvoice = newInvoice.toObject();
     }

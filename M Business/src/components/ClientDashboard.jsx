@@ -1004,7 +1004,6 @@ export default function ClientDashboard({ user, setUser }) {
         {/* Mobile topbar */}
         <div className="mob-topbar" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background:"#fff", borderBottom:"1px solid #e2e8f0", position:"sticky", top:0, zIndex:100 }}>
           <button onClick={()=>setSidebarOpen(true)} style={{ background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#6366f1" }}>☰</button>
-          <span style={{ fontWeight:800, fontSize:14, color:"#0f172a" }}>CompanyHub</span>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo}/>
             <ProfileDropdown user={user} />

@@ -1134,7 +1134,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const addSlide = (type) => {
     const s = makeSlide(type, doc.theme);
     const slides = [...doc.slides, s];
-    setDoc({ ...doc, slides }); setPage(slides.length - 1); setLeftPanel("templates"); flash("✨ Slide added!");
+    setDoc({ ...doc, slides }); setPage(slides.length - 1); 
   };
   const delSlide = (i) => {
     if (doc.slides.length <= 1) return;

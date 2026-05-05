@@ -263,259 +263,278 @@ export default function AdminDashboard({ user, setUser }) {
       </div>
 
       {/* Package Creation Modal */}
-      {modal === "package_add" && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,0,0,0.5)",
-          backdropFilter: "blur(4px)",
-          zIndex: 1000,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 16
-        }}>
-          <div style={{
-            background: "#fff",
-            borderRadius: 20,
-            width: "100%",
-            maxWidth: 600,
-            maxHeight: "90vh",
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-            boxShadow: "0 32px 80px rgba(0,0,0,0.25)"
-          }}>
-            <div style={{
-              padding: "20px 24px",
-              borderBottom: "1px solid #e2e8f0",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center"
-            }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0f172a" }}>Add New Package</h2>
-              <button
-                onClick={() => setModal(null)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: 20,
-                  cursor: "pointer",
-                  color: "#64748b",
-                  padding: 4
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <div style={{ padding: "24px", overflowY: "auto" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Package Title *</label>
-                  <input
-                    type="text"
-                    value={npkg.title}
-                    onChange={e => setNpkg({ ...npkg, title: e.target.value })}
-                    style={{
-                      width: "100%",
-                      padding: "10px 14px",
-                      border: pkgError.title ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb",
-                      borderRadius: 8,
-                      fontSize: 14,
-                      outline: "none"
-                    }}
-                    placeholder="e.g., Basic Plan"
-                  />
-                  {pkgError.title && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{pkgError.title}</div>}
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Icon</label>
-                  <input
-                    type="text"
-                    value={npkg.icon}
-                    onChange={e => setNpkg({ ...npkg, icon: e.target.value })}
-                    style={{
-                      width: "100%",
-                      padding: "10px 14px",
-                      border: "1.5px solid #e5e7eb",
-                      borderRadius: 8,
-                      fontSize: 14,
-                      outline: "none"
-                    }}
-                    placeholder="??"
-                  />
-                </div>
-              </div>
+   {modal === "package_add" && (
+  <div style={{
+    position: "fixed", inset: 0,
+    background: "rgba(0,0,0,0.6)",
+    backdropFilter: "blur(8px)",
+    zIndex: 1000,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    padding: 16
+  }}>
+    <div style={{
+      background: "#fff",
+      borderRadius: 20,
+      width: "100%", maxWidth: 640,
+      maxHeight: "90vh",
+      overflow: "hidden",
+      display: "flex", flexDirection: "column",
+      boxShadow: "0 32px 80px rgba(0,0,0,0.25)"
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: "20px 24px",
+        borderBottom: "1px solid #f1f5f9",
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        background: "linear-gradient(135deg, #0a0a0f, #1a1a2e)"
+      }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>
+            📦 Add New Package
+          </h2>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+            Create a subscription plan for subadmins
+          </p>
+        </div>
+        <button onClick={() => setModal(null)} style={{
+          background: "rgba(255,255,255,0.1)",
+          border: "1px solid rgba(255,255,255,0.15)",
+          borderRadius: 8, width: 32, height: 32,
+          color: "#fff", fontSize: 16, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>✕</button>
+      </div>
 
-              <div style={{ marginTop: 16 }}>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Description *</label>
-                <textarea
-                  value={npkg.description}
-                  onChange={e => setNpkg({ ...npkg, description: e.target.value })}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    border: pkgError.description ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb",
-                    borderRadius: 8,
-                    fontSize: 14,
-                    outline: "none",
-                    minHeight: 80,
-                    resize: "vertical"
-                  }}
-                  placeholder="Describe the package features and benefits..."
-                />
-                {pkgError.description && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{pkgError.description}</div>}
-              </div>
+      {/* Body */}
+      <div style={{ padding: "24px", overflowY: "auto", flex: 1 }}>
 
-              <div style={{ marginTop: 16 }}>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Package Type *</label>
-                <div style={{ display: "flex", gap: 12 }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input
-                      type="radio"
-                      name="packageType"
-                      checked={npkg.isFree}
-                      onChange={() => setNpkg({ ...npkg, isFree: true, price: "Free" })}
-                      style={{ cursor: "pointer" }}
-                    />
-                    <span style={{ fontSize: 14, color: "#374151" }}>Free</span>
-                  </label>
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input
-                      type="radio"
-                      name="packageType"
-                      checked={!npkg.isFree}
-                      onChange={() => setNpkg({ ...npkg, isFree: false })}
-                      style={{ cursor: "pointer" }}
-                    />
-                    <span style={{ fontSize: 14, color: "#374151" }}>Paid</span>
-                  </label>
-                </div>
-              </div>
-
-              {!npkg.isFree && (
-                <div style={{ marginTop: 16 }}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Price *</label>
-                  <input
-                    type="text"
-                    value={npkg.price}
-                    onChange={e => setNpkg({ ...npkg, price: e.target.value })}
-                    style={{
-                      width: "100%",
-                      padding: "10px 14px",
-                      border: pkgError.price ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb",
-                      borderRadius: 8,
-                      fontSize: 14,
-                      outline: "none"
-                    }}
-                    placeholder="999"
-                  />
-                  {pkgError.price && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{pkgError.price}</div>}
-                </div>
-              )}
-
-              <div style={{ marginTop: 16 }}>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Number of Days *</label>
-                <input
-                  type="text"
-                  value={npkg.noOfDays}
-                  onChange={e => setNpkg({ ...npkg, noOfDays: e.target.value })}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    border: pkgError.noOfDays ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb",
-                    borderRadius: 8,
-                    fontSize: 14,
-                    outline: "none"
-                  }}
-                  placeholder="e.g., 30, 60, 90, 365"
-                />
-                {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{pkgError.noOfDays}</div>}
-              </div>
-
-              {/* Assign to Subadmins */}
-              <div style={{ marginTop: 16 }}>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
-                  Assign to Subadmins (Optional - leave empty for all)
-                </label>
-                <select
-                  multiple
-                  value={npkg.assignedSubadmins || []}
-                  onChange={e => {
-                    const selected = Array.from(e.target.selectedOptions, opt => opt.value);
-                    setNpkg({ ...npkg, assignedSubadmins: selected });
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    border: "1.5px solid #e5e7eb",
-                    borderRadius: 8,
-                    fontSize: 14,
-                    outline: "none",
-                    background: "#fff",
-                    cursor: "pointer",
-                    minHeight: "80px"
-                  }}
-                >
-                  {subadmins.map(sub => (
-                    <option key={sub._id} value={sub._id}>
-                      {sub.name} ({sub.email})
-                    </option>
-                  ))}
-                </select>
-                <p style={{ fontSize: 11, color: "#6b7280", marginTop: 4 }}>
-                  Hold Ctrl/Cmd to select multiple subadmins
-                </p>
-              </div>
-
-              <div style={{ marginTop: 16 }}>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Plan Duration *</label>
-                <select
-                  value={npkg.planDuration}
-                  onChange={e => setNpkg({ ...npkg, planDuration: e.target.value })}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    border: "1.5px solid #e5e7eb",
-                    borderRadius: 8,
-                    fontSize: 14,
-                    outline: "none",
-                    background: "#fff",
-                    cursor: "pointer"
-                  }}
-                >
-                  <option value="Monthly">Monthly</option>
-                  <option value="90 Days">90 Days</option>
-                  <option value="Yearly">Yearly</option>
-                </select>
-              </div>
-
-
-              <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
-                <button
-                  onClick={() => setModal(null)}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    background: "#f8fafc",
-                    border: "1.5px solid #e5e7eb",
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: "#374151",
-                    cursor: "pointer"
-                  }}
-                >
-                  Cancel
-                </button>
-                  <button onClick={createPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), flex: 1, padding: "12px" }}>
-                  {pkgSaveLoading ? "Creating..." : "Create Package"}
-                </button>
-              </div>
-            </div>
+        {/* Row 1: Title + Icon */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, marginBottom: 16 }}>
+          <div>
+            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Package Title *</label>
+            <input
+              type="text"
+              value={npkg.title}
+              onChange={e => setNpkg({ ...npkg, title: e.target.value })}
+              placeholder="e.g., Basic Plan"
+              style={{
+                width: "100%", padding: "11px 14px",
+                border: pkgError.title ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                borderRadius: 10, fontSize: 13, outline: "none",
+                background: "#f8fafc", boxSizing: "border-box",
+                transition: "border-color 0.2s"
+              }}
+              onFocus={e => e.target.style.borderColor = "#7c3aed"}
+              onBlur={e => e.target.style.borderColor = pkgError.title ? "#ef4444" : "#e2e8f0"}
+            />
+            {pkgError.title && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.title}</div>}
+          </div>
+          <div style={{ width: 90 }}>
+            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Icon</label>
+            <input
+              type="text"
+              value={npkg.icon}
+              onChange={e => setNpkg({ ...npkg, icon: e.target.value })}
+              placeholder="📦"
+              style={{
+                width: "100%", padding: "11px 10px",
+                border: "1.5px solid #e2e8f0",
+                borderRadius: 10, fontSize: 20, outline: "none",
+                background: "#f8fafc", textAlign: "center",
+                boxSizing: "border-box"
+              }}
+            />
           </div>
         </div>
-      )}
+
+        {/* Description */}
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Description *</label>
+          <textarea
+            value={npkg.description}
+            onChange={e => setNpkg({ ...npkg, description: e.target.value })}
+            placeholder="Describe what's included in this plan..."
+            rows={3}
+            style={{
+              width: "100%", padding: "11px 14px",
+              border: pkgError.description ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+              borderRadius: 10, fontSize: 13, outline: "none",
+              background: "#f8fafc", resize: "none",
+              fontFamily: "inherit", boxSizing: "border-box"
+            }}
+          />
+          {pkgError.description && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.description}</div>}
+        </div>
+
+        {/* Package Type + Price in one row */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div>
+            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Package Type *</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {["Free", "Paid"].map(type => (
+                <button
+                  key={type}
+                  onClick={() => setNpkg({ ...npkg, isFree: type === "Free", price: type === "Free" ? "0" : npkg.price })}
+                  style={{
+                    flex: 1, padding: "10px",
+                    borderRadius: 10, fontSize: 13, fontWeight: 700,
+                    cursor: "pointer", fontFamily: "inherit",
+                    border: "1.5px solid",
+                    borderColor: (type === "Free" ? npkg.isFree : !npkg.isFree)
+                      ? "#7c3aed" : "#e2e8f0",
+                    background: (type === "Free" ? npkg.isFree : !npkg.isFree)
+                      ? "#f5f3ff" : "#f8fafc",
+                    color: (type === "Free" ? npkg.isFree : !npkg.isFree)
+                      ? "#7c3aed" : "#64748b",
+                    transition: "all 0.15s"
+                  }}
+                >
+                  {type === "Free" ? "🎁 Free" : "💳 Paid"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>
+              Price {!npkg.isFree && "*"}
+            </label>
+            <div style={{ position: "relative" }}>
+              <span style={{
+                position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+                fontSize: 14, color: "#94a3b8", fontWeight: 600, pointerEvents: "none"
+              }}>₹</span>
+              <input
+                type="text"
+                value={npkg.isFree ? "0" : npkg.price}
+                onChange={e => setNpkg({ ...npkg, price: e.target.value })}
+                disabled={npkg.isFree}
+                placeholder="999"
+                style={{
+                  width: "100%", padding: "11px 14px 11px 28px",
+                  border: pkgError.price ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                  borderRadius: 10, fontSize: 13, outline: "none",
+                  background: npkg.isFree ? "#f1f5f9" : "#f8fafc",
+                  color: npkg.isFree ? "#94a3b8" : "#0f172a",
+                  boxSizing: "border-box", fontFamily: "inherit"
+                }}
+              />
+            </div>
+            {pkgError.price && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.price}</div>}
+          </div>
+        </div>
+
+        {/* Days + Plan Duration */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div>
+            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Number of Days *</label>
+            <input
+              type="text"
+              value={npkg.noOfDays}
+              onChange={e => setNpkg({ ...npkg, noOfDays: e.target.value })}
+              placeholder="e.g., 30, 90, 365"
+              style={{
+                width: "100%", padding: "11px 14px",
+                border: pkgError.noOfDays ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                borderRadius: 10, fontSize: 13, outline: "none",
+                background: "#f8fafc", boxSizing: "border-box"
+              }}
+            />
+            {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.noOfDays}</div>}
+          </div>
+          <div>
+            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Plan Duration</label>
+            <select
+              value={npkg.planDuration}
+              onChange={e => setNpkg({ ...npkg, planDuration: e.target.value })}
+              style={{
+                width: "100%", padding: "11px 14px",
+                border: "1.5px solid #e2e8f0",
+                borderRadius: 10, fontSize: 13, outline: "none",
+                background: "#f8fafc", cursor: "pointer",
+                boxSizing: "border-box", fontFamily: "inherit"
+              }}
+            >
+              <option value="Monthly">Monthly</option>
+              <option value="90 Days">90 Days</option>
+              <option value="Yearly">Yearly</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Assign to Subadmins */}
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>
+            Assign to Subadmins
+            <span style={{ fontSize: 10, fontWeight: 400, color: "#94a3b8", marginLeft: 6, textTransform: "none" }}></span>
+          </label>
+          <select
+            multiple
+            value={npkg.assignedSubadmins || []}
+            onChange={e => {
+              const selected = Array.from(e.target.selectedOptions, opt => opt.value);
+              setNpkg({ ...npkg, assignedSubadmins: selected });
+            }}
+            style={{
+              width: "100%", padding: "8px",
+              border: "1.5px solid #e2e8f0",
+              borderRadius: 10, fontSize: 13, outline: "none",
+              background: "#f8fafc", cursor: "pointer",
+              minHeight: 100, boxSizing: "border-box",
+              fontFamily: "inherit"
+            }}
+          >
+            {subadmins.map(sub => (
+              <option key={sub._id} value={sub._id}
+                style={{ padding: "6px 10px", borderRadius: 6 }}>
+                {sub.name} ({sub.email})
+              </option>
+            ))}
+          </select>
+          {/* {(npkg.assignedSubadmins?.length || 0) > 0 && (
+            <div style={{ fontSize: 11, color: "#7c3aed", marginTop: 4, fontWeight: 600 }}>
+              ✓ {npkg.assignedSubadmins.length} subadmin(s) selected
+            </div>
+          )} */}
+        </div>
+
+        {/* Action Buttons */}
+        <div style={{ display: "flex", gap: 10 }}>
+          <button
+            onClick={() => setModal(null)}
+            style={{
+              flex: 1, padding: "12px",
+              background: "#f8fafc",
+              border: "1.5px solid #e2e8f0",
+              borderRadius: 10, fontSize: 13, fontWeight: 600,
+              color: "#64748b", cursor: "pointer", fontFamily: "inherit"
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={createPackage}
+            disabled={pkgSaveLoading}
+            style={{
+              flex: 2, padding: "12px",
+              background: pkgSaveLoading
+                ? "#a78bfa"
+                : "linear-gradient(135deg, #7c3aed, #6d28d9)",
+              border: "none", borderRadius: 10,
+              fontSize: 13, fontWeight: 700,
+              color: "#fff", cursor: pkgSaveLoading ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+              boxShadow: "0 4px 14px rgba(124,58,237,0.35)",
+              transition: "all 0.2s"
+            }}
+          >
+            {pkgSaveLoading ? "Creating..." : "✨ Create Package"}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
@@ -1158,193 +1177,251 @@ function SubscriptionsPage({ subscriptions }) {
     </div>
   );
 }
-
-// Packages Page
 function PackagesPage({ packages }) {
-  try {
-    const displayedPackages = (packages && packages.length > 0) ? packages : [];
+  const displayedPackages = (packages && packages.length > 0) ? packages : [];
 
-    if (displayedPackages.length === 0) {
-      return (
-        <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0" }}>
-          <div style={{ fontSize: 40, marginBottom: 16 }}>📦</div>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>No Packages Yet</h3>
-          <p style={{ color: "#64748b", fontSize: 14, maxWidth: 400, margin: "0 auto" }}>Create your first subscription package to start offering services to subadmins.</p>
-        </div>
-      );
-    }
-
+  if (displayedPackages.length === 0) {
     return (
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
-        {/* Cards Grid - 3 columns like the design */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0, marginBottom: 40, background: "#f8fafc", borderRadius: 16, overflow: "hidden" }}>
-          {displayedPackages.map((p, idx) => {
-            const isPro = p.id === "pro" || p.title === "PRO";
-            const features = Array.isArray(p.features) ? p.features : (p.features || "").split('\n').filter(f => f.trim());
-            return (
-              <div key={p.id || idx} style={{
-                background: "#fff",
-                padding: "40px 32px",
-                display: "flex",
-                flexDirection: "column",
-                borderRight: idx < 2 ? "1px solid #e2e8f0" : "none"
-              }}>
-                {/* Icon */}
-                <div style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: "50%",
-                  border: "2px solid #e0f2fe",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 22,
-                  marginBottom: 20,
-                  color: "#0ea5e9"
-                }}>
-                  {p.icon || "📦"}
-                </div>
-
-                {/* Title */}
-                <h3 style={{
-                  margin: "0 0 16px",
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: "#1e293b",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5
-                }}>
-                  {p.title}
-                </h3>
-
-                {/* Description */}
-                <p style={{
-                  margin: "0 0 32px",
-                  fontSize: 14,
-                  color: "#64748b",
-                  lineHeight: 1.6,
-                  minHeight: 70
-                }}>
-                  {p.description}
-                </p>
-
-                {/* Per seat label */}
-                <div style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: "#94a3b8",
-                  marginBottom: 8,
-                  textTransform: "lowercase"
-                }}>
-                  {p.perSeat || "Per seat"}
-                </div>
-
-                {/* Price */}
-                <div style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: 6,
-                  marginBottom: 24
-                }}>
-                  <span style={{
-                    fontSize: 36,
-                    fontWeight: 700,
-                    color: "#0f172a"
-                  }}>
-                    {p.price || p.monthlyPrice}
-                  </span>
-                  {p.currency && (
-                    <span style={{
-                      fontSize: 16,
-                      fontWeight: 600,
-                      color: "#64748b"
-                    }}>
-                      {p.currency}
-                    </span>
-                  )}
-                  {p.period && (
-                    <span style={{
-                      fontSize: 14,
-                      fontWeight: 500,
-                      color: "#94a3b8"
-                    }}>
-                      {p.period}
-                    </span>
-                  )}
-                </div>
-
-                {/* Button */}
-                <button style={{
-                  width: "100%",
-                  padding: "14px 24px",
-                  borderRadius: 10,
-                  background: isPro ? "#0284c7" : "#fff",
-                  color: isPro ? "#fff" : "#0f172a",
-                  border: isPro ? "none" : "2px solid #e2e8f0",
-                  fontWeight: 600,
-                  fontSize: 14,
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  marginBottom: 32,
-                  boxShadow: isPro ? "0 4px 14px rgba(2, 132, 199, 0.3)" : "none"
-                }}>
-                  {p.buttonName || "Get Started"}
-                </button>
-
-                {/* Features */}
-                <div style={{ flex: 1 }}>
-                  <div style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: "#0f172a",
-                    marginBottom: 16
-                  }}>
-                    {p.featuresTitle || "Features:"}
-                  </div>
-                  <ul style={{
-                    margin: 0,
-                    padding: 0,
-                    listStyle: "none",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 12
-                  }}>
-                    {features.map((f, i) => (
-                      <li key={i} style={{
-                        fontSize: 13,
-                        color: "#475569",
-                        display: "flex",
-                        alignItems: "flex-start",
-                        gap: 10,
-                        lineHeight: 1.4
-                      }}>
-                        <span style={{
-                          color: "#0ea5e9",
-                          fontWeight: 700,
-                          fontSize: 12,
-                          marginTop: 1
-                        }}>•</span>
-                        <span>{f && f.trim ? f.trim() : f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  } catch (error) {
-    console.error("PackagesPage error:", error);
-    return (
-      <div style={{ padding: 40, textAlign: "center", color: "#64748b" }}>
-        <div style={{ fontSize: 24, marginBottom: 16 }}>⚠️</div>
-        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Unable to load packages</div>
-        <div style={{ fontSize: 14 }}>Please try refreshing the page</div>
+      <div style={{
+        minHeight: "60vh",
+        background: "linear-gradient(135deg, #0a0a0f 0%, #0d1117 50%, #0a0f0a 100%)",
+        borderRadius: 20,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 60
+      }}>
+        <div style={{ fontSize: 56, marginBottom: 20 }}>📦</div>
+        <h3 style={{ fontSize: 22, fontWeight: 800, color: "rgba(255,255,255,0.7)", marginBottom: 10, margin: "0 0 10px" }}>
+          No Packages Yet
+        </h3>
+        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, maxWidth: 360, textAlign: "center", margin: 0 }}>
+          Create your first subscription package using the "+ Add Package" button above.
+        </p>
       </div>
     );
   }
+
+  return (
+    <div style={{
+      background: "linear-gradient(135deg, #0a0a0f 0%, #0d1117 50%, #0a0f0a 100%)",
+      borderRadius: 20,
+      padding: "56px 40px 60px",
+      position: "relative",
+      overflow: "hidden",
+      minHeight: "60vh"
+    }}>
+      {/* Background glow */}
+      <div style={{
+        position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+        width: 700, height: 300,
+        background: "radial-gradient(ellipse, rgba(0,255,180,0.055) 0%, transparent 70%)",
+        pointerEvents: "none"
+      }} />
+
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: 52, position: "relative", zIndex: 1 }}>
+        <h1 style={{
+          fontSize: 38, fontWeight: 800, color: "#ffffff",
+          margin: "0 0 12px", letterSpacing: "-1px", lineHeight: 1.1
+        }}>
+          Choose your Plan
+        </h1>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", margin: 0 }}>
+          Discover the perfect plan tailored just for you.
+        </p>
+      </div>
+
+      {/* Cards grid */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${Math.min(displayedPackages.length, 3)}, 1fr)`,
+        gap: 20,
+        maxWidth: 1020,
+        margin: "0 auto",
+        position: "relative",
+        zIndex: 1
+      }}>
+        {displayedPackages.map((p, idx) => {
+          const isPro = (p.title || "").toUpperCase() === "PRO" ||
+            (p.title || "").toLowerCase().includes("pro");
+          const features = Array.isArray(p.features)
+            ? p.features
+            : (p.features || "").split(/[\n,]/).map(f => f.trim()).filter(Boolean);
+
+          return (
+            <div
+              key={p._id || idx}
+              style={{
+                background: isPro
+                  ? "linear-gradient(160deg, #0d2a22 0%, #0a1f1a 60%, #081a15 100%)"
+                  : "linear-gradient(160deg, #141418 0%, #111115 100%)",
+                border: isPro
+                  ? "1.5px solid rgba(0,220,150,0.3)"
+                  : "1.5px solid rgba(255,255,255,0.07)",
+                borderRadius: 20,
+                padding: "32px 26px",
+                position: "relative",
+                overflow: "hidden",
+                boxShadow: isPro
+                  ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
+                  : "0 20px 40px rgba(0,0,0,0.35)",
+                transition: "transform 0.22s, box-shadow 0.22s",
+                display: "flex",
+                flexDirection: "column"
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-5px)";
+                e.currentTarget.style.boxShadow = isPro
+                  ? "0 0 80px rgba(0,200,130,0.18), 0 30px 60px rgba(0,0,0,0.6)"
+                  : "0 30px 60px rgba(0,0,0,0.5)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = isPro
+                  ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
+                  : "0 20px 40px rgba(0,0,0,0.35)";
+              }}
+            >
+              {/* Pro glow orb */}
+              {isPro && (
+                <div style={{
+                  position: "absolute", top: -50, left: "50%", transform: "translateX(-50%)",
+                  width: 220, height: 220,
+                  background: "radial-gradient(ellipse, rgba(0,220,150,0.13) 0%, transparent 70%)",
+                  pointerEvents: "none"
+                }} />
+              )}
+
+              {/* MOST POPULAR badge */}
+              {isPro && (
+                <div style={{
+                  position: "absolute", top: 18, right: 18,
+                  background: "rgba(0,220,150,0.12)",
+                  border: "1px solid rgba(0,220,150,0.35)",
+                  borderRadius: 100, padding: "3px 11px",
+                  fontSize: 9, fontWeight: 800,
+                  color: "#00dc96", letterSpacing: 1.2,
+                  textTransform: "uppercase"
+                }}>
+                  MOST POPULAR
+                </div>
+              )}
+
+              {/* Plan title */}
+              <div style={{
+                fontSize: 20, fontWeight: 800, color: "#fff",
+                marginBottom: 4
+              }}>
+                {p.title}
+              </div>
+              <div style={{
+                fontSize: 11, color: "rgba(255,255,255,0.32)",
+                marginBottom: 22, fontWeight: 500, letterSpacing: 0.3
+              }}>
+                {p.planDuration ? `Billed ${p.planDuration.toLowerCase()}` : "Billed monthly"}
+              </div>
+
+              {/* Price */}
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
+                <span style={{
+                  fontSize: 44, fontWeight: 800, color: "#fff",
+                  lineHeight: 1, letterSpacing: "-2px"
+                }}>
+                  {p.type === "free" ? "₹0"
+                    : p.price ? `₹${p.price}` : "₹0"}
+                </span>
+                <span style={{
+                  fontSize: 13, color: "rgba(255,255,255,0.38)",
+                  marginBottom: 5, fontWeight: 400
+                }}>/ month</span>
+              </div>
+
+              <div style={{
+                fontSize: 12, color: "rgba(255,255,255,0.28)",
+                marginBottom: 22, minHeight: 16, lineHeight: 1.5
+              }}>
+                {p.description}
+              </div>
+
+              {/* Divider */}
+              <div style={{
+                height: 1,
+                background: isPro ? "rgba(0,220,150,0.13)" : "rgba(255,255,255,0.06)",
+                marginBottom: 22
+              }} />
+
+              {/* Features */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1, marginBottom: 28 }}>
+                {features.map((f, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <div style={{
+                      width: 17, height: 17, borderRadius: "50%", flexShrink: 0, marginTop: 1,
+                      background: isPro ? "rgba(0,220,150,0.12)" : "rgba(255,255,255,0.07)",
+                      border: isPro ? "1px solid rgba(0,220,150,0.35)" : "1px solid rgba(255,255,255,0.12)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 8, color: isPro ? "#00dc96" : "rgba(255,255,255,0.45)"
+                    }}>✓</div>
+                    <span style={{
+                      fontSize: 12.5, color: "rgba(255,255,255,0.6)",
+                      fontWeight: 400, lineHeight: 1.5
+                    }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA Button */}
+              <button
+                style={{
+                  width: "100%", padding: "13px",
+                  borderRadius: 11, fontSize: 14, fontWeight: 700,
+                  cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit",
+                  ...(isPro ? {
+                    background: "linear-gradient(135deg, #00dc96, #00b87a)",
+                    border: "none", color: "#000",
+                    boxShadow: "0 6px 22px rgba(0,220,150,0.32)"
+                  } : {
+                    background: "transparent",
+                    border: "1.5px solid rgba(255,255,255,0.14)",
+                    color: "rgba(255,255,255,0.75)"
+                  })
+                }}
+                onMouseEnter={e => {
+                  if (isPro) {
+                    e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,220,150,0.48)";
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                  } else {
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
+                    e.currentTarget.style.color = "#fff";
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (isPro) {
+                    e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,220,150,0.32)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  } else {
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.75)";
+                  }
+                }}
+              >
+                {p.buttonName || "Get it now"}
+              </button>
+
+              {/* Duration badge */}
+              <div style={{
+                marginTop: 14, textAlign: "center",
+                fontSize: 11, color: "rgba(255,255,255,0.22)"
+              }}>
+                {p.no_of_days || p.noOfDays || 30} days validity
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 // ── Clients Page ──

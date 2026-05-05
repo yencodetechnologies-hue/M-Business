@@ -64,9 +64,7 @@ const RolePermissionDashboard = () => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20, padding: "10px" }}>
       <div style={{ background: "#fff", borderRadius: 16, padding: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", border: `1px solid ${T.border}` }}>
-        <h2 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 800, color: T.text, display: "flex", alignItems: "center", gap: 10 }}>
-          🛡️ Role & Permission Management
-        </h2>
+       
    
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 10px" }}>
@@ -83,8 +81,9 @@ const RolePermissionDashboard = () => {
                       fontSize: 12, 
                       fontWeight: 800,
                       textTransform: "uppercase",
-                      boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.2)"
-                    }}>
+                      boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.2)",
+                        width: "fit-content",
+                         margin: "0 auto"                     }}>
                       {r.role}
                     </div>
                   </th>

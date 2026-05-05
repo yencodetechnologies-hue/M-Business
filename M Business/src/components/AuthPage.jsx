@@ -436,7 +436,7 @@ export default function AuthPage({ setUser, initialTab = "register" }) {
               <button className="purple-btn" onClick={handleRegister} disabled={loading}>
                 {loading ? <><span className="spinner" />Creating account...</> : "Sign Up"}
               </button>
-              <p style={{ textAlign: "left", marginTop: 14, fontSize: 13, color: "rgba(255,255,255,0.32)" }}>
+                       <p style={{ textAlign: "left", marginTop: 14, fontSize: 13, color: "rgba(255,255,255,0.32)" }}>
                 Already have an account? <button className="link-btn" onClick={() => switchTab("login")}>Login</button>
               </p>
             </div>

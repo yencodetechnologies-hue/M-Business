@@ -2361,220 +2361,268 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 function PackagesPage({ packages, onViewPackage, onEditPackage }) {
   const displayedPackages = packages || [];
 
-  if (displayedPackages.length === 0) {
-    return (
-      <div style={{ flex: 1, padding: "0 20px" }}>
-        <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 24, border: "2px dashed var(--app-border)", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)" }}>
-          <div style={{ fontSize: 64, marginBottom: 24 }}>📦</div>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 12 }}>No Packages Assigned</h2>
-          <p style={{ fontSize: 15, color: "var(--app-muted)", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>
-            You don't have any packages assigned yet. Please contact your administrator to assign packages to your dashboard.
+  return (
+    <div style={{
+      background: "linear-gradient(135deg, #0a0a0f 0%, #0d1117 50%, #0a0f0a 100%)",
+      borderRadius: 20,
+      padding: "56px 40px 60px",
+      position: "relative",
+      overflow: "hidden",
+      minHeight: "60vh"
+    }}>
+      {/* Background glow */}
+      <div style={{
+        position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+        width: 700, height: 300,
+        background: "radial-gradient(ellipse, rgba(0,255,180,0.055) 0%, transparent 70%)",
+        pointerEvents: "none"
+      }} />
+
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: 52, position: "relative", zIndex: 1 }}>
+        <h1 style={{
+          fontSize: 38, fontWeight: 800, color: "#ffffff",
+          margin: "0 0 12px", letterSpacing: "-1px", lineHeight: 1.1
+        }}>
+          Choose your Plan
+        </h1>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", margin: 0 }}>
+          Discover the perfect plan tailored just for you.
+        </p>
+      </div>
+
+      {displayedPackages.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "60px 20px", position: "relative", zIndex: 1 }}>
+          <div style={{ fontSize: 56, marginBottom: 20 }}>📦</div>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: "rgba(255,255,255,0.7)", marginBottom: 10, margin: "0 0 10px" }}>
+            No Packages Assigned
+          </h2>
+          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, maxWidth: 360, textAlign: "center", margin: "10px auto 0" }}>
+            Contact your administrator to assign packages.
           </p>
         </div>
-      </div>
-    );
-  }
+      ) : (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${Math.min(displayedPackages.length, 3)}, 1fr)`,
+          gap: 20,
+          maxWidth: 1020,
+          margin: "0 auto",
+          position: "relative",
+          zIndex: 1
+        }}>
+          {displayedPackages.map((p, idx) => {
+            const isPro = (p.title || "").toUpperCase() === "PRO" ||
+              (p.title || "").toLowerCase().includes("pro");
+            const features = Array.isArray(p.features)
+              ? p.features
+              : (p.features || "").split(/[\n,]/).map(f => f.trim()).filter(Boolean);
 
-  return (
-    <div style={{ flex: 1, padding: "0 20px" }}>
-      {/* Cards Grid - 3 columns like the design */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: 0, marginBottom: 40, background: "#f8fafc", borderRadius: 16, overflow: "hidden" }}>
-        {displayedPackages.map((p, idx) => {
-          const isPro = p.id === "pro" || p.title === "PRO";
-          return (
-            <div key={p.id || idx} style={{
-              background: "#fff",
-              padding: "40px 32px",
-              display: "flex",
-              flexDirection: "column",
-              borderRight: idx < 2 ? "1px solid #e2e8f0" : "none"
-            }}>
-              {/* Icon */}
-              <div style={{
-                width: 48,
-                height: 48,
-                borderRadius: "50%",
-                border: "2px solid #e0f2fe",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 22,
-                marginBottom: 20,
-                color: "#0ea5e9"
-              }}>
-                {p.icon || "📦"}
-              </div>
-
-              {/* Title */}
-              <h3 style={{
-                margin: "0 0 16px",
-                fontSize: 20,
-                fontWeight: 700,
-                color: "#1e293b",
-                textTransform: "uppercase",
-                letterSpacing: 0.5
-              }}>
-                {p.title}
-              </h3>
-
-              {/* Description */}
-              <p style={{
-                margin: "0 0 32px",
-                fontSize: 14,
-                color: "#64748b",
-                lineHeight: 1.6,
-                minHeight: 70
-              }}>
-                {p.description || p.desc}
-              </p>
-
-              {/* Per seat label */}
-              <div style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: "#94a3b8",
-                marginBottom: 8,
-                textTransform: "lowercase"
-              }}>
-                {p.perSeat || "Per seat"}
-              </div>
-
-              {/* Price */}
-              <div style={{
-                display: "flex",
-                alignItems: "baseline",
-                gap: 6,
-                marginBottom: 24
-              }}>
-                <span style={{
-                  fontSize: 36,
-                  fontWeight: 700,
-                  color: "#0f172a"
-                }}>
-                  {p.price}
-                </span>
-                {p.currency && (
-                  <span style={{
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: "#64748b"
-                  }}>
-                    {p.currency}
-                  </span>
-                )}
-                {p.period && (
-                  <span style={{
-                    fontSize: 14,
-                    fontWeight: 500,
-                    color: "#94a3b8"
-                  }}>
-                    {p.period}
-                  </span>
-                )}
-              </div>
-
-              {/* Button */}
-              <button style={{
-                width: "100%",
-                padding: "14px 24px",
-                borderRadius: 10,
-                background: isPro ? "#0284c7" : "#fff",
-                color: isPro ? "#fff" : "#0f172a",
-                border: isPro ? "none" : "2px solid #e2e8f0",
-                fontWeight: 600,
-                fontSize: 14,
-                cursor: "pointer",
-                transition: "all 0.2s",
-                marginBottom: 32,
-                boxShadow: isPro ? "0 4px 14px rgba(2, 132, 199, 0.3)" : "none"
-              }}>
-                {p.buttonName || "Get Started"}
-              </button>
-
-              {/* View/Edit Buttons for Admin */}
-              {(onViewPackage || onEditPackage) && (
-                <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-                  {onViewPackage && (
-                    <button
-                      onClick={() => onViewPackage(p)}
-                      style={{
-                        flex: 1,
-                        padding: "8px 12px",
-                        borderRadius: 8,
-                        background: "#f1f5f9",
-                        border: "1.5px solid #e2e8f0",
-                        color: "#475569",
-                        fontWeight: 600,
-                        fontSize: 12,
-                        cursor: "pointer"
-                      }}
-                    >
-                      View
-                    </button>
-                  )}
-                  {onEditPackage && (
-                    <button
-                      onClick={() => onEditPackage(p)}
-                      style={{
-                        flex: 1,
-                        padding: "8px 12px",
-                        borderRadius: 8,
-                        background: "#0284c7",
-                        border: "none",
-                        color: "#fff",
-                        fontWeight: 600,
-                        fontSize: 12,
-                        cursor: "pointer"
-                      }}
-                    >
-                      Edit
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Features */}
-              <div style={{ flex: 1 }}>
-                <div style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#0f172a",
-                  marginBottom: 16
-                }}>
-                  {p.featuresTitle || "Features:"}
-                </div>
-                <ul style={{
-                  margin: 0,
-                  padding: 0,
-                  listStyle: "none",
+            return (
+              <div
+                key={p.id || p._id || idx}
+                style={{
+                  background: isPro
+                    ? "linear-gradient(160deg, #0d2a22 0%, #0a1f1a 60%, #081a15 100%)"
+                    : "linear-gradient(160deg, #141418 0%, #111115 100%)",
+                  border: isPro
+                    ? "1.5px solid rgba(0,220,150,0.3)"
+                    : "1.5px solid rgba(255,255,255,0.07)",
+                  borderRadius: 20,
+                  padding: "32px 26px",
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow: isPro
+                    ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
+                    : "0 20px 40px rgba(0,0,0,0.35)",
+                  transition: "transform 0.22s, box-shadow 0.22s",
                   display: "flex",
-                  flexDirection: "column",
-                  gap: 12
+                  flexDirection: "column"
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "translateY(-5px)";
+                  e.currentTarget.style.boxShadow = isPro
+                    ? "0 0 80px rgba(0,200,130,0.18), 0 30px 60px rgba(0,0,0,0.6)"
+                    : "0 30px 60px rgba(0,0,0,0.5)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = isPro
+                    ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
+                    : "0 20px 40px rgba(0,0,0,0.35)";
+                }}
+              >
+                {/* Pro glow orb */}
+                {isPro && (
+                  <div style={{
+                    position: "absolute", top: -50, left: "50%", transform: "translateX(-50%)",
+                    width: 220, height: 220,
+                    background: "radial-gradient(ellipse, rgba(0,220,150,0.13) 0%, transparent 70%)",
+                    pointerEvents: "none"
+                  }} />
+                )}
+
+                {/* MOST POPULAR badge */}
+                {isPro && (
+                  <div style={{
+                    position: "absolute", top: 18, right: 18,
+                    background: "rgba(0,220,150,0.12)",
+                    border: "1px solid rgba(0,220,150,0.35)",
+                    borderRadius: 100, padding: "3px 11px",
+                    fontSize: 9, fontWeight: 800,
+                    color: "#00dc96", letterSpacing: 1.2,
+                    textTransform: "uppercase"
+                  }}>
+                    MOST POPULAR
+                  </div>
+                )}
+
+                {/* Icon */}
+                <div style={{
+                  width: 44, height: 44, borderRadius: "50%",
+                  border: isPro ? "2px solid rgba(0,220,150,0.3)" : "2px solid rgba(255,255,255,0.1)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 20, marginBottom: 18,
+                  background: isPro ? "rgba(0,220,150,0.08)" : "rgba(255,255,255,0.04)"
                 }}>
-                  {(p.features || []).map((f, i) => (
-                    <li key={i} style={{
-                      fontSize: 13,
-                      color: "#475569",
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 10,
-                      lineHeight: 1.4
-                    }}>
+                  {p.icon || "📦"}
+                </div>
+
+                {/* Plan title */}
+                <div style={{
+                  fontSize: 20, fontWeight: 800, color: "#fff",
+                  marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5
+                }}>
+                  {p.title}
+                </div>
+                <div style={{
+                  fontSize: 11, color: "rgba(255,255,255,0.32)",
+                  marginBottom: 22, fontWeight: 500
+                }}>
+                  {p.planDuration ? `Billed ${p.planDuration.toLowerCase()}` : "Billed monthly"}
+                </div>
+
+                {/* Price */}
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
+                  <span style={{
+                    fontSize: 44, fontWeight: 800, color: "#fff",
+                    lineHeight: 1, letterSpacing: "-2px"
+                  }}>
+                    {p.type === "free" ? "₹0" : p.price ? `₹${p.price}` : "₹0"}
+                  </span>
+                  <span style={{
+                    fontSize: 13, color: "rgba(255,255,255,0.38)",
+                    marginBottom: 5
+                  }}>/month</span>
+                </div>
+
+                <div style={{
+                  fontSize: 12, color: "rgba(255,255,255,0.28)",
+                  marginBottom: 22, minHeight: 16, lineHeight: 1.5
+                }}>
+                  {p.description}
+                </div>
+
+                {/* Divider */}
+                <div style={{
+                  height: 1,
+                  background: isPro ? "rgba(0,220,150,0.13)" : "rgba(255,255,255,0.06)",
+                  marginBottom: 22
+                }} />
+
+                {/* Features */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1, marginBottom: 28 }}>
+                  {features.map((f, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                      <div style={{
+                        width: 17, height: 17, borderRadius: "50%", flexShrink: 0, marginTop: 1,
+                        background: isPro ? "rgba(0,220,150,0.12)" : "rgba(255,255,255,0.07)",
+                        border: isPro ? "1px solid rgba(0,220,150,0.35)" : "1px solid rgba(255,255,255,0.12)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 8, color: isPro ? "#00dc96" : "rgba(255,255,255,0.45)"
+                      }}>✓</div>
                       <span style={{
-                        color: "#0ea5e9",
-                        fontWeight: 700,
-                        fontSize: 12,
-                        marginTop: 1
-                      }}>•</span>
-                      <span>{f}</span>
-                    </li>
+                        fontSize: 12.5, color: "rgba(255,255,255,0.6)",
+                        fontWeight: 400, lineHeight: 1.5
+                      }}>{f}</span>
+                    </div>
                   ))}
-                </ul>
+                </div>
+
+                {/* CTA Button */}
+                <button
+                  style={{
+                    width: "100%", padding: "13px",
+                    borderRadius: 11, fontSize: 14, fontWeight: 700,
+                    cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit",
+                    ...(isPro ? {
+                      background: "linear-gradient(135deg, #00dc96, #00b87a)",
+                      border: "none", color: "#000",
+                      boxShadow: "0 6px 22px rgba(0,220,150,0.32)"
+                    } : {
+                      background: "transparent",
+                      border: "1.5px solid rgba(255,255,255,0.14)",
+                      color: "rgba(255,255,255,0.75)"
+                    })
+                  }}
+                  onMouseEnter={e => {
+                    if (isPro) {
+                      e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,220,150,0.48)";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                    } else {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
+                      e.currentTarget.style.color = "#fff";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (isPro) {
+                      e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,220,150,0.32)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    } else {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
+                      e.currentTarget.style.color = "rgba(255,255,255,0.75)";
+                    }
+                  }}
+                >
+                  {p.buttonName || "Get it now"}
+                </button>
+
+                {/* Admin View/Edit buttons */}
+                {(onViewPackage || onEditPackage) && (
+                  <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                    {onViewPackage && (
+                      <button onClick={() => onViewPackage(p)} style={{
+                        flex: 1, padding: "8px", borderRadius: 8,
+                        background: "rgba(255,255,255,0.05)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "rgba(255,255,255,0.5)", fontSize: 11,
+                        fontWeight: 600, cursor: "pointer", fontFamily: "inherit"
+                      }}>View</button>
+                    )}
+                    {onEditPackage && (
+                      <button onClick={() => onEditPackage(p)} style={{
+                        flex: 1, padding: "8px", borderRadius: 8,
+                        background: isPro ? "rgba(0,220,150,0.1)" : "rgba(255,255,255,0.07)",
+                        border: isPro ? "1px solid rgba(0,220,150,0.2)" : "1px solid rgba(255,255,255,0.1)",
+                        color: isPro ? "#00dc96" : "rgba(255,255,255,0.5)",
+                        fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit"
+                      }}>Edit</button>
+                    )}
+                  </div>
+                )}
+
+                {/* Validity */}
+                <div style={{
+                  marginTop: 14, textAlign: "center",
+                  fontSize: 11, color: "rgba(255,255,255,0.2)"
+                }}>
+                  {p.no_of_days || p.noOfDays || 30} days validity
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

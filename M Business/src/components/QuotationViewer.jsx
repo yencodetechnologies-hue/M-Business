@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import QRScanner from "./QRScanner.jsx";
+import axios from "axios";
+import { BASE_URL } from "../config";
 
 function formatCurrency(val, symbol = "₹") {
   const num = parseFloat(val) || 0;
@@ -16,32 +17,16 @@ function formatDate(d) {
 export default function QuotationViewer() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [showScanner, setShowScanner] = useState(false);
-
-  const handleScanSuccess = (decodedText) => {
-    setShowScanner(false);
-    if (decodedText.startsWith('http')) {
-      window.location.href = decodedText;
-    } else {
-      alert('Scanned data: ' + decodedText);
-    }
-  };
-
-  const handleScanError = (error) => {
-    console.error('Scan error:', error);
-  };
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const encoded = params.get("d");
       if (!encoded) { setError("No quotation data found in URL."); return; }
-      
-      // Robust decoding: replace spaces back to plus signs (common issue with URLSearchParams)
       const safeEncoded = encoded.replace(/ /g, "+");
       const decoded = decodeURIComponent(escape(atob(safeEncoded)));
       const slim = JSON.parse(decoded);
-     
       const qt = {
         quoteNo: slim.no, date: slim.date, expiryDate: slim.exp,
         companyName: slim.co, companyEmail: slim.email,
@@ -49,15 +34,15 @@ export default function QuotationViewer() {
         client: slim.cl, project: slim.proj,
         gstRate: slim.gst, notes: slim.notes, terms: slim.terms,
         isGstIncluded: slim.incGst, amountPaid: slim.paid || 0,
-        upiId: slim.upi || "",
-        currency: slim.cur || "₹",
+        upiId: slim.upi || "", currency: slim.cur || "₹",
+        logoUrl: slim.logo || "",
+        cid: slim.cid || "",
       };
       const items = (slim.items || []).map((i, idx) => ({
         id: idx + 1, description: i.d, quantity: i.q, rate: i.r,
       }));
       const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0) * (parseFloat(i.quantity)||0), 0);
       let subtotal, gstAmt, total;
-      
       if (qt.isGstIncluded) {
         total = subtotalRaw;
         subtotal = total / (1 + (qt.gstRate / 100));
@@ -67,17 +52,41 @@ export default function QuotationViewer() {
         gstAmt = subtotal * (qt.gstRate / 100);
         total = subtotal + gstAmt;
       }
-      
       const balanceDue = total - qt.amountPaid;
       setData({ qt, items, subtotal, gstAmt, total, balanceDue });
+
+      // Fetch branding if CID exists and no logo in payload
+      if (qt.cid && !qt.logoUrl) {
+        axios.get(`${BASE_URL}/api/subadmins/branding/${qt.cid}`)
+          .then(res => {
+            if (res.data.logoUrl) {
+              setData(prev => prev ? ({ ...prev, qt: { ...prev.qt, logoUrl: res.data.logoUrl } }) : prev);
+            }
+          })
+          .catch(() => {});
+      }
     } catch (e) {
-      setError("Could not read quotation data. The QR code may be invalid or expired.");
+      setError("Could not read quotation data.");
     }
   }, []);
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({ title: `Quotation ${data?.qt?.quoteNo}`, url: window.location.href });
+    } else {
+      handleCopyLink();
+    }
+  };
+
   if (error) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "sans-serif", padding: 24 }}>
-      <div style={{ textAlign: "center", color: "#10b981" }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 24 }}>
+      <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#064e3b" }}>{error}</div>
       </div>
@@ -85,146 +94,170 @@ export default function QuotationViewer() {
   );
 
   if (!data) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "sans-serif" }}>
-      <div style={{ textAlign: "center", color: "#10b981", fontSize: 14 }}>Loading quotation...</div>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div style={{ textAlign: "center", fontSize: 14, color: "#10b981" }}>Loading quotation...</div>
     </div>
   );
 
   const { qt, items, subtotal, gstAmt, total, balanceDue } = data;
-  const upiLink = qt.upiId ? `upi://pay?pa=${qt.upiId}&pn=${encodeURIComponent(qt.companyName)}&am=${balanceDue.toFixed(2)}&cu=INR&tn=${encodeURIComponent("Quotation " + qt.quoteNo)}` : "";
+  const isExpired = qt.expiryDate && new Date(qt.expiryDate) < new Date();
+  const qrData = window.location.href;
 
   return (
-    <div style={{ fontFamily: "'Segoe UI', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "0 0 40px" }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>
       <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #ecfdf5; }
-        .qt-card { background: #fff; border-radius: 16px; margin: 0 12px 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(5,150,105,0.10); }
-        .label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #10b981; text-transform: uppercase; margin-bottom: 4px; }
-        .value { font-size: 14px; font-weight: 700; color: #064e3b; }
-        .value-sm { font-size: 12px; color: #4b5563; }
-        table { width: 100%; border-collapse: collapse; }
-        th { font-size: 9px; color: #059669; font-weight: 700; letter-spacing: 1px; padding: 8px 10px; border-bottom: 2px solid #d1fae5; text-align: left; background: #f0fdf4; }
-        th.r, td.r { text-align: right; }
-        td { font-size: 12px; padding: 10px 10px; border-bottom: 1px solid #f0fdf4; color: #064e3b; }
-        td.desc { font-weight: 600; }
-        td.amt { font-weight: 700; }
-        .pill { display: inline-block; background: #f0fdf4; border-radius: 20px; padding: 2px 10px; font-size: 11px; color: #059669; font-weight: 600; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        * { box-sizing: border-box; }
+        .qt-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); overflow: hidden; display: flex; flex-direction: column; }
         @media print {
-          body { background: white !important; }
-          .no-print { display: none !important; }
-          .qt-card { box-shadow: none !important; border-radius: 0 !important; }
+          @page { size: A4 portrait; margin: 0; }
+          html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
+          .no-print, .no-print * { display: none !important; }
+          .qt-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+          body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
         }
+        @media (max-width:600px) { .qt-hgrid { flex-direction:column!important; } .qt-btgrid { grid-template-columns:1fr!important; } }
       `}</style>
 
-      <div style={{ background: "linear-gradient(135deg,#064e3b 0%,#065f46 60%,#059669 100%)", padding: "28px 20px 24px", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(52,211,153,0.18),transparent)", top: -60, right: -40 }} />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>QUOTATION</div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: "#6ee7b7", marginBottom: 2 }}>{qt.quoteNo}</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{qt.companyName}</div>
+      <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
+        <button className="action-btn" onClick={() => window.print()}
+          style={{ padding: "10px 22px", background: "linear-gradient(135deg,#059669,#065f46)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
+          🖨️ Print / Save PDF
+        </button>
+        <button className="action-btn" onClick={handleShare}
+          style={{ padding: "10px 22px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>
+          🔗 Share Link
+        </button>
+      </div>
 
-          {qt.companyEmail && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 3 }}>{qt.companyEmail}</div>}
-          {qt.companyPhone && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{qt.companyPhone}</div>}
-
-          <div style={{ display: "flex", gap: 20, marginTop: 16 }}>
+      <div className="qt-paper">
+        {/* Header */}
+        <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
+          <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(5,150,105,0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
+          <div className="qt-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
             <div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-              <div style={{ fontSize: 12, color: "#fff", fontWeight: 700 }}>{formatDate(qt.date)}</div>
+              {qt.logoUrl && (
+                <img src={qt.logoUrl} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
+              )}
+              <div style={{ fontSize: 24, fontWeight: 900, color: "#064e3b", textTransform: "uppercase", letterSpacing: 1 }}>{qt.companyName}</div>
+              {qt.companyEmail && <div style={{ fontSize: 11, color: "#065f46", marginTop: 3 }}>{qt.companyEmail}</div>}
+              {qt.companyPhone && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyPhone}</div>}
+              {qt.companyAddress && <div style={{ fontSize: 11, color: "#065f46", marginTop: 2 }}>{qt.companyAddress}</div>}
             </div>
-            <div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
-              <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800 }}>{formatDate(qt.expiryDate)}</div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(5,150,105,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>QUOTATION</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#059669" }}>{qt.quoteNo}</div>
+              <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                  <div style={{ fontSize: 12, color: "#064e3b", fontWeight: 700 }}>{formatDate(qt.date)}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>VALID UNTIL</div>
+                  <div style={{ fontSize: 12, color: isExpired ? "#dc2626" : "#ea580c", fontWeight: 700 }}>{formatDate(qt.expiryDate)}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div style={{ background: "linear-gradient(135deg,#059669,#10b981)", margin: "0 12px", borderRadius: "0 0 16px 16px", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#d1fae5" }}>{balanceDue > 0 ? "BALANCE DUE" : "TOTAL AMOUNT"}</span>
-        <span style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{formatCurrency(balanceDue > 0 ? balanceDue : total, qt.currency)}</span>
-      </div>
-
-   
-
-      <div className="qt-card" style={{ padding: "16px 18px" }}>
-        <div className="label">Prepared For</div>
-        <div className="value" style={{ fontSize: 16 }}>{qt.client || "—"}</div>
-        {qt.project && (
-          <div style={{ marginTop: 8 }}>
-            <div className="label">Project</div>
-            <div className="pill">{qt.project}</div>
+        {/* Prepared for */}
+        <div className="qt-btgrid" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4", flexShrink: 0 }}>
+          <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #f0fdf4" : "none" }}>
+            <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{qt.client || "—"}</div>
           </div>
-        )}
-      </div>
+          {qt.project && (
+            <div style={{ padding: "20px 32px" }}>
+              <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{qt.project}</div>
+            </div>
+          )}
+        </div>
 
-      <div className="qt-card" style={{ padding: "16px 0" }}>
-        <div style={{ padding: "0 18px 10px", fontSize: 11, fontWeight: 700, color: "#064e3b" }}>📦 Items / Services</div>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Description</th>
-              <th className="r">Qty</th>
-              <th className="r">Rate</th>
-              <th className="r">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, idx) => (
-              <tr key={item.id || idx}>
-                <td style={{ color: "#10b981", fontWeight: 700, fontSize: 11 }}>{String(idx + 1).padStart(2, "0")}</td>
-                <td className="desc">{item.description || "—"}</td>
-                <td className="r">{item.quantity}</td>
-                <td className="r">{formatCurrency(item.rate, qt.currency)}</td>
-                <td className="r amt">{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), qt.currency)}</td>
+        {/* Items */}
+        <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
+            <thead>
+              <tr style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
+                {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
+                  <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#059669", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div style={{ padding: "14px 18px 2px", borderTop: "2px solid #f0fdf4", marginTop: 4 }}>
-          {[
-            ["Subtotal", formatCurrency(subtotal, qt.currency)],
-            [`GST (${qt.gstRate}%)`, formatCurrency(gstAmt, qt.currency)],
-            ["Total", formatCurrency(total, qt.currency)],
-            ["Amount Paid", formatCurrency(qt.amountPaid, qt.currency)]
-          ].map(([l, v]) => (
-            <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #f0fdf4" }}>
-              <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#064e3b" }}>{v}</span>
+            </thead>
+            <tbody>
+              {items.map((item, idx) => (
+                <tr key={idx} style={{ borderBottom: "1px solid #f0fdf4" }}>
+                  <td style={{ padding: "12px 11px", color: "#6ee7b7", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                  <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
+                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
+                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, qt.currency)}</td>
+                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), qt.currency)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+            <div style={{ width: "min(280px,100%)" }}>
+              {[
+                ["Subtotal", formatCurrency(subtotal, qt.currency)],
+                [`GST (${qt.gstRate}%)${qt.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, qt.currency)],
+                ["Total Amount", formatCurrency(total, qt.currency)],
+                ["Amount Paid", formatCurrency(qt.amountPaid, qt.currency)]
+              ].map(([l, v]) => (
+                <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0fdf4" }}>
+                  <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
+                </div>
+              ))}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
+                <span style={{ fontSize: 19, fontWeight: 900, color: "#064e3b" }}>{formatCurrency(balanceDue, qt.currency)}</span>
+              </div>
             </div>
-          ))}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, background: "linear-gradient(135deg,#065f46,#059669)", borderRadius: 12, padding: "12px 14px" }}>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#d1fae5" }}>BALANCE DUE</span>
-            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(balanceDue, qt.currency)}</span>
           </div>
         </div>
-      </div>
 
-      {(qt.notes || qt.terms) && (
-        <div className="qt-card" style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
-          {qt.notes && (
-            <div>
-              <div className="label">📝 Notes</div>
-              <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7, marginTop: 4 }}>{qt.notes}</div>
+        {/* Notes + QR */}
+        <div style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {qt.notes && (
+              <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📝 NOTES</div>
+                <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.notes}</div>
+              </div>
+            )}
+            {qt.terms && (
+              <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
+                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
+                <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{qt.terms}</div>
+              </div>
+            )}
+            {qt.upiId && (
+              <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                <div style={{ fontSize: 9, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 UPI PAYMENT</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{qt.upiId}</div>
+              </div>
+            )}
+          </div>
+          <div className="no-print" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f0fdf4", borderRadius: 12, padding: "14px 16px", border: "1px solid #d1fae5", minWidth: 110 }}>
+            <div style={{ fontSize: 8, color: "#059669", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN QUOTE</div>
+            <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #d1fae5" }}>
+              <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="#064e3b" />
             </div>
-          )}
-          {qt.terms && (
-            <div>
-              <div className="label">📜 Terms & Conditions</div>
-              <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7, marginTop: 4 }}>{qt.terms}</div>
-            </div>
-          )}
+            <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{qt.quoteNo}</div>
+          </div>
         </div>
-      )}
 
-      <div style={{ textAlign: "center", padding: "10px 20px", fontSize: 11, color: "#9ca3af" }}>
-        Quotation Generated by {qt.companyName} · {qt.quoteNo}
+        <div style={{ flex: 1 }} />
+
+        {/* Footer */}
+        <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.companyName}</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#059669" }}>{qt.footerMessage || "Thank you for your business!"}</div>
+          <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.quoteNo}</div>
+        </div>
       </div>
-
-  
     </div>
   );
 }
-
-

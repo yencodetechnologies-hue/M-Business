@@ -2284,7 +2284,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
               <div style={{ position: "relative", flexShrink: 0 }}>
                 <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, pointerEvents: "none", color: P.muted }}>🔍</span>
                 <input placeholder="Search tasks..." value={search} onChange={e => setSearch(e.target.value)}
-                  style={{ border: `1.5px solid ${search ? P.accent : P.border}`, borderRadius: 8, padding: "5px 10px 5px 28px", fontSize: 13, color: P.text, outline: "none", width: search ? 360 : 100,   width: 100,    minWidth: 160,   background: search ? "#fff" : P.light, transition: "all .2s", fontFamily: "inherit" }}
+                  style={{ border: `1.5px solid ${search ? P.accent : P.border}`, borderRadius: 8, padding: "5px 10px 5px 28px", fontSize: 13, color: P.text, outline: "none", width: search ? 360 : 100,    minWidth: 160,   background: search ? "#fff" : P.light, transition: "all .2s", fontFamily: "inherit" }}
                   onFocus={e => { e.target.style.borderColor = P.accent; e.target.style.background = "#fff"; e.target.style.width = "200px"; }}
                   onBlur={e => { if (!search) { e.target.style.borderColor = P.border; e.target.style.background = P.light; e.target.style.width = "100px"; } }} />
               </div>

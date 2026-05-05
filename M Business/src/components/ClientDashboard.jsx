@@ -806,6 +806,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [proposals,     setProposals]     = useState([]);
   const [quotations,    setQuotations]    = useState([]);
   const [permissions,   setPermissions]   = useState({});
+  const [branding,      setBranding]      = useState(null);
 
   // ── API calls ─────────────────────────────────────────────
   useEffect(() => {
@@ -839,6 +840,12 @@ export default function ClientDashboard({ user, setUser }) {
         "x-company-id": user?.companyId || "" 
       } 
     };
+
+    if (user?.companyId) {
+      axios.get(`${BASE_URL}/api/subadmins/branding/${user.companyId}`)
+        .then(res => setBranding(res.data))
+        .catch(() => {});
+    }
 
     // Fetch Proposals
     axios.get(`${BASE_URL}/api/proposals/client/${encodedName}${companyQuery}`, config)
@@ -1343,9 +1350,13 @@ export default function ClientDashboard({ user, setUser }) {
                           const qtData = q.qt || {};
                           const slimPayload = {
                             no: q.quoteNo, date: qtData.date, exp: qtData.expiryDate,
-                            co: qtData.companyName, email: qtData.companyEmail, phone: qtData.companyPhone, addr: qtData.companyAddress,
+                            co: qtData.companyName || branding?.companyName,
+                            email: qtData.companyEmail || branding?.email,
+                            phone: qtData.companyPhone || branding?.phone,
+                            addr: qtData.companyAddress,
+                            cid: user?.companyId || "",
                             cl: q.client || qtData.client, proj: q.project || qtData.project, gst: qtData.gstRate, notes: qtData.notes, terms: qtData.terms,
-                            incGst: qtData.isGstIncluded, paid: qtData.amountPaid, upi: qtData.upiId, cur: qtData.currency,
+                            incGst: qtData.isGstIncluded, paid: qtData.amountPaid, upi: qtData.upiId || branding?.upiId || "", cur: qtData.currency,
                             items: (q.items || []).map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
                           };
                           const d = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
@@ -1414,10 +1425,11 @@ export default function ClientDashboard({ user, setUser }) {
                               no: inv.invoiceNo || inv.id || inv._id,
                               date: inv.date,
                               due: inv.due || inv.dueDate,
-                              co: inv.companyName || inv.inv?.companyName,
-                              email: inv.companyEmail || inv.inv?.companyEmail,
-                              phone: inv.companyPhone || inv.inv?.companyPhone,
+                              co: inv.companyName || inv.inv?.companyName || branding?.companyName,
+                              email: inv.companyEmail || inv.inv?.companyEmail || branding?.email,
+                              phone: inv.companyPhone || inv.inv?.companyPhone || branding?.phone,
                               addr: inv.companyAddress || inv.inv?.companyAddress,
+                              cid: user?.companyId || "",
                               cl: inv.client,
                               proj: inv.project,
                               gst: inv.gstRate || 0,
@@ -1425,7 +1437,7 @@ export default function ClientDashboard({ user, setUser }) {
                               terms: inv.terms,
                               incGst: inv.isGstIncluded,
                               paid: inv.amountPaid || 0,
-                              upi: inv.upiId || "",
+                              upi: inv.upiId || branding?.upiId || "",
                               cur: inv.currency || "₹",
                               items: (inv.items || []).map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
                               history: inv.paymentHistory || [],
@@ -1445,11 +1457,12 @@ export default function ClientDashboard({ user, setUser }) {
                                 r: { status: inv.status, client: inv.client, invoiceNo: inv.invoiceNo || inv.id || inv._id, total: inv.total },
                                 pd: { amountPaid: inv.amountPaid, paymentDate: inv.updatedAt || new Date().toISOString(), paymentMode: "Online", transactionId: "" },
                                 invData: {
-                                  companyName: inv.companyName || inv.inv?.companyName,
-                                  companyEmail: inv.companyEmail || inv.inv?.companyEmail,
-                                  companyPhone: inv.companyPhone || inv.inv?.companyPhone,
+                                  companyName: inv.companyName || inv.inv?.companyName || branding?.companyName,
+                                  companyEmail: inv.companyEmail || inv.inv?.companyEmail || branding?.email,
+                                  companyPhone: inv.companyPhone || inv.inv?.companyPhone || branding?.phone,
                                   companyAddress: inv.companyAddress || inv.inv?.companyAddress,
-                                  currency: inv.currency || "₹"
+                                  currency: inv.currency || "₹",
+                                  cid: user?.companyId || "",
                                 }
                               };
                               const d = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));

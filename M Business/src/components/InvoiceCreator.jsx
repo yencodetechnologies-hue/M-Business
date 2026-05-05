@@ -395,6 +395,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     cur: inv.currency,
     items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
     history: inv.paymentHistory || [],
+    cid: user?._id || "",
   };
   const qrData = `${FRONTEND_URL}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 

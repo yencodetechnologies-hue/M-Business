@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { BASE_URL } from "../config";
 
 function formatCurrency(val, symbol = "₹") {
   const num = parseFloat(val) || 0;
@@ -24,7 +26,21 @@ export default function ReceiptViewer() {
       // Robust decoding: replace spaces back to plus signs (common issue with URLSearchParams)
       const safeEncoded = encoded.replace(/ /g, "+");
       const decoded = decodeURIComponent(escape(atob(safeEncoded)));
-      setData(JSON.parse(decoded));
+      const parsed = JSON.parse(decoded);
+      setData(parsed);
+
+      // Fetch branding if CID exists and no logo in payload
+      const cid = parsed.invData?.cid;
+      const hasLogo = parsed.invData?.logo;
+      if (cid && !hasLogo) {
+        axios.get(`${BASE_URL}/api/subadmins/branding/${cid}`)
+          .then(res => {
+            if (res.data.logoUrl) {
+              setData(prev => prev ? ({ ...prev, invData: { ...prev.invData, logo: res.data.logoUrl } }) : prev);
+            }
+          })
+          .catch(() => {});
+      }
     } catch (e) {
       setError("Could not read receipt data.");
     }
@@ -66,6 +82,9 @@ export default function ReceiptViewer() {
       <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "#fff", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.05)", overflow: "hidden", border: "1px solid #e2e8f0" }}>
         {/* Header */}
         <div style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
+          {invData.logo && (
+            <img src={invData.logo} alt="logo" style={{ height: 50, width: "auto", maxWidth: "180px", objectFit: "contain", background: "#fff", padding: "4px", borderRadius: "10px", marginBottom: "16px", margin: "0 auto", display: "block" }} />
+          )}
           <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>💸</div>
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>{r.status === "part_paid" ? "PART PAYMENT RECEIPT" : "PAYMENT RECEIPT"}</h2>
           <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4, fontWeight: 600 }}>{receiptNo}</div>

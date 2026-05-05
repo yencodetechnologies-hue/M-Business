@@ -103,52 +103,25 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// GET company details with all related data (quotations, employees, managers, clients)
-router.get("/company/:companyName", async (req, res) => {
+// GET branding details for a companyId
+router.get("/branding/:companyId", async (req, res) => {
   try {
-    const { companyName } = req.params;
-    const decodedCompanyName = decodeURIComponent(companyName);
-
-    // Fetch all related data for this company
-    const [employees, managers, clients, quotations, subadmins] = await Promise.all([
-      Employee.find({
-        $or: [
-          { companyId: decodedCompanyName },
-          { companyId: { $regex: decodedCompanyName, $options: "i" } }
-        ]
-      }),
-      Manager.find({
-        $or: [
-          { companyId: decodedCompanyName },
-          { companyId: { $regex: decodedCompanyName, $options: "i" } }
-        ]
-      }),
-      Client.find({
-        $or: [
-          { companyName: decodedCompanyName },
-          { companyName: { $regex: decodedCompanyName, $options: "i" } }
-        ]
-      }),
-      Quotation.find().sort({ createdAt: -1 }),
-      User.find({
-        $or: [
-          { companyName: decodedCompanyName },
-          { companyName: { $regex: decodedCompanyName, $options: "i" } }
-        ]
-      })
-    ]);
-
+    const { companyId } = req.params;
+    // Find subadmin by ID
+    const subadmin = await User.findById(companyId);
+    if (!subadmin) {
+      return res.status(404).json({ msg: "Sub-admin not found" });
+    }
     res.json({
-      companyName: decodedCompanyName,
-      employees,
-      managers,
-      clients,
-      quotations,
-      subadmins
+      companyName: subadmin.companyName,
+      logoUrl: subadmin.logoUrl,
+      upiId: subadmin.upiId,
+      phone: subadmin.phone,
+      email: subadmin.email
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: "Server error fetching company details" });
+    res.status(500).json({ msg: "Server error" });
   }
 });
 

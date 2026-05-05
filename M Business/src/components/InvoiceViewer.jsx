@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import QRScanner from "./QRScanner.jsx";
+import axios from "axios";
+import { BASE_URL } from "../config";
 
 function formatCurrency(val, symbol = "₹") {
   const num = parseFloat(val) || 0;
@@ -16,32 +17,16 @@ function formatDate(d) {
 export default function InvoiceViewer() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [showScanner, setShowScanner] = useState(false);
-
-  const handleScanSuccess = (decodedText) => {
-    setShowScanner(false);
-    if (decodedText.startsWith('http')) {
-      window.location.href = decodedText;
-    } else {
-      alert('Scanned data: ' + decodedText);
-    }
-  };
-
-  const handleScanError = (error) => {
-    console.error('Scan error:', error);
-  };
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const encoded = params.get("d");
       if (!encoded) { setError("No invoice data found in URL."); return; }
-      
-      // Robust decoding: replace spaces back to plus signs (common issue with URLSearchParams)
       const safeEncoded = encoded.replace(/ /g, "+");
       const decoded = decodeURIComponent(escape(atob(safeEncoded)));
       const slim = JSON.parse(decoded);
-     
       const inv = {
         invoiceNo: slim.no, date: slim.date, dueDate: slim.due,
         companyName: slim.co, companyEmail: slim.email,
@@ -51,13 +36,14 @@ export default function InvoiceViewer() {
         isGstIncluded: slim.incGst, amountPaid: slim.paid || 0,
         upiId: slim.upi || "", currency: slim.cur || "₹",
         paymentHistory: slim.history || [],
+        logoUrl: slim.logo || "",
+        cid: slim.cid || "",
       };
       const items = (slim.items || []).map((i, idx) => ({
         id: idx + 1, description: i.d, quantity: i.q, rate: i.r,
       }));
       const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0) * (parseFloat(i.quantity)||0), 0);
       let subtotal, gstAmt, total;
-      
       if (inv.isGstIncluded) {
         total = subtotalRaw;
         subtotal = total / (1 + (inv.gstRate / 100));
@@ -67,184 +53,235 @@ export default function InvoiceViewer() {
         gstAmt = subtotal * (inv.gstRate / 100);
         total = subtotal + gstAmt;
       }
-      
       const historyTotal = inv.paymentHistory?.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0) || 0;
       const finalPaid = Math.max(inv.amountPaid, historyTotal);
       const balanceDue = total - finalPaid;
       setData({ inv, items, subtotal, gstAmt, total, balanceDue, finalPaid });
+
+      // Fetch branding if CID exists and no logo in payload
+      if (inv.cid && !inv.logoUrl) {
+        axios.get(`${BASE_URL}/api/subadmins/branding/${inv.cid}`)
+          .then(res => {
+            if (res.data.logoUrl) {
+              setData(prev => prev ? ({ ...prev, inv: { ...prev.inv, logoUrl: res.data.logoUrl } }) : prev);
+            }
+          })
+          .catch(() => {});
+      }
     } catch (e) {
-      setError("Could not read invoice data. The QR code may be invalid or expired.");
+      setError("Could not read invoice data.");
     }
   }, []);
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({ title: `Invoice ${data?.inv?.invoiceNo}`, url: window.location.href });
+    } else {
+      handleCopyLink();
+    }
+  };
+
   if (error) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", fontFamily: "sans-serif", padding: 24 }}>
-      <div style={{ textAlign: "center", color: "var(--app-accent)" }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 24 }}>
+      <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "var(--app-text)" }}>{error}</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a" }}>{error}</div>
       </div>
     </div>
   );
 
   if (!data) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--app-bg)", fontFamily: "sans-serif" }}>
-      <div style={{ textAlign: "center", color: "var(--app-accent)", fontSize: 14 }}>Loading invoice...</div>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div style={{ textAlign: "center", fontSize: 14, color: "#6366f1" }}>Loading invoice...</div>
     </div>
   );
 
-  const { inv, items, subtotal, gstAmt, total, balanceDue } = data;
-  const upiLink = inv.upiId ? `upi://pay?pa=${inv.upiId}&pn=${encodeURIComponent(inv.companyName)}&am=${balanceDue.toFixed(2)}&cu=INR&tn=${encodeURIComponent("Invoice " + inv.invoiceNo)}` : "";
+  const { inv, items, subtotal, gstAmt, total, balanceDue, finalPaid } = data;
+  const isPaid = balanceDue <= 0;
+  const qrData = window.location.href;
 
   return (
-    <div style={{ fontFamily: "'Segoe UI', sans-serif", background: "var(--app-border)", minHeight: "100vh", padding: "0 0 40px" }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#f1f5f9", minHeight: "100vh", padding: "20px 12px" }}>
       <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--app-border); }
-        .inv-card { background: #fff; border-radius: 16px; margin: 0 12px 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(109,40,217,0.10); }
-        .label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--app-muted); text-transform: uppercase; margin-bottom: 4px; }
-        .value { font-size: 14px; font-weight: 700; color: var(--app-text); }
-        .value-sm { font-size: 12px; color: #4b5563; }
-        table { width: 100%; border-collapse: collapse; }
-        th { font-size: 9px; color: var(--app-accent); font-weight: 700; letter-spacing: 1px; padding: 8px 10px; border-bottom: 2px solid var(--app-border); text-align: left; background: var(--app-bg); }
-        th.r, td.r { text-align: right; }
-        td { font-size: 12px; padding: 10px 10px; border-bottom: 1px solid var(--app-bg); color: var(--app-text); }
-        td.desc { font-weight: 600; }
-        td.amt { font-weight: 700; }
-        .pill { display: inline-block; background: var(--app-bg); border-radius: 20px; padding: 2px 10px; font-size: 11px; color: var(--app-accent); font-weight: 600; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        * { box-sizing: border-box; }
+        .inv-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(99,102,241,0.15); overflow: hidden; display: flex; flex-direction: column; }
         @media print {
-          body { background: white !important; }
-          .no-print { display: none !important; }
-          .inv-card { box-shadow: none !important; border-radius: 0 !important; }
+          @page { size: A4 portrait; margin: 0; }
+          html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
+          .no-print, .no-print * { display: none !important; }
+          .inv-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+          body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
         }
+        @media (max-width:600px) { .inv-hgrid { flex-direction:column!important; } .inv-btgrid { grid-template-columns:1fr!important; } }
       `}</style>
 
-      <div style={{ background: "linear-gradient(135deg,var(--app-sidebar) 0%,var(--app-text) 60%,var(--app-accent) 100%)", padding: "28px 20px 24px", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(167,139,250,0.18),transparent)", top: -60, right: -40 }} />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>INVOICE</div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: "#c4b5fd", marginBottom: 2 }}>{inv.invoiceNo}</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{inv.companyName}</div>
+      <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
+        <button className="action-btn" onClick={() => window.print()}
+          style={{ padding: "10px 22px", background: "linear-gradient(135deg,#4338ca,#6366f1)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
+          🖨️ Print / Save PDF
+        </button>
+        {inv.upiId && balanceDue > 0 && (
+          <button className="action-btn" onClick={() => {
+            const upiLink = `upi://pay?pa=${inv.upiId}&pn=${encodeURIComponent(inv.companyName)}&am=${balanceDue.toFixed(2)}&cu=INR&tn=${encodeURIComponent("Invoice " + inv.invoiceNo)}`;
+            window.location.href = upiLink;
+          }} style={{ padding: "10px 22px", background: "linear-gradient(135deg,#065f46,#059669)", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
+            💳 Pay via UPI
+          </button>
+        )}
+        <button className="action-btn" onClick={handleShare}
+          style={{ padding: "10px 22px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>
+          🔗 Share Link
+        </button>
+      </div>
 
-          {inv.companyEmail && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 3 }}>{inv.companyEmail}</div>}
-          {inv.companyPhone && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{inv.companyPhone}</div>}
-
-          <div style={{ display: "flex", gap: 20, marginTop: 16 }}>
+      <div className="inv-paper">
+        {/* Header */}
+        <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
+          <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(99,102,241,0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
+          <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
             <div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-              <div style={{ fontSize: 12, color: "#fff", fontWeight: 700 }}>{formatDate(inv.date)}</div>
+              {inv.logoUrl && (
+                <img src={inv.logoUrl} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
+              )}
+              <div style={{ fontSize: 24, fontWeight: 900, color: "#1e1b4b", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName}</div>
+              {inv.companyEmail && <div style={{ fontSize: 11, color: "#4338ca", marginTop: 3 }}>{inv.companyEmail}</div>}
+              {inv.companyPhone && <div style={{ fontSize: 11, color: "#4338ca", marginTop: 2 }}>{inv.companyPhone}</div>}
+              {inv.companyAddress && <div style={{ fontSize: 11, color: "#4338ca", marginTop: 2 }}>{inv.companyAddress}</div>}
             </div>
-            <div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
-              <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800 }}>{formatDate(inv.dueDate)}</div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "rgba(99,102,241,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#4338ca" }}>{inv.invoiceNo}</div>
+              <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 9, color: "#6366f1", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                  <div style={{ fontSize: 12, color: "#1e1b4b", fontWeight: 700 }}>{formatDate(inv.date)}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 9, color: "#6366f1", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
+                  <div style={{ fontSize: 12, color: isPaid ? "#10b981" : "#f59e0b", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", margin: "0 12px", borderRadius: "0 0 16px 16px", padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#e9d5ff" }}>{balanceDue > 0 ? "BALANCE DUE" : "TOTAL AMOUNT"}</span>
-        <span style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{formatCurrency(balanceDue > 0 ? balanceDue : total, inv.currency)}</span>
-      </div>
-
-   
-
-      <div className="inv-card" style={{ padding: "16px 18px" }}>
-        <div className="label">Bill To</div>
-        <div className="value" style={{ fontSize: 16 }}>{inv.client || "—"}</div>
-        {inv.project && (
-          <div style={{ marginTop: 8 }}>
-            <div className="label">Project</div>
-            <div className="pill">{inv.project}</div>
+        {/* Bill To */}
+        <div className="inv-btgrid" style={{ display: "grid", gridTemplateColumns: inv.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f1f5f9", flexShrink: 0 }}>
+          <div style={{ padding: "20px 32px", borderRight: inv.project ? "1px solid #f1f5f9" : "none" }}>
+            <div style={{ fontSize: 9, color: "#6366f1", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{inv.client || "—"}</div>
           </div>
-        )}
-        {inv.orderNo && (
-          <div style={{ marginTop: 8 }}>
-            <div className="label">Order No</div>
-            <div className="value-sm">{inv.orderNo}</div>
-          </div>
-        )}
-      </div>
-
-      <div className="inv-card" style={{ padding: "16px 0" }}>
-        <div style={{ padding: "0 18px 10px", fontSize: 11, fontWeight: 700, color: "var(--app-text)" }}>📦 Items / Services</div>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Description</th>
-              <th className="r">Qty</th>
-              <th className="r">Rate</th>
-              <th className="r">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, idx) => (
-              <tr key={item.id || idx}>
-                <td style={{ color: "var(--app-muted)", fontWeight: 700, fontSize: 11 }}>{String(idx + 1).padStart(2, "0")}</td>
-                <td className="desc">{item.description || "—"}</td>
-                <td className="r">{item.quantity}</td>
-                <td className="r">{formatCurrency(item.rate, inv.currency)}</td>
-                <td className="r amt">{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div style={{ padding: "14px 18px 2px", borderTop: "2px solid var(--app-border)", marginTop: 4 }}>
-          {[
-            ["Subtotal", formatCurrency(subtotal, inv.currency)],
-            [`GST (${inv.gstRate}%)`, formatCurrency(gstAmt, inv.currency)],
-            ["Total", formatCurrency(total, inv.currency)],
-            ["Amount Paid", formatCurrency(data.finalPaid, inv.currency)]
-          ].map(([l, v]) => (
-            <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--app-bg)" }}>
-              <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-text)" }}>{v}</span>
+          {inv.project && (
+            <div style={{ padding: "20px 32px" }}>
+              <div style={{ fontSize: 9, color: "#6366f1", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{inv.project}</div>
             </div>
-          ))}
+          )}
+        </div>
 
-          {inv.paymentHistory?.length > 0 && (
-            <div style={{ marginTop: 12, padding: "10px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
-              <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-accent)", marginBottom: 8, letterSpacing: 0.5, textTransform: "uppercase" }}>💳 Payment History</div>
-              {inv.paymentHistory.map((p, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0", borderBottom: i < inv.paymentHistory.length - 1 ? "1px solid #f1f5f9" : "none" }}>
-                  <span style={{ color: "#64748b" }}>{formatDate(p.date)} {p.category === "Advance" ? "(Advance)" : ""}</span>
-                  <span style={{ fontWeight: 700, color: "var(--app-text)" }}>{formatCurrency(p.amount, inv.currency)}</span>
+        {/* Items */}
+        <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
+            <thead>
+              <tr style={{ background: "linear-gradient(90deg,#f8fafc,#f1f5f9)" }}>
+                {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
+                  <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#6366f1", letterSpacing: 1.5, borderBottom: "2px solid #e2e8f0", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, idx) => (
+                <tr key={idx} style={{ borderBottom: "1px solid #f8fafc" }}>
+                  <td style={{ padding: "12px 11px", color: "#6366f1", fontWeight: 700, fontSize: 12, opacity: 0.5 }}>{String(idx + 1).padStart(2, "0")}</td>
+                  <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
+                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
+                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                  <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#111827" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+            <div style={{ width: "min(280px,100%)" }}>
+              {[
+                ["Subtotal", formatCurrency(subtotal, inv.currency)],
+                [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)],
+                ["Total Amount", formatCurrency(total, inv.currency)],
+                ["Amount Paid", formatCurrency(finalPaid, inv.currency)]
+              ].map(([l, v]) => (
+                <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f8fafc" }}>
+                  <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{v}</span>
                 </div>
               ))}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
+                <span style={{ fontSize: 19, fontWeight: 900, color: isPaid ? "#059669" : "#4338ca" }}>{formatCurrency(balanceDue, inv.currency)}</span>
+              </div>
             </div>
-          )}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", borderRadius: 12, padding: "12px 14px" }}>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#e9d5ff" }}>BALANCE DUE</span>
-            <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{formatCurrency(data.balanceDue, inv.currency)}</span>
           </div>
         </div>
-      </div>
 
-      {(inv.notes || inv.terms) && (
-        <div className="inv-card" style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
-          {inv.notes && (
-            <div>
-              <div className="label">📝 Notes</div>
-              <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7, marginTop: 4 }}>{inv.notes}</div>
+        {/* Notes + QR */}
+        <div style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {inv.notes && (
+              <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                <div style={{ fontSize: 9, color: "#6366f1", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📝 NOTES</div>
+                <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.notes}</div>
+              </div>
+            )}
+            {inv.terms && (
+              <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                <div style={{ fontSize: 9, color: "#6366f1", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
+                <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.terms}</div>
+              </div>
+            )}
+            {inv.upiId && (
+              <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                <div style={{ fontSize: 9, color: "#6366f1", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 UPI PAYMENT</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{inv.upiId}</div>
+              </div>
+            )}
+            {inv.paymentHistory?.length > 0 && (
+              <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
+                <div style={{ fontSize: 9, color: "#6366f1", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}>💳 PAYMENT HISTORY</div>
+                {inv.paymentHistory.map((p, i) => (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "4px 0", borderBottom: i < inv.paymentHistory.length - 1 ? "1px solid #f1f5f9" : "none" }}>
+                    <span style={{ color: "#64748b" }}>{formatDate(p.date)}{p.category === "Advance" ? " (Advance)" : ""}</span>
+                    <span style={{ fontWeight: 700, color: "#0f172a" }}>{formatCurrency(p.amount, inv.currency)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="no-print" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f8fafc", borderRadius: 12, padding: "14px 16px", border: "1px solid #e2e8f0", minWidth: 110 }}>
+            <div style={{ fontSize: 8, color: "#6366f1", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN INVOICE</div>
+            <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="#1e1b4b" />
             </div>
-          )}
-          {inv.terms && (
-            <div>
-              <div className="label">📜 Terms & Conditions</div>
-              <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7, marginTop: 4 }}>{inv.terms}</div>
-            </div>
-          )}
+            <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
+          </div>
         </div>
-      )}
 
-      <div style={{ textAlign: "center", padding: "10px 20px", fontSize: 11, color: "#9ca3af" }}>
-        Invoice Generated by {inv.companyName} · {inv.invoiceNo}
+        <div style={{ flex: 1 }} />
+
+        {/* Footer */}
+        <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "1px solid #e2e8f0" }}>
+          <div style={{ fontSize: 11, color: "#94a3b8" }}>{inv.companyName}</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#6366f1" }}>Thank you for your business!</div>
+          <div style={{ fontSize: 11, color: "#94a3b8" }}>{inv.invoiceNo}</div>
+        </div>
       </div>
-
- 
     </div>
   );
 }
 
-
+   

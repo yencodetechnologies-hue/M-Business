@@ -1094,7 +1094,7 @@ export default function ClientDashboard({ user, setUser }) {
                           const text = `📁 *Project Update*\n\nProject: ${p.name}\nStatus: ${p.status}\nProgress: ${p.progress || 0}%\nTasks: ${p.completedTasks || 0}/${p.tasks || 0}`;
                           const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                           window.open(wpUrl, "_blank");
-                        }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                        }} style= {{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <span>🔗</span>
                         </button>
                       </div>

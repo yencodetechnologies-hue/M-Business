@@ -1165,7 +1165,9 @@ export default function ClientDashboard({ user, setUser }) {
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10, marginBottom:14 }}>
                     <div>
                       <div style={{ fontSize:16, fontWeight:800, color:"#0f172a", marginBottom:4 }}>{p.name}</div>
-                      <div style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace" }}>{p.id||p._id} · Deadline: {p.deadline}</div>
+                     <div style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace" }}>
+  {p.deadline ? `Deadline: ${p.deadline}` : "No deadline set"}
+</div>
                     </div>
                     <Badge label={p.status} size="lg"/>
                   </div>
@@ -1272,9 +1274,7 @@ export default function ClientDashboard({ user, setUser }) {
       }} style={{  background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>Reject</button>
     </div>
   </div>
-)}
-                    
-                  </div>
+)}                         </div>
                 ))
               )}
             </div>
@@ -1340,11 +1340,15 @@ export default function ClientDashboard({ user, setUser }) {
                     <div style={{ marginTop:12, display:"flex", gap:8 }}>
                       <button 
                         onClick={() => {
+                          const qtData = q.qt || {};
                           const slimPayload = {
-                            qt: q.qt,
-                            items: q.items,
+                            no: q.quoteNo, date: qtData.date, exp: qtData.expiryDate,
+                            co: qtData.companyName, email: qtData.companyEmail, phone: qtData.companyPhone, addr: qtData.companyAddress,
+                            cl: q.client || qtData.client, proj: q.project || qtData.project, gst: qtData.gstRate, notes: qtData.notes, terms: qtData.terms,
+                            incGst: qtData.isGstIncluded, paid: qtData.amountPaid, upi: qtData.upiId, cur: qtData.currency,
+                            items: (q.items || []).map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
                           };
-                          const d = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
+                          const d = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
                           window.open(`/quotation-view?d=${d}`, "_blank");
                         }}
                         style={{ 
@@ -1391,7 +1395,9 @@ export default function ClientDashboard({ user, setUser }) {
                       {inv.status==="Paid"?"🧾":inv.status==="Overdue"?"🚨":"⏳"}
                     </div>
                     <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:2 }}>{inv.id||inv.invoiceId||inv._id} · {inv.project}</div>
+<div style={{ fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:2 }}>
+  {inv.invoiceNo ? `Invoice #${inv.invoiceNo}` : "Invoice"}
+</div>
                       <div style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace" }}>Issued {inv.date} · Due {inv.due}{inv.method&&inv.method!=="—"?` · Paid via ${inv.method}`:""}</div>
                     </div>
                     <div style={{ textAlign:"right", flexShrink:0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
@@ -1424,7 +1430,7 @@ export default function ClientDashboard({ user, setUser }) {
                               items: (inv.items || []).map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
                               history: inv.paymentHistory || [],
                             };
-                            const d = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
+                            const d = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
                             window.open(`/invoice-view?d=${d}`, "_blank");
                           }}
                           style={{ background: "none", border: "1px solid #e2e8f0", borderRadius: 8, padding: "2px 8px", fontSize: 10, color: "#6366f1", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
@@ -1446,7 +1452,7 @@ export default function ClientDashboard({ user, setUser }) {
                                   currency: inv.currency || "₹"
                                 }
                               };
-                              const d = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+                              const d = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
                               window.open(`/receipt-view?d=${d}`, "_blank");
                             }}
                             style={{ background: "#10b981", border: "none", borderRadius: 8, padding: "2px 8px", fontSize: 10, color: "#fff", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}

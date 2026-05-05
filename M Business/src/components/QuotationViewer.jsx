@@ -36,7 +36,10 @@ export default function QuotationViewer() {
       const params = new URLSearchParams(window.location.search);
       const encoded = params.get("d");
       if (!encoded) { setError("No quotation data found in URL."); return; }
-      const decoded = decodeURIComponent(escape(atob(encoded)));
+      
+      // Robust decoding: replace spaces back to plus signs (common issue with URLSearchParams)
+      const safeEncoded = encoded.replace(/ /g, "+");
+      const decoded = decodeURIComponent(escape(atob(safeEncoded)));
       const slim = JSON.parse(decoded);
      
       const qt = {

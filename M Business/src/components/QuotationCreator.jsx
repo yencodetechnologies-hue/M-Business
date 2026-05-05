@@ -232,8 +232,21 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
   const shareQuotation = async (entry) => {
     const qtData = entry.qt || qt;
-    const link = `${window.location.origin}/quotation-view?id=${entry.id || entry.quoteNo}`;
-    const text = `*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`;
+    const itemsData = entry.items || items;
+    const slimPayload = {
+      no: entry.quoteNo, date: qtData.date, exp: qtData.expiryDate,
+      co: qtData.companyName, email: qtData.companyEmail, phone: qtData.companyPhone, addr: qtData.companyAddress,
+      cl: entry.client || qtData.client, proj: qtData.project, gst: qtData.gstRate, notes: qtData.notes, terms: qtData.terms,
+      incGst: qtData.isGstIncluded,
+      paid: qtData.amountPaid,
+      upi: qtData.upiId,
+      cur: qtData.currency,
+      items: itemsData.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
+    };
+    const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
+    const link = `${window.location.origin}/quotation-view?d=${encodedData}`;
+    
+    const text = `*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`;
     if (navigator.share) {
       try { await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, url: link }); } catch (err) { console.log(err); }
     } else {
@@ -244,8 +257,21 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
   const shareWhatsApp = (entry) => {
     const qtData = entry.qt || qt;
-    const link = `${window.location.origin}/quotation-view?id=${entry.id || entry.quoteNo}`;
-    const text = encodeURIComponent(`*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`);
+    const itemsData = entry.items || items;
+    const slimPayload = {
+      no: entry.quoteNo, date: qtData.date, exp: qtData.expiryDate,
+      co: qtData.companyName, email: qtData.companyEmail, phone: qtData.companyPhone, addr: qtData.companyAddress,
+      cl: entry.client || qtData.client, proj: qtData.project, gst: qtData.gstRate, notes: qtData.notes, terms: qtData.terms,
+      incGst: qtData.isGstIncluded,
+      paid: qtData.amountPaid,
+      upi: qtData.upiId,
+      cur: qtData.currency,
+      items: itemsData.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
+    };
+    const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
+    const link = `${window.location.origin}/quotation-view?d=${encodedData}`;
+    
+    const text = encodeURIComponent(`*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
@@ -441,7 +467,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       cur: qt.currency,
       items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
     };
-    const qrData = `${FRONTEND_URL}/quotation-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
+    const qrData = `${FRONTEND_URL}/quotation-view?d=${encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))))}`;
 
     return (
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>

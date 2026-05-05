@@ -3463,22 +3463,30 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         button,input,select,textarea{font-family:inherit}
         @media(min-width:769px){.sidebar{transform:translateX(0)!important;position:sticky!important;top:0!important;}.sidebar-close{display:none!important;}.mob-overlay{display:none!important;}.mob-topbar{display:none!important;}.sidebar-spacer{display:none!important;}}
         @media(max-width:768px){.sidebar-spacer{display:none!important;}.mob-topbar-hide{display:none!important;}.main-content{padding:12px!important;}.dash-stats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}.dash-2col{grid-template-columns:1fr!important;}.modal-2col{grid-template-columns:1fr!important;}.page-header{flex-wrap:wrap;gap:8px;}.header-actions{flex-wrap:wrap;gap:8px;}}
+        @media print {
+          .no-print { display: none !important; }
+          .sidebar, .mob-topbar, .page-header, .header-actions { display: none !important; }
+          .main-content { padding: 0 !important; margin: 0 !important; overflow: visible !important; }
+          body { background: white !important; }
+        }
       `}</style>
 
       {!enforceMySubscriptions && (
-        <Sidebar
-          user={user}
-          active={validActive}
-          setActive={setActive}
-          onLogout={handleLogout}
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          navItems={navItems}
-          companyLogo={companyLogo}
-          onLogoChange={onLogoChange}
-          enforceMySubscriptions={enforceMySubscriptions}
-          onLogoUploadClick={() => headerLogoRef.current?.click()}
-        />
+        <div className="no-print">
+          <Sidebar
+            user={user}
+            active={validActive}
+            setActive={setActive}
+            onLogout={handleLogout}
+            open={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            navItems={navItems}
+            companyLogo={companyLogo}
+            onLogoChange={onLogoChange}
+            enforceMySubscriptions={enforceMySubscriptions}
+            onLogoUploadClick={() => headerLogoRef.current?.click()}
+          />
+        </div>
       )}
 
       {showCropModal && (
@@ -3493,7 +3501,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         {/* Mobile Topbar */}
-        <div className="mob-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
+        <div className="mob-topbar no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
           {!enforceMySubscriptions ? (
             <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
           ) : (
@@ -3526,7 +3534,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div className="main-content" style={{ flex: 1, padding: "22px 24px", overflowY: "auto" }}>
           <EmployeeSubscriptionWarning user={user} />
           {/* Page Header */}
-          <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
+          <div className="page-header no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
             <div>
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: T.text }}>{page?.icon} {page?.label}</h1>
             </div>

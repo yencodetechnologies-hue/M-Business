@@ -582,28 +582,6 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // BLANK FIRST PAGE - A4 Format Document
   if (slide.type === "blank_first_page") return (
     <>
-      <style>{`
-        @media print {
-          @page { 
-            size: A4; 
-            margin: 20mm; 
-          }
-          body { 
-            margin: 0; 
-            background: white !important; 
-          }
-          .blank-page-content {
-            width: 100% !important;
-            height: auto !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            overflow: visible !important;
-          }
-          .no-print { 
-            display: none !important; 
-          }
-        }
-      `}</style>
       <div className="blank-page-content" style={{ ...W, padding: "40px 60px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative", minHeight: "1273px" }}>
         {/* Print Button - Only show when not editing */}
         {!editing && (
@@ -640,14 +618,6 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // PROPOSAL - A4 Format Document
   if (slide.type === "proposal") return (
     <>
-      <style>{`
-        @media print {
-          @page { size: A4; margin: 20mm; }
-          body { margin: 0; background: white !important; }
-          .proposal-content { width: 100% !important; height: auto !important; box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
-          .no-print { display: none !important; }
-        }
-      `}</style>
       <div className="proposal-content" style={{ ...W, padding: "40px 60px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative" }}>
         {/* Truly empty page container */}
         <div style={{ height: "100%" }}>
@@ -660,14 +630,6 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // PROPOSAL PAGE 2 - A4 Format Document
   if (slide.type === "proposal_page2") return (
     <>
-      <style>{`
-        @media print {
-          @page { size: A4; margin: 20mm; }
-          body { margin: 0; background: white !important; }
-          .proposal-content { width: 100% !important; height: auto !important; box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
-          .no-print { display: none !important; }
-        }
-      `}</style>
       <div className="proposal-content" style={{ ...W, padding: "40px 60px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative" }}>
         {/* Redundant Print Button Hidden */}
 
@@ -737,28 +699,6 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // PORTRAIT PAGE
   if (slide.type === "portrait") return (
     <>
-      <style>{`
-        @media print {
-          @page { 
-            size: A4 portrait; 
-            margin: 20mm; 
-          }
-          body { 
-            margin: 0; 
-            background: white !important; 
-          }
-          .portrait-content {
-            width: 100% !important;
-            height: auto !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            overflow: visible !important;
-          }
-          .no-print { 
-            display: none !important; 
-          }
-        }
-      `}</style>
       <div className="portrait-content" style={{ ...W, padding: "40px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative", aspectRatio: "210/297" }}>
         {/* Print Button */}
         {/* Redundant Print Button Hidden */}
@@ -776,28 +716,6 @@ function Slide({ slide, theme: tn, docFormat, editing, onChange, selectedId, onS
   // LANDSCAPE PAGE
   if (slide.type === "landscape") return (
     <>
-      <style>{`
-        @media print {
-          @page { 
-            size: A4 landscape; 
-            margin: 20mm; 
-          }
-          body { 
-            margin: 0; 
-            background: white !important; 
-          }
-          .landscape-content {
-            width: 100% !important;
-            height: auto !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            overflow: visible !important;
-          }
-          .no-print { 
-            display: none !important; 
-          }
-        }
-      `}</style>
       <div className="landscape-content" style={{ ...W, padding: "40px", background: "#fff", fontSize: "14px", lineHeight: "1.5", color: "#000", position: "relative", aspectRatio: "297/210" }}>
         {/* Print Button */}
         {/* Redundant Print Button Hidden */}
@@ -1208,7 +1126,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
         if (slide.type === "cover") {
           return `
-            <div style="page-break-after: always; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; position: relative; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); color: white; padding: 48px 56px; overflow: hidden;">
+            <div style="page-break-after: always; width: 210mm; height: 297mm; display: flex; flex-direction: column; justify-content: flex-end; position: relative; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); color: white; padding: 48px 56px; overflow: hidden;">
               <div style="position: absolute; inset: 0; background: url('${slide.coverImage || ''}') center/cover; z-index: -2;"></div>
               <div style="position: absolute; inset: 0; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); z-index: -1;"></div>
               <h1 style="font-size: 48px; font-weight: 900; margin-bottom: 16px; line-height: 1.05;">${slide.title}</h1>
@@ -1220,7 +1138,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
         if (slide.type === "overview" || slide.type === "closing") {
           return `
-            <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
+            <div style="page-break-after: always; width: 210mm; height: 297mm; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
               ${slide.heading ? `
                 <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
                 <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px; letter-spacing: -0.5px; line-height: 1.1;">${slide.heading}</h1>
@@ -1233,7 +1151,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
         if (slide.type === "objectives") {
           return `
-            <div style="page-break-after: always; min-height: 100vh; padding: 56px; position: relative; background: #fff; overflow: hidden;">
+            <div style="page-break-after: always; width: 210mm; height: 297mm; padding: 56px; position: relative; background: #fff; overflow: hidden;">
               ${slide.heading ? `
                 <div style="width: 56px; height: 6px; background: ${t.g}; border-radius: 3px; margin-bottom: 20px;"></div>
                 <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">${slide.heading}</h1>
@@ -1497,9 +1415,47 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         @media print {
           .no-print { display: none !important; }
           .print-only { display: block !important; }
-          body { background: white !important; }
+          body, html { 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            background: white !important;
+            height: auto !important;
+            overflow: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          @page {
+            size: A4;
+            margin: 0;
+          }
+          /* Hide all dashboard UI ancestors and siblings */
+          .sidebar, .mob-topbar, .page-header, .header-actions { display: none !important; }
+          .main-content { padding: 0 !important; margin: 0 !important; overflow: visible !important; }
+          
+          .slide-print-container {
+            width: 210mm !important;
+            height: 297mm !important;
+            page-break-after: always !important;
+            page-break-inside: avoid !important;
+            overflow: hidden !important;
+            position: relative !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            background: white !important;
+          }
+          /* Scale the 900px slide content to fit exactly in 210mm (A4) */
+          .slide-print-container > div {
+            transform: scale(0.88) !important; 
+            transform-origin: top left !important;
+            width: 900px !important;
+          }
+          /* Fix for the last page empty issue */
+          .slide-print-container:last-child {
+            page-break-after: auto !important;
+          }
           .canvas-container { padding: 0 !important; margin: 0 !important; }
-          .slide-wrapper { box-shadow: none !important; border: none !important; margin: 0 !important; }
         }
       `}</style>
 
@@ -1901,7 +1857,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 const ar = isP ? "210/297" : isL ? "297/210" : "16/9";
 
                 return (
-                  <div key={s.id || idx} style={{
+                  <div key={s.id || idx} className="slide-print-container" style={{
                     width: 900 * (zoom / 100 + 0.4),
                     minWidth: 900 * 0.4,
                     aspectRatio: ar,

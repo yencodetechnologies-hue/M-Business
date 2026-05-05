@@ -1243,80 +1243,37 @@ export default function ClientDashboard({ user, setUser }) {
                       <Badge label={p.status==="pending" ? "Pending Approval" : p.status==="approved" ? "Approved" : p.status==="rejected" ? "Rejected" : "Draft"} size="lg"/>
                     </div>
 
-                    {p.status === "pending" && (
-                      <div style={{ marginTop:16, display:"flex", gap:10, paddingTop:16, borderTop:"1px solid #f1f5f9" }}>
-                        <button onClick={()=>{
-                          axios.put(`${BASE_URL}/api/proposals/${p._id}/approve`)
-                            .then(res => {
-                              setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                            })
-                            .catch(err => console.error("Error approving proposal:", err));
-                        }} style={{ flex:1, background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Approve</button>
-                        
-                        <button onClick={()=>{
-                          const reason = window.prompt("Reason for rejection:");
-                          if(reason===null) return;
-                          axios.put(`${BASE_URL}/api/proposals/${p._id}/reject`, { rejectNote: reason || "Needs revision" })
-                            .then(res => {
-                              setProposals(proposals.map(x=>x._id===p._id ? res.data : x));
-                              alert("❌ Proposal Rejected");
-                            })
-                            .catch(err => console.error("Error rejecting proposal:", err));
-                        }} style={{ flex:1, background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer" }}>Reject</button>
-                      </div>
-                    )}
+{p.status === "pending" && (
+  <div style={{ marginTop:16, paddingTop:16, borderTop:"1px solid #f1f5f9", display:"flex", gap:10 }}>
+    {/* Left half: View + Print */}
+    <div style={{ display:"flex", gap:8 }}>
+      <button 
+        onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")}
+        style={{  background:"#6366f1", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}
+      >View Proposal</button>
+      <button 
+        onClick={() => window.open(`/project-proposal?view=${p._id || p.id}&print=true`, "_blank")}
+        style={{ background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}
+      >🖨️ Print</button>
+    </div>
+    {/* Right half: Approve + Reject */}
+    <div style={{ display:"flex", gap:8 }}>
+      <button onClick={()=>{
+        axios.put(`${BASE_URL}/api/proposals/${p._id}/approve`)
+          .then(res => setProposals(proposals.map(x=>x._id===p._id ? res.data : x)))
+          .catch(err => console.error("Error approving proposal:", err));
+      }} style={{  background:"#10b981", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>Approve</button>
+      <button onClick={()=>{
+        const reason = window.prompt("Reason for rejection:");
+        if(reason===null) return;
+        axios.put(`${BASE_URL}/api/proposals/${p._id}/reject`, { rejectNote: reason || "Needs revision" })
+          .then(res => { setProposals(proposals.map(x=>x._id===p._id ? res.data : x)); alert("❌ Proposal Rejected"); })
+          .catch(err => console.error("Error rejecting proposal:", err));
+      }} style={{  background:"#ef4444", color:"#fff", border:"none", borderRadius:8, padding:"10px", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>Reject</button>
+    </div>
+  </div>
+)}
                     
-                    {p.status === "approved" && (
-                      <div style={{ marginTop:16, padding:"12px", background:"#f0fdf4", borderRadius:8, border:"1px solid #86efac" }}>
-                        <div style={{ fontSize:12, color:"#14532d", fontWeight:600 }}>✅ Proposal Approved</div>
-                        <div style={{ fontSize:11, color:"#166534", marginTop:2 }}>This proposal has been approved and is ready for implementation.</div>
-                      </div>
-                    )}
-                    
-                    {p.status === "rejected" && (
-                      <div style={{ marginTop:16, padding:"12px", background:"#fef2f2", borderRadius:8, border:"1px solid #fca5a5" }}>
-                        <div style={{ fontSize:12, color:"#9f1239", fontWeight:600 }}>❌ Proposal Rejected</div>
-                        <div style={{ fontSize:11, color:"#991b1b", marginTop:2 }}>Reason: {p.rejectNote || "Needs revision"}</div>
-                        <div style={{ marginTop:12, display:"flex", gap:8 }}>
-                        
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div style={{ marginTop:12, display:"flex", gap:8 }}>
-                        <button 
-                          onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")}
-                        style={{ 
-                          background:"#6366f1", 
-                          border:"none", 
-                          borderRadius:8, 
-                          padding:"8px 16px", 
-                          fontSize:12, 
-                          color:"#fff", 
-                          fontWeight: 700,
-                          cursor:"pointer", 
-                          fontFamily:"inherit" 
-                        }}
-                      >
-                        View Full Proposal
-                      </button>
-                      <button 
-                          onClick={() => window.open(`/project-proposal?view=${p._id || p.id}&print=true`, "_blank")}
-                        style={{ 
-                          background:"#10b981", 
-                          border:"none", 
-                          borderRadius:8, 
-                          padding:"8px 16px", 
-                          fontSize:12, 
-                          color:"#fff", 
-                          fontWeight: 700,
-                          cursor:"pointer", 
-                          fontFamily:"inherit" 
-                        }}
-                      >
-                        🖨️ Print
-                      </button>
-                    </div>
                   </div>
                 ))
               )}

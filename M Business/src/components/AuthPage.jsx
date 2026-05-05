@@ -1,9 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
-export default function AuthPage({ setUser, initialTab = "login" }) {
-  const normalizedInitialTab = initialTab === "register" ? "register" : "login";
-  const [tab, setTab] = useState(normalizedInitialTab);
+
+export default function AuthPage({ setUser, initialTab = "register" }) {
+  const [tab, setTab] = useState(initialTab === "login" ? "login" : "register");
+  const [animating, setAnimating] = useState(false);
+  const [panelAnim, setPanelAnim] = useState("idle"); // "idle" | "flip-out" | "flip-in"
+  const [formVisible, setFormVisible] = useState(true);
+
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -12,495 +16,620 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginErr, setLoginErr] = useState({});
-  const [regData, setRegData] = useState({ name: "", email: "", phone: "", password: "", confirm: "", role: "Subadmin", companyName: "", companyType: "IT", employeeCount: "0-10" });
+  const [regData, setRegData] = useState({
+    name: "", email: "", phone: "", password: "", confirm: "",
+    role: "Subadmin", companyName: "", companyType: "IT", employeeCount: "0-10"
+  });
   const [regErr, setRegErr] = useState({});
-  
+
   const [verifyEmail, setVerifyEmail] = useState("");
   const [otp, setOtp] = useState("");
-
   const [forgotEmail, setForgotEmail] = useState("");
   const [resetData, setResetData] = useState({ email: "", otp: "", newPassword: "", confirm: "" });
-const handleLogin = async () => {
-  const errs = {};
-  if (!loginData.email.trim()) errs.email = "Email is required";
-  if (!loginData.password.trim()) errs.password = "Password is required";
-  if (Object.keys(errs).length) { setLoginErr(errs); return; }
 
-  try {
-    setLoading(true);
-    setError("");
+  // ── Animated tab switch with 3D flip ──
+  const switchTab = (t) => {
+    if (animating || tab === t) return;
+    setAnimating(true);
+    setError(""); setSuccess(""); setLoginErr({}); setRegErr({});
 
-    const res = await axios.post(
-      `${BASE_URL}/api/auth/login`,
-      loginData
-    );
+    // Phase 1: fade out form + flip panel out
+    setFormVisible(false);
+    setPanelAnim("flip-out");
 
-    const userData = res.data.user || res.data;
-    const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+    setTimeout(() => {
+      // Phase 2: switch tab content, panel flips back in
+      setTab(t);
+      setPanelAnim("flip-in");
 
-    localStorage.setItem("user", JSON.stringify(userWithLogo));
-    setUser(userWithLogo);
+      // Small delay then fade form back in
+      setTimeout(() => {
+        setFormVisible(true);
+        setPanelAnim("idle");
+        setAnimating(false);
+      }, 280);
+    }, 300);
+  };
 
-  } catch (e) {
-    if (e.response?.data?.requiresOTP) {
-      setVerifyEmail(e.response.data.email);
-      setTab("otp");
-      setError("");
-      setSuccess("Please verify your email to continue. We have sent an OTP.");
-    } else {
-      setError(
-        e.response?.data?.msg ||
-        e.response?.data?.message ||
-        "Invalid email or password."
-      );
-    }
-  } finally {
-    setLoading(false);
-  }
-};const handleRegister = async () => {
-  const errs = {};
-  if (!regData.name.trim()) errs.name = "Name is required";
-  if (!regData.email.trim()) errs.email = "Email is required";
-  if (!regData.password.trim()) errs.password = "Password is required";
-  else if (regData.password.length < 6) errs.password = "Minimum 6 characters";
-  if (regData.password !== regData.confirm) errs.confirm = "Passwords do not match";
+  // ── API handlers ──
+  const handleLogin = async () => {
+    const errs = {};
+    if (!loginData.email.trim()) errs.email = "Email is required";
+    if (!loginData.password.trim()) errs.password = "Password is required";
+    if (Object.keys(errs).length) { setLoginErr(errs); return; }
+    try {
+      setLoading(true); setError("");
+      const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
+      const userData = res.data.user || res.data;
+      const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+      localStorage.setItem("user", JSON.stringify(userWithLogo));
+      setUser(userWithLogo);
+    } catch (e) {
+      if (e.response?.data?.requiresOTP) {
+        setVerifyEmail(e.response.data.email);
+        setTab("otp"); setError("");
+        setSuccess("OTP sent to your email.");
+      } else {
+        setError(e.response?.data?.msg || e.response?.data?.message || "Invalid email or password.");
+      }
+    } finally { setLoading(false); }
+  };
 
-  if (Object.keys(errs).length) { 
-    setRegErr(errs); 
-    return; 
-  }
-
-  try {
-    setLoading(true);
-    setError("");
-
-    console.log("Sending data:", regData); // 🔥 debug
-
-    const payload = {
-        name: regData.name,
-        email: regData.email,
-        password: regData.password,
-        role: regData.role,
-        phone: regData.phone,
+  const handleRegister = async () => {
+    const errs = {};
+    if (!regData.name.trim()) errs.name = "Name is required";
+    if (!regData.email.trim()) errs.email = "Email is required";
+    if (!regData.password.trim()) errs.password = "Password is required";
+    else if (regData.password.length < 6) errs.password = "Minimum 6 characters";
+    if (regData.password !== regData.confirm) errs.confirm = "Passwords do not match";
+    if (Object.keys(errs).length) { setRegErr(errs); return; }
+    try {
+      setLoading(true); setError("");
+      const payload = {
+        name: regData.name, email: regData.email,
+        password: regData.password, role: regData.role, phone: regData.phone
       };
-
-      // Add company details for Subadmin registration
       if (regData.role === "Subadmin") {
         payload.companyName = regData.companyName;
         payload.companyType = regData.companyType;
         payload.employeeCount = regData.employeeCount;
       }
-
-    const res = await axios.post(
-      `${BASE_URL}/api/auth/signup`,
-      payload,
-      {
-        timeout: 15000  // ⏱️ important (15 sec)
+      const res = await axios.post(`${BASE_URL}/api/auth/signup`, payload, { timeout: 15000 });
+      if (res.data.requiresOTP) {
+        setSuccess("OTP sent to your email!");
+        setVerifyEmail(res.data.email);
+        setTab("otp");
+      } else {
+        setSuccess("Account created!");
+        const userData = res.data.user;
+        if (userData) {
+          const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
+          localStorage.setItem("user", JSON.stringify(userWithLogo));
+          setUser(userWithLogo);
+        } else { setTab("login"); }
       }
-    );
+    } catch (e) {
+      if (e.code === "ECONNABORTED") setError("Server slow. Please try again.");
+      else setError(e.response?.data?.msg || e.response?.data?.message || "Registration failed.");
+    } finally { setLoading(false); }
+  };
 
-    console.log("Response:", res.data); // 🔥 debug
-
-    if (res.data.requiresOTP) {
-      setSuccess("OTP sent to your email!");
-      setVerifyEmail(res.data.email);
-      setTab("otp");
-    } else {
-      setSuccess("Account created successfully!");
-      
-      // Auto-login after successful registration
+  const handleVerifyOTP = async () => {
+    if (!otp.trim()) { setError("Please enter the OTP"); return; }
+    try {
+      setLoading(true); setError("");
+      const res = await axios.post(`${BASE_URL}/api/auth/verify-otp`, { email: verifyEmail, otp: otp.trim() });
       const userData = res.data.user;
       if (userData) {
         const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
         localStorage.setItem("user", JSON.stringify(userWithLogo));
         setUser(userWithLogo);
-      } else {
-        setTab("login");
-      }
-    }
+      } else { setTab("login"); }
+    } catch (e) { setError(e.response?.data?.msg || "Invalid OTP"); }
+    finally { setLoading(false); }
+  };
 
-  } catch (e) {
-    console.log("ERROR:", e);
+  const handleForgotPassword = async () => {
+    if (!forgotEmail.trim()) { setError("Please enter your email"); return; }
+    try {
+      setLoading(true); setError("");
+      await axios.post(`${BASE_URL}/api/auth/forgot-password`, { email: forgotEmail });
+      setSuccess("OTP sent!");
+      setResetData(p => ({ ...p, email: forgotEmail, otp: "", newPassword: "", confirm: "" }));
+      setTab("reset");
+    } catch (e) { setError(e.response?.data?.msg || "Failed to send reset OTP"); }
+    finally { setLoading(false); }
+  };
 
-    if (e.code === "ECONNABORTED") {
-      setError("Server slow (Render sleep). Please try again.");
-    } else {
-      setError(
-        e.response?.data?.msg ||
-        e.response?.data?.message ||
-        "Registration failed."
-      );
-    }
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleVerifyOTP = async () => {
-  if (!otp.trim()) { setError("Please enter the OTP"); return; }
-  try {
-    setLoading(true);
-    setError("");
-    const res = await axios.post(`${BASE_URL}/api/auth/verify-otp`, {
-      email: verifyEmail,
-      otp: otp.trim()
-    });
-    setSuccess("Email verified successfully!");
-    const userData = res.data.user;
-    if (userData) {
-      const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
-      localStorage.setItem("user", JSON.stringify(userWithLogo));
-      setUser(userWithLogo);
-    } else {
+  const handleResetPassword = async () => {
+    if (!resetData.otp.trim()) { setError("Please enter the OTP"); return; }
+    if (resetData.newPassword.length < 6) { setError("Min 6 characters"); return; }
+    if (resetData.newPassword !== resetData.confirm) { setError("Passwords do not match"); return; }
+    try {
+      setLoading(true); setError("");
+      await axios.post(`${BASE_URL}/api/auth/reset-password`, {
+        email: resetData.email, otp: resetData.otp, newPassword: resetData.newPassword
+      });
+      setSuccess("Password reset! Please login.");
       setTab("login");
-    }
-  } catch (e) {
-    setError(e.response?.data?.msg || "Invalid OTP");
-  } finally {
-    setLoading(false);
-  }
-};
+      setLoginData(p => ({ ...p, email: resetData.email, password: "" }));
+    } catch (e) { setError(e.response?.data?.msg || "Failed to reset password"); }
+    finally { setLoading(false); }
+  };
 
-const handleForgotPassword = async () => {
-  if (!forgotEmail.trim()) { setError("Please enter your email"); return; }
-  try {
-    setLoading(true);
-    setError("");
-    await axios.post(`${BASE_URL}/api/auth/forgot-password`, { email: forgotEmail });
-    setSuccess("OTP sent to your email!");
-    setResetData(p => ({ ...p, email: forgotEmail, otp: "", newPassword: "", confirm: "" }));
-    setTab("reset");
-  } catch (e) {
-    setError(e.response?.data?.msg || "Failed to send reset OTP");
-  } finally {
-    setLoading(false);
-  }
-};
+  const isRegister = tab === "register";
+  const isLogin = tab === "login";
+  const showMainTabs = isLogin || isRegister;
 
-const handleResetPassword = async () => {
-  if (!resetData.otp.trim()) { setError("Please enter the OTP"); return; }
-  if (resetData.newPassword.length < 6) { setError("Password must be at least 6 characters"); return; }
-  if (resetData.newPassword !== resetData.confirm) { setError("Passwords do not match"); return; }
+  // Purple panel position & clip based on tab
+  // register → left side; login → right side
+  const panelLeft = isRegister ? "0" : "58%";
+  const panelClip = isRegister
+    ? "polygon(0 0, 87% 0, 100% 100%, 0 100%)"
+    : "polygon(13% 0, 100% 0, 100% 100%, 0 100%)";
 
-  try {
-    setLoading(true);
-    setError("");
-    await axios.post(`${BASE_URL}/api/auth/reset-password`, {
-      email: resetData.email,
-      otp: resetData.otp,
-      newPassword: resetData.newPassword
-    });
-    setSuccess("Password reset successfully! Please login with your new password.");
-    setTab("login");
-    setLoginData(p => ({ ...p, email: resetData.email, password: "" }));
-  } catch (e) {
-    setError(e.response?.data?.msg || "Failed to reset password");
-  } finally {
-    setLoading(false);
-  }
-};
-  const iStyle = (err) => ({
-    width: "100%", padding: "12px 16px",
-    background: "rgba(255,255,255,0.1)",
-    border: `1.5px solid ${err ? "rgba(248,113,113,0.7)" : "rgba(255,255,255,0.2)"}`,
-    borderRadius: 10, fontSize: 14, color: "#fff", outline: "none",
-    fontFamily: "inherit", boxSizing: "border-box",
+  // 3D flip transform based on animation phase
+  // flip-out: rotate to 90deg (disappear edge-on)
+  // flip-in: start from -90deg and go to 0 (appear from other side)
+  let panelTransform = "rotateY(0deg)";
+  if (panelAnim === "flip-out") panelTransform = "rotateY(90deg)";
+  if (panelAnim === "flip-in") panelTransform = "rotateY(0deg)";
+
+  const inp = (err) => ({
+    width: "100%", background: "transparent",
+    border: "none",
+    borderBottom: `1.5px solid ${err ? "rgba(248,113,113,0.7)" : "rgba(255,255,255,0.2)"}`,
+    padding: "9px 36px 9px 0", color: "#fff", fontSize: 14,
+    outline: "none", fontFamily: "inherit", transition: "border-color .2s",
   });
 
-  const lStyle = {
-    display: "block", fontSize: 10, fontWeight: 700,
-    color: "rgba(255,255,255,0.45)", letterSpacing: 1.2,
-    marginBottom: 6, textTransform: "uppercase",
+  const selectSty = {
+    width: "100%", background: "transparent",
+    border: "none", borderBottom: "1.5px solid rgba(255,255,255,0.2)",
+    padding: "9px 0", color: "#fff", fontSize: 14,
+    outline: "none", fontFamily: "inherit", cursor: "pointer",
+    appearance: "auto",
   };
+
+  const errMsg = (msg) => msg
+    ? <div style={{ fontSize: 11, color: "#fca5a5", marginTop: 4 }}>⚠ {msg}</div>
+    : null;
 
   return (
     <div style={{
       minHeight: "100vh", width: "100%",
-      background: "linear-gradient(135deg,#0f0528 0%,#1e293b 40%,#1e293b 75%,#0f0528 100%)",
-      fontFamily: "'DM Sans', sans-serif",
-      position: "relative", overflow: "hidden",
-      display: "flex", alignItems: "stretch",
+      background: "#08081a",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      padding: 20,
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
-        input::placeholder { color: rgba(255,255,255,0.28); }
-        input:focus { border-color: rgba(167,139,250,0.7) !important; background: rgba(255,255,255,0.14) !important; }
-        input:-webkit-autofill { -webkit-box-shadow: 0 0 0 30px #2d0a6e inset !important; -webkit-text-fill-color: #fff !important; }
-        @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-28px)} }
-        @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(22px)} }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-        .auth-layout { display: flex; width: 100%; min-height: 100vh; justify-content: center; align-items: center; }
-        .auth-left { display: none; }
-        .auth-right { width: 480px; display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; z-index: 2; flex-shrink: 0; }
-        .auth-card { width: 100%; background: rgba(255,255,255,0.07); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.16); border-radius: 22px; padding: 36px 32px; box-shadow: 0 32px 80px rgba(0,0,0,0.4); animation: fadeUp 0.5s ease; }
-        .reg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
-
-        @media (max-width: 900px) {
-          .auth-layout { flex-direction: column; }
-          .auth-left { padding: 40px 24px 20px; flex: none; }
-          .auth-left h1 { font-size: 28px !important; }
-          .auth-left p { display: none; }
-          .auth-stats { display: none !important; }
-          .auth-right { width: 100%; padding: 20px 16px 40px; }
-          .auth-card { padding: 28px 20px; }
+        input::placeholder { color: rgba(255,255,255,0.25); }
+        input:focus { border-bottom-color: #a855f7 !important; }
+        input:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0 40px #100820 inset !important;
+          -webkit-text-fill-color: #fff !important;
         }
-        @media (max-width: 480px) {
-          .auth-left { padding: 28px 16px 12px; }
-          .auth-left h1 { font-size: 22px !important; }
-          .auth-right { padding: 12px 12px 32px; }
-          .auth-card { padding: 22px 16px; border-radius: 16px; }
-          .reg-grid { grid-template-columns: 1fr; }
-          .role-btns { flex-direction: column !important; }
+        select option { background: #130a2e; color: #fff; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .auth-card {
+          width: 100%;
+          max-width: 900px;
+          min-height: 500px;
+          border-radius: 22px;
+          border: 2px solid #7429cc;
+          box-shadow:
+            0 0 0 1px rgba(116,41,204,0.12),
+            0 0 60px rgba(116,41,204,0.28),
+            0 24px 80px rgba(0,0,0,0.5);
+          display: flex;
+          overflow: visible;
+          position: relative;
+          perspective: 1200px;
+        }
+
+        .form-side {
+          flex: 1;
+          background: #0d0d20;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 40px 52px;
+          position: relative;
+          z-index: 1;
+          min-width: 0;
+          border-radius: 20px;
+          overflow: hidden;
+          transition: opacity 0.25s ease;
+        }
+        .form-side.reg-form {
+          padding: 28px 44px;
+        }
+
+        /* Purple panel — position controlled by inline style, 3D flip via transform */
+        .purple-panel {
+          position: absolute;
+          top: 0; bottom: 0;
+          width: 42%;
+          background: linear-gradient(155deg, #6d28d9 0%, #8b5cf6 60%, #5b21b6 100%);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 48px 40px;
+          color: #fff;
+          z-index: 10;
+          border-radius: 18px;
+          transform-style: preserve-3d;
+          transform-origin: center center;
+          /* position & clip transition for slide; transform for flip */
+          transition:
+            left 0.0s,
+            clip-path 0.0s,
+            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.3s ease;
+          backface-visibility: hidden;
+        }
+
+        /* When flipping out — brief opacity dip at the 90deg peak */
+        .purple-panel.flip-out {
+          opacity: 0.3;
+        }
+        .purple-panel.flip-in {
+          opacity: 1;
+        }
+
+        .outline-btn {
+          display: inline-block;
+          padding: 10px 28px;
+          background: transparent;
+          border: 2px solid rgba(255,255,255,0.7);
+          border-radius: 50px;
+          color: #fff; font-size: 14px; font-weight: 700;
+          cursor: pointer; font-family: inherit;
+          transition: background .2s;
+        }
+        .outline-btn:hover { background: rgba(255,255,255,0.12); }
+
+        .purple-btn {
+          width: 100%; padding: 13px 0;
+          background: linear-gradient(90deg, #7c3aed, #a855f7);
+          border: none; border-radius: 50px;
+          color: #fff; font-size: 15px; font-weight: 700;
+          cursor: pointer; font-family: inherit;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          box-shadow: 0 4px 22px rgba(168,85,247,0.4);
+          margin-top: 8px; transition: opacity .2s;
+        }
+        .purple-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .purple-btn:hover:not(:disabled) { opacity: 0.9; }
+
+        .spinner {
+          width: 15px; height: 15px;
+          border: 2px solid rgba(255,255,255,0.2);
+          border-top-color: #fff;
+          border-radius: 50%;
+          animation: spin .8s linear infinite;
+          display: inline-block;
+        }
+
+        .link-btn {
+          background: none; border: none;
+          color: #a855f7; font-weight: 700;
+          cursor: pointer; font-family: inherit; font-size: 13px;
+        }
+
+        .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+
+        @media (max-width: 640px) {
+          .auth-card { flex-direction: column; min-height: unset; }
+          .purple-panel {
+            position: relative !important;
+            left: auto !important;
+            width: 100% !important;
+            clip-path: none !important;
+            border-radius: 18px 18px 0 0 !important;
+            min-height: 160px;
+            padding: 28px 24px !important;
+            transform: none !important;
+          }
+          .form-side, .form-side.reg-form { padding: 24px 20px !important; }
+          .grid2 { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
-      {/* Blobs */}
-      <div style={{ position:"absolute", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle,rgba(192,132,252,0.4),transparent 70%)", top:-160, left:-120, animation:"float1 7s ease-in-out infinite", pointerEvents:"none" }}/>
-      <div style={{ position:"absolute", width:380, height:380, borderRadius:"50%", background: "radial-gradient(circle,rgba(124, 58, 237, 0.45),transparent 70%)", bottom:-100, left:"20%", animation:"float2 9s ease-in-out infinite", pointerEvents:"none" }}/>
-      <div style={{ position:"absolute", width:280, height:280, borderRadius:"50%", background:"radial-gradient(circle,rgba(216,180,254,0.25),transparent 70%)", top:"-5%", left:"50%", animation:"float2 8s ease-in-out infinite 1s", pointerEvents:"none" }}/>
+      <div className="auth-card">
 
-      <div className="auth-layout">
-        {/* LEFT */}
-        {/* Center Card Container */}
-        <div className="auth-right">
-          <div className="auth-card">
-            <div style={{ textAlign: "center", marginBottom: 30 }}>
-              <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: 0, fontFamily: "'Syne', sans-serif" }}>M Business</h1>
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 5 }}>Manage your workspace efficiently</p>
+        {/* ── FORM PANEL ── */}
+        <div
+          className={`form-side${tab === "register" ? " reg-form" : ""}`}
+          style={{
+ paddingLeft: isRegister ? "44%" : isLogin ? "52px" : undefined,
+    paddingRight: isRegister ? "44px" : isLogin ? "44%" : undefined,
+    opacity: formVisible ? 1 : 0,
+          }}
+        >
+          {/* REGISTER */}
+          {isRegister && (
+            <div>
+              <h2 style={{ color: "#fff", fontSize: 26, fontWeight: 800, margin: "0 0 22px", textAlign: "left" }}>Sign Up</h2>
+
+              {success && <Alert type="success" msg={success} />}
+              {error && <Alert type="error" msg={error} />}
+
+              <Field label="Full Name" err={regErr.name}>
+                <div style={{ position: "relative" }}>
+                  <input value={regData.name}
+                    onChange={e => { setRegData(p => ({ ...p, name: e.target.value })); setRegErr(p => ({ ...p, name: "" })); }}
+                    placeholder="Your full name" style={inp(regErr.name)} />
+                  <Icon>👤</Icon>
+                  {errMsg(regErr.name)}
+                </div>
+              </Field>
+
+              <div className="grid2">
+                <Field label="Email" err={regErr.email}>
+                  <div style={{ position: "relative" }}>
+                    <input type="email" value={regData.email}
+                      onChange={e => { setRegData(p => ({ ...p, email: e.target.value })); setRegErr(p => ({ ...p, email: "" })); }}
+                      placeholder="you@email.com" style={inp(regErr.email)} />
+                    <Icon>✉️</Icon>
+                    {errMsg(regErr.email)}
+                  </div>
+                </Field>
+                <Field label="Phone">
+                  <div style={{ position: "relative" }}>
+                    <input value={regData.phone}
+                      onChange={e => setRegData(p => ({ ...p, phone: e.target.value }))}
+                      placeholder="+91 98765 43210" style={inp(false)} />
+                    <Icon>📱</Icon>
+                  </div>
+                </Field>
+              </div>
+
+              <div className="grid2">
+                <Field label="Password" err={regErr.password}>
+                  <div style={{ position: "relative" }}>
+                    <input type={showPass ? "text" : "password"} value={regData.password}
+                      onChange={e => { setRegData(p => ({ ...p, password: e.target.value })); setRegErr(p => ({ ...p, password: "" })); }}
+                      placeholder="Min 6 chars" style={{ ...inp(regErr.password), paddingRight: 52 }} />
+                    <ShowHide show={showPass} toggle={() => setShowPass(!showPass)} />
+                    {errMsg(regErr.password)}
+                  </div>
+                </Field>
+                <Field label="Confirm Password" err={regErr.confirm}>
+                  <div style={{ position: "relative" }}>
+                    <input type={showConfirm ? "text" : "password"} value={regData.confirm}
+                      onChange={e => { setRegData(p => ({ ...p, confirm: e.target.value })); setRegErr(p => ({ ...p, confirm: "" })); }}
+                      placeholder="Repeat password" style={{ ...inp(regErr.confirm), paddingRight: 52 }} />
+                    <ShowHide show={showConfirm} toggle={() => setShowConfirm(!showConfirm)} />
+                    {errMsg(regErr.confirm)}
+                  </div>
+                </Field>
+              </div>
+
+              {regData.role === "Subadmin" && <>
+                <Field label="Company Name">
+                  <div style={{ position: "relative" }}>
+                    <input value={regData.companyName}
+                      onChange={e => setRegData(p => ({ ...p, companyName: e.target.value }))}
+                      placeholder="Your company name" style={inp(false)} />
+                    <Icon>🏢</Icon>
+                  </div>
+                </Field>
+                <div className="grid2">
+                  <Field label="Company Type">
+                    <select value={regData.companyType} onChange={e => setRegData(p => ({ ...p, companyType: e.target.value }))} style={selectSty}>
+                      {["IT", "Software", "Services", "Consulting", "Other"].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </Field>
+                  <Field label="No. of Employees">
+                    <select value={regData.employeeCount} onChange={e => setRegData(p => ({ ...p, employeeCount: e.target.value }))} style={selectSty}>
+                      {["0-10", "11-50", "51-100", "100+"].map(ec => <option key={ec} value={ec}>{ec}</option>)}
+                    </select>
+                  </Field>
+                </div>
+              </>}
+
+              <button className="purple-btn" onClick={handleRegister} disabled={loading}>
+                {loading ? <><span className="spinner" />Creating account...</> : "Sign Up"}
+              </button>
+              <p style={{ textAlign: "left", marginTop: 14, fontSize: 13, color: "rgba(255,255,255,0.32)" }}>
+                Already have an account? <button className="link-btn" onClick={() => switchTab("login")}>Login</button>
+              </p>
             </div>
-            {/* Tab */}
-            {tab !== "otp" && (
-            <div style={{ display:"flex", background:"rgba(255,255,255,0.06)", borderRadius:10, padding:4, marginBottom:26, border:"1px solid rgba(255,255,255,0.1)" }}>
-              {[["login","Login"],["register","Register"]].map(([k,l])=>(
-                <button key={k} onClick={()=>{setTab(k);setError("");setSuccess("");setLoginErr({});setRegErr({});}}
-                  style={{ flex:1, padding:"9px", border:"none", borderRadius:8, fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", transition:"all 0.2s",
-                    background: tab===k ? "rgba(255,255,255,0.16)" : "transparent",
-                    color: tab===k ? "#fff" : "rgba(255,255,255,0.38)",
-                    boxShadow: tab===k ? "0 2px 10px rgba(0,0,0,0.2)" : "none",
-                  }}>{l}</button>
-              ))}
+          )}
+
+          {/* LOGIN */}
+          {isLogin && (
+            <div>
+              <h2 style={{ color: "#fff", fontSize: 26, fontWeight: 800, margin: "0 0 28px", textAlign: "center" }}>Login</h2>
+
+              {success && <Alert type="success" msg={success} />}
+              {error && <Alert type="error" msg={error} />}
+
+              <Field label="Username" err={loginErr.email}>
+                <div style={{ position: "relative" }}>
+                  <input type="email" value={loginData.email}
+                    onChange={e => { setLoginData(p => ({ ...p, email: e.target.value })); setLoginErr(p => ({ ...p, email: "" })); }}
+                    placeholder="you@email.com" style={inp(loginErr.email)} />
+                  <Icon>👤</Icon>
+                  {errMsg(loginErr.email)}
+                </div>
+              </Field>
+
+              <Field label="Password" err={loginErr.password}>
+                <div style={{ position: "relative" }}>
+                  <input type={showPass ? "text" : "password"} value={loginData.password}
+                    onChange={e => { setLoginData(p => ({ ...p, password: e.target.value })); setLoginErr(p => ({ ...p, password: "" })); }}
+                    onKeyDown={e => e.key === "Enter" && handleLogin()}
+                    placeholder="••••••••" style={{ ...inp(loginErr.password), paddingRight: 56 }} />
+                  <ShowHide show={showPass} toggle={() => setShowPass(!showPass)} />
+                  {errMsg(loginErr.password)}
+                </div>
+              </Field>
+
+              <div style={{ textAlign: "right", marginBottom: 22, marginTop: -4 }}>
+                <button onClick={() => { setTab("forgot"); setError(""); setSuccess(""); }}
+                  style={{ background: "none", border: "none", color: "rgba(192,132,252,0.85)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                  Forgot Password?
+                </button>
+              </div>
+
+              <button className="purple-btn" onClick={handleLogin} disabled={loading}>
+                {loading ? <><span className="spinner" />Signing in...</> : "Login"}
+              </button>
+              <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "rgba(255,255,255,0.32)" }}>
+                Don't have an account? <button className="link-btn" onClick={() => switchTab("register")}>Sign Up</button>
+              </p>
             </div>
-            )}
+          )}
 
-            <div style={{ marginBottom:22 }}>
-              <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.35)", letterSpacing:2, marginBottom:4 }}>
-                {tab==="login" ? "WELCOME BACK" : tab==="otp" ? "VERIFY EMAIL" : tab==="forgot" ? "FORGOT PASSWORD" : tab==="reset" ? "RESET PASSWORD" : "CREATE YOUR ACCOUNT"}
-              </div>
-              <div style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>
-                {tab==="login" ? "" : tab==="otp" ? `Enter the 6-digit OTP sent to ${verifyEmail}` : tab==="forgot" ? "Enter your email to receive a password reset OTP." : tab==="reset" ? `Enter the OTP and your new password.` : "Fill in the details below to get started."}
+          {/* OTP */}
+          {tab === "otp" && (
+            <div style={{ maxWidth: 380, margin: "0 auto", width: "100%" }}>
+              <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: "0 0 12px", textAlign: "center" }}>Verify OTP</h2>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24, textAlign: "center" }}>
+                6-digit OTP sent to <strong style={{ color: "#c084fc" }}>{verifyEmail}</strong>
+              </p>
+              {success && <Alert type="success" msg={success} />}
+              {error && <Alert type="error" msg={error} />}
+              <Field label="One-Time Password">
+                <input type="text" value={otp} onChange={e => setOtp(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handleVerifyOTP()}
+                  placeholder="1  2  3  4  5  6"
+                  style={{ ...inp(false), letterSpacing: 8, fontWeight: 700, fontSize: 18, textAlign: "center", paddingRight: 0 }}
+                  maxLength={6} />
+              </Field>
+              <button className="purple-btn" onClick={handleVerifyOTP} disabled={loading}>
+                {loading ? <><span className="spinner" />Verifying...</> : "Verify & Continue"}
+              </button>
+              <div style={{ textAlign: "center", marginTop: 14 }}>
+                <button className="link-btn" onClick={() => switchTab("login")}>← Back to Login</button>
               </div>
             </div>
+          )}
 
-            {success && <div style={{ background:"rgba(34,197,94,0.16)", border:"1px solid rgba(34,197,94,0.35)", borderRadius:9, padding:"10px 13px", marginBottom:16, fontSize:12.5, color:"#86efac" }}>✅ {success}</div>}
-            {error && <div style={{ background:"rgba(239,68,68,0.16)", border:"1px solid rgba(239,68,68,0.3)", borderRadius:9, padding:"10px 13px", marginBottom:16, fontSize:12.5, color:"#fca5a5" }}>⚠️ {error}</div>}
-
-            {/* LOGIN */}
-            {tab==="login" && (
-              <div>
-                <div style={{ marginBottom:14 }}>
-                  <label style={lStyle}>Email Address</label>
-                  <div style={{ position:"relative" }}>
-                    <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>✉️</span>
-                    <input type="email" value={loginData.email} onChange={e=>{setLoginData(p=>({...p,email:e.target.value}));setLoginErr(p=>({...p,email:""}));}} placeholder="you@email.com" style={{ ...iStyle(loginErr.email), paddingLeft:38 }}/>
-                  </div>
-                  {loginErr.email && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {loginErr.email}</div>}
+          {/* FORGOT */}
+          {tab === "forgot" && (
+            <div style={{ maxWidth: 380, margin: "0 auto", width: "100%" }}>
+              <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: "0 0 12px", textAlign: "center" }}>Forgot Password</h2>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>Enter your email to receive a password reset OTP.</p>
+              {success && <Alert type="success" msg={success} />}
+              {error && <Alert type="error" msg={error} />}
+              <Field label="Email Address">
+                <div style={{ position: "relative" }}>
+                  <input type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleForgotPassword()}
+                    placeholder="you@email.com" style={inp(false)} />
+                  <Icon>✉️</Icon>
                 </div>
-                <div style={{ marginBottom:22 }}>
-                  <label style={lStyle}>Password</label>
-                  <div style={{ position:"relative" }}>
-                    <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>🔒</span>
-                    <input type={showPass?"text":"password"} value={loginData.password} onChange={e=>{setLoginData(p=>({...p,password:e.target.value}));setLoginErr(p=>({...p,password:""}));}} onKeyDown={e=>e.key==="Enter"&&handleLogin()} placeholder="••••••••" style={{ ...iStyle(loginErr.password), paddingLeft:38, paddingRight:56 }}/>
-                    <button type="button" onClick={()=>setShowPass(!showPass)} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", color:"rgba(255,255,255,0.45)", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>{showPass?"HIDE":"SHOW"}</button>
-                  </div>
-                  {loginErr.password && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {loginErr.password}</div>}
-                  <div style={{ textAlign:"right", marginTop:6 }}>
-                    <button onClick={()=>{setTab("forgot");setError("");setSuccess("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.6)", fontSize:11, cursor:"pointer", fontFamily:"inherit" }}>Forgot Password?</button>
-                  </div>
-                </div>
-                <button onClick={handleLogin} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e293b", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
-                  <span>{loading ? "Signing in..." : "Proceed to my Account"}</span>
-                  {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
-                </button>
-                <div style={{ textAlign:"center", marginTop:18, fontSize:12, color:"rgba(255,255,255,0.3)" }}>
-                  Don't have an account?{" "}
-                  <button onClick={()=>{setTab("register");setError("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.8)", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>Register here →</button>
-                </div>
+              </Field>
+              <button className="purple-btn" onClick={handleForgotPassword} disabled={loading}>
+                {loading ? <><span className="spinner" />Sending...</> : "Send Reset OTP"}
+              </button>
+              <div style={{ textAlign: "center", marginTop: 14 }}>
+                <button className="link-btn" onClick={() => switchTab("login")}>← Back to Login</button>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* OTP VERIFICATION */}
-            {tab==="otp" && (
-              <div>
-                <div style={{ marginBottom:22 }}>
-                  <label style={lStyle}>One-Time Password (OTP)</label>
-                  <div style={{ position:"relative" }}>
-                    <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>🔑</span>
-                    <input type="text" value={otp} onChange={e=>setOtp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleVerifyOTP()} placeholder="123456" style={{ ...iStyle(false), paddingLeft:38, letterSpacing:4, fontWeight:700 }} maxLength={6}/>
-                  </div>
-                </div>
-                <button onClick={handleVerifyOTP} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e293b", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
-                  <span>{loading ? "Verifying..." : "Verify & Continue"}</span>
-                  {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
-                </button>
-                <div style={{ textAlign:"center", marginTop:18, fontSize:12, color:"rgba(255,255,255,0.3)" }}>
-                  <button onClick={()=>{setTab("login");setError("");setSuccess("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.8)", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>← Back to login</button>
-                </div>
-              </div>
-            )}
-
-            {/* FORGOT PASSWORD */}
-            {tab==="forgot" && (
-              <div>
-                <div style={{ marginBottom:22 }}>
-                  <label style={lStyle}>Email Address</label>
-                  <div style={{ position:"relative" }}>
-                    <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>✉️</span>
-                    <input type="email" value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleForgotPassword()} placeholder="you@email.com" style={{ ...iStyle(false), paddingLeft:38 }}/>
-                  </div>
-                </div>
-                <button onClick={handleForgotPassword} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e293b", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
-                  <span>{loading ? "Sending..." : "Send Reset OTP"}</span>
-                  {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
-                </button>
-                <div style={{ textAlign:"center", marginTop:18, fontSize:12, color:"rgba(255,255,255,0.3)" }}>
-                  <button onClick={()=>{setTab("login");setError("");setSuccess("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.8)", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>← Back to login</button>
-                </div>
-              </div>
-            )}
-
-            {/* RESET PASSWORD */}
-            {tab==="reset" && (
-              <div>
-                <div style={{ marginBottom:14 }}>
-                  <label style={lStyle}>OTP</label>
-                  <input value={resetData.otp} onChange={e=>setResetData(p=>({...p,otp:e.target.value}))} placeholder="6-digit code" style={{ ...iStyle(false) }} maxLength={6}/>
-                </div>
-                <div style={{ marginBottom:14 }}>
-                  <label style={lStyle}>New Password</label>
-                  <input type="password" value={resetData.newPassword} onChange={e=>setResetData(p=>({...p,newPassword:e.target.value}))} placeholder="Min 6 chars" style={{ ...iStyle(false) }}/>
-                </div>
-                <div style={{ marginBottom:22 }}>
-                  <label style={lStyle}>Confirm Password</label>
-                  <input type="password" value={resetData.confirm} onChange={e=>setResetData(p=>({...p,confirm:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&handleResetPassword()} placeholder="Repeat password" style={{ ...iStyle(false) }}/>
-                </div>
-                <button onClick={handleResetPassword} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e293b", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)", transition:"all 0.2s" }}>
-                  <span>{loading ? "Updating..." : "Reset Password"}</span>
-                  {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
-                </button>
-              </div>
-            )}
-
-            {/* REGISTER */}
-            {tab==="register" && (
-              <div>
-                <div className="reg-grid">
-                  <div style={{ gridColumn:"1/-1", marginBottom:13 }}>
-                    <label style={lStyle}>Full Name</label>
-                    <div style={{ position:"relative" }}>
-                      <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>👤</span>
-                      <input value={regData.name} onChange={e=>{setRegData(p=>({...p,name:e.target.value}));setRegErr(p=>({...p,name:""}));}} placeholder="Your full name" style={{ ...iStyle(regErr.name), paddingLeft:38 }}/>
-                    </div>
-                    {regErr.name && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {regErr.name}</div>}
-                  </div>
-                  <div style={{ marginBottom:13 }}>
-                    <label style={lStyle}>Email</label>
-                    <div style={{ position:"relative" }}>
-                      <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>✉️</span>
-                      <input type="email" value={regData.email} onChange={e=>{setRegData(p=>({...p,email:e.target.value}));setRegErr(p=>({...p,email:""}));}} placeholder="you@email.com" style={{ ...iStyle(regErr.email), paddingLeft:38 }}/>
-                    </div>
-                    {regErr.email && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {regErr.email}</div>}
-                  </div>
-                  <div style={{ marginBottom:13 }}>
-                    <label style={lStyle}>Phone</label>
-                    <div style={{ position:"relative" }}>
-                      <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>📱</span>
-                      <input value={regData.phone} onChange={e=>setRegData(p=>({...p,phone:e.target.value}))} placeholder="+91 98765 43210" style={{ ...iStyle(false), paddingLeft:38 }}/>
-                    </div>
-                  </div>
-                  <div style={{ marginBottom:13 }}>
-                    <label style={lStyle}>Password</label>
-                    <div style={{ position:"relative" }}>
-                      <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>🔒</span>
-                      <input type={showPass?"text":"password"} value={regData.password} onChange={e=>{setRegData(p=>({...p,password:e.target.value}));setRegErr(p=>({...p,password:""}));}} placeholder="Min 6 chars" style={{ ...iStyle(regErr.password), paddingLeft:38, paddingRight:56 }}/>
-                      <button type="button" onClick={()=>setShowPass(!showPass)} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", color:"rgba(255,255,255,0.45)", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>{showPass?"HIDE":"SHOW"}</button>
-                    </div>
-                    {regErr.password && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {regErr.password}</div>}
-                  </div>
-                  {/* Role Selection - Client registration disabled, only Subadmin allowed */}
-                  <div style={{ gridColumn:"1/-1", marginBottom:13 }}>
-
-                    <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-                      
-                    </div>
-                    
-                  </div>
-
-                  {/* Company Fields - Only for Subadmin */}
-                  {regData.role === "Subadmin" && (
-                    <>
-                      <div style={{ gridColumn:"1/-1", marginBottom:13 }}>
-                        <label style={lStyle}>Company Name</label>
-                        <div style={{ position:"relative" }}>
-                          <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>🏢</span>
-                          <input value={regData.companyName} onChange={e=>setRegData(p=>({...p,companyName:e.target.value}))} placeholder="Your company name" style={{ ...iStyle(regErr.companyName), paddingLeft:38 }}/>
-                        </div>
-                      </div>
-                      <div style={{ marginBottom:13 }}>
-                        <label style={lStyle}>Company Type</label>
-                        <select
-                          value={regData.companyType}
-                          onChange={e=>setRegData(p=>({...p,companyType:e.target.value}))}
-                          style={{ ...iStyle(false), paddingLeft:12, cursor:"pointer" }}
-                        >
-                          <option value="IT" style={{background:"#1e293b",color:"#fff"}}>IT</option>
-                          <option value="Software" style={{background:"#1e293b",color:"#fff"}}>Software</option>
-                          <option value="Services" style={{background:"#1e293b",color:"#fff"}}>Services</option>
-                          <option value="Consulting" style={{background:"#1e293b",color:"#fff"}}>Consulting</option>
-                          <option value="Other" style={{background:"#1e293b",color:"#fff"}}>Other</option>
-                        </select>
-                      </div>
-                      <div style={{ marginBottom:13 }}>
-                        <label style={lStyle}>No. of Employees</label>
-                        <select
-                          value={regData.employeeCount}
-                          onChange={e=>setRegData(p=>({...p,employeeCount:e.target.value}))}
-                          style={{ ...iStyle(false), paddingLeft:12, cursor:"pointer" }}
-                        >
-                          {["0-10","11-50","51-100","100+"].map(ec => (
-                            <option key={ec} value={ec} style={{background:"#1e293b",color:"#fff"}}>{ec}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </>
-                  )}
-
-                  <div style={{ gridColumn:"1/-1", marginBottom:13 }}>
-                    <label style={lStyle}>Confirm Password</label>
-                    <div style={{ position:"relative" }}>
-                      <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none" }}>✅</span>
-                      <input type={showConfirm?"text":"password"} value={regData.confirm} onChange={e=>{setRegData(p=>({...p,confirm:e.target.value}));setRegErr(p=>({...p,confirm:""}));}} onKeyDown={e=>e.key==="Enter"&&handleRegister()} placeholder="Repeat password" style={{ ...iStyle(regErr.confirm), paddingLeft:38, paddingRight:56 }}/>
-                      <button type="button" onClick={()=>setShowConfirm(!showConfirm)} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", color:"rgba(255,255,255,0.45)", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>{showConfirm?"HIDE":"SHOW"}</button>
-                    </div>
-                    {regErr.confirm && <div style={{ fontSize:11, color:"#fca5a5", marginTop:4 }}>⚠️ {regErr.confirm}</div>}
-                  </div>
-                </div>
-                <button onClick={handleRegister} disabled={loading} style={{ width:"100%", padding:"13px 18px", background: loading?"rgba(255,255,255,0.08)":"#1e293b", border:"1px solid rgba(255,255,255,0.1)", borderRadius:11, fontSize:14, fontWeight:800, color:"#fff", cursor: loading?"not-allowed":"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: loading?"none":"0 6px 22px rgba(0,0,0,0.35)" }}>
-                  <span>{loading ? "Creating account..." : "Create My Account"}</span>
-                  {loading ? <span style={{ width:17, height:17, border:"2px solid rgba(255,255,255,0.2)", borderTop:"2px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/> : <span>→</span>}
-                </button>
-                <div style={{ textAlign:"center", marginTop:18, fontSize:12, color:"rgba(255,255,255,0.3)" }}>
-                  Already have an account?{" "}
-                  <button onClick={()=>{setTab("login");setError("");}} style={{ background:"none", border:"none", color:"rgba(216,180,254,0.8)", fontWeight:700, cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>Sign in →</button>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* RESET */}
+          {tab === "reset" && (
+            <div style={{ maxWidth: 380, margin: "0 auto", width: "100%" }}>
+              <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: "0 0 20px", textAlign: "center" }}>Reset Password</h2>
+              {success && <Alert type="success" msg={success} />}
+              {error && <Alert type="error" msg={error} />}
+              <Field label="OTP Code">
+                <input value={resetData.otp} onChange={e => setResetData(p => ({ ...p, otp: e.target.value }))}
+                  placeholder="6-digit code" style={{ ...inp(false), letterSpacing: 4 }} maxLength={6} />
+              </Field>
+              <Field label="New Password">
+                <input type="password" value={resetData.newPassword}
+                  onChange={e => setResetData(p => ({ ...p, newPassword: e.target.value }))}
+                  placeholder="Min 6 chars" style={inp(false)} />
+              </Field>
+              <Field label="Confirm Password">
+                <input type="password" value={resetData.confirm}
+                  onChange={e => setResetData(p => ({ ...p, confirm: e.target.value }))}
+                  onKeyDown={e => e.key === "Enter" && handleResetPassword()}
+                  placeholder="Repeat password" style={inp(false)} />
+              </Field>
+              <button className="purple-btn" onClick={handleResetPassword} disabled={loading}>
+                {loading ? <><span className="spinner" />Updating...</> : "Reset Password"}
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* ── PURPLE SLIDING + FLIPPING PANEL ── */}
+        {showMainTabs && (
+          <div
+            className={`purple-panel${panelAnim === "flip-out" ? " flip-out" : ""}${panelAnim === "flip-in" ? " flip-in" : ""}`}
+            style={{
+              left: panelLeft,
+              clipPath: panelClip,
+              transform: panelTransform,
+            }}
+          >
+        
+            <h2 style={{ fontSize: 36, fontWeight: 900, lineHeight: 1.1, margin: "0 0 16px", color: "#fff" }}>
+              WELCOME<br />BACK!
+            </h2>
+            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.62)", lineHeight: 1.8, marginBottom: 30, maxWidth: 210 }}>
+            Manage your workspace efficiently
+            </p>
+            {/* <button className="outline-btn" onClick={() => switchTab(isRegister ? "login" : "register")}>
+              {isRegister ? "Sign In" : "Sign Up"}
+            </button> */}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
+/* ── Small helper components ── */
+function Field({ label, children }) {
+  return (
+    <div style={{ marginBottom: 15 }}>
+      <label style={{ display: "block", fontSize: 13, color: "rgba(255,255,255,0.65)", marginBottom: 7, fontWeight: 500 }}>
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
 
+function Icon({ children }) {
+  return (
+    <span style={{ position: "absolute", right: 4, bottom: 10, fontSize: 14, color: "rgba(255,255,255,0.27)", pointerEvents: "none" }}>
+      {children}
+    </span>
+  );
+}
+
+function ShowHide({ show, toggle }) {
+  return (
+    <button type="button" onClick={toggle}
+      style={{ position: "absolute", right: 0, bottom: 9, background: "none", border: "none", color: "rgba(255,255,255,0.38)", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", letterSpacing: .5 }}>
+      {show ? "HIDE" : "SHOW"}
+    </button>
+  );
+}
+
+function Alert({ type, msg }) {
+  const isSuccess = type === "success";
+  return (
+    <div style={{
+      background: isSuccess ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)",
+      border: `1px solid ${isSuccess ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
+      borderRadius: 8, padding: "9px 13px", marginBottom: 14,
+      fontSize: 12.5, color: isSuccess ? "#86efac" : "#fca5a5",
+    }}>
+      {isSuccess ? "✅" : "⚠"} {msg}
+    </div>
+  );
+}

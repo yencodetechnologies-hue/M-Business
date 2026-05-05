@@ -89,3 +89,42 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #cbd5e1;
 }
+
+/* Responsive Grids to prevent overflow */
+@media (max-width: 768px) {
+  .modal-2col {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .two-col {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Ensure images don't overflow */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.stat-value {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.1;
+}
+
+/* Word break for long text */
+.break-word {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}

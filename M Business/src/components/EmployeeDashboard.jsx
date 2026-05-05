@@ -307,6 +307,7 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
             <div key={dt.key}
               style={{
                 display: "flex", alignItems: "center", gap: 14,
+                flexWrap: "wrap",
                 padding: "12px 14px", borderRadius: 16,
                 background: hasDoc ? `${dt.color}05` : "#f8fafc",
                 border: `1px solid ${hasDoc ? dt.color + "20" : "#f1f5f9"}`,
@@ -504,7 +505,7 @@ function ProjectsPage({ projects }) {
             <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>Client: {selected.client || "—"} · Deadline: {selected.deadline || "—"}</div></div>
           <Badge label={selected.status || "active"} />
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, marginBottom: 20 }}>
           {[["Budget", selected.budget || "—"], ["Progress", `${selected.progress || 0}%`], ["Manager", selected.manager || "—"]].map(([k, v]) => (
             <div key={k} style={{ background: "#f8fafc", borderRadius: 12, padding: "12px 14px" }}>
               <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>{k}</div>

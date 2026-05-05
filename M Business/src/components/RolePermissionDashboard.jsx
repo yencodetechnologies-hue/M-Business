@@ -41,10 +41,21 @@ const RolePermissionDashboard = () => {
     }
   };
 
-  const togglePermission = (roleIndex, permKey) => {
+  const togglePermission = async (roleIndex, permKey) => {
     const updatedRoles = [...roles];
-    updatedRoles[roleIndex].permissions[permKey] = !updatedRoles[roleIndex].permissions[permKey];
+    const role = updatedRoles[roleIndex];
+    role.permissions[permKey] = !role.permissions[permKey];
     setRoles(updatedRoles);
+    
+    // Auto-save
+    try {
+      await axios.post(`${BASE_URL}/api/role-permissions`, role);
+    } catch (err) {
+      toast.error("Failed to auto-save permissions");
+      // Rollback on failure
+      role.permissions[permKey] = !role.permissions[permKey];
+      setRoles([...updatedRoles]);
+    }
   };
 
   const saveRole = async (role) => {
@@ -144,35 +155,6 @@ const RolePermissionDashboard = () => {
                 </tr>
               ))}
             </tbody>
-            <tfoot>
-              <tr>
-                <td style={{ padding: "20px 15px" }}></td>
-                {roles.map(r => (
-                  <td key={`save-${r.role}`} style={{ padding: "20px 15px", textAlign: "center" }}>
-                    <button 
-                      onClick={() => saveRole(r)}
-                      disabled={saving}
-                      style={{ 
-                        padding: "8px 16px", 
-                        background: "linear-gradient(135deg, var(--app-sidebar), var(--app-text))", 
-                        color: "#fff", 
-                        border: "none", 
-                        borderRadius: 8, 
-                        fontSize: 12, 
-                        fontWeight: 700, 
-                        cursor: "pointer",
-                        transition: "0.2s",
-                        opacity: saving ? 0.7 : 1
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
-                      onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-                    >
-                      Save {r.role}
-                    </button>
-                  </td>
-                ))}
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>

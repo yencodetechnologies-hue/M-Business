@@ -251,7 +251,7 @@ function FinancialOverview() {
                 <div style={{ fontSize: 12, color: "#94a3b8" }}>{desc}</div>
               </div>
             </div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: c }}>{v}</div>
+            <div className="stat-value" style={{ fontSize: 32, fontWeight: 800, color: c }}>{v}</div>
           </div>
         ))}
       </div>
@@ -428,7 +428,7 @@ const openEdit = (a) => {
               fontSize:17, marginBottom:8 }}>{i}</div>
             <div style={{ fontSize:10, color:"var(--app-muted)", fontWeight:700,
               letterSpacing:0.5, marginBottom:2 }}>{t.toUpperCase()}</div>
-            <div style={{ fontSize:24, fontWeight:800, color:c }}>{v}</div>
+            <div className="stat-value" style={{ fontSize:24, fontWeight:800, color:c }}>{v}</div>
           </div>
         ))}
       </div>

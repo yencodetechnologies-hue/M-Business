@@ -32,12 +32,13 @@ export default function EmployeeSubscriptionWarning({ user }) {
       <div style={{
         background: "linear-gradient(135deg,#1e293b,#334155)",
         border: "2px solid #475569", borderRadius: 14, padding: "18px 22px",
-        marginBottom: 18, display: "flex", alignItems: "center", gap: 14
+        marginBottom: 18, display: "flex", alignItems: "center", gap: 14,
+        flexWrap: "wrap"
       }}>
         <div style={{ fontSize: 28 }}>🔒</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 800, color: "#f1f5f9", marginBottom: 4 }}>Access Restricted</div>
-          <div style={{ fontSize: 13, color: "#cbd5e1" }}>
+          <div style={{ fontSize: 13, color: "#cbd5e1", wordBreak: "break-word" }}>
             Your company's subscription has expired. Please contact your administrator to restore access.
           </div>
         </div>
@@ -54,12 +55,13 @@ export default function EmployeeSubscriptionWarning({ user }) {
         <div style={{
           background: "linear-gradient(135deg,#fef2f2,#fee2e2)",
           border: "2px solid #fecaca", borderRadius: 14, padding: "16px 20px",
-          marginBottom: 16, display: "flex", alignItems: "center", gap: 12
+          marginBottom: 16, display: "flex", alignItems: "center", gap: 12,
+          flexWrap: "wrap"
         }}>
           <div style={{ fontSize: 22 }}>🚫</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#991b1b", marginBottom: 3 }}>Subscription Expired</div>
-            <div style={{ fontSize: 13, color: "#7f1d1d" }}>Contact your administrator to renew the company subscription.</div>
+            <div style={{ fontSize: 13, color: "#7f1d1d", wordBreak: "break-word" }}>Contact your administrator to renew the company subscription.</div>
           </div>
         </div>
       );
@@ -77,18 +79,18 @@ export default function EmployeeSubscriptionWarning({ user }) {
         background: "linear-gradient(135deg,#fef3c7,#fde68a)",
         border: "2px solid #f59e0b", borderRadius: 14, padding: "16px 22px",
         marginBottom: 18, display: "flex", alignItems: "center", gap: 14,
-        boxShadow: "0 4px 16px rgba(245,158,11,0.15)"
+        boxShadow: "0 4px 16px rgba(245,158,11,0.15)", flexWrap: "wrap"
       }}>
         <div style={{ fontSize: 28 }}>⏰</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 800, color: "#92400e", marginBottom: 4 }}>
             Subscription Renewal Required
           </div>
-          <div style={{ fontSize: 13, color: "#78350f", lineHeight: 1.5 }}>
+          <div style={{ fontSize: 13, color: "#78350f", lineHeight: 1.5, wordBreak: "break-word" }}>
             {notification.message}
           </div>
           {notification.daysLeft !== undefined && (
-            <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <div style={{ background: "#fde68a", border: "1px solid #f59e0b", borderRadius: 20, padding: "2px 10px", fontSize: 12, fontWeight: 800, color: "#92400e" }}>
                 {notification.daysLeft} day{notification.daysLeft === 1 ? "" : "s"} remaining
               </div>

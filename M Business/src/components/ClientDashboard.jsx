@@ -732,9 +732,7 @@ function WorkspacePage({ user }) {
           placeholder="Jot down your ideas, requirements, or meeting notes here..."
           style={{ flex: 1, width: "100%", border: "1.5px solid #f1f5f9", borderRadius: 12, padding: 18, fontSize: 14, color: "#334155", background: "#f8fafc", resize: "none", outline: "none", fontFamily: "inherit", lineHeight: 1.6 }}
         />
-        <div style={{ marginTop: 12, fontSize: 11, color: "#94a3b8", textAlign: "right" }}>
-          Autosaved locally
-        </div>
+       
       </div>
 
       {/* To-do List Section */}

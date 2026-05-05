@@ -72,7 +72,7 @@ router.get("/", async (req, res) => {
 
 router.get("/client/:clientName", async (req, res) => {
   try {
-    const companyId = req.companyId || "";
+    const companyId = req.headers['x-company-id'] || req.companyId || "";
     const name = decodeURIComponent(req.params.clientName).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
     
@@ -81,10 +81,24 @@ router.get("/client/:clientName", async (req, res) => {
     const safeCompany = escapeRegExp(companyName);
     
     const conditions = [];
-    if (safeName) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
-    if (safeCompany) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
+    if (safeName) {
+      conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
+    }
+    if (safeCompany) {
+      conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
+    }
     
-    const filter = conditions.length > 0 ? { $or: conditions } : {};
+    let filter = conditions.length > 0 ? { $or: conditions } : {};
+
+    // Isolation: Filter by companyId if provided
+    if (companyId) {
+      filter = {
+        $and: [
+          filter,
+          { $or: [{ companyId: companyId }, { companyId: "" }, { companyId: { $exists: false } }] }
+        ]
+      };
+    }
     const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
     const normalised = await Promise.all(invoices.map(async (doc) => {

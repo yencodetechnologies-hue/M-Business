@@ -24,6 +24,7 @@ const sc = (s) => ({
   { key:"workspace", icon:"📝", label:"Workspace" },
   { key:"projects",  icon:"◈", label:"My Projects" },
   { key:"proposals", icon:"📄", label:"Proposals" },
+  { key:"quotations", icon:"📜", label:"Quotations" },
   { key:"tasks",     icon:"◉", label:"Active Tasks" },
   { key:"payments",  icon:"◆", label:"Payments" },
   { key:"calendar",  icon:"◷", label:"Calendar" },
@@ -86,7 +87,10 @@ function ProjectTimeline({ project }) {
 
 // ── NEW: PaymentTimeline — issued → due → paid ─────────────────
 function PaymentTimeline({ inv }) {
-  const fmt = (n) => n >= 100000 ? `₹${(n / 100000).toFixed(2)}L` : `₹${n.toLocaleString("en-IN")}`;
+  const fmt = (n) => {
+    const val = parseFloat(n) || 0;
+    return val >= 100000 ? `₹${(val / 100000).toFixed(2)}L` : `₹${val.toLocaleString("en-IN")}`;
+  };
   
   const parseLocalDate = (dateStr) => {
     if (!dateStr) return null;
@@ -800,6 +804,7 @@ export default function ClientDashboard({ user, setUser }) {
   };
 
   const [proposals,     setProposals]     = useState([]);
+  const [quotations,    setQuotations]    = useState([]);
   const [permissions,   setPermissions]   = useState({});
 
   // ── API calls ─────────────────────────────────────────────
@@ -828,42 +833,63 @@ export default function ClientDashboard({ user, setUser }) {
     const encodedName = encodeURIComponent(currentClientName || currentCompanyName);
     const companyQuery = currentCompanyName ? `?company=${encodeURIComponent(currentCompanyName)}` : "";
 
+    // Headers config with companyId
+    const config = { 
+      headers: { 
+        "x-company-id": user?.companyId || "" 
+      } 
+    };
+
     // Fetch Proposals
-    axios.get(`${BASE_URL}/api/proposals/client/${encodedName}${companyQuery}`)
+    axios.get(`${BASE_URL}/api/proposals/client/${encodedName}${companyQuery}`, config)
       .then(res => {
-        const clientProposals = res.data.filter(p => 
-          ["draft", "pending", "approved", "rejected"].includes(p.status)
-        );
-        setProposals(clientProposals);
+        if (Array.isArray(res.data)) {
+          const clientProposals = res.data.filter(p => 
+            ["draft", "pending", "approved", "rejected"].includes(p.status)
+          );
+          setProposals(clientProposals);
+        }
       })
       .catch(err => {
         console.error("Error loading proposals:", err);
         setProposals([]);
       });
 
-    // Fetch Projects
-    axios.get(`${BASE_URL}/api/projects/client/${encodedName}${companyQuery}`)
+    // Fetch Quotations
+    axios.get(`${BASE_URL}/api/quotations/client/${encodedName}${companyQuery}`, config)
       .then(res => {
-        if (res.data) setProjects(res.data);
+        if (Array.isArray(res.data)) {
+          setQuotations(res.data);
+        }
+      })
+      .catch(err => {
+        console.error("Error loading quotations:", err);
+        setQuotations([]);
+      });
+
+    // Fetch Projects
+    axios.get(`${BASE_URL}/api/projects/client/${encodedName}${companyQuery}`, config)
+      .then(res => {
+        if (Array.isArray(res.data)) setProjects(res.data);
       })
       .catch((err) => {
         console.error("Error fetching projects:", err);
       });
 
     // Fetch Tasks
-    axios.get(`${BASE_URL}/api/tasks/client/${encodedName}${companyQuery}`)
+    axios.get(`${BASE_URL}/api/tasks/client/${encodedName}${companyQuery}`, config)
       .then(res => {
-        if (res.data) setTasks(res.data);
+        if (Array.isArray(res.data)) setTasks(res.data);
       })
       .catch(err => console.error("Error fetching tasks:", err));
 
     // Fetch Invoices
-    axios.get(`${BASE_URL}/api/invoices/client/${encodedName}${companyQuery}`)
+    axios.get(`${BASE_URL}/api/invoices/client/${encodedName}${companyQuery}`, config)
       .then(res => {
-        if (res.data) {
+        if (Array.isArray(res.data)) {
           const mapped = res.data.map(inv => ({
             ...inv,
-            amount: `${inv.currency || "₹"}${inv.total.toLocaleString("en-IN")}`,
+            amount: `${inv.currency || "₹"}${(inv.total || 0).toLocaleString("en-IN")}`,
             project: inv.project || "—",
             due: inv.dueDate || inv.date,
           }));
@@ -1297,6 +1323,94 @@ export default function ClientDashboard({ user, setUser }) {
             </div>
           )}
 
+          {/* ── QUOTATIONS ── */}
+          {active==="quotations" && (
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
+                <div style={{ fontSize:13, color:"#64748b" }}>
+                  {quotations.length} quotation{quotations.length !== 1 ? "s" : ""} found
+                </div>
+              </div>
+              
+              {quotations.length === 0 ? (
+                <div style={{ 
+                  background:"#fff", 
+                  borderRadius:16, 
+                  border:"1px solid #e2e8f0", 
+                  padding:"40px 22px", 
+                  textAlign:"center" 
+                }}>
+                  <div style={{ fontSize:48, marginBottom:16 }}>📝</div>
+                  <div style={{ fontSize:16, fontWeight:700, color:"#0f172a", marginBottom:8 }}>
+                    No quotations yet
+                  </div>
+                  <div style={{ fontSize:13, color:"#94a3b8" }}>
+                    Your quotations from the subadmin will appear here.
+                  </div>
+                </div>
+              ) : (
+                quotations.map(q => (
+                  <div key={q.id} style={{ 
+                    background:"#fff", 
+                    borderRadius:16, 
+                    border:"1px solid #e2e8f0", 
+                    padding:"20px 22px",
+                    transition:"box-shadow 0.2s"
+                  }}
+                  onMouseEnter={e=>e.currentTarget.style.boxShadow="0 6px 20px rgba(99,102,241,0.1)"}
+                  onMouseLeave={e=>e.currentTarget.style.boxShadow=""}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+                      <div>
+                        <div style={{ fontSize:16, fontWeight:800, color:"#0f172a" }}>{q.qt?.project || q.project || "Quotation"}</div>
+                        <div style={{ fontSize:11, color:"#94a3b8", marginTop:4 }}>{q.quoteNo} · {q.date ? new Date(q.date).toLocaleDateString() : "—"}</div>
+                      </div>
+                      <Badge label={q.status} size="lg"/>
+                    </div>
+
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, marginBottom:16 }}>
+                      <div style={{ background:"#f8fafc", borderRadius:10, padding:"10px 12px", border:"1px solid #f1f5f9" }}>
+                        <div style={{ fontSize:10, color:"#94a3b8", fontWeight:700, letterSpacing:0.5, textTransform:"uppercase", marginBottom:3 }}>Total Amount</div>
+                        <div style={{ fontSize:14, fontWeight:800, color:"#0f172a", fontFamily:"'DM Mono',monospace" }}>
+                          {q.qt?.currency || q.currency || "₹"}{(q.total || 0).toLocaleString("en-IN")}
+                        </div>
+                      </div>
+                      <div style={{ background:"#f8fafc", borderRadius:10, padding:"10px 12px", border:"1px solid #f1f5f9" }}>
+                        <div style={{ fontSize:10, color:"#94a3b8", fontWeight:700, letterSpacing:0.5, textTransform:"uppercase", marginBottom:3 }}>Expiry Date</div>
+                        <div style={{ fontSize:14, fontWeight:800, color:"#0f172a", fontFamily:"'DM Mono',monospace" }}>{q.expiryDate || "—"}</div>
+                      </div>
+                    </div>
+                    
+                    <div style={{ marginTop:12, display:"flex", gap:8 }}>
+                      <button 
+                        onClick={() => {
+                          const slimPayload = {
+                            qt: q.qt,
+                            items: q.items,
+                          };
+                          const d = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
+                          window.open(`/quotation-view?d=${d}`, "_blank");
+                        }}
+                        style={{ 
+                          background:"#6366f1", 
+                          border:"none", 
+                          borderRadius:8, 
+                          padding:"8px 16px", 
+                          fontSize:12, 
+                          color:"#fff", 
+                          fontWeight: 700,
+                          cursor:"pointer", 
+                          fontFamily:"inherit" 
+                        }}
+                      >
+                        View Quotation
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
           {/* ── TASKS — live tasks state ── */}
           {active==="tasks" && (
             <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
@@ -1326,7 +1440,7 @@ export default function ClientDashboard({ user, setUser }) {
                     <div style={{ textAlign:"right", flexShrink:0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
                       {(inv.amountPaid || 0) > 0 && (
                         <div style={{ fontSize: 13, fontWeight: 800, color: "#10b981" }}>
-                          Paid: {inv.currency || "₹"}{(inv.amountPaid || 0).toLocaleString("en-IN")}
+                          Paid: {inv.currency || "₹"}{(parseFloat(inv.amountPaid) || 0).toLocaleString("en-IN")}
                         </div>
                       )}
                       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -1358,8 +1472,31 @@ export default function ClientDashboard({ user, setUser }) {
                           }}
                           style={{ background: "none", border: "1px solid #e2e8f0", borderRadius: 8, padding: "2px 8px", fontSize: 10, color: "#6366f1", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                         >
-                          View 🧾
+                          View Invoice 🧾
                         </button>
+                        
+                        {(inv.amountPaid || 0) > 0 && (
+                          <button 
+                            onClick={() => {
+                              const payload = {
+                                r: { status: inv.status, client: inv.client, invoiceNo: inv.invoiceNo || inv.id || inv._id, total: inv.total },
+                                pd: { amountPaid: inv.amountPaid, paymentDate: inv.updatedAt || new Date().toISOString(), paymentMode: "Online", transactionId: "" },
+                                invData: {
+                                  companyName: inv.companyName || inv.inv?.companyName,
+                                  companyEmail: inv.companyEmail || inv.inv?.companyEmail,
+                                  companyPhone: inv.companyPhone || inv.inv?.companyPhone,
+                                  companyAddress: inv.companyAddress || inv.inv?.companyAddress,
+                                  currency: inv.currency || "₹"
+                                }
+                              };
+                              const d = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+                              window.open(`/receipt-view?d=${d}`, "_blank");
+                            }}
+                            style={{ background: "#10b981", border: "none", borderRadius: 8, padding: "2px 8px", fontSize: 10, color: "#fff", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                          >
+                            View Receipt 💸
+                          </button>
+                        )}
                       </div>
                     </div>
                     

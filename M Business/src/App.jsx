@@ -9,6 +9,7 @@ import EmployeeDashboard  from "./components/EmployeeDashboard";
 
 import InvoiceViewer      from "./components/InvoiceViewer";
 import QuotationViewer    from "./components/QuotationViewer";
+import ReceiptViewer      from "./components/ReceiptViewer";
 import TasksPage          from "./components/TaskPage";
 import CalendarPage       from "./components/CalendarPage";
 import { ExpensesPage }   from "./components/AccountsPage";
@@ -120,6 +121,7 @@ const getRootPage = () => {
         <Route path="/canvas"            element={<CanvasPage />} />
         <Route path="/invoice-view"      element={<InvoiceViewer />} />
         <Route path="/quotation-view"    element={<QuotationViewer />} />
+        <Route path="/receipt-view"      element={<ReceiptViewer />} />
         <Route path="/calendar"          element={<CalendarPage />} />
         <Route path="/expenses"          element={<ExpensesPage />} />
         <Route path="/reports"           element={<ReportsPage />} />

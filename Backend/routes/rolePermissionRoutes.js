@@ -59,20 +59,39 @@ router.post("/seed", async (req, res) => {
     {
       role: "client",
       permissions: {
-        dashboard: true, projects: true, proposals: true, tasks: true, 
-        payments: true, calendar: true, reports: true
+        dashboard: true, projects: true, proposals: true, quotations: true, tasks: true, 
+        payments: true, calendar: true, reports: true, messaging: true
       }
     }
   ];
 
   try {
     for (const r of defaultRoles) {
-      // Use $setOnInsert so existing permissions are NOT overwritten
-      await RolePermission.findOneAndUpdate(
-        { role: r.role },
-        { $setOnInsert: { permissions: r.permissions, companyId: "" } },
-        { upsert: true, new: true }
-      );
+      if (r.role === "client") {
+        // Force update ALL client roles to ensure new tabs appear for everyone
+        await RolePermission.updateMany(
+          { role: r.role },
+          { $set: { 
+            "permissions.quotations": true, 
+            "permissions.payments": true, 
+            "permissions.reports": true,
+            "permissions.messaging": true
+          } }
+        );
+        // Also ensure the default one (empty companyId) is fully synced
+        await RolePermission.findOneAndUpdate(
+          { role: r.role, companyId: "" },
+          { $set: { permissions: r.permissions } },
+          { upsert: true, new: true }
+        );
+      } else {
+        // Use $setOnInsert for other roles
+        await RolePermission.findOneAndUpdate(
+          { role: r.role, companyId: "" },
+          { $setOnInsert: { permissions: r.permissions } },
+          { upsert: true, new: true }
+        );
+      }
     }
     res.json({ message: "Default roles seeded successfully" });
   } catch (err) {

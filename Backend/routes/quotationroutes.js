@@ -35,6 +35,65 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ── GET for specific client ───────────────────────────────────────────────────
+router.get("/client/:clientName", async (req, res) => {
+  try {
+    const name = decodeURIComponent(req.params.clientName).trim();
+    const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
+    const companyId = req.headers['x-company-id'] || "";
+    
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const safeCompany = escapeRegExp(companyName);
+    
+    const conditions = [];
+    if (safeName) {
+      conditions.push({ "qt.client": { $regex: new RegExp(safeName, "i") } });
+      conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
+    }
+    if (safeCompany) {
+      conditions.push({ "qt.client": { $regex: new RegExp(safeCompany, "i") } });
+      conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
+    }
+    
+    let filter = conditions.length > 0 ? { $or: conditions } : {};
+
+    // Isolation: Filter by companyId if provided
+    if (companyId) {
+      filter = {
+        $and: [
+          filter,
+          { $or: [{ companyId: companyId }, { companyId: "" }, { companyId: { $exists: false } }] }
+        ]
+      };
+    }
+    const docs = await Quotation.find(filter).sort({ createdAt: -1 }).lean();
+    
+    const quotations = docs.map((doc) => {
+      const qt = doc.qt || {};
+      const items = doc.items || [];
+      const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate)||0)*(parseFloat(i.quantity)||0), 0);
+      const total    = subtotal * (1 + (parseFloat(qt.gstRate)||0) / 100);
+      return {
+        id:          doc._id.toString(),
+        quoteNo:     qt.quoteNo     || doc.quoteNo || "—",
+        client:      qt.client      || doc.client  || "—",
+        project:     qt.project     || "",
+        date:        qt.date        || null,
+        expiryDate:  qt.expiryDate  || null,
+        status:      doc.status     || "draft",
+        total,
+        savedAt:     doc.createdAt  || Date.now(),
+        qt,
+        items,
+      };
+    });
+    res.json(quotations);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
 // ── POST create / update ──────────────────────────────────────────────────────
 router.post("/", async (req, res) => {
   try {

@@ -1009,7 +1009,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const openDoc = (d) => { setDoc({ ...d }); setPage(0); setView("editor"); };
   const createNew = () => {
     const d = { id: pid(), title: "", client: "", theme: null, status: "draft", created: new Date().toISOString(), updated: new Date().toISOString(), rejectNote: "", format: "a4-portrait", slides: [makeSlide("proposal", null, companyName)], currency: "₹" };
-    setDoc(d); setPage(0); setView("editor");
+    setDoc(d); setPage(0); setView("editor"); setLeftPanel("text");
   };
 
   const saveDoc = (d = doc) => { const nd = { ...d, updated: new Date().toISOString() }; persist(nd); setDoc(nd); flash("💾 Saved!"); };

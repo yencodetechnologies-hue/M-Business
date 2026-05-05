@@ -242,7 +242,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       upi: qtData.upiId,
       cur: qtData.currency,
       items: itemsData.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
-      cid: user?._id || "",
+      cid: user?.companyId || user?.company || user?._id || "",
     };
     const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
     const link = `${window.location.origin}/quotation-view?d=${encodedData}`;
@@ -468,7 +468,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       upi: qt.upiId,
       cur: qt.currency,
       items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
-      cid: user?._id || "",
+      cid: user?.companyId || user?.company || user?._id || "",
     };
     const qrData = `${FRONTEND_URL}/quotation-view?d=${encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))))}`;
 

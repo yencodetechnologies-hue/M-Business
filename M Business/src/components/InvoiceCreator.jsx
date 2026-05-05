@@ -395,13 +395,28 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     cur: inv.currency,
     items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
     history: inv.paymentHistory || [],
-    cid: user?._id || "",
+    cid: user?.companyId || user?.company || user?._id || "",
   };
   const qrData = `${FRONTEND_URL}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
   const shareInvoice = async (entry) => {
     const invData = entry.inv || inv;
-    const link = `${window.location.origin}/invoice-view?id=${entry.id || entry.invoiceNo}`;
+    const itemsData = entry.items || items;
+    const slimPayload = {
+      no: entry.invoiceNo, date: invData.date, due: invData.dueDate,
+      co: invData.companyName, email: invData.companyEmail, phone: invData.companyPhone, addr: invData.companyAddress,
+      cl: entry.client || invData.client, proj: invData.project, gst: invData.gstRate, notes: invData.notes, terms: invData.terms,
+      incGst: invData.isGstIncluded,
+      paid: entry.amountPaid || invData.amountPaid || 0,
+      upi: invData.upiId,
+      cur: invData.currency,
+      items: itemsData.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
+      history: entry.paymentHistory || invData.paymentHistory || [],
+      cid: user?.companyId || user?.company || user?._id || "",
+    };
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
+    const link = `${window.location.origin}/invoice-view?d=${encoded}`;
+    
     const text = `*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`;
     if (navigator.share) {
       try { await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, url: link }); } catch (err) { console.log(err); }
@@ -413,7 +428,22 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   const shareWhatsApp = (entry) => {
     const invData = entry.inv || inv;
-    const link = `${window.location.origin}/invoice-view?id=${entry.id || entry.invoiceNo}`;
+    const itemsData = entry.items || items;
+    const slimPayload = {
+      no: entry.invoiceNo, date: invData.date, due: invData.dueDate,
+      co: invData.companyName, email: invData.companyEmail, phone: invData.companyPhone, addr: invData.companyAddress,
+      cl: entry.client || invData.client, proj: invData.project, gst: invData.gstRate, notes: invData.notes, terms: invData.terms,
+      incGst: invData.isGstIncluded,
+      paid: entry.amountPaid || invData.amountPaid || 0,
+      upi: invData.upiId,
+      cur: invData.currency,
+      items: itemsData.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
+      history: entry.paymentHistory || invData.paymentHistory || [],
+      cid: user?.companyId || user?.company || user?._id || "",
+    };
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
+    const link = `${window.location.origin}/invoice-view?d=${encoded}`;
+
     const text = encodeURIComponent(`*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };

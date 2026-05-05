@@ -1224,12 +1224,8 @@ function GrpByMenu({ anchor, groupBy, onGroupBy, onClose }) {
 const COLUMN_TYPES = [
   { type: "text", icon: "📝", label: "Text", desc: "Add notes or free text" },
   { type: "number", icon: "🔢", label: "Numbers", desc: "Track progress, budget" },
-  { type: "status2", icon: "🏷️", label: "Status", desc: "Custom label column" },
   { type: "date2", icon: "📅", label: "Date", desc: "Set another date" },
-  { type: "priority", icon: "🔥", label: "Priority", desc: "Critical, High, Medium, Low" },
-  { type: "checkbox", icon: "☑️", label: "Checkbox", desc: "Simple yes/no toggle" },
   { type: "link", icon: "🔗", label: "Link", desc: "Add a URL" },
-  { type: "tags", icon: "🏷", label: "Tags", desc: "Add labels/tags" },
   { type: "timeline", icon: "📊", label: "Timeline", desc: "Start date → end date" },
   { type: "rating", icon: "⭐", label: "Rating", desc: "Rate 1–5 stars" },
 ];
@@ -1793,6 +1789,39 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                   </div>
                 ))}
                 <div style={{ width: COL_W.dots, flexShrink: 0 }} />
+
+{/* ✅ + Add Column button — HEADER ROW-ல */}
+<div
+  onClick={onAddCol}
+  style={{
+    flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "0 14px",
+    cursor: "pointer",
+    borderLeft: `1px solid ${P.border}`,
+    color: P.muted,
+    fontSize: 12,
+    fontWeight: 700,
+    gap: 5,
+    whiteSpace: "nowrap",
+    transition: "all .15s",
+    minWidth: 110,
+    height: "100%",
+  }}
+  onMouseEnter={e => {
+    e.currentTarget.style.background = P.light;
+    e.currentTarget.style.color = P.accent;
+  }}
+  onMouseLeave={e => {
+    e.currentTarget.style.background = "transparent";
+    e.currentTarget.style.color = P.muted;
+  }}
+>
+  <span style={{ fontSize: 16, fontWeight: 300 }}>+</span>
+  Add column
+</div>
               </div>
 
               {tasks.length === 0 && !adding && <div style={{ padding: "12px 16px", fontSize: 12, color: "#c4b5fd", fontStyle: "italic" }}>No tasks yet</div>}
@@ -2255,8 +2284,8 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
               <div style={{ position: "relative", flexShrink: 0 }}>
                 <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, pointerEvents: "none", color: P.muted }}>🔍</span>
                 <input placeholder="Search tasks..." value={search} onChange={e => setSearch(e.target.value)}
-                  style={{ border: `1.5px solid ${search ? P.accent : P.border}`, borderRadius: 8, padding: "5px 10px 5px 28px", fontSize: 13, color: P.text, outline: "none", width: search ? 160 : 100, background: search ? "#fff" : P.light, transition: "all .2s", fontFamily: "inherit" }}
-                  onFocus={e => { e.target.style.borderColor = P.accent; e.target.style.background = "#fff"; e.target.style.width = "160px"; }}
+                  style={{ border: `1.5px solid ${search ? P.accent : P.border}`, borderRadius: 8, padding: "5px 10px 5px 28px", fontSize: 13, color: P.text, outline: "none", width: search ? 360 : 100,   width: 100,    minWidth: 160,   background: search ? "#fff" : P.light, transition: "all .2s", fontFamily: "inherit" }}
+                  onFocus={e => { e.target.style.borderColor = P.accent; e.target.style.background = "#fff"; e.target.style.width = "200px"; }}
                   onBlur={e => { if (!search) { e.target.style.borderColor = P.border; e.target.style.background = P.light; e.target.style.width = "100px"; } }} />
               </div>
             </div>

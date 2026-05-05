@@ -304,7 +304,7 @@ export default function CalendarPage({ projects=[], tasks=[], clients=[], compan
       </div>
 
       {/* ── MAIN SPLIT LAYOUT ─────────────────────────────────────── */}
-      <div style={{ display:"grid", gridTemplateColumns:"360px 1fr", gap:16, alignItems:"start", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, alignItems:"start", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
 
         {/* ── LEFT: CALENDAR ──────────────────────────────────────── */}
         <div style={{ background:"#fff", borderRadius:16, padding:20,

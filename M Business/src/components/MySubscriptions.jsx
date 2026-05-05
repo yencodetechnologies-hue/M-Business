@@ -395,190 +395,322 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
   }
 
   // ── No Subscription → Show Plans ─────────────────────────────────────────────
-  if (!subscription) {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 28, padding: "4px 0" }}>
-        {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)", animation: "slideIn 0.3s ease" }}>{toast}<style>{`@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }`}</style></div>}
+ if (!subscription) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 28, padding: "4px 0" }}>
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
+
+      {/* Full dark wrapper */}
+      <div style={{
+        background: "linear-gradient(135deg, #0a0a0f 0%, #0d1117 50%, #0a0f0a 100%)",
+        borderRadius: 24,
+        padding: "60px 40px 64px",
+        position: "relative",
+        overflow: "hidden",
+        minHeight: 500
+      }}>
+        {/* Background glow */}
+        <div style={{
+          position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+          width: 800, height: 320,
+          background: "radial-gradient(ellipse, rgba(0,255,180,0.05) 0%, transparent 70%)",
+          pointerEvents: "none"
+        }} />
 
         {/* Header */}
-        <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
-          <div style={{ fontSize: 36, marginBottom: 10 }}>🚀</div>
-          <h2 style={{ fontSize: 26, fontWeight: 800, color: T.text, margin: "0 0 8px" }}>Choose Your Plan</h2>
-          <p style={{ color: T.muted, fontSize: 14, margin: 0 }}>Select the best plan for your business growth • {user?.companyName && `Powered by ${user.companyName}`} </p>
+        <div style={{ textAlign: "center", marginBottom: 56, position: "relative", zIndex: 1 }}>
+          <h2 style={{
+            fontSize: 42, fontWeight: 800, color: "#ffffff",
+            margin: "0 0 14px", letterSpacing: "-1.5px", lineHeight: 1.1
+          }}>
+            Choose your Plan
+          </h2>
+          <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 15, margin: 0 }}>
+            Discover the perfect plan tailored just for you.
+          </p>
         </div>
 
         {/* Plans Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${Math.min(PLANS.length, 4)}, 1fr)`,
+          gap: 18,
+          maxWidth: 1100,
+          margin: "0 auto",
+          position: "relative",
+          zIndex: 1
+        }}>
           {PLANS.map((plan) => {
             const isProcessing = payLoading === plan.name;
+            const isPro = plan.popular;
+            const isTrial = plan.isTrial;
+
             return (
-              <div key={plan.name} style={{
-                background: "#fff", borderRadius: 24, padding: "32px 28px",
-                border: plan.popular ? `2px solid ${T.accent}` : "1.5px solid var(--app-border)",
-                position: "relative", display: "flex", flexDirection: "column",
-                boxShadow: plan.popular ? "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237),0.14)" : "0 4px 20px rgba(0,0,0,0.04)",
-                transition: "transform 0.25s, box-shadow 0.25s"
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-8px)"; e.currentTarget.style.boxShadow = plan.popular ? "0 28px 50px rgba(var(--app-accent-rgb, 124, 58, 237),0.2)" : "0 12px 32px rgba(0,0,0,0.1)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = plan.popular ? "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237),0.14)" : "0 4px 20px rgba(0,0,0,0.04)"; }}
+              <div
+                key={plan.name}
+                style={{
+                  background: isPro
+                    ? "linear-gradient(160deg, #0d2a22 0%, #0a1f1a 60%, #081a15 100%)"
+                    : "linear-gradient(160deg, #141418 0%, #111115 100%)",
+                  border: isPro
+                    ? "1.5px solid rgba(0,220,150,0.3)"
+                    : "1.5px solid rgba(255,255,255,0.07)",
+                  borderRadius: 20,
+                  padding: "32px 24px",
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow: isPro
+                    ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
+                    : "0 20px 40px rgba(0,0,0,0.35)",
+                  transition: "transform 0.22s, box-shadow 0.22s",
+                  display: "flex", flexDirection: "column"
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "translateY(-6px)";
+                  e.currentTarget.style.boxShadow = isPro
+                    ? "0 0 80px rgba(0,200,130,0.18), 0 30px 60px rgba(0,0,0,0.6)"
+                    : "0 28px 56px rgba(0,0,0,0.5)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = isPro
+                    ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
+                    : "0 20px 40px rgba(0,0,0,0.35)";
+                }}
               >
-                {plan.popular && (
-                  <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", background: `linear-gradient(135deg,${T.accent},var(--app-muted))`, color: "#fff", fontSize: 11, fontWeight: 800, padding: "5px 16px", borderRadius: 20, textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>
-                    ⭐ Most Popular
-                  </div>
+                {/* Pro glow orb */}
+                {isPro && (
+                  <div style={{
+                    position: "absolute", top: -60, left: "50%", transform: "translateX(-50%)",
+                    width: 240, height: 240,
+                    background: "radial-gradient(ellipse, rgba(0,220,150,0.13) 0%, transparent 70%)",
+                    pointerEvents: "none"
+                  }} />
                 )}
 
-                <div style={{ fontSize: 42, marginBottom: 18 }}>{plan.icon}</div>
-                <h3 style={{ fontSize: 22, fontWeight: 800, color: T.text, margin: "0 0 8px" }}>{plan.name}</h3>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 5, marginBottom: 20 }}>
-                  <span style={{ fontSize: 34, fontWeight: 800, color: plan.color }}>
-                    {plan.price === null ? "Custom" : plan.price === 0 ? "Free" : `₹${plan.price.toLocaleString("en-IN")}`}
+                {/* MOST POPULAR badge */}
+                {isPro && (
+                  <div style={{
+                    position: "absolute", top: 16, right: 16,
+                    background: "rgba(0,220,150,0.12)",
+                    border: "1px solid rgba(0,220,150,0.35)",
+                    borderRadius: 100, padding: "3px 10px",
+                    fontSize: 9, fontWeight: 800,
+                    color: "#00dc96", letterSpacing: 1.2,
+                    textTransform: "uppercase"
+                  }}>MOST POPULAR</div>
+                )}
+
+                {/* Icon */}
+                <div style={{ fontSize: 34, marginBottom: 18 }}>{plan.icon}</div>
+
+                {/* Plan name */}
+                <div style={{
+                  fontSize: 18, fontWeight: 800, color: "#fff",
+                  marginBottom: 4
+                }}>{plan.name}</div>
+
+                {/* Billed label */}
+                <div style={{
+                  fontSize: 11, color: "rgba(255,255,255,0.32)",
+                  marginBottom: 20, fontWeight: 500
+                }}>Billed monthly</div>
+
+                {/* Price */}
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
+                  <span style={{
+                    fontSize: 40, fontWeight: 800, color: "#fff",
+                    lineHeight: 1, letterSpacing: "-2px"
+                  }}>
+                    {plan.price === null ? "Custom"
+                      : plan.price === 0 ? "$0"
+                      : `₹${plan.price.toLocaleString("en-IN")}`}
                   </span>
-                  {plan.price !== null && plan.price > 0 && <span style={{ fontSize: 14, color: T.muted, fontWeight: 600 }}>/month</span>}
+                  {plan.price !== null && (
+                    <span style={{
+                      fontSize: 13, color: "rgba(255,255,255,0.38)",
+                      marginBottom: 5, fontWeight: 400
+                    }}>/ month</span>
+                  )}
                 </div>
 
+                {/* Description */}
+                <div style={{
+                  fontSize: 12, color: "rgba(255,255,255,0.25)",
+                  marginBottom: 20, minHeight: 14, lineHeight: 1.5
+                }}>
+                  {isTrial ? "Ideal for individual users."
+                    : plan.name === "Starter" ? "Ideal for small teams."
+                    : plan.name === "Professional" ? "Best for growing businesses."
+                    : "Best choice for Enterprises."}
+                </div>
+
+                {/* Divider */}
+                <div style={{
+                  height: 1,
+                  background: isPro ? "rgba(0,220,150,0.13)" : "rgba(255,255,255,0.06)",
+                  marginBottom: 20
+                }} />
+
                 {/* Features */}
-                <div style={{ flex: 1, marginBottom: 28 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 24 }}>
                   {plan.features.map((f, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 12 }}>
-                      <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center", color: "#22c55e", fontSize: 11, fontWeight: 800, flexShrink: 0, marginTop: 1 }}>✓</div>
-                      <span style={{ fontSize: 14, color: T.text, fontWeight: 500, lineHeight: 1.5 }}>{f}</span>
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+                      <div style={{
+                        width: 16, height: 16, borderRadius: "50%", flexShrink: 0, marginTop: 1,
+                        background: isPro ? "rgba(0,220,150,0.12)" : "rgba(255,255,255,0.07)",
+                        border: isPro ? "1px solid rgba(0,220,150,0.35)" : "1px solid rgba(255,255,255,0.12)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 7, color: isPro ? "#00dc96" : "rgba(255,255,255,0.45)"
+                      }}>✓</div>
+                      <span style={{
+                        fontSize: 12, color: "rgba(255,255,255,0.55)",
+                        fontWeight: 400, lineHeight: 1.5
+                      }}>{f}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* Payment info for paid plans */}
-                {plan.price > 0 && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
-                    <span style={{ fontSize: 12 }}>🔒</span>
-                    <span style={{ fontSize: 11, color: T.muted, fontWeight: 700, letterSpacing: 0.3 }}>Razorpay Secured • UPI · Card · Net Banking</span>
-                  </div>
-                )}
-
+                {/* CTA Button */}
                 <button
                   onClick={() => startRazorpayPayment(plan)}
                   disabled={!!payLoading}
                   style={{
-                    width: "100%", padding: "16px", borderRadius: 14,
-                    background: isProcessing
-                      ? "#e5e7eb"
-                      : plan.popular
-                        ? `linear-gradient(135deg,${T.accent},var(--app-muted))`
-                        : plan.isTrial
-                          ? "linear-gradient(135deg,#10b981,#059669)"
-                          : "var(--app-bg)",
-                    color: (plan.popular || plan.isTrial || isProcessing) ? "#fff" : T.accent,
-                    border: (plan.popular || plan.isTrial || isProcessing) ? "none" : `2.5px solid ${T.accent}`,
-                    fontSize: 15, fontWeight: 800, cursor: payLoading ? "wait" : "pointer",
-                    transition: "0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                    boxShadow: (plan.popular || plan.isTrial) && !isProcessing ? "0 10px 20px rgba(0,0,0,0.1)" : "none"
+                    width: "100%", padding: "13px",
+                    borderRadius: 11, fontSize: 14, fontWeight: 700,
+                    cursor: payLoading ? "wait" : "pointer",
+                    transition: "all 0.2s", fontFamily: "inherit",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    ...(isProcessing ? {
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1.5px solid rgba(255,255,255,0.1)",
+                      color: "rgba(255,255,255,0.4)"
+                    } : isPro ? {
+                      background: "linear-gradient(135deg, #00dc96, #00b87a)",
+                      border: "none", color: "#000",
+                      boxShadow: "0 6px 22px rgba(0,220,150,0.32)"
+                    } : isTrial ? {
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1.5px solid rgba(255,255,255,0.18)",
+                      color: "#fff"
+                    } : {
+                      background: "transparent",
+                      border: "1.5px solid rgba(255,255,255,0.14)",
+                      color: "rgba(255,255,255,0.7)"
+                    })
+                  }}
+                  onMouseEnter={e => {
+                    if (isProcessing) return;
+                    if (isPro) {
+                      e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,220,150,0.48)";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                    } else {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)";
+                      e.currentTarget.style.color = "#fff";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (isProcessing) return;
+                    if (isPro) {
+                      e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,220,150,0.32)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    } else {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
+                      e.currentTarget.style.color = isTrial ? "#fff" : "rgba(255,255,255,0.7)";
+                    }
                   }}
                 >
                   {isProcessing ? (
-                    <><div style={{ width: 18, height: 18, border: "2px solid rgba(255,255,255,0.4)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing...</>
-                  ) : (
-                    <>{plan.price === null ? "📞 Contact Sales" : plan.isTrial ? "🎁 Start Free Trial" : `💳 ${plan.btnLabel}`}</>
-                  )}
+                    <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid rgba(255,255,255,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing...</>
+                  ) : plan.price === null ? "📞 Contact Sales"
+                    : isTrial ? "🎁 Get it now"
+                    : "Get it now"}
                 </button>
               </div>
             );
           })}
         </div>
 
-        {/* Security Badge */}
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 24, padding: "16px 24px", background: "var(--app-bg)", borderRadius: 16, border: "1.5px solid var(--app-border)", flexWrap: "wrap" }}>
+        {/* Security footer */}
+        <div style={{
+          display: "flex", justifyContent: "center", alignItems: "center", gap: 28,
+          marginTop: 40, flexWrap: "wrap", position: "relative", zIndex: 1
+        }}>
           {["🔒 SSL Encrypted", "💳 Razorpay Secured", "🏦 RBI Compliant", "📞 +91 98765 43210"].map(t => (
-            <span key={t} style={{ fontSize: 12, color: T.muted, fontWeight: 600 }}>{t}</span>
+            <span key={t} style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", fontWeight: 600 }}>{t}</span>
           ))}
         </div>
+      </div>
 
-        {/* ── Mock Simulated Payment Gateway ── */}
-        {mockGatewayOpen && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(10px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <div style={{ background: "#fff", width: "100%", maxWidth: 420, borderRadius: 24, overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,0.3)", animation: "slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}>
-              <style>{`@keyframes slideUp { from { transform: translateY(40px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }`}</style>
-
-              {/* Header */}
-              <div style={{ background: "linear-gradient(135deg,var(--app-sidebar),var(--app-sidebar))", padding: "32px 24px", color: "#fff", position: "relative" }}>
-                <button onClick={() => setMockGatewayOpen(null)} style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1, opacity: 0.8 }}>M BUSINESS</div>
-                  <div style={{ background: "rgba(255,255,255,0.15)", padding: "4px 10px", borderRadius: 12, fontSize: 11, fontWeight: 700, letterSpacing: 0.5 }}>TEST MODE</div>
-                </div>
-                <div style={{ fontSize: 14, opacity: 0.9, marginBottom: 4 }}>Amount to Pay</div>
-                <div style={{ fontSize: 36, fontWeight: 800 }}>₹{mockGatewayOpen.plan.price?.toLocaleString("en-IN")}</div>
-                <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4 }}>{mockGatewayOpen.plan.name} Plan - Monthly Subscription</div>
+      {/* Mock Gateway - same as before */}
+      {mockGatewayOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(10px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: "#fff", width: "100%", maxWidth: 420, borderRadius: 24, overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,0.3)" }}>
+            <div style={{ background: "linear-gradient(135deg, #0a0a0f, #0d2a22)", padding: "32px 24px", color: "#fff", position: "relative" }}>
+              <button onClick={() => setMockGatewayOpen(null)} style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1, opacity: 0.8 }}>M BUSINESS</div>
+                <div style={{ background: "rgba(0,220,150,0.15)", border: "1px solid rgba(0,220,150,0.3)", padding: "4px 10px", borderRadius: 12, fontSize: 11, fontWeight: 700, color: "#00dc96" }}>TEST MODE</div>
               </div>
-
-              {/* Body */}
-              <div style={{ padding: 24 }}>
-                <div style={{ marginBottom: 24 }}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Simulated Card Details</label>
-                  <div style={{ border: "2px solid var(--app-border)", borderRadius: 12, overflow: "hidden" }}>
-                    <input readOnly value="4242 4242 4242 4242" style={{ width: "100%", padding: "14px 16px", border: "none", borderBottom: "2px solid var(--app-border)", fontSize: 14, fontWeight: 600, color: "#1e293b", background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
-                    <div style={{ display: "flex" }}>
-                      <input readOnly value="12/28" style={{ width: "50%", padding: "14px 16px", border: "none", borderRight: "2px solid var(--app-border)", fontSize: 14, fontWeight: 600, color: "#1e293b", background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
-                      <input readOnly value="123" style={{ width: "50%", padding: "14px 16px", border: "none", fontSize: 14, fontWeight: 600, color: "#1e293b", background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
-                    </div>
+              <div style={{ fontSize: 14, opacity: 0.7, marginBottom: 4 }}>Amount to Pay</div>
+              <div style={{ fontSize: 36, fontWeight: 800 }}>₹{mockGatewayOpen.plan.price?.toLocaleString("en-IN")}</div>
+              <div style={{ fontSize: 13, opacity: 0.7, marginTop: 4 }}>{mockGatewayOpen.plan.name} Plan</div>
+            </div>
+            <div style={{ padding: 24 }}>
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 8, textTransform: "uppercase" }}>Simulated Card</label>
+                <div style={{ border: "1.5px solid #e2e8f0", borderRadius: 12, overflow: "hidden" }}>
+                  <input readOnly value="4242 4242 4242 4242" style={{ width: "100%", padding: "13px 14px", border: "none", borderBottom: "1.5px solid #e2e8f0", fontSize: 14, fontWeight: 600, background: "#f8fafc", outline: "none", fontFamily: "monospace", boxSizing: "border-box" }} />
+                  <div style={{ display: "flex" }}>
+                    <input readOnly value="12/28" style={{ width: "50%", padding: "13px 14px", border: "none", borderRight: "1.5px solid #e2e8f0", fontSize: 14, fontWeight: 600, background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
+                    <input readOnly value="123" style={{ width: "50%", padding: "13px 14px", border: "none", fontSize: 14, fontWeight: 600, background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
                   </div>
                 </div>
-
-                <button
-                  onClick={async () => {
-                    const { plan, orderId } = mockGatewayOpen;
-                    setMockGatewayOpen({ ...mockGatewayOpen, processing: true });
-                    try {
-                      const endDate = new Date();
-                      endDate.setDate(endDate.getDate() + 30);
-                      await axios.post(`${BASE_URL}/api/subscriptions/create`, {
-                        userId, companyId: userId,
-                        userEmail, userName,
-                        planName: plan.name, planPrice: plan.price,
-                        billingCycle: "monthly", status: "active",
-                        isFullyPaid: true, startDate: new Date(), endDate, nextBillingDate: endDate,
-                        usageLimit: 999, features: plan.features, paymentMethod: "other",
-                      });
-
-                      await axios.post(`${BASE_URL}/api/payments/verify`, {
-                        razorpay_order_id: orderId,
-                        razorpay_payment_id: `pay_mock_${Date.now()}`,
-                        razorpay_signature: "mock_signature",
-                        paymentId: orderId, paymentMethod: "other"
-                      }).catch(() => { });
-
-                      await fetchData();
-                      setMockGatewayOpen(null);
-                      setPaymentSuccessData(plan);
-                    } catch (err) {
-                      showToast("❌ Payment failed during simulation.");
-                    } finally {
-                      setMockGatewayOpen(null);
-                    }
-                  }}
-                  disabled={mockGatewayOpen.processing}
-                  style={{
-                    width: "100%", padding: "16px", borderRadius: 14,
-                    background: mockGatewayOpen.processing ? "#94a3b8" : "linear-gradient(135deg,#10b981,#059669)",
-                    color: "#fff", border: "none", fontSize: 16, fontWeight: 800, cursor: mockGatewayOpen.processing ? "wait" : "pointer",
-                    display: "flex", justifyContent: "center", alignItems: "center", gap: 10,
-                    boxShadow: mockGatewayOpen.processing ? "none" : "0 10px 24px rgba(16,185,129,0.3)",
-                    transition: "0.2s"
-                  }}
-                >
-                  {mockGatewayOpen.processing ? "Processing Transaction..." : `Pay ₹${mockGatewayOpen.plan.price?.toLocaleString("en-IN")} Securely`}
-                </button>
-
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 20 }}>
-                  <span style={{ fontSize: 14 }}>🔒</span>
-                  <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>Secured by M Business Simulated Gateway</span>
-                </div>
+              </div>
+              <button
+                onClick={async () => {
+                  const { plan, orderId } = mockGatewayOpen;
+                  setMockGatewayOpen({ ...mockGatewayOpen, processing: true });
+                  try {
+                    const endDate = new Date();
+                    endDate.setDate(endDate.getDate() + 30);
+                    await axios.post(`${BASE_URL}/api/subscriptions/create`, {
+                      userId, companyId: userId, userEmail, userName,
+                      planName: plan.name, planPrice: plan.price,
+                      billingCycle: "monthly", status: "active",
+                      isFullyPaid: true, startDate: new Date(), endDate, nextBillingDate: endDate,
+                      usageLimit: 999, features: plan.features, paymentMethod: "other",
+                    });
+                    await fetchData();
+                    setMockGatewayOpen(null);
+                    setPaymentSuccessData(plan);
+                  } catch (err) {
+                    showToast("❌ Payment failed.");
+                    setMockGatewayOpen(null);
+                  }
+                }}
+                disabled={mockGatewayOpen.processing}
+                style={{
+                  width: "100%", padding: "14px", borderRadius: 12,
+                  background: mockGatewayOpen.processing ? "#94a3b8" : "linear-gradient(135deg, #00dc96, #00b87a)",
+                  color: "#000", border: "none", fontSize: 15, fontWeight: 800,
+                  cursor: mockGatewayOpen.processing ? "wait" : "pointer",
+                  boxShadow: mockGatewayOpen.processing ? "none" : "0 8px 20px rgba(0,220,150,0.3)"
+                }}
+              >
+                {mockGatewayOpen.processing ? "Processing..." : `Pay ₹${mockGatewayOpen.plan.price?.toLocaleString("en-IN")} Securely`}
+              </button>
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 16 }}>
+                <span style={{ fontSize: 12 }}>🔒</span>
+                <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>Secured by M Business</span>
               </div>
             </div>
           </div>
-        )}
-      </div>
-    );
-  }
+        </div>
+      )}
+    </div>
+  );
+}
 
   // ── Has Subscription ─────────────────────────────────────────────────────────
   const daysLeft = getDaysLeft(subscription.endDate);

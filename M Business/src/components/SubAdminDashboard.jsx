@@ -482,12 +482,12 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
       {editClient && (
         <Mdl title="Edit Company" onClose={() => setEditClient(null)}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-              <div style={{ position: "relative", width: 100, height: 100 }}>
-                {editForm.logoUrl ? (
-                  <img src={editForm.logoUrl} alt="Logo" style={{ width: 100, height: 100, borderRadius: "50%", objectFit: "cover", border: "2px dashed #d8b4fe", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", display: "block" }} />
-                ) : (
-                  <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", border: "2px dashed #d8b4fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>🏢</div>
-                )}
+            <div style={{ position: "relative", width: 100, height: 100 }}>
+              {editForm.logoUrl ? (
+                <img src={editForm.logoUrl} alt="Logo" style={{ width: 100, height: 100, borderRadius: "50%", objectFit: "cover", border: "2px dashed #d8b4fe", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", display: "block" }} />
+              ) : (
+                <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", border: "2px dashed #d8b4fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>🏢</div>
+              )}
               <label style={{ position: "absolute", bottom: 0, right: 0, background: "var(--app-muted)", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                 <span style={{ fontSize: 16 }}>📷</span>
                 <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
@@ -572,13 +572,13 @@ function EmployeesPage({ employees, setEmployees }) {
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (e) => {
-    setEditForm({ 
-      name: e.name || "", 
-      email: e.email || "", 
-      phone: e.phone || "", 
-      role: e.role || "Employee", 
-      department: e.department || "", 
-      salary: e.salary || "", 
+    setEditForm({
+      name: e.name || "",
+      email: e.email || "",
+      phone: e.phone || "",
+      role: e.role || "Employee",
+      department: e.department || "",
+      salary: e.salary || "",
       status: e.status || "Pending",
       dateOfBirth: e.dateOfBirth || "",
       maritalStatus: e.maritalStatus || "Unmarried",
@@ -724,13 +724,13 @@ function EmployeesPage({ employees, setEmployees }) {
                           <option value="Approved">Approved</option>
                           <option value="Rejected">Rejected</option>
                         </select>
-                        <span style={{ 
-                          position: "absolute", 
-                          right: "10px", 
-                          top: "50%", 
-                          transform: "translateY(-50%)", 
-                          fontSize: "10px", 
-                          color: sc(e.status || "Pending"), 
+                        <span style={{
+                          position: "absolute",
+                          right: "10px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          fontSize: "10px",
+                          color: sc(e.status || "Pending"),
                           pointerEvents: "none",
                           fontWeight: "bold"
                         }}>▼</span>
@@ -824,7 +824,7 @@ function EmployeesPage({ employees, setEmployees }) {
                         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                           <button onClick={() => window.open(doc.url, "_blank")}
                             style={{ flex: 1, padding: "6px 10px", background: `${dt.color}10`, border: `1px solid ${dt.color}30`, borderRadius: 7, fontSize: 11, fontWeight: 700, color: dt.color, cursor: "pointer", fontFamily: "inherit" }}>
-                            👁 
+                            👁
                           </button>
                           <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             ⬇ Download
@@ -858,7 +858,7 @@ function EmployeesPage({ employees, setEmployees }) {
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
           </div>
           <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
-          
+
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
@@ -1463,10 +1463,10 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                           e.stopPropagation();
                           const text = `📁 *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${formatCurrency(p.budget, p.currency)}`;
                           const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                       window.open(wpUrl, "_blank");
-}} style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-  <span>🔗</span>
-</button>
+                          window.open(wpUrl, "_blank");
+                        }} style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span>🔗</span>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -1791,19 +1791,19 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                           showToast("❌ Update failed");
                         }
                       }}
-                        style={{
-                          background: `${sc(p.status)}15`,
-                          color: sc(p.status) === "var(--app-muted)" ? "var(--app-sidebar)" : sc(p.status),
-                          border: `1.5px solid ${sc(p.status)}40`,
-                          padding: "4px 10px",
-                          borderRadius: 20,
-                          fontSize: 11,
-                          fontWeight: 800,
-                          outline: "none",
-                          cursor: "pointer",
-                          appearance: "none",
-                          textAlign: "center"
-                        }}
+                      style={{
+                        background: `${sc(p.status)}15`,
+                        color: sc(p.status) === "var(--app-muted)" ? "var(--app-sidebar)" : sc(p.status),
+                        border: `1.5px solid ${sc(p.status)}40`,
+                        padding: "4px 10px",
+                        borderRadius: 20,
+                        fontSize: 11,
+                        fontWeight: 800,
+                        outline: "none",
+                        cursor: "pointer",
+                        appearance: "none",
+                        textAlign: "center"
+                      }}
                     >
                       {(config?.projectStatuses || ["In Progress", "Pending", "Completed", "On Hold"]).map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -1817,10 +1817,10 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                         e.stopPropagation();
                         const text = `📊 *Project Status Update*\n\nProject: ${p.name}\nStatus: ${p.status}\nProgress: ${p.progress || p.pct || 0}%\nDeadline: ${p.deadline || "—"}\nNotes: ${p.notes || p.note || "No notes"}`;
                         const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                     window.open(wpUrl, "_blank");
-}} style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-  <span>🔗</span>
-</button>
+                        window.open(wpUrl, "_blank");
+                      }} style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <span>🔗</span>
+                      </button>
                     </div>
                   </td>
                 </tr>))}
@@ -1870,14 +1870,14 @@ function InterviewPage({ companyId, companyName }) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const appLink = `http://${window.location.host}/interview-apply/${CNAME.replace(/\s+/g, "-")}-${CID}`;
-  useEffect(() => { 
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); 
-    if (saved.length) { setCandidates(saved); setLoading(false); } 
-    axios.get(`${BASE_URL}/api/interviews?companyId=${CID}`).then(r => { 
-      const list = r.data?.data || (Array.isArray(r.data) ? r.data : []); 
-      setCandidates(list); 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); 
-    }).catch(() => { }).finally(() => setLoading(false)); 
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    if (saved.length) { setCandidates(saved); setLoading(false); }
+    axios.get(`${BASE_URL}/api/interviews?companyId=${CID}`).then(r => {
+      const list = r.data?.data || (Array.isArray(r.data) ? r.data : []);
+      setCandidates(list);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }).catch(() => { }).finally(() => setLoading(false));
   }, [CID]);
   const persist = (list) => { setCandidates(list); localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); };
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
@@ -2540,7 +2540,7 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
                     background: isPro ? "#fff" : "var(--app-accent)",
                     border: "none",
                     color: isPro ? "var(--app-sidebar)" : "#fff",
-                    boxShadow: isPro 
+                    boxShadow: isPro
                       ? "0 4px 12px rgba(255,255,255,0.2)"
                       : "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)"
                   }}
@@ -2773,17 +2773,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // Helper: hex to HSL
   const hexToHsl = (hex) => {
-    let r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
-    const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
-    let h = 0, s = 0, l = (max+min)/2;
-    if (d !== 0) { s = l > 0.5 ? d/(2-max-min) : d/(max+min); h = max===r ? ((g-b)/d+(g<b?6:0))*60 : max===g ? ((b-r)/d+2)*60 : ((r-g)/d+4)*60; }
-    return [Math.round(h), Math.round(s*100), Math.round(l*100)];
+    let r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+    let h = 0, s = 0, l = (max + min) / 2;
+    if (d !== 0) { s = l > 0.5 ? d / (2 - max - min) : d / (max + min); h = max === r ? ((g - b) / d + (g < b ? 6 : 0)) * 60 : max === g ? ((b - r) / d + 2) * 60 : ((r - g) / d + 4) * 60; }
+    return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
   };
-  const hslToHex = (h,s,l) => {
-    s/=100; l/=100;
-    const a = s*Math.min(l,1-l);
-    const f = n => { const k=(n+h/30)%12; return Math.round(255*(l-a*Math.max(Math.min(k-3,9-k,1),-1))); };
-    return `#${[f(0),f(8),f(4)].map(x=>x.toString(16).padStart(2,'0')).join('')}`;
+  const hslToHex = (h, s, l) => {
+    s /= 100; l /= 100;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => { const k = (n + h / 30) % 12; return Math.round(255 * (l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1))); };
+    return `#${[f(0), f(8), f(4)].map(x => x.toString(16).padStart(2, '0')).join('')}`;
   };
 
   const hexToRgb = (hex) => {
@@ -2801,11 +2801,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const accentL = Math.min(l, 50); // Lowered lightness for better visibility
     const accentS = Math.max(s, 70); // Higher saturation for "punchy" color
     const accentColor = hslToHex(h, accentS, accentL);
-    
+
     return {
-      label: "Custom", 
+      label: "Custom",
       sidebar: hslToHex(h, Math.min(s + 20, 100), 12), // Very deep color for sidebar
-      accent: accentColor, 
+      accent: accentColor,
       bg: hslToHex(h, 30, 95), // Clearer tinted background
       muted: hslToHex(h, 60, 30), // Much darker muted text (30% vs 35%)
       border: hslToHex(h, 40, 85), // Stronger borders
@@ -2932,7 +2932,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [showSubPass, setShowSubPass] = useState(false);
 
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
   const [pkgError, setPkgError] = useState({});
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
 
@@ -3056,6 +3056,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const subStatus = getSubStatus();
 
+  const parseLimit = (limitStr, type = "client") => {
+    if (!limitStr) {
+      if (type === "client") return 1;
+      if (type === "employee") return 5;
+      if (type === "manager") return 1;
+      return 1;
+    }
+    if (limitStr.toLowerCase().includes("unlimited")) return Infinity;
+    const match = limitStr.match(/\d+/);
+    if (match) return parseInt(match[0]);
+    return 1;
+  };
+
   const handleLogout = () => { localStorage.removeItem("user"); setUser(null); };
   const handleAuthSetUser = (userData) => {
     setAccountAuthOpen(false);
@@ -3119,8 +3132,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       price: pkg.price || "",
       noOfDays: pkg.no_of_days || pkg.noOfDays || "",
       planDuration: pkg.planDuration || "Monthly",
-      businessLimit: pkg.businessLimit || "Single business manage",
-      managerLimit: pkg.managerLimit || "1 Manager",
+      businessLimit: pkg.businessLimit || "",
+      managerLimit: pkg.managerLimit || "",
       clientLimit: pkg.clientLimit || "3 Client manage",
       status: pkg.status || "Active"
     });
@@ -3183,6 +3196,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (!nc.name.trim()) errors.name = "Name is required";
     if (!nc.email.trim()) errors.email = "Email is required";
     if (!nc.password.trim()) errors.password = "Password is required";
+
+    // Subscription Limit Check
+    if (subscription) {
+      const clientLimit = parseLimit(subscription.clientLimit);
+      if (clients.length >= clientLimit) {
+        alert(`❌ Limit Reached: Your current plan only allows up to ${clientLimit} Company Names (Clients). Please upgrade your plan.`);
+        return;
+      }
+      // Business Manage Check
+      if (subscription.businessLimit === "" && clients.length >= 1) {
+        alert("❌ Limit Reached: Your current plan only allows managing a single business (1 Company Name). Please upgrade to 'Multiple business manage' plan.");
+        return;
+      }
+    }
+
     if (Object.keys(errors).length > 0) { setNcError(errors); return; }
     try {
       setSaveLoading(true);
@@ -3216,28 +3244,38 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const addEmployee = async () => {
-    const errors = {}; 
-    if (!ne.name.trim()) errors.name = "Name is required"; 
-    if (!ne.email.trim()) errors.email = "Email required"; 
-    if (!ne.password.trim()) errors.password = "Password is required"; 
-    if (Object.keys(errors).length > 0) { setNeError(errors); return; } 
-    try { 
-      setEmpSaveLoading(true); 
-      const payload = { 
-        ...ne, 
+    const errors = {};
+    if (!ne.name.trim()) errors.name = "Name is required";
+    if (!ne.email.trim()) errors.email = "Email required";
+    if (!ne.password.trim()) errors.password = "Password is required";
+
+    // Subscription Limit Check
+    if (subscription) {
+      const employeeLimit = parseLimit(subscription.employeeLimit);
+      if (employees.length >= employeeLimit) {
+        alert(`❌ Limit Reached: Your current plan only allows up to ${employeeLimit} Employees. Please upgrade your plan.`);
+        return;
+      }
+    }
+
+    if (Object.keys(errors).length > 0) { setNeError(errors); return; }
+    try {
+      setEmpSaveLoading(true);
+      const payload = {
+        ...ne,
         role: ne.role || "employee",
         bankDetails: {
           bankName: ne.bankName,
           ifscCode: ne.ifscCode,
           accountNumber: ne.accountNumber
         }
-      }; 
-      const res = await axios.post(BASE_URL + "/api/employees/add", payload); 
-      setEmployees(prev => [res.data.employee, ...prev]); 
-      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" }); 
-      setShowEmpPass(false); 
-      setNeError({}); 
-      if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); } 
+      };
+      const res = await axios.post(BASE_URL + "/api/employees/add", payload);
+      setEmployees(prev => [res.data.employee, ...prev]);
+      setNe({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "", dateOfBirth: "", maritalStatus: "", address: "", bankName: "", ifscCode: "", accountNumber: "" });
+      setShowEmpPass(false);
+      setNeError({});
+      if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); }
     } catch (err) {
       const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
       const isPasswordError = errMsg.toLowerCase().includes("password");
@@ -3273,6 +3311,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (!nm.managerName.trim()) errors.managerName = "Name is required";
     if (!nm.email.trim()) errors.email = "Email is required";
     if (!nm.password.trim()) errors.password = "Password is required";
+
+    // Subscription Limit Check
+    if (subscription) {
+      const managerLimit = parseLimit(subscription.managerLimit);
+      if (managers.length >= managerLimit) {
+        alert(`❌ Limit Reached: Your current plan only allows up to ${managerLimit} Managers. Please upgrade your plan.`);
+        return;
+      }
+    }
+
     if (Object.keys(errors).length > 0) { setNmError(errors); return; }
     try {
       setMgrSaveLoading(true);
@@ -3331,8 +3379,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         buttonName: npkg.buttonName || "Get Started",
         features: npkg.features ? npkg.features.split(',').map(f => f.trim()).filter(f => f) : [],
         planDuration: npkg.planDuration || "Monthly",
-        businessLimit: npkg.businessLimit || "Single business manage",
-        managerLimit: npkg.managerLimit || "1 Manager",
+        businessLimit: npkg.businessLimit || "",
+        managerLimit: npkg.managerLimit || "",
         clientLimit: npkg.clientLimit || "3 Client manage",
         status: "Active",
         targetRole: "subadmin",
@@ -3341,7 +3389,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       const res = await axios.post(BASE_URL + "/api/packages", packageData);
       setPackages(prev => [...prev, res.data]);
-      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
+      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
       setPkgError({});
       setModal(null);
       toast.success("✅ Package added!");
@@ -3434,15 +3482,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const B = (color) => {
     const isVar = color && color.startsWith("var");
-    return { 
-      background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}ee)`, 
-      color: "#fff", 
-      border: "none", 
-      borderRadius: 12, 
-      padding: "9px 18px", 
+    return {
+      background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}ee)`,
+      color: "#fff",
+      border: "none",
+      borderRadius: 12,
+      padding: "9px 18px",
       fontWeight: 800,
-      fontSize: 13, 
-      cursor: "pointer", 
+      fontSize: 13,
+      cursor: "pointer",
       fontFamily: "inherit",
       boxShadow: isVar ? `0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)` : `0 4px 12px ${color}40`,
       textShadow: "0 1px 2px rgba(0,0,0,0.2)"
@@ -3539,15 +3587,73 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: T.text }}>{page?.icon} {page?.label}</h1>
             </div>
             <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-              {validActive === "clients" && <button onClick={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} style={B("var(--app-accent)")}>+ Add Client</button>}
-              {validActive === "employees" && <button onClick={() => { setNeError({}); setModal("employee"); }} style={B("var(--app-accent)")}>+ Add Employee</button>}
+              {validActive === "clients" && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  {subscription && (
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
+                      {clients.length} / {parseLimit(subscription.clientLimit, "client") === Infinity ? "Unlimited" : parseLimit(subscription.clientLimit, "client")} Used
+                    </span>
+                  )}
+                  <button onClick={() => {
+                    const limit = parseLimit(subscription?.clientLimit, "client");
+                    if (subscription && clients.length >= limit) {
+                      alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
+                      return;
+                    }
+                    if (subscription?.businessLimit === "" && clients.length >= 1) {
+                      alert("❌ Limit Reached: Your current plan only allows managing a single business. Please upgrade your plan.");
+                      return;
+                    }
+                    setNcError({}); setShowClientPass(false); setModal("client");
+                  }} style={B(subscription && (clients.length >= parseLimit(subscription.clientLimit, "client") || (subscription.businessLimit === "" && clients.length >= 1)) ? "#94a3b8" : "var(--app-accent)")}>
+                    + Add Client
+                  </button>
+                </div>
+              )}
+              {validActive === "employees" && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  {subscription && (
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
+                      {employees.length} / {parseLimit(subscription.employeeLimit, "employee") === Infinity ? "Unlimited" : parseLimit(subscription.employeeLimit, "employee")} Used
+                    </span>
+                  )}
+                  <button onClick={() => {
+                    const limit = parseLimit(subscription?.employeeLimit, "employee");
+                    if (subscription && employees.length >= limit) {
+                      alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Employees. Please upgrade your plan.`);
+                      return;
+                    }
+                    setNeError({}); setModal("employee");
+                  }} style={B(subscription && employees.length >= parseLimit(subscription.employeeLimit, "employee") ? "#94a3b8" : "var(--app-accent)")}>
+                    + Add Employee
+                  </button>
+                </div>
+              )}
               {validActive === "projects" && (
                 <>
                   <button onClick={() => { setNpError({}); setModal("project"); }} style={B("var(--app-accent)")}>+ New Project</button>
                 </>
               )}
 
-              {validActive === "managers" && <button onClick={() => { setNmError({}); setShowMgrPass(false); setModal("manager"); }} style={B("var(--app-accent)")}>+ Add Manager</button>}
+              {validActive === "managers" && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  {subscription && (
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
+                      {managers.length} / {parseLimit(subscription.managerLimit, "manager") === Infinity ? "Unlimited" : parseLimit(subscription.managerLimit, "manager")} Used
+                    </span>
+                  )}
+                  <button onClick={() => {
+                    const limit = parseLimit(subscription?.managerLimit, "manager");
+                    if (subscription && managers.length >= limit) {
+                      alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Managers. Please upgrade your plan.`);
+                      return;
+                    }
+                    setNmError({}); setShowMgrPass(false); setModal("manager");
+                  }} style={B(subscription && managers.length >= parseLimit(subscription.managerLimit, "manager") ? "#94a3b8" : "var(--app-accent)")}>
+                    + Add Manager
+                  </button>
+                </div>
+              )}
               {validActive === "subadmins" && <button onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }} style={B("var(--app-accent)")}>+ Add Partner</button>}
 
               {validActive === "vendors" && <button onClick={() => { setNvError({}); setModal("vendor_add"); }} style={B("var(--app-accent)")}>+ Add Vendor</button>}
@@ -3620,7 +3726,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             cursor: "pointer", transition: "all 0.2s",
                             display: "flex", alignItems: "center", justifyContent: "center"
                           }}
-                          onClick={() => document.getElementById("customColorInput")?.click()}
+                            onClick={() => document.getElementById("customColorInput")?.click()}
                           >
                             <span style={{ fontSize: 16 }}>🎨</span>
                           </div>
@@ -3656,7 +3762,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       {/* Quick custom color presets */}
                       <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-                        {["var(--app-accent)","#2563eb","#0891b2","#059669","#d97706","#dc2626","#db2777","#7c2d12","#4f46e5","#0f766e","#b91c1c","var(--app-accent)"].map(c => (
+                        {["var(--app-accent)", "#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c", "var(--app-accent)"].map(c => (
                           <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); }}
                             style={{
                               width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
@@ -3854,8 +3960,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     { t: "Total Expenses", v: formatCurrency(expenses.reduce((s, x) => s + (Number(x.amount) || 0), 0), user?.currency), i: "💸", c: "#EF4444", bg: "linear-gradient(135deg,#fee2e2,#fff1f1)" }
                   ].map(({ t, v, i, c, bg }) => (
                     <div key={t} style={{ background: "#fff", borderRadius: 16, padding: "16px", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)", border: "1.5px solid var(--app-border)", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: 8 }}>
-                      <div   key={t}
-   />
+                      <div key={t}
+                      />
                       <div style={{ width: 36, height: 36, borderRadius: 10, background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, boxShadow: `0 4px 10px ${c}15` }}>{i}</div>
                       <div>
                         <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 }}>{t}</div>
@@ -3879,24 +3985,25 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           const pTasks = tasks.filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
                           const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
                           return (
-                          <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { setSelectedProjectForTasks(p); setActive("tasks"); }}>
-                            <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
-                              <div style={{ fontSize: 13 }}>{p.name}</div>
-                              <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
-                           
-                            </td>
-                            <td style={{ padding: "12px 12px", color: "var(--app-muted)" }}>{p.client}</td>
-                            <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>
-                            <td style={{ padding: "12px 12px" }} onClick={e => e.stopPropagation()}>
-                              <button onClick={() => {
-                                const text = `📁 *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${formatCurrency(p.budget, p.currency)}`;
-                                const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                                window.open(wpUrl, "_blank");
-                              }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 6, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Share</button>
-                            </td>
-                            <td style={{ padding: "12px 12px" }} onClick={e => e.stopPropagation()}><button onClick={() => setViewProject(p)} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button></td>
-                          </tr>
-                        );})}
+                            <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { setSelectedProjectForTasks(p); setActive("tasks"); }}>
+                              <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
+                                <div style={{ fontSize: 13 }}>{p.name}</div>
+                                <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
+
+                              </td>
+                              <td style={{ padding: "12px 12px", color: "var(--app-muted)" }}>{p.client}</td>
+                              <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>
+                              <td style={{ padding: "12px 12px" }} onClick={e => e.stopPropagation()}>
+                                <button onClick={() => {
+                                  const text = `📁 *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${formatCurrency(p.budget, p.currency)}`;
+                                  const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                                  window.open(wpUrl, "_blank");
+                                }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 6, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Share</button>
+                              </td>
+                              <td style={{ padding: "12px 12px" }} onClick={e => e.stopPropagation()}><button onClick={() => setViewProject(p)} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button></td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -3960,9 +4067,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               triggerCrop={triggerCrop}
             />
           )}
-          {validActive === "accounts" && <AccountsPage initialTab="overview" />}
-          {validActive === "payments" && <AccountsPage initialTab="income" />}
-          {validActive === "expenses" && <AccountsPage initialTab="expenses" />}
+          {validActive === "accounts" && <AccountsPage initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+          {validActive === "payments" && <AccountsPage initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+          {validActive === "expenses" && <AccountsPage initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
@@ -4282,7 +4389,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Pending", "Approved", "Rejected"]} />
         </div>
         <Fld label="Address" value={ne.address} onChange={v => setNe({ ...ne, address: v })} />
-        
+
         <div style={{ marginTop: 14 }}>
           <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
           <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
@@ -4539,9 +4646,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
             <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `₹${viewPackage.price || 0}`} />
             <InfoRow icon="🗓️" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
-            <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || "Single business manage"} />
-            <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || "1 Manager"} />
-            <InfoRow icon="👥" label="Company Name" value={viewPackage.clientLimit || "3 Company manage"} />
+            <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
+            <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
+            <InfoRow icon="👥" label="Company Name" value={viewPackage.clientLimit || ""} />
+            <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
             <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
 
             {viewPackage.features && viewPackage.features.length > 0 && (
@@ -4579,9 +4687,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PACKAGE LIMITS</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
               <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
-              <Fld label="Business Limit" value={editPkgForm.businessLimit} onChange={v => setEditPkgForm({ ...editPkgForm, businessLimit: v })} options={["Single business manage", "Multiple business manage", "Unlimited business manage"]} />
-              <Fld label="Manager Limit" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} options={["1 Manager", "2 Managers", "3 Managers", "5 Managers", "Unlimited Managers"]} />
-              <Fld label="Company Name Limit" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} options={["3 Company manage", "5 Company manage", "10 Company manage", "Unlimited Company manage"]} />
+              <Fld label="Business Limit" value={editPkgForm.businessLimit} onChange={v => setEditPkgForm({ ...editPkgForm, businessLimit: v })} options={["", "Multiple business manage", "Unlimited business manage"]} />
+              <Fld label="Manager Limit" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} options={["", "2 Managers", "3 Managers", "5 Managers", "Unlimited Managers"]} />
+              <Fld label="Company Name Limit" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} options={["1 Company manage", "", "5 Company manage", "10 Company manage", "Unlimited Company manage"]} />
+              <Fld label="Employee Limit" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} options={["5 Employee manage", "", "20 Employee manage", "50 Employee manage", "Unlimited Employee manage"]} />
             </div>
           </div>
 

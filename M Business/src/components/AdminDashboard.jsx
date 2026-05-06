@@ -45,7 +45,22 @@ export default function AdminDashboard({ user, setUser }) {
   const [managers, setManagers] = useState([]);
   const [quotations, setQuotations] = useState([]);
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "", isFree: false, price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Company manage", assignedSubadmins: [] });
+  const [npkg, setNpkg] = useState({
+    title: "",
+    description: "",
+    icon: "📦",
+    isFree: false,
+    price: "",
+    noOfDays: "30",
+    planDuration: "Monthly Plan",
+    businessLimit: "Single business manage",
+    managerLimit: "",
+    clientLimit: "",
+    employeeLimit: "",
+    assignedSubadmins: []
+  });
+  const [editPkg, setEditPkg] = useState(null);
+  const [updateActiveSubs, setUpdateActiveSubs] = useState(true);
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
   const [modal, setModal] = useState(null);
   const [invoices, setInvoices] = useState([]);
@@ -143,17 +158,31 @@ export default function AdminDashboard({ user, setUser }) {
         halfYearlyPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 6 * 0.85).toString(),
         annualPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 12 * 0.8).toString(),
         buttonName: "Get Started",
-        features: `${npkg.planDuration} Plan\n${npkg.businessLimit}\n${npkg.managerLimit}\n${npkg.clientLimit}`,
+        features: `${npkg.planDuration} Plan\n${npkg.businessLimit}\n${npkg.managerLimit}\n${npkg.clientLimit}\n${npkg.employeeLimit}`,
         planDuration: npkg.planDuration,
         businessLimit: npkg.businessLimit,
         managerLimit: npkg.managerLimit,
         clientLimit: npkg.clientLimit,
+        employeeLimit: npkg.employeeLimit,
         targetRole: "subadmin",
         assignedSubadmins: npkg.assignedSubadmins || []
       };
       const res = await axios.post(BASE_URL + "/api/packages", packageData);
       setPackages(prev => [...prev, res.data]);
-      setNpkg({ title: "", description: "", icon: "", isFree: false, price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", assignedSubadmins: [] });
+      setNpkg({
+        title: "",
+        description: "",
+        icon: "📦",
+        isFree: false,
+        price: "",
+        noOfDays: "30",
+        planDuration: "Monthly Plan",
+        businessLimit: "Single business manage",
+        managerLimit: "",
+        clientLimit: "",
+        employeeLimit: "",
+        assignedSubadmins: []
+      });
       setPkgError({});
       setModal(null);
     } catch (err) {
@@ -263,278 +292,330 @@ export default function AdminDashboard({ user, setUser }) {
       </div>
 
       {/* Package Creation Modal */}
-   {modal === "package_add" && (
-  <div style={{
-    position: "fixed", inset: 0,
-    background: "rgba(0,0,0,0.6)",
-    backdropFilter: "blur(8px)",
-    zIndex: 1000,
-    display: "flex", alignItems: "center", justifyContent: "center",
-    padding: 16
-  }}>
-    <div style={{
-      background: "#fff",
-      borderRadius: 20,
-      width: "100%", maxWidth: 640,
-      maxHeight: "90vh",
-      overflow: "hidden",
-      display: "flex", flexDirection: "column",
-      boxShadow: "0 32px 80px rgba(0,0,0,0.25)"
-    }}>
-      {/* Header */}
-      <div style={{
-        padding: "20px 24px",
-        borderBottom: "1px solid #f1f5f9",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        background: "linear-gradient(135deg, #0a0a0f, #1a1a2e)"
-      }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>
-            📦 Add New Package
-          </h2>
-          <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-            Create a subscription plan for subadmins
-          </p>
-        </div>
-        <button onClick={() => setModal(null)} style={{
-          background: "rgba(255,255,255,0.1)",
-          border: "1px solid rgba(255,255,255,0.15)",
-          borderRadius: 8, width: 32, height: 32,
-          color: "#fff", fontSize: 16, cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center"
-        }}>✕</button>
-      </div>
+      {modal === "package_add" && (
+        <div style={{
+          position: "fixed", inset: 0,
+          background: "rgba(0,0,0,0.6)",
+          backdropFilter: "blur(8px)",
+          zIndex: 1000,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: 16
+        }}>
+          <div style={{
+            background: "#fff",
+            borderRadius: 20,
+            width: "100%", maxWidth: 640,
+            maxHeight: "90vh",
+            overflow: "hidden",
+            display: "flex", flexDirection: "column",
+            boxShadow: "0 32px 80px rgba(0,0,0,0.25)"
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: "20px 24px",
+              borderBottom: "1px solid #f1f5f9",
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              background: "linear-gradient(135deg, #0a0a0f, #1a1a2e)"
+            }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>
+                  📦 Add New Package
+                </h2>
+                <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+                  Create a subscription plan for subadmins
+                </p>
+              </div>
+              <button onClick={() => setModal(null)} style={{
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                borderRadius: 8, width: 32, height: 32,
+                color: "#fff", fontSize: 16, cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center"
+              }}>✕</button>
+            </div>
 
-      {/* Body */}
-      <div style={{ padding: "24px", overflowY: "auto", flex: 1 }}>
+            {/* Body */}
+            <div style={{ padding: "24px", overflowY: "auto", flex: 1 }}>
 
-        {/* Row 1: Title + Icon */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, marginBottom: 16 }}>
-          <div>
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Package Title *</label>
-            <input
-              type="text"
-              value={npkg.title}
-              onChange={e => setNpkg({ ...npkg, title: e.target.value })}
-              placeholder="e.g., Basic Plan"
-              style={{
-                width: "100%", padding: "11px 14px",
-                border: pkgError.title ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
-                borderRadius: 10, fontSize: 13, outline: "none",
-                background: "#f8fafc", boxSizing: "border-box",
-                transition: "border-color 0.2s"
-              }}
-              onFocus={e => e.target.style.borderColor = "#7c3aed"}
-              onBlur={e => e.target.style.borderColor = pkgError.title ? "#ef4444" : "#e2e8f0"}
-            />
-            {pkgError.title && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.title}</div>}
-          </div>
-          <div style={{ width: 90 }}>
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Icon</label>
-            <input
-              type="text"
-              value={npkg.icon}
-              onChange={e => setNpkg({ ...npkg, icon: e.target.value })}
-              placeholder="📦"
-              style={{
-                width: "100%", padding: "11px 10px",
-                border: "1.5px solid #e2e8f0",
-                borderRadius: 10, fontSize: 20, outline: "none",
-                background: "#f8fafc", textAlign: "center",
-                boxSizing: "border-box"
-              }}
-            />
-          </div>
-        </div>
+              {/* Row 1: Title + Icon */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, marginBottom: 16 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Package Title *</label>
+                  <input
+                    type="text"
+                    value={npkg.title}
+                    onChange={e => setNpkg({ ...npkg, title: e.target.value })}
+                    placeholder="e.g., Basic Plan"
+                    style={{
+                      width: "100%", padding: "11px 14px",
+                      border: pkgError.title ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                      borderRadius: 10, fontSize: 13, outline: "none",
+                      background: "#f8fafc", boxSizing: "border-box",
+                      transition: "border-color 0.2s"
+                    }}
+                    onFocus={e => e.target.style.borderColor = "#7c3aed"}
+                    onBlur={e => e.target.style.borderColor = pkgError.title ? "#ef4444" : "#e2e8f0"}
+                  />
+                  {pkgError.title && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.title}</div>}
+                </div>
+                <div style={{ width: 90 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Icon</label>
+                  <input
+                    type="text"
+                    value={npkg.icon}
+                    onChange={e => setNpkg({ ...npkg, icon: e.target.value })}
+                    placeholder="📦"
+                    style={{
+                      width: "100%", padding: "11px 10px",
+                      border: "1.5px solid #e2e8f0",
+                      borderRadius: 10, fontSize: 20, outline: "none",
+                      background: "#f8fafc", textAlign: "center",
+                      boxSizing: "border-box"
+                    }}
+                  />
+                </div>
+              </div>
 
-        {/* Description */}
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Description *</label>
-          <textarea
-            value={npkg.description}
-            onChange={e => setNpkg({ ...npkg, description: e.target.value })}
-            placeholder="Describe what's included in this plan..."
-            rows={3}
-            style={{
-              width: "100%", padding: "11px 14px",
-              border: pkgError.description ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
-              borderRadius: 10, fontSize: 13, outline: "none",
-              background: "#f8fafc", resize: "none",
-              fontFamily: "inherit", boxSizing: "border-box"
-            }}
-          />
-          {pkgError.description && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.description}</div>}
-        </div>
-
-        {/* Package Type + Price in one row */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-          <div>
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Package Type *</label>
-            <div style={{ display: "flex", gap: 8 }}>
-              {["Free", "Paid"].map(type => (
-                <button
-                  key={type}
-                  onClick={() => setNpkg({ ...npkg, isFree: type === "Free", price: type === "Free" ? "0" : npkg.price })}
+              {/* Description */}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Description *</label>
+                <textarea
+                  value={npkg.description}
+                  onChange={e => setNpkg({ ...npkg, description: e.target.value })}
+                  placeholder="Describe what's included in this plan..."
+                  rows={3}
                   style={{
-                    flex: 1, padding: "10px",
-                    borderRadius: 10, fontSize: 13, fontWeight: 700,
-                    cursor: "pointer", fontFamily: "inherit",
-                    border: "1.5px solid",
-                    borderColor: (type === "Free" ? npkg.isFree : !npkg.isFree)
-                      ? "#7c3aed" : "#e2e8f0",
-                    background: (type === "Free" ? npkg.isFree : !npkg.isFree)
-                      ? "#f5f3ff" : "#f8fafc",
-                    color: (type === "Free" ? npkg.isFree : !npkg.isFree)
-                      ? "#7c3aed" : "#64748b",
-                    transition: "all 0.15s"
+                    width: "100%", padding: "11px 14px",
+                    border: pkgError.description ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                    borderRadius: 10, fontSize: 13, outline: "none",
+                    background: "#f8fafc", resize: "none",
+                    fontFamily: "inherit", boxSizing: "border-box"
+                  }}
+                />
+                {pkgError.description && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.description}</div>}
+              </div>
+
+              {/* Package Type + Price in one row */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Package Type *</label>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {["Free", "Paid"].map(type => (
+                      <button
+                        key={type}
+                        onClick={() => setNpkg({ ...npkg, isFree: type === "Free", price: type === "Free" ? "0" : npkg.price })}
+                        style={{
+                          flex: 1, padding: "10px",
+                          borderRadius: 10, fontSize: 13, fontWeight: 700,
+                          cursor: "pointer", fontFamily: "inherit",
+                          border: "1.5px solid",
+                          borderColor: (type === "Free" ? npkg.isFree : !npkg.isFree)
+                            ? "#7c3aed" : "#e2e8f0",
+                          background: (type === "Free" ? npkg.isFree : !npkg.isFree)
+                            ? "#f5f3ff" : "#f8fafc",
+                          color: (type === "Free" ? npkg.isFree : !npkg.isFree)
+                            ? "#7c3aed" : "#64748b",
+                          transition: "all 0.15s"
+                        }}
+                      >
+                        {type === "Free" ? "🎁 Free" : "💳 Paid"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>
+                    Price {!npkg.isFree && "*"}
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <span style={{
+                      position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+                      fontSize: 14, color: "#94a3b8", fontWeight: 600, pointerEvents: "none"
+                    }}>₹</span>
+                    <input
+                      type="text"
+                      value={npkg.isFree ? "0" : npkg.price}
+                      onChange={e => setNpkg({ ...npkg, price: e.target.value })}
+                      disabled={npkg.isFree}
+                      placeholder="999"
+                      style={{
+                        width: "100%", padding: "11px 14px 11px 28px",
+                        border: pkgError.price ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                        borderRadius: 10, fontSize: 13, outline: "none",
+                        background: npkg.isFree ? "#f1f5f9" : "#f8fafc",
+                        color: npkg.isFree ? "#94a3b8" : "#0f172a",
+                        boxSizing: "border-box", fontFamily: "inherit"
+                      }}
+                    />
+                  </div>
+                  {pkgError.price && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.price}</div>}
+                </div>
+              </div>
+
+              {/* Row: Days + Plan Duration */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Number of Days *</label>
+                  <input
+                    type="text"
+                    value={npkg.noOfDays}
+                    onChange={e => setNpkg({ ...npkg, noOfDays: e.target.value })}
+                    placeholder="e.g., 30, 90, 365"
+                    style={{
+                      width: "100%", padding: "11px 14px",
+                      border: pkgError.noOfDays ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                      borderRadius: 10, fontSize: 13, outline: "none",
+                      background: "#f8fafc", boxSizing: "border-box"
+                    }}
+                  />
+                  {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.noOfDays}</div>}
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Plan Duration</label>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {["Monthly Plan", "90 days", "Yearly Plan"].map(d => (
+                      <button key={d} onClick={() => setNpkg({ ...npkg, planDuration: d, noOfDays: d === "Monthly Plan" ? "30" : d === "90 days" ? "90" : "365" })} style={{
+                        padding: "8px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "1.5px solid",
+                        borderColor: npkg.planDuration === d ? "var(--app-accent)" : "#e2e8f0",
+                        background: npkg.planDuration === d ? "#f5f3ff" : "transparent",
+                        color: npkg.planDuration === d ? "var(--app-accent)" : "#64748b",
+                        transition: "0.2s", display: "flex", alignItems: "center", gap: 4
+                      }}>
+                        {npkg.planDuration === d && "✓"} {d}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row: Business Management */}
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Business Management</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {["Single business manage", "Multiple business manage"].map(b => (
+                    <button key={b} onClick={() => setNpkg({ ...npkg, businessLimit: b })} style={{
+                      flex: 1, padding: "10px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "1.5px solid",
+                      borderColor: npkg.businessLimit === b ? "var(--app-accent)" : "#e2e8f0",
+                      background: npkg.businessLimit === b ? "#f5f3ff" : "transparent",
+                      color: npkg.businessLimit === b ? "var(--app-accent)" : "#64748b",
+                      transition: "0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 6
+                    }}>
+                      {npkg.businessLimit === b && "✓"} {b}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row: Manager Limit */}
+              <div style={{ marginBottom: 15 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Manager Limit (Type Number)</label>
+                <input
+                  type="text"
+                  value={npkg.managerLimit}
+                  onChange={e => setNpkg({ ...npkg, managerLimit: e.target.value })}
+                  placeholder="e.g. 5 Manager or Unlimited Manager"
+                  style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
+                />
+              </div>
+
+              {/* Row: Company Name (Client) Limit */}
+              <div style={{ marginBottom: 15 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Company Name Limit (Clients)</label>
+                <input
+                  type="text"
+                  value={npkg.clientLimit}
+                  onChange={e => setNpkg({ ...npkg, clientLimit: e.target.value })}
+                  placeholder="e.g. 10 Company manage or Unlimited"
+                  style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
+                />
+              </div>
+
+              {/* Row: Employee Limit */}
+              <div style={{ marginBottom: 15 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Employee Limit</label>
+                <input
+                  type="text"
+                  value={npkg.employeeLimit}
+                  onChange={e => setNpkg({ ...npkg, employeeLimit: e.target.value })}
+                  placeholder="e.g. 50 Employee manage or Unlimited"
+                  style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
+                />
+              </div>
+
+              {/* Assign to Subadmins */}
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>
+                  Assign to Subadmins
+                  <span style={{ fontSize: 10, fontWeight: 400, color: "#94a3b8", marginLeft: 6, textTransform: "none" }}></span>
+                </label>
+                <select
+                  multiple
+                  value={npkg.assignedSubadmins || []}
+                  onChange={e => {
+                    const selected = Array.from(e.target.selectedOptions, opt => opt.value);
+                    setNpkg({ ...npkg, assignedSubadmins: selected });
+                  }}
+                  style={{
+                    width: "100%", padding: "8px",
+                    border: "1.5px solid #e2e8f0",
+                    borderRadius: 10, fontSize: 13, outline: "none",
+                    background: "#f8fafc", cursor: "pointer",
+                    minHeight: 100, boxSizing: "border-box",
+                    fontFamily: "inherit"
                   }}
                 >
-                  {type === "Free" ? "🎁 Free" : "💳 Paid"}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>
-              Price {!npkg.isFree && "*"}
-            </label>
-            <div style={{ position: "relative" }}>
-              <span style={{
-                position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
-                fontSize: 14, color: "#94a3b8", fontWeight: 600, pointerEvents: "none"
-              }}>₹</span>
-              <input
-                type="text"
-                value={npkg.isFree ? "0" : npkg.price}
-                onChange={e => setNpkg({ ...npkg, price: e.target.value })}
-                disabled={npkg.isFree}
-                placeholder="999"
-                style={{
-                  width: "100%", padding: "11px 14px 11px 28px",
-                  border: pkgError.price ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
-                  borderRadius: 10, fontSize: 13, outline: "none",
-                  background: npkg.isFree ? "#f1f5f9" : "#f8fafc",
-                  color: npkg.isFree ? "#94a3b8" : "#0f172a",
-                  boxSizing: "border-box", fontFamily: "inherit"
-                }}
-              />
-            </div>
-            {pkgError.price && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.price}</div>}
-          </div>
-        </div>
-
-        {/* Days + Plan Duration */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-          <div>
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Number of Days *</label>
-            <input
-              type="text"
-              value={npkg.noOfDays}
-              onChange={e => setNpkg({ ...npkg, noOfDays: e.target.value })}
-              placeholder="e.g., 30, 90, 365"
-              style={{
-                width: "100%", padding: "11px 14px",
-                border: pkgError.noOfDays ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
-                borderRadius: 10, fontSize: 13, outline: "none",
-                background: "#f8fafc", boxSizing: "border-box"
-              }}
-            />
-            {pkgError.noOfDays && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {pkgError.noOfDays}</div>}
-          </div>
-          <div>
-            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>Plan Duration</label>
-            <select
-              value={npkg.planDuration}
-              onChange={e => setNpkg({ ...npkg, planDuration: e.target.value })}
-              style={{
-                width: "100%", padding: "11px 14px",
-                border: "1.5px solid #e2e8f0",
-                borderRadius: 10, fontSize: 13, outline: "none",
-                background: "#f8fafc", cursor: "pointer",
-                boxSizing: "border-box", fontFamily: "inherit"
-              }}
-            >
-              <option value="Monthly">Monthly</option>
-              <option value="90 Days">90 Days</option>
-              <option value="Yearly">Yearly</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Assign to Subadmins */}
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 6, textTransform: "uppercase" }}>
-            Assign to Subadmins
-            <span style={{ fontSize: 10, fontWeight: 400, color: "#94a3b8", marginLeft: 6, textTransform: "none" }}></span>
-          </label>
-          <select
-            multiple
-            value={npkg.assignedSubadmins || []}
-            onChange={e => {
-              const selected = Array.from(e.target.selectedOptions, opt => opt.value);
-              setNpkg({ ...npkg, assignedSubadmins: selected });
-            }}
-            style={{
-              width: "100%", padding: "8px",
-              border: "1.5px solid #e2e8f0",
-              borderRadius: 10, fontSize: 13, outline: "none",
-              background: "#f8fafc", cursor: "pointer",
-              minHeight: 100, boxSizing: "border-box",
-              fontFamily: "inherit"
-            }}
-          >
-            {subadmins.map(sub => (
-              <option key={sub._id} value={sub._id}
-                style={{ padding: "6px 10px", borderRadius: 6 }}>
-                {sub.name} ({sub.email})
-              </option>
-            ))}
-          </select>
-          {/* {(npkg.assignedSubadmins?.length || 0) > 0 && (
+                  {subadmins.map(sub => (
+                    <option key={sub._id} value={sub._id}
+                      style={{ padding: "6px 10px", borderRadius: 6 }}>
+                      {sub.name} ({sub.email})
+                    </option>
+                  ))}
+                </select>
+                {/* {(npkg.assignedSubadmins?.length || 0) > 0 && (
             <div style={{ fontSize: 11, color: "#7c3aed", marginTop: 4, fontWeight: 600 }}>
               ✓ {npkg.assignedSubadmins.length} subadmin(s) selected
             </div>
           )} */}
-        </div>
+              </div>
 
-        {/* Action Buttons */}
-        <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={() => setModal(null)}
-            style={{
-              flex: 1, padding: "12px",
-              background: "#f8fafc",
-              border: "1.5px solid #e2e8f0",
-              borderRadius: 10, fontSize: 13, fontWeight: 600,
-              color: "#64748b", cursor: "pointer", fontFamily: "inherit"
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={createPackage}
-            disabled={pkgSaveLoading}
-            style={{
-              flex: 2, padding: "12px",
-              background: pkgSaveLoading
-                ? "#a78bfa"
-                : "linear-gradient(135deg, #7c3aed, #6d28d9)",
-              border: "none", borderRadius: 10,
-              fontSize: 13, fontWeight: 700,
-              color: "#fff", cursor: pkgSaveLoading ? "not-allowed" : "pointer",
-              fontFamily: "inherit",
-              boxShadow: "0 4px 14px rgba(124,58,237,0.35)",
-              transition: "all 0.2s"
-            }}
-          >
-            {pkgSaveLoading ? "Creating..." : "✨ Create Package"}
-          </button>
+              {/* Action Buttons */}
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={() => setModal(null)}
+                  style={{
+                    flex: 1, padding: "12px",
+                    background: "#f8fafc",
+                    border: "1.5px solid #e2e8f0",
+                    borderRadius: 10, fontSize: 13, fontWeight: 600,
+                    color: "#64748b", cursor: "pointer", fontFamily: "inherit"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={createPackage}
+                  disabled={pkgSaveLoading}
+                  style={{
+                    flex: 2, padding: "12px",
+                    background: pkgSaveLoading
+                      ? "#a78bfa"
+                      : "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                    border: "none", borderRadius: 10,
+                    fontSize: 13, fontWeight: 700,
+                    color: "#fff", cursor: pkgSaveLoading ? "not-allowed" : "pointer",
+                    fontFamily: "inherit",
+                    boxShadow: "0 4px 14px rgba(124,58,237,0.35)",
+                    transition: "all 0.2s"
+                  }}
+                >
+                  {pkgSaveLoading ? "Creating..." : "✨ Create Package"}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }
@@ -661,7 +742,12 @@ function SubadminsList({ subadmins, refresh, packages }) {
         packageTitle: pkg.title,
         planPrice: pkg.price,
         billingCycle,
-        durationDays
+        durationDays,
+        clientLimit: pkg.clientLimit,
+        employeeLimit: pkg.employeeLimit,
+        managerLimit: pkg.managerLimit,
+        businessLimit: pkg.businessLimit,
+        features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n")
       });
       alert(`Package "${pkg.title}" assigned to ${selectedSubadmin.name} successfully!`);
       setAssignModalOpen(false);
@@ -1408,6 +1494,8 @@ function PackagesPage({ packages }) {
               >
                 {p.buttonName || "Get it now"}
               </button>
+
+             
 
               {/* Duration badge */}
               <div style={{

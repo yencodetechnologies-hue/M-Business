@@ -150,7 +150,11 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   );
 }
 
-export default function AccountsPage({ initialTab = "overview" }) {
+export default function AccountsPage({ 
+  initialTab = "overview", 
+  income, setIncome, fetchIncome, 
+  expenses, setExpenses, fetchExpenses 
+}) {
   const [activeTab, setActiveTab] = useState(initialTab);
 
   useEffect(() => {
@@ -187,37 +191,40 @@ export default function AccountsPage({ initialTab = "overview" }) {
       </div>
 
       <div style={{ padding: "0 4px" }}>
-        {activeTab === "overview" && <FinancialOverview />}
-        {activeTab === "income" && <IncomePage />}
-        {activeTab === "expenses" && <ExpensesPage />}
+        {activeTab === "overview" && (
+          <FinancialOverview 
+            income={income} 
+            expenses={expenses} 
+            fetchIncome={fetchIncome} 
+            fetchExpenses={fetchExpenses} 
+          />
+        )}
+        {activeTab === "income" && (
+          <IncomePage 
+            income={income} 
+            setIncome={setIncome} 
+            fetchIncome={fetchIncome} 
+          />
+        )}
+        {activeTab === "expenses" && (
+          <ExpensesPage 
+            expenses={expenses} 
+            setExpenses={setExpenses} 
+            fetchExpenses={fetchExpenses} 
+          />
+        )}
       </div>
     </div>
   );
 }
 
 // ── Financial Overview ──────────────────────────────────────────
-function FinancialOverview() {
-  const [income, setIncome] = useState([]);
-  const [expenses, setExpenses] = useState([]);
-  const [loading, setLoading] = useState(true);
+function FinancialOverview({ income = [], expenses = [], fetchIncome, fetchExpenses }) {
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [incRes, expRes] = await Promise.all([
-          axios.get(INCOME_API),
-          axios.get(EXPENSES_API)
-        ]);
-        setIncome(incRes.data || []);
-        setExpenses(expRes.data || []);
-      } catch (err) {
-        console.error("Failed to fetch financial data", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    if (fetchIncome) fetchIncome();
+    if (fetchExpenses) fetchExpenses();
   }, []);
 
   const totalIncome = income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
@@ -638,8 +645,7 @@ function ExpBadge({ label, colorMap }) {
   );
 }
 
-export function ExpensesPage() {
-  const [expenses,     setExpenses]     = useState([]);
+export function ExpensesPage({ expenses = [], setExpenses, fetchExpenses }) {
   const [loading,      setLoading]      = useState(false);
   const [search,       setSearch]       = useState("");
   const [catFilter,    setCatFilter]    = useState("All");
@@ -651,11 +657,13 @@ export function ExpensesPage() {
   const [saving,       setSaving]       = useState(false);
   const [toast,        setToast]        = useState("");
 
-  useEffect(() => { fetchExpenses(); }, []);
+  useEffect(() => { 
+    if (fetchExpenses) fetchExpenses(); 
+  }, []);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
-  const fetchExpenses = async () => {
+  const loadExpenses  = async () => {
     try {
       setLoading(true);
       const res = await axios.get(EXPENSES_API);
@@ -689,12 +697,14 @@ const save = async () => {
     setSaving(true);
     if (modal === "add") {
       const res = await axios.post(EXPENSES_API, payload);
-      setExpenses(prev => [res.data, ...prev]);
+      if (setExpenses) setExpenses(prev => [res.data, ...prev]);
+      if (fetchExpenses) fetchExpenses();
     } else {
       const res = await axios.put(`${EXPENSES_API}/${editId}`, payload);
-      setExpenses(prev => prev.map(a => (a._id||a.id)===editId ? res.data : a));
+      if (setExpenses) setExpenses(prev => prev.map(a => (a._id||a.id)===editId ? res.data : a));
+      if (fetchExpenses) fetchExpenses();
     }
-    showToast(modal==="add" ? "✅ Account added!" : "✅ Account updated!");
+    showToast(modal==="add" ? "✅ Expense added!" : "✅ Expense updated!");
     setModal(null);
   } catch (e) {
     setErr({ _general: e?.response?.data?.msg || "Failed to save" });
@@ -702,9 +712,13 @@ const save = async () => {
 };
   const del = async (id) => {
     if (!window.confirm("Delete this expense?")) return;
-    try { await axios.delete(`${EXPENSES_API}/${id}`); } catch {}
-    setExpenses(prev => prev.filter(e => (e._id||e.id) !== id));
-    showToast("🗑️ Deleted!");
+    try { 
+      await axios.delete(`${EXPENSES_API}/${id}`); 
+      if (fetchExpenses) fetchExpenses();
+      showToast("🗑️ Deleted!");
+    } catch {
+      showToast("❌ Delete failed");
+    }
   };
 
   const totalAmount    = expenses.reduce((s,e) => s + (Number(e.amount)||0), 0);
@@ -1004,8 +1018,7 @@ const INC_CAT_COLOR = {
 };
 const INC_STATUS_COLOR = { Received:"#22C55E", Pending:"#f59e0b", Cancelled:"#EF4444" };
 
-export function IncomePage() {
-  const [income,       setIncome]       = useState([]);
+export function IncomePage({ income = [], setIncome, fetchIncome }) {
   const [clients,      setClients]      = useState([]);
   const [loading,      setLoading]      = useState(false);
   const [search,       setSearch]       = useState("");
@@ -1019,7 +1032,7 @@ export function IncomePage() {
   const [toast,        setToast]        = useState("");
 
   useEffect(() => { 
-    fetchIncome(); 
+    if (fetchIncome) fetchIncome(); 
     fetchClients();
   }, []);
 
@@ -1031,15 +1044,6 @@ export function IncomePage() {
   };
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
-
-  const fetchIncome = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(INCOME_API);
-      setIncome(res.data);
-    } catch { setIncome([]); }
-    finally { setLoading(false); }
-  };
 
   const openAdd = () => { setForm(INC_EMPTY); setErr({}); setEditId(null); setModal("add"); };
   const openEdit = (i) => {
@@ -1083,9 +1087,13 @@ export function IncomePage() {
 
   const del = async (id) => {
     if (!window.confirm("Delete this entry?")) return;
-    try { await axios.delete(`${INCOME_API}/${id}`); } catch {}
-    setIncome(prev => prev.filter(i => (i._id||i.id) !== id));
-    showToast("🗑️ Deleted!");
+    try { 
+      await axios.delete(`${INCOME_API}/${id}`); 
+      if (fetchIncome) fetchIncome();
+      showToast("🗑️ Deleted!");
+    } catch {
+      showToast("❌ Delete failed");
+    }
   };
 
   const totalIncome = income.reduce((s,i) => s + (Number(i.amount)||0), 0);

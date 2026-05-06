@@ -2682,7 +2682,7 @@ useEffect(() => {
   const [showSubPass, setShowSubPass] = useState(false);
 
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
   const [pkgError, setPkgError] = useState({});
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
 
@@ -2869,8 +2869,8 @@ const handleEditPackage = (pkg) => {
       price: pkg.price || "",
       noOfDays: pkg.no_of_days || pkg.noOfDays || "",
       planDuration: pkg.planDuration || "Monthly",
-      businessLimit: pkg.businessLimit || "Single business manage",
-      managerLimit: pkg.managerLimit || "1 Manager",
+      businessLimit: pkg.businessLimit || "",
+      managerLimit: pkg.managerLimit || "",
       clientLimit: pkg.clientLimit || "3 Client manage",
       status: pkg.status || "Active"
     });
@@ -3058,8 +3058,8 @@ const handleEditPackage = (pkg) => {
         buttonName: npkg.buttonName || "Get Started",
         features: npkg.features ? npkg.features.split(',').map(f => f.trim()).filter(f => f) : [],
         planDuration: npkg.planDuration || "Monthly",
-        businessLimit: npkg.businessLimit || "Single business manage",
-        managerLimit: npkg.managerLimit || "1 Manager",
+        businessLimit: npkg.businessLimit || "",
+        managerLimit: npkg.managerLimit || "",
         clientLimit: npkg.clientLimit || "3 Client manage",
         status: "Active",
         targetRole: "subadmin",
@@ -3068,7 +3068,7 @@ const handleEditPackage = (pkg) => {
       
       const res = await axios.post(BASE_URL + "/api/packages", packageData);
       setPackages(prev => [...prev, res.data]);
-      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "Single business manage", managerLimit: "1 Manager", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
+      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
       setPkgError({});
       setModal(null);
       toast.success("✅ Package added!");
@@ -4128,8 +4128,8 @@ const handleEditPackage = (pkg) => {
             <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
             <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `₹${viewPackage.price || 0}`} />
             <InfoRow icon="🗓️" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
-            <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || "Single business manage"} />
-            <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || "1 Manager"} />
+            <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
+            <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
             <InfoRow icon="👥" label="Client" value={viewPackage.clientLimit || "3 Client manage"} />
             <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
 
@@ -4168,8 +4168,8 @@ const handleEditPackage = (pkg) => {
             <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PACKAGE LIMITS</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
               <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
-              <Fld label="Business Limit" value={editPkgForm.businessLimit} onChange={v => setEditPkgForm({ ...editPkgForm, businessLimit: v })} options={["Single business manage", "Multiple business manage", "Unlimited business manage"]} />
-              <Fld label="Manager Limit" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} options={["1 Manager", "2 Managers", "3 Managers", "5 Managers", "Unlimited Managers"]} />
+              <Fld label="Business Limit" value={editPkgForm.businessLimit} onChange={v => setEditPkgForm({ ...editPkgForm, businessLimit: v })} options={["", "Multiple business manage", "Unlimited business manage"]} />
+              <Fld label="Manager Limit" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} options={["", "2 Managers", "3 Managers", "5 Managers", "Unlimited Managers"]} />
               <Fld label="Client Limit" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} options={["3 Client manage", "5 Client manage", "10 Client manage", "Unlimited Client manage"]} />
             </div>
           </div>

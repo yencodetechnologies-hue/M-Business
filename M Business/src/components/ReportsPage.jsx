@@ -175,44 +175,49 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
   const [selectedReport, setSelectedReport] = useState(null);
 
   // ── summary stats (top row) ─────────────────────────────
-  const totalRevStr = reports.find(r=>r.type==="Project Summary")?.revenue || "₹0";
-  const totalProj   = reports.find(r=>r.type==="Project Summary")?.total   || 0;
-  const totalDone   = reports.find(r=>r.type==="Project Summary")?.done    || 0;
-  const totalPending= reports.find(r=>r.type==="Project Summary")?.pending || 0;
+  const totalIncomeVal = income.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+  const totalExpenseVal = expenses.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+  const fmtCur = (n, sym = "₹") => n >= 100000 ? `${sym}${(n / 100000).toFixed(2)}L` : `${sym}${n.toLocaleString("en-IN")}`;
+  
+  const totalRevStr = fmtCur(totalIncomeVal);
+  const totalExpStr = fmtCur(totalExpenseVal);
+  const totalProj   = projects.length;
+  const totalDone   = projects.filter(p => p.status === "Completed").length;
+  const totalPending = projects.length - totalDone;
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
       {/* ── Top toolbar ── */}
-      <div style={{ display:"flex", justifyContent:"space-between",
-        alignItems:"center", flexWrap:"wrap", gap:10 }}>
+      <div style={{ display: "flex", justifyContent: "space-between",
+        alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div>
-          <h2 style={{ margin:0, fontSize:22, fontWeight:800, color:"var(--app-text)" }}>Reports & Analytics</h2>
-          <p style={{ margin:0, fontSize:13, color:"var(--app-muted)" }}>
+          <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "var(--app-text)" }}>Reports & Analytics</h2>
+          <p style={{ margin: 0, fontSize: 13, color: "var(--app-muted)" }}>
             📊 Auto-generated from live database · {" "}
             {lastSync && (
-              <span style={{ fontSize:11 }}>
+              <span style={{ fontSize: 11 }}>
                 Last synced: {lastSync.toLocaleTimeString()}
               </span>
             )}
           </p>
         </div>
         <button onClick={fetchReports} disabled={loading}
-          style={{ background:"var(--app-accent-gradient)", color:"#fff",
-            border:"none", borderRadius:10, padding:"8px 18px", fontWeight:700,
-            fontSize:13, cursor:"pointer", fontFamily:"inherit",
-            opacity:loading?0.7:1, display:"flex", alignItems:"center", gap:6 }}>
+          style={{ background: "var(--app-accent-gradient)", color: "#fff",
+            border: "none", borderRadius: 10, padding: "8px 18px", fontWeight: 700,
+            fontSize: 13, cursor: "pointer", fontFamily: "inherit",
+            opacity: loading ? 0.7 : 1, display: "flex", alignItems: "center", gap: 6 }}>
           {loading ? "⏳ Loading…" : "🔄 Refresh Reports"}
         </button>
       </div>
 
       {/* ── Summary stat row ── */}
       <div className="dash-stats"
-        style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:12 }}>
-        <StatCard icon="💰" label="Total Revenue"  value={totalRevStr}      color="var(--app-accent)" />
+        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
+        <StatCard icon="💰" label="Total Income"   value={totalRevStr}      color="var(--app-accent)" />
+        <StatCard icon="💸" label="Total Expenses" value={totalExpStr}      color="#f43f5e" />
         <StatCard icon="📁" label="Total Projects" value={totalProj}        color="var(--app-accent)" sub={`${totalDone} completed`} />
         <StatCard icon="✅" label="Completed"      value={totalDone}        color="#22C55E" />
-        <StatCard icon="⏳" label="In Progress"    value={totalPending}     color="#f59e0b" />
       </div>
 
       {/* ── Report cards ── */}

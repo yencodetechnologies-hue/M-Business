@@ -62,7 +62,7 @@ const PLANS = [
   },
   {
     name: "Starter", price: 999, icon: "🌱", color: "#6366f1",
-    features: ["5 Projects", "10 Invoices", "Basic Reports", "Email Support", "1 Manager"],
+    features: ["5 Projects", "10 Invoices", "Basic Reports", "Email Support", ""],
     btnLabel: "Get Started"
   },
   {
@@ -141,7 +141,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
   const handlePrint = (type = "invoice") => {
     if (!viewInvoice) return;
-    
+
     const printWindow = window.open('', '_blank');
     const content = `
       <html>
@@ -395,322 +395,322 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
   }
 
   // ── No Subscription → Show Plans ─────────────────────────────────────────────
- if (!subscription) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 28, padding: "4px 0" }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
+  if (!subscription) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 28, padding: "4px 0" }}>
+        {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
 
-      {/* Full dark wrapper */}
-      <div style={{
-        background: "linear-gradient(135deg, #0a0a0f 0%, #0d1117 50%, #0a0f0a 100%)",
-        borderRadius: 24,
-        padding: "60px 40px 64px",
-        position: "relative",
-        overflow: "hidden",
-        minHeight: 500
-      }}>
-        {/* Background glow */}
+        {/* Full dark wrapper */}
         <div style={{
-          position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-          width: 800, height: 320,
-          background: "radial-gradient(ellipse, rgba(0,255,180,0.05) 0%, transparent 70%)",
-          pointerEvents: "none"
-        }} />
-
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 56, position: "relative", zIndex: 1 }}>
-          <h2 style={{
-            fontSize: 42, fontWeight: 800, color: "#ffffff",
-            margin: "0 0 14px", letterSpacing: "-1.5px", lineHeight: 1.1
-          }}>
-            Choose your Plan
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 15, margin: 0 }}>
-            Discover the perfect plan tailored just for you.
-          </p>
-        </div>
-
-        {/* Plans Grid */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${Math.min(PLANS.length, 4)}, 1fr)`,
-          gap: 18,
-          maxWidth: 1100,
-          margin: "0 auto",
+          background: "linear-gradient(135deg, #0a0a0f 0%, #0d1117 50%, #0a0f0a 100%)",
+          borderRadius: 24,
+          padding: "60px 40px 64px",
           position: "relative",
-          zIndex: 1
+          overflow: "hidden",
+          minHeight: 500
         }}>
-          {PLANS.map((plan) => {
-            const isProcessing = payLoading === plan.name;
-            const isPro = plan.popular;
-            const isTrial = plan.isTrial;
+          {/* Background glow */}
+          <div style={{
+            position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+            width: 800, height: 320,
+            background: "radial-gradient(ellipse, rgba(0,255,180,0.05) 0%, transparent 70%)",
+            pointerEvents: "none"
+          }} />
 
-            return (
-              <div
-                key={plan.name}
-                style={{
-                  background: isPro
-                    ? "linear-gradient(160deg, #0d2a22 0%, #0a1f1a 60%, #081a15 100%)"
-                    : "linear-gradient(160deg, #141418 0%, #111115 100%)",
-                  border: isPro
-                    ? "1.5px solid rgba(0,220,150,0.3)"
-                    : "1.5px solid rgba(255,255,255,0.07)",
-                  borderRadius: 20,
-                  padding: "32px 24px",
-                  position: "relative",
-                  overflow: "hidden",
-                  boxShadow: isPro
-                    ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
-                    : "0 20px 40px rgba(0,0,0,0.35)",
-                  transition: "transform 0.22s, box-shadow 0.22s",
-                  display: "flex", flexDirection: "column"
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = "translateY(-6px)";
-                  e.currentTarget.style.boxShadow = isPro
-                    ? "0 0 80px rgba(0,200,130,0.18), 0 30px 60px rgba(0,0,0,0.6)"
-                    : "0 28px 56px rgba(0,0,0,0.5)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = isPro
-                    ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
-                    : "0 20px 40px rgba(0,0,0,0.35)";
-                }}
-              >
-                {/* Pro glow orb */}
-                {isPro && (
-                  <div style={{
-                    position: "absolute", top: -60, left: "50%", transform: "translateX(-50%)",
-                    width: 240, height: 240,
-                    background: "radial-gradient(ellipse, rgba(0,220,150,0.13) 0%, transparent 70%)",
-                    pointerEvents: "none"
-                  }} />
-                )}
+          {/* Header */}
+          <div style={{ textAlign: "center", marginBottom: 56, position: "relative", zIndex: 1 }}>
+            <h2 style={{
+              fontSize: 42, fontWeight: 800, color: "#ffffff",
+              margin: "0 0 14px", letterSpacing: "-1.5px", lineHeight: 1.1
+            }}>
+              Choose your Plan
+            </h2>
+            <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 15, margin: 0 }}>
+              Discover the perfect plan tailored just for you.
+            </p>
+          </div>
 
-                {/* MOST POPULAR badge */}
-                {isPro && (
-                  <div style={{
-                    position: "absolute", top: 16, right: 16,
-                    background: "rgba(0,220,150,0.12)",
-                    border: "1px solid rgba(0,220,150,0.35)",
-                    borderRadius: 100, padding: "3px 10px",
-                    fontSize: 9, fontWeight: 800,
-                    color: "#00dc96", letterSpacing: 1.2,
-                    textTransform: "uppercase"
-                  }}>MOST POPULAR</div>
-                )}
+          {/* Plans Grid */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${Math.min(PLANS.length, 4)}, 1fr)`,
+            gap: 18,
+            maxWidth: 1100,
+            margin: "0 auto",
+            position: "relative",
+            zIndex: 1
+          }}>
+            {PLANS.map((plan) => {
+              const isProcessing = payLoading === plan.name;
+              const isPro = plan.popular;
+              const isTrial = plan.isTrial;
 
-                {/* Icon */}
-                <div style={{ fontSize: 34, marginBottom: 18 }}>{plan.icon}</div>
-
-                {/* Plan name */}
-                <div style={{
-                  fontSize: 18, fontWeight: 800, color: "#fff",
-                  marginBottom: 4
-                }}>{plan.name}</div>
-
-                {/* Billed label */}
-                <div style={{
-                  fontSize: 11, color: "rgba(255,255,255,0.32)",
-                  marginBottom: 20, fontWeight: 500
-                }}>Billed monthly</div>
-
-                {/* Price */}
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
-                  <span style={{
-                    fontSize: 40, fontWeight: 800, color: "#fff",
-                    lineHeight: 1, letterSpacing: "-2px"
-                  }}>
-                    {plan.price === null ? "Custom"
-                      : plan.price === 0 ? "$0"
-                      : `₹${plan.price.toLocaleString("en-IN")}`}
-                  </span>
-                  {plan.price !== null && (
-                    <span style={{
-                      fontSize: 13, color: "rgba(255,255,255,0.38)",
-                      marginBottom: 5, fontWeight: 400
-                    }}>/ month</span>
-                  )}
-                </div>
-
-                {/* Description */}
-                <div style={{
-                  fontSize: 12, color: "rgba(255,255,255,0.25)",
-                  marginBottom: 20, minHeight: 14, lineHeight: 1.5
-                }}>
-                  {isTrial ? "Ideal for individual users."
-                    : plan.name === "Starter" ? "Ideal for small teams."
-                    : plan.name === "Professional" ? "Best for growing businesses."
-                    : "Best choice for Enterprises."}
-                </div>
-
-                {/* Divider */}
-                <div style={{
-                  height: 1,
-                  background: isPro ? "rgba(0,220,150,0.13)" : "rgba(255,255,255,0.06)",
-                  marginBottom: 20
-                }} />
-
-                {/* Features */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 24 }}>
-                  {plan.features.map((f, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
-                      <div style={{
-                        width: 16, height: 16, borderRadius: "50%", flexShrink: 0, marginTop: 1,
-                        background: isPro ? "rgba(0,220,150,0.12)" : "rgba(255,255,255,0.07)",
-                        border: isPro ? "1px solid rgba(0,220,150,0.35)" : "1px solid rgba(255,255,255,0.12)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 7, color: isPro ? "#00dc96" : "rgba(255,255,255,0.45)"
-                      }}>✓</div>
-                      <span style={{
-                        fontSize: 12, color: "rgba(255,255,255,0.55)",
-                        fontWeight: 400, lineHeight: 1.5
-                      }}>{f}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* CTA Button */}
-                <button
-                  onClick={() => startRazorpayPayment(plan)}
-                  disabled={!!payLoading}
+              return (
+                <div
+                  key={plan.name}
                   style={{
-                    width: "100%", padding: "13px",
-                    borderRadius: 11, fontSize: 14, fontWeight: 700,
-                    cursor: payLoading ? "wait" : "pointer",
-                    transition: "all 0.2s", fontFamily: "inherit",
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                    ...(isProcessing ? {
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1.5px solid rgba(255,255,255,0.1)",
-                      color: "rgba(255,255,255,0.4)"
-                    } : isPro ? {
-                      background: "linear-gradient(135deg, #00dc96, #00b87a)",
-                      border: "none", color: "#000",
-                      boxShadow: "0 6px 22px rgba(0,220,150,0.32)"
-                    } : isTrial ? {
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1.5px solid rgba(255,255,255,0.18)",
-                      color: "#fff"
-                    } : {
-                      background: "transparent",
-                      border: "1.5px solid rgba(255,255,255,0.14)",
-                      color: "rgba(255,255,255,0.7)"
-                    })
+                    background: isPro
+                      ? "linear-gradient(160deg, #0d2a22 0%, #0a1f1a 60%, #081a15 100%)"
+                      : "linear-gradient(160deg, #141418 0%, #111115 100%)",
+                    border: isPro
+                      ? "1.5px solid rgba(0,220,150,0.3)"
+                      : "1.5px solid rgba(255,255,255,0.07)",
+                    borderRadius: 20,
+                    padding: "32px 24px",
+                    position: "relative",
+                    overflow: "hidden",
+                    boxShadow: isPro
+                      ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
+                      : "0 20px 40px rgba(0,0,0,0.35)",
+                    transition: "transform 0.22s, box-shadow 0.22s",
+                    display: "flex", flexDirection: "column"
                   }}
                   onMouseEnter={e => {
-                    if (isProcessing) return;
-                    if (isPro) {
-                      e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,220,150,0.48)";
-                      e.currentTarget.style.transform = "translateY(-1px)";
-                    } else {
-                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)";
-                      e.currentTarget.style.color = "#fff";
-                    }
+                    e.currentTarget.style.transform = "translateY(-6px)";
+                    e.currentTarget.style.boxShadow = isPro
+                      ? "0 0 80px rgba(0,200,130,0.18), 0 30px 60px rgba(0,0,0,0.6)"
+                      : "0 28px 56px rgba(0,0,0,0.5)";
                   }}
                   onMouseLeave={e => {
-                    if (isProcessing) return;
-                    if (isPro) {
-                      e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,220,150,0.32)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    } else {
-                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
-                      e.currentTarget.style.color = isTrial ? "#fff" : "rgba(255,255,255,0.7)";
-                    }
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = isPro
+                      ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)"
+                      : "0 20px 40px rgba(0,0,0,0.35)";
                   }}
                 >
-                  {isProcessing ? (
-                    <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid rgba(255,255,255,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing...</>
-                  ) : plan.price === null ? "📞 Contact Sales"
-                    : isTrial ? "🎁 Get it now"
-                    : "Get it now"}
-                </button>
-              </div>
-            );
-          })}
+                  {/* Pro glow orb */}
+                  {isPro && (
+                    <div style={{
+                      position: "absolute", top: -60, left: "50%", transform: "translateX(-50%)",
+                      width: 240, height: 240,
+                      background: "radial-gradient(ellipse, rgba(0,220,150,0.13) 0%, transparent 70%)",
+                      pointerEvents: "none"
+                    }} />
+                  )}
+
+                  {/* MOST POPULAR badge */}
+                  {isPro && (
+                    <div style={{
+                      position: "absolute", top: 16, right: 16,
+                      background: "rgba(0,220,150,0.12)",
+                      border: "1px solid rgba(0,220,150,0.35)",
+                      borderRadius: 100, padding: "3px 10px",
+                      fontSize: 9, fontWeight: 800,
+                      color: "#00dc96", letterSpacing: 1.2,
+                      textTransform: "uppercase"
+                    }}>MOST POPULAR</div>
+                  )}
+
+                  {/* Icon */}
+                  <div style={{ fontSize: 34, marginBottom: 18 }}>{plan.icon}</div>
+
+                  {/* Plan name */}
+                  <div style={{
+                    fontSize: 18, fontWeight: 800, color: "#fff",
+                    marginBottom: 4
+                  }}>{plan.name}</div>
+
+                  {/* Billed label */}
+                  <div style={{
+                    fontSize: 11, color: "rgba(255,255,255,0.32)",
+                    marginBottom: 20, fontWeight: 500
+                  }}>Billed monthly</div>
+
+                  {/* Price */}
+                  <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
+                    <span style={{
+                      fontSize: 40, fontWeight: 800, color: "#fff",
+                      lineHeight: 1, letterSpacing: "-2px"
+                    }}>
+                      {plan.price === null ? "Custom"
+                        : plan.price === 0 ? "$0"
+                          : `₹${plan.price.toLocaleString("en-IN")}`}
+                    </span>
+                    {plan.price !== null && (
+                      <span style={{
+                        fontSize: 13, color: "rgba(255,255,255,0.38)",
+                        marginBottom: 5, fontWeight: 400
+                      }}>/ month</span>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  <div style={{
+                    fontSize: 12, color: "rgba(255,255,255,0.25)",
+                    marginBottom: 20, minHeight: 14, lineHeight: 1.5
+                  }}>
+                    {isTrial ? "Ideal for individual users."
+                      : plan.name === "Starter" ? "Ideal for small teams."
+                        : plan.name === "Professional" ? "Best for growing businesses."
+                          : "Best choice for Enterprises."}
+                  </div>
+
+                  {/* Divider */}
+                  <div style={{
+                    height: 1,
+                    background: isPro ? "rgba(0,220,150,0.13)" : "rgba(255,255,255,0.06)",
+                    marginBottom: 20
+                  }} />
+
+                  {/* Features */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 24 }}>
+                    {plan.features.map((f, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+                        <div style={{
+                          width: 16, height: 16, borderRadius: "50%", flexShrink: 0, marginTop: 1,
+                          background: isPro ? "rgba(0,220,150,0.12)" : "rgba(255,255,255,0.07)",
+                          border: isPro ? "1px solid rgba(0,220,150,0.35)" : "1px solid rgba(255,255,255,0.12)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 7, color: isPro ? "#00dc96" : "rgba(255,255,255,0.45)"
+                        }}>✓</div>
+                        <span style={{
+                          fontSize: 12, color: "rgba(255,255,255,0.55)",
+                          fontWeight: 400, lineHeight: 1.5
+                        }}>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <button
+                    onClick={() => startRazorpayPayment(plan)}
+                    disabled={!!payLoading}
+                    style={{
+                      width: "100%", padding: "13px",
+                      borderRadius: 11, fontSize: 14, fontWeight: 700,
+                      cursor: payLoading ? "wait" : "pointer",
+                      transition: "all 0.2s", fontFamily: "inherit",
+                      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                      ...(isProcessing ? {
+                        background: "rgba(255,255,255,0.08)",
+                        border: "1.5px solid rgba(255,255,255,0.1)",
+                        color: "rgba(255,255,255,0.4)"
+                      } : isPro ? {
+                        background: "linear-gradient(135deg, #00dc96, #00b87a)",
+                        border: "none", color: "#000",
+                        boxShadow: "0 6px 22px rgba(0,220,150,0.32)"
+                      } : isTrial ? {
+                        background: "rgba(255,255,255,0.08)",
+                        border: "1.5px solid rgba(255,255,255,0.18)",
+                        color: "#fff"
+                      } : {
+                        background: "transparent",
+                        border: "1.5px solid rgba(255,255,255,0.14)",
+                        color: "rgba(255,255,255,0.7)"
+                      })
+                    }}
+                    onMouseEnter={e => {
+                      if (isProcessing) return;
+                      if (isPro) {
+                        e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,220,150,0.48)";
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                      } else {
+                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)";
+                        e.currentTarget.style.color = "#fff";
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (isProcessing) return;
+                      if (isPro) {
+                        e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,220,150,0.32)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      } else {
+                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
+                        e.currentTarget.style.color = isTrial ? "#fff" : "rgba(255,255,255,0.7)";
+                      }
+                    }}
+                  >
+                    {isProcessing ? (
+                      <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid rgba(255,255,255,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing...</>
+                    ) : plan.price === null ? "📞 Contact Sales"
+                      : isTrial ? "🎁 Get it now"
+                        : "Get it now"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Security footer */}
+          <div style={{
+            display: "flex", justifyContent: "center", alignItems: "center", gap: 28,
+            marginTop: 40, flexWrap: "wrap", position: "relative", zIndex: 1
+          }}>
+            {["🔒 SSL Encrypted", "💳 Razorpay Secured", "🏦 RBI Compliant", "📞 +91 98765 43210"].map(t => (
+              <span key={t} style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", fontWeight: 600 }}>{t}</span>
+            ))}
+          </div>
         </div>
 
-        {/* Security footer */}
-        <div style={{
-          display: "flex", justifyContent: "center", alignItems: "center", gap: 28,
-          marginTop: 40, flexWrap: "wrap", position: "relative", zIndex: 1
-        }}>
-          {["🔒 SSL Encrypted", "💳 Razorpay Secured", "🏦 RBI Compliant", "📞 +91 98765 43210"].map(t => (
-            <span key={t} style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", fontWeight: 600 }}>{t}</span>
-          ))}
-        </div>
-      </div>
-
-      {/* Mock Gateway - same as before */}
-      {mockGatewayOpen && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(10px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#fff", width: "100%", maxWidth: 420, borderRadius: 24, overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,0.3)" }}>
-            <div style={{ background: "linear-gradient(135deg, #0a0a0f, #0d2a22)", padding: "32px 24px", color: "#fff", position: "relative" }}>
-              <button onClick={() => setMockGatewayOpen(null)} style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1, opacity: 0.8 }}>M BUSINESS</div>
-                <div style={{ background: "rgba(0,220,150,0.15)", border: "1px solid rgba(0,220,150,0.3)", padding: "4px 10px", borderRadius: 12, fontSize: 11, fontWeight: 700, color: "#00dc96" }}>TEST MODE</div>
+        {/* Mock Gateway - same as before */}
+        {mockGatewayOpen && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(10px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <div style={{ background: "#fff", width: "100%", maxWidth: 420, borderRadius: 24, overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,0.3)" }}>
+              <div style={{ background: "linear-gradient(135deg, #0a0a0f, #0d2a22)", padding: "32px 24px", color: "#fff", position: "relative" }}>
+                <button onClick={() => setMockGatewayOpen(null)} style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1, opacity: 0.8 }}>M BUSINESS</div>
+                  <div style={{ background: "rgba(0,220,150,0.15)", border: "1px solid rgba(0,220,150,0.3)", padding: "4px 10px", borderRadius: 12, fontSize: 11, fontWeight: 700, color: "#00dc96" }}>TEST MODE</div>
+                </div>
+                <div style={{ fontSize: 14, opacity: 0.7, marginBottom: 4 }}>Amount to Pay</div>
+                <div style={{ fontSize: 36, fontWeight: 800 }}>₹{mockGatewayOpen.plan.price?.toLocaleString("en-IN")}</div>
+                <div style={{ fontSize: 13, opacity: 0.7, marginTop: 4 }}>{mockGatewayOpen.plan.name} Plan</div>
               </div>
-              <div style={{ fontSize: 14, opacity: 0.7, marginBottom: 4 }}>Amount to Pay</div>
-              <div style={{ fontSize: 36, fontWeight: 800 }}>₹{mockGatewayOpen.plan.price?.toLocaleString("en-IN")}</div>
-              <div style={{ fontSize: 13, opacity: 0.7, marginTop: 4 }}>{mockGatewayOpen.plan.name} Plan</div>
-            </div>
-            <div style={{ padding: 24 }}>
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 8, textTransform: "uppercase" }}>Simulated Card</label>
-                <div style={{ border: "1.5px solid #e2e8f0", borderRadius: 12, overflow: "hidden" }}>
-                  <input readOnly value="4242 4242 4242 4242" style={{ width: "100%", padding: "13px 14px", border: "none", borderBottom: "1.5px solid #e2e8f0", fontSize: 14, fontWeight: 600, background: "#f8fafc", outline: "none", fontFamily: "monospace", boxSizing: "border-box" }} />
-                  <div style={{ display: "flex" }}>
-                    <input readOnly value="12/28" style={{ width: "50%", padding: "13px 14px", border: "none", borderRight: "1.5px solid #e2e8f0", fontSize: 14, fontWeight: 600, background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
-                    <input readOnly value="123" style={{ width: "50%", padding: "13px 14px", border: "none", fontSize: 14, fontWeight: 600, background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
+              <div style={{ padding: 24 }}>
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", marginBottom: 8, textTransform: "uppercase" }}>Simulated Card</label>
+                  <div style={{ border: "1.5px solid #e2e8f0", borderRadius: 12, overflow: "hidden" }}>
+                    <input readOnly value="4242 4242 4242 4242" style={{ width: "100%", padding: "13px 14px", border: "none", borderBottom: "1.5px solid #e2e8f0", fontSize: 14, fontWeight: 600, background: "#f8fafc", outline: "none", fontFamily: "monospace", boxSizing: "border-box" }} />
+                    <div style={{ display: "flex" }}>
+                      <input readOnly value="12/28" style={{ width: "50%", padding: "13px 14px", border: "none", borderRight: "1.5px solid #e2e8f0", fontSize: 14, fontWeight: 600, background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
+                      <input readOnly value="123" style={{ width: "50%", padding: "13px 14px", border: "none", fontSize: 14, fontWeight: 600, background: "#f8fafc", outline: "none", fontFamily: "monospace" }} />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <button
-                onClick={async () => {
-                  const { plan, orderId } = mockGatewayOpen;
-                  setMockGatewayOpen({ ...mockGatewayOpen, processing: true });
-                  try {
-                    const endDate = new Date();
-                    endDate.setDate(endDate.getDate() + 30);
-                    await axios.post(`${BASE_URL}/api/subscriptions/create`, {
-                      userId, companyId: userId, userEmail, userName,
-                      planName: plan.name, planPrice: plan.price,
-                      billingCycle: "monthly", status: "active",
-                      isFullyPaid: true, startDate: new Date(), endDate, nextBillingDate: endDate,
-                      usageLimit: 999, features: plan.features, paymentMethod: "other",
-                    });
-                    await fetchData();
-                    setMockGatewayOpen(null);
-                    setPaymentSuccessData(plan);
-                  } catch (err) {
-                    showToast("❌ Payment failed.");
-                    setMockGatewayOpen(null);
-                  }
-                }}
-                disabled={mockGatewayOpen.processing}
-                style={{
-                  width: "100%", padding: "14px", borderRadius: 12,
-                  background: mockGatewayOpen.processing ? "#94a3b8" : "linear-gradient(135deg, #00dc96, #00b87a)",
-                  color: "#000", border: "none", fontSize: 15, fontWeight: 800,
-                  cursor: mockGatewayOpen.processing ? "wait" : "pointer",
-                  boxShadow: mockGatewayOpen.processing ? "none" : "0 8px 20px rgba(0,220,150,0.3)"
-                }}
-              >
-                {mockGatewayOpen.processing ? "Processing..." : `Pay ₹${mockGatewayOpen.plan.price?.toLocaleString("en-IN")} Securely`}
-              </button>
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 16 }}>
-                <span style={{ fontSize: 12 }}>🔒</span>
-                <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>Secured by M Business</span>
+                <button
+                  onClick={async () => {
+                    const { plan, orderId } = mockGatewayOpen;
+                    setMockGatewayOpen({ ...mockGatewayOpen, processing: true });
+                    try {
+                      const endDate = new Date();
+                      endDate.setDate(endDate.getDate() + 30);
+                      await axios.post(`${BASE_URL}/api/subscriptions/create`, {
+                        userId, companyId: userId, userEmail, userName,
+                        planName: plan.name, planPrice: plan.price,
+                        billingCycle: "monthly", status: "active",
+                        isFullyPaid: true, startDate: new Date(), endDate, nextBillingDate: endDate,
+                        usageLimit: 999, features: plan.features, paymentMethod: "other",
+                      });
+                      await fetchData();
+                      setMockGatewayOpen(null);
+                      setPaymentSuccessData(plan);
+                    } catch (err) {
+                      showToast("❌ Payment failed.");
+                      setMockGatewayOpen(null);
+                    }
+                  }}
+                  disabled={mockGatewayOpen.processing}
+                  style={{
+                    width: "100%", padding: "14px", borderRadius: 12,
+                    background: mockGatewayOpen.processing ? "#94a3b8" : "linear-gradient(135deg, #00dc96, #00b87a)",
+                    color: "#000", border: "none", fontSize: 15, fontWeight: 800,
+                    cursor: mockGatewayOpen.processing ? "wait" : "pointer",
+                    boxShadow: mockGatewayOpen.processing ? "none" : "0 8px 20px rgba(0,220,150,0.3)"
+                  }}
+                >
+                  {mockGatewayOpen.processing ? "Processing..." : `Pay ₹${mockGatewayOpen.plan.price?.toLocaleString("en-IN")} Securely`}
+                </button>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 16 }}>
+                  <span style={{ fontSize: 12 }}>🔒</span>
+                  <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>Secured by M Business</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
+        )}
+      </div>
+    );
+  }
 
   // ── Has Subscription ─────────────────────────────────────────────────────────
   const daysLeft = getDaysLeft(subscription.endDate);
@@ -872,7 +872,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
       {activeTab === "payments" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           {/* Payment Method Section (Same as Invoices for consistency) */}
-       
+
 
           <Card title={`Payment History`} icon="💰">
             {payments.length === 0 ? (
@@ -901,7 +901,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                           <Badge label={p.status} color={getStatusColor(p.status)} />
                         </td>
                         <td style={{ padding: "16px" }}>
-                          <button 
+                          <button
                             onClick={() => p.invoiceNo ? setViewInvoice(p) : setViewPayment(p)}
                             style={{ background: "none", border: "none", color: "var(--app-accent)", fontWeight: 600, cursor: "pointer", fontSize: 14, padding: 0, textDecoration: "underline" }}
                           >
@@ -921,7 +921,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
       {/* ── Invoices Tab ── */}
       {activeTab === "invoices" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-    
+
 
           <Card title={`Invoices`} icon="🧾">
             {invoices.length === 0 ? (
@@ -950,7 +950,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                           </span>
                         </td>
                         <td style={{ padding: "16px" }}>
-                          <button 
+                          <button
                             onClick={() => setViewInvoice(inv)}
                             style={{ background: "none", border: "none", color: "var(--app-accent)", fontWeight: 600, cursor: "pointer", fontSize: 14, padding: 0, textDecoration: "underline" }}
                           >
@@ -1062,17 +1062,17 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
       {/* ── Stripe-style Invoice Modal ── */}
       {viewInvoice && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setViewInvoice(null)}>
-          <div 
-            style={{ 
-              background: "#fff", 
-              width: "100%", 
-              maxWidth: 440, 
-              borderRadius: 24, 
-              padding: 40, 
+          <div
+            style={{
+              background: "#fff",
+              width: "100%",
+              maxWidth: 440,
+              borderRadius: 24,
+              padding: 40,
               position: "relative",
               boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
               animation: "modalFadeIn 0.3s ease-out"
-            }} 
+            }}
             onClick={e => e.stopPropagation()}
           >
             <style>{`
@@ -1081,9 +1081,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                 to { opacity: 1; transform: scale(1) translateY(0); }
               }
             `}</style>
-            
-            <button 
-              onClick={() => setViewInvoice(null)} 
+
+            <button
+              onClick={() => setViewInvoice(null)}
               style={{ position: "absolute", top: 20, right: 20, background: "#f1f5f9", border: "none", color: "#64748b", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "0.2s" }}
               onMouseEnter={e => e.currentTarget.style.background = "#e2e8f0"}
               onMouseLeave={e => e.currentTarget.style.background = "#f1f5f9"}
@@ -1099,7 +1099,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
               <div style={{ fontSize: 15, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>Invoice paid</div>
               <div style={{ fontSize: 48, fontWeight: 800, color: "#1e293b", marginBottom: 12 }}>{formatCurrency(viewInvoice.amount, viewInvoice.currency)}</div>
-              
+
               <button style={{ background: "none", border: "none", color: "#64748b", fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, marginBottom: 40 }}>
                 View invoice and payment details <span style={{ fontSize: 18 }}>›</span>
               </button>
@@ -1120,7 +1120,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
               </div>
 
               <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
-                <button 
+                <button
                   onClick={() => handlePrint("receipt")}
                   style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#1e293b", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "0.2s" }}
                   onMouseEnter={e => e.currentTarget.style.background = "#0f172a"}
@@ -1128,7 +1128,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                 >
                   Download receipt
                 </button>
-                <button 
+                <button
                   onClick={() => handlePrint("invoice")}
                   style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#fff", color: "#1e293b", border: "1.5px solid #e2e8f0", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "0.2s" }}
                   onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"}

@@ -36,16 +36,28 @@ jobs:
           script: |
             cd ~/mbusiness/M-Business/Backend
 
+            echo "📥 Pulling latest code..."
             git pull origin main
 
+            echo "⚙️ Loading Node via NVM..."
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20
 
+            echo "📦 Installing dependencies..."
             npm install
 
-            pm2 describe mbusiness > /dev/null \
-              && pm2 restart mbusiness \
-              || pm2 start index.js --name mbusiness
+            echo "🚀 Starting or Restarting PM2..."
 
+            # Check if app exists
+            pm2 describe mbusiness > /dev/null
+            if [ $? -eq 0 ]; then
+              echo "♻️ Restarting existing app"
+              pm2 restart mbusiness
+            else
+              echo "🆕 Starting new app"
+              pm2 start npm --name mbusiness -- start
+            fi
+
+            echo "💾 Saving PM2 process list..."
             pm2 save

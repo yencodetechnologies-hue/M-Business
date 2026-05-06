@@ -10,7 +10,7 @@ import { BASE_URL } from "../config";
 const API = `${BASE_URL}/api/reports`;
 const T   = { text:"var(--app-text)" };
 
-const RPT_ICONS   = { "Monthly Revenue":"💰", "Project Summary":"📁", "Client Activity":"👥", "Team Overview":"👨‍💼" };
+const RPT_ICONS   = { "Monthly Revenue":"💰", "Project Summary":"📁", "Client Activity":"👥", "Team Overview":"👨‍💼", "Finance Overview":"📉" };
 const RPT_COLORS  = ["var(--app-accent)","var(--app-accent)","var(--app-muted)","#f59e0b"];
 
 function StatCard({ icon, label, value, color, sub }) {
@@ -102,7 +102,7 @@ function ReportCard({ r, idx }) {
 }
 
 // ── MAIN COMPONENT ───────────────────────────────────────────
-export default function ReportsPage({ clients=[], projects=[], employees=[], managers=[] }) {
+export default function ReportsPage({ clients=[], projects=[], employees=[], managers=[], income=[], expenses=[] }) {
   const [reports,  setReports]  = useState([]);
   const [loading,  setLoading]  = useState(false);
   const [lastSync, setLastSync] = useState(null);
@@ -163,8 +163,16 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
         revenue:`${employees.length} Emp · ${managers.length} Mgr`,
         done:allStaff.filter(m=>m.status==="Active").length,
         pending:allStaff.filter(m=>m.status!=="Active").length },
+      { id:"RPT005", type:"Finance Overview",
+        range:`${MONTHS[now.getMonth()]} ${now.getFullYear()}`,
+        total:income.length + expenses.length,
+        revenue: fmtCur(income.reduce((s,x)=>s+(Number(x.amount)||0),0)),
+        done: income.length,
+        pending: expenses.length },
     ]);
   };
+
+  const [selectedReport, setSelectedReport] = useState(null);
 
   // ── summary stats (top row) ─────────────────────────────
   const totalRevStr = reports.find(r=>r.type==="Project Summary")?.revenue || "₹0";
@@ -179,6 +187,7 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
       <div style={{ display:"flex", justifyContent:"space-between",
         alignItems:"center", flexWrap:"wrap", gap:10 }}>
         <div>
+          <h2 style={{ margin:0, fontSize:22, fontWeight:800, color:"var(--app-text)" }}>Reports & Analytics</h2>
           <p style={{ margin:0, fontSize:13, color:"var(--app-muted)" }}>
             📊 Auto-generated from live database · {" "}
             {lastSync && (
@@ -199,7 +208,7 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
 
       {/* ── Summary stat row ── */}
       <div className="dash-stats"
-        style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
+        style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:12 }}>
         <StatCard icon="💰" label="Total Revenue"  value={totalRevStr}      color="var(--app-accent)" />
         <StatCard icon="📁" label="Total Projects" value={totalProj}        color="var(--app-accent)" sub={`${totalDone} completed`} />
         <StatCard icon="✅" label="Completed"      value={totalDone}        color="#22C55E" />
@@ -240,14 +249,108 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
             <div style={{ display:"grid",
               gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:14 }}>
               {reports.map((r, idx) => (
-                <ReportCard key={r.id} r={r} idx={idx} />
+                <div key={r.id} onClick={() => setSelectedReport(r.type)} style={{ cursor: "pointer", transition: "transform 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
+                  <ReportCard r={r} idx={idx} />
+                </div>
               ))}
             </div>
           )
       }
 
+      {/* ── DETAILED VIEWS ── */}
+      {selectedReport === "Finance Overview" && (
+        <div style={{ 
+          background:"#fff", borderRadius:20, padding:"30px",
+          boxShadow:"0 10px 40px rgba(0,0,0,0.08)", border:"1px solid var(--app-border)", 
+          marginTop: 10, animation: "fadeInUp 0.4s ease-out" 
+        }}>
+          <style>{`
+            @keyframes fadeInUp {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          `}</style>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
+             <div>
+               <h3 style={{ margin: 0, fontSize:20, fontWeight:900, color:"var(--app-text)", letterSpacing: "-0.5px" }}>
+                 💰 Financial Records
+               </h3>
+               <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--app-muted)" }}>Detailed breakdown of recent income and expenditures</p>
+             </div>
+             <button 
+               onClick={() => setSelectedReport(null)} 
+               style={{ 
+                 background: "var(--app-bg)", border: "1px solid var(--app-border)", 
+                 borderRadius: 12, padding: "8px 16px", color: "var(--app-text)", 
+                 fontWeight: 700, cursor: "pointer", fontSize: 13, transition: "0.2s"
+               }}
+               onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
+               onMouseLeave={e => e.currentTarget.style.background = "var(--app-bg)"}
+             >Close Details ✕</button>
+          </div>
+          
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 30 }}>
+            {/* Income Table */}
+            <div style={{ background: "#fcfdfc", borderRadius: 16, padding: 20, border: "1px solid #eef2ee" }}>
+              <h4 style={{ fontSize: 15, fontWeight: 800, color: "#16a34a", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>📥</span>
+                Recent Income
+              </h4>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                  <thead>
+                    <tr style={{ textAlign: "left", color: "var(--app-muted)", borderBottom: "2.5px solid #f1f5f9" }}>
+                      <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5 }}>DATE</th>
+                      <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5 }}>SOURCE</th>
+                      <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5, textAlign: "right" }}>AMOUNT</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {income.length > 0 ? income.slice(0, 15).map((item, i) => (
+                      <tr key={i} style={{ borderBottom: "1.5px solid #f8fafc" }}>
+                        <td style={{ padding: "14px 8px", color: "var(--app-muted)" }}>{item.date ? new Date(item.date).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' }) : "N/A"}</td>
+                        <td style={{ padding: "14px 8px", fontWeight: 700, color: "var(--app-text)" }}>{item.source || item.title || "Payment Received"}</td>
+                        <td style={{ padding: "14px 8px", textAlign: "right", color: "#16a34a", fontWeight: 800 }}>₹{Number(item.amount).toLocaleString()}</td>
+                      </tr>
+                    )) : <tr><td colSpan="3" style={{ padding: 40, textAlign: "center", color: "var(--app-muted)" }}>No income records found</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Expense Table */}
+            <div style={{ background: "#fdfcfc", borderRadius: 16, padding: 20, border: "1px solid #f2eeee" }}>
+              <h4 style={{ fontSize: 15, fontWeight: 800, color: "#dc2626", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>📤</span>
+                Recent Expenses
+              </h4>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                  <thead>
+                    <tr style={{ textAlign: "left", color: "var(--app-muted)", borderBottom: "2.5px solid #f1f5f9" }}>
+                      <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5 }}>DATE</th>
+                      <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5 }}>CATEGORY</th>
+                      <th style={{ padding: "12px 8px", fontWeight: 700, fontSize: 11, letterSpacing: 0.5, textAlign: "right" }}>AMOUNT</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {expenses.length > 0 ? expenses.slice(0, 15).map((item, i) => (
+                      <tr key={i} style={{ borderBottom: "1.5px solid #f8fafc" }}>
+                        <td style={{ padding: "14px 8px", color: "var(--app-muted)" }}>{item.date ? new Date(item.date).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' }) : "N/A"}</td>
+                        <td style={{ padding: "14px 8px", fontWeight: 700, color: "var(--app-text)" }}>{item.category || item.title || "General Expense"}</td>
+                        <td style={{ padding: "14px 8px", textAlign: "right", color: "#dc2626", fontWeight: 800 }}>₹{Number(item.amount).toLocaleString()}</td>
+                      </tr>
+                    )) : <tr><td colSpan="3" style={{ padding: 40, textAlign: "center", color: "var(--app-muted)" }}>No expense records found</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Quick summary table ── */}
-      {reports.length > 0 && (
+      {reports.length > 0 && !selectedReport && (
         <div style={{ background:"#fff", borderRadius:16, padding:22,
           boxShadow:"0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border:"1px solid var(--app-border)" }}>
           <h3 style={{ margin:"0 0 16px", fontSize:15, fontWeight:700, color:"var(--app-text)" }}>
@@ -271,7 +374,8 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
                   const color = RPT_COLORS[i % RPT_COLORS.length];
                   return (
                     <tr key={r.id}
-                      style={{ borderBottom:"1px solid var(--app-border)" }}
+                      onClick={() => setSelectedReport(r.type)}
+                      style={{ borderBottom:"1px solid var(--app-border)", cursor: "pointer" }}
                       onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
                       onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                       <td style={{ padding:"12px 14px" }}>
@@ -303,6 +407,7 @@ export default function ReportsPage({ clients=[], projects=[], employees=[], man
       )}
     </div>
   );
+
 }
 
 

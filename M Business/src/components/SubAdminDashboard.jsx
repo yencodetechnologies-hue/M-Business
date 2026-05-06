@@ -3954,6 +3954,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               appTheme={appTheme}
               setAppTheme={setAppTheme}
               themes={THEMES}
+              customColor={customColor}
+              setCustomColor={setCustomColor}
+              onLogoChange={onLogoChange}
+              triggerCrop={triggerCrop}
             />
           )}
           {validActive === "accounts" && <AccountsPage initialTab="overview" />}
@@ -3962,7 +3966,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
-          {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
+          {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
           {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} />}
           {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
           {validActive === "rolePermissions" && <RolePermissionDashboard />}

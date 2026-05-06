@@ -37,10 +37,10 @@ const subscriptionSchema = new mongoose.Schema({
 
   // Features included in plan
   features: [{ type: String }],
-  clientLimit: { type: String },
-  employeeLimit: { type: String },
-  managerLimit: { type: String },
-  businessLimit: { type: String },
+  clientLimit: { type: String, default: "1 Company manage" },
+  employeeLimit: { type: String, default: "1 Employee manage" },
+  managerLimit: { type: String, default: "1 Manager manage" },
+  businessLimit: { type: String, default: "" },
 
   // Payment provider info
   paymentMethod: { type: String, enum: ["card", "upi", "netbanking", "cash", "other"], default: "other" },

@@ -16,8 +16,9 @@ router.get("/", async (req, res) => {
   }
 });
 
+const { checkResourceLimit } = require("../middleware/subscriptionMiddleware");
 // ADD employee
-router.post("/add", async (req, res) => {
+router.post("/add", checkResourceLimit('employee'), async (req, res) => {
   try {
     const { name, email, phone, role, department, salary, status, password, profilePhoto, bankDetails, dateOfBirth, maritalStatus, address } = req.body;
 

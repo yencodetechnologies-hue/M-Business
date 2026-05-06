@@ -14,8 +14,9 @@ router.get("/", async (req, res) => {
   }
 });
 
+const { checkResourceLimit } = require("../middleware/subscriptionMiddleware");
 // POST add manager
-router.post("/add", addManager);
+router.post("/add", checkResourceLimit('manager'), addManager);
 
 // PUT update manager
 router.put("/:id", async (req, res) => {

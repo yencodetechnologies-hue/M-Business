@@ -43,7 +43,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/add", addClient);
+const { checkResourceLimit } = require("../middleware/subscriptionMiddleware");
+router.post("/add", checkResourceLimit('client'), addClient);
 
 router.put("/:id", async (req, res) => {
   try {

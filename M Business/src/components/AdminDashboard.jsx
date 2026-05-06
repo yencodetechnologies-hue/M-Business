@@ -20,7 +20,18 @@ const sc = (s) => ({
 function Badge({ label }) {
   const c = sc(label);
   return (
-    <span style={{ background: `${c}18`, color: c, border: `1px solid ${c}30`, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
+    <span style={{ 
+      background: `${c}12`, 
+      color: c, 
+      border: `1px solid ${c}25`, 
+      padding: "4px 12px", 
+      borderRadius: "100px", 
+      fontSize: 10, 
+      fontWeight: 800, 
+      whiteSpace: "nowrap",
+      textTransform: "uppercase",
+      letterSpacing: "0.5px"
+    }}>
       {label}
     </span>
   );
@@ -67,6 +78,14 @@ export default function AdminDashboard({ user, setUser }) {
   const [pkgError, setPkgError] = useState({});
 
   useEffect(() => {
+    // Apply modern theme from image
+    document.documentElement.style.setProperty("--app-sidebar", "#1a3d4d");
+    document.documentElement.style.setProperty("--app-bg", "#f0f4f7");
+    document.documentElement.style.setProperty("--app-accent", "#3b82f6");
+    document.documentElement.style.setProperty("--app-accent-rgb", "59, 130, 246");
+    document.documentElement.style.setProperty("--app-border", "#e2e8f0");
+    document.documentElement.style.setProperty("--app-muted", "#64748b");
+
     fetchSubadmins();
     fetchClients();
     fetchProjects();
@@ -158,7 +177,13 @@ export default function AdminDashboard({ user, setUser }) {
         halfYearlyPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 6 * 0.85).toString(),
         annualPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 12 * 0.8).toString(),
         buttonName: "",
-        features: `${npkg.planDuration} Plan\n${npkg.businessLimit}\n${npkg.managerLimit}\n${npkg.clientLimit}\n${npkg.employeeLimit}`,
+        features: [
+          `${npkg.planDuration} Plan`,
+          npkg.businessLimit,
+          npkg.managerLimit ? `Managers: ${npkg.managerLimit}` : "",
+          npkg.clientLimit ? `Clients: ${npkg.clientLimit}` : "",
+          npkg.employeeLimit ? `Employees: ${npkg.employeeLimit}` : ""
+        ].filter(Boolean).join("\n"),
         planDuration: npkg.planDuration,
         businessLimit: npkg.businessLimit,
         managerLimit: npkg.managerLimit,
@@ -178,6 +203,7 @@ export default function AdminDashboard({ user, setUser }) {
         res = await axios.post(BASE_URL + "/api/packages", packageData);
         setPackages(prev => [...prev, res.data]);
       }
+      await fetchSubscriptions();
       setNpkg({
         title: "",
         description: "",
@@ -247,13 +273,18 @@ export default function AdminDashboard({ user, setUser }) {
       background: isVar ? `var(--app-accent-gradient, linear-gradient(135deg, ${color}, ${color}))` : `linear-gradient(135deg, ${color}, ${color}cc)`,
       color: "#fff",
       border: "none",
-      borderRadius: 10,
-      padding: "9px 18px",
+      borderRadius: 12,
+      padding: "10px 20px",
       fontWeight: 700,
       fontSize: 13,
       cursor: "pointer",
       fontFamily: "inherit",
-      boxShadow: isVar ? `0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)` : "none"
+      boxShadow: "0 8px 20px -6px rgba(59, 130, 246, 0.3)",
+      transition: "all 0.3s ease",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8
     };
   };
 
@@ -271,14 +302,32 @@ export default function AdminDashboard({ user, setUser }) {
           </div>
         </div>
 
-        <nav style={{ flex: 1, padding: "20px 14px", overflowY: "auto" }}>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1, marginBottom: 12, paddingLeft: 8 }}>MENU</div>
+        <nav style={{ flex: 1, padding: "24px 14px", overflowY: "auto" }}>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontWeight: 800, letterSpacing: 1.2, marginBottom: 16, paddingLeft: 12, textTransform: "uppercase" }}>Main Menu</div>
           {NAV.map(n => {
             const on = active === n.key;
             return (
               <button key={n.key} onClick={() => setActive(n.key)}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: on ? "rgba(59,130,246,0.15)" : "transparent", border: "none", borderRadius: 10, color: on ? "var(--app-accent)" : "rgba(255,255,255,0.5)", fontWeight: on ? 700 : 500, fontSize: 13, cursor: "pointer", marginBottom: 4, transition: "all 0.2s", textAlign: "left", fontFamily: "inherit" }}>
-                <span style={{ fontSize: 16 }}>{n.icon}</span>
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "12px 16px",
+                  background: on ? "#e7f1f3" : "transparent",
+                  border: "none",
+                  borderRadius: "100px", // Pill shape from image
+                  color: on ? "#1a3d4d" : "rgba(255,255,255,0.6)",
+                  fontWeight: on ? 800 : 600,
+                  fontSize: 13,
+                  cursor: "pointer",
+                  marginBottom: 8,
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  textAlign: "left",
+                  fontFamily: "inherit",
+                  boxShadow: on ? "0 4px 12px rgba(0,0,0,0.1)" : "none"
+                }}>
+                <span style={{ fontSize: 18, opacity: on ? 1 : 0.7 }}>{n.icon || "•"}</span>
                 <span style={{ flex: 1 }}>{n.label}</span>
               </button>
             );
@@ -291,51 +340,82 @@ export default function AdminDashboard({ user, setUser }) {
       </div>
 
       {/* CONTENT */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ padding: "20px 30px", background: "#fff", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "var(--app-bg)" }}>
+        {/* Modern Header */}
+        <div style={{ 
+          padding: "24px 32px", 
+          background: "#fff", 
+          borderBottom: "1px solid rgba(0,0,0,0.04)", 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.02)"
+        }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0f172a" }}>
+            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#1a3d4d", letterSpacing: "-0.5px" }}>
               {NAV.find(n => n.key === active)?.label}
             </h2>
-            <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>Admin Control Panel</div>
+
           </div>
 
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            {/* Search Bar Placeholder like in image */}
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <span style={{ position: "absolute", left: 14, fontSize: 16, opacity: 0.4 }}>🔍</span>
+              <input 
+                placeholder="Search resources..." 
+                style={{ 
+                  padding: "10px 16px 10px 40px", 
+                  borderRadius: "100px", 
+                  border: "1px solid #e2e8f0", 
+                  background: "#f8fafc", 
+                  fontSize: 13, 
+                  width: 240,
+                  outline: "none",
+                  transition: "all 0.2s"
+                }} 
+                onFocus={e => e.currentTarget.style.borderColor = "var(--app-accent)"}
+                onBlur={e => e.currentTarget.style.borderColor = "#e2e8f0"}
+              />
+            </div>
 
-
-
-
-          {active === "packages" && (
-            <button
-              onClick={() => {
-                setEditPkg(null);
-                setNpkg({
-                  title: "",
-                  description: "",
-                  icon: "📦",
-                  isFree: false,
-                  price: "",
-                  noOfDays: "30",
-                  planDuration: "Monthly Plan",
-                  businessLimit: "Single business manage",
-                  managerLimit: "",
-                  clientLimit: "",
-                  employeeLimit: "",
-                  assignedSubadmins: []
-                });
-                setPkgError({});
-                setModal("package_add");
-              }}
-              style={B("var(--app-accent)")}
-            >
-              + Add Package
-            </button>
-          )}
+            {active === "packages" && (
+              <button
+                onClick={() => {
+                  setEditPkg(null);
+                  setNpkg({
+                    title: "",
+                    description: "",
+                    icon: "📦",
+                    isFree: false,
+                    price: "",
+                    noOfDays: "30",
+                    planDuration: "Monthly Plan",
+                    businessLimit: "Single business manage",
+                    managerLimit: "",
+                    clientLimit: "",
+                    employeeLimit: "",
+                    assignedSubadmins: []
+                  });
+                  setPkgError({});
+                  setModal("package_add");
+                }}
+                style={{
+                  ...B("var(--app-accent)"),
+                  borderRadius: "100px",
+                  padding: "10px 24px"
+                }}
+              >
+                + Add Package
+              </button>
+            )}
+          </div>
         </div>
 
         <div style={{ flex: 1, padding: 30, overflowY: "auto" }}>
           {active === "dashboard" && <OverviewPage subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} invoices={invoices} />}
           {active === "clients" && <ClientsPage clients={clients} setClients={setClients} />}
-          {active === "subadmins" && <SubadminsList subadmins={subadmins} refresh={fetchSubadmins} packages={packages} />}
+          {active === "subadmins" && <SubadminsList subadmins={subadmins} refresh={fetchSubadmins} packages={packages} subscriptions={subscriptions} />}
           {active === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
@@ -572,38 +652,67 @@ export default function AdminDashboard({ user, setUser }) {
 
               {/* Row: Manager Limit */}
               <div style={{ marginBottom: 15 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Manager Limit (Type Number)</label>
-                <input
-                  type="text"
-                  value={npkg.managerLimit}
-                  onChange={e => setNpkg({ ...npkg, managerLimit: e.target.value })}
-                  placeholder="e.g. 5 Manager or Unlimited Manager"
-                  style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
-                />
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Manager Limit</label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    list="manager-limits"
+                    value={npkg.managerLimit}
+                    onChange={e => setNpkg({ ...npkg, managerLimit: e.target.value })}
+                    placeholder="e.g. 5 Managers or Unlimited Managers"
+                    style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
+                  />
+                  <datalist id="manager-limits">
+                    <option value="2 Managers" />
+                    <option value="3 Managers" />
+                    <option value="5 Managers" />
+                    <option value="10 Managers" />
+                    <option value="Unlimited Managers" />
+                  </datalist>
+                </div>
               </div>
 
-              {/* Row: Company Name (Client) Limit */}
               <div style={{ marginBottom: 15 }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Company Name Limit (Clients)</label>
-                <input
-                  type="text"
-                  value={npkg.clientLimit}
-                  onChange={e => setNpkg({ ...npkg, clientLimit: e.target.value })}
-                  placeholder="e.g. 10 Company manage or Unlimited"
-                  style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
-                />
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Client Limit (Company Name)</label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    list="client-limits"
+                    value={npkg.clientLimit}
+                    onChange={e => setNpkg({ ...npkg, clientLimit: e.target.value })}
+                    placeholder="e.g. 10 Company manage or Unlimited"
+                    style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
+                  />
+                  <datalist id="client-limits">
+                    <option value="1 Company manage" />
+                    <option value="3 Company manage" />
+                    <option value="5 Company manage" />
+                    <option value="10 Company manage" />
+                    <option value="Unlimited Company manage" />
+                  </datalist>
+                </div>
               </div>
 
               {/* Row: Employee Limit */}
               <div style={{ marginBottom: 15 }}>
                 <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#64748b", letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase" }}>Employee Limit</label>
-                <input
-                  type="text"
-                  value={npkg.employeeLimit}
-                  onChange={e => setNpkg({ ...npkg, employeeLimit: e.target.value })}
-                  placeholder="e.g. 50 Employee manage or Unlimited"
-                  style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
-                />
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    list="employee-limits"
+                    value={npkg.employeeLimit}
+                    onChange={e => setNpkg({ ...npkg, employeeLimit: e.target.value })}
+                    placeholder="e.g. 50 Employees or Unlimited"
+                    style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, fontSize: 13, background: "#f8fafc", outline: "none" }}
+                  />
+                  <datalist id="employee-limits">
+                    <option value="5 Employees" />
+                    <option value="10 Employees" />
+                    <option value="20 Employees" />
+                    <option value="50 Employees" />
+                    <option value="Unlimited Employees" />
+                  </datalist>
+                </div>
               </div>
 
               {/* Assign to Subadmins */}
@@ -712,30 +821,69 @@ function OverviewPage({ subadmins, clients, employees, managers, projects, packa
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 16 }}>
-        {stats.map(s => (
-          <div key={s.label} style={{ background: "#fff", borderRadius: 16, padding: "20px 16px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>{s.label}</div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: s.color, marginTop: 8 }}>{s.value}</div>
+      {/* Premium Stats Grid inspired by Inventory Image */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
+        {[
+          { label: "Total Products", value: clients.length, icon: "📦", bg: "#f0fdfa", iconBg: "#ccfbf1", iconColor: "#0d9488" },
+          { label: "Total Employees", value: employees.length, icon: "👥", bg: "#f0f9ff", iconBg: "#e0f2fe", iconColor: "#0284c7" },
+          { label: "Recent Orders", value: projects.length, icon: "📋", bg: "#fdf4ff", iconBg: "#fae8ff", iconColor: "#a21caf" },
+          { label: "Low Stock", value: subadmins.length, icon: "⚠️", bg: "#fff7ed", iconBg: "#ffedd5", iconColor: "#ea580c" },
+        ].map((s, idx) => (
+          <div key={idx} style={{ 
+            background: "#fff", 
+            borderRadius: 20, 
+            padding: "24px", 
+            display: "flex", 
+            alignItems: "center", 
+            gap: 20,
+            boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)",
+            border: "1px solid #f1f5f9"
+          }}>
+            <div style={{ 
+              width: 54, 
+              height: 54, 
+              borderRadius: 16, 
+              background: s.iconBg, 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center",
+              fontSize: 24,
+              color: s.iconColor
+            }}>
+              {s.icon}
+            </div>
+            <div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: "#1e293b", lineHeight: 1 }}>{s.value}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#64748b", marginTop: 4 }}>{s.label}</div>
+            </div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
-          <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Project Progress</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+        <div style={{ background: "#fff", borderRadius: 24, padding: 28, boxShadow: "0 10px 30px rgba(0,0,0,0.04)", border: "1px solid #f1f5f9" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#1e293b" }}>Project Progress</h3>
+            <button style={{ background: "none", border: "none", color: "var(--app-accent)", fontWeight: 700, fontSize: 12, cursor: "pointer" }}>View All</button>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {projects.length === 0 ? (
               <div style={{ textAlign: "center", padding: 20, color: "#94a3b8", fontSize: 13 }}>No projects found</div>
             ) : (
               projects.slice(0, 5).map(p => (
                 <div key={p._id}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>{p.name}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#3b82f6" }}>{p.progress || 0}%</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "#334155" }}>{p.name}</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#3b82f6" }}>{p.progress || 0}%</span>
                   </div>
-                  <div style={{ background: "#f1f5f9", borderRadius: 4, height: 6 }}>
-                    <div style={{ width: `${p.progress || 0}%`, background: (p.progress || 0) === 100 ? "#22C55E" : "#3b82f6", borderRadius: 4, height: "100%" }} />
+                  <div style={{ background: "#f1f5f9", borderRadius: 10, height: 8, overflow: "hidden" }}>
+                    <div style={{ 
+                      width: `${p.progress || 0}%`, 
+                      background: (p.progress || 0) === 100 ? "linear-gradient(90deg, #10b981, #34d399)" : "linear-gradient(90deg, #3b82f6, #60a5fa)", 
+                      borderRadius: 10, 
+                      height: "100%",
+                      transition: "width 1s ease-out"
+                    }} />
                   </div>
                 </div>
               ))
@@ -743,21 +891,27 @@ function OverviewPage({ subadmins, clients, employees, managers, projects, packa
           </div>
         </div>
 
-        <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #e2e8f0" }}>
-          <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Recent Invoices</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ background: "#fff", borderRadius: 24, padding: 28, boxShadow: "0 10px 30px rgba(0,0,0,0.04)", border: "1px solid #f1f5f9" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#1e293b" }}>Recent Invoices</h3>
+            <button style={{ background: "none", border: "none", color: "var(--app-accent)", fontWeight: 700, fontSize: 12, cursor: "pointer" }}>View All</button>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {invoices.length === 0 ? (
               <div style={{ textAlign: "center", padding: 20, color: "#94a3b8", fontSize: 13 }}>No invoices found</div>
             ) : (
               invoices.slice(0, 5).map(inv => (
-                <div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 12, borderBottom: "1px solid #f1f5f9" }}>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>{inv.invoiceNo} · {inv.client}</div>
-                    <div style={{ fontSize: 11, color: "#64748b" }}>Due: {inv.dueDate || "—"}</div>
+                <div key={inv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderRadius: 16, background: "#f8fafc", transition: "transform 0.2s", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.transform = "translateX(4px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateX(0)"}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, border: "1px solid #e2e8f0" }}>📄</div>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#1e293b" }}>{inv.invoiceNo}</div>
+                      <div style={{ fontSize: 12, color: "#64748b" }}>{inv.client} · {inv.dueDate || "—"}</div>
+                    </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>₹{inv.total?.toLocaleString() || "0"}</div>
-                    <Badge label={inv.status} />
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>₹{inv.total?.toLocaleString() || "0"}</div>
+                    <div style={{ marginTop: 4 }}><Badge label={inv.status} /></div>
                   </div>
                 </div>
               ))
@@ -770,7 +924,7 @@ function OverviewPage({ subadmins, clients, employees, managers, projects, packa
 }
 
 // ── Subadmins List ──
-function SubadminsList({ subadmins, refresh, packages }) {
+function SubadminsList({ subadmins, refresh, packages, subscriptions }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
@@ -830,7 +984,7 @@ function SubadminsList({ subadmins, refresh, packages }) {
       });
       alert(`Package "${pkg.title}" assigned to ${selectedSubadmin.name} successfully!`);
       setAssignModalOpen(false);
-      // Refresh packages for this subadmin
+      await fetchSubscriptions();
       fetchSubadminPackages(selectedSubadmin._id);
     } catch (e) {
       alert("Failed to assign package: " + (e.response?.data?.error || e.message));
@@ -879,61 +1033,118 @@ function SubadminsList({ subadmins, refresh, packages }) {
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ background: "#f8fafc" }}>
-            {["Name", "Email", "Phone", "Company", "Type", "Employees", "Status", "Joined", "Actions"].map(h => (
+            {["Name", "Email", "Phone", "Company", "Current Plan", "Employees", "Status", "Joined", "Actions"].map(h => (
               <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#64748b", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {subadmins.map((s, i) => (
-            <tr key={s._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-              <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{s.name}</td>
-              <td style={{ padding: "14px 16px", color: "#475569" }}>{s.email}</td>
-              <td style={{ padding: "14px 16px", color: "#475569" }}>{s.phone || "—"}</td>
-              <td style={{ padding: "14px 16px" }}>
-                <span
-                  onClick={() => handleViewCompany(s.companyName || s.company)}
-                  style={{
-                    color: (s.companyName || s.company) ? "#3b82f6" : "#94a3b8",
-                    fontWeight: 600,
-                    cursor: (s.companyName || s.company) ? "pointer" : "default",
-                    textDecoration: (s.companyName || s.company) ? "underline" : "none"
-                  }}
-                >
-                  {s.companyName || s.company || "—"}
-                </span>
-              </td>
-              <td style={{ padding: "14px 16px", color: "#475569" }}>{s.companyType || "IT"}</td>
-              <td style={{ padding: "14px 16px", color: "#475569" }}>{s.employeeCount || "0-10"}</td>
-              <td style={{ padding: "14px 16px" }}><Badge label={s.status || "Active"} /></td>
-              <td style={{ padding: "14px 16px", color: "#64748b" }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}</td>
-              <td style={{ padding: "14px 16px" }}>
-                <div style={{ display: "flex", gap: 8 }}>
-
-                  <button
-                    onClick={async () => {
-                      if (window.confirm("Delete this subadmin?")) {
-                        await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`);
-                        refresh();
-                      }
-                    }}
+          {subadmins.map((s, i) => {
+            const sub = subscriptions.find(sub => (sub.userId === s._id || sub.companyId === s._id) && sub.status === "active");
+            return (
+              <tr key={s._id || i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                <td style={{ padding: "14px 16px", fontWeight: 700, color: "#0f172a" }}>{s.name}</td>
+                <td style={{ padding: "14px 16px", color: "#475569" }}>{s.email}</td>
+                <td style={{ padding: "14px 16px", color: "#475569" }}>{s.phone || "—"}</td>
+                <td style={{ padding: "14px 16px" }}>
+                  <span
+                    onClick={() => handleViewCompany(s.companyName || s.company)}
                     style={{
-                      background: "#fee2e2",
-                      color: "#ef4444",
-                      border: "none",
-                      borderRadius: 6,
-                      padding: "6px 12px",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      cursor: "pointer"
+                      color: (s.companyName || s.company) ? "#3b82f6" : "#94a3b8",
+                      fontWeight: 600,
+                      cursor: (s.companyName || s.company) ? "pointer" : "default",
+                      textDecoration: (s.companyName || s.company) ? "underline" : "none"
                     }}
                   >
-                    🗑️ Delete
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
+                    {s.companyName || s.company || "—"}
+                  </span>
+                </td>
+                <td style={{ padding: "14px 16px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontWeight: 700, color: sub ? "#10b981" : "#94a3b8" }}>{sub?.planName || "No Plan"}</span>
+                    {sub && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        <span style={{ fontSize: 10, color: "#64748b", display: "flex", justifyContent: "space-between" }}>
+                          <span>Clients:</span>
+                          <span style={{ fontWeight: 600 }}>{clients.filter(c => c.companyId === s._id).length} / {sub.clientLimit || "—"}</span>
+                        </span>
+                        <span style={{ fontSize: 10, color: "#64748b", display: "flex", justifyContent: "space-between" }}>
+                          <span>Employees:</span>
+                          <span style={{ fontWeight: 600 }}>{employees.filter(e => e.companyId === s._id).length} / {sub.employeeLimit || "—"}</span>
+                        </span>
+                        <span style={{ fontSize: 10, color: "#64748b", display: "flex", justifyContent: "space-between" }}>
+                          <span>Managers:</span>
+                          <span style={{ fontWeight: 600 }}>{managers.filter(m => m.companyId === s._id).length} / {sub.managerLimit || "—"}</span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </td>
+                <td style={{ padding: "14px 16px", color: "#475569" }}>{s.employeeCount || "0-10"}</td>
+                <td style={{ padding: "14px 16px" }}><Badge label={s.status || "Active"} /></td>
+                <td style={{ padding: "14px 16px", color: "#64748b" }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}</td>
+                <td style={{ padding: "14px 16px" }}>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      onClick={() => openAssignModal(s)}
+                      style={{
+                        background: "#f0fdf4",
+                        color: "#16a34a",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "6px 12px",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: "pointer"
+                      }}
+                    >
+                      📦 Assign
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setSelectedSubadmin(s);
+                        handleViewCompany(s.companyName || s.company);
+                      }}
+                      style={{
+                        background: "#eff6ff",
+                        color: "#3b82f6",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "6px 12px",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: "pointer"
+                      }}
+                    >
+                      👥 Resources
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        if (window.confirm("Delete this subadmin?")) {
+                          await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`);
+                          refresh();
+                        }
+                      }}
+                      style={{
+                        background: "#fee2e2",
+                        color: "#ef4444",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "6px 12px",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: "pointer"
+                      }}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
           {subadmins.length === 0 && <tr><td colSpan={9} style={{ padding: 20, textAlign: "center", color: "#94a3b8" }}>No subadmins found</td></tr>}
         </tbody>
       </table>

@@ -2545,7 +2545,7 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
                       : "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)"
                   }}
                 >
-                  {p.buttonName || "Get it now"}
+                  {p.buttonName || ""}
                 </button>
 
                 {/* Admin View/Edit buttons */}
@@ -2958,6 +2958,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (hasFetched.current) return;
     hasFetched.current = true;
     fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
+
+    // Auto-refresh subscription every 30 seconds to catch admin updates
+    const interval = setInterval(fetchSubscription, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchTasks = async () => {
@@ -3057,16 +3061,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const subStatus = getSubStatus();
 
   const parseLimit = (limitStr, type = "client") => {
-    if (!limitStr) {
-      if (type === "client") return 1;
-      if (type === "employee") return 5;
-      if (type === "manager") return 1;
-      return 1;
-    }
+    if (!limitStr || limitStr.trim() === "") return Infinity;
     if (limitStr.toLowerCase().includes("unlimited")) return Infinity;
     const match = limitStr.match(/\d+/);
     if (match) return parseInt(match[0]);
-    return 1;
+    return Infinity;
   };
 
   const handleLogout = () => { localStorage.removeItem("user"); setUser(null); };
@@ -3111,9 +3110,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   // Re-fetch packages when navigating to Packages tab to show admin-added packages
+  // Also refresh subscription when visiting resource tabs to ensure latest limits
   useEffect(() => {
     if (active === "packages") {
       fetchPackages();
+    }
+    if (["dashboard", "clients", "employees", "managers", "mysubscriptions"].includes(active)) {
+      fetchSubscription();
     }
   }, [active]);
 
@@ -3197,17 +3200,36 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (!nc.email.trim()) errors.email = "Email is required";
     if (!nc.password.trim()) errors.password = "Password is required";
 
-    // Subscription Limit Check
-    if (subscription) {
-      const clientLimit = parseLimit(subscription.clientLimit);
-      if (clients.length >= clientLimit) {
-        alert(`❌ Limit Reached: Your current plan only allows up to ${clientLimit} Company Names (Clients). Please upgrade your plan.`);
-        return;
+    // Subscription Limit Check - Fetch latest before check to catch admin updates
+    try {
+      const id = user?._id || user?.id;
+      if (id) {
+        const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+        if (subRes.data.hasSubscription) {
+          const latestSub = subRes.data.subscription;
+          setSubscription(latestSub);
+
+          const clientLimit = parseLimit(latestSub.clientLimit);
+          if (clients.length >= clientLimit) {
+            alert(`❌ Limit Reached: Your current plan only allows up to ${clientLimit} Company Names (Clients). Please upgrade your plan or refresh your page if you just updated.`);
+            return;
+          }
+          // Business Manage Check
+          if (latestSub.businessLimit === "" && clients.length >= 1) {
+            alert("❌ Limit Reached: Your current plan only allows managing a single business (1 Company Name). Please upgrade to 'Multiple business manage' plan.");
+            return;
+          }
+        }
       }
-      // Business Manage Check
-      if (subscription.businessLimit === "" && clients.length >= 1) {
-        alert("❌ Limit Reached: Your current plan only allows managing a single business (1 Company Name). Please upgrade to 'Multiple business manage' plan.");
-        return;
+    } catch (err) {
+      console.error("Failed to fetch latest subscription for limit check", err);
+      // Fallback to existing state if fetch fails
+      if (subscription) {
+        const clientLimit = parseLimit(subscription.clientLimit);
+        if (clients.length >= clientLimit) {
+          alert(`❌ Limit Reached: Your current plan only allows up to ${clientLimit} Company Names (Clients).`);
+          return;
+        }
       }
     }
 
@@ -3249,12 +3271,30 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (!ne.email.trim()) errors.email = "Email required";
     if (!ne.password.trim()) errors.password = "Password is required";
 
-    // Subscription Limit Check
-    if (subscription) {
-      const employeeLimit = parseLimit(subscription.employeeLimit);
-      if (employees.length >= employeeLimit) {
-        alert(`❌ Limit Reached: Your current plan only allows up to ${employeeLimit} Employees. Please upgrade your plan.`);
-        return;
+    // Subscription Limit Check - Fetch latest before check to catch admin updates
+    try {
+      const id = user?._id || user?.id;
+      if (id) {
+        const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+        if (subRes.data.hasSubscription) {
+          const latestSub = subRes.data.subscription;
+          setSubscription(latestSub);
+
+          const employeeLimit = parseLimit(latestSub.employeeLimit);
+          if (employees.length >= employeeLimit) {
+            alert(`❌ Limit Reached: Your current plan only allows up to ${employeeLimit} Employees. Please upgrade your plan or refresh if you just updated.`);
+            return;
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch latest subscription for employee limit check", err);
+      if (subscription) {
+        const employeeLimit = parseLimit(subscription.employeeLimit);
+        if (employees.length >= employeeLimit) {
+          alert(`❌ Limit Reached: Your current plan only allows up to ${employeeLimit} Employees.`);
+          return;
+        }
       }
     }
 
@@ -3312,12 +3352,30 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (!nm.email.trim()) errors.email = "Email is required";
     if (!nm.password.trim()) errors.password = "Password is required";
 
-    // Subscription Limit Check
-    if (subscription) {
-      const managerLimit = parseLimit(subscription.managerLimit);
-      if (managers.length >= managerLimit) {
-        alert(`❌ Limit Reached: Your current plan only allows up to ${managerLimit} Managers. Please upgrade your plan.`);
-        return;
+    // Subscription Limit Check - Fetch latest before check to catch admin updates
+    try {
+      const id = user?._id || user?.id;
+      if (id) {
+        const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+        if (subRes.data.hasSubscription) {
+          const latestSub = subRes.data.subscription;
+          setSubscription(latestSub);
+
+          const managerLimit = parseLimit(latestSub.managerLimit);
+          if (managers.length >= managerLimit) {
+            alert(`❌ Limit Reached: Your current plan only allows up to ${managerLimit} Managers. Please upgrade your plan or refresh if you just updated.`);
+            return;
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch latest subscription for manager limit check", err);
+      if (subscription) {
+        const managerLimit = parseLimit(subscription.managerLimit);
+        if (managers.length >= managerLimit) {
+          alert(`❌ Limit Reached: Your current plan only allows up to ${managerLimit} Managers.`);
+          return;
+        }
       }
     }
 
@@ -3590,8 +3648,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {validActive === "clients" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 6 }}>
                       {clients.length} / {parseLimit(subscription.clientLimit, "client") === Infinity ? "Unlimited" : parseLimit(subscription.clientLimit, "client")} Used
+                      <button
+                        onClick={fetchSubscription}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center" }}
+                        title="Refresh Limits"
+                      >
+                        🔄
+                      </button>
                     </span>
                   )}
                   <button onClick={() => {
@@ -3613,8 +3678,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {validActive === "employees" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 6 }}>
                       {employees.length} / {parseLimit(subscription.employeeLimit, "employee") === Infinity ? "Unlimited" : parseLimit(subscription.employeeLimit, "employee")} Used
+                      <button
+                        onClick={fetchSubscription}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center" }}
+                        title="Refresh Limits"
+                      >
+                        🔄
+                      </button>
                     </span>
                   )}
                   <button onClick={() => {
@@ -3638,8 +3710,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {validActive === "managers" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 6 }}>
                       {managers.length} / {parseLimit(subscription.managerLimit, "manager") === Infinity ? "Unlimited" : parseLimit(subscription.managerLimit, "manager")} Used
+                      <button
+                        onClick={fetchSubscription}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center" }}
+                        title="Refresh Limits"
+                      >
+                        🔄
+                      </button>
                     </span>
                   )}
                   <button onClick={() => {
@@ -4648,7 +4727,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <InfoRow icon="🗓️" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
             <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
             <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
-            <InfoRow icon="👥" label="Company Name" value={viewPackage.clientLimit || ""} />
+            <InfoRow icon="👥" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
             <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
             <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
 
@@ -4689,7 +4768,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
               <Fld label="Business Limit" value={editPkgForm.businessLimit} onChange={v => setEditPkgForm({ ...editPkgForm, businessLimit: v })} options={["", "Multiple business manage", "Unlimited business manage"]} />
               <Fld label="Manager Limit" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} options={["", "2 Managers", "3 Managers", "5 Managers", "Unlimited Managers"]} />
-              <Fld label="Company Name Limit" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} options={["1 Company manage", "", "5 Company manage", "10 Company manage", "Unlimited Company manage"]} />
+              <Fld label="Client Limit (Company Name)" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} options={["1 Company manage", "", "5 Company manage", "10 Company manage", "Unlimited Company manage"]} />
               <Fld label="Employee Limit" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} options={["5 Employee manage", "", "20 Employee manage", "50 Employee manage", "Unlimited Employee manage"]} />
             </div>
           </div>

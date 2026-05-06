@@ -103,10 +103,19 @@ router.put("/:id", async (req, res) => {
       { new: true }
     );
 
-    // If updateActiveSubscriptions is true, update all active subscriptions using this package
+    // If updateActiveSubscriptions is true, update all active/pending subscriptions using this package
     if (updateActiveSubscriptions) {
+      const isTrialPackage = title.toLowerCase().includes("free") || title.toLowerCase().includes("trial");
+      
       await Subscription.updateMany(
-        { packageId: req.params.id, status: "active" },
+        { 
+          $or: [
+            { packageId: req.params.id },
+            { planName: title },
+            ...(isTrialPackage ? [{ isTrial: true }, { planName: "Free" }] : [])
+          ],
+          status: { $in: ["active", "pending", "trial"] } 
+        },
         {
           planName: title,
           planPrice: price,
@@ -114,7 +123,8 @@ router.put("/:id", async (req, res) => {
           employeeLimit,
           managerLimit,
           businessLimit,
-          features: updatedFeatures
+          features: updatedFeatures,
+          updatedAt: Date.now()
         }
       );
     }

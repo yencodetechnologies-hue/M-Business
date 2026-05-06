@@ -20,14 +20,14 @@ const sc = (s) => ({
 function Badge({ label }) {
   const c = sc(label);
   return (
-    <span style={{ 
-      background: `${c}12`, 
-      color: c, 
-      border: `1px solid ${c}25`, 
-      padding: "4px 12px", 
-      borderRadius: "100px", 
-      fontSize: 10, 
-      fontWeight: 800, 
+    <span style={{
+      background: `${c}12`,
+      color: c,
+      border: `1px solid ${c}25`,
+      padding: "4px 12px",
+      borderRadius: "100px",
+      fontSize: 10,
+      fontWeight: 800,
       whiteSpace: "nowrap",
       textTransform: "uppercase",
       letterSpacing: "0.5px"
@@ -342,12 +342,12 @@ export default function AdminDashboard({ user, setUser }) {
       {/* CONTENT */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "var(--app-bg)" }}>
         {/* Modern Header */}
-        <div style={{ 
-          padding: "24px 32px", 
-          background: "#fff", 
-          borderBottom: "1px solid rgba(0,0,0,0.04)", 
-          display: "flex", 
-          justifyContent: "space-between", 
+        <div style={{
+          padding: "24px 32px",
+          background: "#fff",
+          borderBottom: "1px solid rgba(0,0,0,0.04)",
+          display: "flex",
+          justifyContent: "space-between",
           alignItems: "center",
           boxShadow: "0 2px 10px rgba(0,0,0,0.02)"
         }}>
@@ -359,25 +359,7 @@ export default function AdminDashboard({ user, setUser }) {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            {/* Search Bar Placeholder like in image */}
-            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-              <span style={{ position: "absolute", left: 14, fontSize: 16, opacity: 0.4 }}>🔍</span>
-              <input 
-                placeholder="Search resources..." 
-                style={{ 
-                  padding: "10px 16px 10px 40px", 
-                  borderRadius: "100px", 
-                  border: "1px solid #e2e8f0", 
-                  background: "#f8fafc", 
-                  fontSize: 13, 
-                  width: 240,
-                  outline: "none",
-                  transition: "all 0.2s"
-                }} 
-                onFocus={e => e.currentTarget.style.borderColor = "var(--app-accent)"}
-                onBlur={e => e.currentTarget.style.borderColor = "#e2e8f0"}
-              />
-            </div>
+
 
             {active === "packages" && (
               <button
@@ -751,21 +733,7 @@ export default function AdminDashboard({ user, setUser }) {
           )} */}
               </div>
 
-              {/* Update Active Subscriptions Checkbox */}
-              {editPkg && (
-                <div style={{ marginBottom: 20, display: "flex", alignItems: "center", gap: 10, background: "#f5f3ff", padding: "12px 16px", borderRadius: 12, border: "1px solid #ddd6fe" }}>
-                  <input
-                    type="checkbox"
-                    id="updateSubs"
-                    checked={updateActiveSubs}
-                    onChange={e => setUpdateActiveSubs(e.target.checked)}
-                    style={{ width: 18, height: 18, cursor: "pointer", accentColor: "#7c3aed" }}
-                  />
-                  <label htmlFor="updateSubs" style={{ fontSize: 13, fontWeight: 600, color: "#5b21b6", cursor: "pointer" }}>
-                    🔄 Update active subscriptions with these new limits/prices
-                  </label>
-                </div>
-              )}
+
 
               {/* Action Buttons */}
               <div style={{ display: "flex", gap: 10 }}>
@@ -829,23 +797,23 @@ function OverviewPage({ subadmins, clients, employees, managers, projects, packa
           { label: "Recent Orders", value: projects.length, icon: "📋", bg: "#fdf4ff", iconBg: "#fae8ff", iconColor: "#a21caf" },
           { label: "Low Stock", value: subadmins.length, icon: "⚠️", bg: "#fff7ed", iconBg: "#ffedd5", iconColor: "#ea580c" },
         ].map((s, idx) => (
-          <div key={idx} style={{ 
-            background: "#fff", 
-            borderRadius: 20, 
-            padding: "24px", 
-            display: "flex", 
-            alignItems: "center", 
+          <div key={idx} style={{
+            background: "#fff",
+            borderRadius: 20,
+            padding: "24px",
+            display: "flex",
+            alignItems: "center",
             gap: 20,
             boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)",
             border: "1px solid #f1f5f9"
           }}>
-            <div style={{ 
-              width: 54, 
-              height: 54, 
-              borderRadius: 16, 
-              background: s.iconBg, 
-              display: "flex", 
-              alignItems: "center", 
+            <div style={{
+              width: 54,
+              height: 54,
+              borderRadius: 16,
+              background: s.iconBg,
+              display: "flex",
+              alignItems: "center",
               justifyContent: "center",
               fontSize: 24,
               color: s.iconColor
@@ -877,10 +845,10 @@ function OverviewPage({ subadmins, clients, employees, managers, projects, packa
                     <span style={{ fontSize: 12, fontWeight: 800, color: "#3b82f6" }}>{p.progress || 0}%</span>
                   </div>
                   <div style={{ background: "#f1f5f9", borderRadius: 10, height: 8, overflow: "hidden" }}>
-                    <div style={{ 
-                      width: `${p.progress || 0}%`, 
-                      background: (p.progress || 0) === 100 ? "linear-gradient(90deg, #10b981, #34d399)" : "linear-gradient(90deg, #3b82f6, #60a5fa)", 
-                      borderRadius: 10, 
+                    <div style={{
+                      width: `${p.progress || 0}%`,
+                      background: (p.progress || 0) === 100 ? "linear-gradient(90deg, #10b981, #34d399)" : "linear-gradient(90deg, #3b82f6, #60a5fa)",
+                      borderRadius: 10,
                       height: "100%",
                       transition: "width 1s ease-out"
                     }} />

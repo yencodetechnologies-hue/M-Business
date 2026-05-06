@@ -3219,6 +3219,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             alert("❌ Limit Reached: Your current plan only allows managing a single business (1 Company Name). Please upgrade to 'Multiple business manage' plan.");
             return;
           }
+        } else {
+          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
+          return;
         }
       }
     } catch (err) {
@@ -3285,6 +3288,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             alert(`❌ Limit Reached: Your current plan only allows up to ${employeeLimit} Employees. Please upgrade your plan or refresh if you just updated.`);
             return;
           }
+        } else {
+          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
+          return;
         }
       }
     } catch (err) {
@@ -3366,6 +3372,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             alert(`❌ Limit Reached: Your current plan only allows up to ${managerLimit} Managers. Please upgrade your plan or refresh if you just updated.`);
             return;
           }
+        } else {
+          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
+          return;
         }
       }
     } catch (err) {
@@ -4124,11 +4133,40 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => { setReturnToModal(null); setModal("employee"); }} />}
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => { 
+            const limit = parseLimit(subscription?.employeeLimit, "employee");
+            if (subscription && employees.length >= limit) {
+              alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Employees. Please upgrade your plan.`);
+              return;
+            }
+            setReturnToModal(null); setModal("employee"); 
+          }} />}
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { setReturnToModal(modal); setModal("client"); }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
-          {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { setReturnToModal(modal); setModal("client"); }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { 
+            const limit = parseLimit(subscription?.clientLimit, "client");
+            if (subscription && clients.length >= limit) {
+              alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
+              return;
+            }
+            if (subscription?.businessLimit === "" && clients.length >= 1) {
+              alert("❌ Limit Reached: Your current plan only allows managing a single business. Please upgrade your plan.");
+              return;
+            }
+            setReturnToModal(modal); setModal("client"); 
+          }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+          {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { 
+            const limit = parseLimit(subscription?.clientLimit, "client");
+            if (subscription && clients.length >= limit) {
+              alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
+              return;
+            }
+            if (subscription?.businessLimit === "" && clients.length >= 1) {
+              alert("❌ Limit Reached: Your current plan only allows managing a single business. Please upgrade your plan.");
+              return;
+            }
+            setReturnToModal(modal); setModal("client"); 
+          }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} />}
@@ -4518,7 +4556,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 });
               }}
               error={npError.client}
-              onAddClient={() => { setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false); }}
+              onAddClient={() => { 
+                const limit = parseLimit(subscription?.clientLimit, "client");
+                if (subscription && clients.length >= limit) {
+                  alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
+                  return;
+                }
+                if (subscription?.businessLimit === "" && clients.length >= 1) {
+                  alert("❌ Limit Reached: Your current plan only allows managing a single business. Please upgrade your plan.");
+                  return;
+                }
+                setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false); 
+              }}
             />
             {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}
           </div>

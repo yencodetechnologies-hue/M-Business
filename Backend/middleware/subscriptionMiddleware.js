@@ -143,9 +143,13 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
     }).sort({ createdAt: -1 });
 
     if (!subscription) {
-      // If no subscription, we might want to allow if they are in setup phase, 
-      // but usually checkSubscription should have caught this.
-      return next();
+      // If no subscription, strictly block resource creation
+      return res.status(403).json({
+        message: "No active subscription found. Please contact your administrator to assign a package.",
+        limitReached: true,
+        limit: 0,
+        currentCount: 0
+      });
     }
 
     let limit = Infinity;

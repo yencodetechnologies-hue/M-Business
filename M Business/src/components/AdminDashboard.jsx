@@ -137,7 +137,7 @@ export default function AdminDashboard({ user, setUser }) {
     } catch (e) { console.error(e); }
   };
 
-  const createPackage = async () => {
+  const savePackage = async () => {
     const errors = {};
     if (!npkg.title.trim()) errors.title = "Title required";
     if (!npkg.description.trim()) errors.description = "Description required";
@@ -157,7 +157,7 @@ export default function AdminDashboard({ user, setUser }) {
         quarterlyPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 3 * 0.9).toString(),
         halfYearlyPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 6 * 0.85).toString(),
         annualPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 12 * 0.8).toString(),
-        buttonName: "Get Started",
+        buttonName: "",
         features: `${npkg.planDuration} Plan\n${npkg.businessLimit}\n${npkg.managerLimit}\n${npkg.clientLimit}\n${npkg.employeeLimit}`,
         planDuration: npkg.planDuration,
         businessLimit: npkg.businessLimit,
@@ -167,8 +167,17 @@ export default function AdminDashboard({ user, setUser }) {
         targetRole: "subadmin",
         assignedSubadmins: npkg.assignedSubadmins || []
       };
-      const res = await axios.post(BASE_URL + "/api/packages", packageData);
-      setPackages(prev => [...prev, res.data]);
+      let res;
+      if (editPkg) {
+        res = await axios.put(`${BASE_URL}/api/packages/${editPkg._id}`, {
+          ...packageData,
+          updateActiveSubscriptions: updateActiveSubs
+        });
+        setPackages(prev => prev.map(p => p._id === editPkg._id ? res.data : p));
+      } else {
+        res = await axios.post(BASE_URL + "/api/packages", packageData);
+        setPackages(prev => [...prev, res.data]);
+      }
       setNpkg({
         title: "",
         description: "",
@@ -184,13 +193,44 @@ export default function AdminDashboard({ user, setUser }) {
         assignedSubadmins: []
       });
       setPkgError({});
+      setEditPkg(null);
       setModal(null);
     } catch (err) {
       console.error(err);
-      alert("Failed to create package");
+      alert(editPkg ? "Failed to update package" : "Failed to create package");
     } finally {
       setPkgSaveLoading(false);
     }
+  };
+
+  const deletePackage = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this package?")) return;
+    try {
+      await axios.delete(`${BASE_URL}/api/packages/${id}`);
+      setPackages(prev => prev.filter(p => p._id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete package");
+    }
+  };
+
+  const handleEditPackageClick = (pkg) => {
+    setEditPkg(pkg);
+    setNpkg({
+      title: pkg.title || "",
+      description: pkg.description || "",
+      icon: pkg.icon || "📦",
+      isFree: pkg.type === "free",
+      price: pkg.price?.toString() || "",
+      noOfDays: pkg.no_of_days?.toString() || pkg.noOfDays?.toString() || "30",
+      planDuration: pkg.planDuration || "Monthly Plan",
+      businessLimit: pkg.businessLimit || "Single business manage",
+      managerLimit: pkg.managerLimit || "",
+      clientLimit: pkg.clientLimit || "",
+      employeeLimit: pkg.employeeLimit || "",
+      assignedSubadmins: pkg.assignedSubadmins || []
+    });
+    setModal("package_add");
   };
 
   const handleLogout = () => {
@@ -259,9 +299,32 @@ export default function AdminDashboard({ user, setUser }) {
             </h2>
             <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>Admin Control Panel</div>
           </div>
+
+
+
+
+
           {active === "packages" && (
             <button
-              onClick={() => { setPkgError({}); setModal("package_add"); }}
+              onClick={() => {
+                setEditPkg(null);
+                setNpkg({
+                  title: "",
+                  description: "",
+                  icon: "📦",
+                  isFree: false,
+                  price: "",
+                  noOfDays: "30",
+                  planDuration: "Monthly Plan",
+                  businessLimit: "Single business manage",
+                  managerLimit: "",
+                  clientLimit: "",
+                  employeeLimit: "",
+                  assignedSubadmins: []
+                });
+                setPkgError({});
+                setModal("package_add");
+              }}
               style={B("var(--app-accent)")}
             >
               + Add Package
@@ -286,7 +349,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "interviews" && <InterviewPage />}
           {active === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
           {active === "subscriptions" && <SubscriptionsPage subscriptions={subscriptions} />}
-          {active === "packages" && <PackagesPage packages={packages} />}
+          {active === "packages" && <PackagesPage packages={packages} onEdit={handleEditPackageClick} onDelete={deletePackage} />}
           {active === "payments" && <AccountsPage ExpensesPage={ExpensesPage} />}
         </div>
       </div>
@@ -319,10 +382,10 @@ export default function AdminDashboard({ user, setUser }) {
             }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>
-                  📦 Add New Package
+                  {editPkg ? "✏️ Edit Package" : "📦 Add New Package"}
                 </h2>
                 <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-                  Create a subscription plan for subadmins
+                  {editPkg ? "Update subscription plan details" : "Create a subscription plan for subadmins"}
                 </p>
               </div>
               <button onClick={() => setModal(null)} style={{
@@ -579,6 +642,22 @@ export default function AdminDashboard({ user, setUser }) {
           )} */}
               </div>
 
+              {/* Update Active Subscriptions Checkbox */}
+              {editPkg && (
+                <div style={{ marginBottom: 20, display: "flex", alignItems: "center", gap: 10, background: "#f5f3ff", padding: "12px 16px", borderRadius: 12, border: "1px solid #ddd6fe" }}>
+                  <input
+                    type="checkbox"
+                    id="updateSubs"
+                    checked={updateActiveSubs}
+                    onChange={e => setUpdateActiveSubs(e.target.checked)}
+                    style={{ width: 18, height: 18, cursor: "pointer", accentColor: "#7c3aed" }}
+                  />
+                  <label htmlFor="updateSubs" style={{ fontSize: 13, fontWeight: 600, color: "#5b21b6", cursor: "pointer" }}>
+                    🔄 Update active subscriptions with these new limits/prices
+                  </label>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div style={{ display: "flex", gap: 10 }}>
                 <button
@@ -594,7 +673,7 @@ export default function AdminDashboard({ user, setUser }) {
                   Cancel
                 </button>
                 <button
-                  onClick={createPackage}
+                  onClick={savePackage}
                   disabled={pkgSaveLoading}
                   style={{
                     flex: 2, padding: "12px",
@@ -609,7 +688,7 @@ export default function AdminDashboard({ user, setUser }) {
                     transition: "all 0.2s"
                   }}
                 >
-                  {pkgSaveLoading ? "Creating..." : "✨ Create Package"}
+                  {pkgSaveLoading ? (editPkg ? "Updating..." : "Creating...") : (editPkg ? "✨ Update Package" : "✨ Create Package")}
                 </button>
               </div>
             </div>
@@ -1263,7 +1342,7 @@ function SubscriptionsPage({ subscriptions }) {
     </div>
   );
 }
-function PackagesPage({ packages }) {
+function PackagesPage({ packages, onEdit, onDelete }) {
   const displayedPackages = (packages && packages.length > 0) ? packages : [];
 
   if (displayedPackages.length === 0) {
@@ -1395,6 +1474,67 @@ function PackagesPage({ packages }) {
                 </div>
               )}
 
+              {/* Management Buttons */}
+              <div style={{
+                position: "absolute", top: 16, right: 16,
+                display: "flex", gap: 8, zIndex: 10
+              }}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onEdit(p); }}
+                  title="Edit Package"
+                  style={{
+                    width: 36, height: 36, borderRadius: 10,
+                    background: "rgba(124, 58, 237, 0.15)",
+                    border: "1.5px solid rgba(124, 58, 237, 0.3)",
+                    color: "#a78bfa",
+                    cursor: "pointer", display: "flex",
+                    alignItems: "center", justifyContent: "center",
+                    transition: "all 0.2s",
+                    fontSize: 16,
+                    backdropFilter: "blur(4px)"
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = "rgba(124, 58, 237, 0.3)";
+                    e.currentTarget.style.color = "#fff";
+                    e.currentTarget.style.transform = "scale(1.05)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = "rgba(124, 58, 237, 0.15)";
+                    e.currentTarget.style.color = "#a78bfa";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onDelete(p._id); }}
+                  title="Delete Package"
+                  style={{
+                    width: 36, height: 36, borderRadius: 10,
+                    background: "rgba(239, 68, 68, 0.15)",
+                    border: "1.5px solid rgba(239, 68, 68, 0.3)",
+                    color: "#f87171",
+                    cursor: "pointer", display: "flex",
+                    alignItems: "center", justifyContent: "center",
+                    transition: "all 0.2s",
+                    fontSize: 16,
+                    backdropFilter: "blur(4px)"
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.3)";
+                    e.currentTarget.style.color = "#fff";
+                    e.currentTarget.style.transform = "scale(1.05)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)";
+                    e.currentTarget.style.color = "#f87171";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                >
+                  🗑️
+                </button>
+              </div>
+
               {/* Plan title */}
               <div style={{
                 fontSize: 20, fontWeight: 800, color: "#fff",
@@ -1492,10 +1632,10 @@ function PackagesPage({ packages }) {
                   }
                 }}
               >
-                {p.buttonName || "Get it now"}
+                {p.buttonName || "Get Started"}
               </button>
 
-             
+
 
               {/* Duration badge */}
               <div style={{

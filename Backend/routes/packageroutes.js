@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Package = require("../models/PackageModel");
+const Subscription = require("../models/SubscriptionModel");
 
 // GET all packages
 router.get("/", async (req, res) => {
@@ -44,10 +45,9 @@ router.post("/", async (req, res) => {
       quarterlyPrice: quarterlyPrice || "0",
       halfYearlyPrice: halfYearlyPrice || "0",
       annualPrice: annualPrice || "0",
-      buttonName: buttonName || "Get Started",
       planDuration: planDuration || "Monthly",
-      businessLimit: businessLimit || "Single business manage",
-      managerLimit: managerLimit || "1 Manager",
+      businessLimit: businessLimit || "",
+      managerLimit: managerLimit || "",
       clientLimit: clientLimit || "3 Client manage",
       status: status || "Active",
       targetRole: targetRole || "subadmin",
@@ -66,7 +66,7 @@ router.post("/", async (req, res) => {
 // UPDATE a package
 router.put("/:id", async (req, res) => {
   try {
-    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, status, planDuration, businessLimit, managerLimit, clientLimit, targetRole, assignedSubadmins } = req.body;
+    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, status, planDuration, businessLimit, managerLimit, clientLimit, employeeLimit, targetRole, assignedSubadmins, updateActiveSubscriptions } = req.body;
 
     const updatedFeatures = Array.isArray(features) ? features : (features ? features.split(/\r?\n/).map(f => f.trim()).filter(f => f) : []);
 
@@ -88,6 +88,7 @@ router.put("/:id", async (req, res) => {
       businessLimit,
       managerLimit,
       clientLimit,
+      employeeLimit,
       targetRole,
       assignedSubadmins,
       updatedAt: Date.now()
@@ -101,6 +102,22 @@ router.put("/:id", async (req, res) => {
       updateData,
       { new: true }
     );
+
+    // If updateActiveSubscriptions is true, update all active subscriptions using this package
+    if (updateActiveSubscriptions) {
+      await Subscription.updateMany(
+        { packageId: req.params.id, status: "active" },
+        {
+          planName: title,
+          planPrice: price,
+          clientLimit,
+          employeeLimit,
+          managerLimit,
+          businessLimit,
+          features: updatedFeatures
+        }
+      );
+    }
 
     res.json(updatedPackage);
   } catch (err) {

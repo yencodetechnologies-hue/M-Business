@@ -359,4 +359,36 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+// ── POST /api/auth/change-password ──────────────────────────────────────────
+router.post("/change-password", async (req, res) => {
+  try {
+    const { userId, oldPassword, newPassword } = req.body;
+    
+    let user = await User.findById(userId);
+    if (!user) user = await Client.findById(userId);
+    if (!user) user = await Manager.findById(userId);
+    if (!user) user = await Employee.findById(userId);
+
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    // For hardcoded users, we don't allow password change or we bypass bcrypt
+    if (userId === "admin-hardcoded-id" || userId === "subadmin-hardcoded-id" || userId === "client-hardcoded-id") {
+       return res.status(400).json({ msg: "Password change is disabled for demo accounts" });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(400).json({ msg: "Incorrect current password" });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    await user.save();
+
+    res.json({ msg: "Password updated successfully" });
+  } catch (err) {
+    console.error("Change password error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 module.exports = router;
+

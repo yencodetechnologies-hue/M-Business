@@ -63,12 +63,12 @@ const PLANS = [
   {
     name: "Starter", price: 999, icon: "🌱", color: "#6366f1",
     features: ["5 Projects", "10 Invoices", "Basic Reports", "Email Support", ""],
-    btnLabel: "Get Started"
+
   },
   {
     name: "Professional", price: 2999, icon: "🚀", color: "var(--app-accent)", popular: true,
     features: ["Unlimited Projects", "Unlimited Invoices", "Advanced Reports", "Priority Support", "Team Management"],
-    btnLabel: "Get Started"
+
   },
   {
     name: "Enterprise", price: null, icon: "🏢", color: "var(--app-sidebar)",
@@ -623,8 +623,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                     {isProcessing ? (
                       <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid rgba(255,255,255,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing...</>
                     ) : plan.price === null ? "📞 Contact Sales"
-                      : isTrial ? "🎁 Get it now"
-                        : "Get it now"}
+                      : isTrial ? "🎁 Get Started"
+                        : "Get Started"}
                   </button>
                 </div>
               );

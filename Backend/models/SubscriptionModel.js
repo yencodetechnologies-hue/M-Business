@@ -4,6 +4,7 @@ const subscriptionSchema = new mongoose.Schema({
   userId: { type: String, required: true, index: true },
   userEmail: { type: String, required: true },
   userName: { type: String },
+  packageId: { type: String },
 
   // Current Plan Details
   planName: { type: String, required: true, enum: ["Free", "Trial", "Starter", "Professional", "Enterprise", "Custom"] },
@@ -36,6 +37,10 @@ const subscriptionSchema = new mongoose.Schema({
 
   // Features included in plan
   features: [{ type: String }],
+  clientLimit: { type: String },
+  employeeLimit: { type: String },
+  managerLimit: { type: String },
+  businessLimit: { type: String },
 
   // Payment provider info
   paymentMethod: { type: String, enum: ["card", "upi", "netbanking", "cash", "other"], default: "other" },

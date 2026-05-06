@@ -105,7 +105,11 @@ router.post("/start-trial", async (req, res) => {
       nextBillingDate: endDate,
       usageLimit: 999,
       usageCount: 0,
-      features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Basic Reports", "Email Support"],
+      features: ["30 Days Free Trial", "1 Company Name", "5 Employees", "", "Basic Reports", "Email Support"],
+      clientLimit: "1 Company manage",
+      employeeLimit: "5 Employee manage",
+      managerLimit: "",
+      businessLimit: "",
       paymentMethod: "other",
       providerCompany: "M Business",
       notes: "Free 30-day trial"
@@ -135,7 +139,7 @@ router.post("/start-trial", async (req, res) => {
     await trialPayment.save();
 
     // Update user mySubscriptions
-    await User.findByIdAndUpdate(userId, { mySubscriptions: true, numberOfSubscriptions: 1 }).catch(() => {});
+    await User.findByIdAndUpdate(userId, { mySubscriptions: true, numberOfSubscriptions: 1 }).catch(() => { });
 
     // Send trial welcome email
     try {
@@ -163,7 +167,7 @@ router.post("/create", async (req, res) => {
     const subscription = new Subscription(data);
     await subscription.save();
 
-    await User.findByIdAndUpdate(data.userId, { mySubscriptions: true }).catch(() => {});
+    await User.findByIdAndUpdate(data.userId, { mySubscriptions: true }).catch(() => { });
 
     // Send subscription success email
     try {
@@ -309,7 +313,7 @@ router.put("/toggle-visibility/:userId", async (req, res) => {
       { $or: [{ userId }, { companyId: userId }] },
       { showInDashboard: showSubscriptions }
     );
-    await User.findByIdAndUpdate(userId, { mySubscriptions: showSubscriptions }).catch(() => {});
+    await User.findByIdAndUpdate(userId, { mySubscriptions: showSubscriptions }).catch(() => { });
     res.json({ success: true, showSubscriptions });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -392,7 +396,7 @@ router.get("/quotations/:userId", async (req, res) => {
 // ─── Assign package to subadmin ───────────────────────────────────────────────
 router.post("/assign-to-subadmin", async (req, res) => {
   try {
-    const { subadminId, subadminEmail, subadminName, packageId, packageTitle, planPrice, billingCycle, durationDays, features, notes } = req.body;
+    const { subadminId, subadminEmail, subadminName, packageId, packageTitle, planPrice, billingCycle, durationDays, features, notes, clientLimit, employeeLimit, managerLimit, businessLimit } = req.body;
 
     await Subscription.updateMany({ userId: subadminId, status: "active" }, { status: "cancelled" });
 
@@ -405,6 +409,7 @@ router.post("/assign-to-subadmin", async (req, res) => {
       companyId: subadminId,
       userEmail: subadminEmail,
       userName: subadminName,
+      packageId: packageId,
       planName: packageTitle || "Custom",
       planPrice: planPrice || 0,
       billingCycle: billingCycle || "monthly",
@@ -413,13 +418,17 @@ router.post("/assign-to-subadmin", async (req, res) => {
       startDate, endDate,
       nextBillingDate: endDate,
       usageLimit: 999,
-      features: features || ["Subadmin Package"],
+      features: features || [packageTitle || "Subadmin Package"],
+      clientLimit: clientLimit || "Unlimited Company manage",
+      employeeLimit: employeeLimit || "Unlimited Employee manage",
+      managerLimit: managerLimit || "Unlimited Manager",
+      businessLimit: businessLimit || "Multiple business manage",
       paymentMethod: "other",
       notes: notes || "Package assigned by admin"
     });
 
     await sub.save();
-    await User.findByIdAndUpdate(subadminId, { mySubscriptions: true }).catch(() => {});
+    await User.findByIdAndUpdate(subadminId, { mySubscriptions: true }).catch(() => { });
 
     try {
       await sendQuickEmail(subadminEmail, "M Business Package Assigned",

@@ -2932,7 +2932,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [showSubPass, setShowSubPass] = useState(false);
 
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
   const [pkgError, setPkgError] = useState({});
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
 
@@ -3376,7 +3376,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         quarterlyPrice: npkg.quarterlyPrice || "0",
         halfYearlyPrice: npkg.halfYearlyPrice || "0",
         annualPrice: npkg.annualPrice || "0",
-        buttonName: npkg.buttonName || "Get Started",
+
         features: npkg.features ? npkg.features.split(',').map(f => f.trim()).filter(f => f) : [],
         planDuration: npkg.planDuration || "Monthly",
         businessLimit: npkg.businessLimit || "",
@@ -3389,7 +3389,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
       const res = await axios.post(BASE_URL + "/api/packages", packageData);
       setPackages(prev => [...prev, res.data]);
-      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", buttonName: "Get Started", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
+      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
       setPkgError({});
       setModal(null);
       toast.success("✅ Package added!");
@@ -4582,7 +4582,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
           <Fld label="Package Title *" value={npkg.title} onChange={v => { setNpkg({ ...npkg, title: v }); setPkgError(p => ({ ...p, title: "" })); }} error={pkgError.title} />
           <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
-          <Fld label="Button Name" value={npkg.buttonName} onChange={v => setNpkg({ ...npkg, buttonName: v })} placeholder="e.g. Get Started" />
+
           <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
         </div>
 

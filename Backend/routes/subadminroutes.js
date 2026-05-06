@@ -125,4 +125,89 @@ router.get("/branding/:companyId", async (req, res) => {
   }
 });
 
+// GET all resources (employees, clients, managers) assigned to a subadmin
+router.get("/resources/:subadminId", async (req, res) => {
+  try {
+    const { subadminId } = req.params;
+    const [employees, clients, managers] = await Promise.all([
+      Employee.find({ companyId: subadminId }).sort({ name: 1 }),
+      Client.find({ companyId: subadminId }).sort({ clientName: 1 }),
+      Manager.find({ companyId: subadminId }).sort({ managerName: 1 })
+    ]);
+    res.json({ employees, clients, managers });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error fetching resources" });
+  }
+});
+
+// GET all unassigned resources (no companyId set)
+router.get("/unassigned-resources", async (req, res) => {
+  try {
+    const [employees, clients, managers] = await Promise.all([
+      Employee.find({ $or: [{ companyId: "" }, { companyId: null }, { companyId: { $exists: false } }] }).sort({ name: 1 }),
+      Client.find({ $or: [{ companyId: "" }, { companyId: null }, { companyId: { $exists: false } }] }).sort({ clientName: 1 }),
+      Manager.find({ $or: [{ companyId: "" }, { companyId: null }, { companyId: { $exists: false } }] }).sort({ managerName: 1 })
+    ]);
+    res.json({ employees, clients, managers });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error fetching unassigned resources" });
+  }
+});
+
+// POST assign employees/clients/managers to a subadmin
+router.post("/assign-resources", async (req, res) => {
+  try {
+    const { subadminId, employeeIds = [], clientIds = [], managerIds = [] } = req.body;
+    if (!subadminId) return res.status(400).json({ msg: "subadminId required" });
+
+    const results = await Promise.all([
+      employeeIds.length > 0
+        ? Employee.updateMany({ _id: { $in: employeeIds } }, { $set: { companyId: subadminId } })
+        : Promise.resolve({ modifiedCount: 0 }),
+      clientIds.length > 0
+        ? Client.updateMany({ _id: { $in: clientIds } }, { $set: { companyId: subadminId } })
+        : Promise.resolve({ modifiedCount: 0 }),
+      managerIds.length > 0
+        ? Manager.updateMany({ _id: { $in: managerIds } }, { $set: { companyId: subadminId } })
+        : Promise.resolve({ modifiedCount: 0 }),
+    ]);
+
+    res.json({
+      msg: "Resources assigned successfully",
+      employees: results[0].modifiedCount,
+      clients: results[1].modifiedCount,
+      managers: results[2].modifiedCount,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error assigning resources" });
+  }
+});
+
+// POST unassign employees/clients/managers from a subadmin
+router.post("/unassign-resources", async (req, res) => {
+  try {
+    const { employeeIds = [], clientIds = [], managerIds = [] } = req.body;
+
+    await Promise.all([
+      employeeIds.length > 0
+        ? Employee.updateMany({ _id: { $in: employeeIds } }, { $set: { companyId: "" } })
+        : Promise.resolve(),
+      clientIds.length > 0
+        ? Client.updateMany({ _id: { $in: clientIds } }, { $set: { companyId: "" } })
+        : Promise.resolve(),
+      managerIds.length > 0
+        ? Manager.updateMany({ _id: { $in: managerIds } }, { $set: { companyId: "" } })
+        : Promise.resolve(),
+    ]);
+
+    res.json({ msg: "Resources unassigned successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error unassigning resources" });
+  }
+});
+
 module.exports = router;

@@ -419,9 +419,9 @@ router.post("/assign-to-subadmin", async (req, res) => {
       nextBillingDate: endDate,
       usageLimit: 999,
       features: features || [packageTitle || "Subadmin Package"],
-      clientLimit: clientLimit || "Unlimited Company manage",
-      employeeLimit: employeeLimit || "Unlimited Employee manage",
-      managerLimit: managerLimit || "Unlimited Manager",
+      clientLimit: clientLimit || "",
+      employeeLimit: employeeLimit || "",
+      managerLimit: managerLimit || "",
       businessLimit: businessLimit || "Multiple business manage",
       paymentMethod: "other",
       notes: notes || "Package assigned by admin"

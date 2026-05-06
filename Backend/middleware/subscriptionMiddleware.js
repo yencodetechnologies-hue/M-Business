@@ -116,10 +116,10 @@ const adminBypass = (req, res, next) => {
 
 // Helper to parse limit strings (e.g., "10 Employees" -> 10, "Unlimited" -> Infinity)
 const parseLimit = (limitStr) => {
-  if (!limitStr || limitStr.trim() === "") return Infinity; // Default to unlimited if not set, or change to 1/0 based on requirements
+  if (!limitStr || limitStr.trim() === "") return 0; // Default to 0 if not set to strictly restrict
   if (limitStr.toLowerCase().includes("unlimited")) return Infinity;
   const match = limitStr.match(/\d+/);
-  return match ? parseInt(match[0]) : Infinity;
+  return match ? parseInt(match[0]) : 0;
 };
 
 // Middleware to check specific resource limits (Employee, Client, Manager)

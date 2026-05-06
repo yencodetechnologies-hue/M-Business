@@ -186,9 +186,9 @@ export default function AdminDashboard({ user, setUser }) {
         ].filter(Boolean).join("\n"),
         planDuration: npkg.planDuration,
         businessLimit: npkg.businessLimit,
-        managerLimit: npkg.managerLimit,
-        clientLimit: npkg.clientLimit,
-        employeeLimit: npkg.employeeLimit,
+        managerLimit: npkg.managerLimit || "",
+        clientLimit: npkg.clientLimit || "",
+        employeeLimit: npkg.employeeLimit || "",
         targetRole: "subadmin",
         assignedSubadmins: npkg.assignedSubadmins || []
       };
@@ -1034,15 +1034,15 @@ function SubadminsList({ subadmins, refresh, packages, subscriptions }) {
                       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         <span style={{ fontSize: 10, color: "#64748b", display: "flex", justifyContent: "space-between" }}>
                           <span>Clients:</span>
-                          <span style={{ fontWeight: 600 }}>{clients.filter(c => c.companyId === s._id).length} / {sub.clientLimit || "—"}</span>
+                          <span style={{ fontWeight: 600 }}>{clients.filter(c => c.companyId === s._id).length} / {sub.clientLimit || "0"}</span>
                         </span>
                         <span style={{ fontSize: 10, color: "#64748b", display: "flex", justifyContent: "space-between" }}>
                           <span>Employees:</span>
-                          <span style={{ fontWeight: 600 }}>{employees.filter(e => e.companyId === s._id).length} / {sub.employeeLimit || "—"}</span>
+                          <span style={{ fontWeight: 600 }}>{employees.filter(e => e.companyId === s._id).length} / {sub.employeeLimit || "0"}</span>
                         </span>
                         <span style={{ fontSize: 10, color: "#64748b", display: "flex", justifyContent: "space-between" }}>
                           <span>Managers:</span>
-                          <span style={{ fontWeight: 600 }}>{managers.filter(m => m.companyId === s._id).length} / {sub.managerLimit || "—"}</span>
+                          <span style={{ fontWeight: 600 }}>{managers.filter(m => m.companyId === s._id).length} / {sub.managerLimit || "0"}</span>
                         </span>
                       </div>
                     )}

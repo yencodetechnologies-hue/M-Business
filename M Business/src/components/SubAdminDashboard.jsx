@@ -3061,11 +3061,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const subStatus = getSubStatus();
 
   const parseLimit = (limitStr, type = "client") => {
-    if (!limitStr || limitStr.trim() === "") return Infinity;
+    if (!limitStr || limitStr.trim() === "") return 0;
     if (limitStr.toLowerCase().includes("unlimited")) return Infinity;
     const match = limitStr.match(/\d+/);
     if (match) return parseInt(match[0]);
-    return Infinity;
+    return 0;
   };
 
   const handleLogout = () => { localStorage.removeItem("user"); setUser(null); };

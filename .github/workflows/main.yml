@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install Dependencies
         run: npm install
@@ -35,6 +35,17 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/mbusiness/M-Business/Backend
+
             git pull origin main
+
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm use 20
+
             npm install
-            pm2 restart mbusiness
+
+            pm2 describe mbusiness > /dev/null \
+              && pm2 restart mbusiness \
+              || pm2 start index.js --name mbusiness
+
+            pm2 save

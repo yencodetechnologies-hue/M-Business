@@ -1428,7 +1428,7 @@ export default function ClientDashboard({ user, setUser }) {
                       >View</button>
                       <button
                         onClick={() => window.open(`/project-proposal?view=${p._id || p.id}&print=true`, "_blank")}
-                        style={{ background: "#f1f5f9", border: "none", borderRadius: 14, padding: "12px 20px", color: THEME.text, fontWeight: 800, cursor: "pointer" }}
+                        style={{ background: "var(--app-surface)", border: "none", borderRadius: 14, padding: "12px 20px", color: THEME.text, fontWeight: 800, cursor: "pointer" }}
                       >🖨️</button>
                     </div>
                   </div>

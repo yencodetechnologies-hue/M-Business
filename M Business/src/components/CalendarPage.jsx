@@ -192,7 +192,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     if (!window.confirm("Delete this event?")) return;
     try { await axios.delete(`${API}/${id}`); } catch { }
     setEvents(p => p.filter(x => (x._id || x.id) !== id));
-    showToast("🗑️ Deleted!");
+    showToast("Delete Deleted!");
   };
 
   const prevMonth = () => {
@@ -649,7 +649,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                                   borderRadius: 7, padding: "5px 12px", fontSize: 11,
                                   color: "#ef4444", cursor: "pointer", fontWeight: 700
                                 }}>
-                                  🗑️
+                                  Delete
                                 </button>
                               )}
                             </>

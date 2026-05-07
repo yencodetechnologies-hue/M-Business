@@ -516,19 +516,68 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
       {editClient && (
         <Mdl title="Edit Company" onClose={() => setEditClient(null)}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-            <div style={{ position: "relative", width: 100, height: 100 }}>
-              {editForm.logoUrl ? (
-                <img src={editForm.logoUrl} alt="Logo" style={{ width: 100, height: 100, borderRadius: "50%", objectFit: "cover", border: "2px dashed #d8b4fe", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", display: "block" }} />
-              ) : (
-                <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", border: "2px dashed #d8b4fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>🏢</div>
-              )}
-              <label style={{ position: "absolute", bottom: 0, right: 0, background: "var(--app-muted)", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-                <span style={{ fontSize: 16 }}>📷</span>
-                <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
-                  triggerCrop(e, (croppedImage) => setEditForm(p => ({ ...p, logoUrl: croppedImage })), 1);
-                }} />
-
-              </label>
+            <div 
+              onClick={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => triggerCrop(e, (croppedImage) => setEditForm(p => ({ ...p, logoUrl: croppedImage })), 1);
+                input.click();
+              }}
+              style={{ 
+                position: "relative", 
+                cursor: "pointer",
+                width: "auto",
+                height: "auto",
+                maxWidth: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center"
+              }}
+            >
+              <div style={{ 
+                padding: editForm.logoUrl ? 4 : 24, 
+                borderRadius: 20, 
+                background: "#fff", 
+                border: "2.5px dashed var(--app-border)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 100,
+                minHeight: 100,
+                overflow: "hidden",
+                boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                transition: "all 0.3s ease"
+              }}>
+                {editForm.logoUrl ? (
+                  <img 
+                    src={editForm.logoUrl} 
+                    alt="Logo" 
+                    style={{ 
+                      width: "auto", 
+                      height: "auto", 
+                      maxWidth: "240px", 
+                      maxHeight: "120px", 
+                      objectFit: "contain",
+                      display: "block",
+                      borderRadius: 12
+                    }} 
+                  />
+                ) : (
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Change Logo</div>
+                  </div>
+                )}
+              </div>
+              <div style={{ 
+                position: "absolute", bottom: -10, right: -10, 
+                width: 36, height: 36, borderRadius: "50%", 
+                background: "var(--app-accent)", color: "#fff", 
+                display: "flex", alignItems: "center", justifyContent: "center", 
+                fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
+                border: "3px solid #fff"
+              }}>📷</div>
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
@@ -2286,6 +2335,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
     const on = active === n.key;
     return (
       <button
+        data-nav-key={n.key}
         onClick={() => { setActive(n.key); onClose(); }}
         style={{
           width: "100%",
@@ -2449,70 +2499,114 @@ function PackagesPage({ packages, onViewPackage, onEditPackage, onSubscribe }) {
                 key={p.id || p._id || idx}
                 style={{
                   width: "100%",
-                  maxWidth: 400,
-                  background: "#fff",
-                  borderRadius: 24,
-                  padding: 32,
-                  border: isPro ? "2.5px solid var(--app-accent)" : "1px solid var(--app-border)",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
+                  maxWidth: 320,
+                  background: isPro ? "var(--app-accent)" : "#fff",
+                  borderRadius: 32,
+                  padding: "40px 32px",
+                  border: isPro ? "2px solid var(--app-accent)" : "1px solid var(--app-border)",
+                  boxShadow: isPro ? "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237), 0.2)" : "0 10px 30px rgba(0,0,0,0.04)",
                   position: "relative",
                   display: "flex",
                   flexDirection: "column",
-                  transition: "all 0.3s ease"
+                  transition: "all 0.3s ease",
+                  marginTop: isPro ? 0 : 20
                 }}
               >
-                <div style={{ fontSize: 28, marginBottom: 20 }}>{p.icon || "📦"}</div>
-                <h3 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 8px", color: "var(--app-sidebar)" }}>{p.title}</h3>
-                <div style={{ fontSize: 13, color: "var(--app-muted)", marginBottom: 20 }}>Billed monthly</div>
+                {isPro && (
+                  <div style={{
+                    position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
+                    background: "var(--app-sidebar)", color: "#fff", padding: "6px 20px",
+                    borderRadius: 20, fontSize: 11, fontWeight: 900, textTransform: "uppercase",
+                    letterSpacing: 1, whiteSpace: "nowrap"
+                  }}>Most Popular</div>
+                )}
+
+                <div style={{ fontSize: 32, marginBottom: 24, textAlign: "left" }}>{p.icon || "📦"}</div>
                 
-                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
-                  <span style={{ fontSize: 32, fontWeight: 800, color: "var(--app-sidebar)" }}>₹{p.price || 0}</span>
-                  <span style={{ fontSize: 14, color: "var(--app-muted)" }}>/month</span>
+                <h3 style={{ 
+                  fontSize: 24, fontWeight: 800, margin: "0 0 6px", 
+                  color: isPro ? "#fff" : "var(--app-sidebar)" 
+                }}>{p.title}</h3>
+                
+                <div style={{ 
+                  fontSize: 13, color: isPro ? "rgba(255,255,255,0.7)" : "var(--app-muted)", 
+                  marginBottom: 24, fontWeight: 600
+                }}>
+                  {p.planDuration ? `Billed ${p.planDuration.toLowerCase()}` : "Billed monthly"}
                 </div>
 
-                <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 32 }}>
+                  <span style={{ 
+                    fontSize: 42, fontWeight: 900, 
+                    color: isPro ? "#fff" : "var(--app-sidebar)",
+                    letterSpacing: "-1px"
+                  }}>
+                    {p.type === "free" ? "₹0" : p.price ? `₹${p.price}` : "Contact us"}
+                  </span>
+                  {p.price > 0 && (
+                    <span style={{ 
+                      fontSize: 14, color: isPro ? "rgba(255,255,255,0.6)" : "var(--app-muted)",
+                      fontWeight: 700
+                    }}>/month</span>
+                  )}
+                </div>
+
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16, marginBottom: 40 }}>
                   {features.map((f, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, fontSize: 14, color: "var(--app-sidebar)", fontWeight: 500 }}>
-                      <span style={{ color: "var(--app-accent)" }}>✓</span>
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: isPro ? "#fff" : "var(--app-sidebar)", fontWeight: 600 }}>
+                      <span style={{ 
+                        color: isPro ? "#fff" : "var(--app-accent)",
+                        fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
+                        width: 18, height: 18, borderRadius: "50%", background: isPro ? "rgba(255,255,255,0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)"
+                      }}>✓</span>
                       {f}
                     </div>
                   ))}
                 </div>
 
-                {/* CTA Button removed as requested */}
+                <button
+                  onClick={() => onSubscribe(p)}
+                  style={{
+                    width: "100%",
+                    padding: "16px",
+                    borderRadius: 16,
+                    border: isPro ? "1px solid #fff" : "1.5px solid var(--app-accent)",
+                    background: isPro ? "#fff" : "transparent",
+                    color: isPro ? "var(--app-accent)" : "var(--app-accent)",
+                    fontWeight: 800,
+                    fontSize: 15,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    fontFamily: "inherit"
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    if (!isPro) {
+                      e.currentTarget.style.background = "var(--app-accent)";
+                      e.currentTarget.style.color = "#fff";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = "none";
+                    if (!isPro) {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.color = "var(--app-accent)";
+                    }
+                  }}
+                >
+                  {p.buttonName || (p.title === "Enterprise" || p.price === 0 && p.type !== "free" ? "Contact Sales" : "Get Started")}
+                </button>
 
-                {/* Admin View/Edit buttons */}
                 {(onViewPackage || onEditPackage) && (
-                  <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+                  <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "center" }}>
                     {onViewPackage && (
-                      <button onClick={() => onViewPackage(p)} style={{
-                        flex: 1, padding: "10px", borderRadius: 10,
-                        background: isPro ? "rgba(255,255,255,0.1)" : "var(--app-bg)",
-                        border: isPro ? "1px solid rgba(255,255,255,0.2)" : "1px solid var(--app-border)",
-                        color: isPro ? "#fff" : "var(--app-muted)", fontSize: 12,
-                        fontWeight: 700, cursor: "pointer", fontFamily: "inherit"
-                      }}>View</button>
+                      <button onClick={() => onViewPackage(p)} style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(0,0,0,0.05)", border: "none", cursor: "pointer", fontSize: 10, fontWeight: 700 }}>VIEW</button>
                     )}
                     {onEditPackage && (
-                      <button onClick={() => onEditPackage(p)} style={{
-                        flex: 1, padding: "10px", borderRadius: 10,
-                        background: isPro ? "rgba(255,255,255,0.15)" : "rgba(var(--app-accent-rgb, 124, 58, 237), 0.05)",
-                        border: isPro ? "1px solid rgba(255,255,255,0.3)" : "1px solid var(--app-accent)",
-                        color: isPro ? "#fff" : "var(--app-accent)",
-                        fontSize: 12, fontWeight: 800, cursor: "pointer", fontFamily: "inherit"
-                      }}>Edit</button>
+                      <button onClick={() => onEditPackage(p)} style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(0,0,0,0.05)", border: "none", cursor: "pointer", fontSize: 10, fontWeight: 700 }}>EDIT</button>
                     )}
                   </div>
                 )}
-
-                {/* Validity */}
-                <div style={{
-                  marginTop: 18, textAlign: "center",
-                  fontSize: 12, color: isPro ? "rgba(255,255,255,0.4)" : "var(--app-muted)",
-                  fontWeight: 600
-                }}>
-                  {p.no_of_days || p.noOfDays || 30} days validity
-                </div>
               </div>
             );
           })}
@@ -2924,7 +3018,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const fetchSubscription = async () => {
     try {
-      setSubLoading(true);
+      if (!subscription) setSubLoading(true);
       const id = resolveSubadminId();
       if (!id) return;
 
@@ -4418,28 +4512,68 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         ) : (
           <>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-              <div style={{ position: "relative", width: 100, height: 100 }}>
-                <div style={{ width: 100, height: 100, borderRadius: "50%", background: "#fff", border: "2px dashed var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: 12, boxShadow: "inset 0 2px 10px rgba(0,0,0,0.05)" }}>
+              <div 
+                onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = (e) => triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
+                  input.click();
+                }}
+                style={{ 
+                  position: "relative", 
+                  cursor: "pointer",
+                  width: "auto",
+                  height: "auto",
+                  maxWidth: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center"
+                }}
+              >
+                <div style={{ 
+                  padding: nc.logoUrl ? 4 : 24, 
+                  borderRadius: 20, 
+                  background: "#fff", 
+                  border: "2.5px dashed var(--app-border)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: 100,
+                  minHeight: 100,
+                  overflow: "hidden",
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                  transition: "all 0.3s ease"
+                }}>
                   {nc.logoUrl ? (
-                    <div style={{
-                      width: "100%",
-                      height: "100%",
-                      backgroundImage: `url(${nc.logoUrl})`,
-                      backgroundSize: "contain",
-                      backgroundRepeat: "no-repeat",
-                      backgroundPosition: "center"
-                    }} />
+                    <img 
+                      src={nc.logoUrl} 
+                      alt="Logo" 
+                      style={{ 
+                        width: "auto", 
+                        height: "auto", 
+                        maxWidth: "240px", 
+                        maxHeight: "120px", 
+                        objectFit: "contain",
+                        display: "block",
+                        borderRadius: 12
+                      }} 
+                    />
                   ) : (
-                    <span style={{ fontSize: 40, opacity: 0.5 }}>🏢</span>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div>
+                      <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
+                    </div>
                   )}
                 </div>
-                <label style={{ position: "absolute", bottom: 0, right: 0, background: "var(--app-muted)", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-                  <span style={{ fontSize: 16 }}>📷</span>
-                  <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
-                    triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
-                  }} />
-
-                </label>
+                <div style={{ 
+                  position: "absolute", bottom: -10, right: -10, 
+                  width: 36, height: 36, borderRadius: "50%", 
+                  background: "var(--app-accent)", color: "#fff", 
+                  display: "flex", alignItems: "center", justifyContent: "center", 
+                  fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
+                  border: "3px solid #fff"
+                }}>📷</div>
               </div>
             </div>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>

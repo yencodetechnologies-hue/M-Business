@@ -6,11 +6,12 @@ const User = require("../models/UserModels");
 
 // "3" → 3, "10 Employees" → 10, "Unlimited" → Infinity, "" → 10
 const parseLimit = (limitStr) => {
-  if (limitStr === undefined || limitStr === null || limitStr === "") return 0;
+  if (limitStr === undefined || limitStr === null || limitStr === "") return 10;
   const s = String(limitStr).toLowerCase().trim();
   if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
   const m = s.match(/\d+/);
-  return m ? parseInt(m[0]) : 0;
+  const num = m ? parseInt(m[0]) : 10;
+  return num <= 0 ? 10 : num;
 };
 
 const getSubscriptionLimit = (type, sub) => {
@@ -130,29 +131,17 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
       status: { $in: ["active", "grace_period", "trial"] }
     }).sort({ createdAt: -1 });
 
-    if (!subscription) {
-      return res.status(403).json({
-        message: "No active subscription found. Please contact your administrator.",
-        limitReached: true,
-        limit: 0,
-        currentCount: 0
-      });
-    }
-
-    let limit = Infinity;
+    let limit = getSubscriptionLimit(resourceType, subscription);
     let currentCount = 0;
     let errorMessage = "";
 
     if (resourceType === 'client') {
-      limit = getSubscriptionLimit('client', subscription);
       currentCount = await Client.countDocuments({ companyId });
       errorMessage = `Client limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade.`;
     } else if (resourceType === 'employee') {
-      limit = getSubscriptionLimit('employee', subscription);
       currentCount = await Employee.countDocuments({ companyId });
       errorMessage = `Employee limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade.`;
     } else if (resourceType === 'manager') {
-      limit = getSubscriptionLimit('manager', subscription);
       currentCount = await Manager.countDocuments({ companyId });
       errorMessage = `Manager limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade.`;
     }

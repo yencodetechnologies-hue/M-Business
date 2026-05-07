@@ -996,7 +996,7 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
                   <td style={{ padding: "16px" }}>
                     <div style={{ display: "flex", gap: 8 }}>
                       <button onClick={() => openAssignModal(s)} style={{ background: `${THEME.accentSecondary}15`, color: THEME.accentSecondary, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>📦 Assign</button>
-                      <button onClick={async () => { if (window.confirm("Delete?")) { await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`); refresh(); } }} style={{ background: "#ef444415", color: "#ef4444", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>🗑️ Delete</button>
+                      <button onClick={async () => { if (window.confirm("Delete?")) { await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`); refresh(); } }} style={{ background: "#ef444415", color: "#ef4444", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Delete Delete</button>
                     </div>
                   </td>
                 </tr>
@@ -1245,7 +1245,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
                     e.currentTarget.style.transform = "scale(1)";
                   }}
                 >
-                  🗑️
+                  Delete
                 </button>
               </div>
 

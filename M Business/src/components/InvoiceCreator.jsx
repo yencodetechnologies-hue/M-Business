@@ -46,7 +46,7 @@ function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 380, padding: "32px", boxShadow: "var(--app-shadow)", textAlign: "center", border: "1px solid var(--app-border)" }}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, margin: "0 auto 20px" }}>🗑️</div>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, margin: "0 auto 20px" }}>Delete</div>
         <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 800, color: "var(--app-text)" }}>Delete Invoice?</h3>
         <p style={{ color: "var(--app-muted)", fontSize: 14, margin: "0 0 24px", lineHeight: 1.5 }}>
           Are you sure you want to delete <strong style={{ color: "var(--app-accent)" }}>{invoiceNo}</strong>? This cannot be undone.

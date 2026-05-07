@@ -1280,17 +1280,17 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   // ══ LIST VIEW ══════════════════════════════════════════════════════════════
   if (view === "list") return (
-    <div style={{ fontFamily: "'DM Sans',sans-serif", minHeight: "100%", background: "#f8fafc", padding: "24px" }}>
+    <div style={{ fontFamily: "'Outfit',sans-serif", minHeight: "100%", background: "var(--app-bg)", padding: "24px" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');.pc{transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);cursor:pointer;}.pc:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 25px 60px rgba(0,0,0,0.15)!important;}.pc:hover .pci{transform:scale(1.08);}.pci{transition:transform .5s cubic-bezier(0.4, 0, 0.2, 1);}.hb:hover{opacity:.9;transform:translateY(-2px) scale(1.05);}.hb:active{transform:translateY(0) scale(0.98);}@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}.fade-in{animation:fadeIn 0.6s ease-out;}`}</style>
 
       {/* Header Section */}
-      <div style={{ background: `linear-gradient(135deg,var(--app-accent) 0%,var(--app-muted) 100%)`, borderRadius: "24px", padding: "32px", marginBottom: "32px", boxShadow: "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237),0.2)", position: "relative", overflow: "hidden" }}>
+      <div style={{ background: `linear-gradient(135deg,var(--app-accent) 0%,var(--app-muted) 100%)`, borderRadius: "24px", padding: "32px", marginBottom: "32px", boxShadow: "var(--app-shadow)", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "0", right: "0", width: "200px", height: "200px", background: "rgba(255,255,255,0.15)", borderRadius: "50%", transform: "translate(50px,-50px)" }} />
         <div style={{ position: "absolute", bottom: "0", left: "0", width: "150px", height: "150px", background: "rgba(255,255,255,0.1)", borderRadius: "50%", transform: "translate(-30px,30px)" }} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", zIndex: 1, flexWrap: "wrap", gap: 20 }}>
           <div style={{ flex: 1, minWidth: "250px" }}>
-            <h1 style={{ margin: 0, fontSize: 32, fontWeight: 900, color: "#fff", marginBottom: 8, textShadow: "0 2px 4px rgba(0,0,0,0.1)", fontFamily: "'Syne',sans-serif" }}>Project Proposals</h1>
+            <h1 style={{ margin: 0, fontSize: 32, fontWeight: 900, color: "#fff", marginBottom: 8, textShadow: "0 2px 4px rgba(0,0,0,0.1)", fontFamily: "'Outfit',sans-serif" }}>Project Proposals</h1>
             <p style={{ margin: 0, fontSize: 16, color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>Create, manage and track your professional proposals</p>
             <div style={{ display: "flex", gap: 16, marginTop: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,0.8)", fontSize: 14 }}>
@@ -1315,16 +1315,16 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       </div>
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: "100px 20px", background: "#fff", borderRadius: 24, border: "1px solid #e2e8f0", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
+        <div style={{ textAlign: "center", padding: "100px 20px", background: "var(--app-card)", borderRadius: 24, border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)" }}>
           <div style={{ fontSize: 50, marginBottom: 20, animation: "pulse 2s infinite" }}>📡</div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>Loading your proposals...</div>
-          <div style={{ fontSize: 14, color: "#94a3b8" }}>This will only take a moment</div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--app-text)", marginBottom: 8 }}>Loading your proposals...</div>
+          <div style={{ fontSize: 14, color: "var(--app-muted)" }}>This will only take a moment</div>
         </div>
       ) : proposals.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "100px 40px", background: "#fff", borderRadius: 24, border: "2px dashed #e2e8f0", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
+        <div style={{ textAlign: "center", padding: "100px 40px", background: "var(--app-card)", borderRadius: 24, border: "2px dashed var(--app-border)", boxShadow: "var(--app-shadow)" }}>
           <div style={{ fontSize: 80, marginBottom: 24, background: `linear-gradient(135deg,var(--app-accent),var(--app-muted))`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>✨</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: "#0f172a", marginBottom: 12 }}>No proposals yet</div>
-          <div style={{ fontSize: 16, color: "#64748b", marginBottom: 24, maxWidth: "400px", marginLeft: "auto", marginRight: "auto" }}>Start by creating your first professional proposal. It's quick and easy!</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "var(--app-text)", marginBottom: 12 }}>No proposals yet</div>
+          <div style={{ fontSize: 16, color: "var(--app-muted)", marginBottom: 24, maxWidth: "400px", marginLeft: "auto", marginRight: "auto" }}>Start by creating your first professional proposal. It's quick and easy!</div>
           <button onClick={createNew} style={{ background: `linear-gradient(135deg,var(--app-accent),var(--app-muted))`, color: "#fff", border: "none", borderRadius: 16, padding: "16px 32px", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: `0 8px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)`, transition: "all .3s", display: "inline-flex", alignItems: "center", gap: 10 }}>
             <span>🚀</span>
             <span>Create Your First Proposal</span>
@@ -1336,7 +1336,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             const cover = p.slides?.find(s => s.type === "cover");
             const t2 = THEMES.find(x => x.name === p.theme) || THEMES[0];
             return (
-              <div key={p.id} className="pc fade-in" onClick={() => openDoc(p)} style={{ background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", position: "relative", animationDelay: `${index * 0.1}s` }}>
+              <div key={p.id} className="pc fade-in" onClick={() => openDoc(p)} style={{ background: "var(--app-card)", borderRadius: 20, border: "1px solid var(--app-border)", overflow: "hidden", boxShadow: "var(--app-shadow)", position: "relative", animationDelay: `${index * 0.1}s` }}>
                 {/* Status Badge */}
                 <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
                   <Badge status={p.status} />
@@ -1359,7 +1359,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ padding: "20px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#475569" }}>
+                      <div style={{ background: "var(--app-surface)", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--app-text)" }}>
                         📊 {p.slides?.length || 0} slides
                       </div>
                       <div style={{ background: t2.l, padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, color: t2.t }}>
@@ -1368,14 +1368,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 16, borderTop: "1px solid #f1f5f9" }}>
-                    <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 500 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 16, borderTop: "1px solid var(--app-border)" }}>
+                    <div style={{ fontSize: 12, color: "var(--app-muted)", fontWeight: 500 }}>
                       {new Date(p.updated).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
-                      <button onClick={e => { e.stopPropagation(); shareProposal(p); }} style={{ background: "#eff6ff", border: "none", color: "#3b82f6", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Share Link">🔗</button>
+                      <button onClick={e => { e.stopPropagation(); shareProposal(p); }} style={{ background: "var(--app-surface)", border: "1.5px solid var(--app-border)", color: "var(--app-accent)", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Share Link">🔗</button>
                       <button onClick={e => { e.stopPropagation(); shareWhatsApp(p); }} style={{ background: "#dcfce7", border: "none", color: "#16a34a", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="WhatsApp">💬</button>
-                      <button onClick={e => { e.stopPropagation(); printProposal(p); }} style={{ background: "#f1f5f9", border: "none", color: "#475569", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Print">🖨️</button>
+                      <button onClick={e => { e.stopPropagation(); printProposal(p); }} style={{ background: "var(--app-surface)", border: "1.5px solid var(--app-border)", color: "var(--app-text)", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Print">🖨️</button>
                       <button onClick={e => deleteProposal(p.id, p._id, e)} style={{ background: "#fef2f2", border: "none", color: "#ef4444", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Delete"> 🗑️️️️️️</button>
                     </div>
                   </div>
@@ -1466,12 +1466,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
       {/* REJECT MODAL */}
       {rejectModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100001, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#fff", borderRadius: 20, padding: 36, width: 440, boxShadow: "0 24px 64px rgba(0,0,0,0.25)" }}>
-            <div style={{ fontSize: 22, fontWeight: 900, color: "#0f172a", marginBottom: 6 }}>❌ Reject Proposal</div>
-            <div style={{ fontSize: 13, color: "#64748b", marginBottom: 20 }}>Give feedback so the author can revise and resubmit.</div>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 100001, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "var(--app-card)", borderRadius: 24, padding: 36, width: 440, boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
+            <div style={{ fontSize: 22, fontWeight: 900, color: "var(--app-text)", marginBottom: 6 }}>❌ Reject Proposal</div>
+            <div style={{ fontSize: 13, color: "var(--app-muted)", marginBottom: 20 }}>Give feedback so the author can revise and resubmit.</div>
             <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="e.g. Please revise the budget section and update timeline..."
-              style={{ width: "100%", height: 120, borderRadius: 12, border: "2px solid #e2e8f0", padding: "14px 18px", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box", resize: "vertical", color: "#0f172a", transition: "border-color 0.2s", minHeight: 100 }} />
+              style={{ width: "100%", height: 120, borderRadius: 12, border: "2px solid var(--app-border)", background: "var(--app-surface)", padding: "14px 18px", fontSize: 15, fontFamily: "inherit", outline: "none", boxSizing: "border-box", resize: "vertical", color: "var(--app-text)", transition: "border-color 0.2s", minHeight: 100 }} />
             <div style={{ display: "flex", gap: 10, marginTop: 20, justifyContent: "flex-end" }}>
               <button onClick={() => { setRejectModal(false); setRejectReason(""); }} style={{ background: "#f1f5f9", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "#475569", fontFamily: "inherit" }}>Cancel</button>
               <button onClick={() => { setStatus("rejected", { rejectNote: rejectReason || "Please review and resubmit." }); setRejectModal(false); setRejectReason(""); }} style={{ background: "linear-gradient(135deg,#9f1239,#ef4444)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Confirm Reject</button>
@@ -1482,7 +1482,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
       {/* ╔══ TOP BAR (Canva style) ══╗ */}
       {!isViewMode && (
-        <div style={{ height: 56, background: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", borderBottom: "1px solid #e5e7eb", flexShrink: 0, gap: 12, zIndex: 50 }} className="no-print">
+        <div style={{ height: 56, background: "var(--app-card)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", borderBottom: "1px solid var(--app-border)", flexShrink: 0, gap: 12, zIndex: 50 }} className="no-print">
 
           {/* LEFT: logo + File/Resize/Editing */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
@@ -1493,9 +1493,9 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
 
             <div style={{ position: "relative" }}>
-              <button className="topbtn" onClick={() => setShowResizeMenu(!showResizeMenu)} style={{ background: showResizeMenu ? "#f1f5f9" : "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "#374151", padding: "6px 10px", borderRadius: 8 }}>Resize</button>
+              <button className="topbtn" onClick={() => setShowResizeMenu(!showResizeMenu)} style={{ background: showResizeMenu ? "var(--app-surface)" : "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "var(--app-text)", padding: "6px 10px", borderRadius: 8 }}>Resize</button>
               {showResizeMenu && (
-                <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, background: "#fff", borderRadius: 8, boxShadow: "0 10px 25px rgba(0,0,0,0.1)", overflow: "hidden", zIndex: 1000, border: "1px solid #e5e7eb", width: 180 }}>
+                <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, background: "var(--app-card)", borderRadius: 8, boxShadow: "var(--app-shadow)", overflow: "hidden", zIndex: 1000, border: "1px solid var(--app-border)", width: 180 }}>
                   <button onClick={() => changeFormat("a4-portrait")} style={{ width: "100%", padding: "10px 16px", textAlign: "left", background: "none", border: "none", fontSize: 13, fontWeight: 600, color: doc?.format === "a4-portrait" ? "var(--app-accent)" : "#374151", cursor: "pointer", display: "block", borderTop: "1px solid #f1f5f9" }} className="topbtn">📄 A4 Portrait</button>
                   <button onClick={() => changeFormat("a4-landscape")} style={{ width: "100%", padding: "10px 16px", textAlign: "left", background: "none", border: "none", fontSize: 13, fontWeight: 600, color: doc?.format === "a4-landscape" ? "var(--app-accent)" : "#374151", cursor: "pointer", display: "block", borderTop: "1px solid #f1f5f9" }} className="topbtn">🖼️ A4 Landscape</button>
                 </div>
@@ -1515,12 +1515,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 disabled={!canEdit}
                 placeholder="Enter Proposal Title..."
                 style={{
-                  background: "#f8fafc",
-                  border: "1.5px solid #e2e8f0",
+                  background: "var(--app-surface)",
+                  border: "1.5px solid var(--app-border)",
                   borderRadius: "6px",
                   fontSize: 14,
                   fontWeight: 700,
-                  color: "#0f172a",
+                  color: "var(--app-text)",
                   outline: "none",
                   textAlign: "center",
                   width: "300px",
@@ -1529,7 +1529,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                   transition: "all 0.2s"
                 }}
                 onFocus={e => e.target.style.borderColor = "var(--app-accent)"}
-                onBlur={e => e.target.style.borderColor = "#e2e8f0"}
+                onBlur={e => e.target.style.borderColor = "var(--app-border)"}
               />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--app-border)", padding: "4px 12px", borderRadius: 8, border: "1px solid var(--app-accent)" }}>
@@ -1567,8 +1567,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               </span>
             )}
 
-            <button onClick={() => printProposal(doc)} style={{ background: "#fff", color: "#374151", border: "1.5px solid #e2e8f0", padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>🖨️</button>
-            <button onClick={() => shareProposal()} style={{ background: "#eff6ff", color: "#2563eb", border: "1.5px solid #bfdbfe", padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>🔗</button>
+            <button onClick={() => printProposal(doc)} style={{ background: "var(--app-card)", color: "var(--app-text)", border: "1.5px solid var(--app-border)", padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>🖨️</button>
+            <button onClick={() => shareProposal()} style={{ background: "var(--app-surface)", color: "var(--app-accent)", border: "1.5px solid var(--app-border)", padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>🔗</button>
             <button onClick={() => shareWhatsApp()} style={{ background: "#dcfce7", color: "#16a34a", border: "1.5px solid #bbf7d0", padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>💬</button>
 
 
@@ -1599,7 +1599,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         )}
         {/* ── LEFT CONTENT PANEL ── */}
         {!isViewMode && leftPanel && (
-          <div style={{ width: 320, background: "#fff", borderRight: "1px solid #e5e7eb", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
+          <div style={{ width: 320, background: "var(--app-card)", borderRight: "1px solid var(--app-border)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
 
 
 
@@ -1838,7 +1838,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
           style={{
             flex: 1,
             overflow: "auto",
-            background: isViewMode ? "#fff" : "#f1f5f9",
+            background: isViewMode ? "var(--app-card)" : "var(--app-bg)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -1958,7 +1958,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             </div>
           ) : (
             /* Simple Zoom for Client */
-            <div style={{ position: "fixed", bottom: 24, right: 24, display: "flex", alignItems: "center", gap: 12, background: "#fff", padding: "8px 16px", borderRadius: 12, boxShadow: "0 4px 20px rgba(0,0,0,0.08)", zIndex: 100 }} className="no-print">
+            <div style={{ position: "fixed", bottom: 24, right: 24, display: "flex", alignItems: "center", gap: 12, background: "var(--app-card)", border: "1.5px solid var(--app-border)", padding: "8px 16px", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 100 }} className="no-print">
               <span style={{ fontSize: 11, fontWeight: 700, width: 32 }}>{Math.round((zoom + 40))}%</span>
               <input type="range" min={0} max={60} value={zoom} onChange={e => setZoom(+e.target.value)} style={{ width: 80, accentColor: "var(--app-accent)" }} />
             </div>
@@ -1982,7 +1982,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
       {/* ╔══ BOTTOM PAGE STRIP (Canva style) ══╗ */}
       {!isViewMode && doc && (
-        <div style={{ height: 100, background: "#fff", borderTop: "1px solid #e5e7eb", display: "flex", alignItems: "center", padding: "0 20px", gap: 16, overflowX: "auto", flexShrink: 0 }} className="no-print">
+        <div style={{ height: 100, background: "var(--app-card)", borderTop: "1px solid var(--app-border)", display: "flex", alignItems: "center", padding: "0 20px", gap: 16, overflowX: "auto", flexShrink: 0 }} className="no-print">
           {doc.slides.map((s, i) => {
             const isP = doc.format === "a4-portrait" || (!doc.format && (s.type === "proposal" || s.type === "portrait"));
             const isL = doc.format === "a4-landscape" || (!doc.format && s.type === "landscape");

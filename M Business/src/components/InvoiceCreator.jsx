@@ -29,7 +29,7 @@ function StatusBadge({ status }) {
     paid: { bg: "#dcfce7", color: "#16a34a", label: "✅ Paid" },
     unpaid: { bg: "#fff7ed", color: "#ea580c", label: "⏳ Unpaid" },
     overdue: { bg: "#fee2e2", color: "#dc2626", label: "🔴 Overdue" },
-    draft: { bg: "#f3f4f6", color: "#6b7280", label: "📝 Draft" },
+    draft: { bg: "var(--app-surface)", color: "var(--app-muted)", label: "📝 Draft" },
     sent: { bg: "#eff6ff", color: "#2563eb", label: "📤 Sent" },
     part_paid: { bg: "var(--app-bg)", color: "var(--app-accent)", label: "💰 Part Payment" },
   };
@@ -44,16 +44,16 @@ function StatusBadge({ status }) {
 // ── Confirm Delete Modal ──────────────────────────────────────
 function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 380, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", textAlign: "center" }}>
-        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px" }}>     🗑️️️️️️️️️️️️️️️️️️️️️️️️️️</div>
-        <h3 style={{ margin: "0 0 8px", fontSize: 16, fontWeight: 800, color: "var(--app-text)" }}>Delete Invoice?</h3>
-        <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 22px", lineHeight: 1.5 }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 380, padding: "32px", boxShadow: "var(--app-shadow)", textAlign: "center", border: "1px solid var(--app-border)" }}>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, margin: "0 auto 20px" }}>🗑️</div>
+        <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 800, color: "var(--app-text)" }}>Delete Invoice?</h3>
+        <p style={{ color: "var(--app-muted)", fontSize: 14, margin: "0 0 24px", lineHeight: 1.5 }}>
           Are you sure you want to delete <strong style={{ color: "var(--app-accent)" }}>{invoiceNo}</strong>? This cannot be undone.
         </p>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onCancel} style={{ flex: 1, padding: "10px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, fontSize: 13, fontWeight: 600, color: "var(--app-text)", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
-          <button onClick={onConfirm} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
+        <div style={{ display: "flex", gap: 12 }}>
+          <button onClick={onCancel} style={{ flex: 1, padding: "12px", background: "var(--app-surface)", border: "1px solid var(--app-border)", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "var(--app-text)", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+          <button onClick={onConfirm} style={{ flex: 1, padding: "12px", background: "#ef4444", border: "none", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
         </div>
       </div>
     </div>
@@ -64,7 +64,9 @@ function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
 function Toast({ msg }) {
   if (!msg) return null;
   return (
-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)", display: "flex", alignItems: "center", gap: 8 }}>
+    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-card)", border: "2px solid #22c55e", borderRadius: 16, padding: "14px 24px", fontSize: 14, fontWeight: 800, color: "#22c55e", boxShadow: "var(--app-shadow)", display: "flex", alignItems: "center", gap: 10, animation: "fadeInUp 0.3s ease-out" }}>
+      <style>{`@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+      <span>✨</span>
       {msg}
     </div>
   );
@@ -90,7 +92,7 @@ function deleteDraftLocal(invoiceNo) {
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
 }
 
-const T={primary:"var(--app-sidebar)",sidebar:"var(--app-text)",accent:"var(--app-accent)",bg:"var(--app-bg)",card:"#FFFFFF",text:"var(--app-text)",muted:"var(--app-accent)",border:"var(--app-border)"};
+const T={primary:"var(--app-sidebar)",sidebar:"var(--app-text)",accent:"var(--app-accent)",bg:"var(--app-bg)",card:"var(--app-card)",text:"var(--app-text)",muted:"var(--app-muted)",border:"var(--app-border)"};
 
 function CompanyDropdown({clients,value,onChange,error,onAddCompany}){
   const [search,setSearch]=useState("");
@@ -104,12 +106,12 @@ function CompanyDropdown({clients,value,onChange,error,onAddCompany}){
         <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"var(--app-muted)",transition:"0.2s"}}>▼</span>
       </div>
       {open&&(
-        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid var(--app-border)",borderRadius:12,boxShadow:"0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)",zIndex:999,overflow:"hidden"}}>
-          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid var(--app-border)",borderRadius:8,fontSize:12,background:"var(--app-bg)",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
-          {onAddCompany&&<div onClick={()=>{setOpen(false);setSearch("");onAddCompany();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,var(--app-border),var(--app-bg))",borderBottom:"2px solid var(--app-border)"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"var(--app-accent)"}}>Add New Company Name</div></div></div>}
+        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"var(--app-card)",border:"1.5px solid var(--app-border)",borderRadius:12,boxShadow:"var(--app-shadow)",zIndex:999,overflow:"hidden"}}>
+          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid var(--app-border)",borderRadius:8,fontSize:12,background:"var(--app-bg)",color:T.text,outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
+          {onAddCompany&&<div onClick={()=>{setOpen(false);setSearch("");onAddCompany();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"var(--app-surface)",borderBottom:"2px solid var(--app-border)"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"var(--app-accent)"}}>Add New Company Name</div></div></div>}
           <div style={{maxHeight:180,overflowY:"auto"}}>
             {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"var(--app-muted)",fontSize:13}}>No companies found</div>
-              :filtered.map((c,i)=>{const name=c.clientName||c.name||"";const company=c.companyName||c.company||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"var(--app-border)":"transparent",borderBottom:"1px solid var(--app-bg)"}} onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"var(--app-border)":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div>{company&&<div style={{fontSize:11,color:"var(--app-muted)"}}>{company}</div>}</div>{isSel&&<span style={{fontSize:14,color:"var(--app-accent)"}}>✓</span>}</div>);})}
+              :filtered.map((c,i)=>{const name=c.clientName||c.name||"";const company=c.companyName||c.company||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"var(--app-surface)":"transparent",borderBottom:"1px solid var(--app-border)"}} onMouseEnter={e=>e.currentTarget.style.background="var(--app-surface)"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"var(--app-surface)":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div>{company&&<div style={{fontSize:11,color:"var(--app-muted)"}}>{company}</div>}</div>{isSel&&<span style={{fontSize:14,color:"var(--app-accent)"}}>✓</span>}</div>);})}
           </div>
         </div>
       )}
@@ -129,12 +131,12 @@ function ProjectDropdown({projects,value,onChange,onAddProject,disabled}){
         <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"var(--app-muted)",transition:"0.2s"}}>▼</span>
       </div>
       {open&&(
-        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"#fff",border:"1.5px solid var(--app-border)",borderRadius:12,boxShadow:"0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)",zIndex:999,overflow:"hidden"}}>
-          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid var(--app-border)",borderRadius:8,fontSize:12,background:"var(--app-bg)",outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
-          {onAddProject&&<div onClick={()=>{setOpen(false);setSearch("");onAddProject();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"linear-gradient(90deg,var(--app-border),var(--app-bg))",borderBottom:"2px solid var(--app-border)"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"var(--app-accent)"}}>Add New Project</div></div></div>}
+        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"var(--app-card)",border:"1.5px solid var(--app-border)",borderRadius:12,boxShadow:"var(--app-shadow)",zIndex:999,overflow:"hidden"}}>
+          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid var(--app-border)",borderRadius:8,fontSize:12,background:"var(--app-bg)",color:T.text,outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
+          {onAddProject&&<div onClick={()=>{setOpen(false);setSearch("");onAddProject();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"var(--app-surface)",borderBottom:"2px solid var(--app-border)"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"var(--app-accent)"}}>Add New Project</div></div></div>}
           <div style={{maxHeight:180,overflowY:"auto"}}>
             {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"var(--app-muted)",fontSize:13}}>No projects found</div>
-              :filtered.map((p,i)=>{const name=p.name||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"var(--app-border)":"transparent",borderBottom:"1px solid var(--app-bg)"}} onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"var(--app-border)":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div></div>{isSel&&<span style={{fontSize:14,color:"var(--app-accent)"}}>✓</span>}</div>);})}
+              :filtered.map((p,i)=>{const name=p.name||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"var(--app-surface)":"transparent",borderBottom:"1px solid var(--app-border)"}} onMouseEnter={e=>e.currentTarget.style.background="var(--app-surface)"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"var(--app-surface)":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div></div>{isSel&&<span style={{fontSize:14,color:"var(--app-accent)"}}>✓</span>}</div>);})}
           </div>
         </div>
       )}
@@ -450,11 +452,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   // ── Shared styles ────────────────────────────────────────────
   const inp = (err) => ({
-    width: "100%", border: `1.5px solid ${err ? "#ef4444" : "#e5e7eb"}`, borderRadius: 8,
-    padding: "10px 12px", fontSize: 14, color: "#111827", background: err ? "#fff5f5" : "#fff",
-    boxSizing: "border-box", outline: "none", fontFamily: "inherit", transition: "border-color 0.15s",
+    width: "100%", border: `1.5px solid ${err ? "#ef4444" : "var(--app-border)"}`, borderRadius: 10,
+    padding: "10px 12px", fontSize: 14, color: "var(--app-text)", background: err ? "#fff5f5" : "var(--app-surface)",
+    boxSizing: "border-box", outline: "none", fontFamily: "inherit", transition: "all 0.2s",
   });
-  const lbl = { display: "block", fontSize: 12, color: "#6b7280", fontWeight: 600, marginBottom: 4 };
+  const lbl = { display: "block", fontSize: 12, color: "var(--app-muted)", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" };
 
   const statusColor = {
     paid: "#16a34a", unpaid: "#ea580c", overdue: "#dc2626", draft: "#6b7280", sent: "#2563eb", part_paid: "var(--app-accent)",
@@ -485,7 +487,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>🖨️ Print Receipt</button>}
         </div>
 
-        <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "#fff", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.1)", overflow: "hidden", border: "1px solid var(--app-border)" }}>
+        <div className="receipt-paper" style={{ maxWidth: 500, margin: "0 auto", background: "var(--app-card)", borderRadius: 24, boxShadow: "var(--app-shadow)", overflow: "hidden", border: "1px solid var(--app-border)" }}>
           {/* Header */}
           <div style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
             <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>💸</div>
@@ -603,7 +605,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     const draftCnt = enriched.filter(e => e.status === "draft").length;
 
     return (
-      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: "100%", paddingRight: 20 }}>
+      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: "100%", padding: "20px" }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
@@ -623,8 +625,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         
         {/* Payment Modal */}
         {paymentModalEntry && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 400, padding: "32px", boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                 <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "var(--app-text)" }}>Payment Information</h3>
                 <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
@@ -715,7 +717,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
           <div>
-            <p style={{ margin: "3px 0 0", color: "#9ca3af", fontSize: 13 }}>{enriched.length} total invoice{enriched.length !== 1 ? "s" : ""}</p>
+            <p style={{ margin: "3px 0 0", color: "var(--app-muted)", fontSize: 13 }}>{enriched.length} total invoice{enriched.length !== 1 ? "s" : ""}</p>
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <div style={{ position: "relative" }}>
@@ -725,7 +727,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 placeholder="Search invoices..." 
                 value={listSearch}
                 onChange={(e) => setListSearch(e.target.value)}
-                style={{ padding: "9px 12px 9px 34px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 13, outline: "none", width: 220, fontFamily: "inherit" }}
+                style={{ padding: "9px 12px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, outline: "none", width: 220, background: "var(--app-surface)", color: "var(--app-text)", fontFamily: "inherit" }}
               />
             </div>
             <button onClick={() => { clearForm(); setStep("form"); }}
@@ -743,17 +745,17 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             { label: "Awaiting", value: `${unpaidCnt}`, color: "#ea580c", icon: "⏳" },
             { label: "Drafts", value: `${draftCnt}`, color: "#6b7280", icon: "📝" },
           ].map((c) => (
-            <div key={c.label} style={{ background: "#fff", borderRadius: 14, padding: "18px 18px", border: "1px solid #f3f4f6", boxShadow: "0 1px 6px rgba(0,0,0,0.06)", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${c.color}, ${c.color}88)` }} />
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${c.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 10 }}>{c.icon}</div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: c.color }}>{c.value}</div>
-              <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 3, fontWeight: 600 }}>{c.label}</div>
+            <div key={c.label} style={{ background: "var(--app-card)", borderRadius: 18, padding: "20px", border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)", position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: c.color }} />
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: `${c.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>{c.icon}</div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: c.color }}>{c.value}</div>
+              <div style={{ fontSize: 12, color: "var(--app-muted)", marginTop: 4, fontWeight: 700, textTransform: "uppercase" }}>{c.label}</div>
             </div>
           ))}
         </div>
 
         {/* Table */}
-        <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #f3f4f6", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
+        <div style={{ background: "var(--app-card)", borderRadius: 20, border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)", overflow: "hidden" }}>
 
           {/* Table header */}
           <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr", padding: "12px 20px", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", borderBottom: "2px solid var(--app-border)", alignItems: "center" }}>
@@ -785,7 +787,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
             return (
               <div key={entry.id || idx} className="inv-row"
-                style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr", padding: "14px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff" }}>
+                style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1.2fr", padding: "16px 20px", borderBottom: idx < arr.length - 1 ? "1px solid var(--app-border)" : "none", alignItems: "center", background: "transparent" }}>
 
                 {/* Invoice No */}
                 <div onClick={() => setViewEntry(entry)} style={{ overflow: "hidden" }}>

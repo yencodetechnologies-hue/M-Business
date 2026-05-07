@@ -8,11 +8,11 @@ const P = {
   accent: "var(--app-accent)",
   mid: "var(--app-accent)",
   dark: "var(--app-sidebar)",
-  light: "var(--app-bg)",
+  light: "var(--app-surface)",
   border: "var(--app-border)",
-  text: "var(--app-sidebar)",
+  text: "var(--app-text)",
   muted: "var(--app-muted)",
-  hover: "var(--app-bg)",
+  hover: "var(--app-surface)",
 };
 
 const STATUS_CFG = {
@@ -131,9 +131,9 @@ function ChartView({ groups, config }) {
       <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
 
         {/* Status Bar Chart */}
-        <div style={{ flex: 1, minWidth: 280, background: "#fff", borderRadius: 14, border: "1px solid " + P.border, padding: 22, boxShadow: "0 2px 12px rgba(124,58,237,0.07)" }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: P.text, marginBottom: 3 }}>📊 Status Distribution</div>
-          <div style={{ fontSize: 12, color: P.muted, marginBottom: 18 }}>Tasks by current status</div>
+        <div style={{ flex: 1, minWidth: 280, background: "var(--app-card)", borderRadius: 24, border: "1.5px solid var(--app-border)", padding: 22, boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 3 }}>📊 Status Distribution</div>
+          <div style={{ fontSize: 12, color: "var(--app-muted)", marginBottom: 18 }}>Tasks by current status</div>
           {statusData.length === 0
             ? <div style={{ textAlign: "center", color: P.muted, fontSize: 12, padding: 20 }}>No tasks yet</div>
             : statusData.map(item => (
@@ -150,9 +150,9 @@ function ChartView({ groups, config }) {
         </div>
 
         {/* Donut */}
-        <div style={{ flex: 1, minWidth: 220, background: "#fff", borderRadius: 14, border: "1px solid " + P.border, padding: 22, boxShadow: "0 2px 12px rgba(124,58,237,0.07)" }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: P.text, marginBottom: 3 }}>🍩 Overview</div>
-          <div style={{ fontSize: 12, color: P.muted, marginBottom: 16 }}>{total} total tasks</div>
+        <div style={{ flex: 1, minWidth: 220, background: "var(--app-card)", borderRadius: 24, border: "1.5px solid var(--app-border)", padding: 22, boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", marginBottom: 3 }}>🍩 Overview</div>
+          <div style={{ fontSize: 12, color: "var(--app-muted)", marginBottom: 16 }}>{total} total tasks</div>
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
             <svg width={160} height={160} style={{ flexShrink: 0 }}>
               <circle cx={cx} cy={cy} r={donutR} fill="none" stroke={P.light} strokeWidth={22} />
@@ -498,8 +498,8 @@ function DD({ anchor, onClose, children, w = 180 }) {
       onClick={e => e.stopPropagation()}
       style={{
         position: "fixed", top: pos.top, left: pos.left, zIndex: 6000,
-        background: "#fff", border: `1.5px solid ${P.border}`, borderRadius: 10, padding: 5,
-        boxShadow: "0 8px 28px rgba(124,58,237,0.18)", minWidth: w, animation: "ddIn .1s ease"
+        background: "var(--app-card)", border: `1.5px solid var(--app-border)`, borderRadius: 12, padding: 5,
+        boxShadow: "0 10px 40px rgba(0,0,0,0.15)", minWidth: w, animation: "ddIn .1s ease"
       }}>
       {children}
     </div>

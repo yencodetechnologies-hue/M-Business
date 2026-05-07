@@ -25,7 +25,7 @@ function formatDateTime(ts) {
 
 function StatusBadge({ status }) {
   const map = {
-    draft: { bg: "#f3f4f6", color: "#6b7280", label: "📝 Draft" },
+    draft: { bg: "var(--app-surface)", color: "var(--app-muted)", label: "📝 Draft" },
     sent: { bg: "#eff6ff", color: "#2563eb", label: "📤 Sent" },
     approved: { bg: "#dcfce7", color: "#16a34a", label: "✅ Approved" },
     rejected: { bg: "#fee2e2", color: "#dc2626", label: "❌ Rejected" },
@@ -51,7 +51,7 @@ function saveLocal(qt, items) {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
 }
 
-const T = { primary: "var(--app-sidebar)", sidebar: "var(--app-text)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "#FFFFFF", text: "var(--app-text)", muted: "var(--app-accent)", border: "var(--app-border)" };
+const T = { primary: "var(--app-sidebar)", sidebar: "var(--app-text)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)" };
 
 function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
   const [search, setSearch] = useState("");
@@ -65,12 +65,12 @@ function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: "var(--app-text)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No companies found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
       )}
@@ -90,12 +90,12 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
         <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(5,150,105,0.15)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
-          {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,#f0fdf4,#f7fffe)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: "var(--app-text)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No projects found</div>
-              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "#f0fdf4" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "#f7fffe"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "#f0fdf4" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
+              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
       )}
@@ -323,11 +323,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   };
 
   const inp = (err) => ({
-    width: "100%", border: `1.5px solid ${err ? "#ef4444" : "#e5e7eb"}`, borderRadius: 8,
-    padding: "10px 12px", fontSize: 14, color: "#111827", background: err ? "#fff5f5" : "#fff",
-    boxSizing: "border-box", outline: "none", fontFamily: "inherit", transition: "border-color 0.15s",
+    width: "100%", border: `1.5px solid ${err ? "#ef4444" : "var(--app-border)"}`, borderRadius: 10,
+    padding: "10px 12px", fontSize: 14, color: "var(--app-text)", background: err ? "#fff5f5" : "var(--app-surface)",
+    boxSizing: "border-box", outline: "none", fontFamily: "inherit", transition: "all 0.2s",
   });
-  const lbl = { display: "block", fontSize: 12, color: "#6b7280", fontWeight: 600, marginBottom: 4 };
+  const lbl = { display: "block", fontSize: 12, color: "var(--app-muted)", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" };
 
   // ══════════ LIST ══════════
   if (step === "list") {
@@ -365,11 +365,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   placeholder="Search quotations..."
                   value={listSearch}
                   onChange={(e) => setListSearch(e.target.value)}
-                  style={{ padding: "9px 12px 9px 34px", border: "1.5px solid #e5e7eb", borderRadius: 8, fontSize: 13, outline: "none", width: 220, fontFamily: "inherit" }}
+                  style={{ padding: "9px 12px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, outline: "none", width: 220, background: "var(--app-surface)", color: "var(--app-text)", fontFamily: "inherit" }}
                 />
               </div>
               <button onClick={() => { clearForm(); setStep("form"); }}
-                style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>
+                style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>
                 + Create Quotation
               </button>
             </div>
@@ -377,22 +377,24 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12, marginBottom: 24 }}>
             {[
-              { label: "Total Quoted", value: formatCurrency(totalAmt, qt.currency || "₹"), color: "var(--app-accent)" },
-              { label: "Approved Value", value: formatCurrency(approvedAmt, qt.currency || "₹"), color: "#16a34a" },
-              { label: "Pending", value: `${pendingCnt}`, color: "#d97706" },
-              { label: "Approved", value: `${approvedCnt}`, color: "#2563eb" },
+              { label: "Total Quoted", value: formatCurrency(totalAmt, qt.currency || "₹"), color: "var(--app-accent)", icon: "📊" },
+              { label: "Approved Value", value: formatCurrency(approvedAmt, qt.currency || "₹"), color: "#16a34a", icon: "✅" },
+              { label: "Pending", value: `${pendingCnt}`, color: "#d97706", icon: "⏳" },
+              { label: "Approved", value: `${approvedCnt}`, color: "#2563eb", icon: "💎" },
             ].map((c) => (
-              <div key={c.label} style={{ background: "#fff", borderRadius: 12, padding: "16px 18px", border: "1px solid #f3f4f6", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: c.color }}>{c.value}</div>
-                <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 3, fontWeight: 600 }}>{c.label}</div>
+              <div key={c.label} style={{ background: "var(--app-card)", borderRadius: 18, padding: "20px", border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)", position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: c.color }} />
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: `${c.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>{c.icon}</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: c.color }}>{c.value}</div>
+                <div style={{ fontSize: 12, color: "var(--app-muted)", marginTop: 4, fontWeight: 700, textTransform: "uppercase" }}>{c.label}</div>
               </div>
             ))}
           </div>
 
-          <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #f3f4f6", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", overflow: "hidden" }}>
-            <div className="qt-th" style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 0.8fr 1.6fr 0.8fr 0.8fr 1fr 120px", padding: "12px 20px", background: "var(--app-bg)", borderBottom: "2px solid #f3f4f6", gap: 12, alignItems: "center" }}>
+          <div style={{ background: "var(--app-card)", borderRadius: 20, border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)", overflow: "hidden" }}>
+            <div className="qt-th" style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 0.8fr 1.6fr 0.8fr 0.8fr 1fr 120px", padding: "12px 20px", background: "var(--app-bg)", borderBottom: "2px solid var(--app-border)", gap: 12, alignItems: "center" }}>
               {["Quote No", "Company Name", "Project", "Amount", "Date", "Expiry", "Status", "Actions"].map((h) => (
-                <div key={h} style={{ fontSize: 11, fontWeight: 800, color: "#64748b", letterSpacing: 0.5, textAlign: h === "Amount" ? "right" : (h === "Date" || h === "Expiry") ? "center" : "left" }}>{h.toUpperCase()}</div>
+                <div key={h} style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", letterSpacing: 0.5, textAlign: h === "Amount" ? "right" : (h === "Date" || h === "Expiry") ? "center" : "left" }}>{h.toUpperCase()}</div>
               ))}
             </div>
 
@@ -413,7 +415,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               const qtD = entry.qt || {};
               return (
                 <div key={entry.id || idx} className="qt-row" onClick={() => setViewEntry(entry)}
-                  style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 0.8fr 1.6fr 0.8fr 0.8fr 1fr 120px", padding: "14px 20px", borderBottom: idx < arr.length - 1 ? "1px solid #f9fafb" : "none", alignItems: "center", background: "#fff", gap: 12 }}>
+                  style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 0.8fr 1.6fr 0.8fr 0.8fr 1fr 120px", padding: "16px 20px", borderBottom: idx < arr.length - 1 ? "1px solid var(--app-border)" : "none", alignItems: "center", background: "transparent", gap: 12 }}>
                   <div style={{ cursor: "pointer" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{entry.quoteNo || "—"}</div>
                     <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2, fontFamily: "monospace" }}>{formatDateTime(entry.savedAt)}</div>

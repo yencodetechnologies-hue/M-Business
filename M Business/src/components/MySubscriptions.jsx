@@ -57,22 +57,24 @@ const InfoRow = ({ label, value, icon }) => {
 const PLANS = [
   {
     name: "Trial", price: 0, icon: "✨", color: "#10b981", duration: "30 days", isTrial: true,
-    features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Basic Reports", "Email Support"],
+    features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 1", "Employees: 5"],
+    clientLimit: "1 Client manage", employeeLimit: "5 Employee manage", managerLimit: "1 Manager manage",
     btnLabel: "Start Free Trial"
   },
   {
     name: "Starter", price: 999, icon: "🌱", color: "#6366f1",
-    features: ["5 Projects", "10 Invoices", "Basic Reports", "Email Support", ""],
-
+    features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 1", "Clients: 3", "Employees: 10", "Email Support"],
+    clientLimit: "3 Client manage", employeeLimit: "10 Employee manage", managerLimit: "1 Manager manage",
   },
   {
     name: "Professional", price: 2999, icon: "🚀", color: "var(--app-accent)", popular: true,
-    features: ["Unlimited Projects", "Unlimited Invoices", "Advanced Reports", "Priority Support", "Team Management"],
-
+    features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"],
+    clientLimit: "10 Client manage", employeeLimit: "50 Employee manage", managerLimit: "3 Manager manage",
   },
   {
     name: "Enterprise", price: null, icon: "🏢", color: "var(--app-sidebar)",
-    features: ["Custom Branding", "API Access", "Dedicated Manager", "White-label Solution"],
+    features: ["Unlimited business manage", "Unlimited Managers", "Unlimited Clients", "Unlimited Employees", "Custom Branding", "API Access"],
+    clientLimit: "Unlimited", employeeLimit: "Unlimited", managerLimit: "Unlimited",
     btnLabel: "Contact Sales"
   }
 ];
@@ -100,6 +102,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
   const [toast, setToast] = useState("");
   const [mockGatewayOpen, setMockGatewayOpen] = useState(null);
   const [paymentSuccessData, setPaymentSuccessData] = useState(null);
+  const [assignedPackages, setAssignedPackages] = useState([]);
 
   const userId = user?._id || user?.id;
   const userEmail = user?.email;
@@ -128,6 +131,12 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           all = payRes.data || [];
         } catch (fixErr) { console.error("Auto-fix failed:", fixErr); }
       }
+
+      // Fetch assigned packages
+      try {
+        const pkgRes = await axios.get(`${BASE_URL}/api/packages/subadmin/${userId}`);
+        setAssignedPackages(pkgRes.data || []);
+      } catch (pkgErr) { console.error("Failed to fetch assigned packages:", pkgErr); }
 
       setPayments(all);
       setInvoices(all.filter(p => p.invoiceNo));
@@ -251,12 +260,24 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
   }, [paymentSuccessData, onSubscriptionSuccess]);
 
   // ── Start Free Trial ────────────────────────────────────────────────────────
-  const startTrial = async () => {
+  const startTrial = async (targetPkg = null) => {
     try {
       setPayLoading("Trial");
-      const res = await axios.post(`${BASE_URL}/api/subscriptions/start-trial`, { userId, userEmail, userName });
+      const payload = { 
+        userId, 
+        userEmail, 
+        userName,
+        // Pass limits if a specific free package was selected
+        clientLimit: targetPkg?.clientLimit,
+        employeeLimit: targetPkg?.employeeLimit,
+        managerLimit: targetPkg?.managerLimit,
+        businessLimit: targetPkg?.businessLimit,
+        planName: targetPkg?.title || "Free",
+        features: targetPkg?.features
+      };
+      const res = await axios.post(`${BASE_URL}/api/subscriptions/start-trial`, payload);
       if (res.data.success) {
-        showToast("🎉 30-day free trial started!");
+        showToast(`🎉 30-day free trial started${targetPkg ? ` with ${targetPkg.title}` : ""}!`);
         await fetchData();
         if (onSubscriptionSuccess) onSubscriptionSuccess();
         else window.location.href = "/";
@@ -335,6 +356,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                 nextBillingDate: endDate,
                 usageLimit: 999,
                 features: plan.features,
+                clientLimit: plan.clientLimit,
+                employeeLimit: plan.employeeLimit,
+                managerLimit: plan.managerLimit,
+                businessLimit: plan.businessLimit,
                 paymentMethod: "card",
                 invoiceRefs: [verifyRes.data.payment?.invoiceNo].filter(Boolean),
                 quotationRefs: [verifyRes.data.payment?.quotationNo].filter(Boolean)
@@ -425,24 +450,41 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
             }}>
               Choose your Plan
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 15, margin: 0 }}>
-              Discover the perfect plan tailored just for you.
-            </p>
+          
           </div>
 
           {/* Plans Grid */}
           <div style={{
             display: "grid",
-            gridTemplateColumns: `repeat(${Math.min(PLANS.length, 4)}, 1fr)`,
+            gridTemplateColumns: `repeat(auto-fit, minmax(280px, 1fr))`,
             gap: 18,
             maxWidth: 1100,
             margin: "0 auto",
             position: "relative",
-            zIndex: 1
+            zIndex: 1,
+            width: "100%"
           }}>
-            {PLANS.map((plan) => {
+            {assignedPackages.length === 0 ? (
+               <div style={{ gridColumn: "1/-1", textAlign: "center", color: "rgba(255,255,255,0.4)", padding: 40 }}>
+                  <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
+                  <div style={{ fontSize: 18, fontWeight: 700 }}>No Packages Assigned</div>
+                  <div style={{ fontSize: 14 }}>Contact your administrator to assign a plan to your account.</div>
+               </div>
+            ) : assignedPackages.sort((a,b) => (parseFloat(a.price)||0)-(parseFloat(b.price)||0)).map((pkg) => {
+              const plan = {
+                name: pkg.title,
+                price: pkg.type === "free" ? 0 : parseFloat(pkg.price) || 0,
+                icon: pkg.icon || "📦",
+                features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n"),
+                isTrial: pkg.type === "free",
+                clientLimit: pkg.clientLimit,
+                employeeLimit: pkg.employeeLimit,
+                managerLimit: pkg.managerLimit,
+                businessLimit: pkg.businessLimit,
+                noOfDays: parseInt(pkg.no_of_days || pkg.noOfDays) || 30
+              };
               const isProcessing = payLoading === plan.name;
-              const isPro = plan.popular;
+              const isPro = (plan.name || "").toLowerCase().includes("pro") || (plan.name || "").toLowerCase().includes("premium");
               const isTrial = plan.isTrial;
 
               return (
@@ -622,9 +664,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                   >
                     {isProcessing ? (
                       <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid rgba(255,255,255,0.8)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing...</>
-                    ) : plan.price === null ? "📞 Contact Sales"
-                      : isTrial ? "🎁 Get Started"
-                        : "Get Started"}
+                    ) : plan.price === 0 && isTrial ? "🎁 Start Free Trial"
+                      : "Get Started"}
                   </button>
                 </div>
               );
@@ -680,6 +721,10 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
                         billingCycle: "monthly", status: "active",
                         isFullyPaid: true, startDate: new Date(), endDate, nextBillingDate: endDate,
                         usageLimit: 999, features: plan.features, paymentMethod: "other",
+                        clientLimit: plan.clientLimit,
+                        employeeLimit: plan.employeeLimit,
+                        managerLimit: plan.managerLimit,
+                        businessLimit: plan.businessLimit
                       });
                       await fetchData();
                       setMockGatewayOpen(null);
@@ -1006,20 +1051,33 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
             <p style={{ color: T.muted, fontSize: 13, margin: 0 }}>Current plan: <strong>{subscription.planName}</strong> • Expires: <strong>{formatDate(subscription.endDate)}</strong></p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-            {PLANS.filter(p => !p.isTrial && p.price !== null).map(plan => {
+            {assignedPackages.filter(p => p.type !== "free" || (p.title !== subscription.planName)).sort((a,b) => (parseFloat(a.price)||0)-(parseFloat(b.price)||0)).map(pkg => {
+              const plan = {
+                name: pkg.title,
+                price: pkg.type === "free" ? 0 : parseFloat(pkg.price) || 0,
+                icon: pkg.icon || "📦",
+                features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n"),
+                isTrial: pkg.type === "free",
+                clientLimit: pkg.clientLimit,
+                employeeLimit: pkg.employeeLimit,
+                managerLimit: pkg.managerLimit,
+                businessLimit: pkg.businessLimit,
+                noOfDays: parseInt(pkg.no_of_days || pkg.noOfDays) || 30,
+                color: (pkg.title || "").toLowerCase().includes("pro") ? "var(--app-accent)" : "#6366f1"
+              };
               const isProcessing = payLoading === plan.name;
               const isCurrent = subscription.planName === plan.name;
               return (
                 <div key={plan.name} style={{ background: "#fff", borderRadius: 20, padding: "24px 22px", border: isCurrent ? `2px solid ${T.accent}` : "1.5px solid var(--app-border)", boxShadow: isCurrent ? "0 12px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)" : "0 4px 16px rgba(0,0,0,0.04)" }}>
                   <div style={{ fontSize: 28, marginBottom: 12 }}>{plan.icon}</div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 4 }}>{plan.name}{isCurrent && <span style={{ marginLeft: 10, fontSize: 11, background: "var(--app-bg)", color: T.accent, padding: "3px 10px", borderRadius: 20, fontWeight: 800 }}>CURRENT</span>}</div>
-                  <div style={{ fontSize: 26, fontWeight: 800, color: plan.color, marginBottom: 16 }}>₹{plan.price?.toLocaleString("en-IN")}<span style={{ fontSize: 14, color: T.muted, fontWeight: 600 }}>/mo</span></div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: plan.color, marginBottom: 16 }}>{plan.price === 0 ? "Free" : `₹${plan.price?.toLocaleString("en-IN")}`}<span style={{ fontSize: 14, color: T.muted, fontWeight: 600 }}>/mo</span></div>
                   <div style={{ marginBottom: 16, background: "var(--app-bg)", borderRadius: 10, padding: "8px 12px", display: "flex", gap: 8, alignItems: "center" }}>
                     <span style={{ fontSize: 12 }}>🔒</span>
                     <span style={{ fontSize: 11, color: T.muted, fontWeight: 700 }}>Secure Payment Gateway</span>
                   </div>
-                  <button onClick={() => startRazorpayPayment(plan)} disabled={!!payLoading} style={{ width: "100%", padding: "14px", borderRadius: 12, background: isCurrent ? "linear-gradient(135deg,var(--app-accent),var(--app-muted))" : "var(--app-bg)", color: isCurrent ? "#fff" : T.accent, border: isCurrent ? "none" : `2px solid ${T.accent}`, fontSize: 14, fontWeight: 800, cursor: payLoading ? "wait" : "pointer", transition: "0.2s" }}>
-                    {isProcessing ? "Processing..." : isCurrent ? "🔄 Renew Plan" : "⬆️ Switch to " + plan.name}
+                  <button onClick={() => plan.isTrial ? startTrial(pkg) : startRazorpayPayment(plan)} disabled={!!payLoading} style={{ width: "100%", padding: "14px", borderRadius: 12, background: isCurrent ? "linear-gradient(135deg,var(--app-accent),var(--app-muted))" : "var(--app-bg)", color: isCurrent ? "#fff" : T.accent, border: isCurrent ? "none" : `2px solid ${T.accent}`, fontSize: 14, fontWeight: 800, cursor: payLoading ? "wait" : "pointer", transition: "0.2s" }}>
+                    {isProcessing ? "Processing..." : isCurrent ? "🔄 Renew Plan" : (plan.isTrial ? "🎁 Get Started" : "⬆️ Switch to " + plan.name)}
                   </button>
                 </div>
               );

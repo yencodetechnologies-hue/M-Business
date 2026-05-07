@@ -32,7 +32,7 @@ router.get("/subadmin/:subadminId", async (req, res) => {
 // CREATE a package
 router.post("/", async (req, res) => {
   try {
-    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, planDuration, businessLimit, managerLimit, clientLimit, status, targetRole, assignedSubadmins } = req.body;
+    const { title, description, icon, type, no_of_days, price, monthlyPrice, quarterlyPrice, halfYearlyPrice, annualPrice, buttonName, features, planDuration, businessLimit, managerLimit, clientLimit, employeeLimit, status, targetRole, assignedSubadmins } = req.body;
 
     const newPackage = new Package({
       title,
@@ -49,6 +49,7 @@ router.post("/", async (req, res) => {
       businessLimit: businessLimit || "",
       managerLimit: managerLimit || "",
       clientLimit: clientLimit || "3 Client manage",
+      employeeLimit: employeeLimit || "",
       status: status || "Active",
       targetRole: targetRole || "subadmin",
       assignedSubadmins: assignedSubadmins || [],

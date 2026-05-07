@@ -265,6 +265,40 @@ function InfoRow({ icon, label, value }) {
   );
 }
 
+function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
+  const icons = { client: "👥", employee: "👨‍💼", manager: "🧑‍💼" };
+  const labels = { client: "Clients", employee: "Employees", manager: "Managers" };
+  
+  return (
+    <Mdl title="Limit Reached" onClose={onClose} maxWidth={450}>
+      <div style={{ textAlign: "center", padding: "10px 0" }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>{icons[type] || "⚠️"}</div>
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 12 }}>
+          {labels[type] || "Resource"} Limit Reached
+        </h3>
+        <p style={{ fontSize: 14, color: "var(--app-muted)", lineHeight: 1.6, marginBottom: 24 }}>
+          Your current plan allows up to <b>{limit === Infinity ? "Unlimited" : limit} {labels[type]}</b>. 
+          You've reached this limit and need to upgrade your plan to add more.
+        </p>
+        <div style={{ display: "flex", gap: 12 }}>
+          <button 
+            onClick={onClose} 
+            style={{ flex: 1, padding: "12px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 12, fontWeight: 700, color: "var(--app-sidebar)", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            Maybe Later
+          </button>
+          <button 
+            onClick={onUpgrade} 
+            style={{ flex: 1, padding: "12px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, color: "#fff", cursor: "pointer", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)", fontFamily: "inherit" }}
+          >
+            🚀 Upgrade Plan
+          </button>
+        </div>
+      </div>
+    </Mdl>
+  );
+}
+
 function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -2358,8 +2392,8 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 // ═══════════════════════════════════════════════════════════
 // PACKAGES PAGE
 // ═══════════════════════════════════════════════════════════
-function PackagesPage({ packages, onViewPackage, onEditPackage }) {
-  const displayedPackages = packages || [];
+function PackagesPage({ packages, onViewPackage, onEditPackage, onSubscribe }) {
+  const displayedPackages = (packages && packages.length > 0) ? [...packages].sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)) : [];
 
   return (
     <div style={{
@@ -2386,9 +2420,7 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
         }}>
           Choose your Plan
         </h1>
-        <p style={{ fontSize: 15, color: "var(--app-muted)", margin: 0 }}>
-          Discover the perfect plan tailored just for you.
-        </p>
+       
       </div>
 
       {displayedPackages.length === 0 ? (
@@ -2533,6 +2565,7 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
 
                 {/* CTA Button */}
                 <button
+                  onClick={onSubscribe}
                   style={{
                     width: "100%", padding: "14px",
                     borderRadius: 14, fontSize: 15, fontWeight: 800,
@@ -2545,7 +2578,7 @@ function PackagesPage({ packages, onViewPackage, onEditPackage }) {
                       : "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)"
                   }}
                 >
-                  {p.buttonName || ""}
+                  {p.buttonName || "Get Started"}
                 </button>
 
                 {/* Admin View/Edit buttons */}
@@ -2770,6 +2803,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "var(--app-accent)");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [returnToModal, setReturnToModal] = useState(null);
+  const [limitModal, setLimitModal] = useState(null); // { type, limit }
 
   // Helper: hex to HSL
   const hexToHsl = (hex) => {
@@ -2973,7 +3007,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const fetchConfig = async () => {
     try {
-      const cid = user?._id || user?.id;
+      const cid = resolveSubadminId();
       if (!cid) return;
       const res = await axios.get(`${BASE_URL}/api/config/${cid}`);
       setConfig(res.data);
@@ -2983,7 +3017,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchSubscription = async () => {
     try {
       setSubLoading(true);
-      const id = user?._id || user?.id;
+      const id = resolveSubadminId();
       if (!id) return;
       const res = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
       if (res.data.hasSubscription) {
@@ -3008,7 +3042,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const fetchPaymentHistory = async () => {
     try {
-      const id = user?._id || user?.id;
+      const id = resolveSubadminId();
       if (!id) return;
       const res = await axios.get(`${BASE_URL}/api/subscriptions/payments/${id}`);
       setPaymentHistory(res.data || []);
@@ -3059,13 +3093,66 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const subStatus = getSubStatus();
+  const resolveSubadminId = () => {
+    // Aggressively find the subadmin ID from any possible property
+    const id = user?._id || user?.id || user?.userId || user?.companyId || user?.company || "";
+    return String(id).trim();
+  };
 
   const parseLimit = (limitStr, type = "client") => {
-    if (!limitStr || limitStr.trim() === "") return 0;
-    if (limitStr.toLowerCase().includes("unlimited")) return Infinity;
-    const match = limitStr.match(/\d+/);
-    if (match) return parseInt(match[0]);
-    return 0;
+    let identifiedLimits = [];
+
+    // 1. Check direct limit field (e.g. subscription.clientLimit)
+    if (limitStr !== undefined && limitStr !== null && limitStr !== "") {
+      const s = String(limitStr).toLowerCase();
+      if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
+      const m = s.match(/\d+/);
+      if (m) identifiedLimits.push(parseInt(m[0]));
+    }
+
+    // 2. Scan features list for any mention of the limit (e.g. "2 Clients")
+    if (subscription?.features && Array.isArray(subscription.features)) {
+      const keywords = {
+        client: ["client", "company", "business"],
+        employee: ["employee", "staff", "user"],
+        manager: ["manager", "admin"]
+      };
+      const searchKeys = keywords[type] || [type];
+      
+      for (const feat of subscription.features) {
+        if (!feat || typeof feat !== 'string') continue;
+        const f = feat.toLowerCase();
+        if (searchKeys.some(key => f.includes(key))) {
+          if (f.includes("unlimited") || f.includes("infinity")) return Infinity;
+          const m = f.match(/\d+/);
+          if (m) identifiedLimits.push(parseInt(m[0]));
+        }
+      }
+    }
+
+    // 3. Check Plan Name
+    const plan = (subscription?.planName || "").toLowerCase();
+    if (plan.includes("enterprise") || plan.includes("unlimited")) return Infinity;
+    
+    // 4. Return the MAXIMUM identified limit
+    if (identifiedLimits.length > 0) {
+      const maxLimit = Math.max(...identifiedLimits);
+      return maxLimit > 0 ? maxLimit : 1;
+    }
+    
+    // 5. Final Strict Default: If Admin assigned absolutely nothing, return 1
+    return 1; 
+  };
+
+const getSubscriptionLimit = (type) => {
+  if (!subscription) return 1; // Default to 1 (strict) if no subscription state exists
+  const limitKey = `${type}Limit`;
+  return parseLimit(subscription[limitKey], type);
+};
+
+  const isUsageAtLimit = (type, count) => {
+    const limit = getSubscriptionLimit(type);
+    return subscription && limit !== Infinity && count >= limit;
   };
 
   const handleLogout = () => { localStorage.removeItem("user"); setUser(null); };
@@ -3095,7 +3182,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchPackages = async () => {
     try {
       // Get packages assigned to this subadmin
-      const subadminId = user?._id || user?.id;
+      const subadminId = resolveSubadminId();
       if (subadminId) {
         const res = await axios.get(`${BASE_URL}/api/packages/subadmin/${subadminId}`);
         setPackages(res.data);
@@ -3202,21 +3289,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     // Subscription Limit Check - Fetch latest before check to catch admin updates
     try {
-      const id = user?._id || user?.id;
+      const id = resolveSubadminId();
       if (id) {
         const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
         if (subRes.data.hasSubscription) {
           const latestSub = subRes.data.subscription;
           setSubscription(latestSub);
 
-          const clientLimit = parseLimit(latestSub.clientLimit);
-          if (clients.length >= clientLimit) {
-            alert(`❌ Limit Reached: Your current plan only allows up to ${clientLimit} Company Names (Clients). Please upgrade your plan or refresh your page if you just updated.`);
-            return;
-          }
-          // Business Manage Check
-          if (latestSub.businessLimit === "" && clients.length >= 1) {
-            alert("❌ Limit Reached: Your current plan only allows managing a single business (1 Company Name). Please upgrade to 'Multiple business manage' plan.");
+          const clientLimit = parseLimit(latestSub.clientLimit, "client");
+          const effectiveClientLimit = clientLimit > 0 ? clientLimit : Infinity;
+          if (effectiveClientLimit !== Infinity && clients.length >= effectiveClientLimit) {
+            setLimitModal({ type: "client", limit: effectiveClientLimit });
             return;
           }
         } else {
@@ -3228,9 +3311,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       console.error("Failed to fetch latest subscription for limit check", err);
       // Fallback to existing state if fetch fails
       if (subscription) {
-        const clientLimit = parseLimit(subscription.clientLimit);
-        if (clients.length >= clientLimit) {
-          alert(`❌ Limit Reached: Your current plan only allows up to ${clientLimit} Company Names (Clients).`);
+        const clientLimit = parseLimit(subscription.clientLimit, "client");
+        const effectiveClientLimit = clientLimit > 0 ? clientLimit : Infinity;
+        if (effectiveClientLimit !== Infinity && clients.length >= effectiveClientLimit) {
+          setLimitModal({ type: "client", limit: effectiveClientLimit });
           return;
         }
       }
@@ -3251,7 +3335,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         contactPersonName: nc.contactPersonName,
         contactPersonNo: nc.contactPersonNo,
         gstNumber: nc.gstNumber,
-        logoUrl: nc.logoUrl
+        logoUrl: nc.logoUrl,
+        companyId: resolveSubadminId()
       };
       const res = await axios.post(BASE_URL + "/api/clients/add", payload);
       setClients(prev => [res.data.client, ...prev]);
@@ -3262,7 +3347,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
       // Don't close modal yet if no return - show success screen (this depends on existing logic)
     } catch (err) {
-      setNcError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
+        setLimitModal({ type: "client", limit: err.response.data.limit });
+      } else {
+        setNcError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+      }
     } finally {
       setSaveLoading(false);
     }
@@ -3276,16 +3365,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     // Subscription Limit Check - Fetch latest before check to catch admin updates
     try {
-      const id = user?._id || user?.id;
+      const id = resolveSubadminId();
       if (id) {
         const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
         if (subRes.data.hasSubscription) {
           const latestSub = subRes.data.subscription;
           setSubscription(latestSub);
 
-          const employeeLimit = parseLimit(latestSub.employeeLimit);
-          if (employees.length >= employeeLimit) {
-            alert(`❌ Limit Reached: Your current plan only allows up to ${employeeLimit} Employees. Please upgrade your plan or refresh if you just updated.`);
+          const employeeLimit = parseLimit(latestSub.employeeLimit, "employee");
+          const effectiveEmpLimit = employeeLimit > 0 ? employeeLimit : Infinity;
+          if (effectiveEmpLimit !== Infinity && employees.length >= effectiveEmpLimit) {
+            setLimitModal({ type: "employee", limit: effectiveEmpLimit });
             return;
           }
         } else {
@@ -3296,9 +3386,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch (err) {
       console.error("Failed to fetch latest subscription for employee limit check", err);
       if (subscription) {
-        const employeeLimit = parseLimit(subscription.employeeLimit);
-        if (employees.length >= employeeLimit) {
-          alert(`❌ Limit Reached: Your current plan only allows up to ${employeeLimit} Employees.`);
+        const employeeLimit = parseLimit(subscription.employeeLimit, "employee");
+        const effectiveEmpLimit = employeeLimit > 0 ? employeeLimit : Infinity;
+        if (effectiveEmpLimit !== Infinity && employees.length >= effectiveEmpLimit) {
+          setLimitModal({ type: "employee", limit: effectiveEmpLimit });
           return;
         }
       }
@@ -3310,6 +3401,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       const payload = {
         ...ne,
         role: ne.role || "employee",
+        companyId: resolveSubadminId(),
         bankDetails: {
           bankName: ne.bankName,
           ifscCode: ne.ifscCode,
@@ -3323,9 +3415,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setNeError({});
       if (returnToModal) { setModal(returnToModal); setReturnToModal(null); } else { setModal(null); }
     } catch (err) {
-      const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
-      const isPasswordError = errMsg.toLowerCase().includes("password");
-      setNeError(isPasswordError ? { password: errMsg } : { email: errMsg });
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
+        setLimitModal({ type: "employee", limit: err.response.data.limit });
+      } else {
+        const errMsg = err.response?.data?.message || err.response?.data?.msg || "Failed to save";
+        const isPasswordError = errMsg.toLowerCase().includes("password");
+        setNeError(isPasswordError ? { password: errMsg } : { email: errMsg });
+      }
     } finally { setEmpSaveLoading(false); }
   };
 
@@ -3360,16 +3456,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
     // Subscription Limit Check - Fetch latest before check to catch admin updates
     try {
-      const id = user?._id || user?.id;
+      const id = resolveSubadminId();
       if (id) {
         const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
         if (subRes.data.hasSubscription) {
           const latestSub = subRes.data.subscription;
           setSubscription(latestSub);
 
-          const managerLimit = parseLimit(latestSub.managerLimit);
-          if (managers.length >= managerLimit) {
-            alert(`❌ Limit Reached: Your current plan only allows up to ${managerLimit} Managers. Please upgrade your plan or refresh if you just updated.`);
+          const managerLimit = parseLimit(latestSub.managerLimit, "manager");
+          const effectiveMgrLimit = managerLimit > 0 ? managerLimit : Infinity;
+          if (effectiveMgrLimit !== Infinity && managers.length >= effectiveMgrLimit) {
+            setLimitModal({ type: "manager", limit: effectiveMgrLimit });
             return;
           }
         } else {
@@ -3380,9 +3477,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch (err) {
       console.error("Failed to fetch latest subscription for manager limit check", err);
       if (subscription) {
-        const managerLimit = parseLimit(subscription.managerLimit);
-        if (managers.length >= managerLimit) {
-          alert(`❌ Limit Reached: Your current plan only allows up to ${managerLimit} Managers.`);
+        const managerLimit = parseLimit(subscription.managerLimit, "manager");
+        const effectiveMgrLimit = managerLimit > 0 ? managerLimit : Infinity;
+        if (effectiveMgrLimit !== Infinity && managers.length >= effectiveMgrLimit) {
+          setLimitModal({ type: "manager", limit: effectiveMgrLimit });
           return;
         }
       }
@@ -3391,13 +3489,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (Object.keys(errors).length > 0) { setNmError(errors); return; }
     try {
       setMgrSaveLoading(true);
-      const res = await axios.post(BASE_URL + "/api/managers/add", nm);
+      const managerPayload = { ...nm, companyId: resolveSubadminId() };
+      const res = await axios.post(BASE_URL + "/api/managers/add", managerPayload);
       setManagers(prev => [res.data.manager, ...prev]);
       setNm({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" });
       setNmError({});
       setModal(null);
     } catch (err) {
-      setNmError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+      if (err.response?.status === 403 && err.response?.data?.limitReached) {
+        setLimitModal({ type: "manager", limit: err.response.data.limit });
+      } else {
+        setNmError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" });
+      }
     } finally {
       setMgrSaveLoading(false);
     }
@@ -3658,7 +3761,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
                     <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 6 }}>
-                      {clients.length} / {parseLimit(subscription.clientLimit, "client") === Infinity ? "Unlimited" : parseLimit(subscription.clientLimit, "client")} Used
+                      {clients.length} / {getSubscriptionLimit("client") === Infinity ? "Unlimited" : getSubscriptionLimit("client")} Used
                       <button
                         onClick={fetchSubscription}
                         style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center" }}
@@ -3668,18 +3771,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </button>
                     </span>
                   )}
-                  <button onClick={() => {
-                    const limit = parseLimit(subscription?.clientLimit, "client");
-                    if (subscription && clients.length >= limit) {
-                      alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
-                      return;
-                    }
-                    if (subscription?.businessLimit === "" && clients.length >= 1) {
-                      alert("❌ Limit Reached: Your current plan only allows managing a single business. Please upgrade your plan.");
-                      return;
-                    }
-                    setNcError({}); setShowClientPass(false); setModal("client");
-                  }} style={B(subscription && (clients.length >= parseLimit(subscription.clientLimit, "client") || (subscription.businessLimit === "" && clients.length >= 1)) ? "#94a3b8" : "var(--app-accent)")}>
+                  <button
+                    title={isUsageAtLimit("client", clients.length) ? `Plan limit reached: ${getSubscriptionLimit("client")} clients (Click to upgrade)` : "Add new client"}
+                    onClick={async () => {
+                      await fetchSubscription();
+                      const limit = getSubscriptionLimit("client");
+                      if (subscription && clients.length >= limit) {
+                        setLimitModal({ type: "client", limit });
+                        return;
+                      }
+                      setNcError({}); setShowClientPass(false); setModal("client");
+                    }}
+                    style={{ ...B("var(--app-accent)"), cursor: "pointer", opacity: 1 }}
+                  >
                     + Add Client
                   </button>
                 </div>
@@ -3688,7 +3792,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
                     <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 6 }}>
-                      {employees.length} / {parseLimit(subscription.employeeLimit, "employee") === Infinity ? "Unlimited" : parseLimit(subscription.employeeLimit, "employee")} Used
+                      {employees.length} / {getSubscriptionLimit("employee") === Infinity ? "Unlimited" : getSubscriptionLimit("employee")} Used
                       <button
                         onClick={fetchSubscription}
                         style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center" }}
@@ -3698,14 +3802,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </button>
                     </span>
                   )}
-                  <button onClick={() => {
-                    const limit = parseLimit(subscription?.employeeLimit, "employee");
-                    if (subscription && employees.length >= limit) {
-                      alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Employees. Please upgrade your plan.`);
-                      return;
-                    }
-                    setNeError({}); setModal("employee");
-                  }} style={B(subscription && employees.length >= parseLimit(subscription.employeeLimit, "employee") ? "#94a3b8" : "var(--app-accent)")}>
+                  <button
+                    title={isUsageAtLimit("employee", employees.length) ? `Plan limit reached: ${getSubscriptionLimit("employee")} employees (Click to upgrade)` : "Add new employee"}
+                    onClick={async () => {
+                      await fetchSubscription();
+                      const limit = getSubscriptionLimit("employee");
+                      if (subscription && employees.length >= limit) {
+                        setLimitModal({ type: "employee", limit });
+                        return;
+                      }
+                      setNeError({}); setModal("employee");
+                    }}
+                    style={{ ...B("var(--app-accent)"), cursor: "pointer", opacity: 1 }}
+                  >
                     + Add Employee
                   </button>
                 </div>
@@ -3720,7 +3829,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
                     <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 6 }}>
-                      {managers.length} / {parseLimit(subscription.managerLimit, "manager") === Infinity ? "Unlimited" : parseLimit(subscription.managerLimit, "manager")} Used
+                      {managers.length} / {getSubscriptionLimit("manager") === Infinity ? "Unlimited" : getSubscriptionLimit("manager")} Used
                       <button
                         onClick={fetchSubscription}
                         style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center" }}
@@ -3730,14 +3839,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </button>
                     </span>
                   )}
-                  <button onClick={() => {
-                    const limit = parseLimit(subscription?.managerLimit, "manager");
+                  <button onClick={async () => {
+                    await fetchSubscription();
+                    const limit = getSubscriptionLimit("manager");
                     if (subscription && managers.length >= limit) {
-                      alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Managers. Please upgrade your plan.`);
+                      setLimitModal({ type: "manager", limit });
                       return;
                     }
                     setNmError({}); setShowMgrPass(false); setModal("manager");
-                  }} style={B(subscription && managers.length >= parseLimit(subscription.managerLimit, "manager") ? "#94a3b8" : "var(--app-accent)")}>
+                  }} style={B(isUsageAtLimit("manager", managers.length) ? "#94a3b8" : "var(--app-accent)")}>
                     + Add Manager
                   </button>
                 </div>
@@ -4129,14 +4239,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </>)}
 
           {/* ── Pages using new components ── */}
-          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} triggerCrop={triggerCrop} />}
+          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => { 
+            const limit = getSubscriptionLimit("client");
+            if (subscription && clients.length >= limit) {
+              setLimitModal({ type: "client", limit });
+              return;
+            }
+            setNcError({}); setShowClientPass(false); setModal("client"); 
+          }} triggerCrop={triggerCrop} />}
 
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => { 
-            const limit = parseLimit(subscription?.employeeLimit, "employee");
+            const limit = getSubscriptionLimit("employee");
             if (subscription && employees.length >= limit) {
-              alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Employees. Please upgrade your plan.`);
+              setLimitModal({ type: "employee", limit });
               return;
             }
             setReturnToModal(null); setModal("employee"); 
@@ -4144,25 +4261,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
           {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { 
-            const limit = parseLimit(subscription?.clientLimit, "client");
+            const limit = getSubscriptionLimit("client");
             if (subscription && clients.length >= limit) {
-              alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
-              return;
-            }
-            if (subscription?.businessLimit === "" && clients.length >= 1) {
-              alert("❌ Limit Reached: Your current plan only allows managing a single business. Please upgrade your plan.");
+              setLimitModal({ type: "client", limit });
               return;
             }
             setReturnToModal(modal); setModal("client"); 
           }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
           {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { 
-            const limit = parseLimit(subscription?.clientLimit, "client");
+            const limit = getSubscriptionLimit("client");
             if (subscription && clients.length >= limit) {
-              alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
-              return;
-            }
-            if (subscription?.businessLimit === "" && clients.length >= 1) {
-              alert("❌ Limit Reached: Your current plan only allows managing a single business. Please upgrade your plan.");
+              setLimitModal({ type: "client", limit });
               return;
             }
             setReturnToModal(modal); setModal("client"); 
@@ -4191,7 +4300,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
-          {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} />}
+          {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} />}
           {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
           {validActive === "rolePermissions" && <RolePermissionDashboard />}
         </div>
@@ -4298,32 +4407,34 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             >
               <span style={{ fontSize: 14 }}>👤</span> Profile
             </button>
-            <button
-              onClick={() => {
-                setProfileDropdownOpen(false);
-                setAccountAuthTab("login");
-                setAccountAuthOpen(true);
-              }}
-              style={{
-                width: "100%",
-                background: "none",
-                border: "none",
-                padding: "10px 14px",
-                cursor: "pointer",
-                fontSize: 13,
-                fontWeight: 700,
-                fontFamily: "inherit",
-                color: T.text,
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                borderTop: "1px solid #f8fafc",
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-            >
-              <span style={{ fontSize: 14 }}>➕</span> Add account
-            </button>
+            {(isAdmin || subscription?.businessLimit === "Multiple business manage") && (
+              <button
+                onClick={() => {
+                  setProfileDropdownOpen(false);
+                  setAccountAuthTab("login");
+                  setAccountAuthOpen(true);
+                }}
+                style={{
+                  width: "100%",
+                  background: "none",
+                  border: "none",
+                  padding: "10px 14px",
+                  cursor: "pointer",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  fontFamily: "inherit",
+                  color: T.text,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  borderTop: "1px solid #f8fafc",
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              >
+                <span style={{ fontSize: 14 }}>➕</span> Add account
+              </button>
+            )}
             <button
               onClick={() => {
                 setProfileDropdownOpen(false);
@@ -4393,6 +4504,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
       {/* ── Add Client Modal ── */}
+      {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setActive("mysubscriptions"); }} />}
       {modal === "client" && <Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
         {clientSuccessData ? (
           <div style={{ textAlign: "center", padding: "5px 0" }}>
@@ -4560,10 +4672,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 const limit = parseLimit(subscription?.clientLimit, "client");
                 if (subscription && clients.length >= limit) {
                   alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
-                  return;
-                }
-                if (subscription?.businessLimit === "" && clients.length >= 1) {
-                  alert("❌ Limit Reached: Your current plan only allows managing a single business. Please upgrade your plan.");
                   return;
                 }
                 setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false); 

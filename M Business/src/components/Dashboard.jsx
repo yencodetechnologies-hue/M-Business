@@ -56,7 +56,11 @@ function getNavForRole(role){
     return NAV.filter(n=>["dashboard","tasks","calendar","messaging"].includes(n.key));
   return NAV;
 }
-
+const getSubscriptionLimit = (type) => {
+  if (!subscription) return Infinity;  // No subscription = don't block
+  const limitKey = `${type}Limit`;
+  return parseLimit(subscription[limitKey], type);
+};
 const sc=s=>({Active:"#22C55E",Inactive:"#EF4444","In Progress":"var(--app-accent)",Pending:"#F59E0B",Completed:"#22C55E","On Hold":"var(--app-muted)",Sent:"var(--app-accent)",Approved:"#22C55E",Rejected:"#EF4444",Paid:"#22C55E",Overdue:"#EF4444",Client:"var(--app-accent)",Employee:"var(--app-muted)",Manager:"#f59e0b",pending:"#F59E0B",hired:"#22C55E",rejected:"#EF4444"}[s]||"var(--app-muted)");
 
 function Badge({label}){const c=sc(label);return <span style={{background:`${c}18`,color:c,border:`1px solid ${c}33`,padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>{label}</span>;}

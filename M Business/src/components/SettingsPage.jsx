@@ -264,9 +264,9 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
       {toast && (
         <div style={{
           position: "fixed", bottom: 24, right: 24, zIndex: 9999,
-          background: "#fff", borderLeft: `4px solid var(--app-accent)`,
+          background: "var(--app-card)", borderLeft: `4px solid var(--app-accent)`,
           borderRadius: 12, padding: "12px 20px", fontSize: 13,
-          fontWeight: 600, color: "var(--app-text)", boxShadow: "0 8px 20px rgba(0,0,0,0.12)"
+          fontWeight: 600, color: "var(--app-text)", boxShadow: "var(--app-shadow)"
         }}>{toast}</div>
       )}
 
@@ -295,7 +295,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                     borderRadius: 16, 
                     objectFit: "contain", 
                     border: "2px solid var(--app-accent)",
-                    background: "#fff",
+                    background: "var(--app-card)",
                     boxShadow: "0 4px 12px rgba(var(--app-accent-rgb), 0.1)"
                   }} 
                 />
@@ -303,14 +303,14 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                 <div style={{
                   width: 80, height: 80, borderRadius: 28, background: "var(--app-accent-gradient)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 32, fontWeight: 700, color: "white"
+                  fontSize: 32, fontWeight: 700, color: "#fff"
                 }}>{initials}</div>
               )}
               <label style={{
-                position: "absolute", bottom: -10, right: -10, background: "white",
+                position: "absolute", bottom: -10, right: -10, background: "var(--app-card)",
                 borderRadius: 99, width: 32, height: 32, display: "flex", alignItems: "center", 
                 justifyContent: "center", cursor: "pointer", border: "1.5px solid var(--app-border)",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+                boxShadow: "var(--app-shadow)"
               }}>
                 <span style={{ fontSize: 14 }}>📷</span>
                 <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: "none" }} />
@@ -471,7 +471,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
           {activeTab === "security" && (
             <div style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 24, padding: "28px 32px" }}>
               <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6, color: "var(--app-text)" }}>Security</h2>
-              <p style={{ fontSize: 14, color: "var(--app-muted)", marginBottom: 28 }}>Manage password and session security</p>
+
 
               <div style={{ maxWidth: 500 }}>
                 <Input 

@@ -8,6 +8,14 @@ const Quotation = require("../models/QuotationModel");
 const Subscription = require("../models/SubscriptionModel");
 const bcrypt = require("bcryptjs");
 
+const parseLimit = (limitStr = "") => {
+  if (!limitStr || typeof limitStr !== "string") return Infinity;
+  const lowered = limitStr.toLowerCase();
+  if (lowered.includes("unlimited")) return Infinity;
+  const match = lowered.match(/\d+/);
+  return match ? parseInt(match[0], 10) : Infinity;
+};
+
 // GET all subadmins
 router.get("/", async (req, res) => {
   try {
@@ -52,19 +60,23 @@ router.post("/", async (req, res) => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 30);
     
-    const newSubscription = new Subscription({
-      userId: newSubadmin._id.toString(),
-      userEmail: newSubadmin.email,
-      userName: newSubadmin.name,
-      planName: "Free",
-      planPrice: 0,
-      billingCycle: "monthly",
-      status: "active",
-      endDate: endDate,
-      features: ["30 Days Free Trial"],
-      companyId: companyName || newSubadmin._id.toString(),
-      isFullyPaid: true
-    });
+ const newSubscription = new Subscription({
+  userId: newSubadmin._id.toString(),
+  userEmail: newSubadmin.email,
+  userName: newSubadmin.name,
+  planName: "Free",
+  planPrice: 0,
+  billingCycle: "monthly",
+  status: "active",
+  endDate: endDate,
+  features: ["30 Days Free Trial"],
+  companyId: newSubadmin._id.toString(),
+  isFullyPaid: true,
+  clientLimit: "",    // ← ADD: no default
+  employeeLimit: "",  // ← ADD: no default
+  managerLimit: "",   // ← ADD: no default
+  businessLimit: "",  // ← ADD: no default
+});
     await newSubscription.save();
     
     res.status(201).json({ msg: "Subadmin created", subadmin: newSubadmin });
@@ -161,6 +173,70 @@ router.post("/assign-resources", async (req, res) => {
   try {
     const { subadminId, employeeIds = [], clientIds = [], managerIds = [] } = req.body;
     if (!subadminId) return res.status(400).json({ msg: "subadminId required" });
+
+    const activeSubscription = await Subscription.findOne({
+      userId: subadminId,
+      status: { $in: ["active", "grace_period", "trial"] }
+    }).sort({ createdAt: -1 });
+
+    if (!activeSubscription) {
+      return res.status(403).json({
+        msg: "No active package found for this subadmin",
+        limitReached: true
+      });
+    }
+
+    const [currentEmployeeCount, currentClientCount, currentManagerCount] = await Promise.all([
+      Employee.countDocuments({ companyId: subadminId }),
+      Client.countDocuments({ companyId: subadminId }),
+      Manager.countDocuments({ companyId: subadminId })
+    ]);
+
+    const [newEmployeesToAssign, newClientsToAssign, newManagersToAssign] = await Promise.all([
+      employeeIds.length
+        ? Employee.countDocuments({ _id: { $in: employeeIds }, companyId: { $ne: subadminId } })
+        : Promise.resolve(0),
+      clientIds.length
+        ? Client.countDocuments({ _id: { $in: clientIds }, companyId: { $ne: subadminId } })
+        : Promise.resolve(0),
+      managerIds.length
+        ? Manager.countDocuments({ _id: { $in: managerIds }, companyId: { $ne: subadminId } })
+        : Promise.resolve(0)
+    ]);
+
+    const employeeLimit = parseLimit(activeSubscription.employeeLimit);
+    const clientLimit = parseLimit(activeSubscription.clientLimit);
+    const managerLimit = parseLimit(activeSubscription.managerLimit);
+
+    if (Number.isFinite(employeeLimit) && (currentEmployeeCount + newEmployeesToAssign) > employeeLimit) {
+      return res.status(403).json({
+        msg: `Employee limit exceeded. Allowed: ${employeeLimit}, Current: ${currentEmployeeCount}`,
+        type: "employee",
+        limit: employeeLimit,
+        currentCount: currentEmployeeCount,
+        tryingToAdd: newEmployeesToAssign
+      });
+    }
+
+    if (Number.isFinite(clientLimit) && (currentClientCount + newClientsToAssign) > clientLimit) {
+      return res.status(403).json({
+        msg: `Client limit exceeded. Allowed: ${clientLimit}, Current: ${currentClientCount}`,
+        type: "client",
+        limit: clientLimit,
+        currentCount: currentClientCount,
+        tryingToAdd: newClientsToAssign
+      });
+    }
+
+    if (Number.isFinite(managerLimit) && (currentManagerCount + newManagersToAssign) > managerLimit) {
+      return res.status(403).json({
+        msg: `Manager limit exceeded. Allowed: ${managerLimit}, Current: ${currentManagerCount}`,
+        type: "manager",
+        limit: managerLimit,
+        currentCount: currentManagerCount,
+        tryingToAdd: newManagersToAssign
+      });
+    }
 
     const results = await Promise.all([
       employeeIds.length > 0

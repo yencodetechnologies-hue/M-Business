@@ -7,7 +7,7 @@ const subscriptionSchema = new mongoose.Schema({
   packageId: { type: String },
 
   // Current Plan Details
-  planName: { type: String, required: true, enum: ["Free", "Trial", "Starter", "Professional", "Enterprise", "Custom"] },
+  planName: { type: String, required: true },
   planPrice: { type: Number, default: 0 },
   billingCycle: { type: String, enum: ["monthly", "yearly", "trial", "custom"], default: "monthly" },
 
@@ -37,10 +37,10 @@ const subscriptionSchema = new mongoose.Schema({
 
   // Features included in plan
   features: [{ type: String }],
-  clientLimit: { type: String, default: "1 Company manage" },
-  employeeLimit: { type: String, default: "1 Employee manage" },
-  managerLimit: { type: String, default: "1 Manager manage" },
-  businessLimit: { type: String, default: "" },
+clientLimit:   { type: String, default: "" },
+employeeLimit: { type: String, default: "" },
+managerLimit:  { type: String, default: "" },
+businessLimit: { type: String, default: "" },
 
   // Payment provider info
   paymentMethod: { type: String, enum: ["card", "upi", "netbanking", "cash", "other"], default: "other" },

@@ -115,11 +115,49 @@ const adminBypass = (req, res, next) => {
 };
 
 // Helper to parse limit strings (e.g., "10 Employees" -> 10, "Unlimited" -> Infinity)
-const parseLimit = (limitStr) => {
-  if (!limitStr || limitStr.trim() === "") return 0; // Default to 0 if not set to strictly restrict
-  if (limitStr.toLowerCase().includes("unlimited")) return Infinity;
-  const match = limitStr.match(/\d+/);
-  return match ? parseInt(match[0]) : 0;
+const parseLimit = (limitStr, subscription = null, type = "") => {
+  let identifiedLimits = [];
+
+  // 1. Check direct limit field (e.g. subscription.clientLimit)
+  if (limitStr !== undefined && limitStr !== null && limitStr !== "") {
+    const s = String(limitStr).toLowerCase();
+    if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
+    const m = s.match(/\d+/);
+    if (m) identifiedLimits.push(parseInt(m[0]));
+  }
+
+  // 2. Scan features array for matches
+  if (subscription?.features && Array.isArray(subscription.features)) {
+    const keywords = {
+      client: ["client", "company", "business"],
+      employee: ["employee", "staff", "user"],
+      manager: ["manager", "admin"]
+    };
+    const searchKeys = keywords[type] || [type];
+
+    for (const feat of subscription.features) {
+      if (!feat || typeof feat !== "string") continue;
+      const f = feat.toLowerCase();
+      if (searchKeys.some(key => f.includes(key))) {
+        if (f.includes("unlimited") || f.includes("infinity")) return Infinity;
+        const m = f.match(/\d+/);
+        if (m) identifiedLimits.push(parseInt(m[0]));
+      }
+    }
+  }
+
+  // 3. Fallback based on Plan Name
+  const plan = (subscription?.planName || "").toLowerCase();
+  if (plan.includes("enterprise") || plan.includes("unlimited")) return Infinity;
+
+  // 4. Return the MAXIMUM identified limit
+  if (identifiedLimits.length > 0) {
+    const maxLimit = Math.max(...identifiedLimits);
+    return maxLimit > 0 ? maxLimit : Infinity;
+  }
+
+  // 5. Final Default: 10 is a safe dynamic default
+  return Infinity; 
 };
 
 // Middleware to check specific resource limits (Employee, Client, Manager)
@@ -137,8 +175,9 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
     }
 
     // Find active subscription
+    // Find active subscription using either userId or companyId for maximum compatibility
     const subscription = await Subscription.findOne({
-      companyId: companyId,
+      $or: [{ userId: companyId }, { companyId: companyId }],
       status: { $in: ["active", "grace_period", "trial"] }
     }).sort({ createdAt: -1 });
 
@@ -157,17 +196,20 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
     let errorMessage = "";
 
     if (resourceType === 'employee') {
-      limit = parseLimit(subscription.employeeLimit);
+      const rawLimit = parseLimit(subscription.employeeLimit, subscription, 'employee');
+      limit = rawLimit > 0 ? rawLimit : Infinity;
       currentCount = await Employee.countDocuments({ companyId: companyId });
-      errorMessage = `Employee limit reached (${limit}). Please upgrade your package.`;
+      errorMessage = `Employee limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade your package.`;
     } else if (resourceType === 'client') {
-      limit = parseLimit(subscription.clientLimit);
+      const rawLimit = parseLimit(subscription.clientLimit, subscription, 'client');
+      limit = rawLimit > 0 ? rawLimit : Infinity;
       currentCount = await Client.countDocuments({ companyId: companyId });
-      errorMessage = `Client limit reached (${limit}). Please upgrade your package.`;
+      errorMessage = `Client limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade your package.`;
     } else if (resourceType === 'manager') {
-      limit = parseLimit(subscription.managerLimit);
+      const rawLimit = parseLimit(subscription.managerLimit, subscription, 'manager');
+      limit = rawLimit > 0 ? rawLimit : Infinity;
       currentCount = await Manager.countDocuments({ companyId: companyId });
-      errorMessage = `Manager limit reached (${limit}). Please upgrade your package.`;
+      errorMessage = `Manager limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade your package.`;
     }
 
     // Check if limit is reached

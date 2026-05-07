@@ -65,9 +65,9 @@ export default function AdminDashboard({ user, setUser }) {
     noOfDays: "30",
     planDuration: "Monthly Plan",
     businessLimit: "Single business manage",
-    managerLimit: "",
-    clientLimit: "",
-    employeeLimit: "",
+    managerLimit: "1",
+    clientLimit: "3",
+    employeeLimit: "10",
     assignedSubadmins: []
   });
   const [editPkg, setEditPkg] = useState(null);
@@ -183,7 +183,7 @@ export default function AdminDashboard({ user, setUser }) {
           npkg.managerLimit ? `Managers: ${npkg.managerLimit}` : "",
           npkg.clientLimit ? `Clients: ${npkg.clientLimit}` : "",
           npkg.employeeLimit ? `Employees: ${npkg.employeeLimit}` : ""
-        ].filter(Boolean).join("\n"),
+        ].filter(Boolean),
         planDuration: npkg.planDuration,
         businessLimit: npkg.businessLimit,
         managerLimit: npkg.managerLimit || "",
@@ -213,9 +213,9 @@ export default function AdminDashboard({ user, setUser }) {
         noOfDays: "30",
         planDuration: "Monthly Plan",
         businessLimit: "Single business manage",
-        managerLimit: "",
-        clientLimit: "",
-        employeeLimit: "",
+        managerLimit: "1",
+        clientLimit: "3",
+        employeeLimit: "10",
         assignedSubadmins: []
       });
       setPkgError({});
@@ -374,9 +374,9 @@ export default function AdminDashboard({ user, setUser }) {
                     noOfDays: "30",
                     planDuration: "Monthly Plan",
                     businessLimit: "Single business manage",
-                    managerLimit: "",
-                    clientLimit: "",
-                    employeeLimit: "",
+                    managerLimit: "1",
+                    clientLimit: "3",
+                    employeeLimit: "10",
                     assignedSubadmins: []
                   });
                   setPkgError({});
@@ -397,7 +397,7 @@ export default function AdminDashboard({ user, setUser }) {
         <div style={{ flex: 1, padding: 30, overflowY: "auto" }}>
           {active === "dashboard" && <OverviewPage subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} invoices={invoices} />}
           {active === "clients" && <ClientsPage clients={clients} setClients={setClients} />}
-          {active === "subadmins" && <SubadminsList subadmins={subadmins} refresh={fetchSubadmins} packages={packages} subscriptions={subscriptions} />}
+          {active === "subadmins" && <SubadminsList subadmins={subadmins} refresh={fetchSubadmins} packages={packages} subscriptions={subscriptions}   fetchSubscriptions={fetchSubscriptions} />}
           {active === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
@@ -892,7 +892,7 @@ function OverviewPage({ subadmins, clients, employees, managers, projects, packa
 }
 
 // ── Subadmins List ──
-function SubadminsList({ subadmins, refresh, packages, subscriptions }) {
+function SubadminsList({ subadmins, refresh, packages, subscriptions,fetchSubscriptions  }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
@@ -935,6 +935,16 @@ function SubadminsList({ subadmins, refresh, packages, subscriptions }) {
 
     setAssignLoading(true);
     try {
+      // Helper to extract limit from features array
+      const extractFromFeat = (type, feats) => {
+        const keywords = { client: ["client", "company"], employee: ["employee", "staff"], manager: ["manager", "admin"] };
+        const keys = keywords[type] || [type];
+        const feat = feats.find(f => typeof f === 'string' && keys.some(k => f.toLowerCase().includes(k)) && f.match(/\d+/));
+        return feat ? feat.match(/\d+/)[0] : "";
+      };
+
+      const feats = Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n").filter(Boolean);
+
       await axios.post(`${BASE_URL}/api/subscriptions/assign-to-subadmin`, {
         subadminId: selectedSubadmin._id,
         subadminEmail: selectedSubadmin.email,
@@ -944,11 +954,12 @@ function SubadminsList({ subadmins, refresh, packages, subscriptions }) {
         planPrice: pkg.price,
         billingCycle,
         durationDays,
-        clientLimit: pkg.clientLimit,
-        employeeLimit: pkg.employeeLimit,
-        managerLimit: pkg.managerLimit,
-        businessLimit: pkg.businessLimit,
-        features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n")
+        // Prioritize the direct numeric limit fields from the package document
+        clientLimit: pkg.clientLimit || extractFromFeat("client", feats) || "",
+        employeeLimit: pkg.employeeLimit || extractFromFeat("employee", feats) || "",
+        managerLimit: pkg.managerLimit || extractFromFeat("manager", feats) || "",
+        businessLimit: pkg.businessLimit || "",
+        features: feats
       });
       alert(`Package "${pkg.title}" assigned to ${selectedSubadmin.name} successfully!`);
       setAssignModalOpen(false);
@@ -1034,15 +1045,42 @@ function SubadminsList({ subadmins, refresh, packages, subscriptions }) {
                       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         <span style={{ fontSize: 10, color: "#64748b", display: "flex", justifyContent: "space-between" }}>
                           <span>Clients:</span>
-                          <span style={{ fontWeight: 600 }}>{clients.filter(c => c.companyId === s._id).length} / {sub.clientLimit || "0"}</span>
+                          <span style={{ fontWeight: 600 }}>
+                            {clients.filter(c => c.companyId === s._id).length} / {(() => {
+                              const lim = sub.clientLimit;
+                              if (lim && String(lim).match(/\d+/)) return String(lim).match(/\d+/)[0];
+                              const feats = Array.isArray(sub.features) ? sub.features : (sub.features || "").split("\n");
+                              const feat = feats.find(f => typeof f === 'string' && (f.toLowerCase().includes("client") || f.toLowerCase().includes("business")) && f.match(/\d+/));
+                              if (feat) return feat.match(/\d+/)[0];
+                              return "Unlimited";
+                            })()} Used
+                          </span>
                         </span>
                         <span style={{ fontSize: 10, color: "#64748b", display: "flex", justifyContent: "space-between" }}>
                           <span>Employees:</span>
-                          <span style={{ fontWeight: 600 }}>{employees.filter(e => e.companyId === s._id).length} / {sub.employeeLimit || "0"}</span>
+                          <span style={{ fontWeight: 600 }}>
+                            {employees.filter(e => e.companyId === s._id).length} / {(() => {
+                              const lim = sub.employeeLimit;
+                              if (lim && String(lim).match(/\d+/)) return String(lim).match(/\d+/)[0];
+                              const feats = Array.isArray(sub.features) ? sub.features : (sub.features || "").split("\n");
+                              const feat = feats.find(f => typeof f === 'string' && f.toLowerCase().includes("employee") && f.match(/\d+/));
+                              if (feat) return feat.match(/\d+/)[0];
+                              return "Unlimited";
+                            })()} Used
+                          </span>
                         </span>
                         <span style={{ fontSize: 10, color: "#64748b", display: "flex", justifyContent: "space-between" }}>
                           <span>Managers:</span>
-                          <span style={{ fontWeight: 600 }}>{managers.filter(m => m.companyId === s._id).length} / {sub.managerLimit || "0"}</span>
+                          <span style={{ fontWeight: 600 }}>
+                            {managers.filter(m => m.companyId === s._id).length} / {(() => {
+                              const lim = sub.managerLimit;
+                              if (lim && String(lim).match(/\d+/)) return String(lim).match(/\d+/)[0];
+                              const feats = Array.isArray(sub.features) ? sub.features : (sub.features || "").split("\n");
+                              const feat = feats.find(f => typeof f === 'string' && f.toLowerCase().includes("manager") && f.match(/\d+/));
+                              if (feat) return feat.match(/\d+/)[0];
+                              return "Unlimited";
+                            })()} Used
+                          </span>
                         </span>
                       </div>
                     )}
@@ -1522,7 +1560,7 @@ function SubscriptionsPage({ subscriptions }) {
   );
 }
 function PackagesPage({ packages, onEdit, onDelete }) {
-  const displayedPackages = (packages && packages.length > 0) ? packages : [];
+  const displayedPackages = (packages && packages.length > 0) ? [...packages].sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)) : [];
 
   if (displayedPackages.length === 0) {
     return (
@@ -1572,9 +1610,7 @@ function PackagesPage({ packages, onEdit, onDelete }) {
         }}>
           Choose your Plan
         </h1>
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", margin: 0 }}>
-          Discover the perfect plan tailored just for you.
-        </p>
+
       </div>
 
       {/* Cards grid */}

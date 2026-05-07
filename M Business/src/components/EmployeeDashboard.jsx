@@ -1482,7 +1482,7 @@ export default function EmployeeDashboard({ user, setUser }) {
               </div>
               {[
                 { icon: "👤", label: "Profile", action: () => { setProfileDropdownOpen(false); setProfileOpen(true); } },
-                { icon: "➕", label: "Add account", action: () => { setProfileDropdownOpen(false); setAccountAuthOpen(true); } },
+                ...(subscription?.businessLimit === "Multiple business manage" ? [{ icon: "➕", label: "Add account", action: () => { setProfileDropdownOpen(false); setAccountAuthOpen(true); } }] : []),
                 { icon: "🚪", label: "Logout", action: () => { setProfileDropdownOpen(false); handleLogout(); }, danger: true },
               ].map((item, idx) => (
                 <button key={idx} onClick={item.action}
@@ -1504,7 +1504,17 @@ export default function EmployeeDashboard({ user, setUser }) {
             {page === "tasks" && <TasksPage tasks={tasks} />}
             {page === "attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify} />}
             {(page === "salary" || page === "payments") && <SalaryPage salary={salary} user={resolvedUser} />}
-            {page === "calendar" && <CalendarPage projects={projects} tasks={tasks} user={resolvedUser} onUpdateProject={() => loadData()} onUpdateTask={() => loadData()} />}
+          {page === "calendar" && (
+  <CalendarPage
+    projects={projects}
+    tasks={tasks}
+    user={resolvedUser}
+    companyId={resolvedUser?.companyId || ""}
+    clients={[]}
+    onUpdateProject={() => loadData(empName)}
+    onUpdateTask={() => loadData(empName)}
+  />
+)}
             {page === "messaging" && <MessagingPage user={resolvedUser} />}
           </div>
         </div>

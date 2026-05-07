@@ -74,7 +74,7 @@ export default function MessagingPage({ user }) {
   return (
     <div style={{ display: "flex", gap: 16, height: "calc(100vh - 120px)", minHeight: 500 }}>
       {/* Users List */}
-      <div style={{ width: 280, background: "#fff", borderRadius: 16, border: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)" }}>
+      <div style={{ width: 280, background: "var(--app-card)", borderRadius: 16, border: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "var(--app-shadow)" }}>
         <div style={{ padding: 16, borderBottom: `1px solid ${T.border}`, background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
           <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: T.text }}>Members</h3>
         </div>
@@ -109,7 +109,7 @@ export default function MessagingPage({ user }) {
       </div>
 
       {/* Chat Area */}
-      <div style={{ flex: 1, background: "#fff", borderRadius: 16, border: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)" }}>
+      <div style={{ flex: 1, background: "var(--app-card)", borderRadius: 16, border: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "var(--app-shadow)" }}>
         {selectedUser ? (
           <>
             <div style={{ padding: "12px 20px", borderBottom: `1px solid ${T.border}`, background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", display: "flex", alignItems: "center", gap: 12 }}>
@@ -122,7 +122,7 @@ export default function MessagingPage({ user }) {
               </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: "auto", padding: 20, display: "flex", flexDirection: "column", gap: 12, background: "#faf8ff" }}>
+            <div style={{ flex: 1, overflowY: "auto", padding: 20, display: "flex", flexDirection: "column", gap: 12, background: "var(--app-surface)" }}>
               {filteredMessages.length === 0 ? (
                 <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: T.muted, fontSize: 13, fontStyle: "italic" }}>
                   No messages yet. Say hi! 👋
@@ -139,7 +139,7 @@ export default function MessagingPage({ user }) {
                       alignItems: isMe ? "flex-end" : "flex-start"
                     }}>
                       <div style={{ 
-                        background: isMe ? "linear-gradient(135deg,var(--app-accent),var(--app-accent))" : "#fff",
+                        background: isMe ? "var(--app-accent-gradient, var(--app-accent))" : "var(--app-surface)",
                         color: isMe ? "#fff" : T.text,
                         padding: "10px 14px",
                         borderRadius: isMe ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
@@ -160,7 +160,7 @@ export default function MessagingPage({ user }) {
               <div ref={chatEndRef} />
             </div>
 
-            <div style={{ padding: 16, borderTop: `1px solid ${T.border}`, background: "#fff", display: "flex", gap: 10 }}>
+            <div style={{ padding: 16, borderTop: `1px solid ${T.border}`, background: "var(--app-card)", display: "flex", gap: 10 }}>
               <input 
                 placeholder="Type a message..." 
                 value={content}

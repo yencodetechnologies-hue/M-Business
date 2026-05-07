@@ -3,6 +3,7 @@ const router = express.Router();
 const Subscription = require("../models/SubscriptionModel");
 const PaymentHistory = require("../models/PaymentHistoryModel");
 const User = require("../models/UserModels");
+const Package = require("../models/PackageModel");
 const { sendQuickEmail, sendTrialWelcome, sendUsageLimitAlert, sendSubscriptionSuccess } = require("../config/email");
 
 // ─── Get current subscription ───────────────────────────────────────────────
@@ -94,7 +95,7 @@ router.post("/start-trial", async (req, res) => {
       companyId: userId,
       userEmail,
       userName: userName || "User",
-      planName: "Free",
+      planName: req.body.planName || "Free",
       isTrial: true,
       planPrice: 0,
       billingCycle: "trial",
@@ -105,14 +106,14 @@ router.post("/start-trial", async (req, res) => {
       nextBillingDate: endDate,
       usageLimit: 999,
       usageCount: 0,
-      features: ["30 Days Free Trial", "1 Company Name", "1 Employee", "", "Basic Reports", "Email Support"],
-      clientLimit: "1 Company manage",
-      employeeLimit: "1 Employee manage",
-      managerLimit: "",
-      businessLimit: "",
+      features: req.body.features || ["30 Days Free Trial", "1 Company Name", "1 Employee", "", "Basic Reports", "Email Support"],
+      clientLimit: req.body.clientLimit || "1 Company manage",
+      employeeLimit: req.body.employeeLimit || "1 Employee manage",
+      managerLimit: req.body.managerLimit || "",
+      businessLimit: req.body.businessLimit || "",
       paymentMethod: "other",
       providerCompany: "M Business",
-      notes: "Free 30-day trial"
+      notes: req.body.planName ? `Free 30-day trial for ${req.body.planName}` : "Free 30-day trial"
     });
 
     const subRecord = await subscription.save();
@@ -396,20 +397,52 @@ router.get("/quotations/:userId", async (req, res) => {
 // ─── Assign package to subadmin ───────────────────────────────────────────────
 router.post("/assign-to-subadmin", async (req, res) => {
   try {
-    const { subadminId, subadminEmail, subadminName, packageId, packageTitle, planPrice, billingCycle, durationDays, features, notes, clientLimit, employeeLimit, managerLimit, businessLimit } = req.body;
+    const { 
+      subadminId, subadminEmail, subadminName, 
+      packageId, packageTitle, planPrice, billingCycle, 
+      durationDays, features, notes,
+      clientLimit, employeeLimit, managerLimit, businessLimit 
+    } = req.body;
 
-    await Subscription.updateMany({ userId: subadminId, status: "active" }, { status: "cancelled" });
+    const assignedPackage = packageId ? await Package.findById(packageId) : null;
+
+    // ── FIXED: Normalize limit to "N Type" format for consistent parsing ──
+    const normalizeLimit = (rawVal, pkgVal, label) => {
+      const val = (rawVal && rawVal !== "") ? rawVal : (pkgVal || "");
+      if (!val) return "";
+      const s = String(val).toLowerCase();
+      if (s.includes("unlimited")) return "Unlimited";
+      const m = s.match(/\d+/);
+      if (m) return `${m[0]} ${label}`;  // e.g. "6 Employees"
+      return val;
+    };
+
+    const resolvedClientLimit   = normalizeLimit(clientLimit,   assignedPackage?.clientLimit,   "Clients");
+    const resolvedEmployeeLimit = normalizeLimit(employeeLimit, assignedPackage?.employeeLimit, "Employees");
+    const resolvedManagerLimit  = normalizeLimit(managerLimit,  assignedPackage?.managerLimit,  "Managers");
+    const resolvedBusinessLimit = normalizeLimit(businessLimit, assignedPackage?.businessLimit, "Business");
+
+    console.log("[ASSIGN] Normalized limits:", {
+      resolvedClientLimit,
+      resolvedEmployeeLimit,
+      resolvedManagerLimit,
+    });
+
+    await Subscription.updateMany(
+      { userId: subadminId, status: { $in: ["active", "trial", "pending", "grace_period"] } },
+      { status: "cancelled", updatedAt: new Date() }
+    );
 
     const startDate = new Date();
     const endDate = new Date();
-    endDate.setDate(endDate.getDate() + (durationDays || 30));
+    endDate.setDate(endDate.getDate() + (parseInt(durationDays) || 30));
 
     const sub = new Subscription({
       userId: subadminId,
       companyId: subadminId,
       userEmail: subadminEmail,
       userName: subadminName,
-      packageId: packageId,
+      packageId,
       planName: packageTitle || "Custom",
       planPrice: planPrice || 0,
       billingCycle: billingCycle || "monthly",
@@ -419,25 +452,27 @@ router.post("/assign-to-subadmin", async (req, res) => {
       nextBillingDate: endDate,
       usageLimit: 999,
       features: features || [packageTitle || "Subadmin Package"],
-      clientLimit: clientLimit || "",
-      employeeLimit: employeeLimit || "",
-      managerLimit: managerLimit || "",
-      businessLimit: businessLimit || "Multiple business manage",
+      clientLimit: resolvedClientLimit,
+      employeeLimit: resolvedEmployeeLimit,
+      managerLimit: resolvedManagerLimit,
+      businessLimit: resolvedBusinessLimit,
       paymentMethod: "other",
       notes: notes || "Package assigned by admin"
     });
 
     await sub.save();
-    await User.findByIdAndUpdate(subadminId, { mySubscriptions: true }).catch(() => { });
 
-    try {
-      await sendQuickEmail(subadminEmail, "M Business Package Assigned",
-        `Hi ${subadminName},<br><br>Your <strong>${packageTitle || "Custom"}</strong> package has been assigned by M Business. It is valid until <strong>${endDate.toLocaleDateString("en-IN")}</strong>.<br><br>Login to your dashboard to view your subscription details.<br><br>M Business Team`
-      );
-    } catch (e) { console.log("Assignment email failed:", e.message); }
+    console.log("[ASSIGN] Saved subscription:", {
+      clientLimit: sub.clientLimit,
+      employeeLimit: sub.employeeLimit,
+      managerLimit: sub.managerLimit,
+    });
+
+    await User.findByIdAndUpdate(subadminId, { mySubscriptions: true }).catch(() => {});
 
     res.status(201).json({ success: true, subscription: sub });
   } catch (err) {
+    console.error("[ASSIGN ERROR]", err);
     res.status(500).json({ error: err.message });
   }
 });

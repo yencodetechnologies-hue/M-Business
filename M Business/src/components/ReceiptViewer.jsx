@@ -22,7 +22,7 @@ export default function ReceiptViewer() {
       const params = new URLSearchParams(window.location.search);
       const encoded = params.get("d");
       if (!encoded) { setError("No receipt data found in URL."); return; }
-      
+
       // Robust decoding: replace spaces back to plus signs (common issue with URLSearchParams)
       const safeEncoded = encoded.replace(/ /g, "+");
       const decoded = decodeURIComponent(escape(atob(safeEncoded)));
@@ -39,7 +39,7 @@ export default function ReceiptViewer() {
               setData(prev => prev ? ({ ...prev, invData: { ...prev.invData, logo: res.data.logoUrl } }) : prev);
             }
           })
-          .catch(() => {});
+          .catch(() => { });
       }
     } catch (e) {
       setError("Could not read receipt data.");
@@ -83,7 +83,7 @@ export default function ReceiptViewer() {
         {/* Header */}
         <div style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", padding: "40px 32px", textAlign: "center", color: "#fff" }}>
           {invData.logo && (
-            <img src={invData.logo} alt="logo" style={{ height: 50, width: "auto", maxWidth: "180px", objectFit: "contain", background: "#fff", padding: "4px", borderRadius: "10px", marginBottom: "16px", margin: "0 auto", display: "block" }} />
+            <img src={invData.logo} alt="logo" style={{ height: 60, width: "auto", maxWidth: "220px", objectFit: "contain", marginBottom: "20px", margin: "0 auto", display: "block" }} />
           )}
           <div style={{ width: 64, height: 64, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 32 }}>💸</div>
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>{r.status === "part_paid" ? "PART PAYMENT RECEIPT" : "PAYMENT RECEIPT"}</h2>
@@ -138,7 +138,7 @@ export default function ReceiptViewer() {
             {invData.companyPhone && <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{invData.companyPhone}</div>}
           </div>
         </div>
-        
+
         <div style={{ background: "#f8fafc", padding: "16px", textAlign: "center", borderTop: "1px solid #e2e8f0" }}>
           <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 700, letterSpacing: 1 }}>COMPUTER GENERATED RECEIPT</div>
         </div>

@@ -10,7 +10,7 @@ import { T } from "../index";
 
 
 const sc = (s) => {
-  const isDark = document.documentElement.classList.contains('dark-mode') || THEME.bg === 'var(--app-bg)'; 
+  const isDark = document.documentElement.classList.contains('dark-mode') || THEME.bg === 'var(--app-bg)';
   // Simplified logic: sc should just return base colors, the component handles transparency
   return {
     Active: "#10b981", Inactive: "#ef4444", "In Progress": "var(--app-accent)",
@@ -461,13 +461,30 @@ function ProfileDropdown({ user, onLogout, showDetails, darkMode }) {
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <button onClick={() => setOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 12, background: "none", border: "none", cursor: "pointer", padding: "4px", outline: "none" }}>
-        <div style={{ minWidth: 42, height: 42, borderRadius: 12, background: user?.logoUrl ? "#fff" : "linear-gradient(135deg,#7c6cfa,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: 16, border: "2px solid #fff", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", overflow: "hidden", padding: user?.logoUrl ? "5px" : 0 }}>
-          {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : (user?.name || user?.clientName || "C").slice(0, 2).toUpperCase()}
+        <div style={{
+          width: user?.logoUrl ? "auto" : 42,
+          height: 42,
+          minWidth: 42,
+          maxWidth: 120,
+          borderRadius: 10,
+          background: user?.logoUrl ? "transparent" : "linear-gradient(135deg,#7c6cfa,#a855f7)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#fff",
+          fontWeight: 900,
+          fontSize: 14,
+          border: user?.logoUrl ? "none" : "1.5px solid var(--app-border)",
+          boxShadow: user?.logoUrl ? "none" : "0 4px 12px rgba(0,0,0,0.06)",
+          overflow: "hidden",
+          padding: 0,
+          flexShrink: 0
+        }}>
+          {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ height: "100%", width: "auto", objectFit: "contain", display: "block" }} /> : (user?.name || user?.clientName || "C").slice(0, 2).toUpperCase()}
         </div>
         {showDetails && (
           <div style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: THEME.text, lineHeight: 1 }}>{user?.name || user?.clientName || "User"}</div>
-            <div style={{ fontSize: 11, color: THEME.muted, fontWeight: 700 }}>{user?.plan || "Pro"} {user?.role || "Client"}</div>
           </div>
         )}
         <div style={{ fontSize: 14, color: THEME.muted }}>▾</div>
@@ -537,22 +554,24 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
       }} className="client-sidebar">
         <div style={{ padding: "32px 24px", display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{
-            width: 60,
+            width: branding?.logoUrl ? "auto" : 60,
             height: 60,
-            background: branding?.logoUrl ? "var(--app-logo-bg)" : THEME.gradient,
-            borderRadius: 18,
+            minWidth: 60,
+            maxWidth: 180,
+            background: branding?.logoUrl ? "transparent" : THEME.gradient,
+            borderRadius: 12,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: 24,
             color: "#fff",
-            boxShadow: branding?.logoUrl ? "0 4px 14px rgba(0,0,0,0.08)" : "0 8px 16px rgba(217, 70, 239, 0.25)",
+            boxShadow: branding?.logoUrl ? "none" : "0 8px 16px rgba(217, 70, 239, 0.25)",
             overflow: "hidden",
-            padding: branding?.logoUrl ? "4px" : 0,
-            border: branding?.logoUrl ? `1px solid ${THEME.border}` : "none",
+            padding: 0,
+            border: "none",
             flexShrink: 0
           }}>
-            {branding?.logoUrl ? <img src={branding.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ transform: "rotate(-10deg)" }}>💰</span>}
+            {branding?.logoUrl ? <img src={branding.logoUrl} alt="logo" style={{ height: "100%", width: "auto", objectFit: "contain", display: "block" }} /> : <span style={{ transform: "rotate(-10deg)" }}>💰</span>}
           </div>
           <div style={{ fontWeight: 900, fontSize: 22, color: THEME.text, letterSpacing: "-1px" }}>
             {branding?.companyName || "M Business"}
@@ -591,7 +610,7 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
         </nav>
 
         <div style={{ padding: "24px", borderTop: `1.5px solid ${THEME.border}` }}>
-          <div 
+          <div
             onClick={() => setDarkMode(!darkMode)}
             style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: darkMode ? "#334155" : "#f1f5f9", padding: "12px 16px", borderRadius: 16, cursor: "pointer", transition: "0.3s" }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: THEME.muted }}>Dark Mode</div>
@@ -849,16 +868,16 @@ function WorkspacePage({ user }) {
           ) : (
             todos.map(todo => (
               <div key={todo.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", background: todo.done ? "var(--app-surface)" : THEME.card, border: `1.5px solid ${todo.done ? "transparent" : THEME.border}`, borderRadius: 16, transition: "0.2s", boxShadow: todo.done ? "none" : "0 2px 4px rgba(0,0,0,0.02)" }}>
-                <div 
+                <div
                   onClick={() => toggleTodo(todo.id)}
                   style={{ width: 22, height: 22, borderRadius: 7, border: `2px solid ${todo.done ? "#10b981" : "#cbd5e1"}`, background: todo.done ? "#10b981" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "0.2s" }}
                 >
-                  {todo.done && <svg width="12" height="12" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>}
+                  {todo.done && <svg width="12" height="12" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" /></svg>}
                 </div>
                 <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: todo.done ? THEME.muted : THEME.text, textDecoration: todo.done ? "line-through" : "none" }}>
                   {todo.text}
                 </span>
-                <button onClick={() => deleteTodo(todo.id)} style={{ background: "none", border: "none", color: "#cbd5e1", cursor: "pointer", fontSize: 18, padding: 4 }} onMouseEnter={e=>e.target.style.color="#ef4444"} onMouseLeave={e=>e.target.style.color="#cbd5e1"}>✕</button>
+                <button onClick={() => deleteTodo(todo.id)} style={{ background: "none", border: "none", color: "#cbd5e1", cursor: "pointer", fontSize: 18, padding: 4 }} onMouseEnter={e => e.target.style.color = "#ef4444"} onMouseLeave={e => e.target.style.color = "#cbd5e1"}>✕</button>
               </div>
             ))
           )}
@@ -1100,9 +1119,9 @@ export default function ClientDashboard({ user, setUser }) {
           --app-muted: ${darkMode ? '#94a3b8' : '#64748b'};
           --app-border: ${darkMode ? '#334155' : '#f1f5f9'};
           --app-shadow: ${darkMode ? '0 10px 30px rgba(0,0,0,0.4)' : '0 10px 25px rgba(0,0,0,0.03)'};
-          --app-gradient: ${darkMode 
-            ? 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' 
-            : 'linear-gradient(135deg, #d946ef 0%, #8b5cf6 100%)'};
+          --app-gradient: ${darkMode
+          ? 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)'
+          : 'linear-gradient(135deg, #d946ef 0%, #8b5cf6 100%)'};
           --app-accent-gradient: var(--app-gradient);
           --app-logo-bg: #ffffff;
           --app-surface: ${darkMode ? 'rgba(255,255,255,0.05)' : '#f8fafc'};
@@ -1148,14 +1167,14 @@ export default function ClientDashboard({ user, setUser }) {
         }
       `}</style>
 
-      <SidebarClient 
-        active={active} 
-        setActive={setActive} 
-        open={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-        onLogout={handleLogout} 
-        clientUser={clientUser} 
-        navItems={filteredNav} 
+      <SidebarClient
+        active={active}
+        setActive={setActive}
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onLogout={handleLogout}
+        clientUser={clientUser}
+        navItems={filteredNav}
         branding={branding}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
@@ -1214,52 +1233,7 @@ export default function ClientDashboard({ user, setUser }) {
                 </div>
 
                 {/* Analytics Section */}
-                <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
-                    <h2 style={{ fontSize: 20, fontWeight: 900, color: THEME.text }}>Analytics</h2>
-                    <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: THEME.muted }}>
-                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: THEME.accentSecondary }}></div> Income
-                      </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: THEME.muted }}>
-                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: `${THEME.accent}40` }}></div> Outcome
-                      </div>
-                      <select style={{ padding: "6px 12px", borderRadius: 10, border: `1.5px solid ${THEME.border}`, fontSize: 12, fontWeight: 700, color: THEME.text }}>
-                        <option>2026</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Mock Bar Chart */}
-                  <div style={{ height: 260, display: "flex", alignItems: "flex-end", justifyContent: "space-between", padding: "0 10px" }}>
-                    {(() => {
-                      const data = new Array(12).fill(0).map(() => ({ income: 0, outcome: 0 }));
-                      payments.forEach(p => {
-                        const d = new Date(p.date);
-                        if (isNaN(d)) return;
-                        const m = d.getMonth();
-                        const amt = parseFloat(String(p.amount || "0").replace(/[^0-9.]/g, "")) || 0;
-                        if (p.status?.toLowerCase() === "paid" || p.status?.toLowerCase() === "part_paid") {
-                          data[m].income += p.amountPaid || amt;
-                        } else {
-                          data[m].outcome += amt;
-                        }
-                      });
-                      const maxVal = Math.max(...data.map(d => Math.max(d.income, d.outcome)), 1000);
-                      return data.map((d, i) => (
-                        <div key={i} style={{ display: "flex", gap: 4, alignItems: "flex-end", height: "100%", width: 30 }}>
-                          <div style={{ width: 12, height: `${(d.income / maxVal) * 100 || 5}%`, background: THEME.accentSecondary, borderRadius: "4px 4px 0 0", transition: "height 0.5s ease" }}></div>
-                          <div style={{ width: 12, height: `${(d.outcome / maxVal) * 100 || 2}%`, background: `${THEME.accent}40`, borderRadius: "4px 4px 0 0", transition: "height 0.5s ease" }}></div>
-                        </div>
-                      ));
-                    })()}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16, padding: "0 10px" }}>
-                    {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(m => (
-                      <div key={m} style={{ fontSize: 11, fontWeight: 700, color: THEME.muted, width: 30, textAlign: "center" }}>{m}</div>
-                    ))}
-                  </div>
-                </div>
+           
 
                 {/* Recent Transactions */}
                 <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
@@ -1424,7 +1398,7 @@ export default function ClientDashboard({ user, setUser }) {
                     <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
                       <button
                         onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")}
-                        style={{  background: THEME.gradient, border: "none", borderRadius: 14, padding: "12px", color: "#fff", fontWeight: 800, cursor: "pointer" }}
+                        style={{ background: THEME.gradient, border: "none", borderRadius: 14, padding: "12px", color: "#fff", fontWeight: 800, cursor: "pointer" }}
                       >View</button>
                       <button
                         onClick={() => window.open(`/project-proposal?view=${p._id || p.id}&print=true`, "_blank")}
@@ -1545,9 +1519,9 @@ export default function ClientDashboard({ user, setUser }) {
                 <h3 style={{ fontSize: 18, fontWeight: 900, color: THEME.text, marginBottom: 24 }}>Payment History</h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {payments.map(inv => (
-                    <div key={inv.id || inv._id} style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px", background: "#f8fafc", borderRadius: 24, border: `1px solid ${THEME.border}`, transition: "all 0.2s" }}
-                      onMouseEnter={e => e.currentTarget.style.background = "#fff"}>
-                      <div style={{ width: 48, height: 48, borderRadius: 14, background: inv.status === "Paid" ? "#f0fdf4" : "#fffbeb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                    <div key={inv.id || inv._id} style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px", background: "var(--app-surface)", borderRadius: 24, border: `1px solid ${THEME.border}`, transition: "all 0.2s" }}
+                      onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}>
+                      <div style={{ width: 48, height: 48, borderRadius: 14, background: inv.status === "Paid" ? "#f0fdf4" : "#fffbeb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
                         {inv.status === "Paid" ? "🧾" : "⏳"}
                       </div>
                       <div style={{ flex: 1 }}>

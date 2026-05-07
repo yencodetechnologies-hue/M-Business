@@ -63,26 +63,7 @@ const DEFAULT_PACKAGES = [
     employeeLimit: "Unlimited",
     managerLimit: "10"
   },
-  {
-    title: "Enterprise",
-    price: 0,
-    type: "paid",
-    no_of_days: 365,
-    icon: "🏢",
-    targetRole: "subadmin",
-    status: "Active",
-    buttonName: "Contact Sales",
-    features: [
-      "Custom Branding",
-      "API Access",
-      "Dedicated Manager",
-      "White-label Solution"
-    ],
-    planDuration: "Annual",
-    clientLimit: "Unlimited",
-    employeeLimit: "Unlimited",
-    managerLimit: "Unlimited"
-  }
+ 
 ];
 
 async function seedPackages() {

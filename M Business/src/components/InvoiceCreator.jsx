@@ -496,6 +496,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           </div>
 
           <div style={{ padding: "32px" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+              {effectiveLogo ? (
+                <img src={effectiveLogo} alt="logo" style={{ maxHeight: 60, maxWidth: "100%", objectFit: "contain", borderRadius: 8 }} />
+              ) : (
+                <div style={{ fontSize: 18, fontWeight: 900, color: "var(--app-accent)" }}>{effectiveCompanyName}</div>
+              )}
+            </div>
             <div style={{ textAlign: "center", marginBottom: 32 }}>
               <div style={{ fontSize: 36, fontWeight: 900, color: "var(--app-text)" }}>{formatCurrency(pd.amountPaid, invData.currency)}</div>
               <div style={{ fontSize: 12, color: "var(--app-accent)", fontWeight: 700, marginTop: 4, textTransform: "uppercase", letterSpacing: 1 }}>Amount Received</div>
@@ -917,7 +924,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
               <div>
                 {effectiveLogo ? (
-                  <img src={effectiveLogo} alt="logo" style={{ height: 85, borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
+                  <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                 ) : (
                   <div style={{ height: 60, width: 60, background: "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
                     {effectiveCompanyName[0] || "?"}
@@ -1013,13 +1020,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               {inv.notes && (
                 <div style={{ background: "var(--app-bg)", borderRadius: 11, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
                   <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📝 NOTES</div>
-                  <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.notes}</div>
+                  <div style={{ fontSize: 12, color: "var(--app-text)", opacity: 0.8, lineHeight: 1.7 }}>{inv.notes}</div>
                 </div>
               )}
               {inv.terms && (
                 <div style={{ background: "var(--app-bg)", borderRadius: 11, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
                   <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
-                  <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7 }}>{inv.terms}</div>
+                  <div style={{ fontSize: 12, color: "var(--app-text)", opacity: 0.8, lineHeight: 1.7 }}>{inv.terms}</div>
                 </div>
               )}
               {(inv.upiId || inv.bankName) && (
@@ -1105,7 +1112,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <button onClick={() => setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
             ← Back
           </button>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)" }}>
 
           </span>
           {editingId && (
@@ -1135,8 +1142,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       )}
 
       {/* ── Invoice Details ── */}
-      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Invoice Details</div>
+      <div style={{ background: "var(--app-card)", borderRadius: 12, padding: "20px 24px", border: "1px solid var(--app-border)", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", marginBottom: 16 }}>Invoice Details</div>
         <div className="f3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
           <div>
             <label style={lbl}>Invoice Number</label>

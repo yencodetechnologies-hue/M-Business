@@ -289,13 +289,8 @@ router.get("/employee-status/:userId", async (req, res) => {
       hasSubscription: !isExpired && !isHidden,
       isHidden,
       subscription: isHidden ? null : {
-        planName: subscription.planName,
-        status: subscription.status,
-        endDate: subscription.endDate,
+        ...subscription.toObject(),
         daysUntilExpiry,
-        isTrial: subscription.isTrial,
-        usageCount: subscription.usageCount,
-        usageLimit: subscription.usageLimit,
         usageRemaining: Math.max(0, (subscription.usageLimit || 999) - (subscription.usageCount || 0))
       },
       notification

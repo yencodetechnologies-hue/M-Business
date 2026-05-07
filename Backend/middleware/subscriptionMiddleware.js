@@ -156,8 +156,9 @@ const parseLimit = (limitStr, subscription = null, type = "") => {
     return maxLimit > 0 ? maxLimit : Infinity;
   }
 
-  // 5. Final Default: 10 is a safe dynamic default
-  return Infinity; 
+  // 5. Final Default: If nothing is found, we assume a strict baseline of 1
+  // (matches frontend logic for maximum security)
+  returnInfinity; 
 };
 
 // Middleware to check specific resource limits (Employee, Client, Manager)

@@ -104,6 +104,7 @@ export default function AdminDashboard({ user, setUser }) {
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
   const [modal, setModal] = useState(null);
   const [invoices, setInvoices] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [pkgError, setPkgError] = useState({});
 
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("adminDarkMode") === "true");
@@ -125,7 +126,15 @@ export default function AdminDashboard({ user, setUser }) {
     fetchQuotations();
     fetchPackages();
     fetchInvoices();
+    fetchTasks();
   }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/tasks");
+      setTasks(res.data);
+    } catch (e) { console.error(e); }
+  };
 
   const fetchSubadmins = async () => {
     try {
@@ -347,7 +356,7 @@ export default function AdminDashboard({ user, setUser }) {
       {/* SIDEBAR */}
       <div style={{ width: 260, background: THEME.sidebar, color: darkMode ? "#fff" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}` }}>
         <div style={{ padding: "32px 24px", display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "4px" }}>
+          <div style={{ width: 42, height: 42, background: darkMode ? "rgba(255,255,255,0.05)" : "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "4px", border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid #e2e8f0" }}>
              {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} /> : <span style={{ color: darkMode ? "#fff" : "#1a3d4d", fontWeight: 900 }}>A</span>}
           </div>
           <div>
@@ -416,7 +425,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "reports" && <ReportsPage THEME={THEME} clients={clients} projects={projects} employees={employees} managers={managers} />}
           {active === "subscriptions" && <SubscriptionsPage THEME={THEME} subscriptions={subscriptions} />}
           {active === "packages" && <PackagesPage THEME={THEME} packages={packages} onEdit={handleEditPackageClick} onDelete={deletePackage} />}
-          {active === "payments" && <AccountsPage THEME={THEME} ExpensesPage={ExpensesPage} />}
+          {active === "payments" && <AccountsPage THEME={THEME} initialTab="income" />}
         </div>
       </div>
 
@@ -797,7 +806,7 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
       {/* Premium Stats Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
         {[
-          { label: "Total Company Names", value: clients.length, icon: "📦", iconBg: "#eff6ff", iconColor: "#3b82f6" },
+          { label: "Total Company Names", value: clients.length, icon: "🏢", iconBg: "#eff6ff", iconColor: "#3b82f6" },
           { label: "Total Employees", value: employees.length, icon: "👥", iconBg: "#f0fdf4", iconColor: "#10b981" },
           { label: "Recent Projects", value: projects.length, icon: "📋", iconBg: "#fdf4ff", iconColor: "#d946ef" },
           { label: "Active Subadmins", value: subadmins.length, icon: "🛡️", iconBg: "#fff7ed", iconColor: "#f59e0b" },
@@ -810,15 +819,18 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
             alignItems: "center",
             gap: 20,
             boxShadow: THEME.shadow,
-            border: `1.5px solid ${THEME.border}`
+            border: `1.5px solid ${THEME.border}`,
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            cursor: "pointer"
           }}>
             <div style={{
-              width: 54, height: 54, borderRadius: 16, background: s.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: s.iconColor, flexShrink: 0
+              width: 54, height: 54, borderRadius: 16, background: s.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: s.iconColor, flexShrink: 0,
+              boxShadow: `0 8px 16px ${s.iconBg}`
             }}>
               {s.icon}
             </div>
             <div>
-              <div style={{ fontSize: 28, fontWeight: 900, color: THEME.text, lineHeight: 1 }}>{s.value}</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: THEME.text, lineHeight: 1, letterSpacing: "-1px" }}>{s.value}</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: THEME.muted, marginTop: 4 }}>{s.label}</div>
             </div>
           </div>

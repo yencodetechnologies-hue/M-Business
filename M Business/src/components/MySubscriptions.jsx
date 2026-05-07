@@ -859,6 +859,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
             <InfoRow label="Plan Name" value={`${subscription.planName}${subscription.isTrial ? " (Free Trial)" : ""}`} icon="📦" />
             <InfoRow label="Price" value={`${formatCurrency(subscription.planPrice)}/${subscription.billingCycle}`} icon="💵" />
             <InfoRow label="Status" value={subscription.status} icon="🔵" />
+            <InfoRow label="Clients Limit" value={subscription.clientLimit || "Unlimited"} icon="🏢" />
+            <InfoRow label="Employees Limit" value={subscription.employeeLimit || "Unlimited"} icon="👥" />
+            <InfoRow label="Managers Limit" value={subscription.managerLimit || "Unlimited"} icon="👔" />
             <InfoRow label="Start Date" value={formatDate(subscription.startDate)} icon="📅" />
             <InfoRow label="End Date" value={formatDate(subscription.endDate)} icon="⏰" />
             <InfoRow label="Days Remaining" value={`${daysLeft || 0} days`} icon="⌛" />

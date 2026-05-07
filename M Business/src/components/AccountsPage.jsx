@@ -9,6 +9,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import { T as GLOBAL_T } from "../index";
 
 // ── Constants ─────────────────────────────────────────────
 const ACCOUNTS_API = `${BASE_URL}/api/accounts`;
@@ -221,21 +222,55 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
 }
 
 // ── Main Page Component ──────────────────────────────────────────
-export default function AccountsPage({ THEME }) {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [income, setIncome] = useState([]);
-  const [expenses, setExpenses] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function AccountsPage({ 
+  THEME: propTheme, 
+  initialTab = "overview",
+  income: propIncome,
+  setIncome: propSetIncome,
+  fetchIncome: propFetchIncome,
+  expenses: propExpenses,
+  setExpenses: propSetExpenses,
+  fetchExpenses: propFetchExpenses
+}) {
+  const THEME = propTheme || GLOBAL_T;
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [localIncome, setLocalIncome] = useState([]);
+  const [localExpenses, setLocalExpenses] = useState([]);
+  const [loading, setLoading] = useState(!propIncome || !propExpenses);
+
+  const income = propIncome || localIncome;
+  const expenses = propExpenses || localExpenses;
+
+  const setIncome = propSetIncome || setLocalIncome;
+  const setExpenses = propSetExpenses || setLocalExpenses;
+
+  const fetchIncome = propFetchIncome || (async () => {
+    const r = await axios.get(INCOME_API);
+    setLocalIncome(r.data);
+    return r.data;
+  });
+
+  const fetchExpenses = propFetchExpenses || (async () => {
+    const r = await axios.get(EXPENSES_API);
+    setLocalExpenses(r.data);
+    return r.data;
+  });
 
   useEffect(() => {
+    if (propIncome && propExpenses) {
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
+        setLoading(true);
         const [incRes, expRes] = await Promise.all([
           axios.get(INCOME_API),
           axios.get(EXPENSES_API)
         ]);
-        setIncome(incRes.data);
-        setExpenses(expRes.data);
+        setLocalIncome(incRes.data);
+        setLocalExpenses(expRes.data);
       } catch (e) {
         console.error("Failed to fetch financial data", e);
       } finally {
@@ -243,7 +278,7 @@ export default function AccountsPage({ THEME }) {
       }
     };
     fetchData();
-  }, []);
+  }, [propIncome, propExpenses]);
 
   const tabStyle = (on) => ({
     padding: "12px 28px", borderRadius: 12, fontSize: 14, fontWeight: 800,
@@ -266,8 +301,8 @@ export default function AccountsPage({ THEME }) {
 
       <div>
         {activeTab === "overview" && <FinancialOverview THEME={THEME} income={income} expenses={expenses} />}
-        {activeTab === "income" && <IncomePage THEME={THEME} income={income} setIncome={setIncome} fetchIncome={() => axios.get(INCOME_API).then(r => setIncome(r.data))} />}
-        {activeTab === "expenses" && <ExpensesPage THEME={THEME} expenses={expenses} setExpenses={setExpenses} fetchExpenses={() => axios.get(EXPENSES_API).then(r => setExpenses(r.data))} />}
+        {activeTab === "income" && <IncomePage THEME={THEME} income={income} setIncome={setIncome} fetchIncome={fetchIncome} />}
+        {activeTab === "expenses" && <ExpensesPage THEME={THEME} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
       </div>
     </div>
   );

@@ -56,11 +56,14 @@ function getNavForRole(role){
     return NAV.filter(n=>["dashboard","tasks","calendar","messaging"].includes(n.key));
   return NAV;
 }
-const getSubscriptionLimit = (type) => {
-  if (!subscription) return Infinity;  // No subscription = don't block
-  const limitKey = `${type}Limit`;
-  return parseLimit(subscription[limitKey], type);
+const parseLimit = (limitStr = "") => {
+  if (!limitStr || typeof limitStr !== "string") return Infinity;
+  const lowered = limitStr.toLowerCase();
+  if (lowered.includes("unlimited")) return Infinity;
+  const match = lowered.match(/\d+/);
+  return match ? parseInt(match[0], 10) : Infinity;
 };
+
 const sc=s=>({Active:"#22C55E",Inactive:"#EF4444","In Progress":"var(--app-accent)",Pending:"#F59E0B",Completed:"#22C55E","On Hold":"var(--app-muted)",Sent:"var(--app-accent)",Approved:"#22C55E",Rejected:"#EF4444",Paid:"#22C55E",Overdue:"#EF4444",Client:"var(--app-accent)",Employee:"var(--app-muted)",Manager:"#f59e0b",pending:"#F59E0B",hired:"#22C55E",rejected:"#EF4444"}[s]||"var(--app-muted)");
 
 function Badge({label}){const c=sc(label);return <span style={{background:`${c}18`,color:c,border:`1px solid ${c}33`,padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>{label}</span>;}
@@ -1648,8 +1651,25 @@ export default function Dashboard({setUser,user,fixedLogo}){
   const [tasks,setTasks]=useState([]);
   const [config,setConfig]=useState(null);
   const [viewProject,setViewProject]=useState(null);
-
-  useEffect(()=>{fetchClients();fetchEmployees();fetchProjects();fetchManagers();fetchTasks();fetchConfig();},[]);
+ const [subscription, setSubscription] = useState(null);
+  const fetchSubscription = async () => {
+    try {
+      const userId = user?._id || user?.id;
+      if (!userId) return;
+      const res = await axios.get(`${BASE_URL}/api/subscriptions/current/${userId}`);
+      if (res.data?.hasSubscription) {
+        setSubscription(res.data.subscription);
+      }
+    } catch (e) {
+      console.log("Subscription fetch error:", e);
+    }
+  };
+  const getSubscriptionLimit = (type) => {
+    if (!subscription) return Infinity;
+    const limitKey = `${type}Limit`;
+    return parseLimit(subscription[limitKey]);
+  };
+  useEffect(()=>{fetchClients();fetchEmployees();fetchProjects();fetchManagers();fetchTasks();fetchConfig(); fetchSubscription();},[]);
 
   const handleLogout=()=>{localStorage.removeItem("user");setUser(null);};
   const onLogoChange=async(logo)=>{setCompanyLogo(logo||fixedLogo);const updatedUser={...user,logoUrl:logo||""};localStorage.setItem("user",JSON.stringify(updatedUser));setUser(updatedUser);try{await axios.post(BASE_URL + "/api/auth/save-logo",{userId:user._id||user.id,logoUrl:logo||""});}catch(e){console.log(e);}};

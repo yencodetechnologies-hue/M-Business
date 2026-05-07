@@ -2873,6 +2873,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (appTheme === "custom") localStorage.setItem("appCustomColor", customColor);
   }, [appTheme, customColor]);
 
+  const currentTheme = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.purple);
+
   const headerLogoRef = useRef();
 
   useEffect(() => { setCompanyLogo(user?.logoUrl ? user.logoUrl : (fixedLogo || null)); }, [user, fixedLogo]);
@@ -3099,10 +3101,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return String(id).trim();
   };
 
-  const parseLimit = (limitStr, type = "client") => {
+  const parseLimit = (limitStr, type = "client", sub = subscription) => {
     let identifiedLimits = [];
 
-    // 1. Check direct limit field (e.g. subscription.clientLimit)
+    // 1. Check direct limit field (e.g. sub.clientLimit)
     if (limitStr !== undefined && limitStr !== null && limitStr !== "") {
       const s = String(limitStr).toLowerCase();
       if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
@@ -3110,8 +3112,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       if (m) identifiedLimits.push(parseInt(m[0]));
     }
 
-    // 2. Scan features list for any mention of the limit (e.g. "2 Clients")
-    if (subscription?.features && Array.isArray(subscription.features)) {
+    // 2. Scan features list for any mention of the limit (e.g. "10 Clients")
+    if (sub?.features && Array.isArray(sub.features)) {
       const keywords = {
         client: ["client", "company", "business"],
         employee: ["employee", "staff", "user"],
@@ -3119,7 +3121,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       };
       const searchKeys = keywords[type] || [type];
       
-      for (const feat of subscription.features) {
+      for (const feat of sub.features) {
         if (!feat || typeof feat !== 'string') continue;
         const f = feat.toLowerCase();
         if (searchKeys.some(key => f.includes(key))) {
@@ -3130,8 +3132,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       }
     }
 
-    // 3. Check Plan Name
-    const plan = (subscription?.planName || "").toLowerCase();
+    // 3. Check Plan Name for "Enterprise" or "Unlimited"
+    const plan = (sub?.planName || "").toLowerCase();
     if (plan.includes("enterprise") || plan.includes("unlimited")) return Infinity;
     
     // 4. Return the MAXIMUM identified limit
@@ -3140,15 +3142,21 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return maxLimit > 0 ? maxLimit : 1;
     }
     
-    // 5. Final Strict Default: If Admin assigned absolutely nothing, return 1
+    // 5. Final Default Baseline: 1 (for maximum security)
     return 1; 
   };
 
-const getSubscriptionLimit = (type) => {
-  if (!subscription) return 1; // Default to 1 (strict) if no subscription state exists
-  const limitKey = `${type}Limit`;
-  return parseLimit(subscription[limitKey], type);
-};
+  const getSubscriptionLimit = (type, sub = subscription) => {
+    if (!sub) return 1;
+    const limitKeys = {
+      client: "clientLimit",
+      employee: "employeeLimit",
+      manager: "managerLimit",
+      business: "businessLimit"
+    };
+    const limitKey = limitKeys[type] || `${type}Limit`;
+    return parseLimit(sub[limitKey], type, sub);
+  };
 
   const isUsageAtLimit = (type, count) => {
     const limit = getSubscriptionLimit(type);
@@ -3296,7 +3304,7 @@ const getSubscriptionLimit = (type) => {
           const latestSub = subRes.data.subscription;
           setSubscription(latestSub);
 
-          const clientLimit = parseLimit(latestSub.clientLimit, "client");
+          const clientLimit = parseLimit(latestSub.clientLimit, "client", latestSub);
           const effectiveClientLimit = clientLimit > 0 ? clientLimit : Infinity;
           if (effectiveClientLimit !== Infinity && clients.length >= effectiveClientLimit) {
             setLimitModal({ type: "client", limit: effectiveClientLimit });
@@ -3372,7 +3380,7 @@ const getSubscriptionLimit = (type) => {
           const latestSub = subRes.data.subscription;
           setSubscription(latestSub);
 
-          const employeeLimit = parseLimit(latestSub.employeeLimit, "employee");
+          const employeeLimit = parseLimit(latestSub.employeeLimit, "employee", latestSub);
           const effectiveEmpLimit = employeeLimit > 0 ? employeeLimit : Infinity;
           if (effectiveEmpLimit !== Infinity && employees.length >= effectiveEmpLimit) {
             setLimitModal({ type: "employee", limit: effectiveEmpLimit });
@@ -3463,7 +3471,7 @@ const getSubscriptionLimit = (type) => {
           const latestSub = subRes.data.subscription;
           setSubscription(latestSub);
 
-          const managerLimit = parseLimit(latestSub.managerLimit, "manager");
+          const managerLimit = parseLimit(latestSub.managerLimit, "manager", latestSub);
           const effectiveMgrLimit = managerLimit > 0 ? managerLimit : Infinity;
           if (effectiveMgrLimit !== Infinity && managers.length >= effectiveMgrLimit) {
             setLimitModal({ type: "manager", limit: effectiveMgrLimit });
@@ -3782,7 +3790,7 @@ const getSubscriptionLimit = (type) => {
                       }
                       setNcError({}); setShowClientPass(false); setModal("client");
                     }}
-                    style={{ ...B("var(--app-accent)"), cursor: "pointer", opacity: 1 }}
+                    style={{ ...B(isUsageAtLimit("client", clients.length) ? "#94a3b8" : "var(--app-accent)"), cursor: isUsageAtLimit("client", clients.length) ? "not-allowed" : "pointer", opacity: 1 }}
                   >
                     + Add Client
                   </button>
@@ -3813,7 +3821,7 @@ const getSubscriptionLimit = (type) => {
                       }
                       setNeError({}); setModal("employee");
                     }}
-                    style={{ ...B("var(--app-accent)"), cursor: "pointer", opacity: 1 }}
+                    style={{ ...B(isUsageAtLimit("employee", employees.length) ? "#94a3b8" : "var(--app-accent)"), cursor: isUsageAtLimit("employee", employees.length) ? "not-allowed" : "pointer", opacity: 1 }}
                   >
                     + Add Employee
                   </button>
@@ -3839,15 +3847,17 @@ const getSubscriptionLimit = (type) => {
                       </button>
                     </span>
                   )}
-                  <button onClick={async () => {
-                    await fetchSubscription();
-                    const limit = getSubscriptionLimit("manager");
-                    if (subscription && managers.length >= limit) {
-                      setLimitModal({ type: "manager", limit });
-                      return;
-                    }
-                    setNmError({}); setShowMgrPass(false); setModal("manager");
-                  }} style={B(isUsageAtLimit("manager", managers.length) ? "#94a3b8" : "var(--app-accent)")}>
+                  <button 
+                    title={isUsageAtLimit("manager", managers.length) ? `Plan limit reached: ${getSubscriptionLimit("manager")} managers (Click to upgrade)` : "Add new manager"}
+                    onClick={async () => {
+                      await fetchSubscription();
+                      const limit = getSubscriptionLimit("manager");
+                      if (subscription && managers.length >= limit) {
+                        setLimitModal({ type: "manager", limit });
+                        return;
+                      }
+                      setNmError({}); setShowMgrPass(false); setModal("manager");
+                    }} style={{ ...B(isUsageAtLimit("manager", managers.length) ? "#94a3b8" : "var(--app-accent)"), cursor: isUsageAtLimit("manager", managers.length) ? "not-allowed" : "pointer" }}>
                     + Add Manager
                   </button>
                 </div>
@@ -4293,13 +4303,13 @@ const getSubscriptionLimit = (type) => {
               triggerCrop={triggerCrop}
             />
           )}
-          {validActive === "accounts" && <AccountsPage initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
-          {validActive === "payments" && <AccountsPage initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
-          {validActive === "expenses" && <AccountsPage initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+          {validActive === "accounts" && <AccountsPage THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+          {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+          {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
-          {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
+          {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
           {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} />}
           {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
           {validActive === "rolePermissions" && <RolePermissionDashboard />}

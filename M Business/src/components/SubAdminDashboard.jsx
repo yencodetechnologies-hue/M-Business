@@ -230,7 +230,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
     <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "#fee2e2" : "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
-          {danger ? "  🗑️️️️️️️️️️️" : "✅"}
+          {danger ? "  Delete️" : "✅"}
         </div>
         <h3 style={{ textAlign: "center", margin: "0 0 8px", fontSize: 16, fontWeight: 800, color: T.text }}>{title}</h3>
         <p style={{ textAlign: "center", color: "#6b7280", fontSize: 13, margin: "0 0 22px" }}>{message}</p>
@@ -247,10 +247,10 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
 function ActionBtns({ onView, onEdit, onDelete, onShare }) {
   return (
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-      {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>👁</button>}
+      {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>View</button>}
       {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span>🔗</span></button>}
-      {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f59e0b", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>✏️</button>}
-      {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>  🗑️️️️️️️️️️</button>}
+      {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f59e0b", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>Edit</button>}
+      {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>  Delete</button>}
     </div>
   );
 }
@@ -268,7 +268,7 @@ function InfoRow({ icon, label, value }) {
 function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
   const icons = { client: "👥", employee: "👨‍💼", manager: "🧑‍💼" };
   const labels = { client: "Clients", employee: "Employees", manager: "Managers" };
-  
+
   return (
     <Mdl title="Limit Reached" onClose={onClose} maxWidth={450}>
       <div style={{ textAlign: "center", padding: "10px 0" }}>
@@ -277,18 +277,18 @@ function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
           {labels[type] || "Resource"} Limit Reached
         </h3>
         <p style={{ fontSize: 14, color: "var(--app-muted)", lineHeight: 1.6, marginBottom: 24 }}>
-          Your current plan allows up to <b>{limit === Infinity ? "Unlimited" : limit} {labels[type]}</b>. 
+          Your current plan allows up to <b>{limit === Infinity ? "Unlimited" : limit} {labels[type]}</b>.
           You've reached this limit and need to upgrade your plan to add more.
         </p>
         <div style={{ display: "flex", gap: 12 }}>
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             style={{ flex: 1, padding: "12px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 12, fontWeight: 700, color: "var(--app-sidebar)", cursor: "pointer", fontFamily: "inherit" }}
           >
             Maybe Later
           </button>
-          <button 
-            onClick={onUpgrade} 
+          <button
+            onClick={onUpgrade}
             style={{ flex: 1, padding: "12px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, color: "#fff", cursor: "pointer", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)", fontFamily: "inherit" }}
           >
             🚀 Upgrade Plan
@@ -396,7 +396,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
     } catch { }
     setClients(prev => prev.filter(c => c._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast("  🗑️️️️️️️️️️️ Client deleted!");
+    showToast("  Delete️ Client deleted!");
   };
 
   return (
@@ -458,7 +458,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
 
       {/* View Modal */}
       {viewClient && (
-        <Mdl title="Company Profile" onClose={() => setViewClient(null)} maxWidth={500}>
+        <Mdl title="Client Details" onClose={() => setViewClient(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
             {viewClient.logoUrl ? (
               <img src={viewClient.logoUrl} alt="logo" style={{ height: 52, width: "auto", maxWidth: "120px", borderRadius: 10, objectFit: "cover", border: "1px solid var(--app-border)", background: "#fff", display: "block" }} />
@@ -506,8 +506,8 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             })()}
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️</button>
-            <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>  🗑️️️️️️️️️️ </button>
+            <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>  Delete </button>
           </div>
         </Mdl>
       )}
@@ -650,7 +650,7 @@ function EmployeesPage({ employees, setEmployees }) {
     } catch { }
     setEmployees(prev => prev.filter(e => e._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast("  🗑️️️️️️️️️️️ Employee deleted!");
+    showToast("  Delete️ Employee deleted!");
   };
 
   const handleStatusUpdate = async (id, newStatus) => {
@@ -858,7 +858,7 @@ function EmployeesPage({ employees, setEmployees }) {
                         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                           <button onClick={() => window.open(doc.url, "_blank")}
                             style={{ flex: 1, padding: "6px 10px", background: `${dt.color}10`, border: `1px solid ${dt.color}30`, borderRadius: 7, fontSize: 11, fontWeight: 700, color: dt.color, cursor: "pointer", fontFamily: "inherit" }}>
-                            👁
+                            View
                           </button>
                           <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             ⬇ Download
@@ -872,8 +872,8 @@ function EmployeesPage({ employees, setEmployees }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewEmp(null); openEdit(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️</button>
-            <button onClick={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> 🗑️️️️️</button>
+            <button onClick={() => { setViewEmp(null); openEdit(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
           </div>
         </Mdl>
       )}
@@ -964,7 +964,7 @@ function ManagersPage({ managers, setManagers }) {
     } catch { }
     setManagers(prev => prev.filter(m => m._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast(" 🗑️️️️️️ Manager deleted!");
+    showToast(" Delete️ Manager deleted!");
   };
 
   return (
@@ -1034,8 +1034,8 @@ function ManagersPage({ managers, setManagers }) {
           <InfoRow icon="📅" label="Joined" value={viewMgr.createdAt ? new Date(viewMgr.createdAt).toLocaleDateString() : "—"} />
 
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewMgr(null); openEdit(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️</button>
-            <button onClick={() => { setViewMgr(null); setDeleteTarget(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> 🗑️️️️️</button>
+            <button onClick={() => { setViewMgr(null); openEdit(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewMgr(null); setDeleteTarget(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
           </div>
         </Mdl>
       )}
@@ -1111,7 +1111,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
     } catch { }
     setSubadmins(prev => prev.filter(s => s._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast(" 🗑️️️️️️ Subadmin deleted!");
+    showToast(" Delete️ Subadmin deleted!");
   };
 
   // Filter related data for the viewed subadmin
@@ -1311,8 +1311,8 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
             )}
 
             <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-              <button onClick={() => { setViewSub(null); openEdit(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️</button>
-              <button onClick={() => { setViewSub(null); setDeleteTarget(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> 🗑️️️️️ </button>
+              <button onClick={() => { setViewSub(null); openEdit(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+              <button onClick={() => { setViewSub(null); setDeleteTarget(viewSub); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete </button>
             </div>
           </Mdl>
         );
@@ -1397,7 +1397,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
     try { await axios.delete(`${BASE_URL}/api/projects/${deleteTarget._id}`); } catch { }
     setProjects(prev => prev.filter(p => p._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast(" 🗑️️️️️️ Project deleted!");
+    showToast(" Delete️ Project deleted!");
   };
 
   const doAssign = async () => {
@@ -1563,9 +1563,9 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
 
             {/* Bottom Buttons */}
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>✏️</button>
+              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>Edit</button>
               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>👤 Assign</button>
-              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#ef4444,#dc2626)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}> 🗑️️️️️</button>
+              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#ef4444,#dc2626)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}> Delete</button>
             </div>
           </div>
         </Mdl>
@@ -1782,7 +1782,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
   const openEdit = (p) => { setTsForm({ projectId: p.projectId || p.id || "", name: p.name || "", client: p.client || "", manager: p.manager || "", employee: p.employee || "", deadline: p.deadline || "", status: p.status || "In Progress", progress: p.progress || p.pct || 0, notes: p.notes || p.note || "" }); setTsErr({}); setTsEditId(p._id || p.id); setTsModal("edit"); };
   const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0–100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "✅ Project added!" : "✅ Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("✅ Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
-  const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" 🗑️️️️️️ Deleted!"); };
+  const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" Delete️ Deleted!"); };
   const B2 = (color) => ({ background: "var(--app-accent-gradient)", color: "#ffffff", border: "none", borderRadius: 12, padding: "12px 22px", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)" });
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -1949,7 +1949,7 @@ function InterviewPage({ companyId, companyName }) {
       showToast("❌ Copy failed. Please copy manually.");
     }
   };
-  const deleteCandidate = (idx) => { if (!window.confirm("Delete this candidate?")) return; const c = candidates[idx]; const id = c._id || c.id; if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { }); persist(candidates.filter((_, i) => i !== idx)); showToast(" 🗑️️️️️️ Deleted"); setViewModal(null); };
+  const deleteCandidate = (idx) => { if (!window.confirm("Delete this candidate?")) return; const c = candidates[idx]; const id = c._id || c.id; if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { }); persist(candidates.filter((_, i) => i !== idx)); showToast(" Delete️ Deleted"); setViewModal(null); };
   const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -1970,7 +1970,7 @@ function InterviewPage({ companyId, companyName }) {
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "var(--app-accent)", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
           <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
-          <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>👁 Preview Form</button>
+          <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
         </div>
       </div>
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
@@ -2000,7 +2000,7 @@ function InterviewPage({ companyId, companyName }) {
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
                       <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">⏳ Pending</option><option value="hired">✅ Hired</option><option value="rejected">❌ Rejected</option></select></td>
                       <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> 🗑️️️️️</button></div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> Delete</button></div></td>
                     </tr>
                   );
                 })}
@@ -2397,21 +2397,13 @@ function PackagesPage({ packages, onViewPackage, onEditPackage, onSubscribe }) {
 
   return (
     <div style={{
-      background: "linear-gradient(135deg, var(--app-bg) 0%, var(--app-border) 100%)",
+      background: "#fff",
       borderRadius: 20,
       padding: "40px 20px",
       position: "relative",
-      overflow: "hidden",
-      minHeight: "60vh"
+      minHeight: "60vh",
+      border: "1px solid var(--app-border)"
     }}>
-      {/* Background glow */}
-      <div style={{
-        position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-        width: "100%", maxWidth: 700, height: 300,
-        background: "radial-gradient(ellipse, rgba(var(--app-accent-rgb, 124, 58, 237), 0.1) 0%, transparent 70%)",
-        pointerEvents: "none"
-      }} />
-
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: 40, position: "relative", zIndex: 1 }}>
         <h1 style={{
@@ -2420,7 +2412,7 @@ function PackagesPage({ packages, onViewPackage, onEditPackage, onSubscribe }) {
         }}>
           Choose your Plan
         </h1>
-       
+        <p style={{ color: "var(--app-accent)", fontWeight: 600 }}>Select the best plan for your business growth</p>
       </div>
 
       {displayedPackages.length === 0 ? (
@@ -2441,11 +2433,13 @@ function PackagesPage({ packages, onViewPackage, onEditPackage, onSubscribe }) {
           maxWidth: 1100,
           margin: "0 auto",
           position: "relative",
-          zIndex: 1
+          zIndex: 1,
+          justifyItems: "center"
         }}>
           {displayedPackages.map((p, idx) => {
             const isPro = (p.title || "").toUpperCase() === "PRO" ||
-              (p.title || "").toLowerCase().includes("pro");
+              (p.title || "").toLowerCase().includes("pro") || 
+              (p.title || "").toLowerCase().includes("professional");
             const features = Array.isArray(p.features)
               ? p.features
               : (p.features || "").split(/[\n,]/).map(f => f.trim()).filter(Boolean);
@@ -2454,132 +2448,38 @@ function PackagesPage({ packages, onViewPackage, onEditPackage, onSubscribe }) {
               <div
                 key={p.id || p._id || idx}
                 style={{
-                  background: isPro
-                    ? "linear-gradient(160deg, var(--app-sidebar) 0%, #1e1b4b 100%)"
-                    : "#ffffff",
-                  border: isPro
-                    ? "2px solid var(--app-accent)"
-                    : "1.5px solid var(--app-border)",
+                  width: "100%",
+                  maxWidth: 400,
+                  background: "#fff",
                   borderRadius: 24,
-                  padding: "32px 28px",
+                  padding: 32,
+                  border: isPro ? "2.5px solid var(--app-accent)" : "1px solid var(--app-border)",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
                   position: "relative",
-                  overflow: "hidden",
-                  boxShadow: isPro
-                    ? "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237), 0.15)"
-                    : "0 10px 25px rgba(0,0,0,0.05)",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   display: "flex",
-                  flexDirection: "column"
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = "translateY(-8px)";
-                  e.currentTarget.style.boxShadow = isPro
-                    ? "0 30px 60px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)"
-                    : "0 20px 40px rgba(0,0,0,0.1)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = isPro
-                    ? "0 20px 40px rgba(var(--app-accent-rgb, 124, 58, 237), 0.15)"
-                    : "0 10px 25px rgba(0,0,0,0.05)";
+                  flexDirection: "column",
+                  transition: "all 0.3s ease"
                 }}
               >
-                {/* MOST POPULAR badge */}
-                {isPro && (
-                  <div style={{
-                    position: "absolute", top: 20, right: 20,
-                    background: "var(--app-accent)",
-                    borderRadius: 100, padding: "4px 12px",
-                    fontSize: 10, fontWeight: 800,
-                    color: "#fff", letterSpacing: 1,
-                    textTransform: "uppercase",
-                    boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)"
-                  }}>
-                    MOST POPULAR
-                  </div>
-                )}
-
-                {/* Icon */}
-                <div style={{
-                  width: 48, height: 48, borderRadius: 14,
-                  border: isPro ? "2px solid rgba(255,255,255,0.2)" : "2px solid var(--app-border)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 24, marginBottom: 20,
-                  background: isPro ? "rgba(255,255,255,0.1)" : "var(--app-bg)"
-                }}>
-                  {p.icon || "📦"}
+                <div style={{ fontSize: 28, marginBottom: 20 }}>{p.icon || "📦"}</div>
+                <h3 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 8px", color: "var(--app-sidebar)" }}>{p.title}</h3>
+                <div style={{ fontSize: 13, color: "var(--app-muted)", marginBottom: 20 }}>Billed monthly</div>
+                
+                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
+                  <span style={{ fontSize: 32, fontWeight: 800, color: "var(--app-sidebar)" }}>₹{p.price || 0}</span>
+                  <span style={{ fontSize: 14, color: "var(--app-muted)" }}>/month</span>
                 </div>
 
-                {/* Plan title */}
-                <div style={{
-                  fontSize: 22, fontWeight: 800, color: isPro ? "#fff" : "var(--app-sidebar)",
-                  marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5
-                }}>
-                  {p.title}
-                </div>
-                <div style={{
-                  fontSize: 12, color: isPro ? "rgba(255,255,255,0.6)" : "var(--app-muted)",
-                  marginBottom: 24, fontWeight: 600
-                }}>
-                  {p.planDuration ? `Billed ${p.planDuration.toLowerCase()}` : "Billed monthly"}
-                </div>
-
-                {/* Price */}
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 12 }}>
-                  <span style={{
-                    fontSize: 48, fontWeight: 800, color: isPro ? "#fff" : "var(--app-sidebar)",
-                    lineHeight: 1, letterSpacing: "-2px"
-                  }}>
-                    {p.type === "free" ? "₹0" : p.price ? `₹${p.price}` : "₹0"}
-                  </span>
-                  <span style={{
-                    fontSize: 14, color: isPro ? "rgba(255,255,255,0.5)" : "var(--app-muted)",
-                    marginBottom: 6, fontWeight: 700
-                  }}>/month</span>
-                </div>
-
-                <div style={{
-                  fontSize: 13, color: isPro ? "rgba(255,255,255,0.5)" : "var(--app-muted)",
-                  marginBottom: 24, minHeight: 40, lineHeight: 1.6
-                }}>
-                  {p.description}
-                </div>
-
-                {/* Features */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1, marginBottom: 32 }}>
+                <div style={{ flex: 1 }}>
                   {features.map((f, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                      <div style={{
-                        width: 18, height: 18, borderRadius: "50%", flexShrink: 0, marginTop: 1,
-                        background: isPro ? "rgba(255,255,255,0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 10, color: isPro ? "#fff" : "var(--app-accent)"
-                      }}>✓</div>
-                      <span style={{
-                        fontSize: 14, color: isPro ? "rgba(255,255,255,0.8)" : "var(--app-sidebar)",
-                        fontWeight: 500, lineHeight: 1.4
-                      }}>{f}</span>
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, fontSize: 14, color: "var(--app-sidebar)", fontWeight: 500 }}>
+                      <span style={{ color: "var(--app-accent)" }}>✓</span>
+                      {f}
                     </div>
                   ))}
                 </div>
 
-                {/* CTA Button */}
-                <button
-                  onClick={onSubscribe}
-                  style={{
-                    width: "100%", padding: "14px",
-                    borderRadius: 14, fontSize: 15, fontWeight: 800,
-                    cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit",
-                    background: isPro ? "#fff" : "var(--app-accent)",
-                    border: "none",
-                    color: isPro ? "var(--app-sidebar)" : "#fff",
-                    boxShadow: isPro
-                      ? "0 4px 12px rgba(255,255,255,0.2)"
-                      : "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)"
-                  }}
-                >
-                  {p.buttonName || "Get Started"}
-                </button>
+                {/* CTA Button removed as requested */}
 
                 {/* Admin View/Edit buttons */}
                 {(onViewPackage || onEditPackage) && (
@@ -2683,7 +2583,7 @@ function VendorsPage({ vendors, setVendors }) {
       await axios.delete(`${BASE_URL}/api/vendors/${deleteTarget._id}`);
       setVendors(prev => prev.filter(v => v._id !== deleteTarget._id));
       setDeleteTarget(null);
-      showToast(" 🗑️️️️️️ Vendor deleted!");
+      showToast(" Delete️ Vendor deleted!");
     } catch {
       showToast("❌ Delete failed!");
     }
@@ -2745,8 +2645,8 @@ function VendorsPage({ vendors, setVendors }) {
           <InfoRow icon="📅" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
           <InfoRow icon="📝" label="Description" value={viewVendor.productDescription} />
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewVendor(null); openEdit(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>✏️</button>
-            <button onClick={() => { setViewVendor(null); setDeleteTarget(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> 🗑️️️️️</button>
+            <button onClick={() => { setViewVendor(null); openEdit(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewVendor(null); setDeleteTarget(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
           </div>
         </Mdl>
       )}
@@ -2985,6 +2885,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [nv, setNv] = useState({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
   const [nvError, setNvError] = useState({});
   const [vendorSaveLoading, setVendorSaveLoading] = useState(false);
+
   const [invoices, setInvoices] = useState([]);
   const [income, setIncome] = useState([]);
   const [expenses, setExpenses] = useState([]);
@@ -2994,11 +2895,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (hasFetched.current) return;
     hasFetched.current = true;
     fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
-
-    // Auto-refresh subscription every 30 seconds to catch admin updates
-    const interval = setInterval(fetchSubscription, 30000);
-    return () => clearInterval(interval);
   }, []);
+
+  // Redirect to packages ONLY ONCE if no subscription found and currently on dashboard
+  const hasRedirected = useRef(false);
+  useEffect(() => {
+    if (!subLoading && subscription === null && active === "dashboard" && !hasRedirected.current) {
+      hasRedirected.current = true;
+      setActive("packages");
+    }
+  }, [subscription, subLoading, active]);
 
   const fetchTasks = async () => {
     try {
@@ -3021,17 +2927,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setSubLoading(true);
       const id = resolveSubadminId();
       if (!id) return;
+
       const res = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
       if (res.data.hasSubscription) {
         setSubscription(res.data.subscription);
+      } else {
+        setSubscription(null);
       }
     } catch (err) {
-      console.error("Subscription fetch failed", err);
+      console.error("Subscription fetch error:", err);
+      setSubscription(null);
     } finally {
       setSubLoading(false);
     }
   };
-
   const fetchInvoices = async () => {
     try {
       const res = await axios.get(BASE_URL + "/api/invoices");
@@ -3101,67 +3010,45 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return String(id).trim();
   };
 
-  const parseLimit = (limitStr, type = "client", sub = subscription) => {
-    let identifiedLimits = [];
+  // Dashboard.jsx-ல் இருக்கும் parseLimit function-ஐ இதாக மாத்துங்க:
 
-    // 1. Check direct limit field (e.g. sub.clientLimit)
-    if (limitStr !== undefined && limitStr !== null && limitStr !== "") {
-      const s = String(limitStr).toLowerCase();
-      if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
-      const m = s.match(/\d+/);
-      if (m) identifiedLimits.push(parseInt(m[0]));
-    }
+  const parseLimit = (limitStr) => {
+    if (limitStr === undefined || limitStr === null || limitStr === "") return 10;
+    const s = String(limitStr).toLowerCase().trim();
+    if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
+    const m = s.match(/\d+/);
+    const num = m ? parseInt(m[0]) : 10;
+    return num <= 0 ? 10 : num;
+  };
+  const getSubscriptionLimit = (type, sub = subscription) => {
+    if (!sub) return 10;
 
-    // 2. Scan features list for any mention of the limit (e.g. "10 Clients")
-    if (sub?.features && Array.isArray(sub.features)) {
-      const keywords = {
-        client: ["client", "company", "business"],
-        employee: ["employee", "staff", "user"],
-        manager: ["manager", "admin"]
-      };
-      const searchKeys = keywords[type] || [type];
-      
-      for (const feat of sub.features) {
-        if (!feat || typeof feat !== 'string') continue;
-        const f = feat.toLowerCase();
-        if (searchKeys.some(key => f.includes(key))) {
-          if (f.includes("unlimited") || f.includes("infinity")) return Infinity;
-          const m = f.match(/\d+/);
-          if (m) identifiedLimits.push(parseInt(m[0]));
-        }
+    const map = {
+      client: sub.clientLimit,
+      employee: sub.employeeLimit,
+      manager: sub.managerLimit,
+    };
+    let val = map[type];
+
+    // Smart Fallback: If direct field is empty, search in features array
+    if ((!val || val === "") && sub.features && Array.isArray(sub.features)) {
+      const label = type === "client" ? "client" : type === "employee" ? "employee" : "manager";
+      const feat = sub.features.find(f => f.toLowerCase().includes(label));
+      if (feat) {
+        const match = feat.match(/\d+/);
+        if (match) val = match[0];
       }
     }
 
-    // 3. Check Plan Name for "Enterprise" or "Unlimited"
-    const plan = (sub?.planName || "").toLowerCase();
-    if (plan.includes("enterprise") || plan.includes("unlimited")) return Infinity;
-    
-    // 4. Return the MAXIMUM identified limit
-    if (identifiedLimits.length > 0) {
-      const maxLimit = Math.max(...identifiedLimits);
-      return maxLimit > 0 ? maxLimit : 1;
-    }
-    
-    // 5. Final Default Baseline: 1 (for maximum security)
-    return 1; 
+    return parseLimit(val);
   };
 
-  const getSubscriptionLimit = (type, sub = subscription) => {
-    if (!sub) return 1;
-    const limitKeys = {
-      client: "clientLimit",
-      employee: "employeeLimit",
-      manager: "managerLimit",
-      business: "businessLimit"
-    };
-    const limitKey = limitKeys[type] || `${type}Limit`;
-    return parseLimit(sub[limitKey], type, sub);
+  const isUsageAtLimit = (type, currentCount, sub = subscription) => {
+    const limit = getSubscriptionLimit(type, sub);
+    if (limit === Infinity) return false;
+    return currentCount >= limit;
   };
 
-  const isUsageAtLimit = (type, count) => {
-    const limit = getSubscriptionLimit(type);
-    return subscription && limit !== Infinity && count >= limit;
-  };
 
   const handleLogout = () => { localStorage.removeItem("user"); setUser(null); };
   const handleAuthSetUser = (userData) => {
@@ -3304,10 +3191,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           const latestSub = subRes.data.subscription;
           setSubscription(latestSub);
 
-          const clientLimit = parseLimit(latestSub.clientLimit, "client", latestSub);
-          const effectiveClientLimit = clientLimit > 0 ? clientLimit : Infinity;
-          if (effectiveClientLimit !== Infinity && clients.length >= effectiveClientLimit) {
-            setLimitModal({ type: "client", limit: effectiveClientLimit });
+          if (isUsageAtLimit("client", clients.length)) {
+            setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
             return;
           }
         } else {
@@ -3317,14 +3202,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       }
     } catch (err) {
       console.error("Failed to fetch latest subscription for limit check", err);
-      // Fallback to existing state if fetch fails
-      if (subscription) {
-        const clientLimit = parseLimit(subscription.clientLimit, "client");
-        const effectiveClientLimit = clientLimit > 0 ? clientLimit : Infinity;
-        if (effectiveClientLimit !== Infinity && clients.length >= effectiveClientLimit) {
-          setLimitModal({ type: "client", limit: effectiveClientLimit });
-          return;
-        }
+      if (isUsageAtLimit("client", clients.length)) {
+        setLimitModal({ type: "client", limit: getSubscriptionLimit("client") });
+        return;
       }
     }
 
@@ -3380,10 +3260,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           const latestSub = subRes.data.subscription;
           setSubscription(latestSub);
 
-          const employeeLimit = parseLimit(latestSub.employeeLimit, "employee", latestSub);
-          const effectiveEmpLimit = employeeLimit > 0 ? employeeLimit : Infinity;
-          if (effectiveEmpLimit !== Infinity && employees.length >= effectiveEmpLimit) {
-            setLimitModal({ type: "employee", limit: effectiveEmpLimit });
+          if (isUsageAtLimit("employee", employees.length)) {
+            setLimitModal({ type: "employee", limit: getSubscriptionLimit("employee") });
             return;
           }
         } else {
@@ -3393,13 +3271,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       }
     } catch (err) {
       console.error("Failed to fetch latest subscription for employee limit check", err);
-      if (subscription) {
-        const employeeLimit = parseLimit(subscription.employeeLimit, "employee");
-        const effectiveEmpLimit = employeeLimit > 0 ? employeeLimit : Infinity;
-        if (effectiveEmpLimit !== Infinity && employees.length >= effectiveEmpLimit) {
-          setLimitModal({ type: "employee", limit: effectiveEmpLimit });
-          return;
-        }
+      if (isUsageAtLimit("employee", employees.length)) {
+        setLimitModal({ type: "employee", limit: getSubscriptionLimit("employee") });
+        return;
       }
     }
 
@@ -3471,10 +3345,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           const latestSub = subRes.data.subscription;
           setSubscription(latestSub);
 
-          const managerLimit = parseLimit(latestSub.managerLimit, "manager", latestSub);
-          const effectiveMgrLimit = managerLimit > 0 ? managerLimit : Infinity;
-          if (effectiveMgrLimit !== Infinity && managers.length >= effectiveMgrLimit) {
-            setLimitModal({ type: "manager", limit: effectiveMgrLimit });
+          if (isUsageAtLimit("manager", managers.length)) {
+            setLimitModal({ type: "manager", limit: getSubscriptionLimit("manager") });
             return;
           }
         } else {
@@ -3484,13 +3356,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       }
     } catch (err) {
       console.error("Failed to fetch latest subscription for manager limit check", err);
-      if (subscription) {
-        const managerLimit = parseLimit(subscription.managerLimit, "manager");
-        const effectiveMgrLimit = managerLimit > 0 ? managerLimit : Infinity;
-        if (effectiveMgrLimit !== Infinity && managers.length >= effectiveMgrLimit) {
-          setLimitModal({ type: "manager", limit: effectiveMgrLimit });
-          return;
-        }
+      if (isUsageAtLimit("manager", managers.length)) {
+        setLimitModal({ type: "manager", limit: getSubscriptionLimit("manager") });
+        return;
       }
     }
 
@@ -3768,15 +3636,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {validActive === "clients" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
                       {clients.length} / {getSubscriptionLimit("client") === Infinity ? "Unlimited" : getSubscriptionLimit("client")} Used
-                      <button
-                        onClick={fetchSubscription}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center" }}
-                        title="Refresh Limits"
-                      >
-                        🔄
-                      </button>
                     </span>
                   )}
                   <button
@@ -3799,17 +3660,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {validActive === "employees" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
                       {employees.length} / {getSubscriptionLimit("employee") === Infinity ? "Unlimited" : getSubscriptionLimit("employee")} Used
-                      <button
-                        onClick={fetchSubscription}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center" }}
-                        title="Refresh Limits"
-                      >
-                        🔄
-                      </button>
                     </span>
                   )}
+
                   <button
                     title={isUsageAtLimit("employee", employees.length) ? `Plan limit reached: ${getSubscriptionLimit("employee")} employees (Click to upgrade)` : "Add new employee"}
                     onClick={async () => {
@@ -3836,18 +3691,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               {validActive === "managers" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)" }}>
                       {managers.length} / {getSubscriptionLimit("manager") === Infinity ? "Unlimited" : getSubscriptionLimit("manager")} Used
-                      <button
-                        onClick={fetchSubscription}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0, display: "flex", alignItems: "center" }}
-                        title="Refresh Limits"
-                      >
-                        🔄
-                      </button>
                     </span>
                   )}
-                  <button 
+                  <button
                     title={isUsageAtLimit("manager", managers.length) ? `Plan limit reached: ${getSubscriptionLimit("manager")} managers (Click to upgrade)` : "Add new manager"}
                     onClick={async () => {
                       await fetchSubscription();
@@ -4249,42 +4097,42 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </>)}
 
           {/* ── Pages using new components ── */}
-          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => { 
+          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => {
             const limit = getSubscriptionLimit("client");
             if (subscription && clients.length >= limit) {
               setLimitModal({ type: "client", limit });
               return;
             }
-            setNcError({}); setShowClientPass(false); setModal("client"); 
+            setNcError({}); setShowClientPass(false); setModal("client");
           }} triggerCrop={triggerCrop} />}
 
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => { 
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
             const limit = getSubscriptionLimit("employee");
             if (subscription && employees.length >= limit) {
               setLimitModal({ type: "employee", limit });
               return;
             }
-            setReturnToModal(null); setModal("employee"); 
+            setReturnToModal(null); setModal("employee");
           }} />}
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { 
+          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
             const limit = getSubscriptionLimit("client");
             if (subscription && clients.length >= limit) {
               setLimitModal({ type: "client", limit });
               return;
             }
-            setReturnToModal(modal); setModal("client"); 
+            setReturnToModal(modal); setModal("client");
           }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
-          {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => { 
+          {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
             const limit = getSubscriptionLimit("client");
             if (subscription && clients.length >= limit) {
               setLimitModal({ type: "client", limit });
               return;
             }
-            setReturnToModal(modal); setModal("client"); 
+            setReturnToModal(modal); setModal("client");
           }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
@@ -4571,11 +4419,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
               <div style={{ position: "relative", width: 100, height: 100 }}>
-                <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", border: "2px dashed #d8b4fe", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                <div style={{ width: 100, height: 100, borderRadius: "50%", background: "#fff", border: "2px dashed var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: 12, boxShadow: "inset 0 2px 10px rgba(0,0,0,0.05)" }}>
                   {nc.logoUrl ? (
-                    <img src={nc.logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    <div style={{
+                      width: "100%",
+                      height: "100%",
+                      backgroundImage: `url(${nc.logoUrl})`,
+                      backgroundSize: "contain",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center"
+                    }} />
                   ) : (
-                    <span style={{ fontSize: 40 }}>🏢</span>
+                    <span style={{ fontSize: 40, opacity: 0.5 }}>🏢</span>
                   )}
                 </div>
                 <label style={{ position: "absolute", bottom: 0, right: 0, background: "var(--app-muted)", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
@@ -4678,13 +4533,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 });
               }}
               error={npError.client}
-              onAddClient={() => { 
+              onAddClient={() => {
                 const limit = parseLimit(subscription?.clientLimit, "client");
                 if (subscription && clients.length >= limit) {
                   alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
                   return;
                 }
-                setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false); 
+                setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false);
               }}
             />
             {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}

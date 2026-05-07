@@ -92,55 +92,55 @@ function deleteDraftLocal(invoiceNo) {
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
 }
 
-const T={primary:"var(--app-sidebar)",sidebar:"var(--app-text)",accent:"var(--app-accent)",bg:"var(--app-bg)",card:"var(--app-card)",text:"var(--app-text)",muted:"var(--app-muted)",border:"var(--app-border)"};
+const T = { primary: "var(--app-sidebar)", sidebar: "var(--app-text)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)" };
 
-function CompanyDropdown({clients,value,onChange,error,onAddCompany}){
-  const [search,setSearch]=useState("");
-  const [open,setOpen]=useState(false);
-  const filtered=clients.filter(c=>(c.clientName||c.name||"").toLowerCase().includes(search.toLowerCase())||(c.companyName||c.company||"").toLowerCase().includes(search.toLowerCase()));
-  const selected=clients.find(c=>(c.clientName||c.name)===value);
-  return(
-    <div style={{position:"relative"}}>
-      <div onClick={()=>setOpen(!open)} style={{width:"100%",border:`1.5px solid ${error?"#EF4444":open?"var(--app-accent)":"var(--app-border)"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"var(--app-muted)",background:"var(--app-bg)",cursor:"pointer",userSelect:"none",boxSizing:"border-box",position:"relative",minHeight:42}}>
-        {value?(<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName&&<span style={{fontSize:11,color:"var(--app-muted)"}}>({selected.companyName})</span>}</div>):"-- Select Company Name --"}
-        <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"var(--app-muted)",transition:"0.2s"}}>▼</span>
+function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const filtered = clients.filter(c => (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) || (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase()));
+  const selected = clients.find(c => (c.clientName || c.name) === value);
+  return (
+    <div style={{ position: "relative" }}>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
-      {open&&(
-        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"var(--app-card)",border:"1.5px solid var(--app-border)",borderRadius:12,boxShadow:"var(--app-shadow)",zIndex:999,overflow:"hidden"}}>
-          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid var(--app-border)",borderRadius:8,fontSize:12,background:"var(--app-bg)",color:T.text,outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
-          {onAddCompany&&<div onClick={()=>{setOpen(false);setSearch("");onAddCompany();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"var(--app-surface)",borderBottom:"2px solid var(--app-border)"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"var(--app-accent)"}}>Add New Company Name</div></div></div>}
-          <div style={{maxHeight:180,overflowY:"auto"}}>
-            {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"var(--app-muted)",fontSize:13}}>No companies found</div>
-              :filtered.map((c,i)=>{const name=c.clientName||c.name||"";const company=c.companyName||c.company||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"var(--app-surface)":"transparent",borderBottom:"1px solid var(--app-border)"}} onMouseEnter={e=>e.currentTarget.style.background="var(--app-surface)"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"var(--app-surface)":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div>{company&&<div style={{fontSize:11,color:"var(--app-muted)"}}>{company}</div>}</div>{isSel&&<span style={{fontSize:14,color:"var(--app-accent)"}}>✓</span>}</div>);})}
+      {open && (
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
+          <div style={{ maxHeight: 180, overflowY: "auto" }}>
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No companies found</div>
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
       )}
-      {open&&<div style={{position:"fixed",inset:0,zIndex:998}} onClick={()=>{setOpen(false);setSearch("");}}/>}
+      {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
     </div>
   );
 }
 
-function ProjectDropdown({projects,value,onChange,onAddProject,disabled}){
-  const [search,setSearch]=useState("");
-  const [open,setOpen]=useState(false);
-  const filtered=projects.filter(p=>(p.name||"").toLowerCase().includes(search.toLowerCase()));
-  return(
-    <div style={{position:"relative"}}>
-      <div onClick={()=>{if(!disabled)setOpen(!open)}} style={{width:"100%",border:`1.5px solid ${open?"var(--app-accent)":"var(--app-border)"}`,borderRadius:10,padding:"10px 36px 10px 14px",fontSize:13,color:value?T.text:"var(--app-muted)",background:"var(--app-bg)",cursor:disabled?"not-allowed":"pointer",userSelect:"none",boxSizing:"border-box",position:"relative",minHeight:42,opacity:disabled?0.5:1}}>
-        {value?(<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:22,height:22,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:10,fontWeight:700,flexShrink:0}}>{value[0].toUpperCase()}</div><span>{value}</span></div>):"-- Select Project --"}
-        <span style={{position:"absolute",right:12,top:"50%",transform:`translateY(-50%) rotate(${open?180:0}deg)`,fontSize:10,color:"var(--app-muted)",transition:"0.2s"}}>▼</span>
+function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) {
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const filtered = projects.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()));
+  return (
+    <div style={{ position: "relative" }}>
+      <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
-      {open&&(
-        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:"var(--app-card)",border:"1.5px solid var(--app-border)",borderRadius:12,boxShadow:"var(--app-shadow)",zIndex:999,overflow:"hidden"}}>
-          <div style={{padding:"10px 10px 6px"}}><div style={{position:"relative"}}><span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:12}}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e=>setSearch(e.target.value)} onClick={e=>e.stopPropagation()} style={{width:"100%",padding:"7px 10px 7px 30px",border:"1.5px solid var(--app-border)",borderRadius:8,fontSize:12,background:"var(--app-bg)",color:T.text,outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/></div></div>
-          {onAddProject&&<div onClick={()=>{setOpen(false);setSearch("");onAddProject();}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:"var(--app-surface)",borderBottom:"2px solid var(--app-border)"}}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:17,fontWeight:700,flexShrink:0}}>+</div><div><div style={{fontSize:13,fontWeight:700,color:"var(--app-accent)"}}>Add New Project</div></div></div>}
-          <div style={{maxHeight:180,overflowY:"auto"}}>
-            {filtered.length===0?<div style={{padding:14,textAlign:"center",color:"var(--app-muted)",fontSize:13}}>No projects found</div>
-              :filtered.map((p,i)=>{const name=p.name||"";const isSel=value===name;return(<div key={i} onClick={()=>{onChange(name);setOpen(false);setSearch("");}} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer",background:isSel?"var(--app-surface)":"transparent",borderBottom:"1px solid var(--app-border)"}} onMouseEnter={e=>e.currentTarget.style.background="var(--app-surface)"} onMouseLeave={e=>e.currentTarget.style.background=isSel?"var(--app-surface)":"transparent"}><div style={{width:28,height:28,borderRadius:"50%",background:"linear-gradient(135deg,var(--app-accent),var(--app-accent))",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:700,flexShrink:0,overflow:"hidden"}}>{name[0]?.toUpperCase()||"?"}</div><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:T.text}}>{name}</div></div>{isSel&&<span style={{fontSize:14,color:"var(--app-accent)"}}>✓</span>}</div>);})}
+      {open && (
+        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
+          <div style={{ maxHeight: 180, overflowY: "auto" }}>
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No projects found</div>
+              : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
       )}
-      {open&&<div style={{position:"fixed",inset:0,zIndex:998}} onClick={()=>{setOpen(false);setSearch("");}}/>}
+      {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
     </div>
   );
 }
@@ -337,7 +337,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     setInvoiceList(prev => prev.filter(e => (e.id || e.invoiceNo) !== (id || entry.invoiceNo)));
     setDeleteTarget(null);
     setStep("list");
-    showToast("     🗑️️️️️️️️️️️️️️️️️️️️️️️️️️ Invoice deleted!");
+    showToast("     Delete️️️️️️️️️️️️️️️️ Invoice deleted!");
   };
 
   // ── Update status inline ────────────────────────────────────
@@ -352,7 +352,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       });
       setPaymentModalStatus(newStatus);
       setPaymentModalEntry(entry);
-      return; 
+      return;
     }
     await updateStatusBackend(entry, newStatus);
   };
@@ -368,15 +368,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         // Actually, the list expects the structure returned by GET /api/invoices
         // For simplicity, let's just update the specific fields we know changed
         setInvoiceList(prev => prev.map(e =>
-          (e.id || e.invoiceNo) === (id || entry.invoiceNo) 
-            ? { ...e, status: updated.status, amountPaid: updated.amountPaid, inv: { ...(e.inv || {}), amountPaid: updated.amountPaid, status: updated.status } } 
+          (e.id || e.invoiceNo) === (id || entry.invoiceNo)
+            ? { ...e, status: updated.status, amountPaid: updated.amountPaid, inv: { ...(e.inv || {}), amountPaid: updated.amountPaid, status: updated.status } }
             : e
         ));
       }
     } catch (err) {
       console.error("Update status failed", err);
     }
-    
+
     setStatusUpdating(null);
     if (newStatus === "paid" || newStatus === "part_paid") {
       const isPartial = (paymentDetails.amountPaid || 0) < (entry.total || 0);
@@ -418,7 +418,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     };
     const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
     const link = `${window.location.origin}/invoice-view?d=${encoded}`;
-    
+
     const text = `*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`;
     if (navigator.share) {
       try { await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, url: link }); } catch (err) { console.log(err); }
@@ -470,7 +470,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     const pd = r.paymentData || {};
     const invData = r.inv || inv;
     const receiptNo = `RCP-${Date.now().toString().slice(-6)}`;
-    
+
     return (
       <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "40px 20px" }}>
         <style>{`
@@ -483,7 +483,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
           <button onClick={() => { setEditingReceipt(false); setStep("list"); }} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Back to List</button>
-          {!editingReceipt && <button onClick={() => setEditingReceipt(true)} style={{ padding: "12px 24px", background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#ea580c", fontFamily: "inherit" }}>✏️</button>}
+          {!editingReceipt && <button onClick={() => setEditingReceipt(true)} style={{ padding: "12px 24px", background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#ea580c", fontFamily: "inherit" }}>Edit</button>}
           {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>🖨️ Print Receipt</button>}
         </div>
 
@@ -583,7 +583,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               {invData.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{invData.companyPhone}</div>}
             </div>
           </div>
-          
+
           <div style={{ background: "var(--app-bg)", padding: "16px", textAlign: "center", borderTop: "1px solid var(--app-border)" }}>
             <div style={{ fontSize: 10, color: "#d1d5db", fontWeight: 700, letterSpacing: 1 }}>COMPUTER GENERATED RECEIPT</div>
           </div>
@@ -629,7 +629,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         <Toast msg={toast} />
         {deleteTarget && <ConfirmModal invoiceNo={deleteTarget.invoiceNo} onConfirm={() => handleDelete(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
-        
+
         {/* Payment Modal */}
         {paymentModalEntry && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
@@ -638,7 +638,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "var(--app-text)" }}>Payment Information</h3>
                 <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
               </div>
-              
+
               <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "14px", marginBottom: 20, border: "1.5px solid var(--app-border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                   <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Total Amount:</span>
@@ -656,20 +656,20 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
               <div style={{ marginBottom: 16 }}>
                 <label style={lbl}>
-                  {paymentModalStatus === "paid" ? "Final Payment Amount" : "New Payment Amount (Advance)"} 
-                  <span style={{color:"#ef4444"}}> *</span>
+                  {paymentModalStatus === "paid" ? "Final Payment Amount" : "New Payment Amount (Advance)"}
+                  <span style={{ color: "#ef4444" }}> *</span>
                 </label>
-                <div style={{position:"relative"}}>
-                  <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"#6b7280",fontSize:14,fontWeight:600}}>{paymentModalEntry.currency || inv.currency}</span>
-                  <input type="number" 
-                    value={paymentData.amountPaid === 0 ? "" : paymentData.amountPaid} 
-                    onChange={e => setPaymentData(p => ({ ...p, amountPaid: e.target.value === "" ? 0 : Number(e.target.value) }))} 
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#6b7280", fontSize: 14, fontWeight: 600 }}>{paymentModalEntry.currency || inv.currency}</span>
+                  <input type="number"
+                    value={paymentData.amountPaid === 0 ? "" : paymentData.amountPaid}
+                    onChange={e => setPaymentData(p => ({ ...p, amountPaid: e.target.value === "" ? 0 : Number(e.target.value) }))}
                     placeholder="Enter amount"
-                    style={{...inp(), paddingLeft:30, fontWeight: 700, fontSize: 16}} />
+                    style={{ ...inp(), paddingLeft: 30, fontWeight: 700, fontSize: 16 }} />
                 </div>
-                <p style={{fontSize: 10, color: "#9ca3af", marginTop: 4}}>This amount will be added to the total paid.</p>
+                <p style={{ fontSize: 10, color: "#9ca3af", marginTop: 4 }}>This amount will be added to the total paid.</p>
               </div>
-              
+
               <div style={{ marginBottom: 16 }}>
                 <label style={lbl}>Payment Mode</label>
                 <select value={paymentData.paymentMode} onChange={e => setPaymentData(p => ({ ...p, paymentMode: e.target.value }))} style={inp()}>
@@ -683,7 +683,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   <option value="Other">Other</option>
                 </select>
               </div>
-              
+
               <div style={{ marginBottom: 16 }}>
                 <label style={lbl}>Payment Date</label>
                 <input type="date" value={paymentData.paymentDate} onChange={e => setPaymentData(p => ({ ...p, paymentDate: e.target.value }))} style={inp()} />
@@ -729,9 +729,9 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <div style={{ position: "relative" }}>
               <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 13 }}>🔍</span>
-              <input 
-                type="text" 
-                placeholder="Search invoices..." 
+              <input
+                type="text"
+                placeholder="Search invoices..."
                 value={listSearch}
                 onChange={(e) => setListSearch(e.target.value)}
                 style={{ padding: "9px 12px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, outline: "none", width: 220, background: "var(--app-surface)", color: "var(--app-text)", fontFamily: "inherit" }}
@@ -785,8 +785,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           ) : enriched.filter(e => {
             const term = listSearch.toLowerCase();
             return (e.invoiceNo || "").toLowerCase().includes(term) ||
-                   (e.client || "").toLowerCase().includes(term) ||
-                   (e.inv?.project || e.project || "").toLowerCase().includes(term);
+              (e.client || "").toLowerCase().includes(term) ||
+              (e.inv?.project || e.project || "").toLowerCase().includes(term);
           }).map((entry, idx, arr) => {
             const invD = entry.inv || {};
             const sc = statusColor[(entry.status || "draft").toLowerCase()] || "#6b7280";
@@ -860,7 +860,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
                 {/* Action buttons */}
                 <div onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 4, flexWrap: "nowrap" }}>
-                  <button onClick={() => { loadEntry(entry); setStep("preview"); }} style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#374151", cursor: "pointer", fontWeight: 700 }}>👁</button>
+                  <button onClick={() => { loadEntry(entry); setStep("preview"); }} style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#374151", cursor: "pointer", fontWeight: 700 }}>View</button>
                   {(entry.status === "paid" || entry.status === "part_paid") && (
                     <button onClick={() => {
                       setReceiptEntry({ ...entry, paymentData: { amountPaid: entry.amountPaid || entry.total, paymentMode: entry.paymentMode || "Other", paymentDate: entry.paymentDate || new Date().toISOString(), transactionId: entry.transactionId } });
@@ -868,14 +868,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700 }}>🧾 </button>
                   )}
 
-                  <button onClick={() => setDeleteTarget(entry)} style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#ef4444", cursor: "pointer", fontWeight: 700 }}>    🗑️️️️️️️️️️️️️️️️️️️️</button>
+                  <button onClick={() => setDeleteTarget(entry)} style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#ef4444", cursor: "pointer", fontWeight: 700 }}>    Delete️️️️️️️️️️</button>
                 </div>
               </div>
             );
           })}
         </div>
 
-       
+
       </div>
     );
   }
@@ -910,10 +910,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         {/* Toolbar */}
         <div className="no-print" style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 20, flexWrap: "wrap" }}>
           <button onClick={() => setStep("list")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>📋 Back to List</button>
-          <button onClick={() => setStep("form")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>✏️</button>
+          <button onClick={() => setStep("form")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Edit</button>
           <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗 Share</button>
           <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WA</button>
-          <button onClick={() => { setDeleteTarget({ id: editingId, invoiceNo: inv.invoiceNo }); }} style={{ padding: "10px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ef4444", fontFamily: "inherit" }}>     🗑️️️️️️️️️️️️️️️️️️️️️️️️️️ Delete</button>
+          <button onClick={() => { setDeleteTarget({ id: editingId, invoiceNo: inv.invoiceNo }); }} style={{ padding: "10px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ef4444", fontFamily: "inherit" }}>     Delete️️️️️️️️️️️️️️️️ Delete</button>
           <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
@@ -996,8 +996,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
               <div style={{ width: "min(280px,100%)" }}>
                 {[
-                  ["Subtotal", formatCurrency(subtotal, inv.currency)], 
-                  [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)], 
+                  ["Subtotal", formatCurrency(subtotal, inv.currency)],
+                  [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)],
                   ["Total Amount", formatCurrency(total, inv.currency)],
                   ["Advance Paid", formatCurrency(amountPaid, inv.currency)]
                 ].map(([l, v]) => (
@@ -1165,8 +1165,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             <select value={inv.gstRate} onChange={(e) => upd("gstRate", Number(e.target.value))} style={inp()}>
               {GST_RATES.map((r) => <option key={r} value={r}>{r === 0 ? "No GST (0%)" : `GST ${r}%`}</option>)}
             </select>
-            <select value={inv.isGstIncluded ? "including" : "excluding"} 
-              onChange={(e) => upd("isGstIncluded", e.target.value === "including")} 
+            <select value={inv.isGstIncluded ? "including" : "excluding"}
+              onChange={(e) => upd("isGstIncluded", e.target.value === "including")}
               style={{ ...inp(), marginTop: 6, fontSize: 11, fontWeight: 700, color: "var(--app-accent)" }}>
               <option value="excluding">Excluding GST</option>
               <option value="including">Including GST</option>
@@ -1197,43 +1197,43 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </select>
           </div>
         </div>
+      </div>
+      {/* ── Payment Details ── */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Payment & Advance Details</div>
+        <div className="f3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+          <div>
+            <label style={lbl}>Amount Paid (Advance)</label>
+            <input type="number"
+              value={inv.amountPaid === 0 ? "" : inv.amountPaid}
+              onChange={(e) => upd("amountPaid", e.target.value === "" ? 0 : Number(e.target.value))}
+              onWheel={(e) => e.target.blur()}
+              placeholder="0"
+              style={inp()} />
+          </div>
+          <div>
+            <label style={lbl}>Payment Date</label>
+            <input type="date" value={inv.paymentDate} onChange={(e) => upd("paymentDate", e.target.value)} style={inp()} />
+          </div>
+          <div>
+            <label style={lbl}>Payment Mode</label>
+            <select value={inv.paymentMode} onChange={(e) => upd("paymentMode", e.target.value)} style={inp()}>
+              <option value="GPay">GPay</option>
+              <option value="PhonePe">PhonePe</option>
+              <option value="NEFT">NEFT</option>
+              <option value="RTGS">RTGS</option>
+              <option value="Cash">Cash</option>
+              <option value="Cheque">Cheque</option>
+              <option value="Card">Card</option>
+              <option value="UPI">UPI</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+          </div>
         </div>
-        {/* ── Payment Details ── */}
-        <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Payment & Advance Details</div>
-          <div className="f3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-            <div>
-              <label style={lbl}>Amount Paid (Advance)</label>
-              <input type="number" 
-                value={inv.amountPaid === 0 ? "" : inv.amountPaid} 
-                onChange={(e) => upd("amountPaid", e.target.value === "" ? 0 : Number(e.target.value))} 
-                onWheel={(e) => e.target.blur()}
-                placeholder="0" 
-                style={inp()} />
-            </div>
-            <div>
-              <label style={lbl}>Payment Date</label>
-              <input type="date" value={inv.paymentDate} onChange={(e) => upd("paymentDate", e.target.value)} style={inp()} />
-            </div>
-            <div>
-              <label style={lbl}>Payment Mode</label>
-              <select value={inv.paymentMode} onChange={(e) => upd("paymentMode", e.target.value)} style={inp()}>
-                <option value="GPay">GPay</option>
-                <option value="PhonePe">PhonePe</option>
-                <option value="NEFT">NEFT</option>
-                <option value="RTGS">RTGS</option>
-                <option value="Cash">Cash</option>
-                <option value="Cheque">Cheque</option>
-                <option value="Card">Card</option>
-                <option value="UPI">UPI</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-              </select>
-            </div>
-          </div>
-          <div style={{ marginTop: 12 }}>
-            <label style={lbl}>Transaction ID / Ref</label>
-            <input value={inv.transactionId} onChange={(e) => upd("transactionId", e.target.value)} placeholder="TXN123456" style={inp()} />
-          </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={lbl}>Transaction ID / Ref</label>
+          <input value={inv.transactionId} onChange={(e) => upd("transactionId", e.target.value)} placeholder="TXN123456" style={inp()} />
+        </div>
 
         {/* ── Client & Project ── */}
         <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: errors.client ? "1.5px solid #fca5a5" : "1px solid #f3f4f6", marginBottom: 12 }}>
@@ -1241,15 +1241,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
               <label style={{ ...lbl, color: errors.client ? "#ef4444" : "#6b7280" }}>Company Name *</label>
-              <CompanyDropdown clients={clients} value={inv.client} 
+              <CompanyDropdown clients={clients} value={inv.client}
                 onChange={(val) => { upd("client", val); upd("project", ""); setErrors((p) => { const n = { ...p }; delete n.client; return n; }); }}
                 error={errors.client} onAddCompany={onAddClient} />
               {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>⚠ {errors.client}</div>}
             </div>
             <div>
               <label style={lbl}>Project <span style={{ color: "#d1d5db" }}></span></label>
-              <ProjectDropdown projects={filteredProjects} value={inv.project} 
-                onChange={(val) => upd("project", val)} 
+              <ProjectDropdown projects={filteredProjects} value={inv.project}
+                onChange={(val) => upd("project", val)}
                 onAddProject={onAddProject}
                 disabled={!inv.client} />
             </div>
@@ -1284,15 +1284,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     placeholder={`Item ${idx + 1} description`} style={{ ...inp(dErr), fontSize: 13 }} />
                   {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                 </div>
-                <input type="number" 
-                  value={item.quantity === 0 ? "" : item.quantity} 
-                  onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} 
+                <input type="number"
+                  value={item.quantity === 0 ? "" : item.quantity}
+                  onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))}
                   onWheel={(e) => e.target.blur()}
                   placeholder="0" style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
                 <div>
-                  <input type="number" 
-                    value={item.rate === 0 ? "" : item.rate} 
-                    onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} 
+                  <input type="number"
+                    value={item.rate === 0 ? "" : item.rate}
+                    onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))}
                     onWheel={(e) => e.target.blur()}
                     placeholder="0.00" style={{ ...inp(rErr), textAlign: "right", fontSize: 13 }} />
                   {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
@@ -1350,7 +1350,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <label style={lbl}>Company Phone / Number</label>
               <input value={inv.companyPhone} onChange={(e) => {
                 const val = e.target.value;
-                if(val && !/^\d*$/.test(val)) return;
+                if (val && !/^\d*$/.test(val)) return;
                 upd("companyPhone", val);
               }} placeholder="Phone Number" style={inp()} />
             </div>
@@ -1375,7 +1375,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <label style={lbl}>Account Number</label>
               <input value={inv.accountNumber} onChange={(e) => {
                 const val = e.target.value;
-                if(val && !/^\d*$/.test(val)) return;
+                if (val && !/^\d*$/.test(val)) return;
                 upd("accountNumber", val);
               }} placeholder="Bank Account Number" style={inp()} />
             </div>
@@ -1405,13 +1405,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           )}
 
           <button onClick={handleSavePreview} disabled={!!saving}
-            style={{  padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+            style={{ padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
             {saving === "preview" ? "Saving…" : "Preview & Print →"}
           </button>
         </div>
       </div>
-       </div>
-      );
+    </div>
+  );
 }
 
 

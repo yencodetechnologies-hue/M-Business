@@ -18,10 +18,10 @@ const packageSchema = new mongoose.Schema({
 
   // Custom limits for dropdowns
   planDuration: { type: String, default: "Monthly" },
-  businessLimit: { type: String, default: "1" },
-  managerLimit: { type: String, default: "1" },
-  clientLimit: { type: String, default: "3" },
-  employeeLimit: { type: String, default: "10" },
+  businessLimit: { type: String, default: "" },
+  managerLimit: { type: String, default: "" },
+  clientLimit: { type: String, default: "" },
+  employeeLimit: { type: String, default: "" },
 
   status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
   targetRole: { type: String, enum: ["subadmin", "client", "employee", "manager", "all"], default: "subadmin" },

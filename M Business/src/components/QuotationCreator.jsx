@@ -246,7 +246,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     };
     const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
     const link = `${window.location.origin}/quotation-view?d=${encodedData}`;
-    
+
     const text = `*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`;
     if (navigator.share) {
       try { await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, url: link }); } catch (err) { console.log(err); }
@@ -272,7 +272,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     };
     const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
     const link = `${window.location.origin}/quotation-view?d=${encodedData}`;
-    
+
     const text = encodeURIComponent(`*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
@@ -446,7 +446,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                       <span title="Converted to Invoice" style={{ fontSize: 10, fontWeight: 800, color: "#16a34a", padding: "6px", background: "#f0fdf4", borderRadius: 7, border: "1px solid #bbf7d0" }}>✓</span>
                     )}
                     <button onClick={() => loadEntry(entry)} title="Edit"
-                      style={{ padding: "6px", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 7, cursor: "pointer", color: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center" }}>✏️</button>
+                      style={{ padding: "6px", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 7, cursor: "pointer", color: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center" }}>Edit</button>
                   </div>
                 </div>
               );
@@ -903,7 +903,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved as Draft!" : "💾 Save Draft"}
         </button>
         <button onClick={handleSavePreview} disabled={!!saving}
-          style={{  padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#064e3b,var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+          style={{ padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,#064e3b,var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
           {saving === "preview" ? "Saving…" : "Preview & Print →"}
         </button>
       </div>

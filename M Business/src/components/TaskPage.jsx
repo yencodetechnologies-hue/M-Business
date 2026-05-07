@@ -594,13 +594,13 @@ function ProjectPicker({ anchor, projects, currentProjectId, onSelect, onClose }
     !search || (p.name || "").toLowerCase().includes(search.toLowerCase())
   );
 
- 
+
 }
 
 function StatusPicker({ anchor, onSelect, onClose }) {
   const ref = useRef();
   const [pos, setPos] = useState({ top: 0, left: 0 });
-  
+
   useEffect(() => {
     if (anchor?.current) {
       const r = anchor.current.getBoundingClientRect();
@@ -633,7 +633,7 @@ function StatusPicker({ anchor, onSelect, onClose }) {
             borderRadius: 8, fontSize: 12, fontWeight: 800, textAlign: "center",
             cursor: "pointer", marginBottom: 4
           }} onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.1)"}
-             onMouseLeave={e => e.currentTarget.style.filter = "none"}>
+            onMouseLeave={e => e.currentTarget.style.filter = "none"}>
             {s}
           </div>
         );
@@ -679,7 +679,7 @@ function PriorityPicker({ anchor, currentValue, onSelect, onClose }) {
             cursor: "pointer", marginBottom: 4, border: currentValue === p ? "2px solid #fff" : "none",
             boxShadow: currentValue === p ? "0 0 0 2px " + cfg.bg : "none"
           }} onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.1)"}
-             onMouseLeave={e => e.currentTarget.style.filter = "none"}>
+            onMouseLeave={e => e.currentTarget.style.filter = "none"}>
             {p}
           </div>
         );
@@ -1266,7 +1266,7 @@ function ColHeader({ col, onRename, onDelete, onMoveLeft, onMoveRight, canMoveLe
       <span style={{ fontSize: 11 }}>{ct.icon}</span>
       <span style={{ fontSize: 11, color: P.muted, fontWeight: 700, letterSpacing: 0.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 70 }}>{col.label}</span>
       <div ref={menuRef} onClick={e => { e.stopPropagation(); setMenuOpen(v => !v); }} className="col-menu-btn" style={{ width: 13, height: 13, borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 9, color: P.muted, opacity: 0, transition: "opacity .1s", flexShrink: 0 }}>▾</div>
-      {menuOpen && (<DD anchor={menuRef} onClose={() => setMenuOpen(false)} w={160}><MI icon="✏️" title="Rename" onClick={() => { setEditing(true); setMenuOpen(false); }} />{canMoveLeft && <MI icon="‹" title="Move left" onClick={() => { onMoveLeft(); setMenuOpen(false); }} />}{canMoveRight && <MI icon="›" title="Move right" onClick={() => { onMoveRight(); setMenuOpen(false); }} />}<Sep /><MI icon="   🗑️️️️️️️️️️️️️️️" title="Delete column" danger onClick={() => { onDelete(col.id); setMenuOpen(false); }} /></DD>)}
+      {menuOpen && (<DD anchor={menuRef} onClose={() => setMenuOpen(false)} w={160}><MI icon="Edit" title="Rename" onClick={() => { setEditing(true); setMenuOpen(false); }} />{canMoveLeft && <MI icon="‹" title="Move left" onClick={() => { onMoveLeft(); setMenuOpen(false); }} />}{canMoveRight && <MI icon="›" title="Move right" onClick={() => { onMoveRight(); setMenuOpen(false); }} />}<Sep /><MI icon="   Delete️️️️️" title="Delete column" danger onClick={() => { onDelete(col.id); setMenuOpen(false); }} /></DD>)}
     </div>
   );
 }
@@ -1282,11 +1282,17 @@ function Cell({ col, value, onChange }) {
   if (col.type === "rating") { const v = Number(value) || 0; return (<div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, height: "100%" }}>{[1, 2, 3, 4, 5].map(n => (<span key={n} onClick={() => onChange(v === n ? 0 : n)} style={{ fontSize: 15, cursor: "pointer", color: n <= v ? "#f59e0b" : "#e2e8f0" }}>★</span>))}</div>); }
   if (col.type === "date2") { return (<input type="date" value={localVal} onChange={e => { setLocalVal(e.target.value); onChange(e.target.value); }} style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 11, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer", textAlign: "center", padding: "0 4px" }} />); }
   if (col.type === "status2") { const opts = ["—", "Done", "In Progress", "Blocked", "Review", "On Hold"]; const colorMap = { "Done": "#00c875", "In Progress": "#fdab3d", "Blocked": "#e2445c", "Review": "var(--app-accent)", "On Hold": "var(--app-accent)", "—": "#e2e8f0" }; const v = value || "—"; return (<div ref={ref} style={{ height: "100%", display: "flex", alignItems: "stretch" }}><div onClick={() => setOpen(o => !o)} style={{ flex: 1, background: colorMap[v] || "#e2e8f0", color: v === "—" ? "#94a3b8" : "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{v}</div>{open && (<DD anchor={ref} onClose={() => setOpen(false)} w={160}>{opts.map(o => (<div key={o} onClick={() => { onChange(o); setOpen(false); }} style={{ borderRadius: 6, overflow: "hidden", marginBottom: 2, cursor: "pointer" }}><div style={{ background: colorMap[o] || "#e2e8f0", color: o === "—" ? "#94a3b8" : "#fff", padding: "6px 14px", fontSize: 12, fontWeight: 700, textAlign: "center" }}>{o}</div></div>))}</DD>)}</div>); }
-  if (col.type === "tags") { const tags = Array.isArray(value) ? value : (value ? String(value).split(",").map(t => t.trim()).filter(Boolean) : []); return (<div ref={ref} style={{ display: "flex", alignItems: "center", gap: 3, padding: "0 6px", flexWrap: "wrap", height: "100%", cursor: "pointer", minHeight: 36 }} onClick={() => setOpen(o => !o)}>{tags.length === 0 ? <span style={{ fontSize: 11, color: P.muted }}>+ Add</span> : tags.slice(0, 2).map((t) => (<span key={t} style={{ fontSize: 10, background: "#e0e7ff", color: "#4338ca", borderRadius: 10, padding: "2px 6px", fontWeight: 600 }}>{t}</span>))}{open && (<DD anchor={ref} onClose={() => setOpen(false)} w={200}><div style={{ padding: "6px 8px 4px" }}><input autoFocus placeholder="Type tag + Enter" onKeyDown={e => { if (e.key === "Enter" && e.target.value.trim()) { onChange([
-    
-    
-    
-    ...tags, e.target.value.trim()].join(",")); e.target.value = ""; } }} style={{ width: "100%", border: `1.5px solid ${P.border}`, borderRadius: 7, padding: "6px 9px", fontSize: 12, fontFamily: "inherit", outline: "none" }} /></div>{tags.map(t => (<div key={t} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 8px", borderRadius: 6 }}><span style={{ fontSize: 11, background: "#e0e7ff", color: "#4338ca", borderRadius: 10, padding: "2px 8px", fontWeight: 600 }}>{t}</span><span onClick={e => { e.stopPropagation(); onChange(tags.filter(x => x !== t).join(",")); }} style={{ marginLeft: "auto", color: "#e2445c", fontSize: 12, cursor: "pointer" }}>✕</span></div>))}</DD>)}</div>); }
+  if (col.type === "tags") {
+    const tags = Array.isArray(value) ? value : (value ? String(value).split(",").map(t => t.trim()).filter(Boolean) : []); return (<div ref={ref} style={{ display: "flex", alignItems: "center", gap: 3, padding: "0 6px", flexWrap: "wrap", height: "100%", cursor: "pointer", minHeight: 36 }} onClick={() => setOpen(o => !o)}>{tags.length === 0 ? <span style={{ fontSize: 11, color: P.muted }}>+ Add</span> : tags.slice(0, 2).map((t) => (<span key={t} style={{ fontSize: 10, background: "#e0e7ff", color: "#4338ca", borderRadius: 10, padding: "2px 6px", fontWeight: 600 }}>{t}</span>))}{open && (<DD anchor={ref} onClose={() => setOpen(false)} w={200}><div style={{ padding: "6px 8px 4px" }}><input autoFocus placeholder="Type tag + Enter" onKeyDown={e => {
+      if (e.key === "Enter" && e.target.value.trim()) {
+        onChange([
+
+
+
+          ...tags, e.target.value.trim()].join(",")); e.target.value = "";
+      }
+    }} style={{ width: "100%", border: `1.5px solid ${P.border}`, borderRadius: 7, padding: "6px 9px", fontSize: 12, fontFamily: "inherit", outline: "none" }} /></div>{tags.map(t => (<div key={t} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 8px", borderRadius: 6 }}><span style={{ fontSize: 11, background: "#e0e7ff", color: "#4338ca", borderRadius: 10, padding: "2px 8px", fontWeight: 600 }}>{t}</span><span onClick={e => { e.stopPropagation(); onChange(tags.filter(x => x !== t).join(",")); }} style={{ marginLeft: "auto", color: "#e2445c", fontSize: 12, cursor: "pointer" }}>✕</span></div>))}</DD>)}</div>);
+  }
   if (col.type === "link") { return (<input value={localVal} onChange={e => setLocalVal(e.target.value)} onBlur={() => onChange(localVal)} placeholder="https://…" style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 11, color: "#0073ea", fontFamily: "inherit", background: "transparent", padding: "0 8px", textAlign: "center" }} />); }
   if (col.type === "timeline") { const parts = (value || "").split("→").map(s => s.trim()); return (<div style={{ display: "flex", alignItems: "center", gap: 2, padding: "0 4px", height: "100%" }}><input type="date" defaultValue={parts[0] || ""} onChange={e => onChange(`${e.target.value}→${parts[1] || ""}`)} style={{ flex: 1, border: "none", outline: "none", fontSize: 10, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer" }} /><span style={{ fontSize: 9, color: P.muted }}>→</span><input type="date" defaultValue={parts[1] || ""} onChange={e => onChange(`${parts[0] || ""}→${e.target.value}`)} style={{ flex: 1, border: "none", outline: "none", fontSize: 10, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer" }} /></div>); }
   return (<input value={localVal} onChange={e => setLocalVal(e.target.value)} type={col.type === "number" ? "number" : "text"} placeholder={col.type === "number" ? "0" : "—"} style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 12, color: P.text, fontFamily: "inherit", background: "transparent", padding: "0 8px", textAlign: col.type === "number" ? "center" : "left" }} onFocus={e => { e.target.style.background = "#fff"; e.target.style.boxShadow = `inset 0 0 0 1.5px ${P.accent}`; }} onBlur={e => { onChange(localVal); e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} />);
@@ -1661,7 +1667,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             e.currentTarget.style.opacity = hovered ? "1" : "0.6";
           }}
         >
-           Delete
+          Delete
         </button>
         <div ref={dotsRef} onClick={e => { e.stopPropagation(); setDotsOpen(v => !v); }} style={{ width: 26, height: 26, borderRadius: 5, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: P.muted, letterSpacing: 1, userSelect: "none" }} onMouseEnter={e => e.currentTarget.style.background = P.border} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>···</div>
         {dotsOpen && (<DD anchor={dotsRef} onClose={() => setDotsOpen(false)} w={180}>
@@ -1723,7 +1729,7 @@ function AddGroupRow({ onAdd, triggerRef }) {
     <div style={{ marginBottom: 16 }}>
       {active ? (
         <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
-  
+
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", flex: 1, background: P.light, border: `1.5px solid ${P.accent}`, borderLeft: "none", borderRadius: "0 8px 8px 0" }}>
           </div>
         </div>
@@ -1790,38 +1796,38 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                 ))}
                 <div style={{ width: COL_W.dots, flexShrink: 0 }} />
 
-{/* ✅ + Add Column button — HEADER ROW-ல */}
-<div
-  onClick={onAddCol}
-  style={{
-    flexShrink: 0,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "0 14px",
-    cursor: "pointer",
-    borderLeft: `1px solid ${P.border}`,
-    color: P.muted,
-    fontSize: 12,
-    fontWeight: 700,
-    gap: 5,
-    whiteSpace: "nowrap",
-    transition: "all .15s",
-    minWidth: 110,
-    height: "100%",
-  }}
-  onMouseEnter={e => {
-    e.currentTarget.style.background = P.light;
-    e.currentTarget.style.color = P.accent;
-  }}
-  onMouseLeave={e => {
-    e.currentTarget.style.background = "transparent";
-    e.currentTarget.style.color = P.muted;
-  }}
->
-  <span style={{ fontSize: 16, fontWeight: 300 }}>+</span>
-  Add column
-</div>
+                {/* ✅ + Add Column button — HEADER ROW-ல */}
+                <div
+                  onClick={onAddCol}
+                  style={{
+                    flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0 14px",
+                    cursor: "pointer",
+                    borderLeft: `1px solid ${P.border}`,
+                    color: P.muted,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    gap: 5,
+                    whiteSpace: "nowrap",
+                    transition: "all .15s",
+                    minWidth: 110,
+                    height: "100%",
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = P.light;
+                    e.currentTarget.style.color = P.accent;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = P.muted;
+                  }}
+                >
+                  <span style={{ fontSize: 16, fontWeight: 300 }}>+</span>
+                  Add column
+                </div>
               </div>
 
               {tasks.length === 0 && !adding && <div style={{ padding: "12px 16px", fontSize: 12, color: "#c4b5fd", fontStyle: "italic" }}>No tasks yet</div>}
@@ -2082,36 +2088,36 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
 
   const addTask = async (groupId, title) => {
     const projId = selectedProjectId || null;
-    const tmp = { 
-      _id: "tmp_" + Date.now(), 
-      title, 
-      assignTo: "", 
-      status: "Not Started", 
-      priority: "—", 
-      date: "", 
-      checked: false, 
-      groupId, 
+    const tmp = {
+      _id: "tmp_" + Date.now(),
+      title,
+      assignTo: "",
+      status: "Not Started",
+      priority: "—",
+      date: "",
+      checked: false,
+      groupId,
       projectId: projId,
-      createdAt: new Date().toISOString() 
+      createdAt: new Date().toISOString()
     };
-    
+
     setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: [...(g.tasks || []), tmp] } : g));
-    
-    try { 
-      const r = await axios.post(`${API}/tasks`, { 
-        title, 
-        assignTo: "Unassigned", 
-        groupId, 
+
+    try {
+      const r = await axios.post(`${API}/tasks`, {
+        title,
+        assignTo: "Unassigned",
+        groupId,
         status: "Not Started",
         priority: "—",
         projectId: projId
-      }); 
-      setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === tmp._id ? r.data : t) } : g)); 
+      });
+      setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === tmp._id ? r.data : t) } : g));
       onUpdate?.();
     }
-    catch (err) { 
-      setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: (g.tasks || []).filter(t => (t._id || t.id) !== tmp._id) } : g)); 
-      showToast(err.response?.data?.message || "Failed to add task", "error"); 
+    catch (err) {
+      setGroups(p => p.map(g => (g._id || g.id) === groupId ? { ...g, tasks: (g.tasks || []).filter(t => (t._id || t.id) !== tmp._id) } : g));
+      showToast(err.response?.data?.message || "Failed to add task", "error");
     }
   };
 
@@ -2192,17 +2198,17 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
 
   const sortFn = tasks => { if (!sort) return tasks; return [...tasks].sort((a, b) => { if (sort === "name-asc") return (a.title || "").localeCompare(b.title || ""); if (sort === "name-desc") return (b.title || "").localeCompare(a.title || ""); if (sort === "date-asc") return (a.date || "").localeCompare(b.date || ""); if (sort === "date-desc") return (b.date || "").localeCompare(a.date || ""); if (sort === "status") return STATUS_LIST.indexOf(a.status) - STATUS_LIST.indexOf(b.status); return 0; }); };
 
-  const filteredGroups = groups.map(g => ({ 
-    ...g, 
-    tasks: sortFn((g.tasks || []).filter(t => { 
+  const filteredGroups = groups.map(g => ({
+    ...g,
+    tasks: sortFn((g.tasks || []).filter(t => {
       const tProjId = t.projectId?._id || t.projectId || t.project;
-      if (selectedProjectId && String(tProjId) !== String(selectedProjectId)) return false; 
-      if (selectedProjectName && !selectedProjectId && t.project !== selectedProjectName && t.projectName !== selectedProjectName) return false; 
-      if (filters.owner.size > 0 && !filters.owner.has(t.assignTo || "")) return false; 
-      if (filters.status.size > 0 && !filters.status.has(t.status)) return false; 
-      if (search && !t.title?.toLowerCase().includes(search.toLowerCase())) return false; 
-      return true; 
-    })) 
+      if (selectedProjectId && String(tProjId) !== String(selectedProjectId)) return false;
+      if (selectedProjectName && !selectedProjectId && t.project !== selectedProjectName && t.projectName !== selectedProjectName) return false;
+      if (filters.owner.size > 0 && !filters.owner.has(t.assignTo || "")) return false;
+      if (filters.status.size > 0 && !filters.status.has(t.status)) return false;
+      if (search && !t.title?.toLowerCase().includes(search.toLowerCase())) return false;
+      return true;
+    }))
   })).filter(g => {
     if (selectedProjectId || selectedProjectName) {
       return g.tasks.length > 0;
@@ -2279,12 +2285,12 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
             <NewTaskBtn onAddTask={addNewTask} onTriggerGroup={() => addGroupTrigger.current?.trigger()} showToast={showToast} onImport={() => setShowImport(true)} groups={groups} onAddTaskToGroup={addTask} setGroups={setGroups} />
             <div style={{ width: 1, height: 22, background: P.border, margin: "0 4px", flexShrink: 0 }} />
             <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
-           
-              
+
+
               <div style={{ position: "relative", flexShrink: 0 }}>
                 <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, pointerEvents: "none", color: P.muted }}>🔍</span>
                 <input placeholder="Search tasks..." value={search} onChange={e => setSearch(e.target.value)}
-                  style={{ border: `1.5px solid ${search ? P.accent : P.border}`, borderRadius: 8, padding: "5px 10px 5px 28px", fontSize: 13, color: P.text, outline: "none", width: search ? 360 : 100,    minWidth: 160,   background: search ? "#fff" : P.light, transition: "all .2s", fontFamily: "inherit" }}
+                  style={{ border: `1.5px solid ${search ? P.accent : P.border}`, borderRadius: 8, padding: "5px 10px 5px 28px", fontSize: 13, color: P.text, outline: "none", width: search ? 360 : 100, minWidth: 160, background: search ? "#fff" : P.light, transition: "all .2s", fontFamily: "inherit" }}
                   onFocus={e => { e.target.style.borderColor = P.accent; e.target.style.background = "#fff"; e.target.style.width = "200px"; }}
                   onBlur={e => { if (!search) { e.target.style.borderColor = P.border; e.target.style.background = P.light; e.target.style.width = "100px"; } }} />
               </div>
@@ -2293,7 +2299,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
             <TB ref={filterRef} icon="▽" label="Filter" active={filters.status.size > 0} badge={filters.status.size > 0 ? filters.status.size : null} onClick={() => { closeAll(); setFilterOpen(v => !v); }} />
             {filterOpen && <FilterMenu anchor={filterRef} groups={groups} filters={filters} onToggle={toggleFilter} onClear={clearFilters} onClose={() => setFilterOpen(false)} />}
             {sortOpen && <SortMenu anchor={sortRef} sort={sort} onSort={setSort} onClose={() => setSortOpen(false)} />}
-            <TB ref={hideRef} icon="👁" label="Hide" active={hiddenCols.size > 0} badge={hiddenCols.size > 0 ? hiddenCols.size : null} onClick={() => { closeAll(); setHideOpen(v => !v); }} />
+            <TB ref={hideRef} icon="View" label="Hide" active={hiddenCols.size > 0} badge={hiddenCols.size > 0 ? hiddenCols.size : null} onClick={() => { closeAll(); setHideOpen(v => !v); }} />
             {hideOpen && <HideMenu anchor={hideRef} onClose={() => setHideOpen(false)} extraCols={extraCols} hiddenCols={hiddenCols} onToggleHide={toggleHideCol} />}
             <TB ref={grpByRef} icon="⊟" label="Group by" active={groupBy !== "default"} onClick={() => { closeAll(); setGrpByOpen(v => !v); }} />
             {grpByOpen && <GrpByMenu anchor={grpByRef} groupBy={groupBy} onGroupBy={setGroupBy} onClose={() => setGrpByOpen(false)} />}

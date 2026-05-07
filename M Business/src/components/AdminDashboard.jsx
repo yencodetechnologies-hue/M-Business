@@ -357,7 +357,7 @@ export default function AdminDashboard({ user, setUser }) {
       <div style={{ width: 260, background: THEME.sidebar, color: darkMode ? "#fff" : THEME.text, display: "flex", flexDirection: "column", position: "relative", zIndex: 100, borderRight: `1.5px solid ${THEME.border}` }}>
         <div style={{ padding: "32px 24px", display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 42, height: 42, background: darkMode ? "rgba(255,255,255,0.05)" : "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "4px", border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid #e2e8f0" }}>
-             {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} /> : <span style={{ color: darkMode ? "#fff" : "#1a3d4d", fontWeight: 900 }}>A</span>}
+            {user?.logoUrl ? <img src={user.logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} /> : <span style={{ color: darkMode ? "#fff" : "#1a3d4d", fontWeight: 900 }}>A</span>}
           </div>
           <div>
             <div style={{ fontWeight: 900, fontSize: 16, letterSpacing: "-0.5px", color: darkMode ? "#fff" : "#0f172a" }}>M Business</div>
@@ -399,7 +399,7 @@ export default function AdminDashboard({ user, setUser }) {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ padding: "24px 32px", background: THEME.card, borderBottom: `1.5px solid ${THEME.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10 }}>
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: THEME.text, letterSpacing: "-0.5px" }}>{NAV.find(n => n.key === active)?.label}</h2>
-          
+
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {active === "packages" && (
               <button onClick={() => { setEditPkg(null); setNpkg({ title: "", description: "", icon: "📦", isFree: false, price: "", noOfDays: "30", planDuration: "Monthly Plan", businessLimit: "Single business manage", managerLimit: "1", clientLimit: "3", employeeLimit: "10", assignedSubadmins: [] }); setPkgError({}); setModal("package_add"); }}
@@ -458,7 +458,7 @@ export default function AdminDashboard({ user, setUser }) {
             }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>
-                  {editPkg ? "✏️ Edit Package" : "📦 Add New Package"}
+                  {editPkg ? "Edit Edit Package" : "📦 Add New Package"}
                 </h2>
                 <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
                   {editPkg ? "Update subscription plan details" : "Create a subscription plan for subadmins"}
@@ -883,7 +883,7 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: THEME.text }}>₹{inv.total?.toLocaleString() || "0"}</div>
+                    <div style={{ fontSize: 14, fontWeight: 900, color: THEME.text }}>₹{inv.total?.toLocaleString() || "0"}</div>
                     <div style={{ marginTop: 4 }}><Badge label={inv.status} /></div>
                   </div>
                 </div>
@@ -1015,18 +1015,18 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
             </div>
             {companyLoading ? <div>Loading...</div> : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-                 <div style={{ background: THEME.surface, padding: 20, borderRadius: 16 }}>
-                    <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 700 }}>Employees</div>
-                    <div style={{ fontSize: 24, fontWeight: 900 }}>{companyData?.employees?.length || 0}</div>
-                 </div>
-                 <div style={{ background: THEME.surface, padding: 20, borderRadius: 16 }}>
-                    <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 700 }}>Managers</div>
-                    <div style={{ fontSize: 24, fontWeight: 900 }}>{companyData?.managers?.length || 0}</div>
-                 </div>
-                 <div style={{ background: THEME.surface, padding: 20, borderRadius: 16 }}>
-                    <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 700 }}>Clients</div>
-                    <div style={{ fontSize: 24, fontWeight: 900 }}>{companyData?.clients?.length || 0}</div>
-                 </div>
+                <div style={{ background: THEME.surface, padding: 20, borderRadius: 16 }}>
+                  <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 700 }}>Employees</div>
+                  <div style={{ fontSize: 24, fontWeight: 900 }}>{companyData?.employees?.length || 0}</div>
+                </div>
+                <div style={{ background: THEME.surface, padding: 20, borderRadius: 16 }}>
+                  <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 700 }}>Managers</div>
+                  <div style={{ fontSize: 24, fontWeight: 900 }}>{companyData?.managers?.length || 0}</div>
+                </div>
+                <div style={{ background: THEME.surface, padding: 20, borderRadius: 16 }}>
+                  <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 700 }}>Clients</div>
+                  <div style={{ fontSize: 24, fontWeight: 900 }}>{companyData?.clients?.length || 0}</div>
+                </div>
               </div>
             )}
           </div>
@@ -1036,37 +1036,37 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
       {modalOpen && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
           <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 440, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
-             <h3 style={{ margin: "0 0 24px", fontWeight: 900, color: THEME.text }}>New Subadmin</h3>
-             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                <input placeholder="Full Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
-                <input placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
-                <input placeholder="Password" type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
-                <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-                   <button onClick={() => setModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", fontWeight: 700, background: THEME.surface, color: THEME.text }}>Cancel</button>
-                   <button onClick={() => { axios.post(`${BASE_URL}/api/subadmins`, {...form, role: "subadmin"}).then(() => { refresh(); setModalOpen(false); }) }} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#fff", fontWeight: 700 }}>Create</button>
-                </div>
-             </div>
+            <h3 style={{ margin: "0 0 24px", fontWeight: 900, color: THEME.text }}>New Subadmin</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <input placeholder="Full Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+              <input placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+              <input placeholder="Password" type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+              <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+                <button onClick={() => setModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", fontWeight: 700, background: THEME.surface, color: THEME.text }}>Cancel</button>
+                <button onClick={() => { axios.post(`${BASE_URL}/api/subadmins`, { ...form, role: "subadmin" }).then(() => { refresh(); setModalOpen(false); }) }} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#fff", fontWeight: 700 }}>Create</button>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {assignModalOpen && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-           <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 440, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
-              <h3 style={{ margin: "0 0 8px", fontWeight: 900, color: THEME.text }}>Assign Package</h3>
-              <p style={{ margin: "0 0 24px", color: THEME.muted, fontSize: 13 }}>to {selectedSubadmin.name}</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                 <select value={selectedPackage} onChange={e => setSelectedPackage(e.target.value)} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }}>
-                    <option value="">-- Choose Plan --</option>
-                    {packages.map(p => <option key={p._id} value={p._id}>{p.title} (₹{p.price})</option>)}
-                 </select>
-                 <input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
-                 <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-                    <button onClick={() => setAssignModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", fontWeight: 700, background: THEME.surface, color: THEME.text }}>Cancel</button>
-                    <button onClick={handleAssignPackage} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#fff", fontWeight: 700 }}>Assign</button>
-                 </div>
+          <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 440, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
+            <h3 style={{ margin: "0 0 8px", fontWeight: 900, color: THEME.text }}>Assign Package</h3>
+            <p style={{ margin: "0 0 24px", color: THEME.muted, fontSize: 13 }}>to {selectedSubadmin.name}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <select value={selectedPackage} onChange={e => setSelectedPackage(e.target.value)} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }}>
+                <option value="">-- Choose Plan --</option>
+                {packages.map(p => <option key={p._id} value={p._id}>{p.title} (₹{p.price})</option>)}
+              </select>
+              <input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+              <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+                <button onClick={() => setAssignModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", fontWeight: 700, background: THEME.surface, color: THEME.text }}>Cancel</button>
+                <button onClick={handleAssignPackage} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#fff", fontWeight: 700 }}>Assign</button>
               </div>
-           </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -1083,11 +1083,11 @@ function SubscriptionsPage({ THEME, subscriptions }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <h3 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: THEME.text }}>Subscription Management</h3>
         <select value={filter} onChange={e => setFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: 10, fontSize: 13, fontWeight: 600, background: THEME.surface, color: THEME.text, border: `1px solid ${THEME.border}` }}>
-           <option value="all">All Status</option>
-           <option value="active">Active</option>
-           <option value="pending">Pending</option>
-           <option value="expired">Expired</option>
-           <option value="cancelled">Cancelled</option>
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="pending">Pending</option>
+          <option value="expired">Expired</option>
+          <option value="cancelled">Cancelled</option>
         </select>
       </div>
 
@@ -1154,7 +1154,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
                 display: "flex",
                 flexDirection: "column"
               }}
-                onMouseEnter={e => {
+              onMouseEnter={e => {
                 e.currentTarget.style.transform = "translateY(-5px)";
                 e.currentTarget.style.boxShadow = THEME.shadow;
               }}
@@ -1218,7 +1218,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
                     e.currentTarget.style.transform = "scale(1)";
                   }}
                 >
-                  ✏️
+                  Edit
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); onDelete(p._id); }}
@@ -1493,12 +1493,12 @@ function ProjectsPage({ THEME, projects, setProjects, clients, employees }) {
                 <td style={{ padding: "16px", fontWeight: 700, color: THEME.text }}>{p.name || "—"}</td>
                 <td style={{ padding: "16px", color: THEME.muted }}>{p.client || "—"}</td>
                 <td style={{ padding: "16px" }}>
-                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ flex: 1, background: THEME.surface, height: 6, borderRadius: 10 }}>
-                         <div style={{ width: `${p.progress || 0}%`, background: THEME.accent, height: "100%", borderRadius: 10 }} />
-                      </div>
-                      <span style={{ fontSize: 11, fontWeight: 800, color: THEME.accent }}>{p.progress || 0}%</span>
-                   </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ flex: 1, background: THEME.surface, height: 6, borderRadius: 10 }}>
+                      <div style={{ width: `${p.progress || 0}%`, background: THEME.accent, height: "100%", borderRadius: 10 }} />
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: THEME.accent }}>{p.progress || 0}%</span>
+                  </div>
                 </td>
                 <td style={{ padding: "16px" }}><Badge label={p.status || "Pending"} /></td>
                 <td style={{ padding: "16px", fontWeight: 700, color: THEME.text }}>₹{p.budget || 0}</td>

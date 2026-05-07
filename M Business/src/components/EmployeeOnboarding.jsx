@@ -94,8 +94,8 @@ export default function EmployeeOnboarding() {
         },
         profilePhoto: form.photo,
         companyId: queryParams.get("companyId") || "",
-          dateOfBirth: form.dateOfBirth,
-  maritalStatus: form.maritalStatus,
+        dateOfBirth: form.dateOfBirth,
+        maritalStatus: form.maritalStatus,
 
       };
 
@@ -142,7 +142,7 @@ export default function EmployeeOnboarding() {
     );
   }
 
-  
+
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", padding: "40px 20px", display: "flex", justifyContent: "center" }}>
@@ -174,47 +174,47 @@ export default function EmployeeOnboarding() {
           <div style={{ fontSize: 12, fontWeight: 800, color: "#94a3b8", letterSpacing: 1, marginBottom: 16, borderBottom: "1px solid #f1f5f9", paddingBottom: 8 }}>PERSONAL INFORMATION</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: 24 }}>
             <Input label="Full Name" value={form.name} onChange={v => handleChange("name", v)} error={err.name} placeholder="John Doe" />
-            
+
             <Input label="Email Address" value={form.email} onChange={v => handleChange("email", v)} error={err.email} type="email" placeholder="john@company.com" />
             <Input label="Phone Number" value={form.phone} onChange={v => handleChange("phone", v)} error={err.phone} placeholder="+91 98765 43210" />
             <Input
-  label="Date of Birth"
-  value={form.dateOfBirth}
-  onChange={v => handleChange("dateOfBirth", v)}
-  type="date"
-  placeholder=""
-/>
+              label="Date of Birth"
+              value={form.dateOfBirth}
+              onChange={v => handleChange("dateOfBirth", v)}
+              type="date"
+              placeholder=""
+            />
 
-{/* Marital Status - Select */}
-<div style={{ marginBottom: 4 }}>
-  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-    Marital Status *
-  </label>
-  <select
-    value={form.maritalStatus}
-    onChange={e => handleChange("maritalStatus", e.target.value)}
-    style={{
-      width: "100%",
-      height: 46,
-      padding: "0px 14px",
-      boxSizing: "border-box",
-      borderRadius: 12,
-      border: "1.5px solid #e2e8f0",
-      fontSize: 14,
-      color: "#1e293b",
-      outline: "none",
-      background: "#f8fafc",
-      cursor: "pointer"
-    }}
-  >
-    <option value="Unmarried">Unmarried</option>
-    <option value="Married">Married</option>
-  </select>
-</div>
+            {/* Marital Status - Select */}
+            <div style={{ marginBottom: 4 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                Marital Status *
+              </label>
+              <select
+                value={form.maritalStatus}
+                onChange={e => handleChange("maritalStatus", e.target.value)}
+                style={{
+                  width: "100%",
+                  height: 46,
+                  padding: "0px 14px",
+                  boxSizing: "border-box",
+                  borderRadius: 12,
+                  border: "1.5px solid #e2e8f0",
+                  fontSize: 14,
+                  color: "#1e293b",
+                  outline: "none",
+                  background: "#f8fafc",
+                  cursor: "pointer"
+                }}
+              >
+                <option value="Unmarried">Unmarried</option>
+                <option value="Married">Married</option>
+              </select>
+            </div>
             <div style={{ position: "relative" }}>
               <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type={showPass ? "text" : "password"} placeholder="Set your password" />
               <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: 32, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#94a3b8" }}>
-                {showPass ? "👁️" : "👁️‍🗨️"}
+                {showPass ? "View️" : "View️‍🗨️"}
               </button>
             </div>
           </div>
@@ -234,38 +234,38 @@ export default function EmployeeOnboarding() {
             <DocInput label="PAN Card" icon="💳" file={docs.pan} onChange={f => handleFileChange("pan", f)} />
             <DocInput label="Bank Passbook" icon="🏦" file={docs.passbook} onChange={f => handleFileChange("passbook", f)} />
           </div>
-<div style={{ display: "flex", justifyContent: "center" }}>
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "50%",
-              background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
-              color: "#fff",
-              border: "none",
-              borderRadius: 14,
-              padding: "16px",
-              fontWeight: 800,
-              fontSize: 16,
-              cursor: loading ? "not-allowed" : "pointer",
-              boxShadow: "0 10px 25px rgba(124, 58, 237, 0.3)",
-              transition: "all 0.3s ease",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 10
- 
-            }}
-          >
-            {loading ? (
-              <>
-                <span style={{ width: 20, height: 20, border: "3px solid rgba(255,255,255,0.3)", borderTop: "3px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                <span>Submitting...</span>
-              </>
-            ) : (
-              <span>Complete Registration →</span>
-            )}
-          </button></div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: "50%",
+                background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                color: "#fff",
+                border: "none",
+                borderRadius: 14,
+                padding: "16px",
+                fontWeight: 800,
+                fontSize: 16,
+                cursor: loading ? "not-allowed" : "pointer",
+                boxShadow: "0 10px 25px rgba(124, 58, 237, 0.3)",
+                transition: "all 0.3s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10
+
+              }}
+            >
+              {loading ? (
+                <>
+                  <span style={{ width: 20, height: 20, border: "3px solid rgba(255,255,255,0.3)", borderTop: "3px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                <span>Complete Registration →</span>
+              )}
+            </button></div>
         </form>
 
         <p style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: "#64748b" }}>
@@ -292,9 +292,9 @@ function Input({ label, value, onChange, error, type = "text", placeholder }) {
         placeholder={placeholder}
         style={{
           width: "100%",
-            height: 46,
+          height: 46,
           padding: "0px 14px",
-            boxSizing: "border-box", display: "block",
+          boxSizing: "border-box", display: "block",
           borderRadius: 12,
           border: `1.5px solid ${error ? "#ef4444" : "#e2e8f0"}`,
           fontSize: 14,

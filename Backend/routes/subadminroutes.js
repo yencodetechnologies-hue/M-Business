@@ -7,15 +7,13 @@ const Client = require("../models/ClientModel");
 const Quotation = require("../models/QuotationModel");
 const Subscription = require("../models/SubscriptionModel");
 const bcrypt = require("bcryptjs");
-
-const parseLimit = (limitStr = "") => {
-  if (!limitStr || typeof limitStr !== "string") return Infinity;
-  const lowered = limitStr.toLowerCase();
-  if (lowered.includes("unlimited")) return Infinity;
-  const match = lowered.match(/\d+/);
-  return match ? parseInt(match[0], 10) : Infinity;
+const parseLimit = (limitStr) => {
+  if (limitStr === undefined || limitStr === null || limitStr === "") return 10;
+  const s = String(limitStr).toLowerCase().trim();
+  if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
+  const m = s.match(/\d+/);
+  return m ? parseInt(m[0]) : 10;
 };
-
 // GET all subadmins
 router.get("/", async (req, res) => {
   try {
@@ -60,23 +58,24 @@ router.post("/", async (req, res) => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 30);
     
- const newSubscription = new Subscription({
-  userId: newSubadmin._id.toString(),
-  userEmail: newSubadmin.email,
-  userName: newSubadmin.name,
-  planName: "Free",
-  planPrice: 0,
-  billingCycle: "monthly",
-  status: "active",
-  endDate: endDate,
-  features: ["30 Days Free Trial"],
-  companyId: newSubadmin._id.toString(),
-  isFullyPaid: true,
-  clientLimit: "",    // ← ADD: no default
-  employeeLimit: "",  // ← ADD: no default
-  managerLimit: "",   // ← ADD: no default
-  businessLimit: "",  // ← ADD: no default
-});
+    const newSubscription = new Subscription({
+      userId: newSubadmin._id.toString(),
+      userEmail: newSubadmin.email,
+      userName: newSubadmin.name,
+      planName: "Free Trial",
+      planPrice: 0,
+      billingCycle: "trial",
+      status: "active",
+      isTrial: true,
+      endDate: endDate,
+      features: ["30 Days Free Trial", "5 Clients Limit", "20 Employees Limit", "5 Managers Limit"],
+      companyId: newSubadmin._id.toString(),
+      isFullyPaid: true,
+      clientLimit: "5 Clients",
+      employeeLimit: "20 Employees",
+      managerLimit: "5 Managers",
+      businessLimit: "1 Business",
+    });
     await newSubscription.save();
     
     res.status(201).json({ msg: "Subadmin created", subadmin: newSubadmin });

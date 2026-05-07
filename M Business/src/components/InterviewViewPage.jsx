@@ -65,19 +65,19 @@ function StatusPicker({ current = "pending", onChange }) {
   return (
     <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: "var(--app-accent)", marginBottom: 10 }}>UPDATE STATUS</div>
-        {["Pending", "Hired", "Rejected"].map(s => (
-          <button key={s} onClick={() => onChange(s)} style={{
-            flex: 1, padding: "10px", borderRadius: 10,
-            border: `2px solid ${current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-border)"}`,
-            background: current?.toLowerCase() === s.toLowerCase() ? `${sc(s)}15` : "#fff",
-            color: current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-muted)",
-            fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
-          }}>
-            {s === "Pending" ? "⏳ Pending" : s === "Hired" ? "✅ Hired" : "❌ Rejected"}
-          </button>
-        ))}
-      </div>
+      {["Pending", "Hired", "Rejected"].map(s => (
+        <button key={s} onClick={() => onChange(s)} style={{
+          flex: 1, padding: "10px", borderRadius: 10,
+          border: `2px solid ${current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-border)"}`,
+          background: current?.toLowerCase() === s.toLowerCase() ? `${sc(s)}15` : "#fff",
+          color: current?.toLowerCase() === s.toLowerCase() ? sc(s) : "var(--app-muted)",
+          fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
+        }}>
+          {s === "Pending" ? "⏳ Pending" : s === "Hired" ? "✅ Hired" : "❌ Rejected"}
+        </button>
+      ))}
     </div>
+    </div >
   );
 }
 
@@ -97,12 +97,12 @@ function ResumeModal({ candidate, onClose, onStatusChange }) {
   return (
     <Modal title={`📄 Resume — ${candidate.name}`} onClose={onClose} wide>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 18 }}>
-        <InfoCell icon="👤" label="Name"       value={candidate.name} />
-        <InfoCell icon="📧" label="Email"      value={candidate.email} />
-        <InfoCell icon="📱" label="Mobile"     value={candidate.mobile} />
-        <InfoCell icon="🎯" label="Role"       value={candidate.role} />
+        <InfoCell icon="👤" label="Name" value={candidate.name} />
+        <InfoCell icon="📧" label="Email" value={candidate.email} />
+        <InfoCell icon="📱" label="Mobile" value={candidate.mobile} />
+        <InfoCell icon="🎯" label="Role" value={candidate.role} />
         <InfoCell icon="💼" label="Experience" value={candidate.experience === "Fresher" ? "🎓 Fresher" : `${candidate.years || "?"} yrs`} />
-        <InfoCell icon="📅" label="Applied"    value={candidate.date ? new Date(candidate.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"} />
+        <InfoCell icon="📅" label="Applied" value={candidate.date ? new Date(candidate.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"} />
         {candidate.interviewerName && <InfoCell icon="🧑‍💼" label="Interviewer" value={candidate.interviewerName} />}
       </div>
 
@@ -152,12 +152,12 @@ function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-        <InfoCell icon="📧" label="Email"      value={candidate.email} />
-        <InfoCell icon="📱" label="Mobile"     value={candidate.mobile} />
+        <InfoCell icon="📧" label="Email" value={candidate.email} />
+        <InfoCell icon="📱" label="Mobile" value={candidate.mobile} />
         <InfoCell icon="💼" label="Experience" value={candidate.experience === "Fresher" ? "🎓 Fresher" : `💼 ${candidate.years || "?"} years`} />
-        <InfoCell icon="🎯" label="Role"       value={candidate.role} />
-        <InfoCell icon="📅" label="Applied"    value={fmt(candidate.date || candidate.createdAt)} />
-        <InfoCell icon="📎" label="Resume"     value={candidate.resumeName || "Not uploaded"} />
+        <InfoCell icon="🎯" label="Role" value={candidate.role} />
+        <InfoCell icon="📅" label="Applied" value={fmt(candidate.date || candidate.createdAt)} />
+        <InfoCell icon="📎" label="Resume" value={candidate.resumeName || "Not uploaded"} />
         {candidate.interviewerName && <InfoCell icon="🧑‍💼" label="Interviewer" value={candidate.interviewerName} />}
         {candidate.notes && <div style={{ gridColumn: "1/-1" }}><InfoCell icon="📝" label="Notes" value={candidate.notes} /></div>}
       </div>
@@ -177,12 +177,12 @@ function ProfileModal({ candidate, onClose, onStatusChange, onViewResume }) {
 export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", companyName = "Your Business" }) {
   const STORAGE_KEY = `hr_candidates_${companyId}`;
   const [candidates, setCandidates] = useState([]);
-  const [filter, setFilter]         = useState("all");
-  const [search, setSearch]         = useState("");
-  const [loading, setLoading]       = useState(true);
-  const [toast, setToast]           = useState("");
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState("");
   const [linkCopied, setLinkCopied] = useState(false);
-  const [viewResume,  setViewResume]  = useState(null);
+  const [viewResume, setViewResume] = useState(null);
   const [viewProfile, setViewProfile] = useState(null);
 
   const applyLink = `${window.location.origin}/interview-apply/${companyName.replace(/\s+/g, "-")}-${companyId}`;
@@ -192,30 +192,30 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
     if (saved.length) { setCandidates(saved); setLoading(false); }
     axios.get(`${API_URL}/api/interviews?companyId=${companyId}`)
       .then(r => { const d = r.data?.data || r.data || []; if (d.length) persist(d); })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, [companyId]);
 
-  const persist    = (list) => { setCandidates(list); localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); };
-  const showToast  = (msg)  => { setToast(msg); setTimeout(() => setToast(""), 2800); };
+  const persist = (list) => { setCandidates(list); localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); };
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
   const updateStatus = (idx, val) => {
     const updated = [...candidates];
-    updated[idx]  = { ...updated[idx], status: val };
+    updated[idx] = { ...updated[idx], status: val };
     persist(updated);
     const c = updated[idx]; const id = c._id || c.id;
-    if (id) axios.patch(`${API_URL}/api/interviews/${id}/status`, { status: val }).catch(() => {});
+    if (id) axios.patch(`${API_URL}/api/interviews/${id}/status`, { status: val }).catch(() => { });
     showToast(`✅ Status → "${val}"`);
-    if (viewResume  && (viewResume._id  || viewResume.id)  === id) setViewResume(updated[idx]);
+    if (viewResume && (viewResume._id || viewResume.id) === id) setViewResume(updated[idx]);
     if (viewProfile && (viewProfile._id || viewProfile.id) === id) setViewProfile(updated[idx]);
   };
 
   const deleteCandidate = (idx) => {
     if (!window.confirm("Delete this candidate?")) return;
     const c = candidates[idx]; const id = c._id || c.id;
-    if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => {});
+    if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { });
     persist(candidates.filter((_, i) => i !== idx));
-    showToast("  🗑️️️️️️️️️️️ Deleted");
+    showToast("  Delete️ Deleted");
   };
 
   const copyLink = () => {
@@ -229,16 +229,16 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
 
   const displayed = candidates.filter(c => {
     const okF = filter === "all" || (c.status || "pending").toLowerCase() === filter;
-    const q   = search.toLowerCase();
-    const okS = !q || (c.name||"").toLowerCase().includes(q) || (c.role||"").toLowerCase().includes(q) || (c.email||"").toLowerCase().includes(q) || (c.mobile||"").includes(q);
+    const q = search.toLowerCase();
+    const okS = !q || (c.name || "").toLowerCase().includes(q) || (c.role || "").toLowerCase().includes(q) || (c.email || "").toLowerCase().includes(q) || (c.mobile || "").includes(q);
     return okF && okS;
   });
 
   const counts = {
-    total:    candidates.length,
-    pending:  candidates.filter(c => (c.status||"pending").toLowerCase() === "pending").length,
-    hired:    candidates.filter(c => (c.status||"").toLowerCase() === "hired").length,
-    rejected: candidates.filter(c => (c.status||"").toLowerCase() === "rejected").length,
+    total: candidates.length,
+    pending: candidates.filter(c => (c.status || "pending").toLowerCase() === "pending").length,
+    hired: candidates.filter(c => (c.status || "").toLowerCase() === "hired").length,
+    rejected: candidates.filter(c => (c.status || "").toLowerCase() === "rejected").length,
   };
 
   return (
@@ -263,7 +263,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
             {linkCopied ? "✅ Copied!" : "📋 Copy Link"}
           </button>
           <button onClick={() => window.open(applyLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-            👁 Preview Form
+            View Preview Form
           </button>
         </div>
       </div>
@@ -271,9 +271,9 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
         {[
-          { label: "Total",    val: counts.total,    icon: "🎯", c: "var(--app-accent)" },
-          { label: "Pending",  val: counts.pending,  icon: "⏳", c: "#F59E0B" },
-          { label: "Hired",    val: counts.hired,    icon: "✅", c: "#22C55E" },
+          { label: "Total", val: counts.total, icon: "🎯", c: "var(--app-accent)" },
+          { label: "Pending", val: counts.pending, icon: "⏳", c: "#F59E0B" },
+          { label: "Hired", val: counts.hired, icon: "✅", c: "#22C55E" },
           { label: "Rejected", val: counts.rejected, icon: "❌", c: "#EF4444" },
         ].map(({ label, val, icon, c }) => (
           <div key={label} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}>
@@ -296,7 +296,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
             <input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)}
               style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-text)", boxSizing: "border-box" }} />
           </div>
-          {["all","pending","hired","rejected"].map(f => (
+          {["all", "pending", "hired", "rejected"].map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: "7px 16px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
               border: "1.5px solid",
@@ -327,14 +327,14 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 980 }}>
               <thead>
                 <tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
-                  {["#","Candidate","Contact","Experience","Role","Interviewer","Applied Date","Status","Resume","Actions"].map(h => (
+                  {["#", "Candidate", "Contact", "Experience", "Role", "Interviewer", "Applied Date", "Status", "Resume", "Actions"].map(h => (
                     <th key={h} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-accent)", fontWeight: 700, fontSize: 10, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {displayed.map((c, i) => {
-                  const idx    = candidates.indexOf(c);
+                  const idx = candidates.indexOf(c);
                   const status = (c.status || "pending").toLowerCase();
                   return (
                     <tr key={c._id || c.id || i}
@@ -342,28 +342,28 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
                       onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
 
-                      <td style={{ padding: "12px 12px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{String(i+1).padStart(3,"0")}</td>
+                      <td style={{ padding: "12px 12px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{String(i + 1).padStart(3, "0")}</td>
 
                       <td style={{ padding: "12px 12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <div style={avatarStyle(32,12)}>{(c.name||"?")[0].toUpperCase()}</div>
-                          <div style={{ fontWeight: 700, color: "var(--app-text)" }}>{c.name||"—"}</div>
+                          <div style={avatarStyle(32, 12)}>{(c.name || "?")[0].toUpperCase()}</div>
+                          <div style={{ fontWeight: 700, color: "var(--app-text)" }}>{c.name || "—"}</div>
                         </div>
                       </td>
 
                       <td style={{ padding: "12px 12px" }}>
-                        <div style={{ fontSize: 12, color: "var(--app-accent)" }}>{c.email||"—"}</div>
-                        <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile||""}</div>
+                        <div style={{ fontSize: 12, color: "var(--app-accent)" }}>{c.email || "—"}</div>
+                        <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile || ""}</div>
                       </td>
 
                       <td style={{ padding: "12px 12px" }}>
                         {c.experience === "Fresher"
                           ? <span style={expBadge("#22C55E")}>🎓 Fresher</span>
-                          : <span style={expBadge("var(--app-accent)")}>💼 {c.years||"?"}yrs</span>}
+                          : <span style={expBadge("var(--app-accent)")}>💼 {c.years || "?"}yrs</span>}
                       </td>
 
                       <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-text)", fontSize: 12, maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {c.role||"—"}
+                        {c.role || "—"}
                       </td>
 
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-accent)" }}>
@@ -404,7 +404,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
                             👤 Profile
                           </button>
                           <button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
-                              🗑️️️️️️️️️️
+                            Delete
                           </button>
                         </div>
                       </td>
@@ -422,7 +422,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
           candidate={viewResume}
           onClose={() => setViewResume(null)}
           onStatusChange={(s) => {
-            const idx = candidates.findIndex(c => (c._id||c.id) === (viewResume._id||viewResume.id));
+            const idx = candidates.findIndex(c => (c._id || c.id) === (viewResume._id || viewResume.id));
             if (idx !== -1) updateStatus(idx, s);
           }}
         />
@@ -433,7 +433,7 @@ export default function InterviewPage({ companyId = "69b8fe0a6e3d6f1e056f3109", 
           candidate={viewProfile}
           onClose={() => setViewProfile(null)}
           onStatusChange={(s) => {
-            const idx = candidates.findIndex(c => (c._id||c.id) === (viewProfile._id||viewProfile.id));
+            const idx = candidates.findIndex(c => (c._id || c.id) === (viewProfile._id || viewProfile.id));
             if (idx !== -1) { updateStatus(idx, s); setViewProfile({ ...viewProfile, status: s }); }
           }}
           onViewResume={() => { setViewProfile(null); setViewResume(viewProfile); }}

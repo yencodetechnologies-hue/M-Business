@@ -4,16 +4,41 @@ const Employee = require("../models/EmployeeModel");
 const Manager = require("../models/ManagerModel");
 const User = require("../models/UserModels");
 
-// Middleware to check if user has active subscription
+// "3" → 3, "10 Employees" → 10, "Unlimited" → Infinity, "" → 10
+const parseLimit = (limitStr) => {
+  if (limitStr === undefined || limitStr === null || limitStr === "") return 0;
+  const s = String(limitStr).toLowerCase().trim();
+  if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
+  const m = s.match(/\d+/);
+  return m ? parseInt(m[0]) : 0;
+};
+
+const getSubscriptionLimit = (type, sub) => {
+  if (!sub) return 10;
+  const map = {
+    client: sub.clientLimit,
+    employee: sub.employeeLimit,
+    manager: sub.managerLimit,
+  };
+  let val = map[type];
+  if ((!val || val === "") && sub.features && Array.isArray(sub.features)) {
+    const label = type === "client" ? "client" : type === "employee" ? "employee" : "manager";
+    const feat = sub.features.find(f => f.toLowerCase().includes(label));
+    if (feat) {
+      const match = feat.match(/\d+/);
+      if (match) val = match[0];
+    }
+  }
+  return parseLimit(val);
+};
+
+
+// Active subscription check
 const checkSubscription = async (req, res, next) => {
   try {
     const userId = req.user?.id || req.params.userId || req.body.userId;
-    
     if (!userId) {
-      return res.status(401).json({ 
-        message: "User ID required",
-        restricted: true 
-      });
+      return res.status(401).json({ message: "User ID required", restricted: true });
     }
 
     const subscription = await Subscription.findOne({
@@ -22,7 +47,7 @@ const checkSubscription = async (req, res, next) => {
     }).sort({ createdAt: -1 });
 
     if (!subscription) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         message: "No active subscription found. Please contact your administrator.",
         restricted: true,
         needsSubscription: true
@@ -31,161 +56,83 @@ const checkSubscription = async (req, res, next) => {
 
     const now = new Date();
     const endDate = new Date(subscription.endDate);
-    
+
     if (endDate < now) {
-      // Subscription expired
-      await Subscription.findByIdAndUpdate(subscription._id, {
-        status: "expired"
-      });
-      
-      return res.status(403).json({ 
+      await Subscription.findByIdAndUpdate(subscription._id, { status: "expired" });
+      return res.status(403).json({
         message: "Subscription expired. Please contact your administrator to renew.",
         restricted: true,
         expired: true
       });
     }
 
-    // Check if subscription expires in 10 days or less
     const daysUntilExpiry = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
-    
     if (daysUntilExpiry <= 10) {
-      // Add warning to response headers
       res.set('X-Subscription-Warning', `Subscription expires in ${daysUntilExpiry} days`);
-      req.subscriptionWarning = {
-        daysLeft: daysUntilExpiry,
-        message: `Your subscription expires in ${daysUntilExpiry} days`
-      };
+      req.subscriptionWarning = { daysLeft: daysUntilExpiry };
     }
 
     req.subscription = subscription;
     next();
   } catch (error) {
     console.error("Subscription check error:", error);
-    res.status(500).json({ 
-      message: "Error checking subscription",
-      restricted: true 
-    });
+    res.status(500).json({ message: "Error checking subscription", restricted: true });
   }
 };
 
-// Middleware to check if subscription is expired (for hiding features)
+// Expired subscription check
 const checkExpiredSubscription = async (req, res, next) => {
   try {
     const userId = req.user?.id || req.params.userId || req.body.userId;
-    
-    if (!userId) {
-      return next();
-    }
+    if (!userId) return next();
 
     const subscription = await Subscription.findOne({
       $or: [{ userId }, { companyId: userId }],
       status: { $in: ["active", "grace_period", "expired"] }
     }).sort({ createdAt: -1 });
 
-    if (!subscription) {
-      req.isExpired = true;
-      return next();
-    }
+    if (!subscription) { req.isExpired = true; return next(); }
 
     const now = new Date();
     const endDate = new Date(subscription.endDate);
-    
-    if (endDate < now || subscription.status === "expired") {
-      req.isExpired = true;
-      req.subscription = subscription;
-    } else {
-      req.isExpired = false;
-      req.subscription = subscription;
-    }
-
+    req.isExpired = endDate < now || subscription.status === "expired";
+    req.subscription = subscription;
     next();
   } catch (error) {
     console.error("Expired subscription check error:", error);
-    req.isExpired = true; // Default to restricted on error
+    req.isExpired = true;
     next();
   }
 };
 
-// Middleware for admin routes (bypass subscription check)
+// Admin bypass
 const adminBypass = (req, res, next) => {
-  if (req.user?.role === 'admin' || req.user?.role === 'superadmin') {
-    return next();
-  }
+  if (req.user?.role === 'admin' || req.user?.role === 'superadmin') return next();
   checkSubscription(req, res, next);
 };
 
-// Helper to parse limit strings (e.g., "10 Employees" -> 10, "Unlimited" -> Infinity)
-const parseLimit = (limitStr, subscription = null, type = "") => {
-  let identifiedLimits = [];
-
-  // 1. Check direct limit field (e.g. subscription.clientLimit)
-  if (limitStr !== undefined && limitStr !== null && limitStr !== "") {
-    const s = String(limitStr).toLowerCase();
-    if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
-    const m = s.match(/\d+/);
-    if (m) identifiedLimits.push(parseInt(m[0]));
-  }
-
-  // 2. Scan features array for matches
-  if (subscription?.features && Array.isArray(subscription.features)) {
-    const keywords = {
-      client: ["client", "company", "business"],
-      employee: ["employee", "staff", "user"],
-      manager: ["manager", "admin"]
-    };
-    const searchKeys = keywords[type] || [type];
-
-    for (const feat of subscription.features) {
-      if (!feat || typeof feat !== "string") continue;
-      const f = feat.toLowerCase();
-      if (searchKeys.some(key => f.includes(key))) {
-        if (f.includes("unlimited") || f.includes("infinity")) return Infinity;
-        const m = f.match(/\d+/);
-        if (m) identifiedLimits.push(parseInt(m[0]));
-      }
-    }
-  }
-
-  // 3. Fallback based on Plan Name
-  const plan = (subscription?.planName || "").toLowerCase();
-  if (plan.includes("enterprise") || plan.includes("unlimited")) return Infinity;
-
-  // 4. Return the MAXIMUM identified limit
-  if (identifiedLimits.length > 0) {
-    const maxLimit = Math.max(...identifiedLimits);
-    return maxLimit > 0 ? maxLimit : Infinity;
-  }
-
-  // 5. Final Default: If nothing is found, we assume a strict baseline of 1
-  // (matches frontend logic for maximum security)
-  returnInfinity; 
-};
-
-// Middleware to check specific resource limits (Employee, Client, Manager)
+// Resource limit check - client / employee / manager
 const checkResourceLimit = (resourceType) => async (req, res, next) => {
   try {
-    const companyId = req.headers['x-company-id'] || req.companyId || req.body.companyId;
+    // companyId-ஐ எல்லா இடத்திலும் தேடு
+    const companyId =
+      req.body.companyId ||
+      req.headers['x-company-id'] ||
+      req.user?.companyId ||
+      req.user?.id;
 
-    if (!companyId) {
-      return next(); // If no company context, skip check (might be admin)
-    }
+    if (!companyId) return next();
+    if (req.user?.role === 'admin') return next();
 
-    // Bypass for superadmin
-    if (req.user?.role === 'admin') {
-      return next();
-    }
-
-    // Find active subscription
-    // Find active subscription using either userId or companyId for maximum compatibility
+    // Active subscription fetch
     const subscription = await Subscription.findOne({
       $or: [{ userId: companyId }, { companyId: companyId }],
       status: { $in: ["active", "grace_period", "trial"] }
     }).sort({ createdAt: -1 });
 
     if (!subscription) {
-      // If no subscription, strictly block resource creation
       return res.status(403).json({
-        message: "No active subscription found. Please contact your administrator to assign a package.",
+        message: "No active subscription found. Please contact your administrator.",
         limitReached: true,
         limit: 0,
         currentCount: 0
@@ -196,25 +143,21 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
     let currentCount = 0;
     let errorMessage = "";
 
-    if (resourceType === 'employee') {
-      const rawLimit = parseLimit(subscription.employeeLimit, subscription, 'employee');
-      limit = rawLimit > 0 ? rawLimit : Infinity;
-      currentCount = await Employee.countDocuments({ companyId: companyId });
-      errorMessage = `Employee limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade your package.`;
-    } else if (resourceType === 'client') {
-      const rawLimit = parseLimit(subscription.clientLimit, subscription, 'client');
-      limit = rawLimit > 0 ? rawLimit : Infinity;
-      currentCount = await Client.countDocuments({ companyId: companyId });
-      errorMessage = `Client limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade your package.`;
+    if (resourceType === 'client') {
+      limit = getSubscriptionLimit('client', subscription);
+      currentCount = await Client.countDocuments({ companyId });
+      errorMessage = `Client limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade.`;
+    } else if (resourceType === 'employee') {
+      limit = getSubscriptionLimit('employee', subscription);
+      currentCount = await Employee.countDocuments({ companyId });
+      errorMessage = `Employee limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade.`;
     } else if (resourceType === 'manager') {
-      const rawLimit = parseLimit(subscription.managerLimit, subscription, 'manager');
-      limit = rawLimit > 0 ? rawLimit : Infinity;
-      currentCount = await Manager.countDocuments({ companyId: companyId });
-      errorMessage = `Manager limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade your package.`;
+      limit = getSubscriptionLimit('manager', subscription);
+      currentCount = await Manager.countDocuments({ companyId });
+      errorMessage = `Manager limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade.`;
     }
 
-    // Check if limit is reached
-    if (currentCount >= limit) {
+    if (limit !== Infinity && currentCount >= limit) {
       return res.status(403).json({
         message: errorMessage,
         limitReached: true,
@@ -226,7 +169,7 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
     next();
   } catch (error) {
     console.error("Resource limit check error:", error);
-    next(); 
+    next();
   }
 };
 

@@ -69,12 +69,12 @@ const scBg = (s) => ({
 
 const NAV = [
   { key: "dashboard", icon: "⊞", label: "Dashboard" },
-  { key: "projects",  icon: "◈", label: "My Projects" },
-  { key: "tasks",     icon: "◉", label: "Active Tasks" },
-  { key: "calendar",  icon: "◷", label: "Calendar" },
+  { key: "projects", icon: "◈", label: "My Projects" },
+  { key: "tasks", icon: "◉", label: "Active Tasks" },
+  { key: "calendar", icon: "◷", label: "Calendar" },
   { key: "messaging", icon: "✉", label: "Messages" },
-  { key: "reports",   icon: "▦", label: "Reports" },
-  { key: "settings",  icon: "◌", label: "Settings" },
+  { key: "reports", icon: "▦", label: "Reports" },
+  { key: "settings", icon: "◌", label: "Settings" },
 ];
 
 const PERMISSION_TYPES = [
@@ -291,9 +291,9 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
               {hasDoc
                 ? <span style={{ background: T.successBg, border: `1px solid ${T.successBorder}`, borderRadius: 99, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: T.success, textTransform: "uppercase", letterSpacing: "0.5px" }}>✓ Done</span>
                 : <button onClick={onOpenProfile}
-                    style={{ background: T.warningBg, border: `1px solid ${T.warningBorder}`, borderRadius: 99, padding: "3px 12px", fontSize: 9, fontWeight: 800, color: T.warning, cursor: "pointer", fontFamily: "inherit", textTransform: "uppercase", letterSpacing: "0.5px", transition: "all 0.15s" }}>
-                    Upload
-                  </button>}
+                  style={{ background: T.warningBg, border: `1px solid ${T.warningBorder}`, borderRadius: 99, padding: "3px 12px", fontSize: 9, fontWeight: 800, color: T.warning, cursor: "pointer", fontFamily: "inherit", textTransform: "uppercase", letterSpacing: "0.5px", transition: "all 0.15s" }}>
+                  Upload
+                </button>}
             </div>
           );
         })}
@@ -636,8 +636,8 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
   const absent = monthRecs.filter(a => a.status === "absent").length;
   const leave = monthRecs.filter(a => a.status === "leave").length;
 
-  const FULL_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const DAYS_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const DAYS_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const calDateStr = d => `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
@@ -674,15 +674,15 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
   useEffect(() => {
     if (!empName) return;
     const enc = encodeURIComponent(empName);
-    axios.get(`${BASE}/leave/${enc}`).then(r => { if (r.data?.length) setLeaveHistory(r.data); }).catch(() => {});
-    axios.get(`${BASE}/permission/${enc}`).then(r => { if (r.data?.length) setPermHistory(r.data); }).catch(() => {});
+    axios.get(`${BASE}/leave/${enc}`).then(r => { if (r.data?.length) setLeaveHistory(r.data); }).catch(() => { });
+    axios.get(`${BASE}/permission/${enc}`).then(r => { if (r.data?.length) setPermHistory(r.data); }).catch(() => { });
   }, [empName]);
 
   const markAttendance = async (status) => {
     if (todayRec) { notify("Already marked for today", "error"); return; }
     setMarking(true);
     const rec = { date: today, status, employeeName: empName, markedAt: new Date().toISOString() };
-    try { await axios.post(`${BASE}/attendance`, rec); } catch (e) {}
+    try { await axios.post(`${BASE}/attendance`, rec); } catch (e) { }
     setAttendance(prev => [...prev, rec]);
     notify(`Marked as ${status} ✓`);
     setMarking(false);
@@ -694,7 +694,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
     if (exists) { notify("Attendance already marked for this date", "error"); return; }
     setAddSaving(true);
     const rec = { date: addDate, status: addStatus, employeeName: empName, markedAt: new Date().toISOString(), note: addNote };
-    try { await axios.post(`${BASE}/attendance`, rec); } catch (e) {}
+    try { await axios.post(`${BASE}/attendance`, rec); } catch (e) { }
     setAttendance(prev => [...prev, { ...rec, _id: `local_${Date.now()}` }]);
     notify(`Attendance added for ${addDate} ✓`);
     setAddForm(false); setAddDate(todayStr()); setAddStatus("present"); setAddNote("");
@@ -726,7 +726,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
 
   const cancelPermission = async (perm) => {
     if ((perm.status || "pending").toLowerCase() !== "pending") { notify("Only pending requests can be cancelled", "error"); return; }
-    try { await axios.patch(`${BASE}/permission/${perm._id}/cancel`, { employeeName: empName }); } catch {}
+    try { await axios.patch(`${BASE}/permission/${perm._id}/cancel`, { employeeName: empName }); } catch { }
     setPermHistory(prev => prev.map(p => p._id === perm._id ? { ...p, status: "cancelled" } : p));
     notify("Permission request cancelled");
   };
@@ -826,7 +826,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <InputField label="Leave Type">
               <select value={leaveType} onChange={e => setLeaveType(e.target.value)} style={inputStyle}>
-                {["Sick Leave","Casual Leave","Earned Leave","Maternity Leave","Paternity Leave"].map(o => <option key={o}>{o}</option>)}
+                {["Sick Leave", "Casual Leave", "Earned Leave", "Maternity Leave", "Paternity Leave"].map(o => <option key={o}>{o}</option>)}
               </select>
             </InputField>
             <div />
@@ -958,7 +958,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
                         <div key={i} style={{ background: T.surface, borderRadius: T.radiusSm, border: `1px solid ${T.border}`, padding: "11px 14px", display: "flex", alignItems: "center", gap: 12 }}>
                           <div style={{ background: scBg(a.status), border: `1px solid ${c}25`, borderRadius: 9, padding: "7px 9px", textAlign: "center", minWidth: 44, flexShrink: 0 }}>
                             <div style={{ fontSize: 15, fontWeight: 800, color: c, lineHeight: 1 }}>{d.getDate()}</div>
-                            <div style={{ fontSize: 8, color: T.textFaint, fontWeight: 700, letterSpacing: 0.5, marginTop: 2 }}>{["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()].toUpperCase()}</div>
+                            <div style={{ fontSize: 8, color: T.textFaint, fontWeight: 700, letterSpacing: 0.5, marginTop: 2 }}>{["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][d.getMonth()].toUpperCase()}</div>
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
@@ -984,7 +984,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         {activeTab === "leaves" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {[{ label: "Total", val: leaveHistory.length, color: T.accent }, { label: "Pending", val: leaveHistory.filter(l => (l.status||"pending").toLowerCase() === "pending").length, color: "#b45309" }, { label: "Approved", val: leaveHistory.filter(l => (l.status||"").toLowerCase() === "approved").length, color: T.success }, { label: "Rejected", val: leaveHistory.filter(l => (l.status||"").toLowerCase() === "rejected").length, color: T.danger }].map(({ label, val, color }) => (
+              {[{ label: "Total", val: leaveHistory.length, color: T.accent }, { label: "Pending", val: leaveHistory.filter(l => (l.status || "pending").toLowerCase() === "pending").length, color: "#b45309" }, { label: "Approved", val: leaveHistory.filter(l => (l.status || "").toLowerCase() === "approved").length, color: T.success }, { label: "Rejected", val: leaveHistory.filter(l => (l.status || "").toLowerCase() === "rejected").length, color: T.danger }].map(({ label, val, color }) => (
                 <div key={label} style={{ background: scBg(label.toLowerCase()) || T.accentLight, border: `1px solid ${color}20`, borderRadius: T.radiusSm, padding: "10px 16px", minWidth: 80 }}>
                   <div style={{ fontSize: 20, fontWeight: 900, color }}>{val}</div>
                   <div style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, marginTop: 2 }}>{label}</div>
@@ -1029,7 +1029,7 @@ function AttendancePage({ attendance, setAttendance, empName, notify }) {
         {activeTab === "permissions" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {[{ label: "Total", val: permHistory.length, color: T.accent }, { label: "Pending", val: permHistory.filter(p => (p.status||"pending").toLowerCase() === "pending").length, color: "#b45309" }, { label: "Approved", val: permHistory.filter(p => (p.status||"").toLowerCase() === "approved").length, color: T.success }, { label: "Rejected", val: permHistory.filter(p => (p.status||"").toLowerCase() === "rejected").length, color: T.danger }].map(({ label, val, color }) => (
+              {[{ label: "Total", val: permHistory.length, color: T.accent }, { label: "Pending", val: permHistory.filter(p => (p.status || "pending").toLowerCase() === "pending").length, color: "#b45309" }, { label: "Approved", val: permHistory.filter(p => (p.status || "").toLowerCase() === "approved").length, color: T.success }, { label: "Rejected", val: permHistory.filter(p => (p.status || "").toLowerCase() === "rejected").length, color: T.danger }].map(({ label, val, color }) => (
                 <div key={label} style={{ background: T.accentLight, border: `1px solid ${color}20`, borderRadius: T.radiusSm, padding: "10px 16px", minWidth: 80 }}>
                   <div style={{ fontSize: 20, fontWeight: 900, color }}>{val}</div>
                   <div style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, marginTop: 2 }}>{label}</div>
@@ -1179,7 +1179,7 @@ function ProposalsPage({ proposals }) {
                 <Badge label={p.status} />
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => window.location.href = `/project-proposal?edit=${p.id || p._id}`} style={{ background: T.accentLight, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>✏️ Edit</button>
+                <button onClick={() => window.location.href = `/project-proposal?edit=${p.id || p._id}`} style={{ background: T.accentLight, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Edit Edit</button>
                 <button onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")} style={{ background: T.accentLight, color: T.text, border: `1px solid ${T.border}`, borderRadius: T.radiusSm, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>🖨️ Print</button>
               </div>
             </div>
@@ -1222,7 +1222,7 @@ export default function EmployeeDashboard({ user, setUser }) {
   const [permissions, setPermissions] = useState({});
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/api/role-permissions`).then(res => { const ep = res.data.find(r => r.role === 'employee'); if (ep) setPermissions(ep.permissions || {}); }).catch(() => {});
+    axios.get(`${BASE_URL}/api/role-permissions`).then(res => { const ep = res.data.find(r => r.role === 'employee'); if (ep) setPermissions(ep.permissions || {}); }).catch(() => { });
   }, []);
 
   const filteredNav = NAV.filter(item => {
@@ -1249,7 +1249,7 @@ export default function EmployeeDashboard({ user, setUser }) {
 
   const handleAuthSetUser = (userData) => {
     setAccountAuthOpen(false); setProfileDropdownOpen(false);
-    try { let accs = JSON.parse(localStorage.getItem("accounts") || "[]"); const idx = accs.findIndex(a => a.email === userData.email); if (idx !== -1) accs[idx] = userData; else accs.push(userData); localStorage.setItem("accounts", JSON.stringify(accs)); } catch {}
+    try { let accs = JSON.parse(localStorage.getItem("accounts") || "[]"); const idx = accs.findIndex(a => a.email === userData.email); if (idx !== -1) accs[idx] = userData; else accs.push(userData); localStorage.setItem("accounts", JSON.stringify(accs)); } catch { }
     if (setUser) setUser(userData); else window.location.reload();
   };
 
@@ -1338,13 +1338,20 @@ export default function EmployeeDashboard({ user, setUser }) {
   const fetchSubscription = async () => {
     try {
       setSubLoading(true);
-      const companyId = resolvedUser?.companyId;
-      if (!companyId) return;
-      const res = await axios.get(`${BASE_URL}/api/subscriptions/employee-status/${companyId}`);
-      if (res.data.hasSubscription) { setSubscription(res.data.subscription); if (res.data.notification) setSubscriptionNotification(res.data.notification); }
-    } catch (err) { console.error("Employee subscription fetch failed", err); } finally { setSubLoading(false); }
-  };
+      // resolveSubadminId() - இது correct ID return பண்றதா?
+      const id = user?._id || user?.id;
+      if (!id) return;
 
+      const res = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
+      if (res.data.hasSubscription) {
+        setSubscription(res.data.subscription);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubLoading(false);
+    }
+  };
   const handleDocStatusChange = useCallback((statusMap) => { setDocStatus(statusMap); }, []);
 
   // ── NOTIFICATION DROPDOWN ────────────────────────────────────
@@ -1504,17 +1511,17 @@ export default function EmployeeDashboard({ user, setUser }) {
             {page === "tasks" && <TasksPage tasks={tasks} />}
             {page === "attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify} />}
             {(page === "salary" || page === "payments") && <SalaryPage salary={salary} user={resolvedUser} />}
-          {page === "calendar" && (
-  <CalendarPage
-    projects={projects}
-    tasks={tasks}
-    user={resolvedUser}
-    companyId={resolvedUser?.companyId || ""}
-    clients={[]}
-    onUpdateProject={() => loadData(empName)}
-    onUpdateTask={() => loadData(empName)}
-  />
-)}
+            {page === "calendar" && (
+              <CalendarPage
+                projects={projects}
+                tasks={tasks}
+                user={resolvedUser}
+                companyId={resolvedUser?.companyId || ""}
+                clients={[]}
+                onUpdateProject={() => loadData(empName)}
+                onUpdateTask={() => loadData(empName)}
+              />
+            )}
             {page === "messaging" && <MessagingPage user={resolvedUser} />}
           </div>
         </div>

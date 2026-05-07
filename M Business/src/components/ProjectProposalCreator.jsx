@@ -60,7 +60,7 @@ function makeSlide(type, themeName = "Violet", companyName = "") {
     case "timeline": return { ...b, heading: "Project Timeline", phases: [{ label: "Discovery & Strategy", dur: "2 Weeks" }, { label: "Design & Prototyping", dur: "3 Weeks" }, { label: "Development & Testing", dur: "6 Weeks" }, { label: "Launch & Handover", dur: "1 Week" }] };
     case "budget": return { ...b, heading: "Budget Estimate", rows: [{ item: "UI/UX Design", cost: "₹80,000" }, { item: "Frontend Development", cost: "₹1,50,000" }, { item: "Backend & APIs", cost: "₹1,20,000" }, { item: "QA & Testing", cost: "₹40,000" }, { item: "Deployment", cost: "₹30,000" }], total: "₹4,20,000" };
     case "team": return { ...b, heading: "Meet Our Team", members: [{ name: "Arjun Sharma", role: "Project Lead", avatar: "AS" }, { name: "Priya Nair", role: "UI/UX Designer", avatar: "PN" }, { name: "Karthik Raj", role: "Full Stack Dev", avatar: "KR" }, { name: "Meena Iyer", role: "QA Engineer", avatar: "MI" }] };
-    case "process": return { ...b, heading: "Our Process", steps: [{ icon: "🔍", label: "Research", desc: "Deep dive into your needs" }, { icon: "✏️", label: "Design", desc: "Wireframes & prototypes" }, { icon: "⚡", label: "Build", desc: "Agile development" }, { icon: "🚀", label: "Launch", desc: "Deploy & support" }] };
+    case "process": return { ...b, heading: "Our Process", steps: [{ icon: "🔍", label: "Research", desc: "Deep dive into your needs" }, { icon: "Edit", label: "Design", desc: "Wireframes & prototypes" }, { icon: "⚡", label: "Build", desc: "Agile development" }, { icon: "🚀", label: "Launch", desc: "Deploy & support" }] };
     case "blank_first_page": return { ...b, pageTitle: "Blank First Page" };
     case "proposal": return {
       ...b,
@@ -102,7 +102,7 @@ function makeInitialProposal(theme = "Violet", companyName = "") {
 
 // ─── STATUS ───────────────────────────────────────────────────────────────────
 const STATUS = {
-  draft: { label: "Draft", icon: "✏️", bg: "#f8fafc", fg: "#475569", br: "#cbd5e1" },
+  draft: { label: "Draft", icon: "Edit", bg: "#f8fafc", fg: "#475569", br: "#cbd5e1" },
   pending: { label: "Pending Approval", icon: "⏳", bg: "#fffbeb", fg: "#92400e", br: "#fcd34d" },
   approved: { label: "Approved", icon: "✅", bg: "#f0fdf4", fg: "#14532d", br: "#86efac" },
   rejected: { label: "Rejected", icon: "❌", bg: "#fff1f2", fg: "#9f1239", br: "#fda4af" },
@@ -292,7 +292,7 @@ function DraggableElement({ element, selected, onSelect, onUpdate, onDelete, chi
               <div style={{ width: 1, height: 44, background: "#e5e7eb", alignSelf: "center" }} />
               <button onClick={(e) => { e.stopPropagation(); onDelete(element.id); }}
                 style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 28, cursor: "pointer", color: "#ef4444", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
-                title="Delete" className="hb"> 🗑️️️️️️</button>
+                title="Delete" className="hb"> Delete️</button>
               <div style={{ width: 1, height: 44, background: "#e5e7eb", alignSelf: "center" }} />
               <button onClick={(e) => { e.stopPropagation(); onUpdate({ fontWeight: (element.fontWeight === 800 ? 400 : 800) }); }}
                 style={{ border: "none", background: "none", padding: "14px 22px", fontSize: 26, fontWeight: 900, cursor: "pointer", color: element.fontWeight === 800 ? "var(--app-accent)" : "#374151", transition: "all .2s", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
@@ -918,7 +918,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       }
     } catch (err) {
       console.error("Error persisting proposal:", err);
-     
+
       return null;
     }
   }, []);
@@ -959,9 +959,9 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
         }
         currentDoc.title = t.trim();
       }
-      
-      
-      
+
+
+
       try {
         // Ensure doc is saved and has _id before submitting
         const savedDoc = await persist(currentDoc);
@@ -1047,12 +1047,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     const elements = s.elements.filter(e => e.id !== elId);
     updateSlide({ ...s, elements });
     setSelectedElementId(null);
-    flash("  🗑️️️️️️️️️️ Removed");
+    flash("  Delete Removed");
   };
   const addSlide = (type) => {
     const s = makeSlide(type, doc.theme);
     const slides = [...doc.slides, s];
-    setDoc({ ...doc, slides }); setPage(slides.length - 1); 
+    setDoc({ ...doc, slides }); setPage(slides.length - 1);
   };
   const delSlide = (i) => {
     if (doc.slides.length <= 1) return;
@@ -1076,7 +1076,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
       if (dbId) await axios.delete(`${BASE_URL}/api/proposals/${dbId}`);
       const d = proposals.filter(p => p.id !== id);
       setProposals(d);
-      flash("  🗑️️️️️️️️️️ Proposal deleted");
+      flash("  Delete Proposal deleted");
     } catch (err) {
       console.error("Error deleting:", err);
       flash("❌ Error deleting from server", "err");
@@ -1376,7 +1376,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                       <button onClick={e => { e.stopPropagation(); shareProposal(p); }} style={{ background: "var(--app-surface)", border: "1.5px solid var(--app-border)", color: "var(--app-accent)", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Share Link">🔗</button>
                       <button onClick={e => { e.stopPropagation(); shareWhatsApp(p); }} style={{ background: "#dcfce7", border: "none", color: "#16a34a", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="WhatsApp">💬</button>
                       <button onClick={e => { e.stopPropagation(); printProposal(p); }} style={{ background: "var(--app-surface)", border: "1.5px solid var(--app-border)", color: "var(--app-text)", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Print">🖨️</button>
-                      <button onClick={e => deleteProposal(p.id, p._id, e)} style={{ background: "#fef2f2", border: "none", color: "#ef4444", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Delete"> 🗑️️️️️️</button>
+                      <button onClick={e => deleteProposal(p.id, p._id, e)} style={{ background: "#fef2f2", border: "none", color: "#ef4444", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Delete"> Delete️</button>
                     </div>
                   </div>
                 </div>

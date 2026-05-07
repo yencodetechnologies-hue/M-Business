@@ -5,43 +5,43 @@ import { BASE_URL } from "../config";
 import CanvasProposalEditor from "./CanvasProposalEditor";
 
 const THEMES = [
-  { name:"Modern",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
-  { name:"Royal",   p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
-  { name:"Corporate",p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
-  { name:"Violet",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
-  { name:"Cobalt",  p:"#1d4ed8", g:"linear-gradient(135deg,#1e40af,#3b82f6)", l:"#dbeafe", t:"#1e3a8a" },
-  { name:"Emerald", p:"#059669", g:"linear-gradient(135deg,#065f46,#10b981)", l:"#d1fae5", t:"#064e3b" },
-  { name:"Rose",    p:"#e11d48", g:"linear-gradient(135deg,#9f1239,#f43f5e)", l:"#ffe4e6", t:"#881337" },
-  { name:"Amber",   p:"#d97706", g:"linear-gradient(135deg,#92400e,#fbbf24)", l:"#fef3c7", t:"#78350f" },
-  { name:"Slate",   p:"#334155", g:"linear-gradient(135deg,#0f172a,#475569)", l:"#f1f5f9", t:"#0f172a" },
-  { name:"Teal",    p:"#0d9488", g:"linear-gradient(135deg,#134e4a,#2dd4bf)", l:"#ccfbf1", t:"#134e4a" },
-  { name:"Fuchsia", p:"var(--app-accent)", g:"linear-gradient(135deg,#701a75,#e879f9)", l:"var(--app-border)", t:"#4a044e" },
+  { name: "Modern", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", l: "var(--app-border)", t: "var(--app-accent)" },
+  { name: "Royal", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", l: "var(--app-border)", t: "var(--app-accent)" },
+  { name: "Corporate", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", l: "var(--app-border)", t: "var(--app-accent)" },
+  { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", l: "var(--app-border)", t: "var(--app-accent)" },
+  { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)", l: "#dbeafe", t: "#1e3a8a" },
+  { name: "Emerald", p: "#059669", g: "linear-gradient(135deg,#065f46,#10b981)", l: "#d1fae5", t: "#064e3b" },
+  { name: "Rose", p: "#e11d48", g: "linear-gradient(135deg,#9f1239,#f43f5e)", l: "#ffe4e6", t: "#881337" },
+  { name: "Amber", p: "#d97706", g: "linear-gradient(135deg,#92400e,#fbbf24)", l: "#fef3c7", t: "#78350f" },
+  { name: "Slate", p: "#334155", g: "linear-gradient(135deg,#0f172a,#475569)", l: "#f1f5f9", t: "#0f172a" },
+  { name: "Teal", p: "#0d9488", g: "linear-gradient(135deg,#134e4a,#2dd4bf)", l: "#ccfbf1", t: "#134e4a" },
+  { name: "Fuchsia", p: "var(--app-accent)", g: "linear-gradient(135deg,#701a75,#e879f9)", l: "var(--app-border)", t: "#4a044e" },
 ];
 
 const printProposal = (proposal) => {
   if (!proposal) return;
-  
+
   const getElementsHTML = (elements) => {
     if (!elements || elements.length === 0) return '';
     return `
       <div style="position:absolute; inset:0; pointer-events:none; z-index:20;">
         ${elements.map(el => {
-          let content = '';
-          const val = el.val || el.text || '';
-          if (el.type === "text" || el.type === "heading") {
-            const fs = el.fontSize || (el.type === "heading" ? 24 : 16);
-            const fw = el.fontWeight || (el.type === "heading" ? 700 : 400);
-            content = `<div style="font-size:${fs}px; font-weight:${fw}; color:${el.color||'#000'}; white-space:pre-wrap; width:${el.width||el.w}px;">${val}</div>`;
-          } else if (el.type === "shape") {
-             const br = el.borderRadius !== undefined ? (typeof el.borderRadius === 'number' ? el.borderRadius + 'px' : el.borderRadius) : (el.shape === 'circle' ? '50%' : '4px');
-             content = `<div style="width:${el.width||el.w||60}px; height:${el.height||el.h||60}px; background:${el.color||'var(--app-accent)'}; border-radius:${br};"></div>`;
-          } else if (el.type === "image") {
-             content = `<img src="${el.src}" style="width:${el.width||el.w||200}px; height:${el.height||el.h||'auto'}; object-fit:contain; pointer-events:none;" />`;
-          } else if (el.type === "icon") {
-             content = `<div style="font-size:${el.fontSize||40}px; display:flex; align-items:center; justify-content:center;">${el.icon}</div>`;
-          }
-          return `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width||el.w||'auto'}px; height:${el.height||el.h||'auto'}px;">${content}</div>`;
-        }).join('')}
+      let content = '';
+      const val = el.val || el.text || '';
+      if (el.type === "text" || el.type === "heading") {
+        const fs = el.fontSize || (el.type === "heading" ? 24 : 16);
+        const fw = el.fontWeight || (el.type === "heading" ? 700 : 400);
+        content = `<div style="font-size:${fs}px; font-weight:${fw}; color:${el.color || '#000'}; white-space:pre-wrap; width:${el.width || el.w}px;">${val}</div>`;
+      } else if (el.type === "shape") {
+        const br = el.borderRadius !== undefined ? (typeof el.borderRadius === 'number' ? el.borderRadius + 'px' : el.borderRadius) : (el.shape === 'circle' ? '50%' : '4px');
+        content = `<div style="width:${el.width || el.w || 60}px; height:${el.height || el.h || 60}px; background:${el.color || 'var(--app-accent)'}; border-radius:${br};"></div>`;
+      } else if (el.type === "image") {
+        content = `<img src="${el.src}" style="width:${el.width || el.w || 200}px; height:${el.height || el.h || 'auto'}; object-fit:contain; pointer-events:none;" />`;
+      } else if (el.type === "icon") {
+        content = `<div style="font-size:${el.fontSize || 40}px; display:flex; align-items:center; justify-content:center;">${el.icon}</div>`;
+      }
+      return `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width || el.w || 'auto'}px; height:${el.height || el.h || 'auto'}px;">${content}</div>`;
+    }).join('')}
       </div>
     `;
   };
@@ -56,9 +56,9 @@ const printProposal = (proposal) => {
     `;
   } else if (proposal.slides && proposal.slides.length > 0) {
     proposalHTML = proposal.slides.map(slide => {
-      const t = THEMES.find(x=>x.name===proposal.theme)||THEMES[0];
+      const t = THEMES.find(x => x.name === proposal.theme) || THEMES[0];
       const elementsHTML = getElementsHTML(slide.elements);
-      
+
       if (slide.type === "cover") {
         return `
           <div style="page-break-after: always; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; position: relative; background: linear-gradient(150deg,${t.p}dd 0%,rgba(0,0,0,0.85) 60%,rgba(0,0,0,0.5) 100%); color: white; padding: 48px 56px; overflow: hidden;">
@@ -70,7 +70,7 @@ const printProposal = (proposal) => {
           </div>
         `;
       }
-      
+
       if (slide.type === "overview" || slide.type === "closing") {
         return `
           <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
@@ -83,7 +83,7 @@ const printProposal = (proposal) => {
           </div>
         `;
       }
-      
+
       if (slide.type === "objectives") {
         return `
           <div style="page-break-after: always; min-height: 100vh; padding: 56px; position: relative; background: #fff; overflow: hidden;">
@@ -94,7 +94,7 @@ const printProposal = (proposal) => {
             <div style="display: flex; flex-direction: column; gap: 14px;">
               ${(slide.items || []).map((item, i) => `
                 <div style="display: flex; gap: 18px; align-items: flex-start; padding: 16px 22px; background: ${t.l}; border-radius: 14px; border: 1px solid ${t.p}20;">
-                  <div style="width: 36px; height: 36px; border-radius: 50%; background: ${t.g}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; flex-shrink: 0;">${i+1}</div>
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: ${t.g}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; flex-shrink: 0;">${i + 1}</div>
                   <div style="flex: 1; font-size: 14px; color: #1e293b; font-weight: 600; padding-top: 6px;">${item}</div>
                 </div>
               `).join('')}
@@ -103,7 +103,7 @@ const printProposal = (proposal) => {
           </div>
         `;
       }
-      
+
       // Default slide handling
       return `
         <div style="page-break-after: always; min-height: 100vh; padding: 56px; display: flex; flex-direction: column; justify-content: center; position: relative; background: #fff; overflow: hidden;">
@@ -155,7 +155,7 @@ const printProposal = (proposal) => {
 
 
 const STATUS = {
-  draft: { label: "Draft", icon: "✏️", bg: "#f8fafc", fg: "#475569", br: "#cbd5e1" },
+  draft: { label: "Draft", icon: "Edit", bg: "#f8fafc", fg: "#475569", br: "#cbd5e1" },
   pending: { label: "Pending Approval", icon: "⏳", bg: "#fffbeb", fg: "#92400e", br: "#fcd34d" },
   approved: { label: "Approved", icon: "✅", bg: "#f0fdf4", fg: "#14532d", br: "#86efac" },
   rejected: { label: "Rejected", icon: "❌", bg: "#fff1f2", fg: "#9f1239", br: "#fda4af" }
@@ -210,12 +210,12 @@ function Search({ value, onChange, placeholder }) {
 function CompanyDropdown({ clients, value, onChange, error }) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
-  const filtered = clients.filter(c => 
+  const filtered = clients.filter(c =>
     (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) ||
     (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase())
   );
   const selected = clients.find(c => (c.clientName || c.name) === value);
-  
+
   return (
     <div style={{ position: "relative" }}>
       <div onClick={() => setOpen(!open)} style={{
@@ -381,10 +381,10 @@ function CompanyDropdown({ clients, value, onChange, error }) {
 function EmployeeDropdown({ employees, value, onChange, error }) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
-  const filtered = employees.filter(e => 
+  const filtered = employees.filter(e =>
     (e.name || "").toLowerCase().includes(search.toLowerCase())
   );
-  
+
   return (
     <div style={{ position: "relative" }}>
       <div onClick={() => setOpen(!open)} style={{
@@ -597,7 +597,7 @@ function Mdl({ title, onClose, children, maxWidth = 820 }) {
 }
 
 export default function AdminProposalManagement() {
-   const [proposals, setProposals] = useState([]);
+  const [proposals, setProposals] = useState([]);
   const [clients, setClients] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
@@ -635,7 +635,7 @@ export default function AdminProposalManagement() {
     };
   }, []);
 
-   const fetchClients = async () => {
+  const fetchClients = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/clients`);
       setClients(response.data || []);
@@ -681,8 +681,8 @@ export default function AdminProposalManagement() {
     try {
       setCreatingProposal(true);
       const newProposal = {
-        id: `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random()*9000)+1000)}`,
-         title: proposalTitle.trim(),
+        id: `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+        title: proposalTitle.trim(),
         client: selectedClient,
         assignedEmployee: selectedEmployee,
         status: "draft",
@@ -696,7 +696,7 @@ export default function AdminProposalManagement() {
       setShowCreateModal(false);
       setSelectedClient("");
       setProposalTitle("");
-      
+
       // Redirect to proposal editor
       window.location.href = `/project-proposal?edit=${response.data.id}`;
     } catch (error) {
@@ -713,7 +713,7 @@ export default function AdminProposalManagement() {
       const newTitle = window.prompt("Please enter a title for this proposal before submitting:");
       if (!newTitle || !newTitle.trim()) return;
       currentTitle = newTitle.trim();
-      
+
       // Update title on server first
       try {
         await axios.put(`${BASE_URL}/api/proposals/${proposal._id}`, { title: currentTitle });
@@ -727,7 +727,7 @@ export default function AdminProposalManagement() {
 
     try {
       await axios.put(`${BASE_URL}/api/proposals/${proposal._id}/submit`);
-      setProposals(prev => 
+      setProposals(prev =>
         prev.map(p => p._id === proposal._id ? { ...p, status: "pending", title: currentTitle } : p)
       );
     } catch (error) {
@@ -754,7 +754,7 @@ export default function AdminProposalManagement() {
     }
   };
 
-   const handleReject = async (proposalId, reason) => {
+  const handleReject = async (proposalId, reason) => {
     try {
       await axios.put(`${BASE_URL}/api/proposals/${proposalId}/reject`, { rejectNote: reason });
       setProposals(prev => prev.map(p => p._id === proposalId ? { ...p, status: "rejected", rejectNote: reason } : p));
@@ -791,25 +791,25 @@ export default function AdminProposalManagement() {
     fetchProposals(); // Refresh proposals after closing editor
   };
 
-   const filtered = proposals.filter(p =>
+  const filtered = proposals.filter(p =>
     (p.title || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.client || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.assignedEmployee || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.status || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  
+
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <div style={{ 
-        display: "grid", 
-        gridTemplateColumns: "repeat(4, 1fr)", 
-        gap: 12 
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4, 1fr)",
+        gap: 12
       }}>
         {[
           { t: "Total Proposals", v: proposals.length, i: "📋", c: "var(--app-accent)" },
-          { t: "Draft", v: proposals.filter(p => p.status === "draft").length, i: "✏️", c: "#6b7280" },
+          { t: "Draft", v: proposals.filter(p => p.status === "draft").length, i: "Edit", c: "#6b7280" },
           { t: "Pending", v: proposals.filter(p => p.status === "pending").length, i: "⏳", c: "#f59e0b" },
           { t: "Approved", v: proposals.filter(p => p.status === "approved").length, i: "✅", c: "#22c55e" }
         ].map(({ t, v, i, c }) => (
@@ -868,28 +868,28 @@ export default function AdminProposalManagement() {
           <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
             <Search value={search} onChange={setSearch} placeholder="Search proposals..." />
             <div style={{ display: "flex", gap: 8 }}>
-                <button 
-                  onClick={createNewProposal}
-                  style={{
-                    background:"var(--app-accent-gradient, linear-gradient(135deg,var(--app-accent),var(--app-muted)))",
-                    color:"#fff",
-                    border:"none",
-                    borderRadius:10,
-                    padding:"10px 16px",
-                    fontSize:13,
-                    fontWeight:700,
-                    cursor:"pointer",
-                    fontFamily:"inherit",
-                    display:"flex",
-                    alignItems:"center",
-                    gap:8,
-                    boxShadow:"0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",
-                    transition:"all .2s"
-                  }}
-                >
-                  ✨ Add Proposal
-                </button>
-             
+              <button
+                onClick={createNewProposal}
+                style={{
+                  background: "var(--app-accent-gradient, linear-gradient(135deg,var(--app-accent),var(--app-muted)))",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "10px 16px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)",
+                  transition: "all .2s"
+                }}
+              >
+                ✨ Add Proposal
+              </button>
+
             </div>
           </div>
         </div>
@@ -901,7 +901,7 @@ export default function AdminProposalManagement() {
             fontSize: 13,
             minWidth: 700
           }}>
-             <thead>
+            <thead>
               <tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
                 {["#", "Title", "Company Name", "Assigned To", "Slides", "Status", "Updated", "Actions"].map(c => (
                   <th key={c} style={{
@@ -949,7 +949,7 @@ export default function AdminProposalManagement() {
                     }}>
                       {proposal.title || "Untitled Proposal"}
                     </td>
-                     <td style={{
+                    <td style={{
                       padding: "12px 14px",
                       color: "var(--app-accent)"
                     }}>
@@ -1029,7 +1029,7 @@ export default function AdminProposalManagement() {
                         >
                           View
                         </button>
-                        
+
                         <button
                           onClick={() => printProposal(proposal)}
                           style={{
@@ -1050,7 +1050,7 @@ export default function AdminProposalManagement() {
 
                         {proposal.status === "pending" && (
                           <>
-                           
+
                           </>
                         )}
 
@@ -1070,7 +1070,7 @@ export default function AdminProposalManagement() {
                               whiteSpace: "nowrap"
                             }}
                           >
-                            ✏️
+                            Edit
                           </button>
                         )}
 
@@ -1161,13 +1161,13 @@ export default function AdminProposalManagement() {
                 <h4 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700, color: T.text }}>
                   {selectedProposal.title || "Untitled Proposal"}
                 </h4>
-                 <p style={{ margin: 0, fontSize: 13, color: "var(--app-accent)" }}>
+                <p style={{ margin: 0, fontSize: 13, color: "var(--app-accent)" }}>
                   Company Name: {selectedProposal.client || "No company name"}
                 </p>
                 <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: "#6b7280" }}>Assigned To:</span>
                   <div style={{ flex: 1, maxWidth: 200 }}>
-                    <EmployeeDropdown 
+                    <EmployeeDropdown
                       employees={employees}
                       value={selectedProposal.assignedEmployee || ""}
                       onChange={(val) => handleUpdateEmployee(selectedProposal._id, val)}
@@ -1177,7 +1177,7 @@ export default function AdminProposalManagement() {
               </div>
               <Badge status={selectedProposal.status || "draft"} />
             </div>
-            
+
             <div style={{
               display: "grid",
               gridTemplateColumns: "repeat(2, 1fr)",
@@ -1252,7 +1252,7 @@ export default function AdminProposalManagement() {
                   fontFamily: "inherit"
                 }}
               >
-                ✏️
+                Edit
               </button>
             )}
 
@@ -1315,7 +1315,7 @@ export default function AdminProposalManagement() {
               fontSize: 22,
               margin: "0 auto 14px"
             }}>
-                      🗑️️️️️
+              Delete
             </div>
             <h3 style={{
               textAlign: "center",
@@ -1497,7 +1497,7 @@ export default function AdminProposalManagement() {
               }}>
                 COMPANY NAME *
               </label>
-               <CompanyDropdown
+              <CompanyDropdown
                 clients={clients}
                 value={selectedClient}
                 onChange={setSelectedClient}
@@ -1521,7 +1521,7 @@ export default function AdminProposalManagement() {
                 onChange={setSelectedEmployee}
               />
             </div>
-            
+
             <div>
               <label style={{
                 display: "block",

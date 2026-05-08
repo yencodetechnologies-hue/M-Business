@@ -1190,32 +1190,34 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
 
               {/* Management Buttons */}
               <div style={{
-                position: "absolute", top: 16, right: 16,
-                display: "flex", gap: 8, zIndex: 10
+                position: "absolute", top: 12, right: 12,
+                display: "flex", gap: 6, zIndex: 10
               }}>
                 <button
                   onClick={(e) => { e.stopPropagation(); onEdit(p); }}
                   title="Edit Package"
                   style={{
-                    width: 36, height: 36, borderRadius: 10,
-                    background: "rgba(124, 58, 237, 0.15)",
-                    border: "1.5px solid rgba(124, 58, 237, 0.3)",
-                    color: "#a78bfa",
-                    cursor: "pointer", display: "flex",
-                    alignItems: "center", justifyContent: "center",
+                    background: "rgba(99, 102, 241, 0.1)",
+                    border: "1px solid rgba(99, 102, 241, 0.2)",
+                    color: "#6366f1",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     transition: "all 0.2s",
-                    fontSize: 16,
-                    backdropFilter: "blur(4px)"
+                    fontFamily: "inherit"
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = "rgba(124, 58, 237, 0.3)";
-                    e.currentTarget.style.color = "#fff";
-                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.style.background = "rgba(99, 102, 241, 0.2)";
+                    e.currentTarget.style.transform = "translateY(-1px)";
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = "rgba(124, 58, 237, 0.15)";
-                    e.currentTarget.style.color = "#a78bfa";
-                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.background = "rgba(99, 102, 241, 0.1)";
+                    e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
                   Edit
@@ -1224,25 +1226,27 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
                   onClick={(e) => { e.stopPropagation(); onDelete(p._id); }}
                   title="Delete Package"
                   style={{
-                    width: 36, height: 36, borderRadius: 10,
-                    background: "rgba(239, 68, 68, 0.15)",
-                    border: "1.5px solid rgba(239, 68, 68, 0.3)",
-                    color: "#f87171",
-                    cursor: "pointer", display: "flex",
-                    alignItems: "center", justifyContent: "center",
+                    background: "rgba(239, 68, 68, 0.1)",
+                    border: "1px solid rgba(239, 68, 68, 0.2)",
+                    color: "#ef4444",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     transition: "all 0.2s",
-                    fontSize: 16,
-                    backdropFilter: "blur(4px)"
+                    fontFamily: "inherit"
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.3)";
-                    e.currentTarget.style.color = "#fff";
-                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)";
+                    e.currentTarget.style.transform = "translateY(-1px)";
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)";
-                    e.currentTarget.style.color = "#f87171";
-                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)";
+                    e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
                   Delete

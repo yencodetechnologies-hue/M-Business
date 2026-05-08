@@ -9,9 +9,7 @@ import { T } from "../index";
 
 
 
-const sc = (s) => {
-  const isDark = document.documentElement.classList.contains('dark-mode') || THEME.bg === 'var(--app-bg)';
-  // Simplified logic: sc should just return base colors, the component handles transparency
+const sc = (s, isDark) => {
   return {
     Active: "#10b981", Inactive: "#ef4444", "In Progress": "var(--app-accent)",
     Pending: "#f59e0b", Completed: "#10b981", "On Hold": "#8b5cf6",
@@ -23,18 +21,18 @@ const sc = (s) => {
   }[s] || "var(--app-accent)";
 };
 
-const THEME = {
-  bg: "#f8fafc",
-  sidebar: "#ffffff",
-  card: "#ffffff",
+const getTheme = (isDark) => ({
+  bg: isDark ? "#0f172a" : "#f8fafc",
+  sidebar: isDark ? "#1e293b" : "#ffffff",
+  card: isDark ? "#1e293b" : "#ffffff",
   accent: "#6366f1",
   accentSecondary: "#8b5cf6",
-  text: "#1e1b4b",
-  muted: "#64748b",
-  border: "#e2e8f0",
-  shadow: "0 10px 40px rgba(0,0,0,0.03)",
+  text: isDark ? "#f1f5f9" : "#1e1b4b",
+  muted: isDark ? "#94a3b8" : "#64748b",
+  border: isDark ? "#334155" : "#e2e8f0",
+  shadow: isDark ? "0 10px 40px rgba(0,0,0,0.2)" : "0 10px 40px rgba(0,0,0,0.03)",
   gradient: "linear-gradient(135deg, #6366f1, #8b5cf6)"
-};
+});
 
 // ── NAV ───────────────────────────────────────────────────────
 const NAV = [{ key: "dashboard", icon: "⌂", label: "Dashboard" },
@@ -237,7 +235,7 @@ function PaymentTimeline({ inv }) {
   );
 }
 // ── Milestone Line (Dashboard overview) ──────────────────────
-function MilestoneLine({ tasks, completedTasks }) {
+function MilestoneLine({ tasks, completedTasks, THEME }) {
   const steps = [{ label: "Kickoff", pct: 0 }, { label: "Design", pct: 25 }, { label: "Dev", pct: 50 }, { label: "Testing", pct: 75 }, { label: "Launch", pct: 100 }];
   const progress = Math.round(((completedTasks || 0) / (tasks || 1)) * 100);
   const activeIdx = steps.filter(s => progress >= s.pct).length - 1;
@@ -274,8 +272,8 @@ function ProgressBar({ pct, color }) {
 }
 
 // ── Badge ─────────────────────────────────────────────────────
-function Badge({ label, size = "sm" }) {
-  const c = sc(label);
+function Badge({ label, size = "sm", isDark }) {
+  const c = sc(label, isDark);
   const displayLabel = (label === "part_paid" || label === "partial") ? "Part Payment" : label;
   return (
     <span style={{ background: `${c}15`, color: c, border: `1px solid ${c}30`, padding: size === "sm" ? "2px 8px" : "4px 12px", borderRadius: 20, fontSize: size === "sm" ? 11 : 12, fontWeight: 700, letterSpacing: 0.3, whiteSpace: "nowrap", fontFamily: "'DM Mono',monospace", textTransform: (label === "part_paid" || label === "partial") ? "none" : "capitalize" }}>
@@ -285,14 +283,14 @@ function Badge({ label, size = "sm" }) {
 }
 
 // ── Stat Card ─────────────────────────────────────────────────
-function StatCard({ icon, label, value, sub, color, onClick, trend }) {
+function StatCard({ icon, label, value, sub, color, onClick, trend, THEME }) {
   return (
     <div onClick={onClick} style={{
-      background: `linear-gradient(135deg, #ffffff, #fdfdff)`,
+      background: THEME.card,
       borderRadius: 28,
       padding: "28px",
       border: `1.5px solid ${THEME.border}`,
-      boxShadow: "0 10px 30px rgba(0,0,0,0.02)",
+      boxShadow: THEME.shadow,
       cursor: onClick ? "pointer" : "default",
       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       position: "relative",
@@ -307,7 +305,7 @@ function StatCard({ icon, label, value, sub, color, onClick, trend }) {
       }}
       onMouseLeave={e => {
         e.currentTarget.style.transform = "";
-        e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.02)";
+        e.currentTarget.style.boxShadow = THEME.shadow;
         e.currentTarget.style.borderColor = THEME.border;
       }}>
       <div style={{ position: "absolute", top: -20, right: -20, fontSize: 100, opacity: 0.05, transform: "rotate(-15deg)", pointerEvents: "none" }}>{icon}</div>
@@ -346,7 +344,7 @@ function StatCard({ icon, label, value, sub, color, onClick, trend }) {
   );
 }
 
-function NotificationBell({ notifications, onMarkRead, onMarkAllRead, onNavigate, darkMode }) {
+function NotificationBell({ notifications, onMarkRead, onMarkAllRead, onNavigate, darkMode, THEME }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const unread = notifications.filter(n => !n.read).length;
@@ -430,7 +428,7 @@ function NotificationBell({ notifications, onMarkRead, onMarkAllRead, onNavigate
 }
 
 // ── Profile Dropdown ──────────────────────────────────────────
-function ProfileDropdown({ user, onLogout, showDetails, darkMode }) {
+function ProfileDropdown({ user, onLogout, showDetails, darkMode, THEME }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -535,7 +533,7 @@ function ProfileDropdown({ user, onLogout, showDetails, darkMode }) {
 }
 
 // ── Sidebar ───────────────────────────────────────────────────
-function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser, navItems, branding, darkMode, setDarkMode }) {
+function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser, navItems, branding, darkMode, setDarkMode, THEME }) {
   const initials = (clientUser?.company || "W").slice(0, 2).toUpperCase();
   return (
     <>
@@ -605,19 +603,10 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
                   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   boxShadow: on ? `0 10px 20px ${THEME.accent}30` : "none"
                 }}
-                onMouseEnter={e => { if (!on) { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.color = THEME.accent; } }}
+                onMouseEnter={e => { if (!on) { e.currentTarget.style.background = darkMode ? "#334155" : "#f8fafc"; e.currentTarget.style.color = THEME.accent; } }}
                 onMouseLeave={e => { if (!on) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = THEME.muted; } }}>
                 <span style={{ fontSize: 20, width: 24, textAlign: "center", opacity: on ? 1 : 0.7 }}>{n.icon}</span>
                 <span style={{ letterSpacing: on ? "0.3px" : "0" }}>{n.label}</span>
-              </button>
-            );
-          })}
-                  transition: "all 0.2s"
-                }}
-                onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f1f5f9"; }}
-                onMouseLeave={e => { if (!on) e.currentTarget.style.background = "transparent"; }}>
-                <span style={{ fontSize: 20, opacity: on ? 1 : 0.7 }}>{n.icon}</span>
-                <span style={{ flex: 1 }}>{n.label}</span>
               </button>
             );
           })}
@@ -640,7 +629,7 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
 }
 
 // ── Task Card ─────────────────────────────────────────────────
-function TaskCard({ task, onCommentAdded }) {
+function TaskCard({ task, onCommentAdded, THEME }) {
   const [expanded, setExpanded] = useState(false);
   const [localCommentOpen, setLocalCommentOpen] = useState(false);
   const [comment, setComment] = useState("");
@@ -674,52 +663,52 @@ function TaskCard({ task, onCommentAdded }) {
       <div style={{ padding: "14px 16px", cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 12 }} onClick={() => setExpanded(!expanded)}>
         <div style={{ width: 8, height: 8, borderRadius: "50%", background: sc(task.status), marginTop: 5, flexShrink: 0, boxShadow: `0 0 0 3px ${sc(task.status)}20` }} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a", marginBottom: 6, textDecoration: task.status === "Done" ? "line-through" : "none", opacity: task.status === "Done" ? 0.6 : 1 }}>{task.title}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: THEME.text, marginBottom: 6, textDecoration: task.status === "Done" ? "line-through" : "none", opacity: task.status === "Done" ? 0.6 : 1 }}>{task.title}</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             <Badge label={task.priority} /><Badge label={task.status} />
-            <span style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'DM Mono',monospace" }}>📁 {task.project}</span>
-            <span style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'DM Mono',monospace" }}>⏱ Due {task.due}</span>
+            <span style={{ fontSize: 11, color: THEME.muted, fontFamily: "'DM Mono',monospace" }}>📁 {task.project}</span>
+            <span style={{ fontSize: 11, color: THEME.muted, fontFamily: "'DM Mono',monospace" }}>⏱ Due {task.due}</span>
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <span style={{ fontSize: 11, color: "#94a3b8" }}>{done}/{total} subtasks</span>
-          <span style={{ fontSize: 12, color: "#94a3b8", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "0.2s", display: "inline-block" }}>▾</span>
+          <span style={{ fontSize: 11, color: THEME.muted }}>{done}/{total} subtasks</span>
+          <span style={{ fontSize: 12, color: THEME.muted, transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "0.2s", display: "inline-block" }}>▾</span>
         </div>
       </div>
       {expanded && (
-        <div style={{ padding: "0 16px 14px", borderTop: "1px solid #f1f5f9" }}>
+        <div style={{ padding: "0 16px 14px", borderTop: `1px solid ${THEME.border}` }}>
           <div style={{ marginTop: 12, marginBottom: 12 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "#94a3b8", letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 8 }}>Subtasks ({done}/{total})</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: THEME.muted, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 8 }}>Subtasks ({done}/{total})</div>
             {(task.subtasks || []).map((st, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: i < (task.subtasks.length - 1) ? "1px solid #0f1729" : "none" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: i < (task.subtasks.length - 1) ? `1px solid ${THEME.border}` : "none" }}>
                 <div style={{ width: 14, height: 14, borderRadius: 4, border: `1.5px solid ${st.done ? "#10b981" : "#cbd5e1"}`, background: st.done ? "#10b981" : "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   {st.done && <svg width="8" height="8" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" strokeWidth="1.5" fill="none" strokeLinecap="round" /></svg>}
                 </div>
-                <span style={{ fontSize: 12, color: st.done ? "#94a3b8" : "#374151", textDecoration: st.done ? "line-through" : "none" }}>{st.title}</span>
+                <span style={{ fontSize: 12, color: st.done ? THEME.muted : THEME.text, textDecoration: st.done ? "line-through" : "none" }}>{st.title}</span>
               </div>
             ))}
           </div>
           {total > 0 && <ProgressBar pct={Math.round((done / total) * 100)} />}
           <div style={{ marginTop: 12 }}>
-            <button onClick={() => setLocalCommentOpen(!localCommentOpen)} style={{ background: "none", border: "1px solid #e2e8f0", borderRadius: 8, padding: "5px 12px", fontSize: 12, color: "#7c6cfa", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5 }}>
+            <button onClick={() => setLocalCommentOpen(!localCommentOpen)} style={{ background: "none", border: `1px solid ${THEME.border}`, borderRadius: 8, padding: "5px 12px", fontSize: 12, color: THEME.accent, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5 }}>
               💬 Comments ({taskComments.length})
             </button>
             {localCommentOpen && (
               <div style={{ marginTop: 8 }}>
                 {taskComments.map((c, i) => (
-                  <div key={i} style={{ background: "#0f1729", borderRadius: 8, padding: "7px 10px", marginBottom: 6, fontSize: 12, color: "#374151" }}>
+                  <div key={i} style={{ background: THEME.bg, borderRadius: 8, padding: "7px 10px", marginBottom: 6, fontSize: 12, color: THEME.text }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
-                      <span style={{ fontWeight: 700, color: "#7c6cfa" }}>{c.user}:</span>
-                      <span style={{ fontSize: 9, color: "#94a3b8" }}>{new Date(c.date).toLocaleString()}</span>
+                      <span style={{ fontWeight: 700, color: THEME.accent }}>{c.user}:</span>
+                      <span style={{ fontSize: 9, color: THEME.muted }}>{new Date(c.date).toLocaleString()}</span>
                     </div>
                     <div>{c.text}</div>
                   </div>
                 ))}
                 <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
                   <input value={comment} onChange={e => setComment(e.target.value)} placeholder="Add a comment…"
-                    style={{ flex: 1, border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "7px 10px", fontSize: 12, color: "#0f172a", background: "#fff", outline: "none", fontFamily: "inherit" }}
+                    style={{ flex: 1, border: `1.5px solid ${THEME.border}`, borderRadius: 8, padding: "7px 10px", fontSize: 12, color: THEME.text, background: THEME.card, outline: "none", fontFamily: "inherit" }}
                     onKeyDown={e => { if (e.key === "Enter") handleAddComment(); }} />
-                  <button onClick={handleAddComment} style={{ background: "#7c6cfa", border: "none", borderRadius: 8, padding: "7px 12px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Send</button>
+                  <button onClick={handleAddComment} style={{ background: THEME.accent, border: "none", borderRadius: 8, padding: "7px 12px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Send</button>
                 </div>
               </div>
             )}
@@ -731,19 +720,19 @@ function TaskCard({ task, onCommentAdded }) {
 }
 
 // ── Tasks with filter ─────────────────────────────────────────
-function TasksFiltered({ tasks, onCommentAdded }) {
+function TasksFiltered({ tasks, onCommentAdded, THEME }) {
   const [filter, setFilter] = useState("All");
   const displayed = filter === "All" ? tasks : tasks.filter(t => t.status === filter);
   return (
     <>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
         {["All", "In Progress", "Pending", "Done"].map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{ padding: "6px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? "#7c6cfa" : "#e2e8f0", background: filter === f ? "#eef2ff" : "#fff", color: filter === f ? "#7c6cfa" : "#64748b", transition: "all 0.15s" }}>
+          <button key={f} onClick={() => setFilter(f)} style={{ padding: "6px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? THEME.accent : THEME.border, background: filter === f ? `${THEME.accent}15` : THEME.card, color: filter === f ? THEME.accent : THEME.muted, transition: "all 0.15s" }}>
             {f} <span style={{ opacity: 0.6 }}>({f === "All" ? tasks.length : tasks.filter(t => t.status === f).length})</span>
           </button>
         ))}
       </div>
-      {displayed.map(t => <TaskCard key={t.id || t._id} task={t} onCommentAdded={onCommentAdded} />)}
+      {displayed.map(t => <TaskCard key={t.id || t._id} task={t} onCommentAdded={onCommentAdded} THEME={THEME} />)}
     </>
   );
 }
@@ -752,30 +741,30 @@ function TasksFiltered({ tasks, onCommentAdded }) {
 
 
 // ── Notifications Full Page ───────────────────────────────────
-function NotificationsPage({ notifications, onMarkRead, onMarkAllRead, onNavigate }) {
+function NotificationsPage({ notifications, onMarkRead, onMarkAllRead, onNavigate, THEME }) {
   const unread = notifications.filter(n => !n.read).length;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-        <span style={{ fontSize: 13, color: "#64748b" }}>{unread} unread</span>
-        {unread > 0 && <button onClick={onMarkAllRead} style={{ background: "none", border: "none", color: "#7c6cfa", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Mark all read</button>}
+        <span style={{ fontSize: 13, color: THEME.muted }}>{unread} unread</span>
+        {unread > 0 && <button onClick={onMarkAllRead} style={{ background: "none", border: "none", color: THEME.accent, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Mark all read</button>}
       </div>
       {notifications.map(n => {
         const color = notifColor(n.type), bg = notifBg(n.type);
         return (
           <div key={n.id} onClick={() => onMarkRead(n.id)}
-            style={{ background: n.read ? THEME.card : "var(--app-surface)", borderRadius: 12, border: `1px solid ${n.read ? THEME.border : "var(--app-accent)"}30`, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", transition: "background 0.15s" }}
-            onMouseEnter={e => e.currentTarget.style.background = "#f8faff"}
-            onMouseLeave={e => e.currentTarget.style.background = n.read ? "#fff" : "#fafafe"}>
+            style={{ background: n.read ? THEME.card : THEME.bg, borderRadius: 12, border: `1px solid ${n.read ? THEME.border : THEME.accent}30`, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", transition: "background 0.15s" }}
+            onMouseEnter={e => e.currentTarget.style.background = THEME.card}
+            onMouseLeave={e => e.currentTarget.style.background = n.read ? THEME.card : THEME.bg}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: bg, border: `1px solid ${color}20`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{n.icon}</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: n.read ? 500 : 700, color: "#0f172a" }}>{n.text}</div>
-              <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2, display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <div style={{ fontSize: 13, fontWeight: n.read ? 500 : 700, color: THEME.text }}>{n.text}</div>
+              <div style={{ fontSize: 11, color: THEME.muted, marginTop: 2, display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <span>{n.time}</span>
                 {n.action && <button onClick={e => { e.stopPropagation(); onMarkRead(n.id); onNavigate(n.actionPage); }} style={{ background: `${color}12`, border: `1px solid ${color}30`, borderRadius: 6, padding: "1px 8px", fontSize: 10, fontWeight: 700, color: color, cursor: "pointer", fontFamily: "inherit" }}>{n.action} →</button>}
               </div>
             </div>
-            {!n.read && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#7c6cfa", flexShrink: 0, animation: "pulse-dot-color 1.8s ease infinite" }} />}
+            {!n.read && <div style={{ width: 8, height: 8, borderRadius: "50%", background: THEME.accent, flexShrink: 0, animation: "pulse-dot-color 1.8s ease infinite" }} />}
           </div>
         );
       })}
@@ -784,7 +773,7 @@ function NotificationsPage({ notifications, onMarkRead, onMarkAllRead, onNavigat
 }
 
 // ── WORKSPACE PAGE ───────────────────────────────────────────
-function WorkspacePage({ user }) {
+function WorkspacePage({ user, THEME }) {
   const [notes, setNotes] = useState("");
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
@@ -847,7 +836,7 @@ function WorkspacePage({ user }) {
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          style={{ flex: 1, width: "100%", border: `1.5px solid ${THEME.border}`, borderRadius: 16, padding: 20, fontSize: 15, color: THEME.text, background: "var(--app-surface)", resize: "none", outline: "none", fontFamily: "inherit", lineHeight: 1.6, transition: "all 0.2s" }}
+          style={{ flex: 1, width: "100%", border: `1.5px solid ${THEME.border}`, borderRadius: 16, padding: 20, fontSize: 15, color: THEME.text, background: THEME.bg, resize: "none", outline: "none", fontFamily: "inherit", lineHeight: 1.6, transition: "all 0.2s" }}
           onFocus={e => e.target.style.borderColor = THEME.accent}
           onBlur={e => e.target.style.borderColor = THEME.border}
         />
@@ -866,7 +855,7 @@ function WorkspacePage({ user }) {
             onChange={(e) => setNewTodo(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && addTodo()}
             placeholder="Add a quick task..."
-            style={{ flex: 1, padding: "14px 18px", border: `1.5px solid ${THEME.border}`, borderRadius: 14, fontSize: 14, outline: "none", background: "#f8fafc", transition: "all 0.2s" }}
+            style={{ flex: 1, padding: "14px 18px", border: `1.5px solid ${THEME.border}`, borderRadius: 14, fontSize: 14, outline: "none", background: THEME.bg, transition: "all 0.2s", color: THEME.text }}
             onFocus={e => e.target.style.borderColor = THEME.accent}
             onBlur={e => e.target.style.borderColor = THEME.border}
           />
@@ -881,7 +870,7 @@ function WorkspacePage({ user }) {
             </div>
           ) : (
             todos.map(todo => (
-              <div key={todo.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", background: todo.done ? "var(--app-surface)" : THEME.card, border: `1.5px solid ${todo.done ? "transparent" : THEME.border}`, borderRadius: 16, transition: "0.2s", boxShadow: todo.done ? "none" : "0 2px 4px rgba(0,0,0,0.02)" }}>
+              <div key={todo.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", background: todo.done ? THEME.bg : THEME.card, border: `1.5px solid ${todo.done ? "transparent" : THEME.border}`, borderRadius: 16, transition: "0.2s", boxShadow: todo.done ? "none" : "0 2px 4px rgba(0,0,0,0.02)" }}>
                 <div
                   onClick={() => toggleTodo(todo.id)}
                   style={{ width: 22, height: 22, borderRadius: 7, border: `2px solid ${todo.done ? "#10b981" : "#cbd5e1"}`, background: todo.done ? "#10b981" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "0.2s" }}
@@ -911,7 +900,14 @@ export default function ClientDashboard({ user, setUser }) {
   const [payments, setPayments] = useState([]);
   const [dashboardEvents, setDashboardEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
+  const THEME = getTheme(darkMode);
+
+  useEffect(() => {
+    localStorage.setItem("darkMode", darkMode);
+    if (darkMode) document.documentElement.classList.add('dark-mode');
+    else document.documentElement.classList.remove('dark-mode');
+  }, [darkMode]);
 
   const clientUser = {
     name: user?.name || user?.clientName || "Client",
@@ -1192,6 +1188,7 @@ export default function ClientDashboard({ user, setUser }) {
         branding={branding}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        THEME={THEME}
       />
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
@@ -1200,8 +1197,8 @@ export default function ClientDashboard({ user, setUser }) {
         <div className="mob-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: THEME.sidebar, borderBottom: `1px solid ${THEME.border}`, position: "sticky", top: 0, zIndex: 100 }}>
           <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: THEME.accentSecondary }}>☰</button>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo} darkMode={darkMode} />
-            <ProfileDropdown user={user} darkMode={darkMode} />
+            <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo} darkMode={darkMode} THEME={THEME} />
+            <ProfileDropdown user={user} darkMode={darkMode} THEME={THEME} />
           </div>
         </div>
 
@@ -1219,9 +1216,9 @@ export default function ClientDashboard({ user, setUser }) {
                 style={{ paddingLeft: 38, width: 280, height: 44, background: THEME.card, border: `1.5px solid ${THEME.border}`, color: THEME.text }}
               />
             </div>
-            <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo} darkMode={darkMode} />
+            <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo} darkMode={darkMode} THEME={THEME} />
             <div style={{ width: 1, height: 32, background: THEME.border, margin: "0 4px" }} />
-            <ProfileDropdown user={user} showDetails darkMode={darkMode} />
+            <ProfileDropdown user={user} showDetails darkMode={darkMode} THEME={THEME} />
           </div>
         </div>
 
@@ -1240,10 +1237,10 @@ export default function ClientDashboard({ user, setUser }) {
               {/* Left Column */}
               <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                 <div className="stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
-                  <StatCard icon="💰" label="Total Invoiced" value={fmt(totalInvoiced)} color="#7c6cfa" onClick={() => setActive("payments")} />
-                  <StatCard icon="📈" label="Total Paid" value={fmt(totalPaid)} color="#d946ef" onClick={() => setActive("payments")} />
-                  <StatCard icon="🛡️" label="Balance Due" value={fmt(balanceDue)} color="#10b981" onClick={() => setActive("projects")} />
-                  <StatCard icon="💸" label="Total Pending" value={fmt(totalPending)} color="#ef4444" onClick={() => setActive("payments")} />
+                  <StatCard icon="💰" label="Total Invoiced" value={fmt(totalInvoiced)} color="#7c6cfa" onClick={() => setActive("payments")} THEME={THEME} />
+                  <StatCard icon="📈" label="Total Paid" value={fmt(totalPaid)} color="#d946ef" onClick={() => setActive("payments")} THEME={THEME} />
+                  <StatCard icon="🛡️" label="Balance Due" value={fmt(balanceDue)} color="#10b981" onClick={() => setActive("projects")} THEME={THEME} />
+                  <StatCard icon="💸" label="Total Pending" value={fmt(totalPending)} color="#ef4444" onClick={() => setActive("payments")} THEME={THEME} />
                 </div>
 
                 {/* Analytics Section */}
@@ -1295,10 +1292,10 @@ export default function ClientDashboard({ user, setUser }) {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                   {projects.slice(0, 3).map(p => (
-                    <div key={p.id || p._id} style={{ background: "#fff", borderRadius: 24, padding: 20, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
+                    <div key={p.id || p._id} style={{ background: THEME.card, borderRadius: 24, padding: 20, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
                       <div style={{ fontSize: 14, fontWeight: 800, color: THEME.text, marginBottom: 4 }}>{p.name}</div>
                       <div style={{ fontSize: 11, color: THEME.muted, fontWeight: 600, marginBottom: 12 }}>{p.status}</div>
-                      <div style={{ height: 6, background: "#f1f5f9", borderRadius: 99, marginBottom: 8, overflow: "hidden" }}>
+                      <div style={{ height: 6, background: darkMode ? "#334155" : "#f1f5f9", borderRadius: 99, marginBottom: 8, overflow: "hidden" }}>
                         <div style={{ width: `${p.progress || 0}%`, height: "100%", background: THEME.gradient, borderRadius: 99 }}></div>
                       </div>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
@@ -1321,7 +1318,7 @@ export default function ClientDashboard({ user, setUser }) {
                     <span style={{ fontSize: 12, color: THEME.accent, fontWeight: 800, cursor: "pointer" }} onClick={() => setActive("notifications")}>See all</span>
                   </div>
 
-                  <div style={{ background: "#fff", borderRadius: 24, padding: 16, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow, display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ background: THEME.card, borderRadius: 24, padding: 16, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow, display: "flex", flexDirection: "column", gap: 12 }}>
                     {notifications.slice(0, 3).map(n => (
                       <div key={n.id} style={{ display: "flex", gap: 12, alignItems: "center" }}>
                         <div style={{ width: 32, height: 32, borderRadius: 10, background: notifBg(n.type), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>{n.icon}</div>
@@ -1356,7 +1353,7 @@ export default function ClientDashboard({ user, setUser }) {
                         <div style={{ fontSize: 18, fontWeight: 800, color: THEME.text, marginBottom: 4 }}>{p.name}</div>
                         <div style={{ fontSize: 11, color: THEME.muted, fontWeight: 600 }}>{p.deadline ? `Due: ${p.deadline}` : "No deadline"}</div>
                       </div>
-                      <Badge label={p.status} />
+                      <Badge label={p.status} isDark={darkMode} />
                     </div>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 20 }}>
@@ -1406,7 +1403,7 @@ export default function ClientDashboard({ user, setUser }) {
                         <div style={{ fontSize: 18, fontWeight: 800, color: THEME.text }}>{p.title}</div>
                         <div style={{ fontSize: 11, color: THEME.muted, marginTop: 4, fontWeight: 600 }}>{p.id} · {new Date(p.updated).toLocaleDateString()}</div>
                       </div>
-                      <Badge label={p.status === "pending" ? "Pending Approval" : p.status === "approved" ? "Approved" : p.status === "rejected" ? "Rejected" : "Draft"} />
+                      <Badge label={p.status === "pending" ? "Pending Approval" : p.status === "approved" ? "Approved" : p.status === "rejected" ? "Rejected" : "Draft"} isDark={darkMode} />
                     </div>
 
                     <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
@@ -1443,7 +1440,7 @@ export default function ClientDashboard({ user, setUser }) {
                         <div style={{ fontSize: 18, fontWeight: 800, color: THEME.text }}>{q.qt?.project || q.project || "Quotation"}</div>
                         <div style={{ fontSize: 11, color: THEME.muted, marginTop: 4, fontWeight: 600 }}>{q.quoteNo} · {q.date ? new Date(q.date).toLocaleDateString() : "—"}</div>
                       </div>
-                      <Badge label={q.status} />
+                      <Badge label={q.status} isDark={darkMode} />
                     </div>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12, marginBottom: 20 }}>
@@ -1507,10 +1504,10 @@ export default function ClientDashboard({ user, setUser }) {
                         <div style={{ fontSize: 15, fontWeight: 700, color: t.status === "Done" ? THEME.muted : THEME.text, textDecoration: t.status === "Done" ? "line-through" : "none" }}>{t.title}</div>
                         <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
                           <span style={{ fontSize: 11, color: THEME.muted, fontWeight: 600 }}>Project: <span style={{ color: THEME.accent }}>{t.project}</span></span>
-                          <span style={{ fontSize: 11, color: THEME.muted, fontWeight: 600 }}>Priority: <span style={{ color: sc(t.priority) }}>{t.priority}</span></span>
+                          <span style={{ fontSize: 11, color: THEME.muted, fontWeight: 600 }}>Priority: <span style={{ color: sc(t.priority, darkMode) }}>{t.priority}</span></span>
                         </div>
                       </div>
-                      <Badge label={t.status} />
+                      <Badge label={t.status} isDark={darkMode} />
                     </div>
                   ))}
                   {tasks.length === 0 && <div style={{ textAlign: "center", padding: 40, color: THEME.muted }}>No tasks found for your projects.</div>}
@@ -1523,10 +1520,10 @@ export default function ClientDashboard({ user, setUser }) {
           {active === "payments" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }} className="stat-grid">
-                <StatCard icon="📊" label="Total Invoiced" value={fmt(totalInvoiced)} color="#7c6cfa" />
-                <StatCard icon="✅" label="Total Paid" value={fmt(totalPaid)} color="#10b981" />
-                <StatCard icon="🚨" label="Balance Due" value={fmt(balanceDue)} color="#ef4444" />
-                <StatCard icon="⏳" label="Pending" value={fmt(totalPending + totalOverdue)} color="#f59e0b" />
+                <StatCard icon="📊" label="Total Invoiced" value={fmt(totalInvoiced)} color="#7c6cfa" THEME={THEME} />
+                <StatCard icon="✅" label="Total Paid" value={fmt(totalPaid)} color="#10b981" THEME={THEME} />
+                <StatCard icon="🚨" label="Balance Due" value={fmt(balanceDue)} color="#ef4444" THEME={THEME} />
+                <StatCard icon="⏳" label="Pending" value={fmt(totalPending + totalOverdue)} color="#f59e0b" THEME={THEME} />
               </div>
 
               <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
@@ -1544,7 +1541,7 @@ export default function ClientDashboard({ user, setUser }) {
                       </div>
                       <div style={{ textAlign: "right", marginRight: 12 }}>
                         <div style={{ fontSize: 16, fontWeight: 900, color: THEME.text }}>{inv.currency || "₹"}{(parseFloat(inv.amountPaid || inv.total) || 0).toLocaleString("en-IN")}</div>
-                        <Badge label={inv.status} />
+                        <Badge label={inv.status} isDark={darkMode} />
                       </div>
                       <div style={{ display: "flex", gap: 8 }}>
                         <button
@@ -1590,7 +1587,11 @@ export default function ClientDashboard({ user, setUser }) {
           {active === "messaging" && <MessagingPage user={user} />}
 
           {active === "notifications" && (
-            <NotificationsPage notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo} />
+            <NotificationsPage notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo} THEME={THEME} />
+          )}
+
+          {active === "workspace" && (
+            <WorkspacePage user={user} THEME={THEME} />
           )}
 
           {active === "reports" && (
@@ -1603,9 +1604,7 @@ export default function ClientDashboard({ user, setUser }) {
             </div>
           )}
 
-          {active === "workspace" && <WorkspacePage user={user} />}
-
-          {active === "settings" && <SettingsPage clientUser={clientUser} />}
+          {active === "settings" && <SettingsPage user={user} />}
 
         </div>
       </div>

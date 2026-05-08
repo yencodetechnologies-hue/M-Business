@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
   numberOfSubscriptions: { type: Number, default: 0 },
   isVerified: { type: Boolean, default: false },
   upiId: { type: String, default: "" },
+  clientLimit: { type: String, default: "" },
+  employeeLimit: { type: String, default: "" },
   otp: { type: String, default: "" },
   otpExpires: { type: Date },
 }, { timestamps: true });

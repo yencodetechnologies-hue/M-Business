@@ -12,7 +12,7 @@ const API = `${BASE_URL}/api/reports`;
 function StatCard({ THEME, icon, label, value, color, sub }) {
   return (
     <div style={{ background:THEME.card, borderRadius:16, padding:"18px 16px",
-      boxShadow: THEME.shadow, border:`1px solid ${THEME.border}`,
+      boxShadow: THEME.shadow, border:`1.5px solid ${THEME.border}`,
       position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", top:-15, right:-15, width:70, height:70,
         borderRadius:"50%", background:`radial-gradient(circle,${color}20,transparent)` }}/>
@@ -233,7 +233,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
           
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 30 }}>
             {/* Income Table */}
-            <div style={{ background: "#fcfdfc", borderRadius: 16, padding: 20, border: "1px solid #eef2ee" }}>
+            <div style={{ background: THEME.surface, borderRadius: 16, padding: 20, border: `1.5px solid ${THEME.border}` }}>
               <h4 style={{ fontSize: 15, fontWeight: 800, color: "#16a34a", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 10, background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>📥</span>
                 Recent Income
@@ -261,7 +261,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
             </div>
 
             {/* Expense Table */}
-            <div style={{ background: "#fdfcfc", borderRadius: 16, padding: 20, border: "1px solid #f2eeee" }}>
+            <div style={{ background: THEME.surface, borderRadius: 16, padding: 20, border: `1.5px solid ${THEME.border}` }}>
               <h4 style={{ fontSize: 15, fontWeight: 800, color: "#dc2626", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 10, background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>📤</span>
                 Recent Expenses
@@ -301,7 +301,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
           <div style={{ overflowX:"auto" }}>
             <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
               <thead>
-                <tr style={{ background:"linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
+                <tr style={{ background: THEME.surface }}>
                   {["Report","Period","Total","Revenue","Done","Pending"].map(col => (
                     <th key={col} style={{ padding:"10px 14px", textAlign:"left",
                       color:"var(--app-accent)", fontWeight:700, fontSize:11,
@@ -317,8 +317,8 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
                   return (
                     <tr key={r.id}
                       onClick={() => setSelectedReport(r.type)}
-                      style={{ borderBottom:"1px solid var(--app-border)", cursor: "pointer" }}
-                      onMouseEnter={e=>e.currentTarget.style.background="var(--app-bg)"}
+                      style={{ borderBottom:`1.5px solid ${THEME.border}`, cursor: "pointer" }}
+                      onMouseEnter={e=>e.currentTarget.style.background=THEME.surface}
                       onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                       <td style={{ padding:"12px 14px" }}>
                         <div style={{ display:"flex", alignItems:"center", gap:8 }}>

@@ -27,7 +27,7 @@ const packageSchema = new mongoose.Schema({
   targetRole: { type: String, enum: ["subadmin", "client", "employee", "manager", "all"], default: "subadmin" },
 
   // Assigned subadmins (for specific subadmin assignment)
-  assignedSubadmins: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subadmin" }],
+  assignedSubadmins: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

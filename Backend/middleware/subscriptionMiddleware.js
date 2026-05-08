@@ -10,8 +10,8 @@ const parseLimit = (limitStr) => {
   const s = String(limitStr).toLowerCase().trim();
   if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
   const m = s.match(/\d+/);
-  const num = m ? parseInt(m[0]) : 10;
-  return num <= 0 ? 10 : num;
+  if (m) return parseInt(m[0]);
+  return 10;
 };
 
 const getSubscriptionLimit = (type, sub) => {
@@ -131,19 +131,29 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
       status: { $in: ["active", "grace_period", "trial"] }
     }).sort({ createdAt: -1 });
 
-    let limit = getSubscriptionLimit(resourceType, subscription);
+    // Priority 1: Check for manual limit overrides on the User profile
+    const subadmin = await User.findById(companyId);
+    const uLimit = resourceType === "client" ? subadmin?.clientLimit : resourceType === "employee" ? subadmin?.employeeLimit : subadmin?.managerLimit;
+    
+    let limit;
+    if (uLimit && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
+      limit = parseLimit(uLimit);
+    } else {
+      limit = getSubscriptionLimit(resourceType, subscription);
+    }
+
     let currentCount = 0;
     let errorMessage = "";
 
     if (resourceType === 'client') {
       currentCount = await Client.countDocuments({ companyId });
-      errorMessage = `Client limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade.`;
+      errorMessage = `Client limit reached (${limit === Infinity ? "Unlimited" : limit}). Your Admin has restricted your account to ${limit} clients.`;
     } else if (resourceType === 'employee') {
       currentCount = await Employee.countDocuments({ companyId });
-      errorMessage = `Employee limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade.`;
+      errorMessage = `Employee limit reached (${limit === Infinity ? "Unlimited" : limit}). Your Admin has restricted your account to ${limit} employees.`;
     } else if (resourceType === 'manager') {
       currentCount = await Manager.countDocuments({ companyId });
-      errorMessage = `Manager limit reached (${limit === Infinity ? "Unlimited" : limit}). Please upgrade.`;
+      errorMessage = `Manager limit reached (${limit === Infinity ? "Unlimited" : limit}). Your Admin has restricted your account to ${limit} managers.`;
     }
 
     if (limit !== Infinity && currentCount >= limit) {

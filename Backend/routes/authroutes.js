@@ -149,6 +149,8 @@ router.post("/login", async (req, res) => {
         logoUrl: user.logoUrl || "",
         companyName: user.companyName || "",
         upiId: user.upiId || "",
+        clientLimit: user.clientLimit || "",
+        employeeLimit: user.employeeLimit || "",
       },
     });
 
@@ -263,6 +265,8 @@ router.post("/verify-otp", async (req, res) => {
         logoUrl: user.logoUrl || "",
         companyName: user.companyName || "",
         upiId: user.upiId || "",
+        clientLimit: user.clientLimit || "",
+        employeeLimit: user.employeeLimit || "",
       }
     });
   } catch (err) {
@@ -287,6 +291,30 @@ router.post("/save-company-name", async (req, res) => {
     const { userId, companyName } = req.body;
     await User.findByIdAndUpdate(userId, { companyName }, { returnDocument: 'after' });
     res.json({ msg: "Company name saved" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+router.get("/profile/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ msg: "User not found" });
+    res.json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        companyId: user.companyId || user._id.toString(),
+        logoUrl: user.logoUrl || "",
+        companyName: user.companyName || "",
+        upiId: user.upiId || "",
+        clientLimit: user.clientLimit || "",
+        employeeLimit: user.employeeLimit || "",
+      }
+    });
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
   }

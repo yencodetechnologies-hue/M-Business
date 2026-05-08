@@ -5,7 +5,7 @@ import { BASE_URL } from "../config";
 // ─── Theme ──────────────────────────────────────────────────────────────────
 const T = {
   primary: "var(--app-sidebar)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)",
-  bg: "var(--app-bg)", card: "#FFFFFF", text: "var(--app-sidebar)", muted: "var(--app-accent)",
+  bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-sidebar)", muted: "var(--app-accent)",
   border: "var(--app-border)", success: "#22C55E", warning: "#F59E0B", danger: "#EF4444"
 };
 
@@ -31,7 +31,7 @@ const Badge = ({ label, color }) => {
 };
 
 const Card = ({ title, children, icon }) => (
-  <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
+  <div style={{ background: "var(--app-card)", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1.5px solid var(--app-border)" }}>
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
       {icon && <span style={{ fontSize: 18 }}>{icon}</span>}
       <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: T.text }}>{title}</h3>
@@ -43,7 +43,7 @@ const Card = ({ title, children, icon }) => (
 const InfoRow = ({ label, value, icon }) => {
   if (!value && value !== 0) return null;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1.5px solid var(--app-border)", marginBottom: 7 }}>
       {icon && <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{icon}</div>}
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 10, color: T.muted, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{label}</div>
@@ -57,8 +57,8 @@ const InfoRow = ({ label, value, icon }) => {
 const PLANS = [
   {
     name: "Trial", price: 0, icon: "✨", color: "var(--app-accent)", duration: "30 days", isTrial: true,
-    features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 1", "Employees: 5"],
-    clientLimit: "1 Client manage", employeeLimit: "5 Employee manage", managerLimit: "1 Manager manage",
+    features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
+    clientLimit: "5 Clients", employeeLimit: "20 Employees", managerLimit: "1 Manager manage",
     btnLabel: "Start Free Trial"
   },
   {
@@ -286,7 +286,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
 
   // ── Razorpay Payment for Paid Plans ─────────────────────────────────────────
   const startRazorpayPayment = async (plan) => {
-    if (plan.isTrial) { startTrial(); return; }
+    if (plan.isTrial) { startTrial(plan); return; }
     if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
 
     try {
@@ -433,7 +433,20 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           margin: "0 auto",
           width: "100%"
         }}>
-          {PLANS.map((plan, idx) => {
+          {[...PLANS, ...assignedPackages.map(pkg => ({
+            name: pkg.title,
+            price: pkg.type === "free" ? 0 : parseFloat(pkg.price) || 0,
+            icon: pkg.icon || "📦",
+            features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n"),
+            isTrial: pkg.type === "free",
+            clientLimit: pkg.clientLimit,
+            employeeLimit: pkg.employeeLimit,
+            managerLimit: pkg.managerLimit,
+            businessLimit: pkg.businessLimit,
+            noOfDays: parseInt(pkg.no_of_days || pkg.noOfDays) || 30,
+            btnLabel: pkg.type === "free" ? "Start Free Trial" : "Subscribe",
+            isCustom: true
+          }))].map((plan, idx) => {
             const isProcessing = payLoading === plan.name;
             return (
               <div

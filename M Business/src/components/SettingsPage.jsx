@@ -44,7 +44,7 @@ const Toggle = ({ label, desc, checked, onChange }) => (
       onClick={() => onChange(!checked)}
       style={{
         width: 46, height: 26, borderRadius: 99, border: "none", cursor: "pointer",
-        background: checked ? "var(--app-accent)" : "#cbd5e1",
+        background: checked ? "var(--app-accent)" : "rgba(var(--app-accent-rgb, 124, 58, 237), 0.2)",
         position: "relative", transition: "background 0.2s", flexShrink: 0
       }}
     >

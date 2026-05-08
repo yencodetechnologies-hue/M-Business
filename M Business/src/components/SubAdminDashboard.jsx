@@ -25,7 +25,7 @@ import ImageCropModal from "./ImageCropModal";
 
 
 
-const T = { primary: "var(--app-primary)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)" };
+const T = { primary: "var(--app-primary)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)", surface: "var(--app-bg)" };
 const formatCurrency = (amount, currency = "₹") => {
   const sym = currency || "₹";
   const val = Number(amount || 0).toLocaleString("en-IN");
@@ -110,11 +110,17 @@ function getNavForRole(role) {
 
 const sc = s => ({ Active: "#22C55E", Inactive: "#EF4444", "In Progress": "var(--app-accent)", Pending: "#F59E0B", Completed: "#22C55E", "On Hold": "var(--app-accent)", Sent: "var(--app-accent)", Approved: "#22C55E", Rejected: "#EF4444", Paid: "#22C55E", Overdue: "#EF4444", Company: "var(--app-accent)", Employee: "var(--app-accent)", Manager: "#f59e0b", pending: "#F59E0B", hired: "#22C55E", rejected: "#EF4444" }[s] || "var(--app-accent)");
 
-function Badge({ label }) { const c = sc(label); return <span style={{ background: `${c}18`, color: c, border: `1px solid ${c}33`, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{label}</span>; }
+function Badge({ label }) {
+  const c = sc(label);
+  const isVar = c && c.startsWith("var");
+  const bg = isVar ? "rgba(var(--app-accent-rgb, 124, 58, 237), 0.12)" : `${c}18`;
+  const border = isVar ? "rgba(var(--app-accent-rgb, 124, 58, 237), 0.35)" : `${c}4D`; // 4D is ~30% opacity in hex
+  return <span style={{ background: bg, color: c, border: `1.5px solid ${border}`, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{label}</span>;
+}
 
 function SC({ title, children, action }) {
   return (
-    <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
+    <div style={{ background: "var(--app-card)", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1.5px solid var(--app-border)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
         <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: T.text }}>{title}</h3>
         {action}
@@ -841,7 +847,7 @@ function EmployeesPage({ employees, setEmployees }) {
       {viewEmp && (
         <Mdl title="Employee Profile" onClose={() => setViewEmp(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewEmp.name || "?")[0].toUpperCase()}</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewEmp.name || "?")[0].toUpperCase()}</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewEmp.name}</div>
               <div style={{ fontSize: 13, color: "var(--app-accent)", marginTop: 2 }}>{viewEmp.role || "Employee"}</div>
@@ -921,7 +927,7 @@ function EmployeesPage({ employees, setEmployees }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewEmp(null); openEdit(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => { setViewEmp(null); openEdit(viewEmp); }} style={{ flex: 1, padding: "10px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
             <button onClick={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
           </div>
         </Mdl>
@@ -952,7 +958,7 @@ function EmployeesPage({ employees, setEmployees }) {
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
           </div>
         </Mdl>
       )}
@@ -1131,7 +1137,14 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
   const filtered = subadmins.filter(s => (s.name || "").toLowerCase().includes(search.toLowerCase()) || (s.email || "").toLowerCase().includes(search.toLowerCase()));
 
   const openEdit = (s) => {
-    setEditForm({ name: s.name || "", email: s.email || "", phone: s.phone || "", status: s.status || "Active" });
+    setEditForm({ 
+      name: s.name || "", 
+      email: s.email || "", 
+      phone: s.phone || "", 
+      status: s.status || "Active",
+      clientLimit: s.clientLimit || "",
+      employeeLimit: s.employeeLimit || ""
+    });
     setEditErr({});
     setEditSub(s);
   };
@@ -1374,6 +1387,8 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
             <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
             <Fld label="Phone" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
+            <Fld label="Client Limit" type="number" value={editForm.clientLimit} onChange={v => setEditForm(p => ({ ...p, clientLimit: v }))} />
+            <Fld label="Employee Limit" type="number" value={editForm.employeeLimit} onChange={v => setEditForm(p => ({ ...p, employeeLimit: v }))} />
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditSub(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
@@ -2655,7 +2670,7 @@ function VendorsPage({ vendors, setVendors }) {
           <Fld label="Product Description" value={editForm.productDescription} onChange={v => setEditForm(p => ({ ...p, productDescription: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditVendor(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes →"}</button>
           </div>
         </Mdl>
       )}
@@ -2732,20 +2747,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       accent: accentColor,
       bg: hslToHex(h, 30, 95), // Clearer tinted background
       muted: hslToHex(h, 60, 30), // Much darker muted text (30% vs 35%)
-      border: hslToHex(h, 40, 85), // Stronger borders
+      border: hslToHex(h, 40, 80), // Stronger borders (80% lightness vs 85%)
       dot: accentColor
     };
   };
 
   const THEMES = {
-    purple: { label: "Purple", sidebar: "#1e0a3c", accent: "#7c3aed", bg: "#f5f3ff", muted: "#7c3aed", border: "#ede9fe", dot: "#7c3aed" },
-    ocean: { label: "Ocean", sidebar: "#0a3552", accent: "#0284c7", bg: "#f0f9ff", muted: "#0369a1", border: "#bae6fd", dot: "#0284c7" },
-    forest: { label: "Forest", sidebar: "#0f3d22", accent: "#16a34a", bg: "#f0fdf4", muted: "#15803d", border: "#bbf7d0", dot: "#16a34a" },
-    sunset: { label: "Sunset", sidebar: "#5c1f0a", accent: "#ea580c", bg: "#fff7ed", muted: "#c2410c", border: "#fed7aa", dot: "#ea580c" },
-    rose: { label: "Rose", sidebar: "#5f0f28", accent: "#e11d48", bg: "#fff1f2", muted: "#be123c", border: "#fecdd3", dot: "#e11d48" },
-    slate: { label: "Slate", sidebar: "#0f172a", accent: "#475569", bg: "#f8fafc", muted: "#334155", border: "#cbd5e1", dot: "#475569" },
-    mint: { label: "Mint", sidebar: "#0d3b37", accent: "#0d9488", bg: "#f0fdfa", muted: "#0f766e", border: "#99f6e4", dot: "#0d9488" },
-    candy: { label: "Candy", sidebar: "#4a0d4e", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f0abfc", dot: "#c026d3" },
+    purple: { label: "Purple", sidebar: "#1e0a3c", accent: "#7c3aed", bg: "#f5f3ff", muted: "#7c3aed", border: "#ddd6fe", dot: "#7c3aed" },
+    ocean: { label: "Ocean", sidebar: "#0a3552", accent: "#0284c7", bg: "#f0f9ff", muted: "#0369a1", border: "#93c5fd", dot: "#0284c7" },
+    forest: { label: "Forest", sidebar: "#0f3d22", accent: "#16a34a", bg: "#f0fdf4", muted: "#15803d", border: "#86efac", dot: "#16a34a" },
+    sunset: { label: "Sunset", sidebar: "#5c1f0a", accent: "#ea580c", bg: "#fff7ed", muted: "#c2410c", border: "#fdba74", dot: "#ea580c" },
+    rose: { label: "Rose", sidebar: "#5f0f28", accent: "#e11d48", bg: "#fff1f2", muted: "#be123c", border: "#fda4af", dot: "#e11d48" },
+    slate: { label: "Slate", sidebar: "#0f172a", accent: "#475569", bg: "#f8fafc", muted: "#334155", border: "#94a3b8", dot: "#475569" },
+    mint: { label: "Mint", sidebar: "#0d3b37", accent: "#0d9488", bg: "#f0fdfa", muted: "#0f766e", border: "#5eead4", dot: "#0d9488" },
+    candy: { label: "Candy", sidebar: "#4a0d4e", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f5d0fe", dot: "#c026d3" },
   };
 
   // Apply theme whenever appTheme or customColor changes
@@ -2848,24 +2863,34 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [mgrSaveLoading, setMgrSaveLoading] = useState(false);
   const [showMgrPass, setShowMgrPass] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const fetchPackages = async () => {
+    try {
+      const id = resolveSubadminId();
+      const isSub = user?.role === "subadmin";
+      const endpoint = isSub ? `${BASE_URL}/api/packages/subadmin/${id}` : `${BASE_URL}/api/packages`;
+      const res = await axios.get(endpoint);
+      setPackages(res.data || []);
+    } catch (e) { console.log(e); }
+  };
   const [config, setConfig] = useState(null);
   const [viewProject, setViewProject] = useState(null);
 
   const [subadmins, setSubadmins] = useState([]);
-  const [ns, setNs] = useState({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10" });
+  const [ns, setNs] = useState({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10", clientLimit: "3", employeeLimit: "6" });
   const [nsError, setNsError] = useState({});
   const [subSaveLoading, setSubSaveLoading] = useState(false);
   const [showSubPass, setShowSubPass] = useState(false);
 
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
+  const [editPkgForm, setEditPkgForm] = useState({ title: "", description: "", icon: "📦", type: "paid", price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", status: "Active", assignedSubadmins: [] });
   const [pkgError, setPkgError] = useState({});
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
 
   // Package view/edit state
   const [viewPackage, setViewPackage] = useState(null);
   const [editPackage, setEditPackage] = useState(null);
-  const [editPkgForm, setEditPkgForm] = useState({});
+
 
   const [quotations, setQuotations] = useState([]);
   const [vendors, setVendors] = useState([]);
@@ -2880,10 +2905,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [income, setIncome] = useState([]);
   const [expenses, setExpenses] = useState([]);
 
+  const fetchProfile = async () => {
+    try {
+      const id = resolveSubadminId();
+      if (!id) return;
+      const res = await axios.get(`${BASE_URL}/api/auth/profile/${id}`);
+      if (res.data.user) {
+        const updated = { ...user, ...res.data.user };
+        localStorage.setItem("user", JSON.stringify(updated));
+        setUser(updated);
+      }
+    } catch (e) { console.log("Profile sync failed", e); }
+  };
+
   const hasFetched = useRef(false);
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
+    fetchProfile();
     fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
   }, []);
 
@@ -3007,10 +3046,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const s = String(limitStr).toLowerCase().trim();
     if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
     const m = s.match(/\d+/);
-    const num = m ? parseInt(m[0]) : 10;
-    return num <= 0 ? 10 : num;
+    if (m) return parseInt(m[0]);
+    return 10;
   };
   const getSubscriptionLimit = (type, sub = subscription) => {
+    // Priority 1: Direct limit set by Admin on the user profile (Manual override)
+    const uLimit = type === "client" ? user?.clientLimit : type === "employee" ? user?.employeeLimit : user?.managerLimit;
+    if (uLimit && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
+      return parseLimit(uLimit);
+    }
+
     if (!sub) return 10;
 
     const map = {
@@ -3064,22 +3109,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); } catch (e) { console.log(e); } };
   const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
   const fetchSubadmins = async () => { try { const res = await axios.get(BASE_URL + "/api/subadmins"); setSubadmins(res.data); } catch (e) { console.log(e); } };
-  const fetchPackages = async () => {
-    try {
-      // Get packages assigned to this subadmin
-      const subadminId = resolveSubadminId();
-      if (subadminId) {
-        const res = await axios.get(`${BASE_URL}/api/packages/subadmin/${subadminId}`);
-        setPackages(res.data);
-      } else {
-        // Fallback to all packages if no subadmin ID
-        const res = await axios.get(BASE_URL + "/api/packages");
-        setPackages(res.data);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
+
 
   // Re-fetch packages when navigating to Packages tab to show admin-added packages
   // Also refresh subscription when visiting resource tabs to ensure latest limits
@@ -3110,7 +3140,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       businessLimit: pkg.businessLimit || "",
       managerLimit: pkg.managerLimit || "",
       clientLimit: pkg.clientLimit || "3 Client manage",
-      status: pkg.status || "Active"
+      status: pkg.status || "Active",
+      assignedSubadmins: pkg.assignedSubadmins || []
     });
   };
   const savePackageEdit = async () => {
@@ -3129,6 +3160,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         managerLimit: editPkgForm.managerLimit,
         clientLimit: editPkgForm.clientLimit,
         status: editPkgForm.status,
+        assignedSubadmins: editPkgForm.assignedSubadmins,
         monthlyPrice: editPkgForm.type === "free" ? "Free" : editPkgForm.price,
         quarterlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 3 * 0.9).toString(),
         halfYearlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 6 * 0.85).toString(),
@@ -3382,7 +3414,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setSubSaveLoading(true);
       const res = await axios.post(BASE_URL + "/api/subadmins", ns);
       setSubadmins(prev => [res.data.subadmin, ...prev]);
-      setNs({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10" });
+      setNs({ name: "", email: "", phone: "", password: "", status: "Active", companyName: "", companyType: "IT", employeeCount: "0-10", clientLimit: "3", employeeLimit: "6" });
       setNsError({});
       setModal(null);
     } catch (err) {
@@ -3418,14 +3450,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         businessLimit: npkg.businessLimit || "",
         managerLimit: npkg.managerLimit || "",
         clientLimit: npkg.clientLimit || "3 Client manage",
+        employeeLimit: npkg.employeeLimit || "",
         status: "Active",
         targetRole: "subadmin",
-        assignedSubadmins: [] // Subadmin creates package for themselves
+        assignedSubadmins: npkg.assignedSubadmins || []
       };
 
       const res = await axios.post(BASE_URL + "/api/packages", packageData);
       setPackages(prev => [...prev, res.data]);
-      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "" });
+      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
       setPkgError({});
       setModal(null);
       toast.success("✅ Package added!");
@@ -4381,7 +4414,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   navigator.clipboard.writeText(text);
                   toast.success("📋 Credentials copied!");
                 }}
-                style={{ width: "100%", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(124,58,237,0.2)", transition: "all 0.2s" }}
+                style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
               >
                 📋 Copy Login Details
               </button>
@@ -4693,6 +4726,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Company Name" value={ns.companyName} onChange={v => setNs({ ...ns, companyName: v })} placeholder="Company name" />
           <Fld label="Company Type" value={ns.companyType} onChange={v => setNs({ ...ns, companyType: v })} options={["IT", "Software", "Services", "Consulting", "Other"]} />
           <Fld label="No. of Employees" value={ns.employeeCount} onChange={v => setNs({ ...ns, employeeCount: v })} options={["0-10", "11-50", "51-100", "100+"]} />
+          <Fld label="Client Limit *" type="number" value={ns.clientLimit} onChange={v => setNs({ ...ns, clientLimit: v })} />
+          <Fld label="Employee Limit *" type="number" value={ns.employeeLimit} onChange={v => setNs({ ...ns, employeeLimit: v })} />
         </div>
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
@@ -4727,6 +4762,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </div>
         </div>
 
+        <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "1px solid #fce7f3", margin: "14px 0" }}>
+          <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>RESOURCE LIMITS</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
+            <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={npkg.managerLimit} onChange={v => setNpkg({ ...npkg, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
+            <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={npkg.clientLimit} onChange={v => setNpkg({ ...npkg, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
+            <Fld label="EMPLOYEE LIMIT" value={npkg.employeeLimit} onChange={v => setNpkg({ ...npkg, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
+          </div>
+        </div>
+
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
           <textarea
@@ -4736,6 +4780,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             placeholder="e.g. Unlimited Company Names, Premium Support, Custom Branding"
           />
         </div>
+
+        {user?.role === "admin" && (
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
+              {subadmins.map(s => (
+                <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: npkg.assignedSubadmins.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+                  <input
+                    type="checkbox"
+                    checked={npkg.assignedSubadmins.includes(s._id)}
+                    onChange={() => {
+                      const current = npkg.assignedSubadmins || [];
+                      const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
+                      setNpkg({ ...npkg, assignedSubadmins: next });
+                    }}
+                  />
+                  {s.name}
+                </label>
+              ))}
+              {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
@@ -4764,7 +4831,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <Mdl title={`Package Details: ${viewPackage.title}`} onClose={() => setViewPackage(null)} maxWidth={500}>
           <div style={{ padding: "10px 0" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
                 {viewPackage.icon || "📦"}
               </div>
               <div>
@@ -4835,6 +4902,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             />
           </div>
 
+          {user?.role === "admin" && (
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
+                {subadmins.map(s => (
+                  <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: editPkgForm.assignedSubadmins?.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+                    <input
+                      type="checkbox"
+                      checked={editPkgForm.assignedSubadmins?.includes(s._id)}
+                      onChange={() => {
+                        const current = editPkgForm.assignedSubadmins || [];
+                        const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
+                        setEditPkgForm({ ...editPkgForm, assignedSubadmins: next });
+                      }}
+                    />
+                    {s.name}
+                  </label>
+                ))}
+                {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
+              </div>
+            </div>
+          )}
+
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
             <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
@@ -4873,7 +4963,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
                   return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
                     <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
                       <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
                     </div>
                   )) : <div style={{ color: "var(--app-muted)", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
@@ -4891,7 +4981,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
 
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+              <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
             </div>
           </div>
         </Mdl>

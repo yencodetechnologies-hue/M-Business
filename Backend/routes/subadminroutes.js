@@ -12,7 +12,8 @@ const parseLimit = (limitStr) => {
   const s = String(limitStr).toLowerCase().trim();
   if (s.includes("unlimited") || s.includes("infinity")) return Infinity;
   const m = s.match(/\d+/);
-  return m ? parseInt(m[0]) : 10;
+  if (m) return parseInt(m[0]);
+  return 10;
 };
 // GET all subadmins
 router.get("/", async (req, res) => {
@@ -28,7 +29,7 @@ router.get("/", async (req, res) => {
 // CREATE a subadmin
 router.post("/", async (req, res) => {
   try {
-    const { name, email, password, phone, status, companyName } = req.body;
+    const { name, email, password, phone, status, companyName, clientLimit, employeeLimit } = req.body;
     
     // Check if email exists in User
     const existingUser = await User.findOne({ email });
@@ -47,17 +48,15 @@ router.post("/", async (req, res) => {
       companyName: companyName || "",
     });
 
-    // We can also store status if we add it to the UserModel schema.
-    // For now we will save it directly. Mongoose accepts it if strict is false,
-    // or we might need to add it to schema. Usually models here have 'status'.
-    // Wait, UserModel might not have status. I will add it to User schema later if needed.
-
     await newSubadmin.save();
     
     // Create 30 days free trial subscription
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 30);
     
+    const finalClientLimit = (clientLimit !== undefined && clientLimit !== null && clientLimit !== "") ? clientLimit : "5";
+    const finalEmployeeLimit = (employeeLimit !== undefined && employeeLimit !== null && employeeLimit !== "") ? employeeLimit : "20";
+
     const newSubscription = new Subscription({
       userId: newSubadmin._id.toString(),
       userEmail: newSubadmin.email,
@@ -68,11 +67,11 @@ router.post("/", async (req, res) => {
       status: "active",
       isTrial: true,
       endDate: endDate,
-      features: ["30 Days Free Trial", "5 Clients Limit", "20 Employees Limit", "5 Managers Limit"],
+      features: ["30 Days Free Trial", `${finalClientLimit} Clients Limit`, `${finalEmployeeLimit} Employees Limit`, "5 Managers Limit"],
       companyId: newSubadmin._id.toString(),
       isFullyPaid: true,
-      clientLimit: "5 Clients",
-      employeeLimit: "20 Employees",
+      clientLimit: `${finalClientLimit} Clients`,
+      employeeLimit: `${finalEmployeeLimit} Employees`,
       managerLimit: "5 Managers",
       businessLimit: "1 Business",
     });
@@ -88,13 +87,73 @@ router.post("/", async (req, res) => {
 // UPDATE a subadmin
 router.put("/:id", async (req, res) => {
   try {
-    const { name, email, phone, status, companyName, upiId } = req.body;
+    const { name, email, phone, status, companyName, upiId, clientLimit, employeeLimit } = req.body;
     
     const updatedSubadmin = await User.findByIdAndUpdate(
       req.params.id,
-      { name, email, phone, companyName, upiId }, // status might not be in User schema, but let's pass it
+      { name, email, phone, companyName, upiId, clientLimit, employeeLimit },
       { new: true }
     );
+
+    // Also update their active subscription limits
+    const hasLimits = (clientLimit !== undefined && clientLimit !== null && clientLimit !== "") || 
+                     (employeeLimit !== undefined && employeeLimit !== null && employeeLimit !== "");
+    
+    if (hasLimits) {
+      const activeSub = await Subscription.findOne({
+        userId: req.params.id,
+        status: { $in: ["active", "grace_period", "trial"] }
+      }).sort({ createdAt: -1 });
+
+      if (activeSub) {
+        if (clientLimit !== undefined && clientLimit !== null && clientLimit !== "") {
+          activeSub.clientLimit = `${clientLimit} Clients`;
+        }
+        if (employeeLimit !== undefined && employeeLimit !== null && employeeLimit !== "") {
+          activeSub.employeeLimit = `${employeeLimit} Employees`;
+        }
+        
+        // Update features array too for consistency
+        activeSub.features = activeSub.features.map(f => {
+          if (f.toLowerCase().includes("client") && (clientLimit !== undefined && clientLimit !== null && clientLimit !== "")) {
+            return `${clientLimit} Clients Limit`;
+          }
+          if (f.toLowerCase().includes("employee") && (employeeLimit !== undefined && employeeLimit !== null && employeeLimit !== "")) {
+            return `${employeeLimit} Employees Limit`;
+          }
+          return f;
+        });
+        
+        await activeSub.save();
+      } else {
+        // Create a subscription if none exists
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 30);
+        
+        const finalClientLimit = (clientLimit !== undefined && clientLimit !== null && clientLimit !== "") ? clientLimit : "5";
+        const finalEmployeeLimit = (employeeLimit !== undefined && employeeLimit !== null && employeeLimit !== "") ? employeeLimit : "20";
+
+        const newSub = new Subscription({
+          userId: req.params.id,
+          userEmail: updatedSubadmin.email,
+          userName: updatedSubadmin.name,
+          planName: "Free Trial",
+          planPrice: 0,
+          billingCycle: "trial",
+          status: "active",
+          isTrial: true,
+          endDate: endDate,
+          features: ["30 Days Free Trial", `${finalClientLimit} Clients Limit`, `${finalEmployeeLimit} Employees Limit`, "5 Managers Limit"],
+          companyId: req.params.id,
+          isFullyPaid: true,
+          clientLimit: `${finalClientLimit} Clients`,
+          employeeLimit: `${finalEmployeeLimit} Employees`,
+          managerLimit: "5 Managers",
+          businessLimit: "1 Business",
+        });
+        await newSub.save();
+      }
+    }
     
     res.json({ msg: "Subadmin updated", subadmin: updatedSubadmin });
   } catch (err) {

@@ -74,10 +74,9 @@ const PRIORITY_CFG = {
   "High": { bg: "#fdab3d", fg: "#fff" },
   "Medium": { bg: "var(--app-accent)", fg: "#fff" },
   "Low": { bg: "#00c875", fg: "#fff" },
-  "Manual": { bg: "#64748b", fg: "#fff" },
-  "—": { bg: "#e2e8f0", fg: "#94a3b8" },
+  "Manual": { bg: "#64748b", fg: "#fff" }
 };
-const PRIORITY_LIST = ["Critical", "High", "Medium", "Low", "Manual", "—"];
+const PRIORITY_LIST = ["Critical", "High", "Medium", "Low", "Manual"];
 
 /* ══════════════════════════════════════════════════════════
    VIEW DEFINITIONS

@@ -433,20 +433,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           margin: "0 auto",
           width: "100%"
         }}>
-          {[...(assignedPackages.length > 0 ? [] : PLANS), ...assignedPackages.map(pkg => ({
-            name: pkg.title,
-            price: pkg.type === "free" ? 0 : parseFloat(pkg.price) || 0,
-            icon: pkg.icon || "📦",
-            features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n"),
-            isTrial: pkg.type === "free",
-            clientLimit: pkg.clientLimit,
-            employeeLimit: pkg.employeeLimit,
-            managerLimit: pkg.managerLimit,
-            businessLimit: pkg.businessLimit,
-            noOfDays: parseInt(pkg.no_of_days || pkg.noOfDays) || 30,
-            btnLabel: pkg.type === "free" ? "Start Free Trial" : "Subscribe",
-            isCustom: true
-          }))].map((plan, idx) => {
+          {[...PLANS].map((plan, idx) => {
             const isProcessing = payLoading === plan.name;
             return (
               <div

@@ -881,7 +881,7 @@ function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, on
         <DD anchor={arrowRef} onClose={() => setOpen(false)} w={230}>
           <div style={{ fontSize: 10, color: "#676879", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", padding: "8px 12px 5px" }}>Create new</div>
           <MI icon="✅" title="Task" sub="Add task with details" onClick={() => { setOpen(false); setShowPicker(true); }} />
-          <MI icon="📁" title="Group" sub="Add a new group of tasks" onClick={() => { onTriggerGroup(); setOpen(false); }} />
+         
           <Sep />
           <MI icon="📥" title="Import" sub="Excel, CSV or from files" onClick={() => { onImport && onImport(); setOpen(false); }} />
         </DD>

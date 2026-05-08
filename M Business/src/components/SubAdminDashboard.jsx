@@ -140,9 +140,9 @@ function Search({ value, onChange, placeholder }) {
   );
 }
 
-function Mdl({ title, onClose, children, maxWidth = 820 }) {
+function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
       <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
         <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
@@ -276,7 +276,7 @@ function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
   const labels = { client: "Clients", employee: "Employees", manager: "Managers" };
 
   return (
-    <Mdl title="Limit Reached" onClose={onClose} maxWidth={450}>
+    <Mdl title="Limit Reached" onClose={onClose} maxWidth={450} zIndex={2000}>
       <div style={{ textAlign: "center", padding: "10px 0" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>{icons[type] || "⚠️"}</div>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 12 }}>
@@ -4626,9 +4626,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               }}
               error={npError.client}
               onAddClient={() => {
-                const limit = parseLimit(subscription?.clientLimit, "client");
+                const limit = getSubscriptionLimit("client");
                 if (subscription && clients.length >= limit) {
-                  alert(`❌ Limit Reached: Your current plan only allows up to ${limit === Infinity ? "Unlimited" : limit} Company Names. Please upgrade your plan.`);
+                  setLimitModal({ type: "client", limit });
                   return;
                 }
                 setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false);
@@ -4666,7 +4666,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
             <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 0 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400 }}></span></label>
-            <button onClick={() => { setReturnToModal(modal); setModal("employee"); }} style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+            <button 
+              onClick={async () => { 
+                await fetchSubscription();
+                const limit = getSubscriptionLimit("employee");
+                if (subscription && employees.length >= limit) {
+                  setLimitModal({ type: "employee", limit });
+                  return;
+                }
+                setReturnToModal(modal); 
+                setModal("employee"); 
+              }} 
+              style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
+            >
               <span style={{ fontSize: 14 }}>+</span> Add Employee
             </button>
           </div>

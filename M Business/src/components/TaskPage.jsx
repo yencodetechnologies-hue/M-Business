@@ -2201,18 +2201,19 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
   const filteredGroups = groups.map(g => ({
     ...g,
     tasks: sortFn((g.tasks || []).filter(t => {
-      const tProjId = t.projectId?._id || t.projectId || t.project;
+      const tProjId = t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id;
+      const hasProject = tProjId && String(tProjId).trim() !== "" && tProjId !== "null" && tProjId !== "undefined";
       
       // If a project is selected, only show tasks for that project
       
       // If a project is selected, show ONLY that project's tasks
       if (selectedProjectId) {
-        if (tProjId !== selectedProjectId) return false;
+        if (String(tProjId) !== String(selectedProjectId)) return false;
       } else if (selectedProjectName) {
-        if (tProjId !== selectedProjectName) return false;
+        if (String(tProjId) !== String(selectedProjectName)) return false;
       } else {
         // No project selected (General Dashboard) -> Hide ALL tasks that belong to ANY project
-        if (tProjId) return false;
+        if (hasProject) return false;
       }
 
       if (filters.owner.size > 0 && !filters.owner.has(t.assignTo || "")) return false;

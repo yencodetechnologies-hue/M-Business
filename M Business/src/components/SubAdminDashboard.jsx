@@ -2337,7 +2337,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
 // ═══════════════════════════════════════════════════════════
 // SIDEBAR
 // ═══════════════════════════════════════════════════════════
-function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick }) {
+function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks }) {
   const items = navItems || NAV;
   const companyName = user?.companyName || "";
   const initials = (companyName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
@@ -2364,7 +2364,11 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
     return (
       <button
         data-nav-key={n.key}
-        onClick={() => { setActive(n.key); onClose(); }}
+        onClick={() => { 
+          if (n.key === "tasks") setSelectedProjectForTasks(null);
+          setActive(n.key); 
+          onClose(); 
+        }}
         style={{
           width: "100%",
           display: "flex",
@@ -3616,6 +3620,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             onLogoChange={onLogoChange}
             enforceMySubscriptions={enforceMySubscriptions}
             onLogoUploadClick={() => headerLogoRef.current?.click()}
+            setSelectedProjectForTasks={setSelectedProjectForTasks}
           />
         </div>
       )}

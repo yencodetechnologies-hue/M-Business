@@ -1402,7 +1402,8 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
       {/* task name */}
       <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: bg, boxShadow: hovered ? "2px 0 8px rgba(0,0,0,0.07)" : "2px 0 4px rgba(0,0,0,0.04)", display: "flex", alignItems: "center", gap: 4, padding: "0 6px 0 0", transition: "background .1s" }}>
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: groupColor, flexShrink: 0 }} />
-        <input key={task.title} defaultValue={task.title} onBlur={e => { const v = e.target.value.trim(); if (v && v !== task.title) onField(id, "title", v); }} style={{ background: "transparent", border: "none", outline: "none", fontSize: 13, color: P.text, fontFamily: "inherit", width: "100%", padding: "9px 4px 9px 10px", textDecoration: task.checked ? "line-through" : "none", opacity: task.checked ? .5 : 1, fontWeight: 500, cursor: "pointer" }} onFocus={e => { e.target.style.background = "#fff"; e.target.style.boxShadow = "0 0 0 2px " + P.accent + "33"; e.target.style.borderRadius = "4px"; }} onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} />
+        <div onClick={() => onOpen(task)} className="openBtn" style={{ marginLeft: 6, width: 32, height: 18, background: "#fff", border: "1px solid " + P.border, borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: P.text, cursor: "pointer", opacity: 0, transition: "opacity .15s", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", zIndex: 5 }}>Open</div>
+        <input key={task.title} defaultValue={task.title} onBlur={e => { const v = e.target.value.trim(); if (v && v !== task.title) onField(id, "title", v); }} style={{ background: "transparent", border: "none", outline: "none", fontSize: 13, color: P.text, fontFamily: "inherit", width: "100%", padding: "9px 4px 9px 4px", textDecoration: task.checked ? "line-through" : "none", opacity: task.checked ? .5 : 1, fontWeight: 500, cursor: "pointer" }} onFocus={e => { e.target.style.background = "#fff"; e.target.style.boxShadow = "0 0 0 2px " + P.accent + "33"; e.target.style.borderRadius = "4px"; }} onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} />
       </div>
       {/* person */}
       {!hcSet.has('person') && (
@@ -2201,8 +2202,19 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
     ...g,
     tasks: sortFn((g.tasks || []).filter(t => {
       const tProjId = t.projectId?._id || t.projectId || t.project;
-      if (selectedProjectId && String(tProjId) !== String(selectedProjectId)) return false;
-      if (selectedProjectName && !selectedProjectId && t.project !== selectedProjectName && t.projectName !== selectedProjectName) return false;
+      
+      // If a project is selected, only show tasks for that project
+      
+      // If a project is selected, show ONLY that project's tasks
+      if (selectedProjectId) {
+        if (tProjId !== selectedProjectId) return false;
+      } else if (selectedProjectName) {
+        if (tProjId !== selectedProjectName) return false;
+      } else {
+        // No project selected (General Dashboard) -> Hide ALL tasks that belong to ANY project
+        if (tProjId) return false;
+      }
+
       if (filters.owner.size > 0 && !filters.owner.has(t.assignTo || "")) return false;
       if (filters.status.size > 0 && !filters.status.has(t.status)) return false;
       if (search && !t.title?.toLowerCase().includes(search.toLowerCase())) return false;
@@ -2249,7 +2261,17 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
         {/* TOP HEADER */}
         <div style={{ background: "#fff", borderBottom: `1px solid ${P.border}`, padding: "8px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 4px rgba(124,58,237,0.05)", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 22, fontWeight: 800, color: P.text, letterSpacing: -0.5 }}>Task</span>
+            <span style={{ fontSize: 22, fontWeight: 800, color: P.text, letterSpacing: -0.5 }}>
+              {selectedProjectName ? `Project: ${selectedProjectName}` : "Task Dashboard"}
+            </span>
+            {selectedProjectName && (
+              <button 
+                onClick={onClearProjectFilter}
+                style={{ background: "#fef2f2", border: "1px solid #fee2e2", color: "#ef4444", borderRadius: 8, padding: "4px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+              >
+                ✕ Exit Project View
+              </button>
+            )}
 
             <div style={{ display: "flex", alignItems: "center", gap: 0, marginLeft: 8 }}>
 

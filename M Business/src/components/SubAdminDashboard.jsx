@@ -1566,6 +1566,12 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                         <ActionBtns onView={() => setViewProj(p)} onEdit={() => openEdit(p)} onDelete={() => setDeleteTarget(p)} />
                         <button onClick={(e) => {
                           e.stopPropagation();
+                          if (onViewTasks) onViewTasks(p);
+                        }} style={{ padding: "6px 10px", background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", borderRadius: 7, cursor: "pointer", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 700 }}>
+                          <span>+</span> Task
+                        </button>
+                        <button onClick={(e) => {
+                          e.stopPropagation();
                           const text = `📁 *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${formatCurrency(p.budget, p.currency)}`;
                           const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                           window.open(wpUrl, "_blank");

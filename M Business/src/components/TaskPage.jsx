@@ -823,22 +823,36 @@ const TB = React.forwardRef(({ icon, label, active, onClick, badge }, ref) => (
 /* ══════════════════════════════════════════════════════════
    NEW TASK BTN
 ══════════════════════════════════════════════════════════ */
-function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, onAddTaskToGroup, setGroups }) {
+function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, onAddTaskToGroup, setGroups, projects, defaultProjectId, autoOpenAddModal, onAddModalOpened }) {
   const [open, setOpen] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
-  const [selGroup, setSelGroup] = useState("");
+  const [selProjectId, setSelProjectId] = useState(defaultProjectId || "");
   const arrowRef = useRef(); const inputRef = useRef();
-  useEffect(() => { if (showPicker) setTimeout(() => inputRef.current?.focus(), 50); if (!showPicker) setTaskTitle(""); }, [showPicker]);
+
+  useEffect(() => {
+    if (autoOpenAddModal) {
+      setShowPicker(true);
+      onAddModalOpened?.();
+    }
+  }, [autoOpenAddModal, onAddModalOpened]);
+
+  useEffect(() => {
+    if (showPicker) {
+      setTimeout(() => inputRef.current?.focus(), 50);
+      setSelProjectId(defaultProjectId || "");
+    } else {
+      setTaskTitle("");
+    }
+  }, [showPicker, defaultProjectId]);
+
   const submit = async () => {
     let gid = groups && groups[0] && (groups[0]._id || groups[0].id);
     if (!gid) {
-      // Create a default group if none exists
       try {
         const color = GRP_COLORS[0];
         const r = await axios.post(`${API}/groups`, { label: "Tasks", color });
         gid = r.data._id || r.data.id;
-        // Update local groups state
         setGroups(p => [...p, { ...r.data, tasks: [], open: true }]);
       } catch {
         showToast("Failed to create group", "error");
@@ -846,9 +860,10 @@ function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, on
       }
     }
     const title = taskTitle.trim() || "New task";
-    onAddTaskToGroup(gid, title);
-    setShowPicker(false); setSelGroup(""); setTaskTitle(""); setOpen(false);
+    onAddTaskToGroup(gid, title, selProjectId);
+    setShowPicker(false); setTaskTitle(""); setOpen(false);
   };
+
   return (
     <div style={{ display: "flex", flexShrink: 0, position: "relative" }}>
       <button onClick={() => setShowPicker(v => !v)} style={{ background: "#0073ea", color: "#fff", border: "none", borderRadius: "9px 0 0 9px", padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", borderRight: "1px solid rgba(255,255,255,0.25)", fontFamily: "inherit" }}
@@ -861,14 +876,26 @@ function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, on
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 7999 }} onClick={() => setShowPicker(false)}>
           <div onClick={e => e.stopPropagation()} style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "#fff", borderRadius: 14, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.18)", width: 440, zIndex: 8000, border: "1.5px solid #e6e9ef", animation: "ddIn .15s ease" }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: "#323338", marginBottom: 16 }}>Create new task</div>
-            <input ref={inputRef} value={taskTitle} onChange={e => setTaskTitle(e.target.value)} placeholder="Task name..."
-              onKeyDown={e => { if (e.key === "Enter") submit(); if (e.key === "Escape") setShowPicker(false); }}
-              style={{ width: "100%", border: "1.5px solid #d0d4e4", borderRadius: 9, padding: "10px 13px", fontSize: 14, fontFamily: "inherit", outline: "none", color: "#323338", boxSizing: "border-box", marginBottom: 12 }}
-              onFocus={e => e.target.style.borderColor = "#0073ea"}
-              onBlur={e => e.target.style.borderColor = "#d0d4e4"} />
-            <div style={{ marginBottom: 16 }}>
-
-
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#676879", marginBottom: 4, textTransform: "uppercase" }}>Task Title</label>
+              <input ref={inputRef} value={taskTitle} onChange={e => setTaskTitle(e.target.value)} placeholder="What needs to be done?"
+                onKeyDown={e => { if (e.key === "Enter") submit(); if (e.key === "Escape") setShowPicker(false); }}
+                style={{ width: "100%", border: "1.5px solid #d0d4e4", borderRadius: 9, padding: "10px 13px", fontSize: 14, fontFamily: "inherit", outline: "none", color: "#323338", boxSizing: "border-box" }}
+                onFocus={e => e.target.style.borderColor = "#0073ea"}
+                onBlur={e => e.target.style.borderColor = "#d0d4e4"} />
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#676879", marginBottom: 4, textTransform: "uppercase" }}>Assign to Project</label>
+              <select
+                value={selProjectId}
+                onChange={e => setSelProjectId(e.target.value)}
+                style={{ width: "100%", border: "1.5px solid #d0d4e4", borderRadius: 9, padding: "10px 13px", fontSize: 14, fontFamily: "inherit", outline: "none", color: "#323338", background: "#fff" }}
+              >
+                <option value="">No Project</option>
+                {projects.map(p => (
+                  <option key={p._id} value={p._id}>{p.name}</option>
+                ))}
+              </select>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
               <button onClick={() => setShowPicker(false)} style={{ background: "#f5f6f8", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 600, color: "#676879", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
@@ -899,7 +926,7 @@ function ImportModal({ onClose, onImportTasks }) {
   const [colMap, setColMap] = useState({}); const fileRef = useRef();
   const parseCSV = text => { const lines = text.trim().split('\n'); const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim()); const rows = lines.slice(1).map(line => { const vals = line.split(',').map(v => v.replace(/"/g, '').trim()); return Object.fromEntries(headers.map((h, i) => [h, vals[i] || ''])); }); return { headers, rows }; };
   const handleFile = f => { if (!f) return; setFile(f); setLoading(true); const reader = new FileReader(); reader.onload = e => { const text = e.target.result; const { headers, rows } = parseCSV(text); const autoMap = {}; headers.forEach(h => { const hl = h.toLowerCase(); if (hl.includes('name') || hl.includes('task') || hl.includes('title')) autoMap.title = h; else if (hl.includes('owner') || hl.includes('assign')) autoMap.assignTo = h; else if (hl.includes('status')) autoMap.status = h; else if (hl.includes('date')) autoMap.date = h; else if (hl.includes('priority')) autoMap.priority = h; }); setColMap(autoMap); setPreview({ headers, rows: rows.slice(0, 5), totalRows: rows.length, allRows: rows }); setLoading(false); }; reader.readAsText(f); };
-  const doImport = () => { if (!preview) return; const tasks = preview.allRows.map(row => ({ title: colMap.title ? row[colMap.title] : (Object.values(row)[0] || 'Imported task'), assignTo: colMap.assignTo ? row[colMap.assignTo] : '', status: colMap.status ? row[colMap.status] : 'Not Started', date: colMap.date ? row[colMap.date] : '', priority: colMap.priority ? row[colMap.priority] : '—', })).filter(t => t.title); onImportTasks(tasks); onClose(); };
+  const doImport = () => { if (!preview) return; const tasks = preview.allRows.map(row => ({ title: colMap.title ? row[colMap.title] : (Object.values(row)[0] || 'Imported task'), assignTo: colMap.assignTo ? row[colMap.assignTo] : '', status: colMap.status ? row[colMap.status] : 'Not Started', date: colMap.date ? row[colMap.date] : '', priority: colMap.priority ? row[colMap.priority] : '-', })).filter(t => t.title); onImportTasks(tasks); onClose(); };
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 9000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 560, maxHeight: "85vh", boxShadow: "0 24px 80px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -1684,38 +1711,38 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
 /* ══════════════════════════════════════════════════════════
    TASK UPDATE PANEL
 ══════════════════════════════════════════════════════════ */
-function TaskUpdatePanel({ task, onClose, onField }) {
-  const [tab, setTab] = useState("updates"); const [updateText, setUpdateText] = useState(""); const [updates, setUpdates] = useState([]);
-  const postUpdate = () => { if (!updateText.trim()) return; setUpdates(p => [{ id: Date.now(), text: updateText, time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }), date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }), ...p }]); setUpdateText(""); };
-  return (
-    <div style={{ width: 480, flexShrink: 0, background: "#fff", borderLeft: `1.5px solid ${P.border}`, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", fontFamily: "inherit" }}>
-      <div style={{ padding: "14px 18px 0", borderBottom: `1px solid ${P.border}`, flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: P.muted, fontSize: 18, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>×</button>
-            <div style={{ fontSize: 17, fontWeight: 700, color: P.text }}>{task.title}</div>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 0 }}>
-          {["updates", "", ""].map(t => (<div key={t} onClick={() => setTab(t)} style={{ padding: "8px 14px", fontSize: 13, fontWeight: tab === t ? 700 : 500, color: tab === t ? P.text : P.muted, borderBottom: tab === t ? `2px solid ${P.accent}` : "2px solid transparent", cursor: "pointer", textTransform: "capitalize" }}>{t}</div>))}
-        </div>
-      </div>
-      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
-        {tab === "updates" && (<>
-          <div style={{ margin: "12px 18px", border: `1.5px solid ${P.border}`, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
-            <textarea value={updateText} onChange={e => setUpdateText(e.target.value)} placeholder="Write an update..." style={{ width: "100%", minHeight: 100, border: "none", outline: "none", resize: "none", padding: "12px 14px", fontSize: 13, fontFamily: "inherit", color: P.text, boxSizing: "border-box" }} />
-            <div style={{ display: "flex", justifyContent: "flex-end", padding: "8px 10px", borderTop: `1px solid ${P.border}`, background: "var(--app-bg)" }}>
-              <button onClick={postUpdate} style={{ background: updateText.trim() ? "#0073ea" : "#e2e8f0", color: updateText.trim() ? "#fff" : "#94a3b8", border: "none", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 700, cursor: updateText.trim() ? "pointer" : "default", fontFamily: "inherit" }}>Update</button>
-            </div>
-          </div>
-          <div style={{ flex: 1, padding: "0 18px 18px" }}>
-            {updates.length === 0 ? (<div style={{ textAlign: "center", padding: "40px 0", color: P.muted, fontSize: 12 }}>No updates yet</div>) : updates.map(u => (<div key={u.id} style={{ display: "flex", gap: 10, marginBottom: 16 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: getAvatarColor("You"), display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>YO</div><div style={{ flex: 1 }}><div style={{ fontSize: 11, color: P.muted, marginBottom: 4 }}>You · {u.date} {u.time}</div><div style={{ background: P.light, border: `1px solid ${P.border}`, borderRadius: 9, padding: "10px 13px", fontSize: 13, color: P.text, whiteSpace: "pre-wrap" }}>{u.text}</div></div></div>))}
-          </div>
-        </>)}
-      </div>
-    </div>
-  );
-}
+// function TaskUpdatePanel({ task, onClose, onField }) {
+//   const [tab, setTab] = useState("updates"); const [updateText, setUpdateText] = useState(""); const [updates, setUpdates] = useState([]);
+//   const postUpdate = () => { if (!updateText.trim()) return; setUpdates(p => [{ id: Date.now(), text: updateText, time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }), date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }), ...p }]); setUpdateText(""); };
+//   return (
+//     <div style={{ width: 480, flexShrink: 0, background: "#fff", borderLeft: `1.5px solid ${P.border}`, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", fontFamily: "inherit" }}>
+//       <div style={{ padding: "14px 18px 0", borderBottom: `1px solid ${P.border}`, flexShrink: 0 }}>
+//         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+//           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+//             <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: P.muted, fontSize: 18, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6 }}>×</button>
+//             <div style={{ fontSize: 17, fontWeight: 700, color: P.text }}>{task.title}</div>
+//           </div>
+//         </div>
+//         <div style={{ display: "flex", gap: 0 }}>
+//           {["updates", "", ""].map(t => (<div key={t} onClick={() => setTab(t)} style={{ padding: "8px 14px", fontSize: 13, fontWeight: tab === t ? 700 : 500, color: tab === t ? P.text : P.muted, borderBottom: tab === t ? `2px solid ${P.accent}` : "2px solid transparent", cursor: "pointer", textTransform: "capitalize" }}>{t}</div>))}
+//         </div>
+//       </div>
+//       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
+//         {tab === "updates" && (<>
+//           <div style={{ margin: "12px 18px", border: `1.5px solid ${P.border}`, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
+//             <textarea value={updateText} onChange={e => setUpdateText(e.target.value)} placeholder="Write an update..." style={{ width: "100%", minHeight: 100, border: "none", outline: "none", resize: "none", padding: "12px 14px", fontSize: 13, fontFamily: "inherit", color: P.text, boxSizing: "border-box" }} />
+//             <div style={{ display: "flex", justifyContent: "flex-end", padding: "8px 10px", borderTop: `1px solid ${P.border}`, background: "var(--app-bg)" }}>
+//               <button onClick={postUpdate} style={{ background: updateText.trim() ? "#0073ea" : "#e2e8f0", color: updateText.trim() ? "#fff" : "#94a3b8", border: "none", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 700, cursor: updateText.trim() ? "pointer" : "default", fontFamily: "inherit" }}>Update</button>
+//             </div>
+//           </div>
+//           <div style={{ flex: 1, padding: "0 18px 18px" }}>
+//             {updates.length === 0 ? (<div style={{ textAlign: "center", padding: "40px 0", color: P.muted, fontSize: 12 }}>No updates yet</div>) : updates.map(u => (<div key={u.id} style={{ display: "flex", gap: 10, marginBottom: 16 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: getAvatarColor("You"), display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>YO</div><div style={{ flex: 1 }}><div style={{ fontSize: 11, color: P.muted, marginBottom: 4 }}>You · {u.date} {u.time}</div><div style={{ background: P.light, border: `1px solid ${P.border}`, borderRadius: 9, padding: "10px 13px", fontSize: 13, color: P.text, whiteSpace: "pre-wrap" }}>{u.text}</div></div></div>))}
+//           </div>
+//         </>)}
+//       </div>
+//     </div>
+//   );
+// }
 
 /* ══════════════════════════════════════════════════════════
    ADD GROUP ROW
@@ -2033,11 +2060,13 @@ function InviteModal({ task, onClose, onSend }) {
 /* ══════════════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════════════ */
-export default function TaskPage({ projects = [], employees = [], config, user, selectedProjectId = null, selectedProjectName = null, onClearProjectFilter, onUpdate }) {
+export default function TaskPage({ projects = [], employees = [], config, user, selectedProjectId = null, selectedProjectName = null, onClearProjectFilter, onSelectProject, onUpdate, autoOpenAddModal = false, onAddModalOpened }) {
   const S_LIST = config?.taskStatuses || STATUS_LIST;
   const P_LIST = config?.taskPriorities || PRIORITY_LIST;
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [projOpen, setProjOpen] = useState(false);
+  const projRef = useRef();
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState(null);
@@ -2086,8 +2115,8 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
 
   const toggleGroup = async (gid) => { const g = groups.find(x => (x._id || x.id) === gid); const nv = !g?.open; setGroups(p => p.map(x => (x._id || x.id) === gid ? { ...x, open: nv } : x)); try { await axios.put(`${API}/groups/${gid}`, { open: nv }); } catch { } };
 
-  const addTask = async (groupId, title) => {
-    const projId = selectedProjectId || null;
+  const addTask = async (groupId, title, pId) => {
+    const projId = pId || selectedProjectId || null;
     const tmp = {
       _id: "tmp_" + Date.now(),
       title,
@@ -2276,6 +2305,33 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
 
             <div style={{ display: "flex", alignItems: "center", gap: 0, marginLeft: 8 }}>
 
+              {/* ── PROJECT SELECTOR ── */}
+              <div ref={projRef} onClick={() => { closeAll(); setProjOpen(v => !v); }}
+                style={{ display: "flex", alignItems: "center", gap: 0, cursor: "pointer", border: `1px solid ${projOpen ? P.accent : P.border}`, borderRadius: 8, overflow: "hidden", background: projOpen ? P.light : "#fff", marginRight: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "6px 12px", fontSize: 13, fontWeight: 700, color: projOpen ? P.accent : P.text }}>
+                  <span style={{ fontSize: 15 }}>📁</span><span>{selectedProjectName || "All Projects"}</span>
+                </div>
+                <div style={{ padding: "6px 8px", borderLeft: `1px solid ${P.border}`, fontSize: 11, color: projOpen ? P.accent : P.muted }}>▾</div>
+              </div>
+              {projOpen && (
+                <DD anchor={projRef} onClose={() => setProjOpen(false)} w={240}>
+                  <div style={{ padding: "10px 14px 6px", fontSize: 11, fontWeight: 700, color: P.muted, letterSpacing: .8, textTransform: "uppercase" }}>
+                    Select Project
+                  </div>
+                  <MI icon="🌐" title="All Projects (General)" active={!selectedProjectId} onClick={() => { onSelectProject(null); setProjOpen(false); onAddModalOpened?.(true); }} />
+                  <Sep />
+                  <div style={{ maxHeight: 300, overflowY: "auto" }}>
+                    {projects.length === 0 ? (
+                      <div style={{ padding: "12px 14px", fontSize: 12, color: P.muted, fontStyle: "italic" }}>No projects found</div>
+                    ) : (
+                      projects.map(p => (
+                        <MI key={p._id || p.id} icon="📁" title={p.name} sub={p.client} active={selectedProjectId === (p._id || p.id)} onClick={() => { onSelectProject(p); setProjOpen(false); onAddModalOpened?.(true); }} />
+                      ))
+                    )}
+                  </div>
+                </DD>
+              )}
+
               {/* ── VIEW SWITCHER BUTTON ── */}
               <div ref={mainTableRef} onClick={() => { closeAll(); setViewOpen(v => !v); }}
                 style={{ display: "flex", alignItems: "center", gap: 0, cursor: "pointer", border: `1px solid ${viewOpen ? P.accent : P.border}`, borderRadius: 8, overflow: "hidden", background: viewOpen ? P.light : "#fff" }}>
@@ -2304,7 +2360,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
         {/* TOOLBAR — only for table view */}
         {currentView === "table" && (
           <div style={{ background: "#fff", borderBottom: `1.5px solid ${P.border}`, padding: "6px 18px", display: "flex", alignItems: "center", gap: 4, flexShrink: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(124,58,237,0.06)" }}>
-            <NewTaskBtn onAddTask={addNewTask} onTriggerGroup={() => addGroupTrigger.current?.trigger()} showToast={showToast} onImport={() => setShowImport(true)} groups={groups} onAddTaskToGroup={addTask} setGroups={setGroups} />
+            <NewTaskBtn onAddTask={addNewTask} onTriggerGroup={() => addGroupTrigger.current?.trigger()} showToast={showToast} onImport={() => setShowImport(true)} groups={groups} onAddTaskToGroup={addTask} setGroups={setGroups} projects={projects} defaultProjectId={selectedProjectId} autoOpenAddModal={autoOpenAddModal} onAddModalOpened={onAddModalOpened} />
             <div style={{ width: 1, height: 22, background: P.border, margin: "0 4px", flexShrink: 0 }} />
             <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
 
@@ -2392,7 +2448,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
 
         {selected && !sidekick && !updatePanel && <DetailPanel task={selected} onClose={() => setSelected(null)} onField={updateField} projects={projects} />}
         {sidekick && !updatePanel && <SidekickPanel onClose={() => setSidekick(false)} groups={groups} />}
-        {updatePanel && <TaskUpdatePanel task={updatePanel} onClose={() => setUpdatePanel(null)} onField={updateField} />}
+        {/* {updatePanel && <TaskUpdatePanel task={updatePanel} onClose={() => setUpdatePanel(null)} onField={updateField} />} */}
       </div>
 
       {showAddCol && <AddColumnModal onAdd={addExtraCol} onClose={() => setShowAddCol(false)} />}

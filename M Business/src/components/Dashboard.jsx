@@ -843,7 +843,7 @@ function ManagersPage({ managers, setManagers }) {
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, setProjects, clients, employees, config }) {
+function ProjectsPage({ projects, setProjects, clients, employees, config, onViewTasks }) {
   const [search, setSearch] = useState("");
   const [viewProj, setViewProj] = useState(null);
   const [editProj, setEditProj] = useState(null);
@@ -930,7 +930,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config }) {
             <tbody>
               {paginated.length === 0 ? <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "var(--app-muted)" }}>No projects found</td></tr>
                 : paginated.map((p, i) => (
-                  <tr key={p._id || i} style={{ borderBottom: "1px solid var(--app-border)" }} onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
+                  <tr key={p._id || i} style={{ borderBottom: "1px solid var(--app-border)", cursor: "pointer" }} onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"} onClick={() => onViewTasks?.(p)}>
                     <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                     <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{p.name}</td>
                     <td style={{ padding: "12px 14px", color: "var(--app-accent)" }}>{p.client || "—"}</td>
@@ -1693,6 +1693,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const fetchEmployees = async () => { try { const res = await axios.get(BASE_URL + "/api/employees"); setEmployees(res.data); } catch (e) { console.log(e); } };
   const fetchProjects = async () => { try { const res = await axios.get(BASE_URL + "/api/projects"); setProjects(res.data); } catch (e) { console.log(e); } };
   const fetchManagers = async () => { try { const res = await axios.get(BASE_URL + "/api/managers"); setManagers(res.data); } catch (e) { console.log(e); } };
+  const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
+  const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
+  
   const fetchTasks = async () => { try { const res = await axios.get(BASE_URL + "/api/tasks"); setTasks(res.data); } catch (e) { console.log(e); } };
   const fetchConfig = async () => { try { const cid = user?._id || user?.id; if (!cid) return; const res = await axios.get(`${BASE_URL}/api/config/${cid}`); setConfig(res.data); } catch (e) { console.log(e); } };
 
@@ -1889,7 +1892,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         const pTasks = (tasks || []).filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
                         const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
                         return (
-                          <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { if (typeof setSelectedProjectForTasks === "function") setSelectedProjectForTasks(p); setActive("tasks"); }}>
+                          <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { if (typeof setSelectedProjectForTasks === "function") setSelectedProjectForTasks(p); setAutoOpenTaskModal(true); setActive("tasks"); }}>
                             <td style={{ padding: "9px 10px", fontWeight: 600, color: T.text }}>
                               <div style={{ fontSize: 13 }}>{p.name}</div>
                               <div style={{ fontSize: 11, color: "#22C55E" }}>{p.currency || "₹"} {p.budget || "0"}</div>
@@ -1928,13 +1931,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} />}
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} />}
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setAutoOpenTaskModal(true); setActive("tasks"); }} />}
 
           {validActive === "invoices" && <InvoiceCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive === "quotations" && <QuotationCreator clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => setModal("client")} onAddProject={() => setModal("project")} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
-          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} />}
+          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
           {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={user?.companyId || user?._id || ""} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
           {validActive === "settings" && <SettingsPage user={user} />}

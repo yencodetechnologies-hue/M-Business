@@ -2705,6 +2705,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [active, setActive] = useState("dashboard");
   const [jumpProject, setJumpProject] = useState(null);
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
+  const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
   const [modal, setModal] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
@@ -4083,7 +4084,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           const pTasks = tasks.filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
                           const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
                           return (
-                            <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { setSelectedProjectForTasks(p); setActive("tasks"); }}>
+                            <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { setSelectedProjectForTasks(p); setAutoOpenTaskModal(true); setActive("tasks"); }}>
                               <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
                                 <div style={{ fontSize: 13 }}>{p.name}</div>
                                 <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
@@ -4150,7 +4151,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setAutoOpenTaskModal(true); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
             const limit = getSubscriptionLimit("employee");
             if (subscription && employees.length >= limit) {
               setLimitModal({ type: "employee", limit });
@@ -4178,7 +4179,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
           {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
-          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} />}
+          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
           {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
           {validActive === "settings" && (

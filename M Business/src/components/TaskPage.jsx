@@ -1369,7 +1369,28 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
       {/* task name */}
       <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: bg, boxShadow: hovered ? "2px 0 8px rgba(0,0,0,0.07)" : "2px 0 4px rgba(0,0,0,0.04)", display: "flex", alignItems: "center", gap: 4, padding: "0 6px 0 0", transition: "background .1s" }}>
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: groupColor, flexShrink: 0 }} />
-        <input key={task.title} defaultValue={task.title} onBlur={e => { const v = e.target.value.trim(); if (v && v !== task.title) onField(id, "title", v); }} style={{ background: "transparent", border: "none", outline: "none", fontSize: 13, color: P.text, fontFamily: "inherit", width: "100%", padding: "9px 4px 9px 4px", textDecoration: task.checked ? "line-through" : "none", opacity: task.checked ? .5 : 1, fontWeight: 500, cursor: "pointer" }} onFocus={e => { e.target.style.background = "#fff"; e.target.style.boxShadow = "0 0 0 2px " + P.accent + "33"; e.target.style.borderRadius = "4px"; }} onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} />
+        <input 
+          key={task.title} 
+          defaultValue={task.title} 
+          onFocus={e => {
+            if (e.target.value === "New task") {
+              e.target.value = "";
+            }
+            e.target.style.background = "#fff";
+            e.target.style.boxShadow = "0 0 0 2px " + P.accent + "33";
+            e.target.style.borderRadius = "4px";
+          }}
+          onBlur={e => { 
+            const v = e.target.value.trim(); 
+            if (v && v !== task.title) onField(id, "title", v); 
+            else if (!v && task.title === "New task") {
+              // Keep "New task" if blurred with empty and it was originally "New task"
+              e.target.value = "New task";
+            }
+          }} 
+          style={{ background: "transparent", border: "none", outline: "none", fontSize: 13, color: P.text, fontFamily: "inherit", width: "100%", padding: "9px 4px 9px 4px", textDecoration: task.checked ? "line-through" : "none", opacity: task.checked ? .5 : 1, fontWeight: 500, cursor: "pointer" }} 
+          onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} 
+        />
       </div>
       {/* person */}
       {!hcSet.has('person') && (
@@ -2194,7 +2215,23 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
   });
 
   let displayGroups;
-  if (groupBy === "default") { displayGroups = filteredGroups.map(g => ({ ...g, isVirtual: false })); }
+  if (groupBy === "default") { 
+    if (selectedProjectId || selectedProjectName) {
+      // Merge all tasks into one single display group when viewing a specific project
+      const allTasks = filteredGroups.flatMap(g => g.tasks);
+      const firstGid = filteredGroups[0]?._id || groups[0]?._id || "default";
+      displayGroups = [{
+        _id: firstGid,
+        label: "Tasks",
+        color: P.accent,
+        open: true,
+        isVirtual: true, 
+        tasks: allTasks
+      }];
+    } else {
+      displayGroups = filteredGroups.map(g => ({ ...g, isVirtual: false })); 
+    }
+  }
   else { const all = filteredGroups.flatMap(g => g.tasks || []); if (groupBy === "status") { displayGroups = STATUS_LIST.map(s => ({ _id: "v" + s, label: s, color: STATUS_CFG[s].bg, open: true, isVirtual: true, tasks: all.filter(t => t.status === s) })).filter(g => g.tasks.length > 0); } else { const today = new Date(); today.setHours(0, 0, 0, 0); const nw = new Date(today); nw.setDate(nw.getDate() + 7); displayGroups = [{ _id: "vov", label: "Overdue", color: "#e2445c", open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); return !isNaN(d) && d < today && t.status !== "Done"; }) }, { _id: "vto", label: "Today", color: "#fdab3d", open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); d.setHours(0, 0, 0, 0); return !isNaN(d) && d.getTime() === today.getTime(); }) }, { _id: "vwk", label: "This Week", color: P.accent, open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); return !isNaN(d) && d > today && d < nw; }) }, { _id: "vla", label: "Later", color: P.mid, open: true, isVirtual: true, tasks: all.filter(t => { const d = new Date(t.date); return !isNaN(d) && d >= nw; }) }, { _id: "vnd", label: "No date", color: "#c4b5fd", open: true, isVirtual: true, tasks: all.filter(t => !t.date || isNaN(new Date(t.date))) }].filter(g => g.tasks.length > 0); } }
 
   const allTasks = groups.flatMap(g => g.tasks || []);

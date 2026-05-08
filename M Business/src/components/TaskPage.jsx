@@ -824,29 +824,7 @@ const TB = React.forwardRef(({ icon, label, active, onClick, badge }, ref) => (
    NEW TASK BTN
 ══════════════════════════════════════════════════════════ */
 function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, onAddTaskToGroup, setGroups, projects, defaultProjectId, autoOpenAddModal, onAddModalOpened }) {
-  const [open, setOpen] = useState(false);
-  const [showPicker, setShowPicker] = useState(false);
-  const [taskTitle, setTaskTitle] = useState("");
-  const [selProjectId, setSelProjectId] = useState(defaultProjectId || "");
-  const arrowRef = useRef(); const inputRef = useRef();
-
-  useEffect(() => {
-    if (autoOpenAddModal) {
-      setShowPicker(true);
-      onAddModalOpened?.();
-    }
-  }, [autoOpenAddModal, onAddModalOpened]);
-
-  useEffect(() => {
-    if (showPicker) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-      setSelProjectId(defaultProjectId || "");
-    } else {
-      setTaskTitle("");
-    }
-  }, [showPicker, defaultProjectId]);
-
-  const submit = async () => {
+  const quickAdd = async (pId = null) => {
     let gid = groups && groups[0] && (groups[0]._id || groups[0].id);
     if (!gid) {
       try {
@@ -859,60 +837,22 @@ function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, on
         return;
       }
     }
-    const title = taskTitle.trim() || "New task";
-    onAddTaskToGroup(gid, title, selProjectId);
-    setShowPicker(false); setTaskTitle(""); setOpen(false);
+    const projId = pId || defaultProjectId || "";
+    onAddTaskToGroup(gid, "New task", projId);
   };
+
+  useEffect(() => {
+    if (autoOpenAddModal) {
+      quickAdd();
+      onAddModalOpened?.();
+    }
+  }, [autoOpenAddModal, onAddModalOpened, groups, defaultProjectId]);
 
   return (
     <div style={{ display: "flex", flexShrink: 0, position: "relative" }}>
-      <button onClick={() => setShowPicker(v => !v)} style={{ background: "#0073ea", color: "#fff", border: "none", borderRadius: "9px 0 0 9px", padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", borderRight: "1px solid rgba(255,255,255,0.25)", fontFamily: "inherit" }}
+      <button onClick={() => quickAdd()} style={{ background: "#0073ea", color: "#fff", border: "none", borderRadius: "9px", padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
         onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.1)"}
         onMouseLeave={e => e.currentTarget.style.filter = "none"}>+ New task</button>
-      <button ref={arrowRef} onClick={() => { setOpen(v => !v); setShowPicker(false); }} style={{ background: "#0073ea", color: "#fff", border: "none", borderRadius: "0 9px 9px 0", padding: "7px 9px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center" }}
-        onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.1)"}
-        onMouseLeave={e => e.currentTarget.style.filter = "none"}>▾</button>
-      {showPicker && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 7999 }} onClick={() => setShowPicker(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "#fff", borderRadius: 14, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.18)", width: 440, zIndex: 8000, border: "1.5px solid #e6e9ef", animation: "ddIn .15s ease" }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: "#323338", marginBottom: 16 }}>Create new task</div>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#676879", marginBottom: 4, textTransform: "uppercase" }}>Task Title</label>
-              <input ref={inputRef} value={taskTitle} onChange={e => setTaskTitle(e.target.value)} placeholder="What needs to be done?"
-                onKeyDown={e => { if (e.key === "Enter") submit(); if (e.key === "Escape") setShowPicker(false); }}
-                style={{ width: "100%", border: "1.5px solid #d0d4e4", borderRadius: 9, padding: "10px 13px", fontSize: 14, fontFamily: "inherit", outline: "none", color: "#323338", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "#0073ea"}
-                onBlur={e => e.target.style.borderColor = "#d0d4e4"} />
-            </div>
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#676879", marginBottom: 4, textTransform: "uppercase" }}>Assign to Project</label>
-              <select
-                value={selProjectId}
-                onChange={e => setSelProjectId(e.target.value)}
-                style={{ width: "100%", border: "1.5px solid #d0d4e4", borderRadius: 9, padding: "10px 13px", fontSize: 14, fontFamily: "inherit", outline: "none", color: "#323338", background: "#fff" }}
-              >
-                <option value="">No Project</option>
-                {projects.map(p => (
-                  <option key={p._id} value={p._id}>{p.name}</option>
-                ))}
-              </select>
-            </div>
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button onClick={() => setShowPicker(false)} style={{ background: "#f5f6f8", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 600, color: "#676879", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
-              <button onClick={submit} style={{ background: taskTitle.trim() ? "#0073ea" : "#c3d9f0", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 700, cursor: taskTitle.trim() ? "pointer" : "default", fontFamily: "inherit" }}>Create task</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {open && (
-        <DD anchor={arrowRef} onClose={() => setOpen(false)} w={230}>
-          <div style={{ fontSize: 10, color: "#676879", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", padding: "8px 12px 5px" }}>Create new</div>
-          <MI icon="✅" title="Task" sub="Add task with details" onClick={() => { setOpen(false); setShowPicker(true); }} />
-         
-          <Sep />
-          <MI icon="📥" title="Import" sub="Excel, CSV or from files" onClick={() => { onImport && onImport(); setOpen(false); }} />
-        </DD>
-      )}
     </div>
   );
 }
@@ -1429,7 +1369,6 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
       {/* task name */}
       <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: bg, boxShadow: hovered ? "2px 0 8px rgba(0,0,0,0.07)" : "2px 0 4px rgba(0,0,0,0.04)", display: "flex", alignItems: "center", gap: 4, padding: "0 6px 0 0", transition: "background .1s" }}>
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: groupColor, flexShrink: 0 }} />
-        <div onClick={() => onOpen(task)} className="openBtn" style={{ marginLeft: 6, width: 32, height: 18, background: "#fff", border: "1px solid " + P.border, borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: P.text, cursor: "pointer", opacity: 0, transition: "opacity .15s", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", zIndex: 5 }}>Open</div>
         <input key={task.title} defaultValue={task.title} onBlur={e => { const v = e.target.value.trim(); if (v && v !== task.title) onField(id, "title", v); }} style={{ background: "transparent", border: "none", outline: "none", fontSize: 13, color: P.text, fontFamily: "inherit", width: "100%", padding: "9px 4px 9px 4px", textDecoration: task.checked ? "line-through" : "none", opacity: task.checked ? .5 : 1, fontWeight: 500, cursor: "pointer" }} onFocus={e => { e.target.style.background = "#fff"; e.target.style.boxShadow = "0 0 0 2px " + P.accent + "33"; e.target.style.borderRadius = "4px"; }} onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} />
       </div>
       {/* person */}
@@ -1870,7 +1809,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                   shareTask={shareTask} />
               ))}
 
-              {!isVirtual && (adding ? (
+              {!isVirtual && adding && (
                 <div style={{ display: "flex", alignItems: "stretch", borderTop: `1px solid ${P.border}`, background: P.light, minHeight: 40, minWidth: "max-content" }}>
                   <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 10, background: P.light, borderRight: `1px solid ${P.border}`, padding: "6px 8px", display: "flex", gap: 6, alignItems: "center" }}>
                     <input autoFocus placeholder="Task name…" value={newTitle} onChange={e => setNewTitle(e.target.value)} onKeyDown={e => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setNewTitle(""); } }} style={{ flex: 1, border: `1.5px solid ${P.accent}`, borderRadius: 6, padding: "5px 9px", fontSize: 13, fontFamily: "inherit", outline: "none", color: P.text, background: "#fff" }} />
@@ -1884,12 +1823,7 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
                   {visibleExtraCols.map(c => <div key={c.id} style={{ width: extraColWidth(c.type), flexShrink: 0, borderRight: `1px solid ${P.border}` }} />)}
                   <div style={{ width: COL_W.dots, flexShrink: 0 }} />
                 </div>
-              ) : (
-                <div onClick={() => setAdding(true)} className="add-task-row" style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 10px", cursor: "pointer", color: "#676879", fontSize: 13, borderTop: `1px solid ${P.border}`, background: "#fff", minWidth: "max-content" }} onMouseEnter={e => e.currentTarget.style.background = "#f0f7ff"} onMouseLeave={e => e.currentTarget.style.background = "#fff"}>
-                  <span style={{ fontSize: 18, color: "#0073ea", fontWeight: 300, lineHeight: 1, width: 20, textAlign: "center", flexShrink: 0 }}>+</span>
-                  <span style={{ fontWeight: 500, color: "#323338" }}>Add task</span>
-                </div>
-              ))}
+              )}
 
               {/* Footer summary */}
               {tasks.length > 0 && (() => {
@@ -2250,11 +2184,13 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
       if (search && !t.title?.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     }))
-  })).filter(g => {
-    if (selectedProjectId || selectedProjectName) {
-      return g.tasks.length > 0;
+  })).filter((g, i) => {
+    // If no project selected, hide empty groups to keep the board clean
+    if (!selectedProjectId && !selectedProjectName) {
+      return g.tasks.length > 0 || i === 0;
     }
-    return true;
+    // If project selected, show groups that have tasks for this project
+    return g.tasks.length > 0;
   });
 
   let displayGroups;

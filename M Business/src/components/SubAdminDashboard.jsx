@@ -670,6 +670,7 @@ function EmployeesPage({ employees, setEmployees }) {
       salary: e.salary || "",
       status: e.status || "Pending",
       dateOfBirth: e.dateOfBirth || "",
+      joiningDate: e.joiningDate || "",
       maritalStatus: e.maritalStatus || "Unmarried",
       address: e.address || "",
       bankName: e.bankDetails?.bankName || "",
@@ -859,6 +860,7 @@ function EmployeesPage({ employees, setEmployees }) {
           <InfoRow icon="🏢" label="Department" value={viewEmp.department} />
           <InfoRow icon="💰" label="Salary" value={viewEmp.salary} />
           <InfoRow icon="📅" label="Date of Birth" value={viewEmp.dateOfBirth} />
+          <InfoRow icon="📅" label="Joining Date" value={viewEmp.joiningDate} />
           <InfoRow icon="💍" label="Marital Status" value={viewEmp.maritalStatus} />
           <InfoRow icon="📍" label="Address" value={viewEmp.address} />
           <InfoRow icon="🕒" label="Joined" value={viewEmp.createdAt ? new Date(viewEmp.createdAt).toLocaleDateString() : "—"} />
@@ -943,6 +945,7 @@ function EmployeesPage({ employees, setEmployees }) {
             <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
             <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
             <Fld label="Date of Birth" value={editForm.dateOfBirth} onChange={v => setEditForm(p => ({ ...p, dateOfBirth: v }))} type="date" />
+            <Fld label="Joining Date" value={editForm.joiningDate} onChange={v => setEditForm(p => ({ ...p, joiningDate: v }))} type="date" />
             <Fld label="Marital Status" value={editForm.maritalStatus} onChange={v => setEditForm(p => ({ ...p, maritalStatus: v }))} options={["Unmarried", "Married"]} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
           </div>
@@ -4547,6 +4550,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
           <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
           <Fld label="Date of Birth" value={ne.dateOfBirth} onChange={v => setNe({ ...ne, dateOfBirth: v })} type="date" />
+          <Fld label="Joining Date" value={ne.joiningDate} onChange={v => setNe({ ...ne, joiningDate: v })} type="date" />
           <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
           <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Pending", "Approved", "Rejected"]} />
         </div>

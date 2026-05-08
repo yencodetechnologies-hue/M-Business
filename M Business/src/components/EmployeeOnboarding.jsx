@@ -26,6 +26,7 @@ export default function EmployeeOnboarding() {
     role: "employee",
     status: "Pending",
     dateOfBirth: "",
+    joiningDate: "",
     maritalStatus: "Unmarried"
   });
   const [docs, setDocs] = useState({
@@ -95,8 +96,8 @@ export default function EmployeeOnboarding() {
         profilePhoto: form.photo,
         companyId: queryParams.get("companyId") || "",
         dateOfBirth: form.dateOfBirth,
+        joiningDate: form.joiningDate,
         maritalStatus: form.maritalStatus,
-
       };
 
       await axios.post(`${BASE_URL}/api/employees/add`, payload);
@@ -181,6 +182,13 @@ export default function EmployeeOnboarding() {
               label="Date of Birth"
               value={form.dateOfBirth}
               onChange={v => handleChange("dateOfBirth", v)}
+              type="date"
+              placeholder=""
+            />
+            <Input
+              label="Joining Date"
+              value={form.joiningDate}
+              onChange={v => handleChange("joiningDate", v)}
               type="date"
               placeholder=""
             />

@@ -33,9 +33,9 @@ function Modal({ title, onClose, children, THEME }) {
         <div style={{ padding: "20px 24px", borderBottom: `1px solid ${THEME.border}`,
           display: "flex", justifyContent: "space-between", alignItems: "center",
           background: THEME.surface, flexShrink: 0 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: THEME.text }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none",
-            fontSize: 20, cursor: "pointer", color: THEME.muted, padding: "4px 8px" }}>✕</button>
+          <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: THEME.text, letterSpacing: "-0.5px" }}>{title}</h2>
+          <button onClick={onClose} style={{ background: "rgba(0,0,0,0.05)", border: "none",
+            fontSize: 20, cursor: "pointer", color: THEME.text, padding: "6px 12px", borderRadius: 10, fontWeight: 800 }}>✕</button>
         </div>
         <div style={{ overflowY: "auto", padding: "24px", flex: 1, background: THEME.card }}>{children}</div>
       </div>
@@ -56,14 +56,14 @@ function Toast({ msg, THEME }) {
 function Fld({ label, value, onChange, options, type = "text", error, placeholder, prefix, THEME }) {
   const s = {
     width: "100%", border: `1.5px solid ${error ? "#EF4444" : THEME.border}`,
-    borderRadius: 10, padding: prefix ? "10px 14px 10px 30px" : "10px 14px",
-    fontSize: 13, color: THEME.text, background: THEME.surface,
-    boxSizing: "border-box", outline: "none", fontFamily: "inherit"
+    borderRadius: 12, padding: prefix ? "12px 14px 12px 34px" : "12px 14px",
+    fontSize: 14, color: THEME.text, background: "#fff",
+    boxSizing: "border-box", outline: "none", fontFamily: "inherit", fontWeight: 600
   };
   return (
-    <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 11, color: THEME.muted, fontWeight: 700,
-        letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
+    <div style={{ marginBottom: 18 }}>
+      <label style={{ display: "block", fontSize: 12, color: THEME.text, fontWeight: 800,
+        letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase", opacity: 0.8 }}>{label}</label>
       <div style={{ position: "relative" }}>
         {prefix && (
           <span style={{ position: "absolute", left: 10, top: "50%",
@@ -99,15 +99,15 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient, THEME })
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative" }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? THEME.accent : THEME.border}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? THEME.text : THEME.muted, background: THEME.surface, cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? THEME.accent : "#ddd6fe"}`, borderRadius: 12, padding: "12px 36px 12px 14px", fontSize: 14, color: value ? "#1e1b4b" : "#64748b", background: "#fff", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 46, fontWeight: 600 }}>
         {value ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 22, height: 22, borderRadius: "50%", background: THEME.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: THEME.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{value[0].toUpperCase()}</div>
             <span>{value}</span>
-            {selected?.companyName && <span style={{ fontSize: 11, color: THEME.muted }}>({selected.companyName})</span>}
+            {selected?.companyName && <span style={{ fontSize: 12, color: THEME.muted }}>({selected.companyName})</span>}
           </div>
         ) : "-- Select Client --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: THEME.muted, transition: "0.2s" }}>▼</span>
+        <span style={{ position: "absolute", right: 14, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 12, color: THEME.text, transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: THEME.card, border: `1.5px solid ${THEME.border}`, borderRadius: 12, boxShadow: THEME.shadow, zIndex: 999, overflow: "hidden" }}>
@@ -153,67 +153,81 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
         {stats.map(({ t, v, i, c, desc }) => (
-          <div key={t} className="premium-card" style={{ background: THEME.card, borderRadius: 24, padding: 28, boxShadow: THEME.shadow, border: `1.5px solid ${THEME.border}`, position: "relative", overflow: "hidden" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 14, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{i}</div>
+          <div key={t} style={{ 
+            background: `linear-gradient(135deg, ${THEME.card}, ${THEME.surface})`, 
+            borderRadius: 32, padding: 32, 
+            boxShadow: "0 10px 40px rgba(0,0,0,0.04)", 
+            border: `1.5px solid ${THEME.border}`, 
+            position: "relative", overflow: "hidden",
+            transition: "transform 0.2s ease"
+          }} onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
+            <div style={{ position: "absolute", top: -20, right: -20, fontSize: 100, opacity: 0.05, transform: "rotate(-15deg)" }}>{i}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 24 }}>
+              <div style={{ width: 56, height: 56, borderRadius: 18, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, boxShadow: `0 8px 20px ${c}20` }}>{i}</div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 800, color: THEME.muted, letterSpacing: 1, textTransform: "uppercase" }}>{t}</div>
-                <div style={{ fontSize: 12, color: THEME.muted, opacity: 0.8 }}>{desc}</div>
+                <div style={{ fontSize: 12, fontWeight: 800, color: THEME.text, letterSpacing: 1.2, textTransform: "uppercase", opacity: 0.7 }}>{t}</div>
+                <div style={{ fontSize: 13, color: THEME.muted, fontWeight: 600 }}>{desc}</div>
               </div>
             </div>
-            <div style={{ fontSize: 32, fontWeight: 900, color: c }}>{v}</div>
+            <div style={{ fontSize: 36, fontWeight: 900, color: c, letterSpacing: "-1px" }}>{v}</div>
           </div>
         ))}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: 24 }}>
-        <div style={{ background: THEME.card, borderRadius: 28, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
-          <h3 style={{ margin: "0 0 24px 0", fontSize: 18, fontWeight: 900, color: THEME.text }}>Cash Flow Analysis</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: "0 10px 40px rgba(0,0,0,0.04)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
+            <div style={{ width: 12, height: 24, background: THEME.accent, borderRadius: 4 }}></div>
+            <h3 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: THEME.text }}>Cash Flow Analysis</h3>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 13, fontWeight: 700 }}>
-                <span style={{ color: THEME.muted }}>Income</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, fontSize: 14, fontWeight: 800 }}>
+                <span style={{ color: THEME.text }}>Total Income</span>
                 <span style={{ color: "#22c55e" }}>{formatCurrency(totalIncome)}</span>
               </div>
-              <div style={{ height: 10, background: THEME.surface, borderRadius: 5, overflow: "hidden" }}>
-                <div style={{ height: "100%", background: "#22c55e", width: `${Math.min(100, (totalIncome / (totalIncome + totalExpenses || 1)) * 100)}%` }}></div>
+              <div style={{ height: 14, background: "#f1f5f9", borderRadius: 7, overflow: "hidden", border: "1px solid #e2e8f0" }}>
+                <div style={{ height: "100%", background: "linear-gradient(90deg, #22c55e, #4ade80)", width: `${Math.min(100, (totalIncome / (totalIncome + totalExpenses || 1)) * 100)}%`, borderRadius: 7 }}></div>
               </div>
             </div>
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 13, fontWeight: 700 }}>
-                <span style={{ color: THEME.muted }}>Expenses</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, fontSize: 14, fontWeight: 800 }}>
+                <span style={{ color: THEME.text }}>Total Expenses</span>
                 <span style={{ color: "#ef4444" }}>{formatCurrency(totalExpenses)}</span>
               </div>
-              <div style={{ height: 10, background: THEME.surface, borderRadius: 5, overflow: "hidden" }}>
-                <div style={{ height: "100%", background: "#ef4444", width: `${Math.min(100, (totalExpenses / (totalIncome + totalExpenses || 1)) * 100)}%` }}></div>
+              <div style={{ height: 14, background: "#f1f5f9", borderRadius: 7, overflow: "hidden", border: "1px solid #e2e8f0" }}>
+                <div style={{ height: "100%", background: "linear-gradient(90deg, #ef4444, #f87171)", width: `${Math.min(100, (totalExpenses / (totalIncome + totalExpenses || 1)) * 100)}%`, borderRadius: 7 }}></div>
               </div>
             </div>
           </div>
         </div>
 
-        <div style={{ background: THEME.card, borderRadius: 28, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
-          <h3 style={{ margin: "0 0 24px 0", fontSize: 18, fontWeight: 900, color: THEME.text }}>Recent Transactions</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: "0 10px 40px rgba(0,0,0,0.04)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
+            <div style={{ width: 12, height: 24, background: "#10b981", borderRadius: 4 }}></div>
+            <h3 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: THEME.text }}>Recent Activity</h3>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {[...income.map(i => ({ ...i, type: "income" })), ...expenses.map(e => ({ ...e, type: "expense" }))]
               .sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date))
               .slice(0, 5)
               .map((item, idx) => (
-                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 14, borderBottom: idx === 4 ? "none" : `1px solid ${THEME.border}` }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: item.type === "income" ? "#dcfce7" : "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-                    {item.type === "income" ? "📈" : "📉"}
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px", borderRadius: 16, background: idx === 0 ? `${THEME.accent}08` : "transparent", transition: "background 0.2s" }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 14, background: item.type === "income" ? "#dcfce7" : "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: item.type === "income" ? "0 4px 12px #dcfce7" : "0 4px 12px #fee2e2" }}>
+                    {item.type === "income" ? "💰" : "💸"}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 14, fontWeight: 800, color: THEME.text }}>{item.title}</div>
                     <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 600 }}>{new Date(item.createdAt || item.date).toLocaleDateString()} • {item.category}</div>
                   </div>
-                  <div style={{ fontSize: 15, fontWeight: 900, color: item.type === "income" ? "#16a34a" : "#dc2626" }}>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: item.type === "income" ? "#16a34a" : "#dc2626" }}>
                     {item.type === "income" ? "+" : "-"}{formatCurrency(item.amount)}
                   </div>
                 </div>
               ))}
-            {(income.length === 0 && expenses.length === 0) && <div style={{ textAlign: "center", color: THEME.muted, fontSize: 13, padding: 20 }}>No records found</div>}
+            {(income.length === 0 && expenses.length === 0) && <div style={{ textAlign: "center", color: THEME.muted, fontSize: 13, padding: 20 }}>No activity yet</div>}
           </div>
         </div>
       </div>
@@ -335,11 +349,14 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
   };
 
   return (
-    <div style={{ background: THEME.card, borderRadius: 28, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
+    <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: "0 10px 40px rgba(0,0,0,0.04)" }}>
       <Toast msg={toast} THEME={THEME} />
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h3 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: THEME.text }}>Expense Log</h3>
-        <button onClick={() => setModal("add")} style={{ background: THEME.accent, color: "#fff", border: "none", borderRadius: 12, padding: "10px 24px", fontWeight: 800, fontSize: 13, cursor: "pointer" }}>+ New Expense</button>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 14, height: 28, background: THEME.accent, opacity: 0.8, borderRadius: 4 }}></div>
+          <h3 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: THEME.text, letterSpacing: "-0.5px" }}>Expense Log</h3>
+        </div>
+        <button onClick={() => setModal("add")} style={{ background: `linear-gradient(135deg, ${THEME.accent}, ${THEME.accent}dd)`, color: "#fff", border: "none", borderRadius: 14, padding: "12px 28px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: `0 6px 15px ${THEME.accent}40` }}>+ New Expense</button>
       </div>
 
       <div style={{ overflowX: "auto" }}>
@@ -347,7 +364,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
           <thead>
             <tr>
               {["Title", "Category", "Amount", "Status", "Date"].map(h => (
-                <th key={h} style={{ padding: "16px", textAlign: "left", fontWeight: 800, color: THEME.muted, borderBottom: `2px solid ${THEME.border}`, fontSize: 12 }}>{h.toUpperCase()}</th>
+                <th key={h} style={{ padding: "16px", textAlign: "left", fontWeight: 800, color: THEME.text, opacity: 0.6, borderBottom: `2px solid ${THEME.border}`, fontSize: 13 }}>{h.toUpperCase()}</th>
               ))}
             </tr>
           </thead>
@@ -402,11 +419,14 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
   };
 
   return (
-    <div style={{ background: THEME.card, borderRadius: 28, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
+    <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: "0 10px 40px rgba(0,0,0,0.04)" }}>
       <Toast msg={toast} THEME={THEME} />
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h3 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: THEME.text }}>Income Log</h3>
-        <button onClick={() => setModal("add")} style={{ background: "#10b981", color: "#fff", border: "none", borderRadius: 12, padding: "10px 24px", fontWeight: 800, fontSize: 13, cursor: "pointer" }}>+ Record Income</button>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 14, height: 28, background: "#10b981", borderRadius: 4 }}></div>
+          <h3 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: THEME.text, letterSpacing: "-0.5px" }}>Income Log</h3>
+        </div>
+        <button onClick={() => setModal("add")} style={{ background: "linear-gradient(135deg, #10b981, #34d399)", color: "#fff", border: "none", borderRadius: 14, padding: "12px 28px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 6px 15px rgba(16,185,129,0.3)" }}>+ Record Income</button>
       </div>
 
       <div style={{ overflowX: "auto" }}>
@@ -414,7 +434,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
           <thead>
             <tr>
               {["Client / Project", "Amount", "Mode", "Status", "Date"].map(h => (
-                <th key={h} style={{ padding: "16px", textAlign: "left", fontWeight: 800, color: THEME.muted, borderBottom: `2px solid ${THEME.border}`, fontSize: 12 }}>{h.toUpperCase()}</th>
+                <th key={h} style={{ padding: "16px", textAlign: "left", fontWeight: 800, color: THEME.text, opacity: 0.6, borderBottom: `2px solid ${THEME.border}`, fontSize: 13 }}>{h.toUpperCase()}</th>
               ))}
             </tr>
           </thead>
@@ -437,8 +457,8 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
 
       {modal && (
         <Modal THEME={THEME} title="Record Income" onClose={() => setModal(null)}>
-          <div style={{ marginBottom: 16 }}>
-             <label style={{ display: "block", fontSize: 11, color: THEME.muted, fontWeight: 800, letterSpacing: 0.5, marginBottom: 8 }}>SELECT CLIENT</label>
+          <div style={{ marginBottom: 18 }}>
+             <label style={{ display: "block", fontSize: 12, color: THEME.text, fontWeight: 800, letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase", opacity: 0.8 }}>SELECT CLIENT</label>
              <ClientDropdown THEME={THEME} clients={clients} value={form.client} onChange={v => setForm({ ...form, client: v })} />
           </div>
           <Fld THEME={THEME} label="Payment Title" value={form.title} onChange={v => setForm({ ...form, title: v })} placeholder="e.g. Milestone 1 Payment" />

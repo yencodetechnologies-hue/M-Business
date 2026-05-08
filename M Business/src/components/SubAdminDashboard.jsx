@@ -2474,67 +2474,109 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 // ═══════════════════════════════════════════════════════════
 // PACKAGES PAGE
 // ═══════════════════════════════════════════════════════════
-function PackagesPage({ packages, onSubscribe }) {
+function PackagesPage({ packages, onSubscribe, THEME }) {
   const displayedPackages = (packages && packages.length > 0) ? [...packages].sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)) : [];
 
   return (
     <div style={{
-      background: "linear-gradient(135deg, #0a0a0f 0%, #0d1117 50%, #0a0f0a 100%)",
-      borderRadius: 24,
-      padding: "60px 20px 80px",
+      background: `linear-gradient(135deg, #f8fafc 0%, ${THEME.bg} 100%)`,
+      borderRadius: 32,
+      padding: "80px 24px",
       position: "relative",
-      minHeight: "70vh",
+      minHeight: "80vh",
       overflow: "hidden",
-      boxShadow: "0 20px 60px rgba(0,0,0,0.4)"
+      boxShadow: "0 10px 40px rgba(0,0,0,0.03)",
+      border: `1.5px solid ${THEME.border}`
     }}>
-      <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 1000, height: 400, background: "radial-gradient(ellipse, rgba(0,255,180,0.04) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div style={{ textAlign: "center", marginBottom: 56, position: "relative", zIndex: 1 }}>
-        <h1 style={{ fontSize: 42, fontWeight: 800, color: "#ffffff", margin: "0 0 14px", letterSpacing: "-1.5px", lineHeight: 1.1 }}>Choose your Plan</h1>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontWeight: 500, fontSize: 16 }}>Select the best plan for your business growth</p>
+      <div style={{ position: "absolute", top: -100, right: -100, width: 400, height: 400, background: `${THEME.accent}08`, borderRadius: "50%", filter: "blur(80px)" }} />
+      <div style={{ position: "absolute", bottom: -100, left: -100, width: 400, height: 400, background: `${THEME.accent}05`, borderRadius: "50%", filter: "blur(80px)" }} />
+      
+      <div style={{ textAlign: "center", marginBottom: 64, position: "relative", zIndex: 1 }}>
+        <div style={{ display: "inline-block", padding: "8px 20px", background: `${THEME.accent}12`, borderRadius: 100, color: THEME.accent, fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 20 }}>💎 Premium Subscriptions</div>
+        <h1 style={{ fontSize: 48, fontWeight: 900, color: "#1e1b4b", margin: "0 0 16px", letterSpacing: "-1.5px", lineHeight: 1 }}>Choose your Plan</h1>
+        <p style={{ color: "#64748b", fontWeight: 600, fontSize: 17, maxWidth: 500, margin: "0 auto" }}>Unlock powerful business management tools tailored for your growth.</p>
       </div>
+
       {displayedPackages.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "80px 20px", position: "relative", zIndex: 1 }}>
-          <div style={{ fontSize: 64, marginBottom: 24 }}>📦</div>
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "rgba(255,255,255,0.3)", marginBottom: 12 }}>No Packages Assigned</h2>
+        <div style={{ textAlign: "center", padding: "100px 20px", position: "relative", zIndex: 1 }}>
+          <div style={{ fontSize: 72, marginBottom: 24, opacity: 0.5 }}>📦</div>
+          <h2 style={{ fontSize: 26, fontWeight: 800, color: "#94a3b8", marginBottom: 12 }}>No Packages Available</h2>
+          <p style={{ color: "#cbd5e1" }}>Check back later for new subscription plans.</p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1, width: "100%" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 32, maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 1, width: "100%" }}>
           {displayedPackages.map((p, idx) => {
-            const isPro = (p.title || "").toLowerCase().includes("pro") || (p.title || "").toLowerCase().includes("premium");
+            const isPro = (p.title || "").toLowerCase().includes("pro") || (p.title || "").toLowerCase().includes("premium") || idx === 1;
             const features = Array.isArray(p.features) ? p.features : (p.features || "").split(/[\n,]/).map(f => f.trim()).filter(Boolean);
             return (
               <div
                 key={p.id || p._id || idx}
                 style={{
-                  background: isPro ? "linear-gradient(160deg, rgba(var(--app-accent-rgb), 0.15) 0%, rgba(var(--app-accent-rgb), 0.1) 60%, rgba(var(--app-accent-rgb), 0.05) 100%)" : "linear-gradient(160deg, #141418 0%, #111115 100%)",
-                  border: isPro ? "1.5px solid rgba(var(--app-accent-rgb),0.3)" : "1.5px solid rgba(255,255,255,0.07)",
-                  borderRadius: 20, padding: "36px 28px", position: "relative", overflow: "hidden",
-                  boxShadow: isPro ? "0 0 60px rgba(0,200,130,0.1), 0 20px 40px rgba(0,0,0,0.5)" : "0 20px 40px rgba(0,0,0,0.35)",
-                  display: "flex", flexDirection: "column", transition: "transform 0.2s"
+                  background: "#fff",
+                  border: isPro ? `2.5px solid ${THEME.accent}` : `1.5px solid ${THEME.border}`,
+                  borderRadius: 32, padding: "48px 36px", position: "relative",
+                  boxShadow: isPro ? `0 25px 60px ${THEME.accent}15` : "0 15px 40px rgba(0,0,0,0.04)",
+                  display: "flex", flexDirection: "column", transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  transform: isPro ? "scale(1.03)" : "scale(1)"
                 }}
-                onMouseEnter={e => e.currentTarget.style.transform = "translateY(-5px)"}
-                onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+                onMouseEnter={e => e.currentTarget.style.transform = isPro ? "scale(1.05) translateY(-8px)" : "translateY(-8px)"}
+                onMouseLeave={e => e.currentTarget.style.transform = isPro ? "scale(1.03)" : "scale(1)"}
               >
-                {isPro && <div style={{ position: "absolute", top: -60, left: "50%", transform: "translateX(-50%)", width: 240, height: 240, background: "radial-gradient(ellipse, rgba(var(--app-accent-rgb),0.13) 0%, transparent 70%)", pointerEvents: "none" }} />}
-                {isPro && <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(var(--app-accent-rgb),0.12)", border: "1px solid rgba(var(--app-accent-rgb),0.35)", borderRadius: 100, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "var(--app-accent)", letterSpacing: 1.2, textTransform: "uppercase" }}>MOST POPULAR</div>}
-                <div style={{ fontSize: 36, marginBottom: 20 }}>{p.icon || "📦"}</div>
-                <div style={{ fontSize: 19, fontWeight: 800, color: "#fff", marginBottom: 6 }}>{p.title}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.32)", marginBottom: 24, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Billed monthly</div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 10 }}>
-                  <span style={{ fontSize: 44, fontWeight: 900, color: "#fff", lineHeight: 1, letterSpacing: "-2px" }}>{p.type === "free" ? "₹0" : p.price ? `₹${parseFloat(p.price).toLocaleString("en-IN")}` : "Custom"}</span>
-                  {p.price > 0 && <span style={{ fontSize: 13, color: "rgba(255,255,255,0.38)", marginBottom: 6, fontWeight: 400 }}>/ month</span>}
+                {isPro && (
+                  <div style={{ 
+                    position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", 
+                    background: `linear-gradient(135deg, ${THEME.accent}, ${THEME.accent}dd)`, 
+                    color: "#fff", padding: "8px 24px", borderRadius: 100, fontSize: 11, 
+                    fontWeight: 900, letterSpacing: 1.2, textTransform: "uppercase",
+                    boxShadow: `0 8px 20px ${THEME.accent}40`, zIndex: 2
+                  }}>MOST POPULAR</div>
+                )}
+                
+                <div style={{ width: 64, height: 64, borderRadius: 20, background: `${THEME.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, marginBottom: 32, boxShadow: `0 10px 20px ${THEME.accent}15` }}>{p.icon || "🚀"}</div>
+                
+                <div style={{ fontSize: 26, fontWeight: 900, color: "#1e1b4b", marginBottom: 8, letterSpacing: "-0.5px" }}>{p.title}</div>
+                <div style={{ fontSize: 13, color: "#64748b", marginBottom: 32, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{p.description || "Billed Monthly"}</div>
+                
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 6, marginBottom: 12 }}>
+                  <span style={{ fontSize: 56, fontWeight: 900, color: "#1e1b4b", lineHeight: 1, letterSpacing: "-3px" }}>
+                    {p.type === "free" ? "Free" : p.price ? `₹${parseFloat(p.price).toLocaleString("en-IN")}` : "Custom"}
+                  </span>
+                  {p.price > 0 && <span style={{ fontSize: 16, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>/month</span>}
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", marginBottom: 24, minHeight: 36, lineHeight: 1.5 }}>{p.description || `Ideal for businesses needing ${p.clientLimit || 'custom'} client limits.`}</div>
-                <div style={{ height: 1, background: isPro ? "rgba(0,220,150,0.13)" : "rgba(255,255,255,0.06)", marginBottom: 24 }} />
-                <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1, marginBottom: 32 }}>
+                
+                <div style={{ height: 1.5, background: "#f1f5f9", margin: "32px 0" }} />
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: 18, flex: 1, marginBottom: 40 }}>
                   {features.map((f, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                      <div style={{ width: 18, height: 18, borderRadius: "50%", flexShrink: 0, marginTop: 1, background: isPro ? "rgba(var(--app-accent-rgb),0.12)" : "rgba(255,255,255,0.07)", border: isPro ? "1px solid rgba(var(--app-accent-rgb),0.35)" : "1px solid rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: isPro ? "var(--app-accent)" : "rgba(255,255,255,0.45)" }}>✓</div>
-                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", fontWeight: 400, lineHeight: 1.4 }}>{f}</span>
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      <div style={{ width: 22, height: 22, borderRadius: "50%", background: `${THEME.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: THEME.accent, fontWeight: 900, flexShrink: 0 }}>✓</div>
+                      <span style={{ fontSize: 15, color: "#475569", fontWeight: 600 }}>{f}</span>
                     </div>
                   ))}
                 </div>
-                <button onClick={() => onSubscribe(p)} style={{ width: "100%", padding: "14px", borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit", background: isPro ? "var(--app-accent-gradient)" : "rgba(255,255,255,0.08)", border: isPro ? "none" : "1.5px solid rgba(255,255,255,0.18)", color: isPro ? "#fff" : "#fff", boxShadow: isPro ? "0 6px 20px rgba(var(--app-accent-rgb),0.3)" : "none" }} onMouseEnter={e => { if (isPro) e.currentTarget.style.boxShadow = "0 8px 25px rgba(var(--app-accent-rgb),0.45)"; else e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }} onMouseLeave={e => { if (isPro) e.currentTarget.style.boxShadow = "0 6px 20px rgba(var(--app-accent-rgb),0.3)"; else e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}>{p.type === "free" ? "Start Free Trial" : "Get Started"}</button>
+                
+                <button 
+                  onClick={() => onSubscribe(p)} 
+                  style={{ 
+                    width: "100%", padding: "18px", borderRadius: 18, fontSize: 16, 
+                    fontWeight: 800, cursor: "pointer", transition: "all 0.2s", 
+                    fontFamily: "inherit", 
+                    background: isPro ? `linear-gradient(135deg, ${THEME.accent}, ${THEME.accent}dd)` : "#f8fafc", 
+                    border: isPro ? "none" : `2px solid ${THEME.border}`, 
+                    color: isPro ? "#fff" : "#1e1b4b", 
+                    boxShadow: isPro ? `0 10px 25px ${THEME.accent}40` : "none" 
+                  }}
+                  onMouseEnter={e => {
+                    if (isPro) e.currentTarget.style.boxShadow = `0 15px 30px ${THEME.accent}50`;
+                    else e.currentTarget.style.background = "#f1f5f9";
+                  }}
+                  onMouseLeave={e => {
+                    if (isPro) e.currentTarget.style.boxShadow = `0 10px 25px ${THEME.accent}40`;
+                    else e.currentTarget.style.background = "#f8fafc";
+                  }}
+                >
+                  {p.type === "free" ? "Get Started for Free" : "Upgrade Now"}
+                </button>
               </div>
             );
           })}
@@ -4201,7 +4243,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
           {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
-          {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} />}
+          {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
           {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
           {validActive === "rolePermissions" && <RolePermissionDashboard />}
         </div>

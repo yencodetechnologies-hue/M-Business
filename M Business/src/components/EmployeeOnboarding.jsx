@@ -221,8 +221,8 @@ export default function EmployeeOnboarding() {
             </div>
             <div style={{ position: "relative" }}>
               <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type={showPass ? "text" : "password"} placeholder="Set your password" />
-              <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: 32, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#94a3b8" }}>
-                {showPass ? "View️" : "View️‍🗨️"}
+              <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: 36, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#94a3b8" }}>
+                {showPass ? "hide" : "show"}
               </button>
             </div>
           </div>

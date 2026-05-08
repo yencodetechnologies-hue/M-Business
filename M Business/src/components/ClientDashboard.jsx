@@ -24,16 +24,16 @@ const sc = (s) => {
 };
 
 const THEME = {
-  bg: "var(--app-bg)",
-  sidebar: "var(--app-sidebar)",
-  card: "var(--app-card)",
-  accent: "var(--app-accent)",
-  accentSecondary: "var(--app-accent-secondary)",
-  text: "var(--app-text)",
-  muted: "var(--app-muted)",
-  border: "var(--app-border)",
-  shadow: "var(--app-shadow)",
-  gradient: "var(--app-gradient)"
+  bg: "#f8fafc",
+  sidebar: "#ffffff",
+  card: "#ffffff",
+  accent: "#6366f1",
+  accentSecondary: "#8b5cf6",
+  text: "#1e1b4b",
+  muted: "#64748b",
+  border: "#e2e8f0",
+  shadow: "0 10px 40px rgba(0,0,0,0.03)",
+  gradient: "linear-gradient(135deg, #6366f1, #8b5cf6)"
 };
 
 // ── NAV ───────────────────────────────────────────────────────
@@ -288,56 +288,60 @@ function Badge({ label, size = "sm" }) {
 function StatCard({ icon, label, value, sub, color, onClick, trend }) {
   return (
     <div onClick={onClick} style={{
-      background: THEME.card,
-      borderRadius: 24,
-      padding: "24px",
+      background: `linear-gradient(135deg, #ffffff, #fdfdff)`,
+      borderRadius: 28,
+      padding: "28px",
       border: `1.5px solid ${THEME.border}`,
-      boxShadow: THEME.shadow,
+      boxShadow: "0 10px 30px rgba(0,0,0,0.02)",
       cursor: onClick ? "pointer" : "default",
       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       position: "relative",
+      overflow: "hidden"
     }}
       onMouseEnter={e => {
         if (onClick) {
           e.currentTarget.style.transform = "translateY(-6px)";
-          e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.06)";
-          e.currentTarget.style.borderColor = `${color}20`;
+          e.currentTarget.style.boxShadow = `0 20px 40px ${color}15`;
+          e.currentTarget.style.borderColor = `${color}40`;
         }
       }}
       onMouseLeave={e => {
         e.currentTarget.style.transform = "";
-        e.currentTarget.style.boxShadow = THEME.shadow;
+        e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.02)";
         e.currentTarget.style.borderColor = THEME.border;
       }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+      <div style={{ position: "absolute", top: -20, right: -20, fontSize: 100, opacity: 0.05, transform: "rotate(-15deg)", pointerEvents: "none" }}>{icon}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
         <div style={{
-          width: 42,
-          height: 42,
-          borderRadius: 12,
-          background: `${color}10`,
+          width: 52,
+          height: 52,
+          borderRadius: 16,
+          background: `linear-gradient(135deg, ${color}, ${color}dd)`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 20,
-          color: color
+          fontSize: 24,
+          color: "#fff",
+          boxShadow: `0 8px 20px ${color}30`
         }}>{icon}</div>
-        <div style={{ fontSize: 18, color: THEME.muted, fontWeight: 900 }}>⋮</div>
+        <div>
+          <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>{label}</div>
+          <div style={{ fontSize: 11, color: THEME.muted, fontWeight: 600 }}>{sub || "Updated just now"}</div>
+        </div>
       </div>
-      <div style={{ fontSize: 13, color: THEME.muted, fontWeight: 600, marginBottom: 8 }}>{label}</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ fontSize: 28, fontWeight: 900, color: THEME.text, letterSpacing: "-0.5px" }}>{value}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ fontSize: 32, fontWeight: 900, color: THEME.text, letterSpacing: "-1.5px" }}>{value}</div>
         {trend && (
           <div style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 800,
             color: "#10b981",
             background: "#10b98115",
-            padding: "2px 6px",
-            borderRadius: 6
-          }}>+{trend}%</div>
+            padding: "4px 8px",
+            borderRadius: 8
+          }}>↑ {trend}%</div>
         )}
       </div>
-      {sub && <div style={{ fontSize: 12, color: THEME.muted, marginTop: 4, fontWeight: 500 }}>{sub}</div>}
     </div>
   );
 }
@@ -587,17 +591,27 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
                   width: "100%",
                   display: "flex",
                   alignItems: "center",
-                  gap: 12,
-                  padding: "14px 18px",
-                  background: on ? `${THEME.accent}10` : "transparent",
+                  gap: 14,
+                  padding: "16px 20px",
+                  background: on ? `linear-gradient(135deg, ${THEME.accent}, ${THEME.accent}dd)` : "transparent",
                   border: "none",
-                  borderRadius: 16,
-                  color: on ? THEME.accent : THEME.muted,
-                  fontWeight: on ? 800 : 600,
+                  borderRadius: 20,
+                  color: on ? "#fff" : THEME.muted,
+                  fontWeight: on ? 900 : 600,
                   fontSize: 15,
                   cursor: "pointer",
-                  marginBottom: 4,
+                  marginBottom: 6,
                   textAlign: "left",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  boxShadow: on ? `0 10px 20px ${THEME.accent}30` : "none"
+                }}
+                onMouseEnter={e => { if (!on) { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.color = THEME.accent; } }}
+                onMouseLeave={e => { if (!on) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = THEME.muted; } }}>
+                <span style={{ fontSize: 20, width: 24, textAlign: "center", opacity: on ? 1 : 0.7 }}>{n.icon}</span>
+                <span style={{ letterSpacing: on ? "0.3px" : "0" }}>{n.label}</span>
+              </button>
+            );
+          })}
                   transition: "all 0.2s"
                 }}
                 onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f1f5f9"; }}

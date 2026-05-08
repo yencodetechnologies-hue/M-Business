@@ -152,7 +152,8 @@ router.put("/:id", async (req, res) => {
         { 
           clientLimit: clientLimit || "3 Clients",
           employeeLimit: employeeLimit || "10 Employees",
-          managerLimit: managerLimit || "1 Manager"
+          managerLimit: managerLimit || "1 Manager",
+          businessLimit: businessLimit || "Single business manage"
         }
       );
     }

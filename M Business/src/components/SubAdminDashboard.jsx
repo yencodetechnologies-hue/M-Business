@@ -4296,7 +4296,16 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             >
               <span style={{ fontSize: 14 }}>👤</span> Profile
             </button>
-            {(isAdmin || subscription?.businessLimit === "Multiple business manage") && (
+            {(isAdmin || 
+              user?.businessLimit?.toLowerCase().includes("multiple") || 
+              user?.businessLimit?.toLowerCase().includes("unlimited") ||
+              subscription?.businessLimit?.toLowerCase().includes("multiple") ||
+              subscription?.businessLimit?.toLowerCase().includes("unlimited") ||
+              subscription?.features?.some(f => f.toLowerCase().includes("multiple")) ||
+              packages.some(p => p.assignedSubadmins?.includes(user?.id || user?._id) && 
+                (p.businessLimit?.toLowerCase().includes("multiple") || 
+                 p.features?.some(f => f.toLowerCase().includes("multiple"))))
+              ) && (
               <button
                 onClick={() => {
                   setProfileDropdownOpen(false);
@@ -4318,8 +4327,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   gap: 10,
                   borderTop: "1px solid #f8fafc",
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
                 <span style={{ fontSize: 14 }}>➕</span> Add account
               </button>
@@ -4771,8 +4780,32 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </div>
         </div>
 
-        <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "1px solid #fce7f3", margin: "14px 0" }}>
-          <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>RESOURCE LIMITS</div>
+        <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "#fce7f3", margin: "14px 0" }}>
+          <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+          <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+            {["Single business manage", "Multiple business manage"].map(mode => (
+              <button
+                key={mode}
+                onClick={() => setNpkg({ ...npkg, businessLimit: mode })}
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  borderRadius: 12,
+                  border: npkg.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+                  background: npkg.businessLimit === mode ? "#f5f3ff" : "#fff",
+                  color: npkg.businessLimit === mode ? "#7c3aed" : "#64748b",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  transition: "all 0.2s"
+                }}
+              >
+                {npkg.businessLimit === mode ? "✓ " : ""}{mode}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>RESOURCE LIMITS</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
             <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={npkg.managerLimit} onChange={v => setNpkg({ ...npkg, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
             <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={npkg.clientLimit} onChange={v => setNpkg({ ...npkg, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
@@ -4891,7 +4924,31 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </div>
 
           <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
-            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PACKAGE LIMITS</div>
+            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+            <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+              {["Single business manage", "Multiple business manage"].map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setEditPkgForm({ ...editPkgForm, businessLimit: mode })}
+                  style={{
+                    flex: 1,
+                    padding: "12px",
+                    borderRadius: 12,
+                    border: editPkgForm.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+                    background: editPkgForm.businessLimit === mode ? "#f5f3ff" : "#fff",
+                    color: editPkgForm.businessLimit === mode ? "#7c3aed" : "#64748b",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    transition: "all 0.2s"
+                  }}
+                >
+                  {editPkgForm.businessLimit === mode ? "✓ " : ""}{mode}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>PACKAGE LIMITS</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
               <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
               <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />

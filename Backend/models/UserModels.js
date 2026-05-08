@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema({
   upiId: { type: String, default: "" },
   clientLimit: { type: String, default: "" },
   employeeLimit: { type: String, default: "" },
+  managerLimit: { type: String, default: "" },
+  businessLimit: { type: String, default: "" },
   otp: { type: String, default: "" },
   otpExpires: { type: Date },
 }, { timestamps: true });

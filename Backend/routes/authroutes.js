@@ -151,6 +151,8 @@ router.post("/login", async (req, res) => {
         upiId: user.upiId || "",
         clientLimit: user.clientLimit || "",
         employeeLimit: user.employeeLimit || "",
+        managerLimit: user.managerLimit || "",
+        businessLimit: user.businessLimit || "",
       },
     });
 
@@ -314,6 +316,7 @@ router.get("/profile/:id", async (req, res) => {
         clientLimit: user.clientLimit || "",
         employeeLimit: user.employeeLimit || "",
         managerLimit: user.managerLimit || "",
+        businessLimit: user.businessLimit || "",
       }
     });
   } catch (err) {

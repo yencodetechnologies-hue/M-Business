@@ -846,7 +846,7 @@ function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, on
       quickAdd();
       onAddModalOpened?.();
     }
-  }, [autoOpenAddModal, onAddModalOpened, groups, defaultProjectId]);
+  }, [autoOpenAddModal, onAddModalOpened, defaultProjectId]); // Removed 'groups' to prevent infinite loop/duplication
 
   return (
     <div style={{ display: "flex", flexShrink: 0, position: "relative" }}>
@@ -1384,11 +1384,23 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             const v = e.target.value.trim(); 
             if (v && v !== task.title) onField(id, "title", v); 
             else if (!v && task.title === "New task") {
-              // Keep "New task" if blurred with empty and it was originally "New task"
               e.target.value = "New task";
             }
           }} 
-          style={{ background: "transparent", border: "none", outline: "none", fontSize: 13, color: P.text, fontFamily: "inherit", width: "100%", padding: "9px 4px 9px 4px", textDecoration: task.checked ? "line-through" : "none", opacity: task.checked ? .5 : 1, fontWeight: 500, cursor: "pointer" }} 
+          style={{ 
+            background: "transparent", 
+            border: "none", 
+            outline: "none", 
+            fontSize: 14, 
+            color: P.text, 
+            fontFamily: "inherit", 
+            width: "100%", 
+            padding: "12px 8px", // Increased padding
+            textDecoration: task.checked ? "line-through" : "none", 
+            opacity: task.checked ? .5 : 1, 
+            fontWeight: 700, // Made even bolder (700)
+            cursor: "pointer" 
+          }} 
           onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} 
         />
       </div>
@@ -1768,14 +1780,14 @@ function GroupBlock({ group, onToggle, onCheck, onField, onStatus, onPriority, o
 
               {/* Column headers */}
               <div style={{ display: "flex", alignItems: "stretch", background: P.light, borderBottom: `1.5px solid ${P.border}`, minWidth: "max-content" }}>
-                <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 20, background: P.light, borderRight: `1px solid ${P.border}`, boxShadow: "2px 0 4px rgba(0,0,0,0.04)", fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, letterSpacing: 0.3, display: "flex", alignItems: "center" }}>Task</div>
+                <div style={{ width: COL_W.task, flexShrink: 0, position: "sticky", left: 0, zIndex: 20, background: P.light, borderRight: `1px solid ${P.border}`, boxShadow: "2px 0 4px rgba(0,0,0,0.04)", fontSize: 12, color: P.mid, padding: "8px 10px", fontWeight: 800, letterSpacing: 0.3, display: "flex", alignItems: "center" }}>Task</div>
 
-                {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Employee</div>}
+                {!hcSet.has('person') && <div style={{ width: COL_W.person, flexShrink: 0, fontSize: 12, color: P.mid, padding: "8px 10px", fontWeight: 800, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Employee</div>}
 
-                {!hcSet.has('status') && <div style={{ width: COL_W.status, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Status <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
+                {!hcSet.has('status') && <div style={{ width: COL_W.status, flexShrink: 0, fontSize: 12, color: P.mid, padding: "8px 10px", fontWeight: 800, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Status <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
 
-                {!hcSet.has('date') && <div style={{ width: COL_W.date, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Due date <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
-                {!hcSet.has('priority_col') && <div style={{ width: COL_W.priority_col, flexShrink: 0, fontSize: 11, color: P.muted, padding: "7px 10px", fontWeight: 700, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Priority <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
+                {!hcSet.has('date') && <div style={{ width: COL_W.date, flexShrink: 0, fontSize: 12, color: P.mid, padding: "8px 10px", fontWeight: 800, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Due date <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
+                {!hcSet.has('priority_col') && <div style={{ width: COL_W.priority_col, flexShrink: 0, fontSize: 12, color: P.mid, padding: "8px 10px", fontWeight: 800, borderRight: `1px solid ${P.border}`, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>Priority <span style={{ fontSize: 9, opacity: 0.5 }}>ⓘ</span></div>}
                 {visibleExtraCols.map((col, ci) => (
                   <div key={col.id} className="col-hdr-wrap" style={{ width: extraColWidth(col.type), flexShrink: 0, borderRight: `1px solid ${P.border}`, background: P.light, display: "flex", alignItems: "center", justifyContent: "center" }} onMouseEnter={e => { const btns = e.currentTarget.querySelectorAll(".col-menu-btn,.col-move-btn"); btns.forEach(b => b.style.opacity = "1"); }} onMouseLeave={e => { const btns = e.currentTarget.querySelectorAll(".col-menu-btn,.col-move-btn"); btns.forEach(b => b.style.opacity = "0"); }}>
                     <ColHeader col={col} onRename={onRenameCol} onDelete={onDeleteCol} onMoveLeft={() => onMoveCol && onMoveCol(col.id, "left")} onMoveRight={() => onMoveCol && onMoveCol(col.id, "right")} canMoveLeft={(extraCols || []).findIndex(x => x.id === col.id) > 0} canMoveRight={(extraCols || []).findIndex(x => x.id === col.id) < (extraCols || []).length - 1} />
@@ -2291,14 +2303,14 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
                   <div style={{ padding: "10px 14px 6px", fontSize: 11, fontWeight: 700, color: P.muted, letterSpacing: .8, textTransform: "uppercase" }}>
                     Select Project
                   </div>
-                  <MI icon="🌐" title="All Projects (General)" active={!selectedProjectId} onClick={() => { onSelectProject(null); setProjOpen(false); onAddModalOpened?.(true); }} />
+                  <MI icon="🌐" title="All Projects (General)" active={!selectedProjectId} onClick={() => { onSelectProject(null); setProjOpen(false); }} />
                   <Sep />
                   <div style={{ maxHeight: 300, overflowY: "auto" }}>
                     {projects.length === 0 ? (
                       <div style={{ padding: "12px 14px", fontSize: 12, color: P.muted, fontStyle: "italic" }}>No projects found</div>
                     ) : (
                       projects.map(p => (
-                        <MI key={p._id || p.id} icon="📁" title={p.name} sub={p.client} active={selectedProjectId === (p._id || p.id)} onClick={() => { onSelectProject(p); setProjOpen(false); onAddModalOpened?.(true); }} />
+                        <MI key={p._id || p.id} icon="📁" title={p.name} sub={p.client} active={selectedProjectId === (p._id || p.id)} onClick={() => { onSelectProject(p); setProjOpen(false); }} />
                       ))
                     )}
                   </div>

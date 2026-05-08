@@ -4084,7 +4084,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           const pTasks = tasks.filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
                           const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
                           return (
-                            <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { setSelectedProjectForTasks(p); setAutoOpenTaskModal(true); setActive("tasks"); }}>
+                            <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { setSelectedProjectForTasks(p); setActive("tasks"); }}>
                               <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
                                 <div style={{ fontSize: 13 }}>{p.name}</div>
                                 <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
@@ -4151,7 +4151,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setAutoOpenTaskModal(true); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
+          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
             const limit = getSubscriptionLimit("employee");
             if (subscription && employees.length >= limit) {
               setLimitModal({ type: "employee", limit });

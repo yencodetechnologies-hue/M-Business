@@ -1392,13 +1392,13 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
             border: "none", 
             outline: "none", 
             fontSize: 14, 
-            color: P.text, 
+            color: "#1e1b4b", // Darker indigo/black for maximum visibility
             fontFamily: "inherit", 
             width: "100%", 
-            padding: "12px 8px", // Increased padding
+            padding: "12px 8px", 
             textDecoration: task.checked ? "line-through" : "none", 
             opacity: task.checked ? .5 : 1, 
-            fontWeight: 700, // Made even bolder (700)
+            fontWeight: 700, 
             cursor: "pointer" 
           }} 
           onBlurCapture={e => { e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} 
@@ -2068,6 +2068,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
   const [sortOpen, setSortOpen] = useState(false); const [grpByOpen, setGrpByOpen] = useState(false); const [moreOpen, setMoreOpen] = useState(false);
 
   const addGroupTrigger = useRef({ trigger: () => { } });
+  const initializedProjects = useRef(new Set());
 
   const closeAll = () => { setPersonOpen(false); setFilterOpen(false); setSortOpen(false); setGrpByOpen(false); setMoreOpen(false); setHideOpen(false); setViewOpen(false); setTabDotsOpen(false); setAddViewOpen(false); };
 
@@ -2118,6 +2119,25 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
   };
 
   const addNewTask = async () => { const first = groups[0]; if (!first) return; await addTask(first._id || first.id, "New task"); };
+
+  // Auto-add one task when switching to an empty project view (only once per session)
+  useEffect(() => {
+    if (selectedProjectId && !loading && groups.length > 0 && !initializedProjects.current.has(selectedProjectId)) {
+      const allTasks = groups.flatMap(g => g.tasks || []);
+      const projectTasks = allTasks.filter(t => {
+        const tid = t.projectId?._id || t.projectId || t.project;
+        return String(tid) === String(selectedProjectId);
+      });
+
+      if (projectTasks.length === 0) {
+        initializedProjects.current.add(selectedProjectId);
+        addNewTask();
+      } else {
+        // Mark as initialized even if it already has tasks
+        initializedProjects.current.add(selectedProjectId);
+      }
+    }
+  }, [selectedProjectId, loading]);
 
   const toggleCheck = async (id) => { const task = groups.flatMap(g => g.tasks || []).find(t => (t._id || t.id) === id); if (!task) return; const nv = !task.checked; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, checked: nv } : t) }))); if (selected && (selected._id || selected.id) === id) setSelected(p => ({ ...p, checked: nv })); try { await axios.patch(`${API}/tasks/${id}/toggle`); } catch { } };
 

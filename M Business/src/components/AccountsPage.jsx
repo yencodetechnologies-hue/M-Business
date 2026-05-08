@@ -23,21 +23,29 @@ const formatCurrency = (amount, symbol = "₹") => {
 
 // ── Shared UI components ──────────────────────────────────────
 function Modal({ title, onClose, children, THEME }) {
+  const isExpense = title.toLowerCase().includes("expense");
+  const isIncome = title.toLowerCase().includes("income");
+  const accent = isIncome ? "#10b981" : isExpense ? THEME.accent : THEME.accent;
+  
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)",
-      backdropFilter: "blur(8px)", zIndex: 1000, display: "flex",
+    <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.65)",
+      backdropFilter: "blur(12px)", zIndex: 1000, display: "flex",
       alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ background: THEME.card, borderRadius: 24, width: "100%", maxWidth: 720,
+      <div style={{ background: "#fff", borderRadius: 32, width: "100%", maxWidth: 500,
         maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column",
-        boxShadow: THEME.shadow, border: `1.5px solid ${THEME.border}` }}>
-        <div style={{ padding: "20px 24px", borderBottom: `1px solid ${THEME.border}`,
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: `1px solid rgba(255,255,255,0.1)` }}>
+        <div style={{ padding: "32px 32px 24px", 
           display: "flex", justifyContent: "space-between", alignItems: "center",
-          background: THEME.surface, flexShrink: 0 }}>
-          <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: THEME.text, letterSpacing: "-0.5px" }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "rgba(0,0,0,0.05)", border: "none",
-            fontSize: 20, cursor: "pointer", color: THEME.text, padding: "6px 12px", borderRadius: 10, fontWeight: 800 }}>✕</button>
+          background: `linear-gradient(135deg, ${accent}, ${accent}dd)`, flexShrink: 0, position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", right: -20, top: -20, fontSize: 80, opacity: 0.15, transform: "rotate(-15deg)", pointerEvents: "none" }}>{isIncome ? "💰" : isExpense ? "💸" : "📝"}</div>
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: "#fff", letterSpacing: "-1px" }}>{title}</h2>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginTop: 4 }}>Financial Entry</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.2)", border: "none",
+            fontSize: 16, cursor: "pointer", color: "#fff", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 12, fontWeight: 900, transition: "0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.3)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}>✕</button>
         </div>
-        <div style={{ overflowY: "auto", padding: "24px", flex: 1, background: THEME.card }}>{children}</div>
+        <div style={{ overflowY: "auto", padding: "32px", flex: 1, background: "#fff" }}>{children}</div>
       </div>
     </div>
   );
@@ -55,10 +63,11 @@ function Toast({ msg, THEME }) {
 
 function Fld({ label, value, onChange, options, type = "text", error, placeholder, prefix, THEME }) {
   const s = {
-    width: "100%", border: `1.5px solid ${error ? "#EF4444" : THEME.border}`,
-    borderRadius: 12, padding: prefix ? "12px 14px 12px 34px" : "12px 14px",
-    fontSize: 14, color: THEME.text, background: "#fff",
-    boxSizing: "border-box", outline: "none", fontFamily: "inherit", fontWeight: 600
+    width: "100%", border: `1.5px solid ${error ? "#EF4444" : "#e2e8f0"}`,
+    borderRadius: 14, padding: prefix ? "14px 14px 14px 38px" : "14px 16px",
+    fontSize: 15, color: "#1e1b4b", background: "#f8fafc",
+    boxSizing: "border-box", outline: "none", fontFamily: "inherit", fontWeight: 700,
+    transition: "all 0.2s"
   };
   return (
     <div style={{ marginBottom: 18 }}>
@@ -387,8 +396,8 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
           <Fld THEME={THEME} label="Title" value={form.title} onChange={v => setForm({ ...form, title: v })} placeholder="e.g. Server Hosting" />
           <Fld THEME={THEME} label="Category" value={form.category} onChange={v => setForm({ ...form, category: v })} options={CATEGORIES} />
           <Fld THEME={THEME} label="Amount" type="number" value={form.amount} onChange={v => setForm({ ...form, amount: v })} prefix="₹" />
-          <button onClick={save} disabled={saving} style={{ width: "100%", padding: 14, borderRadius: 12, background: THEME.accent, color: "#fff", border: "none", fontWeight: 800, marginTop: 12, cursor: "pointer" }}>
-            {saving ? "Processing..." : "Save Expense"}
+          <button onClick={save} disabled={saving} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>
+            {saving ? "Processing..." : "Save Expense Entry"}
           </button>
         </Modal>
       )}
@@ -463,7 +472,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
           </div>
           <Fld THEME={THEME} label="Payment Title" value={form.title} onChange={v => setForm({ ...form, title: v })} placeholder="e.g. Milestone 1 Payment" />
           <Fld THEME={THEME} label="Amount" type="number" value={form.amount} onChange={v => setForm({ ...form, amount: v })} prefix="₹" />
-          <button onClick={save} style={{ width: "100%", padding: 14, borderRadius: 12, background: "#10b981", color: "#fff", border: "none", fontWeight: 800, marginTop: 12, cursor: "pointer" }}>Save Record</button>
+          <button onClick={save} style={{ width: "100%", padding: 18, borderRadius: 16, background: "#10b981", color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: "0 10px 20px rgba(16,185,129,0.3)" }}>Record Payment</button>
         </Modal>
       )}
     </div>

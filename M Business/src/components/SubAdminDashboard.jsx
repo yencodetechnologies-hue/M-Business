@@ -1288,6 +1288,10 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
               <InfoRow icon="📧" label="Email" value={viewSub.email} />
               <InfoRow icon="📱" label="Phone" value={viewSub.phone} />
               <InfoRow icon="📅" label="Joined" value={viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleDateString() : "—"} />
+              <div style={{ gridColumn: "span 2", height: 1, background: "#bfdbfe", margin: "10px 0" }} />
+              <InfoRow icon="🏢" label="Client Limit" value={viewSub.clientLimit || "Not set (Default 10)"} />
+              <InfoRow icon="👨‍💼" label="Employee Limit" value={viewSub.employeeLimit || "Not set (Default 20)"} />
+              <InfoRow icon="🧑‍💼" label="Manager Limit" value={viewSub.managerLimit || "Not set (Default 5)"} />
             </div>
 
             {/* Stats Cards */}
@@ -3159,13 +3163,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         businessLimit: editPkgForm.businessLimit,
         managerLimit: editPkgForm.managerLimit,
         clientLimit: editPkgForm.clientLimit,
+        employeeLimit: editPkgForm.employeeLimit,
         status: editPkgForm.status,
         assignedSubadmins: editPkgForm.assignedSubadmins,
         monthlyPrice: editPkgForm.type === "free" ? "Free" : editPkgForm.price,
         quarterlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 3 * 0.9).toString(),
         halfYearlyPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 6 * 0.85).toString(),
         annualPrice: editPkgForm.type === "free" ? "Free" : Math.round((parseFloat(editPkgForm.price) || 0) * 12 * 0.8).toString(),
-        features: `${editPkgForm.planDuration} Plan\n${editPkgForm.businessLimit}\n${editPkgForm.managerLimit}\n${editPkgForm.clientLimit}`
+        features: `${editPkgForm.planDuration} Plan\n${editPkgForm.businessLimit}\n${editPkgForm.managerLimit}\n${editPkgForm.clientLimit}\n${editPkgForm.employeeLimit}`
       };
       const res = await axios.put(`${BASE_URL}/api/packages/${editPackage._id}`, packageData);
       setPackages(prev => prev.map(p => p._id === editPackage._id ? res.data : p));
@@ -4030,9 +4035,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 {/* Right Column: Statistics Grid */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 }}>
                   {[
-                    { t: "Total Company Names", v: clients.length, i: "👥", c: "var(--app-accent)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
-                    { t: "Employees", v: employees.length, i: "👨‍💼", c: "var(--app-muted)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
-                    { t: "Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b", bg: "linear-gradient(135deg,#fef3c7,#fffbeb)" },
+                    { t: "Total Company Names", v: `${clients.length} / ${getSubscriptionLimit("client") === Infinity ? "Unlimited" : getSubscriptionLimit("client")} Used`, i: "👥", c: "var(--app-accent)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
+                    { t: "Employees", v: `${employees.length} / ${getSubscriptionLimit("employee") === Infinity ? "Unlimited" : getSubscriptionLimit("employee")} Used`, i: "👨‍💼", c: "var(--app-muted)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
+                    { t: "Managers", v: `${managers.length} / ${getSubscriptionLimit("manager") === Infinity ? "Unlimited" : getSubscriptionLimit("manager")} Used`, i: "🧑‍💼", c: "#f59e0b", bg: "linear-gradient(135deg,#fef3c7,#fffbeb)" },
                     { t: "Projects", v: projects.length, i: "📁", c: "var(--app-accent)", bg: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" },
                     { t: "Invoices", v: invoices.length, i: "🧾", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
                     { t: "Total Income", v: formatCurrency(income.reduce((s, x) => s + (Number(x.amount) || 0), 0), user?.currency), i: "💰", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
@@ -4883,12 +4888,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
             <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PACKAGE LIMITS</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
               <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
-              <Fld label="Business Limit" value={editPkgForm.businessLimit} onChange={v => setEditPkgForm({ ...editPkgForm, businessLimit: v })} options={["", "Multiple business manage", "Unlimited business manage"]} />
-              <Fld label="Manager Limit" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} options={["", "2 Managers", "3 Managers", "5 Managers", "Unlimited Managers"]} />
-              <Fld label="Client Limit (Company Name)" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} options={["1 Company manage", "", "5 Company manage", "10 Company manage", "Unlimited Company manage"]} />
-              <Fld label="Employee Limit" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} options={["5 Employee manage", "", "20 Employee manage", "50 Employee manage", "Unlimited Employee manage"]} />
+              <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
+              <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
+              <Fld label="EMPLOYEE LIMIT" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
             </div>
           </div>
 

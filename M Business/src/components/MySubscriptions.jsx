@@ -433,7 +433,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
           margin: "0 auto",
           width: "100%"
         }}>
-          {[...PLANS, ...assignedPackages.map(pkg => ({
+          {[...(assignedPackages.length > 0 ? [] : PLANS), ...assignedPackages.map(pkg => ({
             name: pkg.title,
             price: pkg.type === "free" ? 0 : parseFloat(pkg.price) || 0,
             icon: pkg.icon || "📦",

@@ -313,6 +313,7 @@ router.get("/profile/:id", async (req, res) => {
         upiId: user.upiId || "",
         clientLimit: user.clientLimit || "",
         employeeLimit: user.employeeLimit || "",
+        managerLimit: user.managerLimit || "",
       }
     });
   } catch (err) {

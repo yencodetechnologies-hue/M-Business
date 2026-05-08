@@ -3,6 +3,8 @@ const router = express.Router();
 const Package = require("../models/PackageModel");
 const Subscription = require("../models/SubscriptionModel");
 
+const User = require("../models/UserModels");
+
 // GET all packages
 router.get("/", async (req, res) => {
   try {
@@ -58,6 +60,19 @@ router.post("/", async (req, res) => {
     });
 
     await newPackage.save();
+
+    // AUTOMATIC SYNC: Update limits for all assigned subadmins
+    if (assignedSubadmins && assignedSubadmins.length > 0) {
+      await User.updateMany(
+        { _id: { $in: assignedSubadmins } },
+        { 
+          clientLimit: clientLimit || "3 Clients",
+          employeeLimit: employeeLimit || "10 Employees",
+          managerLimit: managerLimit || "1 Manager"
+        }
+      );
+    }
+
     res.status(201).json(newPackage);
   } catch (err) {
     console.error(err);
@@ -127,6 +142,17 @@ router.put("/:id", async (req, res) => {
           businessLimit,
           features: updatedFeatures,
           updatedAt: Date.now()
+        }
+      );
+    }
+    // AUTOMATIC SYNC: Update limits for all assigned subadmins
+    if (assignedSubadmins && assignedSubadmins.length > 0) {
+      await User.updateMany(
+        { _id: { $in: assignedSubadmins } },
+        { 
+          clientLimit: clientLimit || "3 Clients",
+          employeeLimit: employeeLimit || "10 Employees",
+          managerLimit: managerLimit || "1 Manager"
         }
       );
     }

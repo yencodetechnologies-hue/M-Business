@@ -353,20 +353,7 @@ export default function InterviewApplyForm() {
             setErrors={setErrors}
           />
 
-          {/* Interviewer Name */}
-          <div className="fade-up d6">
-            <label style={sty.label}>
-              Interviewer Name{" "}
-              <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400, textTransform: "none" }}></span>
-            </label>
-            <input
-              type="text"
-              placeholder="Name of the person who referred / scheduled"
-              value={interviewerName}
-              onChange={e => setInterviewerName(e.target.value)}
-              style={sty.input(null)}
-            />
-          </div>
+       
 
           {/* Resume Upload */}
           <div className="fade-up d7">

@@ -1059,6 +1059,12 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
   );
 }
 
+function formatDate(d) {
+  if (!d) return "—";
+  const dt = new Date(d);
+  return isNaN(dt.getTime()) ? "—" : dt.toLocaleDateString();
+}
+
 function SubscriptionsPage({ THEME, subscriptions }) {
   const [filter, setFilter] = useState("all");
   const filtered = subscriptions.filter(s => filter === "all" || s.status?.toLowerCase() === filter.toLowerCase());
@@ -1101,7 +1107,7 @@ function SubscriptionsPage({ THEME, subscriptions }) {
                     padding: "4px 12px", borderRadius: 10, fontSize: 11, fontWeight: 800, textTransform: "uppercase"
                   }}>{sub.status || "—"}</span>
                 </td>
-                <td style={{ padding: "16px", color: THEME.muted }}>{sub.endDate ? new Date(sub.endDate).toLocaleDateString() : "—"}</td>
+                <td style={{ padding: "16px", color: THEME.muted }}>{formatDate(sub.endDate)}</td>
               </tr>
             ))}
           </tbody>
@@ -1113,7 +1119,9 @@ function SubscriptionsPage({ THEME, subscriptions }) {
 
 function SubadminDropdown({ value, options, onChange, darkMode }) {
   const [open, setOpen] = useState(false);
-  const selected = options.find(o => o._id === value);
+  // Support both single ID and array of IDs, but treat as single for display
+  const effectiveValue = Array.isArray(value) ? value[0] : value;
+  const selected = options.find(o => o._id === effectiveValue);
 
   return (
     <div style={{ position: "relative" }}>
@@ -1121,16 +1129,19 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
         onClick={() => setOpen(!open)}
         style={{
           width: "100%", padding: "11px 14px",
-          border: "1.5px solid #e2e8f0",
-          borderRadius: 10, fontSize: 13, outline: "none",
+          border: `1.5px solid ${open ? "var(--app-accent, #7c3aed)" : "#e2e8f0"}`,
+          borderRadius: 12, fontSize: 13, outline: "none",
           background: darkMode ? "#1e293b" : "#f8fafc",
           color: darkMode ? "#f8fafc" : "#0f172a",
           cursor: "pointer", boxSizing: "border-box",
-          display: "flex", justifyContent: "space-between", alignItems: "center"
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          transition: "all 0.2s"
         }}
       >
-        <span>{selected ? `${selected.name} (${selected.email})` : "-- Select Subadmin --"}</span>
-        <span style={{ fontSize: 10, transform: open ? "rotate(180deg)" : "none", transition: "0.2s" }}>▼</span>
+        <span style={{ fontWeight: selected ? 700 : 500 }}>
+          {selected ? `${selected.name} (${selected.email})` : "-- Select Subadmin --"}
+        </span>
+        <span style={{ fontSize: 10, transform: open ? "rotate(180deg)" : "none", transition: "0.2s", opacity: 0.5 }}>▼</span>
       </div>
 
       {open && (
@@ -1141,33 +1152,50 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
           />
           <div
             style={{
-              position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
+              position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0,
               background: darkMode ? "#1e293b" : "#fff",
               border: "1.5px solid #e2e8f0",
-              borderRadius: 10, boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-              zIndex: 999, maxHeight: 200, overflowY: "auto"
+              borderRadius: 14, boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
+              zIndex: 999, maxHeight: 220, overflowY: "auto",
+              padding: "6px", animation: "notif-slide-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)"
             }}
           >
             <div
-              onClick={() => { onChange(""); setOpen(false); }}
-              style={{ padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", fontSize: 13, color: "#94a3b8" }}
+              onClick={() => { onChange([]); setOpen(false); }}
+              style={{ padding: "10px 14px", cursor: "pointer", borderRadius: 8, fontSize: 13, color: "#94a3b8", transition: "0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.05)" : "#f8fafc"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
-              -- None --
+              -- Clear Selection --
             </div>
-            {options.map(sub => (
-              <div
-                key={sub._id}
-                onClick={() => { onChange(sub._id); setOpen(false); }}
-                style={{
-                  padding: "10px 14px", cursor: "pointer", fontSize: 13,
-                  background: value === sub._id ? (darkMode ? "rgba(255,255,255,0.1)" : "#f5f3ff") : "transparent",
-                  color: darkMode ? "#f8fafc" : "#0f172a",
-                  borderBottom: "1px solid #f1f5f9"
-                }}
-              >
-                {sub.name} ({sub.email})
-              </div>
-            ))}
+            {options.map(sub => {
+              const isSelected = effectiveValue === sub._id;
+              return (
+                <div
+                  key={sub._id}
+                  onClick={() => { 
+                    // Pass as array since state expects array, but only containing ONE ID
+                    onChange([sub._id]); 
+                    setOpen(false); 
+                  }}
+                  style={{
+                    padding: "10px 14px", cursor: "pointer", fontSize: 13, borderRadius: 8,
+                    background: isSelected ? "var(--app-accent, #7c3aed)" : "transparent",
+                    color: isSelected ? "#fff" : (darkMode ? "#f8fafc" : "#0f172a"),
+                    marginBottom: "2px", transition: "0.2s",
+                    display: "flex", justifyContent: "space-between", alignItems: "center"
+                  }}
+                  onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.05)" : "#f8fafc"; }}
+                  onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "transparent"; }}
+                >
+                  <div>
+                    <div style={{ fontWeight: isSelected ? 800 : 700 }}>{sub.name}</div>
+                    <div style={{ fontSize: 11, opacity: 0.7 }}>{sub.email}</div>
+                  </div>
+                  {isSelected && <span>✓</span>}
+                </div>
+              );
+            })}
           </div>
         </>
       )}

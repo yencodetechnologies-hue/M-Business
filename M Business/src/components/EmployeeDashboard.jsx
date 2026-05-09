@@ -1520,6 +1520,7 @@ export default function EmployeeDashboard({ user, setUser }) {
                 clients={[]}
                 onUpdateProject={() => loadData(empName)}
                 onUpdateTask={() => loadData(empName)}
+                THEME={T}
               />
             )}
             {page === "messaging" && <MessagingPage user={resolvedUser} />}

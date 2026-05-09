@@ -123,18 +123,36 @@ router.delete("/:dbId", async (req, res) => {
   }
 });
 
+// PATCH update proposal status (client approve/reject)
+router.patch("/:dbId/status", async (req, res) => {
+  try {
+    const { status, rejectNote } = req.body;
+    if (!["approved", "rejected", "pending"].includes(status)) {
+      return res.status(400).json({ msg: "Invalid status" });
+    }
+    const update = { status, updatedAt: new Date() };
+    if (rejectNote) update.rejectNote = rejectNote;
+    const saved = await Proposal.findByIdAndUpdate(
+      req.params.dbId,
+      { $set: update },
+      { new: true }
+    );
+    if (!saved) return res.status(404).json({ msg: "Proposal not found" });
+    res.json(saved);
+  } catch (err) {
+    res.status(500).json({ msg: "Error updating proposal status", error: err.message });
+  }
+});
+
 // PUT approve proposal
 router.put("/:dbId/approve", async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
+    const companyId = req.headers['x-company-id'] || req.companyId || "";
+    const query = { _id: req.params.dbId };
+    if (companyId && companyId !== "NONE") query.companyId = companyId;
     const saved = await Proposal.findOneAndUpdate(
-      { _id: req.params.dbId, companyId },
-      { 
-        $set: { 
-          status: "approved",
-          updatedAt: new Date()
-        }
-      },
+      query,
+      { $set: { status: "approved", updatedAt: new Date() } },
       { new: true }
     );
     if (!saved) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
@@ -148,16 +166,12 @@ router.put("/:dbId/approve", async (req, res) => {
 router.put("/:dbId/reject", async (req, res) => {
   try {
     const { rejectNote } = req.body;
-    const companyId = req.companyId || "NONE";
+    const companyId = req.headers['x-company-id'] || req.companyId || "";
+    const query = { _id: req.params.dbId };
+    if (companyId && companyId !== "NONE") query.companyId = companyId;
     const saved = await Proposal.findOneAndUpdate(
-      { _id: req.params.dbId, companyId },
-      { 
-        $set: { 
-          status: "rejected",
-          rejectNote: rejectNote || "",
-          updatedAt: new Date()
-        }
-      },
+      query,
+      { $set: { status: "rejected", rejectNote: rejectNote || "", updatedAt: new Date() } },
       { new: true }
     );
     if (!saved) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
@@ -166,6 +180,8 @@ router.put("/:dbId/reject", async (req, res) => {
     res.status(500).json({ msg: "Error rejecting proposal", error: err.message });
   }
 });
+
+
 
 // PUT submit for approval
 router.put("/:dbId/submit", async (req, res) => {

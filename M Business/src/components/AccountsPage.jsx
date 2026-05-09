@@ -28,8 +28,8 @@ function Modal({ title, onClose, children, THEME }) {
   const accent = THEME.accent;
   
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)",
-      backdropFilter: "blur(8px)", zIndex: 1000, display: "flex",
+    <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.35)",
+      backdropFilter: "blur(5px)", zIndex: 1000, display: "flex",
       alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 500,
         maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column",

@@ -1384,9 +1384,9 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 16, borderTop: "1px solid var(--app-border)" }}>
                     <div style={{ fontSize: 12, color: "var(--app-muted)", fontWeight: 500 }}>
                       {(() => {
-                        const d = p.updated || p.created || new Date().toISOString();
+                        const d = p.updated || p.createdAt || p.created || new Date().toISOString();
                         const dateObj = new Date(d);
-                        return isNaN(dateObj) 
+                        return isNaN(dateObj.getTime()) 
                           ? "Date Unavailable" 
                           : dateObj.toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' });
                       })()}

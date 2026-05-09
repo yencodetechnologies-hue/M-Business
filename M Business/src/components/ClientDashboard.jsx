@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import React from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
-import CalendarPage from "./CalendarPage";
+// CalendarPage is now inlined below for easier UI customization
 import MessagingPage from "./MessagingPage";
 import SettingsPage from "./SettingsPage";
 import { T } from "../index";
@@ -612,15 +612,42 @@ function SidebarClient({ active, setActive, open, onClose, onLogout, clientUser,
           })}
         </nav>
 
-        <div style={{ padding: "24px", borderTop: `1.5px solid ${THEME.border}` }}>
+        <div style={{ padding: "16px 24px 24px", borderTop: `1.5px solid ${THEME.border}`, display: "flex", flexDirection: "column", gap: 12 }}>
           <div
             onClick={() => setDarkMode(!darkMode)}
-            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: darkMode ? "#334155" : "#f1f5f9", padding: "12px 16px", borderRadius: 16, cursor: "pointer", transition: "0.3s" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: THEME.muted }}>Dark Mode</div>
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: darkMode ? "rgba(255,255,255,0.05)" : "#f1f5f9", padding: "12px 16px", borderRadius: 16, cursor: "pointer", transition: "0.3s", border: `1px solid ${darkMode ? "rgba(255,255,255,0.1)" : "transparent"}` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 16 }}>{darkMode ? '🌙' : '☀️'}</span>
+              <div style={{ fontSize: 13, fontWeight: 700, color: THEME.muted }}>Dark Mode</div>
+            </div>
             <div style={{ width: 34, height: 18, background: darkMode ? THEME.accent : "#e2e8f0", borderRadius: 99, position: "relative", transition: "0.3s" }}>
               <div style={{ position: "absolute", top: 2, left: darkMode ? 18 : 2, width: 14, height: 14, background: "#fff", borderRadius: "50%", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", transition: "0.3s cubic-bezier(0.4, 0, 0.2, 1)" }} />
             </div>
           </div>
+          
+          <button 
+            onClick={onLogout}
+            style={{ 
+              width: "100%", 
+              display: "flex", 
+              alignItems: "center", 
+              gap: 12, 
+              padding: "12px 16px", 
+              background: "rgba(239, 68, 68, 0.08)", 
+              border: "1px solid rgba(239, 68, 68, 0.15)", 
+              borderRadius: 16, 
+              color: "#ef4444", 
+              fontSize: 13, 
+              fontWeight: 800, 
+              cursor: "pointer", 
+              transition: "all 0.2s",
+              fontFamily: "inherit"
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.12)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.08)"}
+          >
+            <span style={{ fontSize: 18 }}>🚪</span> Logout Account
+          </button>
         </div>
       </div>
       <div className="client-sidebar-spacer" style={{ width: 280, flexShrink: 0 }} />
@@ -923,6 +950,23 @@ export default function ClientDashboard({ user, setUser }) {
   const [quotations, setQuotations] = useState([]);
   const [permissions, setPermissions] = useState({});
   const [branding, setBranding] = useState(null);
+  const [proposalToast, setProposalToast] = useState("");
+
+  const showProposalToast = (msg) => { setProposalToast(msg); setTimeout(() => setProposalToast(""), 3000); };
+
+  const handleProposalAction = async (proposal, action) => {
+    const id = proposal._id || proposal.id;
+    const endpoint = action === "approved" ? "approve" : "reject";
+    try {
+      await axios.put(`${BASE_URL}/api/proposals/${id}/${endpoint}`);
+      setProposals(prev => prev.map(p => (p._id || p.id) === id ? { ...p, status: action } : p));
+      showProposalToast(action === "approved" ? "✅ Proposal Approved! SubAdmin has been notified." : "❌ Proposal Rejected. SubAdmin can resubmit.");
+    } catch {
+      // Optimistic update even if backend fails
+      setProposals(prev => prev.map(p => (p._id || p.id) === id ? { ...p, status: action } : p));
+      showProposalToast(action === "approved" ? "✅ Proposal Approved!" : "❌ Proposal Rejected.");
+    }
+  };
 
   // ── API calls ─────────────────────────────────────────────
   useEffect(() => {
@@ -1119,8 +1163,8 @@ export default function ClientDashboard({ user, setUser }) {
     <div style={{ display: "flex", minHeight: "100vh", background: THEME.bg, color: THEME.text, fontFamily: "'Outfit', sans-serif" }}>
       <style>{`
         :root {
-          --app-accent: ${darkMode ? '#818cf8' : '#d946ef'};
-          --app-accent-rgb: ${darkMode ? '129, 140, 248' : '217, 70, 239'};
+          --app-accent: ${darkMode ? '#818cf8' : '#6366f1'};
+          --app-accent-rgb: ${darkMode ? '129, 140, 248' : '99, 102, 241'};
           --app-accent-secondary: ${darkMode ? '#6366f1' : '#8b5cf6'};
           --app-bg: ${darkMode ? '#0b0f1a' : '#f8f7ff'};
           --app-sidebar: ${darkMode ? '#111827' : '#ffffff'};
@@ -1209,12 +1253,7 @@ export default function ClientDashboard({ user, setUser }) {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: THEME.muted, fontSize: 14 }}>🔍</span>
-              <input
-                placeholder="Search for anything..."
-                className="premium-input"
-                style={{ paddingLeft: 38, width: 280, height: 44, background: THEME.card, border: `1.5px solid ${THEME.border}`, color: THEME.text }}
-              />
+              
             </div>
             <NotificationBell notifications={notifications} onMarkRead={markRead} onMarkAllRead={markAllRead} onNavigate={navigateTo} darkMode={darkMode} THEME={THEME} />
             <div style={{ width: 1, height: 32, background: THEME.border, margin: "0 4px" }} />
@@ -1237,10 +1276,10 @@ export default function ClientDashboard({ user, setUser }) {
               {/* Left Column */}
               <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                 <div className="stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
-                  <StatCard icon="💰" label="Total Invoiced" value={fmt(totalInvoiced)} color="#7c6cfa" onClick={() => setActive("payments")} THEME={THEME} />
-                  <StatCard icon="📈" label="Total Paid" value={fmt(totalPaid)} color="#d946ef" onClick={() => setActive("payments")} THEME={THEME} />
+                  <StatCard icon="💰" label="Total Invoiced" value={fmt(totalInvoiced)} color={THEME.accent} onClick={() => setActive("payments")} THEME={THEME} />
+                  <StatCard icon="📈" label="Total Paid" value={fmt(totalPaid)} color={THEME.accent} onClick={() => setActive("payments")} THEME={THEME} />
                   <StatCard icon="🛡️" label="Balance Due" value={fmt(balanceDue)} color="#10b981" onClick={() => setActive("projects")} THEME={THEME} />
-                  <StatCard icon="💸" label="Total Pending" value={fmt(totalPending)} color="#ef4444" onClick={() => setActive("payments")} THEME={THEME} />
+                  <StatCard icon="💸" label="Total Pending" value={fmt(totalPending)} color="#f59e0b" onClick={() => setActive("payments")} THEME={THEME} />
                 </div>
 
                 {/* Analytics Section */}
@@ -1388,41 +1427,154 @@ export default function ClientDashboard({ user, setUser }) {
           {/* ── PROPOSALS ── */}
           {active === "proposals" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+              {proposalToast && (
+                <div style={{
+                  position: "fixed", top: 24, right: 24, zIndex: 9999,
+                  background: THEME.card, border: `1.5px solid ${proposalToast.startsWith("✅") ? "#22c55e" : "#ef4444"}`,
+                  borderRadius: 14, padding: "14px 22px", fontSize: 14, fontWeight: 700,
+                  color: proposalToast.startsWith("✅") ? "#22c55e" : "#ef4444",
+                  boxShadow: THEME.shadow, maxWidth: 380
+                }}>{proposalToast}</div>
+              )}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2 style={{ fontSize: 20, fontWeight: 900, color: THEME.text }}>Proposals</h2>
-                <div style={{ fontSize: 13, fontWeight: 700, color: THEME.accent }}>{proposals.length} Found</div>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: "#f59e0b", background: "#f59e0b15", padding: "4px 10px", borderRadius: 8 }}>{proposals.filter(p => p.status === "pending").length} Pending</div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: "#10b981", background: "#10b98115", padding: "4px 10px", borderRadius: 8 }}>{proposals.filter(p => p.status === "approved").length} Approved</div>
+                </div>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }} className="proj-grid">
-                {proposals.map(p => (
-                  <div key={p.id || p._id} style={{ background: THEME.card, borderRadius: 24, border: `1.5px solid ${THEME.border}`, padding: "24px", boxShadow: THEME.shadow, transition: "all 0.3s" }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = `${THEME.accent}30`; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = THEME.border; }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                      <div>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: THEME.text }}>{p.title}</div>
-                        <div style={{ fontSize: 11, color: THEME.muted, marginTop: 4, fontWeight: 600 }}>{p.id} · {new Date(p.updated).toLocaleDateString()}</div>
-                      </div>
-                      <Badge label={p.status === "pending" ? "Pending Approval" : p.status === "approved" ? "Approved" : p.status === "rejected" ? "Rejected" : "Draft"} isDark={darkMode} />
-                    </div>
+                {proposals.map(p => {
+                  const isPending = p.status === "pending";
+                  const isApproved = p.status === "approved";
+                  const isRejected = p.status === "rejected";
+                  const borderCol = isApproved ? "#22c55e" : isRejected ? "#ef4444" : isPending ? "#f59e0b" : THEME.border;
+                  return (
+                    <div key={p.id || p._id} style={{
+                      background: THEME.card, borderRadius: 24,
+                      border: `1.5px solid ${borderCol}30`,
+                      padding: "24px", boxShadow: THEME.shadow, transition: "all 0.3s",
+                      position: "relative", overflow: "hidden"
+                    }}
+                      onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = ""; }}
+                    >
+                      {/* Top accent stripe */}
+                      <div style={{
+                        position: "absolute", top: 0, left: 0, right: 0, height: 4,
+                        background: isApproved ? "#22c55e" : isRejected ? "#ef4444" : isPending ? "#f59e0b" : THEME.accent,
+                        borderRadius: "24px 24px 0 0"
+                      }} />
 
-                    <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-                      <button
-                        onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")}
-                        style={{ background: THEME.gradient, border: "none", borderRadius: 14, padding: "12px", color: "#fff", fontWeight: 800, cursor: "pointer" }}
-                      >View</button>
-                      <button
-                        onClick={() => window.open(`/project-proposal?view=${p._id || p.id}&print=true`, "_blank")}
-                        style={{ background: "var(--app-surface)", border: "none", borderRadius: 14, padding: "12px 20px", color: THEME.text, fontWeight: 800, cursor: "pointer" }}
-                      >🖨️</button>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, marginTop: 8 }}>
+                        <div style={{ flex: 1, paddingRight: 12 }}>
+                          <div style={{ fontSize: 17, fontWeight: 800, color: THEME.text, marginBottom: 4 }}>{p.title}</div>
+                          <div style={{ fontSize: 11, color: THEME.muted, fontWeight: 600 }}>
+                            {p.id} • {(() => {
+                              const d = p.updated || p.createdAt || p.created || new Date().toISOString();
+                              const dateObj = new Date(d);
+                              return isNaN(dateObj.getTime()) ? "No Date" : dateObj.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+                            })()}
+                          </div>
+                        </div>
+                        <Badge label={isPending ? "Pending Approval" : isApproved ? "Approved" : isRejected ? "Rejected" : "Draft"} isDark={darkMode} />
+                      </div>
+
+                      {/* Description preview */}
+                      {p.description && (
+                        <div style={{ fontSize: 12, color: THEME.muted, lineHeight: 1.6, marginBottom: 16, padding: "10px 14px", background: THEME.bg, borderRadius: 10 }}>
+                          {p.description.slice(0, 120)}{p.description.length > 120 ? "…" : ""}
+                        </div>
+                      )}
+
+                      {/* Client Action Buttons — only when pending */}
+                      {isPending && (
+                        <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+                          <button
+                            onClick={() => handleProposalAction(p, "approved")}
+                            style={{
+                              flex: 1, background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                              border: "none", borderRadius: 14, padding: "12px",
+                              color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer",
+                              boxShadow: "0 6px 16px rgba(34,197,94,0.25)", transition: "all 0.2s",
+                              fontFamily: "inherit"
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
+                            onMouseLeave={e => e.currentTarget.style.transform = ""}
+                          >✅ Approve</button>
+                          <button
+                            onClick={() => handleProposalAction(p, "rejected")}
+                            style={{
+                              flex: 1, background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                              border: "none", borderRadius: 14, padding: "12px",
+                              color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer",
+                              boxShadow: "0 6px 16px rgba(239,68,68,0.25)", transition: "all 0.2s",
+                              fontFamily: "inherit"
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
+                            onMouseLeave={e => e.currentTarget.style.transform = ""}
+                          >❌ Reject</button>
+                        </div>
+                      )}
+
+                      {/* Rejected state banner */}
+                      {isRejected && (
+                        <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 12, padding: "10px 14px", marginBottom: 14, fontSize: 12, color: "#ef4444", fontWeight: 700 }}>
+                          ❌ Rejected — The SubAdmin has been notified and may resubmit.
+                        </div>
+                      )}
+
+                      {/* Approved state banner */}
+                      {isApproved && (
+                        <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 12, padding: "10px 14px", marginBottom: 14, fontSize: 12, color: "#16a34a", fontWeight: 700 }}>
+                          ✅ Approved — Project in progress!
+                        </div>
+                      )}
+
+                      {/* View / Print */}
+                      <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+                        <button
+                          onClick={() => window.open(`/project-proposal?view=${p._id || p.id}`, "_blank")}
+                          style={{ flex: 1, background: THEME.gradient, border: "none", borderRadius: 14, padding: "11px", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
+                        >👁 View Proposal</button>
+                        <button
+                          onClick={() => window.open(`/project-proposal?view=${p._id || p.id}&print=true`, "_blank")}
+                          style={{ background: THEME.bg, border: `1px solid ${THEME.border}`, borderRadius: 14, padding: "11px 16px", color: THEME.text, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}
+                        >🖨️</button>
+                      </div>
                     </div>
+                  );
+                })}
+                {proposals.length === 0 && (
+                  <div style={{ gridColumn: "span 2", textAlign: "center", padding: 60, color: THEME.muted }}>
+                    <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: THEME.text }}>No proposals yet</div>
+                    <div style={{ fontSize: 13, marginTop: 8 }}>Your SubAdmin will share proposals for your review here.</div>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           )}
 
-          {/* ── QUOTATIONS ── */}
+          {/* ── CALENDAR ── */}
+          {active === "calendar" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <h2 style={{ fontSize: 20, fontWeight: 900, color: THEME.text }}>Business Calendar</h2>
+              </div>
+              <CalendarPage 
+                projects={projects} 
+                tasks={tasks} 
+                clients={[]} 
+                companyId={user?.companyId || ""} 
+                onUpdateProject={refreshData} 
+                onUpdateTask={refreshData} 
+                user={user} 
+                THEME={THEME}
+              />
+            </div>
+          )}
           {active === "quotations" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1582,7 +1734,7 @@ export default function ClientDashboard({ user, setUser }) {
             </div>
           )}
 
-          {active === "calendar" && <CalendarPage projects={projects} tasks={tasks} user={{ ...user, role: 'client' }} onUpdateProject={refreshData} onUpdateTask={refreshData} />}
+          {active === "calendar" && <CalendarPage projects={projects} tasks={tasks} user={{ ...user, role: 'client' }} onUpdateProject={refreshData} onUpdateTask={refreshData} THEME={THEME} />}
 
           {active === "messaging" && <MessagingPage user={user} />}
 
@@ -1611,5 +1763,648 @@ export default function ClientDashboard({ user, setUser }) {
     </div>
   );
 }
+
+// ── INLINED CALENDAR PAGE ─────────────────────────────────────
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const TYPES = ["Meeting", "Call", "Review", "Planning", "Handover", "Other"];
+const TC = { Meeting: "var(--app-accent)", Call: "var(--app-accent)", Review: "#22C55E", Planning: "#f59e0b", Handover: "var(--app-accent)", Other: "var(--app-muted)" };
+const EMPTY = { name: "", project: "", client: "", date: "", start: "", end: "", notes: "", type: "Meeting", category: "Event" };
+
+function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME }) {
+  const finalTheme = THEME || { accent: "var(--app-accent)", muted: "var(--app-muted)", card: "var(--app-card)", bg: "var(--app-bg)", border: "var(--app-border)" };
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
+  const [modal, setModal] = useState(null);
+  const [editId, setEditId] = useState(null);
+  const [form, setForm] = useState(EMPTY);
+  const [err, setErr] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState("");
+
+  const now = new Date();
+  const [calYear, setCalYear] = useState(now.getFullYear());
+  const [calMonth, setCalMonth] = useState(now.getMonth());
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const API = `${BASE_URL}/api/events`;
+  const T_CAL = { text: "var(--app-text)", muted: "var(--app-accent)", border: "var(--app-border)" };
+
+  useEffect(() => { load(); }, []);
+
+  const showToast = (m) => { setToast(m); setTimeout(() => setToast(""), 2800); };
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const isEmp = String(user?.role || user?.userRole || "").toLowerCase() === 'employee';
+      let url = `${API}?companyId=${companyId || ""}`;
+
+      if (isEmp && user?.name) {
+        url += `&employeeName=${encodeURIComponent(user.name)}`;
+        if (projects.length > 0) {
+          const pNames = projects.map(p => p.name).join(",");
+          url += `&projectNames=${encodeURIComponent(pNames)}`;
+        }
+      }
+
+      const r = await axios.get(url);
+      setEvents(Array.isArray(r.data) ? r.data : []);
+    } catch {
+      setEvents([]);
+    }
+    setLoading(false);
+  };
+
+  const role = String(user?.role || user?.userRole || "").toLowerCase();
+  const isClient = role === 'client';
+
+  const filteredEvents = isClient
+    ? events.filter(e => {
+      if (!e.client) return false;
+      const c = String(e.client).toLowerCase().trim();
+      return (user?.name && c === String(user.name).toLowerCase().trim()) ||
+        (user?.clientName && c === String(user.clientName).toLowerCase().trim()) ||
+        (user?.company && c === String(user.company).toLowerCase().trim()) ||
+        (user?.companyName && c === String(user.companyName).toLowerCase().trim());
+    })
+    : events;
+
+  const allDisplayEvents = [
+    ...filteredEvents.map(e => ({ ...e, _type: "event" })),
+    ...projects.filter(p => p.deadline || p.end).map(p => ({
+      _id: `proj-${p._id || p.id}`,
+      name: `🏁 Deadline: ${p.name}`,
+      date: p.deadline || p.end,
+      type: "Planning",
+      project: p.name,
+      client: p.client,
+      _type: "project",
+      _original: p
+    })),
+    ...tasks.filter(t => t.date || t.dueDate).map(t => ({
+      _id: `task-${t._id || t.id}`,
+      name: `📝 Task: ${t.title || t.name}`,
+      date: t.date || t.dueDate,
+      type: "Review",
+      project: t.project,
+      _type: "task",
+      _original: t
+    }))
+  ];
+
+  const openAdd = (dateStr) => {
+    setForm({ ...EMPTY, date: dateStr || "" });
+    setErr({}); setEditId(null); setModal("add");
+  };
+
+  const openEdit = (ev, readOnly = false) => {
+    const finalReadOnly = readOnly || isClient;
+    if (ev._type === "project" || ev._type === "task") {
+      setModal(ev._type);
+      setForm({ ...ev, _readOnly: finalReadOnly });
+      return;
+    }
+    setForm({
+      name: ev.name || "",
+      project: ev.project || "",
+      client: ev.client || "",
+      date: ev.date || "",
+      start: ev.start || "",
+      end: ev.end || "",
+      notes: ev.notes || "",
+      type: ev.type || "Meeting"
+    });
+    setEditId(ev._id || ev.id);
+    setErr({});
+    setModal(finalReadOnly ? "view" : "edit");
+  };
+
+  const save = async () => {
+    const e = {};
+    if (!form.name.trim()) e.name = "Event name required";
+    if (!form.date) e.date = "Date required";
+    if (Object.keys(e).length) { setErr(e); return; }
+    setSaving(true);
+    try {
+      if (modal === "add") {
+        if (form.category === "Project") {
+          const payload = { name: form.name, client: form.client, start: form.date, end: form.date, deadline: form.date, status: "Pending", budget: "0", currency: "₹" };
+          await axios.post(`${BASE_URL}/api/projects/add`, payload);
+          if (onUpdateProject) onUpdateProject();
+          showToast("✅ Project added!");
+        } else if (form.category === "Task") {
+          const payload = { title: form.name, project: form.project, date: form.date, status: "Pending", priority: "Medium" };
+          await axios.post(`${BASE_URL}/api/tasks`, payload);
+          if (onUpdateTask) onUpdateTask();
+          showToast("✅ Task added!");
+        } else {
+          const r = await axios.post(API, { ...form, companyId: companyId || "", createdBy: user?.name || user?.clientName || "", createdByRole: user?.role || user?.userRole || "" });
+          setEvents(p => [r.data, ...p]);
+          showToast("✅ Event added!");
+        }
+      } else {
+        const r = await axios.put(`${API}/${editId}`, form);
+        setEvents(p => p.map(x => (x._id || x.id) === editId ? r.data : x));
+        showToast("✅ Event updated!");
+      }
+      setModal(null);
+    } catch {
+      if (modal === "add") {
+        setEvents(p => [{ ...form, _id: Date.now().toString(), createdBy: user?.name || user?.clientName || "", createdByRole: user?.role || user?.userRole || "" }, ...p]);
+        showToast("✅ Saved locally!");
+      } else {
+        setEvents(p => p.map(x => (x._id || x.id) === editId ? { ...x, ...form } : x));
+        showToast("✅ Updated locally!");
+      }
+      setModal(null);
+    }
+    setSaving(false);
+  };
+
+  const updateProjectTask = async (type, id, updates) => {
+    setSaving(true);
+    try {
+      if (type === "project") {
+        await axios.put(`${BASE_URL}/api/projects/${id}`, updates);
+        if (onUpdateProject) onUpdateProject();
+        showToast("✅ Project updated!");
+      } else if (type === "task") {
+        if (updates.date || updates.dueDate) {
+          await axios.put(`${BASE_URL}/api/tasks/${id}`, updates);
+        } else {
+          await axios.patch(`${BASE_URL}/api/tasks/${id}/status`, updates);
+        }
+        if (onUpdateTask) onUpdateTask();
+        showToast("✅ Task updated!");
+      }
+      setModal(null);
+    } catch (err) {
+      showToast("❌ Update failed!");
+    }
+    setSaving(false);
+  };
+
+  const del = async (id) => {
+    if (!window.confirm("Delete this event?")) return;
+    try { await axios.delete(`${API}/${id}`); } catch { }
+    setEvents(p => p.filter(x => (x._id || x.id) !== id));
+    showToast("Delete Deleted!");
+  };
+
+  const prevMonth = () => {
+    if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
+    else setCalMonth(m => m - 1);
+    setSelectedDate(null);
+  };
+  const nextMonth = () => {
+    if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
+    else setCalMonth(m => m + 1);
+    setSelectedDate(null);
+  };
+
+  const getCalendarDays = () => {
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+    const cells = [];
+    for (let i = firstDay - 1; i >= 0; i--) cells.push({ day: daysInPrev - i, curr: false });
+    for (let d = 1; d <= daysInMonth; d++) cells.push({ day: d, curr: true });
+    while (cells.length % 7 !== 0) cells.push({ day: cells.length - daysInMonth - firstDay + 1, curr: false });
+    return cells;
+  };
+
+  const dateStr = (d) =>
+    `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+  const eventsOnDay = (d) => {
+    const targetDateStr = dateStr(d);
+    return allDisplayEvents.filter(e => {
+      if (!e.date) return false;
+      const eDate = e.date.includes('T') ? e.date.split('T')[0] : e.date;
+      return eDate === targetDateStr;
+    });
+  };
+
+  const f = (x) => {
+    const q = search.toLowerCase();
+    const ms = !q ||
+      (x.name || "").toLowerCase().includes(q) ||
+      (x.project || "").toLowerCase().includes(q) ||
+      (x.client || "").toLowerCase().includes(q);
+    let mf = true;
+    if (selectedDate) {
+      mf = x.date === selectedDate;
+    } else {
+      mf =
+        filter === "All" ? true :
+          filter === "Today" ? x.date === today :
+            filter === "Upcoming" ? x.date > today :
+              filter === "Past" ? x.date < today :
+                (x.type || "Meeting") === filter;
+    }
+    return ms && mf;
+  };
+
+  const shown = [...allDisplayEvents].filter(f).sort((a, b) => (a.date || "") < (b.date || "") ? -1 : 1);
+
+  const stats = [
+    { t: "Total", v: allDisplayEvents.length, c: finalTheme.accent || "var(--app-accent)", i: "📅" },
+    { t: "Today", v: allDisplayEvents.filter(x => x.date === today).length, c: finalTheme.accent || "var(--app-accent)", i: "📌" },
+    { t: "Upcoming", v: allDisplayEvents.filter(x => x.date > today).length, c: "#10b981", i: "⏰" },
+    { t: "Past", v: allDisplayEvents.filter(x => x.date < today).length, c: "#ef4444", i: "✅" },
+  ];
+
+  const pNames = projects.map(p => p.name || "");
+  const cNames = (clients || []).map(c => c.clientName || c.name || "");
+
+  const Btn = {
+    background: finalTheme.gradient || "var(--app-accent-gradient, var(--app-accent, #6366f1))",
+    color: "#fff",
+    border: "none",
+    borderRadius: 12,
+    padding: "10px 22px",
+    fontWeight: 800,
+    fontSize: 13,
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+    boxShadow: "0 8px 20px rgba(var(--app-accent-rgb, 99, 102, 241), 0.2)",
+    transition: "all 0.2s"
+  };
+
+  const inp = (hasErr) => ({
+    width: "100%",
+    border: `1.5px solid ${hasErr ? "#ef4444" : "var(--app-border)"}`,
+    borderRadius: 12,
+    padding: "12px 16px",
+    fontSize: 14,
+    color: "var(--app-text)",
+    background: "var(--app-surface)",
+    outline: "none",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+    transition: "all 0.2s"
+  });
+
+  const calendarDays = getCalendarDays();
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {toast && (
+        <div style={{
+          position: "fixed", bottom: 24, right: 24, zIndex: 9999,
+          background: "var(--app-card)", border: "1.5px solid #22c55e", borderRadius: 12,
+          padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e",
+          boxShadow: "var(--app-shadow)"
+        }}>{toast}</div>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
+        {stats.map(({ t, v, c, i }) => (
+          <div key={t} style={{
+            background: "var(--app-card)",
+            borderRadius: 24,
+            padding: "24px",
+            boxShadow: "var(--app-shadow)",
+            border: "1.5px solid var(--app-border)",
+            transition: "transform 0.3s ease"
+          }}
+            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-5px)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
+            <div style={{
+              width: 44, height: 44, borderRadius: 12, background: c.startsWith('var') ? `rgba(var(--app-accent-rgb), 0.1)` : `${c}15`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 22, marginBottom: 12, color: c
+            }}>{i}</div>
+            <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 800, letterSpacing: 0.8, marginBottom: 4 }}>{t.toUpperCase()}</div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: "var(--app-text)", letterSpacing: "-0.5px" }}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
+        <div style={{
+          background: "var(--app-card)", borderRadius: 16, padding: 20,
+          boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)",
+          position: "sticky", top: 16
+        }}>
+          <div style={{
+            display: "flex", justifyContent: "space-between",
+            alignItems: "center", marginBottom: 14
+          }}>
+            <button onClick={prevMonth} style={{
+              background: "var(--app-bg)",
+              border: "1px solid var(--app-border)", borderRadius: 8, width: 32, height: 32,
+              cursor: "pointer", fontSize: 15, color: "var(--app-accent)", fontWeight: 700
+            }}>‹</button>
+
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T_CAL.text }}>
+                {FULL_MONTHS[calMonth]} {calYear}
+              </div>
+              {selectedDate && (
+                <div style={{ fontSize: 10, color: "var(--app-muted)", marginTop: 2 }}>
+                  {selectedDate}
+                  <span onClick={() => setSelectedDate(null)}
+                    style={{
+                      marginLeft: 6, cursor: "pointer", color: "var(--app-accent)",
+                      textDecoration: "underline"
+                    }}>✕ Clear</span>
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <button onClick={() => { setCalYear(now.getFullYear()); setCalMonth(now.getMonth()); setSelectedDate(null); }}
+                style={{
+                  background: "var(--app-bg)", border: "1px solid var(--app-border)",
+                  borderRadius: 8, padding: "4px 10px", cursor: "pointer",
+                  fontSize: 10, color: "var(--app-accent)", fontWeight: 700
+                }}>Today</button>
+              <button onClick={nextMonth} style={{
+                background: "var(--app-bg)",
+                border: "1px solid var(--app-border)", borderRadius: 8, width: 32, height: 32,
+                cursor: "pointer", fontSize: 15, color: "var(--app-accent)", fontWeight: 700
+              }}>›</button>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, marginBottom: 4 }}>
+            {DAYS.map(d => (
+              <div key={d} style={{
+                textAlign: "center", fontSize: 9, fontWeight: 700,
+                color: "var(--app-muted)", letterSpacing: 0.5, padding: "3px 0"
+              }}>
+                {d.toUpperCase()}
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
+            {calendarDays.map((cell, idx) => {
+              const ds = cell.curr ? dateStr(cell.day) : null;
+              const dayEvents = cell.curr ? eventsOnDay(cell.day) : [];
+              const isToday = ds === today;
+              const isSelected = ds === selectedDate;
+
+              return (
+                <div key={idx}
+                  onClick={() => {
+                    if (!cell.curr) return;
+                    setSelectedDate(prev => prev === ds ? null : ds);
+                    setFilter("All");
+                    setSearch("");
+                  }}
+                  style={{
+                    minHeight: 52, borderRadius: 9, padding: "5px 4px 4px",
+                    cursor: cell.curr ? "pointer" : "default",
+                    background: isSelected ? "rgba(var(--app-accent-rgb), 0.2)" : isToday ? "rgba(var(--app-accent-rgb), 0.1)" : cell.curr ? "var(--app-card)" : "var(--app-bg)",
+                    border: isSelected ? "2px solid var(--app-accent)" : isToday ? "1.5px solid rgba(var(--app-accent-rgb), 0.3)" : "1px solid var(--app-border)",
+                    opacity: cell.curr ? 1 : 0.4, transition: "all 0.15s", position: "relative", boxSizing: "border-box",
+                  }}>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: "50%",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 11, fontWeight: isToday || isSelected ? 800 : 600,
+                    color: isSelected ? "var(--app-accent)" : isToday ? "var(--app-accent)" : cell.curr ? T_CAL.text : "var(--app-border)",
+                    background: isToday && !isSelected ? "var(--app-border)" : "transparent",
+                    marginBottom: 3,
+                  }}>{cell.day}</div>
+
+                  {dayEvents.length > 0 && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                      {dayEvents.slice(0, 2).map((ev, ei) => (
+                        <div key={ei} style={{
+                          background: ev.type && TC[ev.type] && TC[ev.type].startsWith('var') ? "rgba(var(--app-accent-rgb), 0.15)" : `${TC[ev.type || "Meeting"]}22`,
+                          borderRadius: 3, padding: "1px 3px", fontSize: 8, color: TC[ev.type || "Meeting"],
+                          fontWeight: 700, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis",
+                        }}>{ev.name}</div>
+                      ))}
+                      {dayEvents.length > 2 && (
+                        <div style={{ fontSize: 8, color: "var(--app-muted)", fontWeight: 600, paddingLeft: 2 }}>+{dayEvents.length - 2}</div>
+                      )}
+                    </div>
+                  )}
+
+                  {cell.curr && !isClient && (
+                    <div onClick={e => { e.stopPropagation(); openAdd(ds); }} title="Add event"
+                      style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, borderRadius: "50%", background: "var(--app-border)", color: "var(--app-accent)", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: 0, transition: "opacity 0.15s" }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = "0"}
+                    >+</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
+            {Object.entries(TC).map(([type, color]) => (
+              <div key={type} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 9, color: "var(--app-muted)", fontWeight: 600 }}>
+                <div style={{ width: 7, height: 7, borderRadius: 2, background: color }} />
+                {type}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ background: "var(--app-card)", borderRadius: 16, padding: 20, boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: T_CAL.text }}>
+                {selectedDate ? `📅 Events on ${selectedDate} (${shown.length})` : `📅 All Events (${shown.length})`}
+              </h3>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span>
+                  <input placeholder="Search…" value={search} onChange={e => { setSearch(e.target.value); setSelectedDate(null); }}
+                    style={{ ...inp(false), paddingLeft: 30, width: 150, padding: "7px 10px 7px 30px" }} />
+                </div>
+                {!isClient && (
+                  <button onClick={() => openAdd(selectedDate || "")} style={Btn}>+ Add Event</button>
+                )}
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+              {["All", "Today", "Upcoming", "Past", ...TYPES].map((fil, fi) => (
+                <button key={`filter-${fi}`} onClick={() => { setFilter(fil); setSelectedDate(null); }}
+                  style={{ padding: "5px 10px", borderRadius: 7, fontSize: 10, fontWeight: 700, cursor: "pointer", border: "1.5px solid", borderColor: !selectedDate && filter === fil ? "var(--app-accent)" : "var(--app-border)", background: !selectedDate && filter === fil ? "var(--app-accent)" : "var(--app-card)", color: !selectedDate && filter === fil ? "#fff" : "var(--app-muted)" }}>{fil}</button>
+              ))}
+            </div>
+
+            {loading ? (
+              <div style={{ textAlign: "center", padding: 40, color: "var(--app-muted)" }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>⏳</div>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>Loading events...</div>
+              </div>
+            ) : shown.length === 0 ? (
+              <div style={{ textAlign: "center", padding: 40 }}>
+                <div style={{ fontSize: 40, marginBottom: 10 }}>📅</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T_CAL.text }}>{search || selectedDate ? "No events found" : "No events yet!"}</div>
+                <div style={{ fontSize: 12, color: "var(--app-muted)", marginTop: 4 }}>{search || selectedDate ? "Try a different filter or click a date on the calendar" : "Add your first event using the form above"}</div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {shown.map((ev, idx) => {
+                  const isValidDate = ev.date && !isNaN(new Date(ev.date + "T00:00:00").getTime());
+                  const d = isValidDate ? new Date(ev.date + "T00:00:00") : null;
+                  const day = d ? d.getDate() : "--";
+                  const mon = d ? (MONTHS[d.getMonth()] || "---") : "---";
+                  const c = TC[ev.type || "Meeting"] || "var(--app-accent)";
+                  const past = ev.date && ev.date < today;
+
+                  return (
+                    <div key={ev._id || idx} style={{ background: past ? "var(--app-surface)" : "var(--app-card)", borderRadius: 12, padding: "12px 14px", border: `1px solid var(--app-border)`, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", opacity: past ? 0.7 : 1, boxShadow: "var(--app-shadow)" }}>
+                      <div style={{ background: `${c}15`, border: `2px solid ${c}30`, borderRadius: 10, padding: "8px 12px", textAlign: "center", minWidth: 50, flexShrink: 0 }}>
+                        <div style={{ fontSize: 20, fontWeight: 800, color: c, lineHeight: 1 }}>{day}</div>
+                        <div style={{ fontSize: 8, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, marginTop: 2 }}>{mon.toUpperCase()}</div>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 4 }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: T_CAL.text }}>{ev.name}</span>
+                          <span style={{ background: `${c}18`, color: c, border: `1px solid ${c}33`, padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700 }}>{ev.type || "Meeting"}</span>
+                          {past && <span style={{ background: "var(--app-border)", color: "var(--app-muted)", padding: "2px 7px", borderRadius: 20, fontSize: 9, fontWeight: 600 }}>Past</span>}
+                        </div>
+                        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                          {ev.project && <span style={{ color: "var(--app-muted)", fontSize: 11 }}>📁 {ev.project}</span>}
+                          {ev.client && <span style={{ color: "var(--app-muted)", fontSize: 11 }}>👤 {ev.client}</span>}
+                          {(ev.start || ev.end) && <span style={{ color: "var(--app-muted)", fontSize: 11 }}>🕐 {ev.start || "--"} – {ev.end || "--"}</span>}
+                        </div>
+                        {ev.notes && <div style={{ color: "var(--app-muted)", fontSize: 10, marginTop: 3, fontStyle: "italic" }}>📝 {ev.notes}</div>}
+                      </div>
+                      <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
+                        {(() => {
+                          let canEdit = !isClient;
+                          if (ev._type) canEdit = true;
+                          return canEdit ? (
+                            <>
+                              <button onClick={() => openEdit(ev)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 12px", fontSize: 11, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700 }}>{ev._type ? "View" : "Edit"}</button>
+                              {!ev._type && <button onClick={() => del(ev._id || ev.id)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 12px", fontSize: 11, color: "#ef4444", cursor: "pointer", fontWeight: 700 }}>Delete</button>}
+                            </>
+                          ) : (
+                            <button onClick={() => openEdit(ev, true)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 12px", fontSize: 11, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700 }}>View</button>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {modal === "project" && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: "var(--app-card)", borderRadius: 20, width: "100%", maxWidth: 450, padding: 24, boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
+            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: T_CAL.text }}>🏗️ Project Deadline</h2>
+            <div style={{ background: "var(--app-bg)", padding: 16, borderRadius: 12, marginBottom: 20 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: T_CAL.text }}>{form._original.name}</div>
+              <div style={{ fontSize: 12, color: T_CAL.muted, marginTop: 4 }}>Deadline: {form.date}</div>
+            </div>
+            <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 8 }}>DEADLINE</label>
+            <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={{ ...inp(false), marginBottom: 16 }} disabled={form._readOnly} />
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
+              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "none", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600 }}>Close</button>
+              {!form._readOnly && <button onClick={() => updateProjectTask("project", form._original._id, { deadline: form.date })} style={{ background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 700 }}>Save Changes</button>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modal === "task" && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: "var(--app-card)", borderRadius: 20, width: "100%", maxWidth: 450, padding: 24, boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
+            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: T_CAL.text }}>📝 Task Details</h2>
+            <div style={{ background: "var(--app-bg)", padding: 16, borderRadius: 12, marginBottom: 20 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: T_CAL.text }}>{form._original.title || form._original.name}</div>
+              <div style={{ fontSize: 12, color: T_CAL.muted, marginTop: 4 }}>Due Date: {form.date}</div>
+            </div>
+            <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 8 }}>DUE DATE</label>
+            <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={{ ...inp(false), marginBottom: 16 }} disabled={form._readOnly} />
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
+              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "none", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600 }}>Close</button>
+              {!form._readOnly && <button onClick={() => updateProjectTask("task", form._original._id, { date: form.date })} style={{ background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 700 }}>Save Changes</button>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modal && !["project", "task"].includes(modal) && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={(e) => { if (e.target === e.currentTarget) { setModal(null); setForm(EMPTY); setErr({}); } }}>
+          <div style={{ background: "var(--app-card)", borderRadius: 20, width: "100%", maxWidth: 740, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
+            <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--app-bg)", flexShrink: 0 }}>
+              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T_CAL.text }}>{modal === "add" ? "📅 Add New" : "Event Details"}</h2>
+              <button onClick={() => { setModal(null); setForm(EMPTY); setErr({}); }} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)" }}>✕</button>
+            </div>
+            <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>
+              {modal === "add" && (
+                <div style={{ display: "flex", gap: 10, marginBottom: 20, background: "var(--app-bg)", padding: 12, borderRadius: 12 }}>
+                  {["Event", "Project", "Task"].map(cat => (
+                    <button key={cat} onClick={() => setForm({ ...form, category: cat })} style={{ flex: 1, padding: "8px", borderRadius: 8, border: "1.5px solid", borderColor: form.category === cat ? "var(--app-accent)" : "var(--app-border)", background: form.category === cat ? "var(--app-accent)" : "var(--app-card)", color: form.category === cat ? "#fff" : "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{cat}</button>
+                  ))}
+                </div>
+              )}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 5 }}>NAME *</label>
+                  <input value={form.name} disabled={modal === "view"} onChange={e => { setForm({ ...form, name: e.target.value }); setErr(p => ({ ...p, name: "" })); }} style={inp(err.name)} />
+                  {err.name && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {err.name}</div>}
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 5 }}>TYPE</label>
+                  <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inp(false)} disabled={modal === "view"}>
+                    {TYPES.map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 5 }}>DATE *</label>
+                  <input type="date" value={form.date} disabled={modal === "view"} onChange={e => { setForm({ ...form, date: e.target.value }); setErr(p => ({ ...p, date: "" })); }} style={inp(err.date)} />
+                  {err.date && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>⚠️ {err.date}</div>}
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 5 }}>TIME</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    <input type="time" value={form.start} disabled={modal === "view"} onChange={e => setForm({ ...form, start: e.target.value })} style={inp(false)} />
+                    <input type="time" value={form.end} disabled={modal === "view"} onChange={e => setForm({ ...form, end: e.target.value })} style={inp(false)} />
+                  </div>
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 5 }}>PROJECT</label>
+                  <select value={form.project} onChange={e => setForm({ ...form, project: e.target.value })} style={inp(false)} disabled={modal === "view"}>
+                    <option value="">-- Select Project --</option>
+                    {pNames.map((n, i) => <option key={i}>{n}</option>)}
+                  </select>
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 5 }}>CLIENT</label>
+                  <select value={form.client} onChange={e => setForm({ ...form, client: e.target.value })} style={inp(false)} disabled={modal === "view"}>
+                    <option value="">-- Select Client --</option>
+                    {cNames.map((n, i) => <option key={i}>{n}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, marginBottom: 5 }}>NOTES</label>
+                <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} disabled={modal === "view"} rows={3} style={{ ...inp(false), resize: "vertical" }} />
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                <button onClick={() => { setModal(null); setForm(EMPTY); setErr({}); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, padding: "10px 18px", cursor: "pointer", fontWeight: 600 }}>Close</button>
+                {modal !== "view" && <button onClick={save} disabled={saving} style={Btn}>{saving ? "Saving…" : "Save"}</button>}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 

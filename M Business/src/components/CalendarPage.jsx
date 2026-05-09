@@ -8,10 +8,11 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const TYPES = ["Meeting", "Call", "Review", "Planning", "Handover", "Other"];
-const TC = { Meeting: "var(--app-accent, #7c3aed)", Call: "var(--app-accent, #7c3aed)", Review: "#22C55E", Planning: "#f59e0b", Handover: "var(--app-accent, #7c3aed)", Other: "#6b7280" };
+const TC = { Meeting: "var(--app-accent)", Call: "var(--app-accent)", Review: "#22C55E", Planning: "#f59e0b", Handover: "var(--app-accent)", Other: "var(--app-muted)" };
 const EMPTY = { name: "", project: "", client: "", date: "", start: "", end: "", notes: "", type: "Meeting", category: "Event" };
 
-export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user }) {
+export default function CalendarPage({ projects = [], tasks = [], clients = [], companyId, onUpdateProject, onUpdateTask, config, user, THEME }) {
+  const finalTheme = THEME || { accent: "var(--app-accent)", muted: "var(--app-muted)", card: "var(--app-card)", bg: "var(--app-bg)", border: "var(--app-border)" };
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -253,8 +254,8 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
   const shown = [...allDisplayEvents].filter(f).sort((a, b) => (a.date || "") < (b.date || "") ? -1 : 1);
 
   const stats = [
-    { t: "Total", v: allDisplayEvents.length, c: "#7c6cfa", i: "📅" },
-    { t: "Today", v: allDisplayEvents.filter(x => x.date === today).length, c: "#d946ef", i: "📌" },
+    { t: "Total", v: allDisplayEvents.length, c: finalTheme.accent || "var(--app-accent)", i: "📅" },
+    { t: "Today", v: allDisplayEvents.filter(x => x.date === today).length, c: finalTheme.accent || "var(--app-accent)", i: "📌" },
     { t: "Upcoming", v: allDisplayEvents.filter(x => x.date > today).length, c: "#10b981", i: "⏰" },
     { t: "Past", v: allDisplayEvents.filter(x => x.date < today).length, c: "#ef4444", i: "✅" },
   ];
@@ -263,7 +264,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
   const cNames = clients.map(c => c.clientName || c.name || "");
 
   const Btn = {
-    background: "var(--app-accent-gradient, var(--app-gradient, var(--app-accent, linear-gradient(135deg, #7c6cfa, #d946ef))))",
+    background: finalTheme.gradient || "var(--app-accent-gradient, var(--app-accent, #6366f1))",
     color: "#fff",
     border: "none",
     borderRadius: 12,
@@ -272,7 +273,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     fontSize: 13,
     cursor: "pointer",
     whiteSpace: "nowrap",
-    boxShadow: "0 8px 20px rgba(var(--app-accent-rgb, 217, 70, 239), 0.2)",
+    boxShadow: "0 8px 20px rgba(var(--app-accent-rgb, 99, 102, 241), 0.2)",
     transition: "all 0.2s"
   };
 
@@ -319,7 +320,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
             onMouseEnter={e => e.currentTarget.style.transform = "translateY(-5px)"}
             onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
             <div style={{
-              width: 44, height: 44, borderRadius: 12, background: `${c}15`,
+              width: 44, height: 44, borderRadius: 12, background: c.startsWith('var') ? `rgba(var(--app-accent-rgb), 0.1)` : `${c}15`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 22, marginBottom: 12, color: c
             }}>{i}</div>
@@ -414,8 +415,8 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     borderRadius: 9,
                     padding: "5px 4px 4px",
                     cursor: cell.curr ? "pointer" : "default",
-                    background: isSelected ? "var(--app-accent)20" : isToday ? "var(--app-accent)10" : cell.curr ? "var(--app-card)" : "var(--app-bg)",
-                    border: isSelected ? "2px solid var(--app-accent)" : isToday ? "1.5px solid var(--app-accent)30" : "1px solid var(--app-border)",
+                    background: isSelected ? "rgba(var(--app-accent-rgb), 0.2)" : isToday ? "rgba(var(--app-accent-rgb), 0.1)" : cell.curr ? "var(--app-card)" : "var(--app-bg)",
+                    border: isSelected ? "2px solid var(--app-accent)" : isToday ? "1.5px solid rgba(var(--app-accent-rgb), 0.3)" : "1px solid var(--app-border)",
                     opacity: cell.curr ? 1 : 0.4,
                     transition: "all 0.15s",
                     position: "relative",
@@ -435,7 +436,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                     <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
                       {dayEvents.slice(0, 2).map((ev, ei) => (
                         <div key={ei} style={{
-                          background: `${TC[ev.type || "Meeting"]}22`,
+                          background: ev.type && TC[ev.type] && TC[ev.type].startsWith('var') ? "rgba(var(--app-accent-rgb), 0.15)" : `${TC[ev.type || "Meeting"]}22`,
                           borderRadius: 3, padding: "1px 3px",
                           fontSize: 8, color: TC[ev.type || "Meeting"],
                           fontWeight: 700, overflow: "hidden",

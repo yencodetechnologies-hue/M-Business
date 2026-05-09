@@ -100,7 +100,7 @@ const AddInput = ({ onAdd, placeholder }) => {
 // ─────────────────────────────────────────────────────────────
 //  Main Settings Component
 // ─────────────────────────────────────────────────────────────
-export default function SettingsPage({ user, appTheme, setAppTheme, themes, customColor, setCustomColor, onLogoChange, triggerCrop }) {
+export default function SettingsPage({ user, appTheme, setAppTheme, themes, customColor, setCustomColor, onLogoChange, triggerCrop, onProfileUpdate }) {
   const companyId = user?._id || user?.id;
   const [activeTab, setActiveTab] = useState("profile");
   const [config, setConfig] = useState(null);
@@ -165,10 +165,21 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     setProfileSaved(false);
     try {
       await axios.put(`${BASE_URL}/api/subadmins/${companyId}`, {
-        companyName: profile.name, phone: profile.phone, notificationPreferences: notifs,
+        companyName: profile.name,
+        phone: profile.phone,
+        email: profile.email,
+        notificationPreferences: notifs,
       });
       setProfileSaved(true);
       setTimeout(() => setProfileSaved(false), 2500);
+      // ── Notify parent: update user state live everywhere ──
+      if (onProfileUpdate) {
+        onProfileUpdate({
+          companyName: profile.name,
+          phone: profile.phone,
+          email: profile.email,
+        });
+      }
     } catch (err) { showToast("Failed to save profile"); } finally { setProfileSaving(false); }
   };
 
@@ -354,10 +365,9 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
               <p style={{ fontSize: 14, color: "var(--app-muted)", marginBottom: 32 }}>Update your account information</p>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-                <Input label="Company Name" value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} placeholder="Your name or company" required />
-                <Input label="Email" type="email" value={profile.email} onChange={v => setProfile(p => ({ ...p, email: v }))} placeholder="Email address" disabled style={{ opacity: 0.7 }} />
+                <Input label="Company / Display Name" value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} placeholder="Your company name" required />
+                <Input label="Email" type="email" value={profile.email} onChange={v => setProfile(p => ({ ...p, email: v }))} placeholder="Email address" />
                 <Input label="Phone" type="tel" value={profile.phone} onChange={v => setProfile(p => ({ ...p, phone: v }))} placeholder="Contact number" />
-
               </div>
 
               <button

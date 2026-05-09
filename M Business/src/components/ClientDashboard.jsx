@@ -515,7 +515,7 @@ function ProfileDropdown({ user, onLogout, showDetails, darkMode, THEME }) {
           </div>
           <div style={{ padding: "8px" }}>
             <button onClick={() => window.location.href = "/add-account"} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "transparent", border: "none", borderRadius: 10, color: "#0f172a", fontSize: 13, fontWeight: 700, cursor: "pointer", textAlign: "left", transition: "background 0.15s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#0f1729"}
+              onMouseEnter={e => e.currentTarget.style.background = "#d8d8d8ff"}
               onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
               <span style={{ fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", width: 24, color: "#7c6cfa" }}>+</span> Add New Account
             </button>
@@ -1330,19 +1330,31 @@ export default function ClientDashboard({ user, setUser }) {
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                  {projects.slice(0, 3).map(p => (
-                    <div key={p.id || p._id} style={{ background: THEME.card, borderRadius: 24, padding: 20, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: THEME.text, marginBottom: 4 }}>{p.name}</div>
-                      <div style={{ fontSize: 11, color: THEME.muted, fontWeight: 600, marginBottom: 12 }}>{p.status}</div>
-                      <div style={{ height: 6, background: darkMode ? "#334155" : "#f1f5f9", borderRadius: 99, marginBottom: 8, overflow: "hidden" }}>
-                        <div style={{ width: `${p.progress || 0}%`, height: "100%", background: THEME.gradient, borderRadius: 99 }}></div>
+                  {projects.slice(0, 3).map(p => {
+                    const pName = (p.name || "").toLowerCase().trim();
+                    const projTasks = tasks.filter(t =>
+                      (t.project || "").toLowerCase().trim() === pName ||
+                      (t.projectId || t.projectRef || "") === (p._id || p.id)
+                    );
+                    const weights = { "done": 1, "completed": 1, "finished": 1, "in review": 0.8, "working on it": 0.5, "stuck": 0.1, "on hold": 0.2, "not started": 0 };
+                    let weightedSum = 0;
+                    projTasks.forEach(t => { weightedSum += (weights[(t.status || "").toLowerCase().trim()] || 0); });
+                    const dynProgress = projTasks.length > 0 ? Math.round((weightedSum / projTasks.length) * 100) : (p.progress || 0);
+
+                    return (
+                      <div key={p.id || p._id} style={{ background: THEME.card, borderRadius: 24, padding: 20, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: THEME.text, marginBottom: 4 }}>{p.name}</div>
+                        <div style={{ fontSize: 11, color: THEME.muted, fontWeight: 600, marginBottom: 12 }}>{p.status}</div>
+                        <div style={{ height: 6, background: darkMode ? "#334155" : "#f1f5f9", borderRadius: 99, marginBottom: 8, overflow: "hidden" }}>
+                          <div style={{ width: `${dynProgress}%`, height: "100%", background: THEME.gradient, borderRadius: 99, transition: "width 0.6s ease" }}></div>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
+                          <span style={{ color: THEME.muted, fontWeight: 700 }}>Progress</span>
+                          <span style={{ color: THEME.text, fontWeight: 800 }}>{dynProgress}%</span>
+                        </div>
                       </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
-                        <span style={{ color: THEME.muted, fontWeight: 700 }}>Progress</span>
-                        <span style={{ color: THEME.text, fontWeight: 800 }}>{p.progress || 0}%</span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {projects.length === 0 && (
                     <div style={{ padding: 20, textAlign: "center", color: THEME.muted, fontSize: 13, background: "#fff", borderRadius: 24, border: `1.5px solid ${THEME.border}` }}>
                       No active projects.
@@ -1384,15 +1396,56 @@ export default function ClientDashboard({ user, setUser }) {
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }} className="proj-grid">
                 {projects.map(p => {
-                  // Compute tasks for this project from the fetched tasks array
-                  const projTasks = tasks.filter(t =>
-                    (t.project || "").toLowerCase().trim() === (p.name || "").toLowerCase().trim()
-                  );
-                  const doneTasks = projTasks.filter(t => t.status === "Done" || t.status === "Completed").length;
-                  const totalTasks = projTasks.length;
-                  const progress = p.progress || (totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0);
+                  const pName = (p.name || "").toLowerCase().trim();
 
-                  // Deadline: SubAdmin saves as p.end, fallback to p.deadline
+                  // ── Tasks: compute from real tasks array ──────────────────
+                  const projTasks = tasks.filter(t =>
+                    (t.project || "").toLowerCase().trim() === pName ||
+                    (t.projectId || t.projectRef || "") === (p._id || p.id)
+                  );
+                  
+                  // ── Weighted Progress Calculation ────────────────────────
+                  const weights = {
+                    "done": 1,
+                    "completed": 1,
+                    "finished": 1,
+                    "in review": 0.8,
+                    "working on it": 0.5,
+                    "stuck": 0.1,
+                    "on hold": 0.2,
+                    "not started": 0
+                  };
+
+                  let weightedSum = 0;
+                  projTasks.forEach(t => {
+                    const s = (t.status || "").toLowerCase().trim();
+                    weightedSum += (weights[s] || 0);
+                  });
+
+                  const totalTasks = projTasks.length;
+                  const doneTasks = projTasks.filter(t => 
+                    ["done", "completed", "finished"].includes((t.status || "").toLowerCase().trim())
+                  ).length;
+
+                  // Progress: from tasks if available, else use stored p.progress
+                  const progress = totalTasks > 0
+                    ? Math.round((weightedSum / totalTasks) * 100)
+                    : (p.progress || 0);
+
+                  // ── Spent: sum invoice totals for this project ────────────
+                  const projInvoices = payments.filter(inv =>
+                    (inv.project || "").toLowerCase().trim() === pName ||
+                    (inv.projectName || "").toLowerCase().trim() === pName
+                  );
+                  const spentAmt = projInvoices.reduce((sum, inv) => {
+                    const total = parseFloat(
+                      String(inv.total || inv.amount || "0").replace(/[^0-9.]/g, "")
+                    );
+                    return sum + (isNaN(total) ? 0 : total);
+                  }, 0);
+
+                  // ── Deadline: SubAdmin saves as p.end, fallback to p.deadline ──
+
                   const deadline = p.deadline || p.end || null;
                   const deadlineDisplay = deadline
                     ? (() => {
@@ -1441,8 +1494,11 @@ export default function ClientDashboard({ user, setUser }) {
                         </div>
                         <div style={{ background: THEME.bg, borderRadius: 16, padding: "12px 16px", border: `1px solid ${THEME.border}` }}>
                           <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Spent</div>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: THEME.text }}>{p.spent ? `${currency}${p.spent}` : `${currency}0`}</div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: spentAmt > budgetAmt && budgetAmt > 0 ? "#ef4444" : spentAmt > 0 ? THEME.text : THEME.muted }}>
+                            {currency}{spentAmt > 0 ? spentAmt.toLocaleString("en-IN") : "0"}
+                          </div>
                         </div>
+
                       </div>
 
                       <div style={{ marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1589,7 +1645,7 @@ export default function ClientDashboard({ user, setUser }) {
           )}
 
           {/* ── CALENDAR ── */}
-          {active === "calendar" && (
+          {/* {active === "calendar" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2 style={{ fontSize: 20, fontWeight: 900, color: THEME.text }}>Business Calendar</h2>
@@ -1605,7 +1661,7 @@ export default function ClientDashboard({ user, setUser }) {
                 THEME={THEME}
               />
             </div>
-          )}
+          )} */}
           {active === "quotations" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1627,15 +1683,20 @@ export default function ClientDashboard({ user, setUser }) {
                     </div>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12, marginBottom: 20 }}>
-                      <div style={{ background: "#f8fafc", borderRadius: 16, padding: "12px 16px", border: `1px solid ${THEME.border}` }}>
+                      <div style={{ background: THEME.bg, borderRadius: 16, padding: "12px 16px", border: `1px solid ${THEME.border}` }}>
                         <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Total Amount</div>
                         <div style={{ fontSize: 15, fontWeight: 800, color: THEME.text }}>
                           {q.qt?.currency || q.currency || "₹"}{(q.total || 0).toLocaleString("en-IN")}
                         </div>
                       </div>
-                      <div style={{ background: "#f8fafc", borderRadius: 16, padding: "12px 16px", border: `1px solid ${THEME.border}` }}>
+                      <div style={{ background: THEME.bg, borderRadius: 16, padding: "12px 16px", border: `1px solid ${THEME.border}` }}>
                         <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Valid Until</div>
-                        <div style={{ fontSize: 15, fontWeight: 800, color: THEME.text }}>{q.expiryDate || "—"}</div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: THEME.text }}>
+                          {(() => {
+                            const d = new Date(q.expiryDate || q.qt?.expiryDate);
+                            return isNaN(d.getTime()) ? (q.expiryDate || "—") : d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+                          })()}
+                        </div>
                       </div>
                     </div>
 
@@ -1706,7 +1767,7 @@ export default function ClientDashboard({ user, setUser }) {
                 <StatCard icon="📊" label="Total Invoiced" value={fmt(totalInvoiced)} color="#7c6cfa" THEME={THEME} />
                 <StatCard icon="✅" label="Total Paid" value={fmt(totalPaid)} color="#10b981" THEME={THEME} />
                 <StatCard icon="🚨" label="Balance Due" value={fmt(balanceDue)} color="#ef4444" THEME={THEME} />
-                <StatCard icon="⏳" label="Pending" value={fmt(totalPending + totalOverdue)} color="#f59e0b" THEME={THEME} />
+
               </div>
 
               <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>

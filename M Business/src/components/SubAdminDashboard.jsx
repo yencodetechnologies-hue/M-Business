@@ -4245,8 +4245,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               setCustomColor={setCustomColor}
               onLogoChange={onLogoChange}
               triggerCrop={triggerCrop}
+              onProfileUpdate={(updates) => {
+                const updated = { ...user, ...updates };
+                setUser(updated);
+                try { localStorage.setItem("user", JSON.stringify(updated)); } catch {}
+              }}
             />
           )}
+
           {validActive === "accounts" && <AccountsPage THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}

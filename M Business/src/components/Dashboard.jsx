@@ -1940,7 +1940,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
           {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={user?.companyId || user?._id || ""} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
           {validActive === "messaging" && <MessagingPage user={user} />}
-          {validActive === "settings" && <SettingsPage user={user} />}
+          {validActive === "settings" && <SettingsPage user={user} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; setUser(updated); try { localStorage.setItem("user", JSON.stringify(updated)); } catch {} }} />}
+
           {validActive === "accounts" && <AccountsPage />}
           {validActive === "expenses" && <ExpensesPage />}
           {validActive === "income" && <IncomePage />}

@@ -25,27 +25,27 @@ const formatCurrency = (amount, symbol = "₹") => {
 function Modal({ title, onClose, children, THEME }) {
   const isExpense = title.toLowerCase().includes("expense");
   const isIncome = title.toLowerCase().includes("income");
-  const accent = isIncome ? "#10b981" : isExpense ? THEME.accent : THEME.accent;
+  const accent = THEME.accent;
   
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.65)",
-      backdropFilter: "blur(12px)", zIndex: 1000, display: "flex",
+    <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)",
+      backdropFilter: "blur(8px)", zIndex: 1000, display: "flex",
       alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ background: "#fff", borderRadius: 32, width: "100%", maxWidth: 500,
+      <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 500,
         maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column",
-        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: `1px solid rgba(255,255,255,0.1)` }}>
-        <div style={{ padding: "32px 32px 24px", 
+        boxShadow: "0 25px 60px rgba(var(--app-accent-rgb, 124, 58, 237), 0.15)", border: `1.5px solid var(--app-border)` }}>
+        <div style={{ padding: "28px 32px 20px", 
           display: "flex", justifyContent: "space-between", alignItems: "center",
           background: `linear-gradient(135deg, ${accent}, ${accent}dd)`, flexShrink: 0, position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", right: -20, top: -20, fontSize: 80, opacity: 0.15, transform: "rotate(-15deg)", pointerEvents: "none" }}>{isIncome ? "💰" : isExpense ? "💸" : "📝"}</div>
+          <div style={{ position: "absolute", right: -15, top: -15, fontSize: 70, opacity: 0.12, transform: "rotate(-15deg)", pointerEvents: "none" }}>{isIncome ? "💰" : isExpense ? "💸" : "📝"}</div>
           <div style={{ position: "relative", zIndex: 1 }}>
-            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: "#fff", letterSpacing: "-1px" }}>{title}</h2>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginTop: 4 }}>Financial Entry</div>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.5px" }}>{title}</h2>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginTop: 4 }}>Financial Entry</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.2)", border: "none",
-            fontSize: 16, cursor: "pointer", color: "#fff", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 12, fontWeight: 900, transition: "0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.3)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}>✕</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none",
+            fontSize: 14, cursor: "pointer", color: "#fff", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 10, fontWeight: 900, transition: "0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.25)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}>✕</button>
         </div>
-        <div style={{ overflowY: "auto", padding: "32px", flex: 1, background: "#fff" }}>{children}</div>
+        <div style={{ overflowY: "auto", padding: "28px 32px", flex: 1, background: "var(--app-card)" }}>{children}</div>
       </div>
     </div>
   );
@@ -63,16 +63,16 @@ function Toast({ msg, THEME }) {
 
 function Fld({ label, value, onChange, options, type = "text", error, placeholder, prefix, THEME }) {
   const s = {
-    width: "100%", border: `1.5px solid ${error ? "#EF4444" : "#e2e8f0"}`,
+    width: "100%", border: `1.5px solid ${error ? "#EF4444" : THEME.border}`,
     borderRadius: 14, padding: prefix ? "14px 14px 14px 38px" : "14px 16px",
-    fontSize: 15, color: "#1e1b4b", background: "#f8fafc",
+    fontSize: 15, color: THEME.text, background: THEME.surface,
     boxSizing: "border-box", outline: "none", fontFamily: "inherit", fontWeight: 700,
     transition: "all 0.2s"
   };
   return (
     <div style={{ marginBottom: 18 }}>
-      <label style={{ display: "block", fontSize: 12, color: THEME.text, fontWeight: 800,
-        letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase", opacity: 0.8 }}>{label}</label>
+      <label style={{ display: "block", fontSize: 11, color: THEME.accent, fontWeight: 800,
+        letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase", opacity: 0.9 }}>{label}</label>
       <div style={{ position: "relative" }}>
         {prefix && (
           <span style={{ position: "absolute", left: 10, top: "50%",
@@ -108,7 +108,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient, THEME })
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative" }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? THEME.accent : "#ddd6fe"}`, borderRadius: 12, padding: "12px 36px 12px 14px", fontSize: 14, color: value ? "#1e1b4b" : "#64748b", background: "#fff", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 46, fontWeight: 600 }}>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? THEME.accent : "var(--app-border)"}`, borderRadius: 12, padding: "12px 36px 12px 14px", fontSize: 14, color: value ? "var(--app-text)" : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 46, fontWeight: 600 }}>
         {value ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ width: 24, height: 24, borderRadius: "50%", background: THEME.accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{value[0].toUpperCase()}</div>
@@ -362,7 +362,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
       <Toast msg={toast} THEME={THEME} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 14, height: 28, background: THEME.accent, opacity: 0.8, borderRadius: 4 }}></div>
+
           <h3 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: THEME.text, letterSpacing: "-0.5px" }}>Expense Log</h3>
         </div>
         <button onClick={() => setModal("add")} style={{ background: `linear-gradient(135deg, ${THEME.accent}, ${THEME.accent}dd)`, color: "#fff", border: "none", borderRadius: 14, padding: "12px 28px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: `0 6px 15px ${THEME.accent}40` }}>+ New Expense</button>
@@ -432,10 +432,10 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
       <Toast msg={toast} THEME={THEME} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 14, height: 28, background: "#10b981", borderRadius: 4 }}></div>
+
           <h3 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: THEME.text, letterSpacing: "-0.5px" }}>Income Log</h3>
         </div>
-        <button onClick={() => setModal("add")} style={{ background: "linear-gradient(135deg, #10b981, #34d399)", color: "#fff", border: "none", borderRadius: 14, padding: "12px 28px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 6px 15px rgba(16,185,129,0.3)" }}>+ Record Income</button>
+        <button onClick={() => setModal("add")} style={{ background: `linear-gradient(135deg, ${THEME.accent}, ${THEME.accent}dd)`, color: "#fff", border: "none", borderRadius: 14, padding: "12px 28px", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: `0 6px 15px ${THEME.accent}40` }}>+ Record Income</button>
       </div>
 
       <div style={{ overflowX: "auto" }}>
@@ -454,9 +454,9 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
                   <div style={{ fontWeight: 800, color: THEME.text }}>{inc.client}</div>
                   <div style={{ fontSize: 11, color: THEME.muted }}>{inc.title}</div>
                 </td>
-                <td style={{ padding: "16px", fontWeight: 900, color: "#10b981" }}>{formatCurrency(inc.amount)}</td>
+                <td style={{ padding: "16px", fontWeight: 900, color: THEME.accent }}>{formatCurrency(inc.amount)}</td>
                 <td style={{ padding: "16px", color: THEME.muted, fontWeight: 600 }}>{inc.paymentMode || "Bank"}</td>
-                <td style={{ padding: "16px" }}><ExpBadge label={inc.status} colorMap={{ Received: "#10b981", Pending: "#f59e0b" }} /></td>
+                <td style={{ padding: "16px" }}><ExpBadge label={inc.status} colorMap={{ Received: THEME.accent, Pending: "#f59e0b" }} /></td>
                 <td style={{ padding: "16px", color: THEME.muted, fontSize: 13 }}>{new Date(inc.createdAt || inc.date).toLocaleDateString()}</td>
               </tr>
             ))}
@@ -467,12 +467,12 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
       {modal && (
         <Modal THEME={THEME} title="Record Income" onClose={() => setModal(null)}>
           <div style={{ marginBottom: 18 }}>
-             <label style={{ display: "block", fontSize: 12, color: THEME.text, fontWeight: 800, letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase", opacity: 0.8 }}>SELECT CLIENT</label>
+             <label style={{ display: "block", fontSize: 11, color: THEME.accent, fontWeight: 800, letterSpacing: 0.5, marginBottom: 8, textTransform: "uppercase", opacity: 0.9 }}>SELECT CLIENT</label>
              <ClientDropdown THEME={THEME} clients={clients} value={form.client} onChange={v => setForm({ ...form, client: v })} />
           </div>
           <Fld THEME={THEME} label="Payment Title" value={form.title} onChange={v => setForm({ ...form, title: v })} placeholder="e.g. Milestone 1 Payment" />
           <Fld THEME={THEME} label="Amount" type="number" value={form.amount} onChange={v => setForm({ ...form, amount: v })} prefix="₹" />
-          <button onClick={save} style={{ width: "100%", padding: 18, borderRadius: 16, background: "#10b981", color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: "0 10px 20px rgba(16,185,129,0.3)" }}>Record Payment</button>
+          <button onClick={save} style={{ width: "100%", padding: 18, borderRadius: 16, background: THEME.accent, color: "#fff", border: "none", fontWeight: 900, marginTop: 12, cursor: "pointer", fontSize: 16, boxShadow: `0 10px 20px ${THEME.accent}40` }}>Record Payment</button>
         </Modal>
       )}
     </div>

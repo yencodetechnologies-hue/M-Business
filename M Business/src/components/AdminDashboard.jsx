@@ -217,7 +217,7 @@ export default function AdminDashboard({ user, setUser }) {
         annualPrice: npkg.isFree ? "Free" : Math.round((parseFloat(npkg.price) || 0) * 12 * 0.8).toString(),
         buttonName: "",
         features: [
-          `${npkg.planDuration} Plan`,
+          npkg.planDuration.toLowerCase().includes("plan") ? npkg.planDuration : `${npkg.planDuration} Plan`,
           npkg.businessLimit,
           npkg.managerLimit ? `Managers: ${npkg.managerLimit}` : "",
           npkg.clientLimit ? `Clients: ${npkg.clientLimit}` : "",
@@ -424,7 +424,7 @@ export default function AdminDashboard({ user, setUser }) {
           {active === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} />}
           {active === "reports" && <ReportsPage THEME={THEME} clients={clients} projects={projects} employees={employees} managers={managers} />}
           {active === "subscriptions" && <SubscriptionsPage THEME={THEME} subscriptions={subscriptions} />}
-          {active === "packages" && <PackagesPage THEME={THEME} packages={packages} onEdit={handleEditPackageClick} onDelete={deletePackage} />}
+          {active === "packages" && <PackagesPage THEME={THEME} packages={packages} onEdit={handleEditPackageClick} onDelete={deletePackage} darkMode={darkMode} />}
           {active === "payments" && <AccountsPage THEME={THEME} initialTab="income" />}
         </div>
       </div>
@@ -717,29 +717,15 @@ export default function AdminDashboard({ user, setUser }) {
                   Assign to Subadmins
                   <span style={{ fontSize: 10, fontWeight: 400, color: "#94a3b8", marginLeft: 6, textTransform: "none" }}></span>
                 </label>
-                <select
-                  multiple
-                  value={npkg.assignedSubadmins || []}
-                  onChange={e => {
-                    const selected = Array.from(e.target.selectedOptions, opt => opt.value);
+                <SubadminDropdown
+                  value={npkg.assignedSubadmins?.[0] || ""}
+                  options={subadmins}
+                  darkMode={darkMode}
+                  onChange={val => {
+                    const selected = val ? [val] : [];
                     setNpkg({ ...npkg, assignedSubadmins: selected });
                   }}
-                  style={{
-                    width: "100%", padding: "8px",
-                    border: "1.5px solid #e2e8f0",
-                    borderRadius: 10, fontSize: 13, outline: "none",
-                    background: "#f8fafc", cursor: "pointer",
-                    minHeight: 100, boxSizing: "border-box",
-                    fontFamily: "inherit"
-                  }}
-                >
-                  {subadmins.map(sub => (
-                    <option key={sub._id} value={sub._id}
-                      style={{ padding: "6px 10px", borderRadius: 6 }}>
-                      {sub.name} ({sub.email})
-                    </option>
-                  ))}
-                </select>
+                />
                 {/* {(npkg.assignedSubadmins?.length || 0) > 0 && (
             <div style={{ fontSize: 11, color: "#7c3aed", marginTop: 4, fontWeight: 600 }}>
               ✓ {npkg.assignedSubadmins.length} subadmin(s) selected
@@ -1125,7 +1111,71 @@ function SubscriptionsPage({ THEME, subscriptions }) {
   );
 }
 
-function PackagesPage({ THEME, packages, onEdit, onDelete }) {
+function SubadminDropdown({ value, options, onChange, darkMode }) {
+  const [open, setOpen] = useState(false);
+  const selected = options.find(o => o._id === value);
+
+  return (
+    <div style={{ position: "relative" }}>
+      <div
+        onClick={() => setOpen(!open)}
+        style={{
+          width: "100%", padding: "11px 14px",
+          border: "1.5px solid #e2e8f0",
+          borderRadius: 10, fontSize: 13, outline: "none",
+          background: darkMode ? "#1e293b" : "#f8fafc",
+          color: darkMode ? "#f8fafc" : "#0f172a",
+          cursor: "pointer", boxSizing: "border-box",
+          display: "flex", justifyContent: "space-between", alignItems: "center"
+        }}
+      >
+        <span>{selected ? `${selected.name} (${selected.email})` : "-- Select Subadmin --"}</span>
+        <span style={{ fontSize: 10, transform: open ? "rotate(180deg)" : "none", transition: "0.2s" }}>▼</span>
+      </div>
+
+      {open && (
+        <>
+          <div
+            style={{ position: "fixed", inset: 0, zIndex: 998 }}
+            onClick={() => setOpen(false)}
+          />
+          <div
+            style={{
+              position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
+              background: darkMode ? "#1e293b" : "#fff",
+              border: "1.5px solid #e2e8f0",
+              borderRadius: 10, boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+              zIndex: 999, maxHeight: 200, overflowY: "auto"
+            }}
+          >
+            <div
+              onClick={() => { onChange(""); setOpen(false); }}
+              style={{ padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", fontSize: 13, color: "#94a3b8" }}
+            >
+              -- None --
+            </div>
+            {options.map(sub => (
+              <div
+                key={sub._id}
+                onClick={() => { onChange(sub._id); setOpen(false); }}
+                style={{
+                  padding: "10px 14px", cursor: "pointer", fontSize: 13,
+                  background: value === sub._id ? (darkMode ? "rgba(255,255,255,0.1)" : "#f5f3ff") : "transparent",
+                  color: darkMode ? "#f8fafc" : "#0f172a",
+                  borderBottom: "1px solid #f1f5f9"
+                }}
+              >
+                {sub.name} ({sub.email})
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
   const displayedPackages = (packages && packages.length > 0) ? [...packages].sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)) : [];
   return (
     <div style={{ background: THEME.card, borderRadius: 32, padding: 48, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow, position: "relative", overflow: "hidden", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -1133,7 +1183,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
         <h1 style={{ fontSize: 36, fontWeight: 900, color: THEME.text, margin: 0 }}>Choose your Plan</h1>
         <p style={{ color: THEME.muted, fontSize: 14, marginTop: 8 }}>Flexible plans for businesses of all sizes</p>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(displayedPackages.length, 3)}, 1fr)`, gap: 20, maxWidth: 1020, margin: "0 auto" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 380px))", justifyContent: "center", gap: 30, maxWidth: 1200, margin: "0 auto" }}>
         {displayedPackages.map((p, idx) => {
           const isPro = (p.title || "").toUpperCase() === "PRO" ||
             (p.title || "").toLowerCase().includes("pro");
@@ -1302,10 +1352,10 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
                   <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                     <div style={{
                       width: 17, height: 17, borderRadius: "50%", flexShrink: 0, marginTop: 1,
-                      background: isPro ? "rgba(0,220,150,0.12)" : "rgba(255,255,255,0.07)",
-                      border: isPro ? "1px solid rgba(0,220,150,0.35)" : "1px solid rgba(255,255,255,0.12)",
+                      background: isPro ? "rgba(0,220,150,0.12)" : (darkMode ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)"),
+                      border: isPro ? "1px solid rgba(0,220,150,0.35)" : (darkMode ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.1)"),
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 8, color: isPro ? "#00dc96" : "rgba(255,255,255,0.45)"
+                      fontSize: 8, color: isPro ? "#00dc96" : (darkMode ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)")
                     }}>✓</div>
                     <span style={{
                       fontSize: 12.5, color: THEME.text, opacity: 0.8,
@@ -1327,8 +1377,8 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
                     boxShadow: "0 6px 22px rgba(0,220,150,0.32)"
                   } : {
                     background: "transparent",
-                    border: "1.5px solid rgba(255,255,255,0.14)",
-                    color: "rgba(255,255,255,0.75)"
+                    border: `1.5px solid ${darkMode ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.1)"}`,
+                    color: darkMode ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.75)"
                   })
                 }}
                 onMouseEnter={e => {
@@ -1336,8 +1386,8 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
                     e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,220,150,0.48)";
                     e.currentTarget.style.transform = "translateY(-1px)";
                   } else {
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
-                    e.currentTarget.style.color = "#fff";
+                    e.currentTarget.style.borderColor = darkMode ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)";
+                    e.currentTarget.style.color = THEME.text;
                   }
                 }}
                 onMouseLeave={e => {
@@ -1345,8 +1395,8 @@ function PackagesPage({ THEME, packages, onEdit, onDelete }) {
                     e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,220,150,0.32)";
                     e.currentTarget.style.transform = "translateY(0)";
                   } else {
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
-                    e.currentTarget.style.color = "rgba(255,255,255,0.75)";
+                    e.currentTarget.style.borderColor = darkMode ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.1)";
+                    e.currentTarget.style.color = darkMode ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.75)";
                   }
                 }}
               >

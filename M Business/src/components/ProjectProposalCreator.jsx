@@ -926,7 +926,20 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   const openDoc = (d) => { setDoc({ ...d }); setPage(0); setView("editor"); };
   const createNew = () => {
-    const d = { id: pid(), title: "", client: "", theme: null, status: "draft", created: new Date().toISOString(), updated: new Date().toISOString(), rejectNote: "", format: "a4-portrait", slides: [makeSlide("proposal", null, companyName)], currency: "₹" };
+    const now = new Date().toISOString();
+    const d = { 
+      id: pid(), 
+      title: "", 
+      client: "", 
+      theme: null, 
+      status: "draft", 
+      created: now, 
+      updated: now, 
+      rejectNote: "", 
+      format: "a4-portrait", 
+      slides: [makeSlide("proposal", null, companyName)], 
+      currency: "₹" 
+    };
     setDoc(d); setPage(0); setView("editor"); setLeftPanel("text");
   };
 
@@ -1370,7 +1383,13 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 16, borderTop: "1px solid var(--app-border)" }}>
                     <div style={{ fontSize: 12, color: "var(--app-muted)", fontWeight: 500 }}>
-                      {new Date(p.updated).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {(() => {
+                        const d = p.updated || p.created || new Date().toISOString();
+                        const dateObj = new Date(d);
+                        return isNaN(dateObj) 
+                          ? "Date Unavailable" 
+                          : dateObj.toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' });
+                      })()}
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
                       <button onClick={e => { e.stopPropagation(); shareProposal(p); }} style={{ background: "var(--app-surface)", border: "1.5px solid var(--app-border)", color: "var(--app-accent)", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Share Link">🔗</button>

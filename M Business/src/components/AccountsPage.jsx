@@ -188,7 +188,7 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: 24 }}>
         <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: "0 10px 40px rgba(0,0,0,0.04)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
-            <div style={{ width: 12, height: 24, background: THEME.accent, borderRadius: 4 }}></div>
+
             <h3 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: THEME.text }}>Cash Flow Analysis</h3>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -215,7 +215,7 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
 
         <div style={{ background: THEME.card, borderRadius: 32, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: "0 10px 40px rgba(0,0,0,0.04)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
-            <div style={{ width: 12, height: 24, background: "#10b981", borderRadius: 4 }}></div>
+
             <h3 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: THEME.text }}>Recent Activity</h3>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

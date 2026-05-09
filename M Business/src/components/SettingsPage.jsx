@@ -357,7 +357,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                 <Input label="Full Name / Company" value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} placeholder="Your name or company" required />
                 <Input label="Email" type="email" value={profile.email} onChange={v => setProfile(p => ({ ...p, email: v }))} placeholder="Email address" disabled style={{ opacity: 0.7 }} />
                 <Input label="Phone" type="tel" value={profile.phone} onChange={v => setProfile(p => ({ ...p, phone: v }))} placeholder="Contact number" />
-                <Input label="Company Name" value={profile.companyName} onChange={v => setProfile(p => ({ ...p, companyName: v }))} placeholder="Business name" />
+
               </div>
 
               <button

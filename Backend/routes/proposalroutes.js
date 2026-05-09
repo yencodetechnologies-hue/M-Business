@@ -2,24 +2,14 @@ const express = require("express");
 const router = express.Router();
 const Proposal = require("../models/ProposalModel");
 
-// GET all proposals (for admin list)
+// ── Static / specific GET routes (must be before /:dbId) ─────────────────────
+
+// GET all proposals
 router.get("/", async (req, res) => {
   try {
     const companyId = req.companyId || "NONE";
     const list = await Proposal.find({ companyId }).sort({ updatedAt: -1 });
     res.json(list);
-  } catch (err) {
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
-});
-
-// GET single proposal by ID
-router.get("/:dbId", async (req, res) => {
-  try {
-    const companyId = req.companyId || "NONE";
-    const proposal = await Proposal.findOne({ _id: req.params.dbId, companyId });
-    if (!proposal) return res.status(404).json({ msg: "Proposal not found" });
-    res.json(proposal);
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
@@ -31,18 +21,17 @@ router.get("/client/:name", async (req, res) => {
     const companyId = req.headers['x-company-id'] || req.companyId || "";
     const name = decodeURIComponent(req.params.name).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const safeCompany = escapeRegExp(companyName);
-    
+
     const conditions = [];
     if (safeName) conditions.push({ client: { $regex: new RegExp(safeName, "i") } });
     if (safeCompany) conditions.push({ client: { $regex: new RegExp(safeCompany, "i") } });
-    
+
     let filter = conditions.length > 0 ? { $or: conditions } : {};
 
-    // Isolation: Filter by companyId if provided
     if (companyId) {
       filter = {
         $and: [
@@ -63,7 +52,7 @@ router.get("/employee/:name", async (req, res) => {
   try {
     const companyId = req.companyId || "NONE";
     const name = decodeURIComponent(req.params.name).trim();
-    const list = await Proposal.find({ 
+    const list = await Proposal.find({
       assignedEmployee: { $regex: new RegExp(`^\\s*${name}\\s*$`, "i") },
       companyId
     }).sort({ updatedAt: -1 });
@@ -85,45 +74,61 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PUT update proposal
-router.put("/:dbId", async (req, res) => {
+// ── Specific PUT sub-routes BEFORE generic /:dbId ────────────────────────────
+
+// PUT /:dbId/approve  (client approves)
+router.put("/:dbId/approve", async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
-    
-    // Find existing proposal first
-    const existing = await Proposal.findOne({ _id: req.params.dbId, companyId });
-    if (!existing) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
-    
-    // If proposal was approved or rejected, reset to pending on edit (client needs to re-approve)
-    const updateData = { ...req.body };
-    if (existing.status === "approved" || existing.status === "rejected") {
-      updateData.status = "pending";
-    }
-    
-    const saved = await Proposal.findOneAndUpdate(
-      { _id: req.params.dbId, companyId },
-      { $set: updateData },
-      { new: true }
+    const saved = await Proposal.findByIdAndUpdate(
+      req.params.dbId,
+      { $set: { status: "approved" } },
+      { new: true, runValidators: true }
     );
+    if (!saved) return res.status(404).json({ msg: "Proposal not found" });
     res.json(saved);
   } catch (err) {
-    res.status(500).json({ msg: "Error updating proposal", error: err.message });
+    console.error("Approve error:", err.message);
+    res.status(500).json({ msg: "Error approving proposal", error: err.message });
   }
 });
 
-// DELETE proposal
-router.delete("/:dbId", async (req, res) => {
+// PUT /:dbId/reject  (client rejects)
+router.put("/:dbId/reject", async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
-    const doc = await Proposal.findOneAndDelete({ _id: req.params.dbId, companyId });
-    if (!doc) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
-    res.json({ msg: "Proposal deleted" });
+    const rejectNote = (req.body && req.body.rejectNote) ? req.body.rejectNote : "";
+    const saved = await Proposal.findByIdAndUpdate(
+      req.params.dbId,
+      { $set: { status: "rejected", rejectNote } },
+      { new: true, runValidators: true }
+    );
+    if (!saved) return res.status(404).json({ msg: "Proposal not found" });
+    res.json(saved);
   } catch (err) {
-    res.status(500).json({ msg: "Error deleting proposal", error: err.message });
+    console.error("Reject error:", err.message);
+    res.status(500).json({ msg: "Error rejecting proposal", error: err.message });
   }
 });
 
-// PATCH update proposal status (client approve/reject)
+// PUT /:dbId/submit  (subadmin resubmits a rejected proposal → sets back to pending)
+router.put("/:dbId/submit", async (req, res) => {
+  try {
+    const companyId = req.companyId || "";
+    const query = { _id: req.params.dbId };
+    if (companyId && companyId !== "NONE") query.companyId = companyId;
+    const saved = await Proposal.findOneAndUpdate(
+      query,
+      { $set: { status: "pending", submittedAt: new Date() } },
+      { new: true }
+    );
+    if (!saved) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
+    res.json(saved);
+  } catch (err) {
+    console.error("Submit error:", err.message);
+    res.status(500).json({ msg: "Error submitting proposal", error: err.message });
+  }
+});
+
+// PATCH /:dbId/status  (generic status update)
 router.patch("/:dbId/status", async (req, res) => {
   try {
     const { status, rejectNote } = req.body;
@@ -144,64 +149,53 @@ router.patch("/:dbId/status", async (req, res) => {
   }
 });
 
-// PUT approve proposal
-router.put("/:dbId/approve", async (req, res) => {
-  try {
-    const companyId = req.headers['x-company-id'] || req.companyId || "";
-    const query = { _id: req.params.dbId };
-    if (companyId && companyId !== "NONE") query.companyId = companyId;
-    const saved = await Proposal.findOneAndUpdate(
-      query,
-      { $set: { status: "approved", updatedAt: new Date() } },
-      { new: true }
-    );
-    if (!saved) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
-    res.json(saved);
-  } catch (err) {
-    res.status(500).json({ msg: "Error approving proposal", error: err.message });
-  }
-});
+// ── Generic single-document routes (MUST come after specific sub-routes) ──────
 
-// PUT reject proposal
-router.put("/:dbId/reject", async (req, res) => {
-  try {
-    const { rejectNote } = req.body;
-    const companyId = req.headers['x-company-id'] || req.companyId || "";
-    const query = { _id: req.params.dbId };
-    if (companyId && companyId !== "NONE") query.companyId = companyId;
-    const saved = await Proposal.findOneAndUpdate(
-      query,
-      { $set: { status: "rejected", rejectNote: rejectNote || "", updatedAt: new Date() } },
-      { new: true }
-    );
-    if (!saved) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
-    res.json(saved);
-  } catch (err) {
-    res.status(500).json({ msg: "Error rejecting proposal", error: err.message });
-  }
-});
-
-
-
-// PUT submit for approval
-router.put("/:dbId/submit", async (req, res) => {
+// GET single proposal by ID
+router.get("/:dbId", async (req, res) => {
   try {
     const companyId = req.companyId || "NONE";
+    const proposal = await Proposal.findOne({ _id: req.params.dbId, companyId });
+    if (!proposal) return res.status(404).json({ msg: "Proposal not found" });
+    res.json(proposal);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
+// PUT update proposal (full edit — resets to pending if currently approved/rejected)
+router.put("/:dbId", async (req, res) => {
+  try {
+    const companyId = req.companyId || "NONE";
+
+    const existing = await Proposal.findOne({ _id: req.params.dbId, companyId });
+    if (!existing) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
+
+    const updateData = { ...req.body };
+    if (existing.status === "approved" || existing.status === "rejected") {
+      updateData.status = "pending";
+    }
+
     const saved = await Proposal.findOneAndUpdate(
       { _id: req.params.dbId, companyId },
-      { 
-        $set: { 
-          status: "pending",
-          submittedAt: new Date(),
-          updatedAt: new Date()
-        }
-      },
+      { $set: updateData },
       { new: true }
     );
-    if (!saved) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
     res.json(saved);
   } catch (err) {
-    res.status(500).json({ msg: "Error submitting proposal", error: err.message });
+    res.status(500).json({ msg: "Error updating proposal", error: err.message });
+  }
+});
+
+// DELETE proposal
+router.delete("/:dbId", async (req, res) => {
+  try {
+    const companyId = req.companyId || "NONE";
+    const doc = await Proposal.findOneAndDelete({ _id: req.params.dbId, companyId });
+    if (!doc) return res.status(404).json({ msg: "Proposal not found or unauthorized" });
+    res.json({ msg: "Proposal deleted" });
+  } catch (err) {
+    res.status(500).json({ msg: "Error deleting proposal", error: err.message });
   }
 });
 

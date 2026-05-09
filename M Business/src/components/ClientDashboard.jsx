@@ -1383,46 +1383,89 @@ export default function ClientDashboard({ user, setUser }) {
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }} className="proj-grid">
-                {projects.map(p => (
-                  <div key={p.id || p._id} style={{ background: THEME.card, borderRadius: 24, border: `1.5px solid ${THEME.border}`, padding: "24px", boxShadow: THEME.shadow, transition: "all 0.3s" }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = `${THEME.accent}30`; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = THEME.border; }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                      <div>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: THEME.text, marginBottom: 4 }}>{p.name}</div>
-                        <div style={{ fontSize: 11, color: THEME.muted, fontWeight: 600 }}>{p.deadline ? `Due: ${p.deadline}` : "No deadline"}</div>
-                      </div>
-                      <Badge label={p.status} isDark={darkMode} />
-                    </div>
+                {projects.map(p => {
+                  // Compute tasks for this project from the fetched tasks array
+                  const projTasks = tasks.filter(t =>
+                    (t.project || "").toLowerCase().trim() === (p.name || "").toLowerCase().trim()
+                  );
+                  const doneTasks = projTasks.filter(t => t.status === "Done" || t.status === "Completed").length;
+                  const totalTasks = projTasks.length;
+                  const progress = p.progress || (totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0);
 
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 20 }}>
-                      <div style={{ background: "#f8fafc", borderRadius: 16, padding: "12px 16px", border: `1px solid ${THEME.border}` }}>
-                        <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Budget</div>
-                        <div style={{ fontSize: 15, fontWeight: 800, color: THEME.text }}>{p.budget}</div>
-                      </div>
-                      <div style={{ background: "var(--app-surface)", borderRadius: 16, padding: "12px 16px", border: `1px solid ${THEME.border}` }}>
-                        <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Spent</div>
-                        <div style={{ fontSize: 15, fontWeight: 800, color: THEME.text }}>{p.spent || "₹0"}</div>
-                      </div>
-                    </div>
+                  // Deadline: SubAdmin saves as p.end, fallback to p.deadline
+                  const deadline = p.deadline || p.end || null;
+                  const deadlineDisplay = deadline
+                    ? (() => {
+                        const d = new Date(deadline);
+                        return isNaN(d.getTime()) ? deadline : d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+                      })()
+                    : "No deadline";
 
-                    <div style={{ marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: THEME.muted }}>Progress</span>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: THEME.text }}>{p.progress || 0}%</span>
-                    </div>
-                    <div style={{ height: 8, background: "var(--app-surface)", borderRadius: 99, overflow: "hidden" }}>
-                      <div style={{ width: `${p.progress || 0}%`, height: "100%", background: THEME.gradient, borderRadius: 99 }}></div>
-                    </div>
+                  // Budget: format with currency
+                  const budgetAmt = parseFloat(p.budget) || 0;
+                  const currency = p.currency || "₹";
+                  const budgetDisplay = budgetAmt > 0
+                    ? `${currency}${budgetAmt.toLocaleString("en-IN")}`
+                    : (p.budget ? `${currency}${p.budget}` : "Not Set");
 
-                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20, paddingTop: 16, borderTop: `1.5px solid ${THEME.border}` }}>
-                      <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 600 }}>Tasks: <span style={{ color: THEME.text, fontWeight: 800 }}>{p.completedTasks || 0}/{p.tasks || 0}</span></div>
-                      <button onClick={() => setActive("tasks")} style={{ background: "transparent", border: "none", color: THEME.accent, fontWeight: 800, fontSize: 12, cursor: "pointer" }}>View Details →</button>
+                  // Status color stripe
+                  const statusColor = p.status === "Completed" ? "#22c55e" : p.status === "In Progress" ? THEME.accent : p.status === "On Hold" ? "#f59e0b" : "#94a3b8";
+
+                  return (
+                    <div key={p.id || p._id} style={{
+                      background: THEME.card, borderRadius: 24,
+                      border: `1.5px solid ${THEME.border}`,
+                      padding: "24px", boxShadow: THEME.shadow, transition: "all 0.3s",
+                      position: "relative", overflow: "hidden"
+                    }}
+                      onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = `${THEME.accent}30`; }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = THEME.border; }}>
+
+                      {/* Top status stripe */}
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: statusColor, borderRadius: "24px 24px 0 0" }} />
+
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, marginTop: 4 }}>
+                        <div style={{ flex: 1, paddingRight: 12 }}>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: THEME.text, marginBottom: 4 }}>{p.name}</div>
+                          <div style={{ fontSize: 11, color: THEME.muted, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+                            <span>📅</span> {deadlineDisplay}
+                          </div>
+                        </div>
+                        <Badge label={p.status || "Pending"} isDark={darkMode} />
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 20 }}>
+                        <div style={{ background: THEME.bg, borderRadius: 16, padding: "12px 16px", border: `1px solid ${THEME.border}` }}>
+                          <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Budget</div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: budgetAmt > 0 ? "#22c55e" : THEME.muted }}>{budgetDisplay}</div>
+                        </div>
+                        <div style={{ background: THEME.bg, borderRadius: 16, padding: "12px 16px", border: `1px solid ${THEME.border}` }}>
+                          <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Spent</div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: THEME.text }}>{p.spent ? `${currency}${p.spent}` : `${currency}0`}</div>
+                        </div>
+                      </div>
+
+                      <div style={{ marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: THEME.muted }}>Progress</span>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: progress === 100 ? "#22c55e" : THEME.text }}>{progress}%</span>
+                      </div>
+                      <div style={{ height: 8, background: "var(--app-surface)", borderRadius: 99, overflow: "hidden", marginBottom: 20 }}>
+                        <div style={{ width: `${progress}%`, height: "100%", background: progress === 100 ? "linear-gradient(90deg,#22c55e,#16a34a)" : THEME.gradient, borderRadius: 99, transition: "width 0.6s ease" }} />
+                      </div>
+
+                      <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 16, borderTop: `1.5px solid ${THEME.border}`, alignItems: "center" }}>
+                        <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 600 }}>
+                          Tasks: <span style={{ color: doneTasks === totalTasks && totalTasks > 0 ? "#22c55e" : THEME.text, fontWeight: 800 }}>{doneTasks}/{totalTasks}</span>
+                        </div>
+                        <button onClick={() => setActive("tasks")} style={{ background: "transparent", border: "none", color: THEME.accent, fontWeight: 800, fontSize: 12, cursor: "pointer" }}>View Details →</button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
+
 
           {/* ── PROPOSALS ── */}
           {active === "proposals" && (
@@ -1518,19 +1561,7 @@ export default function ClientDashboard({ user, setUser }) {
                         </div>
                       )}
 
-                      {/* Rejected state banner */}
-                      {isRejected && (
-                        <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 12, padding: "10px 14px", marginBottom: 14, fontSize: 12, color: "#ef4444", fontWeight: 700 }}>
-                          ❌ Rejected — The SubAdmin has been notified and may resubmit.
-                        </div>
-                      )}
-
-                      {/* Approved state banner */}
-                      {isApproved && (
-                        <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 12, padding: "10px 14px", marginBottom: 14, fontSize: 12, color: "#16a34a", fontWeight: 700 }}>
-                          ✅ Approved — Project in progress!
-                        </div>
-                      )}
+              
 
                       {/* View / Print */}
                       <div style={{ display: "flex", gap: 10, marginTop: 4 }}>

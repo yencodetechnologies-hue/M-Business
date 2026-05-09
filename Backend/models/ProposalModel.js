@@ -14,6 +14,7 @@ const ProposalSchema = new mongoose.Schema(
     format:    { type: String, default: "ppt" },
     slides:    { type: Array,   default: [] },
     rejectNote: { type: String,  default: "" },
+    submittedAt: { type: Date, default: null },
     companyId: { type: String, default: "" },
     assignedEmployee: { type: String, default: "" },
   },

@@ -252,14 +252,7 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
   const pct = Math.round((uploadedCount / total) * 100);
 
   return (
-    <Card title="My Documents" action={
-      <button onClick={onOpenProfile}
-        style={{ background: T.accent, border: "none", borderRadius: T.radiusSm, padding: "5px 12px", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "opacity 0.15s" }}
-        onMouseEnter={e => e.currentTarget.style.opacity = "0.8"}
-        onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
-        Manage →
-      </button>
-    }>
+    <Card title="My Documents">
       {/* Progress */}
       <div style={{ marginBottom: 18 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>

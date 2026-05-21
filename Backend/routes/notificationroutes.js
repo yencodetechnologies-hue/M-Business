@@ -32,4 +32,16 @@ router.patch('/read-all/:userId', async (req, res) => {
     }
 });
 
+// Create notification
+router.post('/', async (req, res) => {
+    try {
+        const { userId, type, icon, text, link } = req.body;
+        const newNotif = new Notification({ userId, type, icon, text, link });
+        await newNotif.save();
+        res.json(newNotif);
+    } catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+});
+
 module.exports = router;

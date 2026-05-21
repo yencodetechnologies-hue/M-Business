@@ -23,7 +23,7 @@ export default function EmployeeOnboarding() {
     ifscCode: "",
     photo: null,
     department: "",
-    role: "employee",
+    role: "Employee",
     status: "Pending",
     dateOfBirth: "",
     joiningDate: "",
@@ -219,6 +219,35 @@ export default function EmployeeOnboarding() {
                 <option value="Married">Married</option>
               </select>
             </div>
+
+            {/* Role - Select */}
+            <div style={{ marginBottom: 4 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#7c3aed", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                Role *
+              </label>
+              <select
+                value={form.role}
+                onChange={e => handleChange("role", e.target.value)}
+                style={{
+                  width: "100%",
+                  height: 46,
+                  padding: "0px 14px",
+                  boxSizing: "border-box",
+                  borderRadius: 12,
+                  border: "1.5px solid #e2e8f0",
+                  fontSize: 14,
+                  color: "#1e293b",
+                  outline: "none",
+                  background: "#f8fafc",
+                  cursor: "pointer"
+                }}
+              >
+                <option value="Employee">Employee</option>
+                <option value="Manager">Manager</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </div>
+
             <div style={{ position: "relative" }}>
               <Input label="Password" value={form.password} onChange={v => handleChange("password", v)} error={err.password} type={showPass ? "text" : "password"} placeholder="Set your password" />
               <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: 36, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#94a3b8" }}>

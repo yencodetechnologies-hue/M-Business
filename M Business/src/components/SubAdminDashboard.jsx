@@ -26,10 +26,25 @@ import ImageCropModal from "./ImageCropModal";
 
 
 const T = { primary: "var(--app-primary)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)", surface: "var(--app-bg)" };
-const formatCurrency = (amount, currency = "₹") => {
+const formatCurrency = (amount, currency = "₹", compact = false, disableCompact = false) => {
   const sym = currency || "₹";
-  const val = Number(amount || 0).toLocaleString("en-IN");
-  return sym + val;
+  const num = Number(amount) || 0;
+  const absNum = Math.abs(num);
+  
+  if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
+    try {
+      const formatter = new Intl.NumberFormat('en-IN', {
+        notation: 'compact',
+        compactDisplay: 'short',
+        maximumFractionDigits: 2
+      });
+      return sym + (/[A-Za-z]/.test(sym) ? " " : "") + formatter.format(num);
+    } catch (e) {
+      // Fallback
+    }
+  }
+  
+  return sym + (/[A-Za-z]/.test(sym) ? " " : "") + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 const TRACKING_SEED = [{ id: "PRJ001", name: "Website Redesign", client: "TechNova Pvt Ltd", deadline: "2024-05-30", pct: 65, status: "In Progress", note: "Design done, dev ongoing" }, { id: "PRJ002", name: "Mobile App Dev", client: "Bloom Creatives", deadline: "2024-08-15", pct: 15, status: "Pending", note: "Requirements gathering" }, { id: "PRJ003", name: "ERP Integration", client: "Infra Solutions", deadline: "2024-04-30", pct: 100, status: "Completed", note: "Signed off by Company Name" }];
 const INVOICES = [{ id: "INV001", client: "TechNova Pvt Ltd", project: "Website Redesign", date: "2024-04-01", due: "2024-04-30", total: "1,47,500", status: "Paid" }, { id: "INV002", client: "Infra Solutions", project: "ERP Integration", date: "2024-05-01", due: "2024-05-15", total: "4,24,800", status: "Overdue" }, { id: "INV003", client: "Bloom Creatives", project: "Mobile App Dev", date: "2024-05-10", due: "2024-06-10", total: "1,18,000", status: "Pending" }];
@@ -1666,7 +1681,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
                   onChange={e => setEditForm({ ...editForm, currency: e.target.value })}
                   style={{ width: 70, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
                 >
-                  {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR"].map(c => <option key={c} value={c}>{c}</option>)}
+                  {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
                 <input
                   type="text"
@@ -3274,7 +3289,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const errors = {};
     if (!nc.name.trim()) errors.name = "Name is required";
     if (!nc.email.trim()) errors.email = "Email is required";
-    if (!nc.password.trim()) errors.password = "Password is required";
 
     // Subscription Limit Check - Fetch latest before check to catch admin updates
     try {
@@ -3409,10 +3423,34 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setNpError(errors);
       return;
     }
+
+    const notifyAssigned = async (projectId, projectName, assignees) => {
+      try {
+        for (const name of assignees) {
+          const emp = employees.find(e => (e.name || e.employeeName || "").toLowerCase() === name.toLowerCase());
+          if (emp && (emp._id || emp.id)) {
+            await axios.post(`${BASE_URL}/api/notifications`, {
+              userId: emp._id || emp.id,
+              type: 'project',
+              icon: '◈',
+              text: `You have been assigned to a new project: "${projectName}"`,
+              link: 'projects'
+            });
+          }
+        }
+      } catch (err) { console.error("Notification failed", err); }
+    };
+
     try {
       setProjSaveLoading(true);
       const res = await axios.post(BASE_URL + "/api/projects/add", np);
       await fetchProjects();
+      
+      // Notify assigned employees
+      if (np.assignedTo && np.assignedTo.length > 0) {
+        notifyAssigned(res.data._id, np.name, np.assignedTo);
+      }
+
       setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", team: "", status: "Pending", assignedTo: [] });
       setNpError({});
       setModal(null);
@@ -4129,7 +4167,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 600 }}>
                       <thead>
                         <tr style={{ background: "var(--app-bg)" }}>
-                          {["Project", "Company Name", "Status", "Share", "View"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
+                          {["Project", "Company Name", "Status", "Progress", "Share", "View"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
                         </tr>
                       </thead>
                       <tbody>
@@ -4141,10 +4179,30 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
                                 <div style={{ fontSize: 13 }}>{p.name}</div>
                                 <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
-
                               </td>
                               <td style={{ padding: "12px 12px", color: "var(--app-muted)" }}>{p.client}</td>
                               <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>
+                              <td style={{ padding: "12px 12px" }}>
+                                {(() => {
+                                  const s = (p.status || "").toLowerCase();
+                                  let pct = 0;
+                                  if (s === "done" || s === "completed") pct = 100;
+                                  else if (pTasks.length > 0) pct = Math.round((pTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length / pTasks.length) * 100);
+                                  else if (s === "in progress") pct = 50;
+                                  else if (s === "on hold") pct = 30;
+                                  else if (s === "pending" || s === "not started") pct = 0;
+                                  else if (s === "review" || s === "in review") pct = 90;
+                                  else pct = (p.progress || 0);
+                                  return (
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ flex: 1, minWidth: 60, height: 6, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)", overflow: "hidden" }}>
+                                        <div style={{ width: `${pct}%`, height: "100%", background: "var(--app-accent)", borderRadius: 10 }} />
+                                      </div>
+                                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--app-muted)" }}>{pct}%</span>
+                                    </div>
+                                  );
+                                })()}
+                              </td>
                               <td style={{ padding: "12px 12px" }} onClick={e => e.stopPropagation()}>
                                 <button onClick={() => {
                                   const text = `📁 *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${formatCurrency(p.budget, p.currency)}`;
@@ -4491,14 +4549,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               </div>
               <div>
                 <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password || "Not set (optional)"}</div>
               </div>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <button
                 onClick={() => {
-                  const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
+                  const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
                   navigator.clipboard.writeText(text);
                   toast.success("📋 Credentials copied!");
                 }}
@@ -4509,7 +4567,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
               <button
                 onClick={() => {
-                  const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password}\n\nLogin URL: ${window.location.origin}`;
+                  const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}`;
                   const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                   window.open(wpUrl, "_blank");
                 }}
@@ -4604,9 +4662,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             </div>
             <Fld label="Company Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} />
             <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD (OPTIONAL)</label>
               <div style={{ position: "relative" }}>
-                <input type={showClientPass ? "text" : "password"} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })} style={{ width: "100%", border: `1.5px solid ${ncError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set client password" />
+                <input type={showClientPass ? "text" : "password"} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })} style={{ width: "100%", border: `1.5px solid ${ncError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set client password (optional)" />
                 <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showClientPass ? "HIDE" : "SHOW"}</button>
               </div>
               <div style={{ fontSize: 10, color: "var(--app-muted)", marginTop: 4 }}></div>
@@ -4707,7 +4765,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 onChange={e => setNp({ ...np, currency: e.target.value })}
                 style={{ width: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
               >
-                {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR"].map(c => <option key={c} value={c}>{c}</option>)}
+                {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
               </select>
               <input
                 type="text"

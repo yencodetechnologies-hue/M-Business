@@ -16,9 +16,26 @@ const ACCOUNTS_API = `${BASE_URL}/api/accounts`;
 const EXPENSES_API = `${BASE_URL}/api/expenses`;
 const INCOME_API   = `${BASE_URL}/api/income`;
 
-const formatCurrency = (amount, symbol = "₹") => {
+const formatCurrency = (amount, symbol = "₹", compact = false, disableCompact = false) => {
   const num = Number(amount) || 0;
-  return `${symbol}${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const absNum = Math.abs(num);
+  
+  if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
+    try {
+      const isINR = symbol === "₹";
+      const formatter = new Intl.NumberFormat(isINR ? 'en-IN' : 'en-US', {
+        notation: 'compact',
+        compactDisplay: 'short',
+        maximumFractionDigits: 2
+      });
+      return `${symbol}${formatter.format(num)}`;
+    } catch (e) {
+      // Fallback
+    }
+  }
+  
+  const isINR = symbol === "₹";
+  return `${symbol}${num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
 // ── Shared UI components ──────────────────────────────────────
@@ -155,15 +172,15 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
   const netBalance = totalIncome - totalExpenses;
 
   const stats = [
-    { t: "Total Income", v: formatCurrency(totalIncome), c: "#22c55e", i: "💰", desc: "Revenue generated" },
-    { t: "Total Expenses", v: formatCurrency(totalExpenses), c: "#ef4444", i: "💸", desc: "Operational costs" },
-    { t: "Net Balance", v: formatCurrency(netBalance), c: netBalance >= 0 ? THEME.accent : "#f43f5e", i: "🏦", desc: "Current liquidity" },
+    { t: "Total Income", v: formatCurrency(totalIncome), f: formatCurrency(totalIncome, "₹", false, true), c: "#22c55e", i: "💰", desc: "Revenue generated" },
+    { t: "Total Expenses", v: formatCurrency(totalExpenses), f: formatCurrency(totalExpenses, "₹", false, true), c: "#ef4444", i: "💸", desc: "Operational costs" },
+    { t: "Net Balance", v: formatCurrency(netBalance), f: formatCurrency(netBalance, "₹", false, true), c: netBalance >= 0 ? THEME.accent : "#f43f5e", i: "🏦", desc: "Current liquidity" },
   ];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
-        {stats.map(({ t, v, i, c, desc }) => (
+        {stats.map(({ t, v, f, i, c, desc }) => (
           <div key={t} style={{ 
             background: `linear-gradient(135deg, ${THEME.card}, ${THEME.surface})`, 
             borderRadius: 32, padding: 32, 
@@ -180,7 +197,15 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
                 <div style={{ fontSize: 13, color: THEME.muted, fontWeight: 600 }}>{desc}</div>
               </div>
             </div>
-            <div style={{ fontSize: 36, fontWeight: 900, color: c, letterSpacing: "-1px" }}>{v}</div>
+            <div style={{ 
+              fontSize: 36, 
+              fontWeight: 900, 
+              color: c, 
+              letterSpacing: "-1px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }} title={f}>{v}</div>
           </div>
         ))}
       </div>
@@ -193,18 +218,18 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, fontSize: 14, fontWeight: 800 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, fontSize: 14, fontWeight: 800 }}>
                 <span style={{ color: THEME.text }}>Total Income</span>
-                <span style={{ color: "#22c55e" }}>{formatCurrency(totalIncome)}</span>
+                <span style={{ color: "#22c55e", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 10 }} title={formatCurrency(totalIncome, "₹", false, true)}>{formatCurrency(totalIncome)}</span>
               </div>
               <div style={{ height: 14, background: "#f1f5f9", borderRadius: 7, overflow: "hidden", border: "1px solid #e2e8f0" }}>
                 <div style={{ height: "100%", background: "linear-gradient(90deg, #22c55e, #4ade80)", width: `${Math.min(100, (totalIncome / (totalIncome + totalExpenses || 1)) * 100)}%`, borderRadius: 7 }}></div>
               </div>
             </div>
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, fontSize: 14, fontWeight: 800 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, fontSize: 14, fontWeight: 800 }}>
                 <span style={{ color: THEME.text }}>Total Expenses</span>
-                <span style={{ color: "#ef4444" }}>{formatCurrency(totalExpenses)}</span>
+                <span style={{ color: "#ef4444", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 10 }} title={formatCurrency(totalExpenses, "₹", false, true)}>{formatCurrency(totalExpenses)}</span>
               </div>
               <div style={{ height: 14, background: "#f1f5f9", borderRadius: 7, overflow: "hidden", border: "1px solid #e2e8f0" }}>
                 <div style={{ height: "100%", background: "linear-gradient(90deg, #ef4444, #f87171)", width: `${Math.min(100, (totalExpenses / (totalIncome + totalExpenses || 1)) * 100)}%`, borderRadius: 7 }}></div>
@@ -231,7 +256,7 @@ function FinancialOverview({ THEME, income = [], expenses = [] }) {
                     <div style={{ fontSize: 14, fontWeight: 800, color: THEME.text }}>{item.title}</div>
                     <div style={{ fontSize: 12, color: THEME.muted, fontWeight: 600 }}>{new Date(item.createdAt || item.date).toLocaleDateString()} • {item.category}</div>
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: item.type === "income" ? "#16a34a" : "#dc2626" }}>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: item.type === "income" ? "#16a34a" : "#dc2626", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 10 }} title={formatCurrency(item.amount, "₹", false, true)}>
                     {item.type === "income" ? "+" : "-"}{formatCurrency(item.amount)}
                   </div>
                 </div>
@@ -382,7 +407,7 @@ export function ExpensesPage({ THEME, expenses = [], setExpenses, fetchExpenses 
               <tr key={idx} style={{ borderBottom: `1px solid ${THEME.border}` }}>
                 <td style={{ padding: "16px", fontWeight: 700, color: THEME.text }}>{e.title}</td>
                 <td style={{ padding: "16px" }}><ExpBadge label={e.category} colorMap={CATEGORY_COLOR} /></td>
-                <td style={{ padding: "16px", fontWeight: 900, color: THEME.text }}>{formatCurrency(e.amount)}</td>
+                <td style={{ padding: "16px", fontWeight: 900, color: THEME.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={formatCurrency(e.amount, "₹", false, true)}>{formatCurrency(e.amount)}</td>
                 <td style={{ padding: "16px" }}><ExpBadge label={e.status} colorMap={STATUS_COLOR} /></td>
                 <td style={{ padding: "16px", color: THEME.muted, fontSize: 13 }}>{new Date(e.createdAt || e.date).toLocaleDateString()}</td>
               </tr>
@@ -454,7 +479,7 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
                   <div style={{ fontWeight: 800, color: THEME.text }}>{inc.client}</div>
                   <div style={{ fontSize: 11, color: THEME.muted }}>{inc.title}</div>
                 </td>
-                <td style={{ padding: "16px", fontWeight: 900, color: THEME.accent }}>{formatCurrency(inc.amount)}</td>
+                <td style={{ padding: "16px", fontWeight: 900, color: THEME.accent, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={formatCurrency(inc.amount, "₹", false, true)}>{formatCurrency(inc.amount)}</td>
                 <td style={{ padding: "16px", color: THEME.muted, fontWeight: 600 }}>{inc.paymentMode || "Bank"}</td>
                 <td style={{ padding: "16px" }}><ExpBadge label={inc.status} colorMap={{ Received: THEME.accent, Pending: "#f59e0b" }} /></td>
                 <td style={{ padding: "16px", color: THEME.muted, fontSize: 13 }}>{new Date(inc.createdAt || inc.date).toLocaleDateString()}</td>

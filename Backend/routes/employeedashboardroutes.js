@@ -126,8 +126,22 @@ router.get("/projects/:name", async (req, res) => {
     const name = decodeURIComponent(req.params.name).trim();
     if (!name) return res.json([]);
     
-    const companyId = req.headers['x-company-id'] || "";
-    const nameRegex = new RegExp(`^${name}$`, "i");
+    let companyId = req.headers['x-company-id'] || "";
+    
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
+
+    // Company ID Recovery
+    if (!companyId) {
+      const [u, e] = await Promise.all([
+        User.findOne({ name: nameRegex }),
+        Employee.findOne({ name: nameRegex })
+      ]);
+      companyId = u?.companyId || e?.companyId || "";
+    }
+
+    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
     
     const query = {
       companyId,
@@ -179,8 +193,7 @@ router.get("/tasks/:name", async (req, res) => {
     const query = {
       companyId,
       $or: [
-        { assignTo: nameRegex },
-        { assignedTo: nameRegex } 
+        { assignTo: nameRegex }
       ],
       isDeleted: false
     };
@@ -204,12 +217,25 @@ router.get("/tasks/:name", async (req, res) => {
 router.get("/attendance/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
-    const companyId = req.headers['x-company-id'] || "";
+    let companyId = req.headers['x-company-id'] || "";
+    
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
+
+    if (!companyId) {
+      const [u, e] = await Promise.all([
+        User.findOne({ name: nameRegex }),
+        Employee.findOne({ name: nameRegex })
+      ]);
+      companyId = u?.companyId || e?.companyId || "";
+    }
+
     if (!companyId) return res.status(400).json({ msg: "Company ID required" });
     
     const query = { 
       companyId,
-      employeeName: { $regex: new RegExp(`^${name}$`, "i") }
+      employeeName: { $regex: nameRegex }
     };
     
     const records = await Attendance.find(query).sort({ date: -1 });
@@ -271,9 +297,26 @@ router.get("/leave/all/list", async (req, res) => {
 router.get("/leave/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
-    const companyId = req.headers['x-company-id'] || "";
-    const query = { employeeName: new RegExp(`^${name}$`, "i") };
-    if (companyId) query.companyId = companyId;
+    let companyId = req.headers['x-company-id'] || "";
+    
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
+
+    if (!companyId) {
+      const [u, e] = await Promise.all([
+        User.findOne({ name: nameRegex }),
+        Employee.findOne({ name: nameRegex })
+      ]);
+      companyId = u?.companyId || e?.companyId || "";
+    }
+
+    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
+    
+    const query = { 
+      companyId,
+      employeeName: nameRegex 
+    };
     
     const leaves = await Leave.find(query).sort({ from: -1 });
     res.json(leaves);
@@ -361,9 +404,26 @@ router.get("/permission/all/list", async (req, res) => {
 router.get("/permission/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
-    const companyId = req.headers['x-company-id'] || "";
-    const query = { employeeName: new RegExp(`^${name}$`, "i") };
-    if (companyId) query.companyId = companyId;
+    let companyId = req.headers['x-company-id'] || "";
+    
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
+
+    if (!companyId) {
+      const [u, e] = await Promise.all([
+        User.findOne({ name: nameRegex }),
+        Employee.findOne({ name: nameRegex })
+      ]);
+      companyId = u?.companyId || e?.companyId || "";
+    }
+
+    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
+    
+    const query = { 
+      companyId,
+      employeeName: nameRegex 
+    };
     
     const perms = await Permission.find(query).sort({ createdAt: -1 });
     res.json(perms);
@@ -418,9 +478,26 @@ router.patch("/permission/:id/reject", async (req, res) => {
 router.get("/salary/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
-    const companyId = req.headers['x-company-id'] || "";
-    const query = { employeeName: new RegExp(`^${name}$`, "i") };
-    if (companyId) query.companyId = companyId;
+    let companyId = req.headers['x-company-id'] || "";
+    
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
+
+    if (!companyId) {
+      const [u, e] = await Promise.all([
+        User.findOne({ name: nameRegex }),
+        Employee.findOne({ name: nameRegex })
+      ]);
+      companyId = u?.companyId || e?.companyId || "";
+    }
+
+    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
+    
+    const query = { 
+      companyId,
+      employeeName: nameRegex 
+    };
     
     const slips = await Salary.find(query).sort({ createdAt: -1 });
     res.json(slips);
@@ -496,22 +573,39 @@ router.delete("/documents/:name/:docType", async (req, res) => {
 router.get("/summary/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name).trim();
-    const companyId = req.headers['x-company-id'] || "";
-    const nameRegex = new RegExp(`^${name}$`, "i");
+    let companyId = req.headers['x-company-id'] || "";
+    
+    const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeName = escapeRegExp(name);
+    const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
+
+    if (!companyId) {
+      const [u, e] = await Promise.all([
+        User.findOne({ name: nameRegex }),
+        Employee.findOne({ name: nameRegex })
+      ]);
+      companyId = u?.companyId || e?.companyId || "";
+    }
+
+    if (!companyId) return res.status(400).json({ msg: "Company ID required" });
+
     const user = await User.findOne({ name: nameRegex, companyId });
+    const employee = await Employee.findOne({ name: nameRegex, companyId });
 
     const query = { 
       companyId,
       $or: [{ assignedTo: nameRegex }, { manager: nameRegex }] 
     };
     if (user) query.$or.push({ assignedTo: user._id });
+    if (employee) query.$or.push({ assignedTo: employee._id });
 
     const taskQuery = { 
       companyId,
-      $or: [{ assignTo: nameRegex }, { assignedTo: nameRegex }], 
+      $or: [{ assignTo: nameRegex }], 
       isDeleted: false 
     };
     if (user) taskQuery.$or.push({ assignedTo: user._id });
+    if (employee) taskQuery.$or.push({ assignedTo: employee._id });
 
     const attQuery = { 
       companyId,

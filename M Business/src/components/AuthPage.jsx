@@ -369,6 +369,14 @@ export default function AuthPage({ setUser, initialTab = "register" }) {
                 </div>
               </Field>
 
+              <Field label="Role">
+                <select value={regData.role} onChange={e => setRegData(p => ({ ...p, role: e.target.value }))} style={selectSty}>
+                  <option value="employee">Employee</option>
+                  <option value="manager">Manager</option>
+                  <option value="Subadmin">Admin</option>
+                </select>
+              </Field>
+
               <div className="grid2">
                 <Field label="Email" err={regErr.email}>
                   <div style={{ position: "relative" }}>

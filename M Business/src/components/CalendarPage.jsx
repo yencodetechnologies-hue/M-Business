@@ -40,7 +40,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
   const today = new Date().toISOString().slice(0, 10);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [projects, user, companyId]);
 
   const showToast = (m) => { setToast(m); setTimeout(() => setToast(""), 2800); };
 
@@ -66,7 +66,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     setLoading(false);
   };
 
-  const role = String(user?.role || user?.userRole || "").toLowerCase();
+  const role = String(user?.role || user?.userRole || "").toLowerCase().trim();
   const isClient = role === 'client';
   const isEmployee = role === 'employee';
 
@@ -139,27 +139,54 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
     if (Object.keys(e).length) { setErr(e); return; }
     setSaving(true);
     try {
+      let savedEvent = null;
+
       if (modal === "add") {
         if (form.category === "Project") {
           const payload = { name: form.name, client: form.client, start: form.date, end: form.date, deadline: form.date, status: "Pending", budget: "0", currency: "₹" };
-          await axios.post(`${BASE_URL}/api/projects/add`, payload);
+          const r = await axios.post(`${BASE_URL}/api/projects/add`, payload);
           if (onUpdateProject) onUpdateProject();
           showToast("✅ Project added!");
+          savedEvent = { ...r.data, _type: "project" };
         } else if (form.category === "Task") {
           const payload = { title: form.name, project: form.project, date: form.date, status: "Pending", priority: "Medium" };
-          await axios.post(`${BASE_URL}/api/tasks`, payload);
+          const r = await axios.post(`${BASE_URL}/api/tasks`, payload);
           if (onUpdateTask) onUpdateTask();
           showToast("✅ Task added!");
+          savedEvent = { ...r.data, _type: "task" };
         } else {
           const r = await axios.post(API, { ...form, companyId: companyId || "", createdBy: user?.name || user?.clientName || "", createdByRole: user?.role || user?.userRole || "" });
-          setEvents(p => [r.data, ...p]);
+          savedEvent = r.data;
+          setEvents(p => [savedEvent, ...p]);
           showToast("✅ Event added!");
         }
       } else {
         const r = await axios.put(`${API}/${editId}`, form);
-        setEvents(p => p.map(x => (x._id || x.id) === editId ? r.data : x));
+        savedEvent = r.data;
+        setEvents(p => p.map(x => (x._id || x.id) === editId ? savedEvent : x));
         showToast("✅ Event updated!");
       }
+
+      // Notification logic
+      if (savedEvent && (savedEvent.client || savedEvent.employee)) {
+        const targetNames = [savedEvent.client, savedEvent.employee].filter(Boolean);
+        for (const name of targetNames) {
+          const targetClient = (clients || []).find(c => (c.name || c.clientName || "").toLowerCase() === name.toLowerCase());
+          const targetEmp = (projects || []).flatMap(p => p.team || []).find(e => (typeof e === 'string' ? e : e.name || "").toLowerCase() === name.toLowerCase());
+          
+          const userId = targetClient?._id || targetClient?.id || targetEmp?._id || targetEmp?.id;
+          if (userId) {
+            axios.post(`${BASE_URL}/api/notifications`, {
+              userId,
+              type: 'event',
+              icon: '📅',
+              text: `New event scheduled: "${savedEvent.name || savedEvent.title || 'Meeting'}" on ${savedEvent.date}`,
+              link: 'calendar'
+            }).catch(() => {});
+          }
+        }
+      }
+
       setModal(null);
     } catch {
       if (modal === "add") {
@@ -672,7 +699,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                               borderRadius: 7, padding: "5px 12px", fontSize: 11,
                               color: finalTheme.accent, cursor: "pointer", fontWeight: 700
                             }}>
-                              View️ View
+                              View
                             </button>
                           );
                         })()}
@@ -691,13 +718,13 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
       {/* ── MODALS ───────────────────────────────────────────────── */}
       {modal === "project" && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: finalTheme.card, borderRadius: 20, width: "100%", maxWidth: 450, padding: 24, boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}` }}>
-            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>🏗️ Project Deadline</h2>
-            <div style={{ background: finalTheme.bg, padding: 16, borderRadius: 12, marginBottom: 20 }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: finalTheme.text || "var(--app-text)" }}>{form._original.name}</div>
-              <div style={{ fontSize: 12, color: finalTheme.muted, marginTop: 4 }}>Deadline: {form.date}</div>
-              <div style={{ fontSize: 12, color: finalTheme.muted }}>Client: {form.client || "—"}</div>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: finalTheme.card, borderRadius: 24, width: "100%", maxWidth: 450, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.15)", border: `1.5px solid ${finalTheme.border}` }}>
+            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)", display: "flex", alignItems: "center", gap: 10 }}>🏗️ Project Deadline</h2>
+            <div style={{ background: finalTheme.bg, padding: 20, borderRadius: 16, marginBottom: 24, border: `1px solid ${finalTheme.border}` }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>{form._original.name}</div>
+              <div style={{ fontSize: 13, color: finalTheme.muted, marginTop: 6, fontWeight: 600 }}>Deadline: {form.date}</div>
+              <div style={{ fontSize: 13, color: finalTheme.muted, fontWeight: 600 }}>Client: {form.client || "—"}</div>
             </div>
             <label style={{ display: "block", fontSize: 11, color: finalTheme.accent, fontWeight: 700, marginBottom: 8 }}>DEADLINE</label>
             <input
@@ -732,13 +759,13 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
       )}
 
       {modal === "task" && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: finalTheme.card, borderRadius: 20, width: "100%", maxWidth: 450, padding: 24, boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}` }}>
-            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>📝 Task Details</h2>
-            <div style={{ background: finalTheme.bg, padding: 16, borderRadius: 12, marginBottom: 20 }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: finalTheme.text || "var(--app-text)" }}>{form._original.title || form._original.name}</div>
-              <div style={{ fontSize: 12, color: finalTheme.muted, marginTop: 4 }}>Due Date: {form.date}</div>
-              <div style={{ fontSize: 12, color: finalTheme.muted }}>Project: {form.project || "—"}</div>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: finalTheme.card, borderRadius: 24, width: "100%", maxWidth: 450, padding: 28, boxShadow: "0 20px 50px rgba(0,0,0,0.15)", border: `1.5px solid ${finalTheme.border}` }}>
+            <h2 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 900, color: finalTheme.text || "var(--app-text)", display: "flex", alignItems: "center", gap: 10 }}>📝 Task Details</h2>
+            <div style={{ background: finalTheme.bg, padding: 20, borderRadius: 16, marginBottom: 24, border: `1px solid ${finalTheme.border}` }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: finalTheme.text || "var(--app-text)" }}>{form._original.title || form._original.name}</div>
+              <div style={{ fontSize: 13, color: finalTheme.muted, marginTop: 6, fontWeight: 600 }}>Due Date: {form.date}</div>
+              <div style={{ fontSize: 13, color: finalTheme.muted, fontWeight: 600 }}>Project: {form.project || "—"}</div>
             </div>
             <label style={{ display: "block", fontSize: 11, color: finalTheme.accent, fontWeight: 700, marginBottom: 8 }}>DUE DATE</label>
             <input
@@ -774,15 +801,15 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
       {modal && !["project", "task"].includes(modal) && (
         <div style={{
-          position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)",
-          backdropFilter: "blur(10px)", zIndex: 1000, display: "flex",
+          position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)",
+          backdropFilter: "blur(8px)", zIndex: 1000, display: "flex",
           alignItems: "center", justifyContent: "center", padding: 16
         }}
           onClick={(e) => { if (e.target === e.currentTarget) { setModal(null); setForm(EMPTY); setErr({}); } }}>
           <div style={{
-            background: finalTheme.card, borderRadius: 20, width: "100%", maxWidth: 740,
+            background: finalTheme.card, borderRadius: 28, width: "100%", maxWidth: 740,
             maxHeight: "90vh", overflow: "hidden", display: "flex",
-            flexDirection: "column", boxShadow: finalTheme.shadow || "var(--app-shadow)", border: `1px solid ${finalTheme.border}`
+            flexDirection: "column", boxShadow: "0 30px 60px rgba(0,0,0,0.2)", border: `1.5px solid ${finalTheme.border}`
           }}>
 
             {/* Modal header */}

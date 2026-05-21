@@ -9,10 +9,26 @@ const DEFAULT_LOGO_URL = "";
 function generateInvoiceNo() {
   return `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 }
-function formatCurrency(val, symbol = "₹") {
+function formatCurrency(val, symbol = "₹", compact = false, disableCompact = false) {
   const num = parseFloat(val) || 0;
+  const absNum = Math.abs(num);
+  
+  if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
+    try {
+      const isINR = symbol === "₹";
+      const formatter = new Intl.NumberFormat(isINR ? 'en-IN' : 'en-US', {
+        notation: 'compact',
+        compactDisplay: 'short',
+        maximumFractionDigits: 2
+      });
+      return symbol + (/[A-Za-z]/.test(symbol) ? " " : "") + formatter.format(num);
+    } catch (e) {
+      // Fallback
+    }
+  }
+  
   const isINR = symbol === "₹";
-  return symbol + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return symbol + (/[A-Za-z]/.test(symbol) ? " " : "") + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function formatDate(d) {
   if (!d) return "—";
@@ -1175,15 +1191,24 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div>
             <label style={lbl}>Currency</label>
             <div style={{ display: "flex", gap: 8 }}>
-              <select value={["₹", "$", "€", "£", "¥"].includes(inv.currency) ? inv.currency : "Custom"} onChange={(e) => upd("currency", e.target.value === "Custom" ? "" : e.target.value)} style={{ ...inp(), flex: 1 }}>
+              <select value={["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].includes(inv.currency) ? inv.currency : "Custom"} onChange={(e) => upd("currency", e.target.value === "Custom" ? "" : e.target.value)} style={{ ...inp(), flex: 1 }}>
                 <option value="₹">INR (₹)</option>
                 <option value="$">USD ($)</option>
                 <option value="€">EUR (€)</option>
                 <option value="£">GBP (£)</option>
                 <option value="¥">JPY (¥)</option>
+                <option value="AED">AED (Dh)</option>
+                <option value="SAR">SAR (SR)</option>
+                <option value="QAR">QAR (QR)</option>
+                <option value="CAD">CAD (C$)</option>
+                <option value="AUD">AUD (A$)</option>
+                <option value="SGD">SGD (S$)</option>
+                <option value="KWD">KWD (KD)</option>
+                <option value="BHD">BHD (BD)</option>
+                <option value="OMR">OMR (RO)</option>
                 <option value="Custom">Custom...</option>
               </select>
-              {!["₹", "$", "€", "£", "¥"].includes(inv.currency) && (
+              {!["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].includes(inv.currency) && (
                 <input value={inv.currency} onChange={(e) => upd("currency", e.target.value)} style={{ ...inp(), flex: 1 }} placeholder="e.g. AUD" />
               )}
             </div>

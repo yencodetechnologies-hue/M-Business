@@ -1111,6 +1111,24 @@ export default function ClientDashboard({ user, setUser }) {
   useEffect(() => {
     setLoading(true);
     refreshData();
+
+    // One-time login notification
+    const clientName = user?.name || user?.clientName || "Client";
+    const hasNotified = localStorage.getItem(`login_notified_ever_${clientName}`) === "true";
+    if (!hasNotified && user) {
+      // We don't have addNotification helper here, but we can use the backend API or just show a toast
+      // For now, let's assume they want the same in-app notification bell experience.
+      // Since refreshData already fetches notifications, we could POST a new one to the backend.
+      axios.post(`${BASE_URL}/api/notifications`, {
+        userId: user._id || user.id,
+        type: 'login',
+        icon: '🔐',
+        text: `Welcome back, ${clientName}! Login Successful.`,
+      }).then(() => {
+        localStorage.setItem(`login_notified_ever_${clientName}`, "true");
+        refreshData(); // Refresh to show the new notification
+      }).catch(() => {});
+    }
   }, [user]);
 
   useEffect(() => {

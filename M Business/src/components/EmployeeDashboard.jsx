@@ -9,6 +9,8 @@ import { BASE_URL } from "../config";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
 import CalendarPage from "./CalendarPage";
 import MessagingPage from "./MessagingPage";
+import SettingsPage from "./SettingsPage";
+import ImageCropModal from "./ImageCropModal";
 
 const BASE = "/api/employee-dashboard";
 
@@ -358,8 +360,24 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
                 <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
                 <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>{p.client || "—"} · Due {p.deadline || "—"}</div>
                 <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
-                  <ProgressBar pct={p.progress || 0} />
-                  <span style={{ fontSize: 10, color: T.textFaint, fontWeight: 700, minWidth: 28 }}>{p.progress || 0}%</span>
+                  {(() => {
+                    const pTasks = tasks.filter(t => t.project === p.name || t.projectId === p._id || t.projectId === p.id);
+                    const s = (p.status || "").toLowerCase();
+                    let pct = 0;
+                    if (s === "done" || s === "completed") pct = 100;
+                    else if (pTasks.length > 0) pct = Math.round((pTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length / pTasks.length) * 100);
+                    else if (s === "in progress") pct = 50;
+                    else if (s === "on hold") pct = 30;
+                    else if (s === "pending" || s === "not started") pct = 0;
+                    else if (s === "review" || s === "in review") pct = 90;
+                    else pct = (p.progress || 0);
+                    return (
+                      <>
+                        <ProgressBar pct={pct} />
+                        <span style={{ fontSize: 10, color: T.textFaint, fontWeight: 700, minWidth: 28 }}>{pct}%</span>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
               <Badge label={p.status || "active"} />
@@ -431,7 +449,7 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
 
 // ── PROJECTS PAGE ────────────────────────────────────────────
 
-function ProjectsPage({ projects }) {
+function ProjectsPage({ projects, tasks }) {
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState(null);
   const tabs = [
@@ -460,18 +478,50 @@ function ProjectsPage({ projects }) {
           <Badge label={selected.status || "active"} />
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 10, marginBottom: 20 }}>
-          {[["Budget", selected.budget || "—"], ["Progress", `${selected.progress || 0}%`], ["Manager", selected.manager || "—"]].map(([k, v]) => (
-            <div key={k} style={{ background: T.bg, borderRadius: T.radiusSm, padding: "12px 14px", border: `1px solid ${T.border}` }}>
-              <div style={{ fontSize: 10, color: T.textFaint, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>{k}</div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>{k === "Budget" ? fmt(v, selected.currency) : v}</div>
-            </div>
-          ))}
+          {(() => {
+            const pTasks = tasks.filter(t => t.project === selected.name || t.projectId === selected._id || t.projectId === selected.id);
+            const s = (selected.status || "").toLowerCase();
+            let pct = 0;
+            if (s === "done" || s === "completed") pct = 100;
+            else if (pTasks.length > 0) pct = Math.round((pTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length / pTasks.length) * 100);
+            else if (s === "in progress") pct = 50;
+            else if (s === "on hold") pct = 30;
+            else if (s === "pending" || s === "not started") pct = 0;
+            else if (s === "review" || s === "in review") pct = 90;
+            else pct = (selected.progress || 0);
+            return [
+              ["Budget", selected.budget || "0"],
+              ["Progress", `${pct}%`],
+              ["Manager", selected.manager || "Not Assigned"]
+            ].map(([k, v]) => (
+              <div key={k} style={{ background: T.bg, borderRadius: T.radiusSm, padding: "12px 14px", border: `1px solid ${T.border}` }}>
+                <div style={{ fontSize: 10, color: T.textFaint, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>{k}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>{k === "Budget" ? fmt(v, selected.currency) : v}</div>
+              </div>
+            ));
+          })()}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1, background: T.bg, borderRadius: 99, height: 8, overflow: "hidden", border: `1px solid ${T.border}` }}>
-            <div style={{ width: `${selected.progress || 0}%`, background: T.accent, height: "100%", borderRadius: 99 }} />
-          </div>
-          <span style={{ fontSize: 13, fontWeight: 800, color: T.text, minWidth: 36 }}>{selected.progress || 0}%</span>
+          {(() => {
+            const pTasks = tasks.filter(t => t.project === selected.name || t.projectId === selected._id || t.projectId === selected.id);
+            const s = (selected.status || "").toLowerCase();
+            let pct = 0;
+            if (s === "done" || s === "completed") pct = 100;
+            else if (pTasks.length > 0) pct = Math.round((pTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length / pTasks.length) * 100);
+            else if (s === "in progress") pct = 50;
+            else if (s === "on hold") pct = 30;
+            else if (s === "pending" || s === "not started") pct = 0;
+            else if (s === "review" || s === "in review") pct = 90;
+            else pct = (selected.progress || 0);
+            return (
+              <>
+                <div style={{ flex: 1, background: T.bg, borderRadius: 99, height: 8, overflow: "hidden", border: `1px solid ${T.border}` }}>
+                  <div style={{ width: `${pct}%`, background: T.accent, height: "100%", borderRadius: 99 }} />
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 800, color: T.text, minWidth: 36 }}>{pct}%</span>
+              </>
+            );
+          })()}
         </div>
         {selected.description && <p style={{ marginTop: 16, fontSize: 13, color: T.textMuted, lineHeight: 1.7 }}>{selected.description}</p>}
       </Card>
@@ -500,8 +550,24 @@ function ProjectsPage({ projects }) {
                 <Badge label={p.status || "active"} />
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <ProgressBar pct={p.progress || 0} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, minWidth: 34 }}>{p.progress || 0}%</span>
+                {(() => {
+                  const pTasks = tasks.filter(t => t.project === p.name || t.projectId === p._id || t.projectId === p.id);
+                  const s = (p.status || "").toLowerCase();
+                  let pct = 0;
+                  if (s === "done" || s === "completed") pct = 100;
+                  else if (pTasks.length > 0) pct = Math.round((pTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length / pTasks.length) * 100);
+                  else if (s === "in progress") pct = 50;
+                  else if (s === "on hold") pct = 30;
+                  else if (s === "pending" || s === "not started") pct = 0;
+                  else if (s === "review" || s === "in review") pct = 90;
+                  else pct = (p.progress || 0);
+                  return (
+                    <>
+                      <ProgressBar pct={pct} />
+                      <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, minWidth: 34 }}>{pct}%</span>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           ))}
@@ -514,7 +580,7 @@ function ProjectsPage({ projects }) {
 
 // ── TASKS PAGE ───────────────────────────────────────────────
 
-function TasksPage({ tasks }) {
+function TasksPage({ tasks, onToggle }) {
   const [filter, setFilter] = useState("all");
   const [expanded, setExpanded] = useState(null);
 
@@ -554,11 +620,13 @@ function TasksPage({ tasks }) {
             const isOpen = expanded === t._id;
             return (
               <div key={t._id || i} style={{ background: T.bg, borderRadius: T.radiusSm, border: `1px solid ${isOpen ? T.accent : T.border}`, overflow: "hidden", transition: "border-color 0.18s" }}>
-                <div onClick={() => setExpanded(isOpen ? null : t._id)} style={{ padding: "13px 14px", cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 12 }}>
-                  <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${t._isDone ? T.success : T.borderDark}`, background: t._isDone ? T.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
-                    {t._isDone && <span style={{ color: "#fff", fontSize: 9, fontWeight: 900 }}>✓</span>}
+                <div style={{ padding: "13px 14px", display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <div 
+                    onClick={(e) => { e.stopPropagation(); if (onToggle) onToggle(t); }}
+                    style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${t._isDone ? T.success : T.borderDark}`, background: t._isDone ? T.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1, cursor: "pointer", transition: "all 0.2s" }}>
+                    {t._isDone && <span style={{ color: "#fff", fontSize: 10, fontWeight: 900 }}>✓</span>}
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div onClick={() => setExpanded(isOpen ? null : t._id)} style={{ flex: 1, minWidth: 0, cursor: "pointer" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: t._isDone ? T.textFaint : T.text, textDecoration: t._isDone ? "line-through" : "none" }}>{t.title}</div>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 5, alignItems: "center" }}>
                       <Badge label={t.priority || "medium"} />
@@ -567,7 +635,7 @@ function TasksPage({ tasks }) {
                       <span style={{ fontSize: 10, color: T.textFaint }}>⏱ {t._due}</span>
                     </div>
                   </div>
-                  <span style={{ fontSize: 12, color: T.textFaint, transform: isOpen ? "rotate(180deg)" : "rotate(0)", display: "inline-block", transition: "transform 0.2s" }}>▾</span>
+                  <span onClick={() => setExpanded(isOpen ? null : t._id)} style={{ fontSize: 12, color: T.textFaint, transform: isOpen ? "rotate(180deg)" : "rotate(0)", display: "inline-block", transition: "transform 0.2s", cursor: "pointer" }}>▾</span>
                 </div>
                 {isOpen && (
                   <div style={{ padding: "0 14px 14px", borderTop: `1px solid ${T.border}` }}>
@@ -1213,19 +1281,24 @@ export default function EmployeeDashboard({ user, setUser }) {
   const [accounts, setAccounts] = useState([]);
   const [accountAuthOpen, setAccountAuthOpen] = useState(false);
   const [permissions, setPermissions] = useState({});
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropImage, setCropImage] = useState(null);
+  const [cropCallback, setCropCallback] = useState(null);
+  const [cropAspect, setCropAspect] = useState(1);
 
   useEffect(() => {
     axios.get(`${BASE_URL}/api/role-permissions`).then(res => { const ep = res.data.find(r => r.role === 'employee'); if (ep) setPermissions(ep.permissions || {}); }).catch(() => { });
   }, []);
+
+  const resolvedUser = user || (() => { try { return JSON.parse(localStorage.getItem("user")); } catch { return null; } })();
+  if (resolvedUser && !resolvedUser.role) resolvedUser.role = "employee";
+  const empName = resolvedUser?.name || "";
 
   const filteredNav = NAV.filter(item => {
     if (item.key === 'dashboard' || item.key === 'settings') return true;
     if (Object.keys(permissions).length === 0) return true;
     return permissions[item.key] === true;
   });
-
-  const resolvedUser = user || (() => { try { return JSON.parse(localStorage.getItem("user")); } catch { return null; } })();
-  const empName = resolvedUser?.name || "";
 
   useEffect(() => {
     try { const a = JSON.parse(localStorage.getItem("accounts") || "[]"); setAccounts(a); } catch { setAccounts([]); }
@@ -1240,6 +1313,25 @@ export default function EmployeeDashboard({ user, setUser }) {
 
   const switchAccount = (account) => { localStorage.setItem("user", JSON.stringify(account)); if (setUser) setUser(account); else window.location.reload(); setProfileDropdownOpen(false); };
 
+  const triggerCrop = (e, callback, aspect = 1) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCropImage(reader.result);
+        setCropCallback(() => callback);
+        setCropAspect(aspect);
+        setShowCropModal(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCropComplete = (croppedImage) => {
+    setShowCropModal(false);
+    if (cropCallback) cropCallback(croppedImage);
+  };
+
   const handleAuthSetUser = (userData) => {
     setAccountAuthOpen(false); setProfileDropdownOpen(false);
     try { let accs = JSON.parse(localStorage.getItem("accounts") || "[]"); const idx = accs.findIndex(a => a.email === userData.email); if (idx !== -1) accs[idx] = userData; else accs.push(userData); localStorage.setItem("accounts", JSON.stringify(accs)); } catch { }
@@ -1247,6 +1339,8 @@ export default function EmployeeDashboard({ user, setUser }) {
   };
 
   const notify = useCallback((msg, type = "success") => { setToast(msg); setToastType(type); setTimeout(() => setToast(""), 3000); }, []);
+
+  const [events, setEvents] = useState([]);
 
   const handleLogout = () => { localStorage.removeItem("user"); setDocStatus({}); setProfileOpen(false); if (setUser) setUser(null); else window.location.href = "/"; };
 
@@ -1268,13 +1362,15 @@ export default function EmployeeDashboard({ user, setUser }) {
     setLoading(true);
     try {
       const config = { headers: { "x-company-id": companyId } };
-      const [projRes, taskRes, propRes, attRes, salRes] = await Promise.allSettled([
+      const [projRes, taskRes, propRes, attRes, salRes, eventRes] = await Promise.allSettled([
         axios.get(`${BASE}/projects/${enc}`, config),
         axios.get(`${BASE}/tasks/${enc}`, config),
         axios.get(`${BASE_URL}/api/proposals/employee/${enc}`, config),
         axios.get(`${BASE}/attendance/${enc}`, config),
-        axios.get(`${BASE}/salary/${enc}`, config)
+        axios.get(`${BASE}/salary/${enc}`, config),
+        axios.get(`${BASE_URL}/api/events?companyId=${companyId}&employeeName=${enc}`, config)
       ]);
+
       if (projRes.status === "fulfilled") {
         const data = projRes.value.data || [];
         setProjects(data);
@@ -1285,12 +1381,34 @@ export default function EmployeeDashboard({ user, setUser }) {
         }
         sessionStorage.setItem(`projects_${n}`, JSON.stringify(data));
       } else setProjects([]);
-      if (taskRes.status === "fulfilled") setTasks(taskRes.value.data || []); else setTasks([]);
+
+      if (taskRes.status === "fulfilled") {
+        const data = taskRes.value.data || [];
+        setTasks(data);
+        const savedTasks = JSON.parse(sessionStorage.getItem(`tasks_${n}`) || "[]");
+        if (savedTasks.length > 0 && data.length > savedTasks.length) {
+          const newTasks = data.filter(t => !savedTasks.find(st => st._id === t._id));
+          newTasks.forEach(t => addNotification({ id: `task_${t._id}_${Date.now()}`, type: "task", title: "New Task Assigned", msg: `You have a new task: "${t.title}"`, icon: "📝", color: T.success, time: new Date().toISOString() }));
+        }
+        sessionStorage.setItem(`tasks_${n}`, JSON.stringify(data));
+      } else setTasks([]);
+
+      if (eventRes.status === "fulfilled") {
+        const data = eventRes.value.data || [];
+        setEvents(data);
+        const savedEvents = JSON.parse(sessionStorage.getItem(`events_${n}`) || "[]");
+        if (savedEvents.length > 0 && data.length > savedEvents.length) {
+          const newEvents = data.filter(e => !savedEvents.find(se => se._id === e._id));
+          newEvents.forEach(e => addNotification({ id: `event_${e._id}_${Date.now()}`, type: "event", title: "New Event / Meeting", msg: `New event: "${e.name}" on ${e.date}`, icon: "📅", color: T.accent, time: new Date().toISOString() }));
+        }
+        sessionStorage.setItem(`events_${n}`, JSON.stringify(data));
+      } else setEvents([]);
+
       if (propRes.status === "fulfilled") setProposals(propRes.value.data || []); else setProposals([]);
       if (attRes.status === "fulfilled") setAttendance(attRes.value.data || []); else setAttendance([]);
       if (salRes.status === "fulfilled") setSalary(salRes.value.data || []); else setSalary([]);
     } catch (err) { console.error("LoadData Error:", err); } finally { setLoading(false); }
-  }, [empName, addNotification]);
+  }, [empName, addNotification, resolvedUser?.companyId]);
 
   useEffect(() => { if (!empName) return; setDocStatus({}); setProfileOpen(false); loadData(empName); }, [empName]);
 
@@ -1305,11 +1423,11 @@ export default function EmployeeDashboard({ user, setUser }) {
   useEffect(() => {
     if (!resolvedUser || !empName) return;
     if (!hasNotifiedLogin) {
-      const isAlready = sessionStorage.getItem(`login_notified_${empName}`) === "true";
+      const isAlready = localStorage.getItem(`login_notified_ever_${empName}`) === "true";
       if (!isAlready) {
         addNotification({ id: `login_${Date.now()}`, type: 'login', title: 'Login Successful', msg: `Welcome back, ${resolvedUser.name}!`, icon: '🔐', color: T.success, time: new Date().toISOString() });
         setHasNotifiedLogin(true);
-        sessionStorage.setItem(`login_notified_${empName}`, "true");
+        localStorage.setItem(`login_notified_ever_${empName}`, "true");
       }
     }
     const dob = resolvedUser.dob || resolvedUser.dateOfBirth;
@@ -1346,6 +1464,18 @@ export default function EmployeeDashboard({ user, setUser }) {
     }
   };
   const handleDocStatusChange = useCallback((statusMap) => { setDocStatus(statusMap); }, []);
+
+  const handleToggleTask = async (task) => {
+    try {
+      const newStatus = ["done", "completed"].includes((task.status || "").toLowerCase()) ? "Pending" : "Done";
+      await axios.patch(`${BASE_URL}/api/tasks/${task._id}/status`, { status: newStatus });
+      setTasks(prev => prev.map(t => t._id === task._id ? { ...t, status: newStatus } : t));
+      notify(`Task marked as ${newStatus}`);
+    } catch (err) {
+      console.error("Toggle Task Error:", err);
+      notify("Failed to update task", "error");
+    }
+  };
 
   // ── NOTIFICATION DROPDOWN ────────────────────────────────────
   const NotifDropdown = () => (
@@ -1499,9 +1629,9 @@ export default function EmployeeDashboard({ user, setUser }) {
           <div className="main-pad" style={{ flex: 1, padding: "22px 28px", overflowY: "auto" }}>
             <EmployeeSubscriptionWarning user={resolvedUser} />
             {page === "dashboard" && <DashboardPage user={resolvedUser} projects={projects} tasks={tasks} proposals={proposals} attendance={attendance} salary={salary} setPage={setPage} docStatus={docStatus} onOpenProfile={() => setProfileOpen(true)} />}
-            {page === "projects" && <ProjectsPage projects={projects} />}
+            {page === "projects" && <ProjectsPage projects={projects} tasks={tasks} />}
             {page === "proposals" && <ProposalsPage proposals={proposals} />}
-            {page === "tasks" && <TasksPage tasks={tasks} />}
+            {page === "tasks" && <TasksPage tasks={tasks} onToggle={handleToggleTask} />}
             {page === "attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify} />}
             {(page === "salary" || page === "payments") && <SalaryPage salary={salary} user={resolvedUser} />}
             {page === "calendar" && (
@@ -1517,6 +1647,17 @@ export default function EmployeeDashboard({ user, setUser }) {
               />
             )}
             {page === "messaging" && <MessagingPage user={resolvedUser} />}
+            {page === "settings" && (
+              <SettingsPage 
+                user={resolvedUser}
+                triggerCrop={triggerCrop}
+                onProfileUpdate={(updates) => {
+                  const updated = { ...resolvedUser, ...updates };
+                  if (setUser) setUser(updated);
+                  localStorage.setItem("user", JSON.stringify(updated));
+                }}
+              />
+            )}
           </div>
         </div>
 
@@ -1528,6 +1669,14 @@ export default function EmployeeDashboard({ user, setUser }) {
             <button onClick={() => setAccountAuthOpen(false)} style={{ position: "absolute", top: 16, right: 16, zIndex: 10061, background: "rgba(255,255,255,0.9)", border: `1px solid ${T.border}`, color: T.text, borderRadius: 9, width: 34, height: 34, cursor: "pointer", fontWeight: 900, fontSize: 13 }}>✕</button>
             <AuthPage setUser={handleAuthSetUser} initialTab="login" />
           </div>
+        )}
+        {showCropModal && (
+          <ImageCropModal 
+            image={cropImage} 
+            aspect={cropAspect} 
+            onComplete={handleCropComplete} 
+            onClose={() => setShowCropModal(false)} 
+          />
         )}
       </div>
     </div>

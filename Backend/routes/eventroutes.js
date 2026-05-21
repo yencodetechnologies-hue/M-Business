@@ -11,18 +11,29 @@ router.get("/", async (req, res) => {
     
     if (companyId && companyId !== "admin-company-id" && companyId !== "default") {
       filter.companyId = companyId;
+    } else if (!employeeName) {
+      // If no companyId and no employeeName, we return nothing for safety
+      return res.json([]);
     }
 
     // If employeeName is provided, we filter to show:
     // 1. Events created by this employee
     // 2. Events linked to projects this employee is assigned to (passed via projectNames array/string)
     if (employeeName) {
-      const nameRegex = new RegExp(`^${employeeName}$`, "i");
-      const orConditions = [{ createdBy: { $regex: nameRegex } }];
+      const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const safeName = escapeRegExp(employeeName);
+      const nameRegex = new RegExp(`^\\s*${safeName}\\s*$`, "i");
       
-      if (projectNames) {
-        const pList = Array.isArray(projectNames) ? projectNames : projectNames.split(",");
-        orConditions.push({ project: { $in: pList } });
+      const orConditions = [
+        { createdBy: { $regex: nameRegex } },
+        { client: { $regex: nameRegex } } // For clients viewing the same route
+      ];
+      
+      if (projectNames && projectNames !== "undefined" && projectNames !== "null") {
+        const pList = Array.isArray(projectNames) ? projectNames : projectNames.split(",").filter(Boolean);
+        if (pList.length > 0) {
+          orConditions.push({ project: { $in: pList } });
+        }
       }
       
       filter.$or = orConditions;

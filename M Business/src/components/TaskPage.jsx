@@ -694,11 +694,23 @@ function PriorityPicker({ anchor, currentValue, onSelect, onClose }) {
 ══════════════════════════════════════════════════════════ */
 function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, onInvite, onAutoAssign }) {
   const [search, setSearch] = useState("");
+  const [localEmployees, setLocalEmployees] = useState(employees || []);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newEmp, setNewEmp] = useState({ name: "", email: "", password: "", phone: "", role: "employee", department: "", salary: "" });
+  const [saveError, setSaveError] = useState("");
+  const [saving, setSaving] = useState(false);
   const inputRef = useRef();
-  useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
 
-  // Build list from employees prop
-  const empList = (employees || [])
+  useEffect(() => {
+    setLocalEmployees(employees || []);
+  }, [employees]);
+
+  useEffect(() => {
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }, []);
+
+  // Build list from localEmployees state
+  const empList = (localEmployees || [])
     .map(e => typeof e === 'object' && e !== null ? (e.name || e.employeeName || "") : (e || ""))
     .filter(e => typeof e === 'string' && e.trim() !== "");
 
@@ -714,88 +726,270 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
     onClose();
   };
 
+  const handleCreateEmployee = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!newEmp.name.trim()) { setSaveError("Name is required"); return; }
+    if (!newEmp.email.trim()) { setSaveError("Email is required"); return; }
+    if (!newEmp.password.trim() || newEmp.password.trim().length < 4) { setSaveError("Password is required (min 4 chars)"); return; }
+
+    try {
+      setSaving(true);
+      setSaveError("");
+      const res = await axios.post(`${BASE_URL}/api/employees/add`, newEmp);
+      const added = res.data.employee;
+      
+      // Update local dropdown state
+      setLocalEmployees(prev => [added, ...prev]);
+      
+      // Select the newly added employee
+      handleSelect(added.name);
+      
+      // Close modal
+      setShowAddModal(false);
+      
+      // Reset state
+      setNewEmp({ name: "", email: "", password: "", phone: "", role: "employee", department: "", salary: "" });
+    } catch (err) {
+      setSaveError(err.response?.data?.msg || err.response?.data?.message || "Failed to create employee");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <DD anchor={anchor} onClose={onClose} w={320}>
-      <div style={{ padding: "12px 12px 4px" }}>
-        <div style={{
-          display: "flex", alignItems: "center", gap: 6,
-          border: `1px solid #0073ea`, borderRadius: 6,
-          padding: "8px 12px", background: "#fff"
-        }}>
-          <span style={{ fontSize: 14, color: P.muted }}>🔍</span>
-          <input
-            ref={inputRef}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search employee..."
-            onKeyDown={e => {
-              if (e.key === "Enter" && search.trim()) {
-                handleSelect(search.trim(), e);
-              }
-            }}
-            style={{
-              border: "none", outline: "none", background: "transparent",
-              fontSize: 13, color: P.text, fontFamily: "inherit", flex: 1
-            }}
-          />
-          {search && (
-            <span
-              onClick={() => setSearch("")}
-              style={{ color: P.muted, cursor: "pointer", fontSize: 14 }}
-            >✕</span>
+    <>
+      <DD anchor={anchor} onClose={onClose} w={320}>
+        <div style={{ padding: "12px 12px 4px" }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 6,
+            border: `1px solid #0073ea`, borderRadius: 6,
+            padding: "8px 12px", background: "#fff"
+          }}>
+            <span style={{ fontSize: 14, color: P.muted }}>🔍</span>
+            <input
+              ref={inputRef}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search employee..."
+              onKeyDown={e => {
+                if (e.key === "Enter" && search.trim()) {
+                  handleSelect(search.trim(), e);
+                }
+              }}
+              style={{
+                border: "none", outline: "none", background: "transparent",
+                fontSize: 13, color: P.text, fontFamily: "inherit", flex: 1
+              }}
+            />
+            {search && (
+              <span
+                onClick={() => setSearch("")}
+                style={{ color: P.muted, cursor: "pointer", fontSize: 14 }}
+              >✕</span>
+            )}
+          </div>
+        </div>
+
+        {empList.length > 0 && (
+          <div style={{ padding: "8px 14px 4px", fontSize: 11, fontWeight: 700, color: P.muted, textTransform: "uppercase", letterSpacing: 0.5 }}>
+            {search ? "Matching employees" : "Employees"}
+          </div>
+        )}
+
+        <div style={{ maxHeight: 200, overflowY: "auto", padding: "0 8px" }}>
+          {filtered.length === 0 && !isNewName ? (
+            <div style={{ padding: "10px 12px", fontSize: 12, color: P.muted, textAlign: "center" }}>
+              {empList.length === 0
+                ? "Type a name above to assign someone"
+                : "No people found"}
+            </div>
+          ) : (
+            filtered.map(emp => {
+              const isActive = currentAssignee === emp;
+              return (
+                <div
+                  key={emp}
+                  onClick={(e) => handleSelect(emp, e)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "8px 6px", borderRadius: 6, cursor: "pointer",
+                    background: isActive ? "#e8f4fd" : "transparent"
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#f0f2f5"}
+                  onMouseLeave={e => e.currentTarget.style.background = isActive ? "#e8f4fd" : "transparent"}
+                >
+                  <div style={{
+                    width: 30, height: 30, borderRadius: "50%",
+                    background: getAvatarColor(emp),
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0
+                  }}>
+                    {emp.slice(0, 2).toUpperCase()}
+                  </div>
+                  <span style={{
+                    fontSize: 14, color: P.text, flex: 1,
+                    fontWeight: isActive ? 500 : 400
+                  }}>{emp}</span>
+                  {isActive && <span style={{ color: "#0073ea", fontSize: 13 }}>✓</span>}
+                </div>
+              );
+            })
           )}
         </div>
-      </div>
 
+        <div style={{ padding: "8px 12px 12px 12px", borderTop: `1px solid ${P.border}`, marginTop: 4 }}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowAddModal(true);
+            }}
+            style={{
+              width: "100%", background: "var(--app-accent)", color: "#fff", border: "none",
+              borderRadius: 8, padding: "8px 12px", fontSize: 13, fontWeight: 700,
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              fontFamily: "inherit"
+            }}
+          >
+            <span>➕ Add New Employee</span>
+          </button>
+        </div>
+      </DD>
 
+      {showAddModal && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(15, 23, 42, 0.4)",
+          backdropFilter: "blur(4px)",
+          zIndex: 10000,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "inherit"
+        }} onClick={e => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}>
+          <div style={{
+            background: "#fff",
+            borderRadius: 16,
+            width: 400,
+            padding: 24,
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            border: "1px solid #e2e8f0"
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e293b" }}>➕ Add New Employee</h3>
+              <button 
+                onClick={() => setShowAddModal(false)} 
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "#64748b" }}
+              >✕</button>
+            </div>
 
-      {empList.length > 0 && (
-        <div style={{ padding: "8px 14px 4px", fontSize: 11, fontWeight: 700, color: P.muted, textTransform: "uppercase", letterSpacing: 0.5 }}>
-          {search ? "Matching employees" : "Employees"}
+            {saveError && (
+              <div style={{ background: "#fef2f2", border: "1px solid #fee2e2", color: "#ef4444", borderRadius: 8, padding: "8px 12px", fontSize: 12, marginBottom: 14, fontWeight: 500 }}>
+                ⚠️ {saveError}
+              </div>
+            )}
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Full Name *</label>
+                <input 
+                  type="text" 
+                  value={newEmp.name} 
+                  onChange={e => setNewEmp({ ...newEmp, name: e.target.value })}
+                  placeholder="Enter name" 
+                  style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Email Address *</label>
+                <input 
+                  type="email" 
+                  value={newEmp.email} 
+                  onChange={e => setNewEmp({ ...newEmp, email: e.target.value })}
+                  placeholder="Enter email" 
+                  style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Password *</label>
+                <input 
+                  type="password" 
+                  value={newEmp.password} 
+                  onChange={e => setNewEmp({ ...newEmp, password: e.target.value })}
+                  placeholder="Min 4 characters" 
+                  style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Role</label>
+                <select 
+                  value={newEmp.role} 
+                  onChange={e => setNewEmp({ ...newEmp, role: e.target.value })}
+                  style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff", color: "#1e293b", fontWeight: 500 }}
+                >
+                  <option value="employee">Employee</option>
+                  <option value="manager">Manager</option>
+                  <option value="Subadmin">Admin</option>
+                </select>
+              </div>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Phone</label>
+                  <input 
+                    type="text" 
+                    value={newEmp.phone} 
+                    onChange={e => setNewEmp({ ...newEmp, phone: e.target.value })}
+                    placeholder="Optional" 
+                    style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: 4 }}>Department</label>
+                  <input 
+                    type="text" 
+                    value={newEmp.department} 
+                    onChange={e => setNewEmp({ ...newEmp, department: e.target.value })}
+                    placeholder="Optional" 
+                    style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 20 }}>
+              <button 
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowAddModal(false);
+                }}
+                style={{ background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handleCreateEmployee}
+                disabled={saving}
+                style={{ background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontFamily: "inherit" }}
+              >
+                {saving ? "Adding..." : "Add Employee"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      <div style={{ maxHeight: 200, overflowY: "auto", padding: "0 8px" }}>
-        {filtered.length === 0 && !isNewName ? (
-          <div style={{ padding: "10px 12px", fontSize: 12, color: P.muted, textAlign: "center" }}>
-            {empList.length === 0
-              ? "Type a name above to assign someone"
-              : "No people found"}
-          </div>
-        ) : (
-          filtered.map(emp => {
-            const isActive = currentAssignee === emp;
-            return (
-              <div
-                key={emp}
-                onClick={(e) => handleSelect(emp, e)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  padding: "8px 6px", borderRadius: 6, cursor: "pointer",
-                  background: isActive ? "#e8f4fd" : "transparent"
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = "#f0f2f5"}
-                onMouseLeave={e => e.currentTarget.style.background = isActive ? "#e8f4fd" : "transparent"}
-              >
-                <div style={{
-                  width: 30, height: 30, borderRadius: "50%",
-                  background: getAvatarColor(emp),
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0
-                }}>
-                  {emp.slice(0, 2).toUpperCase()}
-                </div>
-                <span style={{
-                  fontSize: 14, color: P.text, flex: 1,
-                  fontWeight: isActive ? 500 : 400
-                }}>{emp}</span>
-                {isActive && <span style={{ color: "#0073ea", fontSize: 13 }}>✓</span>}
-              </div>
-            );
-          })
-        )}
-      </div>
-    </DD>
+    </>
   );
 }
 
@@ -2075,10 +2269,18 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
   const showToast = (msg, type = "success") => { setToast({ msg, type }); setTimeout(() => setToast(null), 2800); };
 
   const load = useCallback(async () => {
-    try { setLoading(true); const r = await axios.get(`${API}/tasks/board`); setGroups(r.data.map(g => ({ ...g, open: g.open !== false }))); }
+    try {
+      setLoading(true);
+      let url = `${API}/tasks/board`;
+      if (user?.role === "employee") {
+        url += `?employeeName=${encodeURIComponent(user.name)}`;
+      }
+      const r = await axios.get(url);
+      setGroups(r.data.map(g => ({ ...g, open: g.open !== false })));
+    }
     catch { showToast("Failed to load board", "error"); }
     finally { setLoading(false); }
-  }, []);
+  }, [user?.role, user?.name]);
   useEffect(() => { load(); }, [load]);
 
   const toggleGroup = async (gid) => { const g = groups.find(x => (x._id || x.id) === gid); const nv = !g?.open; setGroups(p => p.map(x => (x._id || x.id) === gid ? { ...x, open: nv } : x)); try { await axios.put(`${API}/groups/${gid}`, { open: nv }); } catch { } };
@@ -2141,7 +2343,29 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
 
   const toggleCheck = async (id) => { const task = groups.flatMap(g => g.tasks || []).find(t => (t._id || t.id) === id); if (!task) return; const nv = !task.checked; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, checked: nv } : t) }))); if (selected && (selected._id || selected.id) === id) setSelected(p => ({ ...p, checked: nv })); try { await axios.patch(`${API}/tasks/${id}/toggle`); } catch { } };
 
-  const updateField = async (id, field, value) => { if (!id || String(id).startsWith("tmp_")) return; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, [field]: value } : t) }))); if (selected && (selected._id || selected.id) === id) setSelected(p => ({ ...p, [field]: value })); onUpdate?.(); try { await axios.put(`${API}/tasks/${id}`, { [field]: value }); } catch { showToast("Failed to save", "error"); } };
+  const updateField = async (id, field, value) => {
+    if (!id || String(id).startsWith("tmp_")) return;
+    setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, [field]: value } : t) })));
+    if (selected && (selected._id || selected.id) === id) setSelected(p => ({ ...p, [field]: value }));
+    onUpdate?.();
+    try {
+      await axios.put(`${API}/tasks/${id}`, { [field]: value });
+      
+      // Notify if assigned
+      if (field === "assignTo" && value && value !== "Unassigned") {
+        const emp = (employees || []).find(e => (e.name || e.employeeName || "").toLowerCase() === value.toLowerCase());
+        if (emp && (emp._id || emp.id)) {
+          axios.post(`${BASE_URL}/api/notifications`, {
+            userId: emp._id || emp.id,
+            type: 'task',
+            icon: '📝',
+            text: `Task assigned to you: "${(selected?.title || 'New Task')}"`,
+            link: 'tasks'
+          }).catch(() => {});
+        }
+      }
+    } catch { showToast("Failed to save", "error"); }
+  };
 
   const setStatus = (id, s) => updateField(id, "status", s);
   const setPriority = (id, v) => updateField(id, "priority", v);
@@ -2165,10 +2389,27 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
     try {
       const id = task._id || task.id;
       const r = await axios.post(`${API}/tasks/${id}/auto-assign`);
+      const assignedName = r.data.assignedTo?.[0]?.name || r.data.assignTo;
+      
       setGroups(p => p.map(g => ({
         ...g,
-        tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, assignTo: r.data.assignedTo?.[0]?.name || r.data.assignTo } : t)
+        tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, assignTo: assignedName } : t)
       })));
+      
+      // Notify assigned employee
+      if (assignedName && assignedName !== "Unassigned") {
+        const emp = (employees || []).find(e => (e.name || e.employeeName || "").toLowerCase() === assignedName.toLowerCase());
+        if (emp && (emp._id || emp.id)) {
+          axios.post(`${BASE_URL}/api/notifications`, {
+            userId: emp._id || emp.id,
+            type: 'task',
+            icon: '📝',
+            text: `Task auto-assigned to you: "${task.title || 'New Task'}"`,
+            link: 'tasks'
+          }).catch(() => {});
+        }
+      }
+
       showToast("Task auto-assigned successfully!");
     } catch (err) {
       showToast(err.response?.data?.message || "Auto-assign failed", "error");

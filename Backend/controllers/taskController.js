@@ -38,10 +38,22 @@ exports.getBoardData = async (req, res) => {
     if (companyId) groupFilter.companyId = companyId;
     const groups = await Group.find(groupFilter).sort({ order: 1, createdAt: 1 });
 
+    const employeeName = req.query.employeeName || "";
+    const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     const board = await Promise.all(
       groups.map(async (g) => {
         const taskFilter = { groupId: g._id, isDeleted: false };
         if (companyId) taskFilter.companyId = companyId;
+
+        if (employeeName) {
+          const nameRegex = new RegExp(`^\\s*${escapeRegExp(employeeName)}\\s*$`, "i");
+          taskFilter.$or = [
+            { assignTo: nameRegex },
+            { "invitedMembers.email": nameRegex }
+          ];
+        }
+
         const tasks = await Task.find(taskFilter)
           .populate("projectId", "name color")
           .sort({ order: 1, createdAt: 1 });

@@ -14,6 +14,7 @@ const isLocalhost = (origin) =>
   );
 
 const allowedOrigins = [
+  "https://m-business-eta.vercel.app",
   "https://m-business-tau.vercel.app",
   "https://mbusiness.octosofttechnologies.in",
   "http://localhost:5173",

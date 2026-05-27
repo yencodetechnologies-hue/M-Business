@@ -3766,7 +3766,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div>
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: T.text }}>{page?.icon} {page?.label}</h1>
             </div>
-            <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 ,fontSize:"14px"}}>
               {validActive === "clients" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (

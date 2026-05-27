@@ -1792,7 +1792,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "Your Business";
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#f8fafc", fontFamily: T.fontDM }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#f8fafc", fontFamily: T.fontDM}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
@@ -1838,7 +1838,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: T.text }}>{page?.icon} {page?.label}</h1>
               <p style={{ margin: "3px 0 0", color: "var(--app-muted)", fontSize: 12 }}>{companyNameStr} M Business · {user?.role || "Admin"}</p>
             </div>
-            <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0,fontSize:"14px" }}>
               {validActive === "clients" && <button onClick={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} style={B("var(--app-accent)")}>+ Add Client</button>}
               {validActive === "employees" && <button onClick={() => { setNeError({}); setModal("employee"); }} style={B("var(--app-accent)")}>+ Add Employee</button>}
               {validActive === "projects" && <button onClick={() => { setNpError({}); setModal("project"); }} style={B("var(--app-muted)")}>+ New Project</button>}

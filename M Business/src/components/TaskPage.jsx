@@ -762,7 +762,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
   return (
     <>
       <DD anchor={anchor} onClose={onClose} w={320}>
-        <div style={{ padding: "12px 12px 4px" }}>
+        <div style={{ padding: "12px 12px 6px" }}>
           <div style={{
             display: "flex", alignItems: "center", gap: 6,
             border: `1px solid #0073ea`, borderRadius: 6,
@@ -791,15 +791,31 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
               >✕</span>
             )}
           </div>
+
+          {/* ➕ Add New Employee button — directly below search */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowAddModal(true);
+            }}
+            style={{
+              width: "100%", background: "var(--app-accent)", color: "#fff", border: "none",
+              borderRadius: 8, padding: "7px 12px", fontSize: 13, fontWeight: 700,
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              fontFamily: "inherit", marginTop: 8
+            }}
+          >
+            <span>➕ Add New Employee</span>
+          </button>
         </div>
 
         {empList.length > 0 && (
-          <div style={{ padding: "8px 14px 4px", fontSize: 11, fontWeight: 700, color: P.muted, textTransform: "uppercase", letterSpacing: 0.5 }}>
+          <div style={{ padding: "6px 14px 4px", fontSize: 11, fontWeight: 700, color: P.muted, textTransform: "uppercase", letterSpacing: 0.5 }}>
             {search ? "Matching employees" : "Employees"}
           </div>
         )}
 
-        <div style={{ maxHeight: 200, overflowY: "auto", padding: "0 8px" }}>
+        <div style={{ maxHeight: 200, overflowY: "auto", padding: "0 8px 8px" }}>
           {filtered.length === 0 && !isNewName ? (
             <div style={{ padding: "10px 12px", fontSize: 12, color: P.muted, textAlign: "center" }}>
               {empList.length === 0
@@ -838,23 +854,6 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
               );
             })
           )}
-        </div>
-
-        <div style={{ padding: "8px 12px 12px 12px", borderTop: `1px solid ${P.border}`, marginTop: 4 }}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowAddModal(true);
-            }}
-            style={{
-              width: "100%", background: "var(--app-accent)", color: "#fff", border: "none",
-              borderRadius: 8, padding: "8px 12px", fontSize: 13, fontWeight: 700,
-              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-              fontFamily: "inherit"
-            }}
-          >
-            <span>➕ Add New Employee</span>
-          </button>
         </div>
       </DD>
 
@@ -1550,7 +1549,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
   const [isCustomPriorityEditing, setIsCustomPriorityEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
   const id = task._id || task.id;
-  const sc = STATUS_CFG[task.status] || STATUS_CFG["Not Started"];
+  const sc = STATUS_CFG[task.status] || { bg: "#64748b", fg: "#fff" };
   const hcSet = hiddenCols || new Set();
   const cols = (extraCols || []).filter(c => !hcSet.has(c.id));
   const priorityVal = task.priority || "—";
@@ -1665,8 +1664,8 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
                   if (e.key === "Escape") setIsCustomEditing(false);
                 }}
                 style={{
-                  flex: 1, background: "transparent", border: "none", outline: "none",
-                  fontSize: 11, fontWeight: 800, color: "inherit", textAlign: "center",
+                  flex: 1, background: "#64748b", border: "none", outline: "none",
+                  fontSize: 11, fontWeight: 800, color: "#fff", textAlign: "center",
                   width: "100%", padding: "0 4px", fontFamily: "inherit"
                 }}
               />
@@ -1771,8 +1770,8 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
                   if (e.key === "Escape") setIsCustomPriorityEditing(false);
                 }}
                 style={{
-                  flex: 1, background: "transparent", border: "none", outline: "none",
-                  fontSize: 11, fontWeight: 800, color: "inherit", textAlign: "center",
+                  flex: 1, background: "#64748b", border: "none", outline: "none",
+                  fontSize: 11, fontWeight: 800, color: "#fff", textAlign: "center",
                   width: "100%", padding: "0 4px", fontFamily: "inherit"
                 }}
               />

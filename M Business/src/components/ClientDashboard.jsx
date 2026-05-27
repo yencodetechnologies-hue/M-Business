@@ -1178,7 +1178,7 @@ export default function ClientDashboard({ user, setUser }) {
   const fmt = (n) => n >= 100000 ? `₹${(n / 100000).toFixed(2)}L` : `₹${n.toLocaleString("en-IN")}`;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: THEME.bg, color: THEME.text, fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: THEME.bg, color: THEME.text, fontFamily: "'Outfit', sans-serif" }}>
       <style>{`
         :root {
           --app-accent: ${darkMode ? '#818cf8' : '#6366f1'};

@@ -580,13 +580,15 @@ export default function AuthPage({ setUser, initialTab = "register" }) {
               left: panelLeft,
               clipPath: panelClip,
               transform: panelTransform,
+              alignItems: "center",
+              textAlign: "center"
             }}
           >
         
             <h2 style={{ fontSize: 36, fontWeight: 900, lineHeight: 1.1, margin: "0 0 16px", color: "#fff" }}>
               WELCOME<br />BACK!
             </h2>
-            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.62)", lineHeight: 1.8, marginBottom: 30, maxWidth: 210 }}>
+            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.62)", lineHeight: 1.8, marginBottom: 30, maxWidth: 250 }}>
             Manage your workspace efficiently
             </p>
             {/* <button className="outline-btn" onClick={() => switchTab(isRegister ? "login" : "register")}>

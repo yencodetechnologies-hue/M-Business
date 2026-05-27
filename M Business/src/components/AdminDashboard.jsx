@@ -328,7 +328,7 @@ export default function AdminDashboard({ user, setUser }) {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: THEME.bg, fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: THEME.text }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: THEME.bg, fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif", color: THEME.text }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         :root {

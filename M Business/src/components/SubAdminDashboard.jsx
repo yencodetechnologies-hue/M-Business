@@ -3681,7 +3681,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const roleDisplay = user?.role || "Admin";
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}

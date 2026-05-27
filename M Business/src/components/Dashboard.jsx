@@ -1792,7 +1792,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "Your Business";
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc", fontFamily: T.fontDM }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#f8fafc", fontFamily: T.fontDM }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}

@@ -1,62 +1,36 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { BASE_URL } from "../config";
 
 // ── Color System (from image: dark navy + pink-purple gradient) ──
 const C = {
-  bg:       "#0a0a14",
-  surface:  "#10101e",
-  card:     "#13132a",
-  cardHov:  "#181830",
-  border:   "#ffffff0d",
+  bg:       "#0d0d1a",
+  surface:  "#12122b",
+  card:     "#1a1a35",
+  cardHov:  "#1f1f40",
+  border:   "#2a2a5020",
   borderHov:"#e91e9940",
-  // Gradients matching the image
+
   grad:     "linear-gradient(135deg,#e91e99,#7b2ff7)",
-  gradSoft: "linear-gradient(135deg,#e91e9930,#7b2ff730)",
+  gradSoft: "linear-gradient(135deg,#e91e9918,#7b2ff718)",
   gradText: "linear-gradient(135deg,#f472b6,#a78bfa)",
-  // Accents
+
   pink:     "#e91e99",
   purple:   "#7b2ff7",
   violet:   "#a855f7",
-  // Glow colors
+
   glowPink: "#e91e9930",
   glowPurp: "#7b2ff730",
-  // Text
+
   text:     "#ffffff",
-  muted:    "#c8c8e8",
-  dim:      "#8888aa",
-  // Status
+  muted:    "#a89cc8",
+  dim:      "#6655aa",
+
   green:    "#00e5a0",
   amber:    "#ffb547",
   red:      "#ff4d6d",
   blue:     "#4db8ff",
 };
-
-// ── Mock Data ─────────────────────────────────────────────────
-const MOCK_PROJECTS = [
-  { id:1, name:"Brand Redesign",       status:"In Progress", progress:68, budget:280000, spent:190000, deadline:"2026-06-20", tasks:12, done:8  },
-  { id:2, name:"Mobile App MVP",       status:"Active",      progress:41, budget:450000, spent:185000, deadline:"2026-08-10", tasks:18, done:7  },
-  { id:3, name:"SEO Overhaul",         status:"Completed",   progress:100,budget:95000,  spent:92000,  deadline:"2026-04-30", tasks:9,  done:9  },
-  { id:4, name:"Dashboard Analytics",  status:"On Hold",     progress:23, budget:160000, spent:37000,  deadline:"2026-09-01", tasks:14, done:3  },
-];
-const MOCK_PAYMENTS = [
-  { id:1, invoiceNo:"INV-2041", project:"Brand Redesign",       date:"2026-05-01", amount:95000,  status:"Paid",    due:"2026-05-15" },
-  { id:2, invoiceNo:"INV-2038", project:"Mobile App MVP",       date:"2026-04-18", amount:125000, status:"Overdue", due:"2026-05-05" },
-  { id:3, invoiceNo:"INV-2035", project:"SEO Overhaul",         date:"2026-04-01", amount:48000,  status:"Paid",    due:"2026-04-20" },
-  { id:4, invoiceNo:"INV-2052", project:"Dashboard Analytics",  date:"2026-05-20", amount:37000,  status:"Pending", due:"2026-06-05" },
-];
-const MOCK_TASKS = [
-  { id:1, title:"Wireframes Review",       project:"Brand Redesign",      status:"Done",        priority:"High",   due:"2026-05-20" },
-  { id:2, title:"API Integration",         project:"Mobile App MVP",       status:"In Progress", priority:"High",   due:"2026-06-10" },
-  { id:3, title:"Content Audit",           project:"SEO Overhaul",         status:"Done",        priority:"Medium", due:"2026-04-25" },
-  { id:4, title:"Keyword Mapping",         project:"SEO Overhaul",         status:"Done",        priority:"Low",    due:"2026-04-28" },
-  { id:5, title:"UI Component Library",    project:"Brand Redesign",       status:"In Progress", priority:"Medium", due:"2026-06-15" },
-  { id:6, title:"Performance Baseline",    project:"Dashboard Analytics",  status:"Pending",     priority:"High",   due:"2026-07-01" },
-];
-const MOCK_NOTIFS = [
-  { id:1, text:"Invoice INV-2038 is overdue by 22 days", type:"danger",  icon:"⚠️", time:"2h ago",   read:false },
-  { id:2, text:"Brand Redesign milestone reached — 68%",  type:"success", icon:"🎯", time:"5h ago",   read:false },
-  { id:3, text:"New proposal shared for your review",     type:"info",    icon:"📄", time:"Yesterday", read:true  },
-  { id:4, text:"Payment of ₹95,000 received",             type:"success", icon:"✅", time:"2d ago",   read:true  },
-];
 
 const NAV = [
   { key:"dashboard", icon:"ti-layout-dashboard", label:"Overview"  },
@@ -77,6 +51,11 @@ const STATUS = {
   "On Hold":    { bg:"#ffb54720", text:"#ffb547", dot:"#ffb547" },
   "Pending":    { bg:"#ffb54720", text:"#ffb547", dot:"#ffb547" },
   "Paid":       { bg:"#00e5a020", text:"#00e5a0", dot:"#00e5a0" },
+  "part_paid":  { bg:"#00e5a020", text:"#00e5a0", dot:"#00e5a0" },
+  "paid":       { bg:"#00e5a020", text:"#00e5a0", dot:"#00e5a0" },
+  "unpaid":     { bg:"#ffb54720", text:"#ffb547", dot:"#ffb547" },
+  "overdue":    { bg:"#ff4d6d20", text:"#ff4d6d", dot:"#ff4d6d" },
+  "draft":      { bg:"#7b2ff720", text:"#c084fc", dot:"#a855f7" },
   "Overdue":    { bg:"#ff4d6d20", text:"#ff4d6d", dot:"#ff4d6d" },
   "High":       { bg:"#ff4d6d20", text:"#ff4d6d", dot:"#ff4d6d" },
   "Medium":     { bg:"#7b2ff720", text:"#c084fc", dot:"#a855f7" },
@@ -84,17 +63,23 @@ const STATUS = {
 };
 const sc = (s) => STATUS[s] || { bg:"#ffffff08", text:"#c8c8e8", dot:"#8888bb" };
 
-const fmt = (n) => n >= 100000 ? `₹${(n/100000).toFixed(1)}L` : `₹${n.toLocaleString("en-IN")}`;
+const fmt = (n) => {
+  if (!n) return "₹0";
+  const num = Number(n);
+  return num >= 100000 ? `₹${(num/100000).toFixed(1)}L` : `₹${num.toLocaleString("en-IN")}`;
+};
 
 // ── Font + Icon Loader ────────────────────────────────────────
 function useAssets() {
   useEffect(() => {
     ["https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap",
-     "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/tabler-icons.min.css"
+     "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
     ].forEach(href => {
-      const l = document.createElement("link");
-      l.rel = "stylesheet"; l.href = href;
-      document.head.appendChild(l);
+      if (!document.querySelector(`link[href="${href}"]`)) {
+        const l = document.createElement("link");
+        l.rel = "stylesheet"; l.href = href;
+        document.head.appendChild(l);
+      }
     });
   }, []);
 }
@@ -113,12 +98,13 @@ function GlowOrb({ color, size, top, left, right, bottom, opacity=0.18 }) {
 // ── Status Badge ──────────────────────────────────────────────
 function Badge({ label }) {
   const c = sc(label);
+  const displayLabel = typeof label === 'string' ? (label.charAt(0).toUpperCase() + label.slice(1).replace('_', ' ')) : label;
   return (
     <span style={{ background:c.bg, color:c.text, fontSize:10, fontWeight:600,
       padding:"3px 10px", borderRadius:20, display:"inline-flex", alignItems:"center",
       gap:5, letterSpacing:0.3, whiteSpace:"nowrap", border:`1px solid ${c.dot}25` }}>
       <span style={{ width:5, height:5, borderRadius:"50%", background:c.dot }}/>
-      {label}
+      {displayLabel}
     </span>
   );
 }
@@ -147,7 +133,6 @@ function StatCard({ icon, label, value, sub, accent, onClick }) {
       style={{ background: h ? C.cardHov : C.card, border:`1px solid ${h ? accent+"50" : C.border}`,
         borderRadius:18, padding:"22px 20px", cursor:onClick?"pointer":"default",
         transition:"all 0.3s", position:"relative", overflow:"hidden" }}>
-      {/* Glow bg */}
       <div style={{ position:"absolute", top:-30, right:-30, width:100, height:100, borderRadius:"50%",
         background:`radial-gradient(circle,${accent}25,transparent 70%)`, pointerEvents:"none" }}/>
       <div style={{ width:40, height:40, borderRadius:12, background:`${accent}18`,
@@ -179,7 +164,18 @@ function GradBtn({ children, onClick, style: s }) {
 }
 
 // ── Sidebar ───────────────────────────────────────────────────
-function Sidebar({ active, setActive }) {
+function Sidebar({ active, setActive, user, setUser }) {
+  const displayName = user?.clientName || user?.name || "Client";
+  const initials = displayName.substring(0, 2).toUpperCase();
+
+  const handleLogout = () => {
+    if(setUser) setUser(null);
+    else {
+      localStorage.removeItem("user");
+      window.location.href = "/";
+    }
+  };
+
   return (
     <div style={{ width:230, background:C.surface, borderRight:`1px solid ${C.border}`,
       display:"flex", flexDirection:"column", height:"100vh", position:"sticky", top:0, flexShrink:0,
@@ -187,40 +183,22 @@ function Sidebar({ active, setActive }) {
       <GlowOrb color={C.pink} size={200} top={-80} left={-80} opacity={0.12}/>
       <GlowOrb color={C.purple} size={160} bottom={-60} right={-60} opacity={0.1}/>
 
-      {/* Logo */}
-      <div style={{ padding:"26px 22px 18px", borderBottom:`1px solid ${C.border}`, position:"relative", zIndex:1 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <div style={{ width:36, height:36, borderRadius:10, background:C.grad,
-            display:"flex", alignItems:"center", justifyContent:"center",
-            boxShadow:`0 0 16px ${C.glowPink}` }}>
-            <span style={{ fontSize:16, fontWeight:800, color:"#fff",
-              fontFamily:"'Space Grotesk'" }}>V</span>
-          </div>
-          <div>
-            <div style={{ fontSize:15, fontWeight:700, color:C.text,
-              fontFamily:"'Space Grotesk',sans-serif" }}>VentureFlow</div>
-            <div style={{ fontSize:9, color:C.pink, fontWeight:600, letterSpacing:1.5 }}>CLIENT PORTAL</div>
-          </div>
-        </div>
-      </div>
 
-      {/* User */}
       <div style={{ margin:"14px 14px 6px", background:C.card, borderRadius:14,
         padding:"14px", border:`1px solid ${C.border}`, position:"relative", zIndex:1 }}>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ width:38, height:38, borderRadius:10, background:C.grad,
             display:"flex", alignItems:"center", justifyContent:"center",
             fontSize:13, fontWeight:700, color:"#fff", fontFamily:"'Space Grotesk'",
-            boxShadow:`0 0 12px ${C.glowPurp}` }}>AM</div>
+            boxShadow:`0 0 12px ${C.glowPurp}` }}>{initials}</div>
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ fontSize:13, fontWeight:600, color:C.text,
-              whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>Arjun Mehta</div>
-            <div style={{ fontSize:9, color:C.violet, fontWeight:600, letterSpacing:0.8 }}>ENTERPRISE PLAN</div>
+              whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{displayName}</div>
+            <div style={{ fontSize:9, color:C.violet, fontWeight:600, letterSpacing:0.8 }}>CLIENT</div>
           </div>
         </div>
       </div>
 
-      {/* Nav */}
       <nav style={{ flex:1, padding:"8px 10px", overflowY:"auto", position:"relative", zIndex:1 }}>
         <div style={{ fontSize:8, color:"#9999cc", fontWeight:700, letterSpacing:2,
           padding:"6px 10px 4px" }}>MAIN MENU</div>
@@ -247,9 +225,8 @@ function Sidebar({ active, setActive }) {
         })}
       </nav>
 
-      {/* Logout */}
       <div style={{ padding:"14px 10px 20px", borderTop:`1px solid ${C.border}`, position:"relative", zIndex:1 }}>
-        <button style={{ width:"100%", display:"flex", alignItems:"center", gap:10,
+        <button onClick={handleLogout} style={{ width:"100%", display:"flex", alignItems:"center", gap:10,
           padding:"11px 14px", background:"transparent", border:"none", borderRadius:12,
           color:"#ff4d6d80", fontSize:13, cursor:"pointer", fontFamily:"inherit",
           transition:"all 0.2s" }}
@@ -264,10 +241,13 @@ function Sidebar({ active, setActive }) {
 }
 
 // ── Topbar ─────────────────────────────────────────────────────
-function Topbar({ active, notifs }) {
-  const unread = notifs.filter(n=>!n.read).length;
+function Topbar({ active, notifs, user }) {
+  const unread = notifs.filter(n=>!n.isRead).length;
   const label = NAV.find(n=>n.key===active)?.label || "Overview";
   const day = new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"});
+  const displayName = user?.clientName || user?.name || "Client";
+  const initials = displayName.substring(0, 2).toUpperCase();
+
   return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
       padding:"18px 28px", borderBottom:`1px solid ${C.border}`, background:C.bg,
@@ -278,14 +258,12 @@ function Topbar({ active, notifs }) {
         <div style={{ fontSize:11, color:"#b8b8dd", marginTop:1 }}>{day}</div>
       </div>
       <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-        {/* Search */}
         <div style={{ display:"flex", alignItems:"center", gap:8, background:C.card,
           border:`1px solid ${C.border}`, borderRadius:10, padding:"8px 14px" }}>
           <i className="ti ti-search" style={{ fontSize:14, color:"#a0a0c8" }}/>
           <input placeholder="Search…" style={{ background:"none", border:"none", outline:"none",
             fontSize:13, color:"#dcdcff", fontFamily:"inherit", width:150 }}/>
         </div>
-        {/* Bell */}
         <div style={{ position:"relative" }}>
           <button style={{ width:40, height:40, borderRadius:10, background:C.card,
             border:`1px solid ${C.border}`, cursor:"pointer",
@@ -298,27 +276,34 @@ function Topbar({ active, notifs }) {
             alignItems:"center", justifyContent:"center", border:`2px solid ${C.bg}`,
             boxShadow:`0 0 8px ${C.glowPink}` }}>{unread}</span>}
         </div>
-        {/* Avatar */}
         <div style={{ width:40, height:40, borderRadius:10, background:C.grad,
           display:"flex", alignItems:"center", justifyContent:"center",
           fontSize:13, fontWeight:700, color:"#fff", fontFamily:"'Space Grotesk'",
-          boxShadow:`0 0 14px ${C.glowPurp}` }}>AM</div>
+          boxShadow:`0 0 14px ${C.glowPurp}` }}>{initials}</div>
       </div>
     </div>
   );
 }
 
 // ── Dashboard Page ────────────────────────────────────────────
-function DashboardPage() {
-  const totalInvoiced = MOCK_PAYMENTS.reduce((s,p)=>s+p.amount,0);
-  const totalPaid     = MOCK_PAYMENTS.filter(p=>p.status==="Paid").reduce((s,p)=>s+p.amount,0);
-  const totalOverdue  = MOCK_PAYMENTS.filter(p=>p.status==="Overdue").reduce((s,p)=>s+p.amount,0);
-  const activeProj    = MOCK_PROJECTS.filter(p=>p.status!=="Completed").length;
+function DashboardPage({ user, projects, invoices, tasks, notifs, setActive }) {
+  const totalInvoiced = invoices.reduce((s,p)=>s+p.total,0);
+  const totalPaid     = invoices.filter(p=>p.status==="paid").reduce((s,p)=>s+p.total,0);
+  const totalOverdue  = invoices.filter(p=>p.status==="overdue").reduce((s,p)=>s+p.total,0);
+  const activeProj    = projects.filter(p=>p.status!=="Completed").length;
+
+  const getRelativeTime = (dateStr) => {
+    if(!dateStr) return "";
+    const d = new Date(dateStr);
+    const diff = Math.floor((new Date() - d) / 1000);
+    if(diff < 60) return `${diff}s ago`;
+    if(diff < 3600) return `${Math.floor(diff/60)}m ago`;
+    if(diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+    return `${Math.floor(diff/86400)}d ago`;
+  };
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
-
-      {/* Welcome Banner */}
       <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:22,
         padding:"28px 30px", position:"relative", overflow:"hidden" }}>
         <GlowOrb color={C.pink}   size={300} top={-100} right={-50}  opacity={0.2}/>
@@ -326,18 +311,18 @@ function DashboardPage() {
         <div style={{ position:"relative", zIndex:1 }}>
           <div style={{ fontSize:10, color:C.pink, fontWeight:700, letterSpacing:2, marginBottom:8 }}>WELCOME BACK</div>
           <div style={{ fontSize:26, fontWeight:700, color:C.text,
-            fontFamily:"'Space Grotesk',sans-serif", marginBottom:6 }}>Arjun Mehta 👋</div>
+            fontFamily:"'Space Grotesk',sans-serif", marginBottom:6 }}>{user?.clientName || user?.name || "Client"} 👋</div>
           <div style={{ fontSize:13, color:"#dcdcff", maxWidth:480, lineHeight:1.6 }}>
             You have{" "}
-            <span style={{ color:C.red, fontWeight:600 }}>1 overdue invoice</span> and{" "}
+            <span style={{ color:C.red, fontWeight:600 }}>{invoices.filter(i => i.status === 'overdue').length} overdue invoices</span> and{" "}
             <span style={{ background:C.gradText, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", fontWeight:600 }}>
-              {MOCK_TASKS.filter(t=>t.status!=="Done").length} active tasks
+              {tasks.filter(t=>t.status!=="Done").length} active tasks
             </span>{" "}awaiting attention.
           </div>
           <div style={{ display:"flex", gap:10, marginTop:18, flexWrap:"wrap" }}>
             <span style={{ fontSize:11, background:C.gradSoft, color:C.pink,
               border:`1px solid ${C.pink}30`, padding:"5px 14px", borderRadius:20, fontWeight:600 }}>
-              Enterprise Plan</span>
+              Client Portal</span>
             <span style={{ fontSize:11, background:"#00e5a015", color:C.green,
               border:`1px solid ${C.green}30`, padding:"5px 14px", borderRadius:20, fontWeight:600 }}>
               {activeProj} Active Projects</span>
@@ -345,35 +330,32 @@ function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
-        <StatCard icon="ti-cash"            label="Total Invoiced" value={fmt(totalInvoiced)} sub="All time"         accent={C.pink}   />
-        <StatCard icon="ti-circle-check"    label="Total Paid"     value={fmt(totalPaid)}     sub={`${MOCK_PAYMENTS.filter(p=>p.status==="Paid").length} invoices`} accent={C.green}  />
-        <StatCard icon="ti-alert-triangle"  label="Overdue"        value={fmt(totalOverdue)}  sub="Needs attention"  accent={C.red}    />
-        <StatCard icon="ti-layout-kanban"   label="Active Projects" value={String(activeProj)} sub={`of ${MOCK_PROJECTS.length} total`} accent={C.violet} />
+        <StatCard icon="ti-cash"            label="Total Invoiced" value={fmt(totalInvoiced)} sub="All time"         accent={C.pink} onClick={() => setActive("payments")}  />
+        <StatCard icon="ti-circle-check"    label="Total Paid"     value={fmt(totalPaid)}     sub={`${invoices.filter(p=>p.status==="paid").length} invoices`} accent={C.green} onClick={() => setActive("payments")} />
+        <StatCard icon="ti-alert-triangle"  label="Overdue"        value={fmt(totalOverdue)}  sub="Needs attention"  accent={C.red} onClick={() => setActive("payments")}   />
+        <StatCard icon="ti-layout-kanban"   label="Active Projects" value={String(activeProj)} sub={`of ${projects.length} total`} accent={C.violet} onClick={() => setActive("projects")} />
       </div>
 
-      {/* Middle */}
       <div style={{ display:"grid", gridTemplateColumns:"1.5fr 1fr", gap:18 }}>
-
-        {/* Projects */}
         <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, padding:24, position:"relative", overflow:"hidden" }}>
           <GlowOrb color={C.purple} size={200} bottom={-60} right={-60} opacity={0.1}/>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20, position:"relative", zIndex:1 }}>
             <div style={{ fontSize:14, fontWeight:700, color:C.text, fontFamily:"'Space Grotesk'" }}>Project Progress</div>
-            <button style={{ fontSize:11, color:C.pink, background:"none", border:"none",
+            <button onClick={() => setActive("projects")} style={{ fontSize:11, color:C.pink, background:"none", border:"none",
               cursor:"pointer", fontFamily:"inherit", fontWeight:600 }}>View All →</button>
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:16, position:"relative", zIndex:1 }}>
-            {MOCK_PROJECTS.map(p => {
-              const col = p.status==="Completed"?C.green : p.status==="On Hold"?C.amber : p.progress>60?C.pink:C.violet;
+            {projects.slice(0, 4).map(p => {
+              const progress = p.progress || 0;
+              const col = p.status==="Completed"?C.green : p.status==="On Hold"?C.amber : progress>60?C.pink:C.violet;
               return (
-                <div key={p.id} style={{ display:"flex", alignItems:"center", gap:14 }}>
+                <div key={p._id} style={{ display:"flex", alignItems:"center", gap:14 }}>
                   <div style={{ position:"relative", flexShrink:0 }}>
-                    <Ring pct={p.progress} size={50} color={col}/>
+                    <Ring pct={progress} size={50} color={col}/>
                     <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center",
                       justifyContent:"center", fontSize:10, fontWeight:700, color:col,
-                      fontFamily:"'Space Grotesk'" }}>{p.progress}%</div>
+                      fontFamily:"'Space Grotesk'" }}>{progress}%</div>
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
@@ -382,64 +364,64 @@ function DashboardPage() {
                       <Badge label={p.status}/>
                     </div>
                     <div style={{ height:4, background:"#2a2a4a", borderRadius:99, overflow:"hidden" }}>
-                      <div style={{ width:`${p.progress}%`, height:"100%", borderRadius:99,
+                      <div style={{ width:`${progress}%`, height:"100%", borderRadius:99,
                         background:`linear-gradient(90deg,${col},${col}bb)`,
                         boxShadow:`0 0 8px ${col}60`, transition:"width 1s ease" }}/>
                     </div>
-                    <div style={{ fontSize:10, color:"#dcdcff", marginTop:4 }}>Tasks {p.done}/{p.tasks} · Deadline {p.deadline}</div>
+                    <div style={{ fontSize:10, color:"#dcdcff", marginTop:4 }}>Tasks {p.completedTasks || 0}/{p.tasks || 0} · Deadline {p.deadline || "N/A"}</div>
                   </div>
                 </div>
               );
             })}
+            {projects.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", marginTop: 20 }}>No projects found.</div>}
           </div>
         </div>
 
-        {/* Notifications */}
         <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, padding:24, position:"relative", overflow:"hidden" }}>
           <GlowOrb color={C.pink} size={160} top={-50} right={-50} opacity={0.1}/>
           <div style={{ fontSize:14, fontWeight:700, color:C.text,
             fontFamily:"'Space Grotesk'", marginBottom:18, position:"relative", zIndex:1 }}>Recent Alerts</div>
           <div style={{ display:"flex", flexDirection:"column", gap:10, position:"relative", zIndex:1 }}>
-            {MOCK_NOTIFS.map(n => {
+            {notifs.slice(0, 5).map(n => {
               const tc = { danger:C.red, success:C.green, info:C.blue, warning:C.amber };
               const col = tc[n.type]||C.muted;
               return (
-                <div key={n.id} style={{ display:"flex", gap:10, padding:"12px 14px",
-                  background: n.read ? "transparent" : `${col}0d`,
-                  borderRadius:12, border:`1px solid ${n.read ? C.border : col+"30"}`,
+                <div key={n._id} style={{ display:"flex", gap:10, padding:"12px 14px",
+                  background: n.isRead ? "transparent" : `${col}0d`,
+                  borderRadius:12, border:`1px solid ${n.isRead ? C.border : col+"30"}`,
                   alignItems:"flex-start" }}>
                   <div style={{ width:32, height:32, borderRadius:10, background:`${col}18`,
                     display:"flex", alignItems:"center", justifyContent:"center",
-                    fontSize:15, flexShrink:0 }}>{n.icon}</div>
+                    fontSize:15, flexShrink:0 }}>{n.icon || "🔔"}</div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:12, fontWeight: n.read?400:600,
-                      color: n.read?C.muted:C.text, lineHeight:1.4 }}>{n.text}</div>
-                    <div style={{ fontSize:10, color:"#a0a0c8", marginTop:3 }}>{n.time}</div>
+                    <div style={{ fontSize:12, fontWeight: n.isRead?400:600,
+                      color: n.isRead?C.muted:C.text, lineHeight:1.4 }}>{n.text}</div>
+                    <div style={{ fontSize:10, color:"#a0a0c8", marginTop:3 }}>{getRelativeTime(n.createdAt)}</div>
                   </div>
-                  {!n.read && <div style={{ width:6, height:6, borderRadius:"50%", background:col,
+                  {!n.isRead && <div style={{ width:6, height:6, borderRadius:"50%", background:col,
                     boxShadow:`0 0 6px ${col}`, flexShrink:0, marginTop:4 }}/>}
                 </div>
               );
             })}
+            {notifs.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", marginTop: 20 }}>No new alerts.</div>}
           </div>
         </div>
       </div>
 
-      {/* Transactions */}
       <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, padding:24, position:"relative", overflow:"hidden" }}>
         <GlowOrb color={C.purple} size={250} bottom={-80} right={-80} opacity={0.08}/>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20, position:"relative", zIndex:1 }}>
           <div style={{ fontSize:14, fontWeight:700, color:C.text, fontFamily:"'Space Grotesk'" }}>Recent Transactions</div>
-          <GradBtn>View All</GradBtn>
+          <GradBtn onClick={() => setActive("payments")}>View All</GradBtn>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 100px",
           padding:"8px 12px", fontSize:9, fontWeight:700, color:"#ffffff", letterSpacing:1.3,
           textTransform:"uppercase", borderBottom:`1px solid ${C.border}`, marginBottom:4, position:"relative", zIndex:1 }}>
           <span>Project</span><span>Invoice</span><span>Date</span><span>Amount</span><span>Status</span>
         </div>
-        {MOCK_PAYMENTS.map((p,i)=>(
-          <div key={p.id} style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 100px",
-            padding:"14px 12px", borderBottom: i<MOCK_PAYMENTS.length-1?`1px solid ${C.border}`:"none",
+        {invoices.slice(0, 5).map((p,i)=>(
+          <div key={p._id || p.id} style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 100px",
+            padding:"14px 12px", borderBottom: i<Math.min(invoices.length, 5)-1?`1px solid ${C.border}`:"none",
             alignItems:"center", borderRadius:10, transition:"background 0.15s", cursor:"pointer",
             position:"relative", zIndex:1 }}
             onMouseEnter={e=>e.currentTarget.style.background=C.surface}
@@ -448,47 +430,53 @@ function DashboardPage() {
               <div style={{ width:32, height:32, borderRadius:8, background:C.gradSoft,
                 border:`1px solid ${C.pink}30`, display:"flex", alignItems:"center",
                 justifyContent:"center", fontSize:11, fontWeight:700, color:C.pink,
-                fontFamily:"'Space Grotesk'" }}>{p.project.slice(0,2).toUpperCase()}</div>
-              <span style={{ fontSize:13, fontWeight:500, color:C.text }}>{p.project}</span>
+                fontFamily:"'Space Grotesk'" }}>{(p.project || "PR").slice(0,2).toUpperCase()}</div>
+              <span style={{ fontSize:13, fontWeight:500, color:C.text }}>{p.project || "N/A"}</span>
             </div>
             <span style={{ fontSize:11, color:"#dcdcff" }}>{p.invoiceNo}</span>
             <span style={{ fontSize:11, color:"#dcdcff" }}>{p.date}</span>
-            <span style={{ fontSize:13, fontWeight:700, color:C.text, fontFamily:"'Space Grotesk'" }}>{fmt(p.amount)}</span>
+            <span style={{ fontSize:13, fontWeight:700, color:C.text, fontFamily:"'Space Grotesk'" }}>{fmt(p.total)}</span>
             <Badge label={p.status}/>
           </div>
         ))}
+        {invoices.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", marginTop: 20 }}>No transactions found.</div>}
       </div>
     </div>
   );
 }
 
 // ── Projects Page ─────────────────────────────────────────────
-function ProjectsPage() {
+function ProjectsPage({ projects }) {
+  const [filter, setFilter] = useState("All");
+  const shown = filter==="All" ? projects : projects.filter(p=>p.status===filter);
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <div style={{ fontSize:13, color:"#e0e0ff" }}>{MOCK_PROJECTS.length} projects total</div>
+        <div style={{ fontSize:13, color:"#e0e0ff" }}>{projects.length} projects total</div>
         <div style={{ display:"flex", gap:8 }}>
           {["All","Active","Completed","On Hold"].map((f,i)=>(
-            <button key={f} style={{ padding:"6px 14px", background:i===0?C.gradSoft:"transparent",
-              border:`1px solid ${i===0?C.pink+"50":C.border}`, borderRadius:8,
-              color:i===0?C.pink:C.muted, fontSize:11, cursor:"pointer", fontFamily:"inherit",
-              fontWeight:i===0?600:400 }}>{f}</button>
+            <button key={f} onClick={() => setFilter(f)} style={{ padding:"6px 14px", background:filter===f?C.gradSoft:"transparent",
+              border:`1px solid ${filter===f?C.pink+"50":C.border}`, borderRadius:8,
+              color:filter===f?C.pink:C.muted, fontSize:11, cursor:"pointer", fontFamily:"inherit",
+              fontWeight:filter===f?600:400 }}>{f}</button>
           ))}
         </div>
       </div>
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-        {MOCK_PROJECTS.map(p=>{
-          const bpct = Math.round((p.spent/p.budget)*100);
-          const isOver = p.spent>p.budget;
-          const col = p.status==="Completed"?C.green:p.status==="On Hold"?C.amber:p.progress>60?C.pink:C.violet;
+        {shown.map(p=>{
+          const budget = parseFloat(String(p.budget).replace(/[^0-9.-]+/g,"")) || 0;
+          const spent = p.spent || (budget * (p.progress || 0) / 100);
+          const bpct = budget > 0 ? Math.round((spent/budget)*100) : 0;
+          const isOver = spent>budget;
+          const progress = p.progress || 0;
+          const col = p.status==="Completed"?C.green:p.status==="On Hold"?C.amber:progress>60?C.pink:C.violet;
           return (
-            <div key={p.id} style={{ background:C.card, border:`1px solid ${C.border}`,
+            <div key={p._id} style={{ background:C.card, border:`1px solid ${C.border}`,
               borderRadius:20, padding:24, position:"relative", overflow:"hidden",
               transition:"border-color 0.2s, transform 0.2s" }}
               onMouseEnter={e=>{e.currentTarget.style.borderColor=col+"50";e.currentTarget.style.transform="translateY(-3px)";}}
               onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border;e.currentTarget.style.transform="";}}>
-              {/* Top glow strip */}
               <div style={{ position:"absolute", top:0, left:0, right:0, height:2,
                 background:`linear-gradient(90deg,transparent,${col},transparent)`,
                 boxShadow:`0 0 12px ${col}` }}/>
@@ -499,33 +487,31 @@ function ProjectsPage() {
                   <div style={{ fontSize:16, fontWeight:700, color:C.text,
                     fontFamily:"'Space Grotesk'", marginBottom:4 }}>{p.name}</div>
                   <div style={{ fontSize:11, color:"#dcdcff", display:"flex", alignItems:"center", gap:4 }}>
-                    <i className="ti ti-calendar" style={{ fontSize:12 }}/>{p.deadline}
+                    <i className="ti ti-calendar" style={{ fontSize:12 }}/>{p.deadline || "No deadline"}
                   </div>
                 </div>
                 <Badge label={p.status}/>
               </div>
 
-              {/* Progress */}
               <div style={{ marginBottom:18, position:"relative", zIndex:1 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
                   <span style={{ fontSize:11, color:"#dcdcff" }}>Completion</span>
                   <span style={{ fontSize:13, fontWeight:700, color:col,
-                    fontFamily:"'Space Grotesk'", textShadow:`0 0 8px ${col}` }}>{p.progress}%</span>
+                    fontFamily:"'Space Grotesk'", textShadow:`0 0 8px ${col}` }}>{progress}%</span>
                 </div>
                 <div style={{ height:6, background:"#2a2a4a", borderRadius:99, overflow:"hidden" }}>
-                  <div style={{ width:`${p.progress}%`, height:"100%", borderRadius:99,
+                  <div style={{ width:`${progress}%`, height:"100%", borderRadius:99,
                     background:`linear-gradient(90deg,${C.pink},${C.purple})`,
                     boxShadow:`0 0 10px ${C.glowPink}` }}/>
                 </div>
               </div>
 
-              {/* Metrics */}
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8,
                 marginBottom:14, position:"relative", zIndex:1 }}>
                 {[
-                  { l:"Budget", v:fmt(p.budget), c:C.pink   },
-                  { l:"Spent",  v:fmt(p.spent),  c:isOver?C.red:C.text },
-                  { l:"Tasks",  v:`${p.done}/${p.tasks}`, c:p.done===p.tasks?C.green:C.text },
+                  { l:"Budget", v:fmt(budget), c:C.pink   },
+                  { l:"Spent (Est)",  v:fmt(spent),  c:isOver?C.red:C.text },
+                  { l:"Tasks",  v:`${p.completedTasks || 0}/${p.tasks || 0}`, c:(p.completedTasks === p.tasks && p.tasks > 0)?C.green:C.text },
                 ].map(m=>(
                   <div key={m.l} style={{ background:C.surface, borderRadius:10,
                     padding:"10px 12px", border:`1px solid ${C.border}` }}>
@@ -537,7 +523,6 @@ function ProjectsPage() {
                 ))}
               </div>
 
-              {/* Budget bar */}
               <div style={{ position:"relative", zIndex:1 }}>
                 <div style={{ display:"flex", justifyContent:"space-between",
                   fontSize:9, color:"#c8c8ee", marginBottom:4, letterSpacing:0.5 }}>
@@ -553,14 +538,16 @@ function ProjectsPage() {
           );
         })}
       </div>
+      {shown.length === 0 && <div style={{ fontSize: 14, color: C.muted, textAlign: "center", marginTop: 40 }}>No projects found.</div>}
     </div>
   );
 }
 
 // ── Tasks Page ────────────────────────────────────────────────
-function TasksPage() {
+function TasksPage({ tasks }) {
   const [filter, setFilter] = useState("All");
-  const shown = filter==="All" ? MOCK_TASKS : MOCK_TASKS.filter(t=>t.status===filter);
+  const shown = filter==="All" ? tasks : tasks.filter(t=>t.status===filter || (filter === "Done" && t.status === "Completed") || (filter === "Pending" && t.status === "Not Started"));
+  
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
       <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
@@ -570,7 +557,7 @@ function TasksPage() {
               border:`1px solid ${filter===f?C.pink+"50":C.border}`, borderRadius:10,
               color:filter===f?C.pink:C.muted, fontSize:12, fontWeight:filter===f?700:400,
               cursor:"pointer", fontFamily:"inherit" }}>
-            {f} <span style={{ opacity:0.5 }}>({f==="All"?MOCK_TASKS.length:MOCK_TASKS.filter(t=>t.status===f).length})</span>
+            {f} <span style={{ opacity:0.5 }}>({f==="All"?tasks.length:tasks.filter(t=>t.status===f || (f === "Done" && t.status === "Completed") || (f === "Pending" && t.status === "Not Started")).length})</span>
           </button>
         ))}
       </div>
@@ -582,38 +569,40 @@ function TasksPage() {
           <span>Task</span><span>Project</span><span>Priority</span><span>Due</span><span>Status</span>
         </div>
         {shown.map((t,i)=>(
-          <div key={t.id} style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 110px",
+          <div key={t._id} style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 110px",
             padding:"16px 20px", borderBottom:i<shown.length-1?`1px solid ${C.border}`:"none",
             alignItems:"center", transition:"background 0.15s", cursor:"pointer", position:"relative", zIndex:1 }}
             onMouseEnter={e=>e.currentTarget.style.background=C.surface}
             onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
             <div style={{ display:"flex", alignItems:"center", gap:10 }}>
               <div style={{ width:20, height:20, borderRadius:6,
-                border:`1.5px solid ${t.status==="Done"?C.green:C.dim}`,
-                background:t.status==="Done"?`${C.green}20`:"transparent",
+                border:`1.5px solid ${t.status==="Done" || t.status==="Completed"?C.green:C.dim}`,
+                background:t.status==="Done" || t.status==="Completed"?`${C.green}20`:"transparent",
                 display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                {t.status==="Done" && <i className="ti ti-check" style={{ fontSize:11, color:C.green }}/>}
+                {(t.status==="Done" || t.status==="Completed") && <i className="ti ti-check" style={{ fontSize:11, color:C.green }}/>}
               </div>
-              <span style={{ fontSize:13, fontWeight:500, color:t.status==="Done"?C.muted:C.text,
-                textDecoration:t.status==="Done"?"line-through":"none" }}>{t.title}</span>
+              <span style={{ fontSize:13, fontWeight:500, color:(t.status==="Done" || t.status==="Completed")?C.muted:C.text,
+                textDecoration:(t.status==="Done" || t.status==="Completed")?"line-through":"none" }}>{t.title}</span>
             </div>
-            <span style={{ fontSize:12, color:"#dcdcff" }}>{t.project}</span>
-            <Badge label={t.priority}/>
-            <span style={{ fontSize:12, color:"#dcdcff" }}>{t.due}</span>
-            <Badge label={t.status}/>
+            <span style={{ fontSize:12, color:"#dcdcff" }}>{t.project || "General"}</span>
+            <Badge label={t.priority || "Medium"}/>
+            <span style={{ fontSize:12, color:"#dcdcff" }}>{t.date || t.dueDate || "N/A"}</span>
+            <Badge label={t.status || "Pending"}/>
           </div>
         ))}
+        {shown.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", padding: 20 }}>No tasks found.</div>}
       </div>
     </div>
   );
 }
 
 // ── Payments Page ─────────────────────────────────────────────
-function PaymentsPage() {
-  const totalInvoiced = MOCK_PAYMENTS.reduce((s,p)=>s+p.amount,0);
-  const totalPaid     = MOCK_PAYMENTS.filter(p=>p.status==="Paid").reduce((s,p)=>s+p.amount,0);
-  const totalOverdue  = MOCK_PAYMENTS.filter(p=>p.status==="Overdue").reduce((s,p)=>s+p.amount,0);
-  const totalPending  = MOCK_PAYMENTS.filter(p=>p.status==="Pending").reduce((s,p)=>s+p.amount,0);
+function PaymentsPage({ invoices }) {
+  const totalInvoiced = invoices.reduce((s,p)=>s+p.total,0);
+  const totalPaid     = invoices.filter(p=>p.status==="paid").reduce((s,p)=>s+p.total,0);
+  const totalOverdue  = invoices.filter(p=>p.status==="overdue").reduce((s,p)=>s+p.total,0);
+  const totalPending  = invoices.filter(p=>p.status==="unpaid" || p.status==="draft" || p.status==="sent").reduce((s,p)=>s+p.total,0);
+  
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:22 }}>
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
@@ -627,27 +616,27 @@ function PaymentsPage() {
         <div style={{ fontSize:14, fontWeight:700, color:C.text,
           fontFamily:"'Space Grotesk'", marginBottom:20, position:"relative", zIndex:1 }}>Payment History</div>
         <div style={{ display:"flex", flexDirection:"column", gap:10, position:"relative", zIndex:1 }}>
-          {MOCK_PAYMENTS.map(inv=>{
+          {invoices.map(inv=>{
             const c = sc(inv.status);
-            const isOvd = inv.status==="Overdue";
+            const isOvd = inv.status==="overdue";
             return (
-              <div key={inv.id} style={{ display:"flex", alignItems:"center", gap:16,
+              <div key={inv._id || inv.id} style={{ display:"flex", alignItems:"center", gap:16,
                 padding:"18px 20px", background:C.surface, borderRadius:14,
                 border:`1px solid ${isOvd?C.red+"30":C.border}`, transition:"all 0.2s" }}
                 onMouseEnter={e=>{e.currentTarget.style.borderColor=C.pink+"40";e.currentTarget.style.background=C.card;}}
                 onMouseLeave={e=>{e.currentTarget.style.borderColor=isOvd?C.red+"30":C.border;e.currentTarget.style.background=C.surface;}}>
                 <div style={{ width:46, height:46, borderRadius:12, background:c.bg,
                   display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <i className={inv.status==="Paid"?"ti ti-receipt":isOvd?"ti ti-alert-triangle":"ti ti-clock"}
+                  <i className={inv.status==="paid"?"ti ti-receipt":isOvd?"ti ti-alert-triangle":"ti ti-clock"}
                     style={{ fontSize:18, color:c.text, filter:`drop-shadow(0 0 5px ${c.dot})` }}/>
                 </div>
                 <div style={{ flex:1 }}>
                   <div style={{ fontSize:14, fontWeight:600, color:C.text }}>{inv.invoiceNo}</div>
-                  <div style={{ fontSize:11, color:"#dcdcff" }}>{inv.project} · Due {inv.due}</div>
+                  <div style={{ fontSize:11, color:"#dcdcff" }}>{inv.project || "N/A"} · Due {inv.dueDate || "N/A"}</div>
                 </div>
                 <div style={{ textAlign:"right", marginRight:14 }}>
                   <div style={{ fontSize:16, fontWeight:700, color:C.text,
-                    fontFamily:"'Space Grotesk'" }}>{fmt(inv.amount)}</div>
+                    fontFamily:"'Space Grotesk'" }}>{fmt(inv.total)}</div>
                   <div style={{ fontSize:10, color:"#a0a0c8" }}>{inv.date}</div>
                 </div>
                 <Badge label={inv.status}/>
@@ -661,6 +650,7 @@ function PaymentsPage() {
               </div>
             );
           })}
+          {invoices.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", padding: 20 }}>No invoices found.</div>}
         </div>
       </div>
     </div>
@@ -687,9 +677,47 @@ function PlaceholderPage({ icon, title, sub }) {
 }
 
 // ── Main ──────────────────────────────────────────────────────
-export default function ClientDashboard() {
+export default function ClientDashboard({ user, setUser }) {
   useAssets();
   const [active, setActive] = useState("dashboard");
+  const [projects, setProjects] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [notifs, setNotifs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    const clientName = user.clientName || user.name;
+    const fetchAll = async () => {
+      try {
+        const [projRes, taskRes, invRes, notifRes] = await Promise.all([
+          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`)
+        ]);
+        setProjects(projRes.data || []);
+        setTasks(taskRes.data || []);
+        setInvoices(invRes.data || []);
+        setNotifs(notifRes.data || []);
+      } catch (err) {
+        console.error("Failed to fetch dashboard data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAll();
+  }, [user]);
 
   const CSS = `
     *{box-sizing:border-box;margin:0;padding:0;}
@@ -702,19 +730,23 @@ export default function ClientDashboard() {
     .pg{animation:fadeUp 0.35s ease forwards;}
   `;
 
+  if (loading) {
+    return <div style={{ display: 'flex', height: '100vh', background: C.bg, alignItems: 'center', justifyContent: 'center', color: C.text }}>Loading dashboard...</div>;
+  }
+
   return (
     <div style={{ display:"flex", height:"100vh", overflow:"hidden",
       background:C.bg, fontFamily:"'Plus Jakarta Sans',sans-serif", color:C.text }}>
       <style>{CSS}</style>
-      <Sidebar active={active} setActive={setActive}/>
+      <Sidebar active={active} setActive={setActive} user={user} setUser={setUser}/>
       <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0, overflow:"hidden" }}>
-        <Topbar active={active} notifs={MOCK_NOTIFS}/>
+        <Topbar active={active} notifs={notifs} user={user} />
         <div key={active} className="pg"
           style={{ flex:1, overflowY:"auto", padding:"26px 30px" }}>
-          {active==="dashboard" && <DashboardPage/>}
-          {active==="projects"  && <ProjectsPage/>}
-          {active==="tasks"     && <TasksPage/>}
-          {active==="payments"  && <PaymentsPage/>}
+          {active==="dashboard" && <DashboardPage user={user} projects={projects} invoices={invoices} tasks={tasks} notifs={notifs} setActive={setActive} />}
+          {active==="projects"  && <ProjectsPage projects={projects} />}
+          {active==="tasks"     && <TasksPage tasks={tasks} />}
+          {active==="payments"  && <PaymentsPage invoices={invoices} />}
           {active==="calendar"  && <PlaceholderPage icon="ti-calendar"       title="Business Calendar" sub="Deadlines, meetings, and milestones — all in one view."/>}
           {active==="messages"  && <PlaceholderPage icon="ti-message-circle" title="Messages"          sub="Communicate directly with your project team."/>}
           {active==="reports"   && <PlaceholderPage icon="ti-chart-bar"      title="Reports"           sub="Detailed financial and project performance analytics."/>}

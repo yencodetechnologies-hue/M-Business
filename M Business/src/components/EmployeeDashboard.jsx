@@ -231,7 +231,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
             const on = active === n.key;
             return (
               <button key={n.key} onClick={() => { setActive(n.key); onClose(); }}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", background: on ? "rgba(255,255,255,0.1)" : "transparent", border: on ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent", borderRadius: 10, color: on ? "#fff" : "rgba(255,255,255,0.45)", fontWeight: on ? 700 : 500, fontSize: 13, cursor: "pointer", marginBottom: 3, textAlign: "left", fontFamily: "inherit", transition: "all 0.18s" }}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", background: on ? "rgba(255,255,255,0.1)" : "transparent", border: on ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent", borderRadius: 10, color: on ? "#fff" : "rgba(255,255,255,0.45)", fontWeight: on ? 900 : 700, fontSize: 13, cursor: "pointer", marginBottom: 3, textAlign: "left", fontFamily: "inherit", transition: "all 0.18s" }}
                 onMouseEnter={e => { if (!on) { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; } }}
                 onMouseLeave={e => { if (!on) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.45)"; } }}>
                 <span style={{ fontSize: 15, opacity: on ? 1 : 0.5, minWidth: 18, textAlign: "center" }}>{n.icon}</span>
@@ -1479,7 +1479,7 @@ export default function EmployeeDashboard({ user, setUser }) {
   const handleToggleTask = async (task) => {
     try {
       const newStatus = ["done", "completed"].includes((task.status || "").toLowerCase()) ? "Pending" : "Done";
-      await axios.patch(`${BASE_URL}/api/tasks/${task._id}/status`, { status: newStatus });
+      await axios.put(`${BASE_URL}/api/tasks/${task._id}`, { status: newStatus });
       setTasks(prev => prev.map(t => t._id === task._id ? { ...t, status: newStatus } : t));
       notify(`Task marked as ${newStatus}`);
     } catch (err) {

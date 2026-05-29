@@ -258,12 +258,7 @@ function Topbar({ active, notifs, user }) {
         <div style={{ fontSize:11, color:"#b8b8dd", marginTop:1 }}>{day}</div>
       </div>
       <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:8, background:C.card,
-          border:`1px solid ${C.border}`, borderRadius:10, padding:"8px 14px" }}>
-          <i className="ti ti-search" style={{ fontSize:14, color:"#a0a0c8" }}/>
-          <input placeholder="Search…" style={{ background:"none", border:"none", outline:"none",
-            fontSize:13, color:"#dcdcff", fontFamily:"inherit", width:150 }}/>
-        </div>
+      
         <div style={{ position:"relative" }}>
           <button style={{ width:40, height:40, borderRadius:10, background:C.card,
             border:`1px solid ${C.border}`, cursor:"pointer",

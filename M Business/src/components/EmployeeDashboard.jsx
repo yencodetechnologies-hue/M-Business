@@ -16,19 +16,28 @@ const BASE = "/api/employee-dashboard";
 
 // ── DESIGN TOKENS ────────────────────────────────────────────
 const T = {
-  bg: "#f7f7f7",
-  surface: "#ffffff",
-  sidebar: "#111111",
-  sidebarActive: "rgba(255,255,255,0.1)",
-  sidebarText: "rgba(255,255,255,0.5)",
+  // ── BACKGROUNDS ──────────────────────────────────────────
+  bg: "#f5f0ff",                    // soft lavender page bg
+  surface: "#ffffff",               // white cards
+  sidebar: "linear-gradient(180deg, #e8a0d0 0%, #c084e8 40%, #9b6fd4 70%, #7c5cbf 100%)",  // pink→purple gradient
+  sidebarActive: "rgba(255,255,255,0.22)",
+  sidebarText: "rgba(255,255,255,0.65)",
   sidebarTextActive: "#ffffff",
-  border: "#ebebeb",
-  borderDark: "#d4d4d4",
-  text: "#111111",
-  textMuted: "#888888",
-  textFaint: "#bbbbbb",
-  accent: "#111111",
-  accentLight: "#f0f0f0",
+
+  // ── BORDERS ──────────────────────────────────────────────
+  border: "#ece5f8",
+  borderDark: "#d4c4f0",
+
+  // ── TEXT ─────────────────────────────────────────────────
+  text: "#2d1b69",                  // deep purple text
+  textMuted: "#7c6b9e",
+  textFaint: "#b8aad4",
+
+  // ── ACCENT ───────────────────────────────────────────────
+  accent: "#9b6fd4",                // main purple
+  accentLight: "#f0e8ff",
+
+  // ── STATUS (unchanged) ───────────────────────────────────
   success: "#16a34a",
   successBg: "#f0fdf4",
   successBorder: "#bbf7d0",
@@ -41,12 +50,14 @@ const T = {
   info: "#2563eb",
   infoBg: "#eff6ff",
   infoBorder: "#bfdbfe",
+
+  // ── SHAPE ────────────────────────────────────────────────
   radius: "14px",
   radiusSm: "9px",
   radiusLg: "20px",
-  shadow: "0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-  shadowMd: "0 4px 16px rgba(0,0,0,0.08)",
-  shadowLg: "0 12px 32px rgba(0,0,0,0.10)",
+  shadow: "0 1px 4px rgba(155,111,212,0.08), 0 1px 2px rgba(155,111,212,0.05)",
+  shadowMd: "0 4px 16px rgba(155,111,212,0.14)",
+  shadowLg: "0 12px 32px rgba(155,111,212,0.18)",
 };
 
 const sc = (s) => ({
@@ -621,7 +632,7 @@ function TasksPage({ tasks, onToggle }) {
             return (
               <div key={t._id || i} style={{ background: T.bg, borderRadius: T.radiusSm, border: `1px solid ${isOpen ? T.accent : T.border}`, overflow: "hidden", transition: "border-color 0.18s" }}>
                 <div style={{ padding: "13px 14px", display: "flex", alignItems: "flex-start", gap: 12 }}>
-                  <div 
+                  <div
                     onClick={(e) => { e.stopPropagation(); if (onToggle) onToggle(t); }}
                     style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${t._isDone ? T.success : T.borderDark}`, background: t._isDone ? T.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1, cursor: "pointer", transition: "all 0.2s" }}>
                     {t._isDone && <span style={{ color: "#fff", fontSize: 10, fontWeight: 900 }}>✓</span>}
@@ -1648,8 +1659,9 @@ export default function EmployeeDashboard({ user, setUser }) {
             )}
             {page === "messaging" && <MessagingPage user={resolvedUser} />}
             {page === "settings" && (
-              <SettingsPage 
+              <SettingsPage
                 user={resolvedUser}
+                THEME={T}
                 triggerCrop={triggerCrop}
                 onProfileUpdate={(updates) => {
                   const updated = { ...resolvedUser, ...updates };
@@ -1661,7 +1673,7 @@ export default function EmployeeDashboard({ user, setUser }) {
           </div>
         </div>
 
-        <EmployeeProfilePanel empName={empName} user={resolvedUser} notify={notify} onDocStatusChange={handleDocStatusChange} forceOpen={profileOpen} onClose={() => setProfileOpen(false)} />
+        <EmployeeProfilePanel empName={empName} user={resolvedUser} notify={notify} onDocStatusChange={handleDocStatusChange} forceOpen={profileOpen} onClose={() => setProfileOpen(false)} THEME={T} />
         <Toast msg={toast} type={toastType} />
 
         {accountAuthOpen && (
@@ -1671,11 +1683,11 @@ export default function EmployeeDashboard({ user, setUser }) {
           </div>
         )}
         {showCropModal && (
-          <ImageCropModal 
-            image={cropImage} 
-            aspect={cropAspect} 
-            onComplete={handleCropComplete} 
-            onClose={() => setShowCropModal(false)} 
+          <ImageCropModal
+            image={cropImage}
+            aspect={cropAspect}
+            onComplete={handleCropComplete}
+            onClose={() => setShowCropModal(false)}
           />
         )}
       </div>

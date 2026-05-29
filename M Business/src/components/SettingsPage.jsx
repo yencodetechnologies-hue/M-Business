@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
+function hexToRgb(hex) {
+  if (!hex || !hex.startsWith('#')) return "124, 58, 237";
+  const bigint = parseInt(hex.replace(/^#/, ''), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `${r}, ${g}, ${b}`;
+}
+
 // ─────────────────────────────────────────────────────────────
 //  Reusable Components
 // ─────────────────────────────────────────────────────────────
@@ -100,7 +109,7 @@ const AddInput = ({ onAdd, placeholder }) => {
 // ─────────────────────────────────────────────────────────────
 //  Main Settings Component
 // ─────────────────────────────────────────────────────────────
-export default function SettingsPage({ user, appTheme, setAppTheme, themes, customColor, setCustomColor, onLogoChange, triggerCrop, onProfileUpdate }) {
+export default function SettingsPage({ user, appTheme, setAppTheme, themes, customColor, setCustomColor, onLogoChange, triggerCrop, onProfileUpdate, THEME }) {
   const companyId = user?._id || user?.id;
   const [activeTab, setActiveTab] = useState("profile");
   const [config, setConfig] = useState(null);
@@ -269,8 +278,20 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   const initials = (user?.companyName || user?.name || "AD").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const roleLabel = (user?.role || "SubAdmin").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 
+  const wrapperStyle = THEME ? {
+    "--app-bg": THEME.bg || "var(--app-bg)",
+    "--app-card": THEME.surface || THEME.card || "var(--app-card)",
+    "--app-border": THEME.border || "var(--app-border)",
+    "--app-text": THEME.text || "var(--app-text)",
+    "--app-muted": THEME.textMuted || THEME.muted || "var(--app-muted)",
+    "--app-accent": THEME.accent || THEME.pink || "var(--app-accent)",
+    "--app-accent-rgb": THEME.accent ? hexToRgb(THEME.accent) : THEME.pink ? hexToRgb(THEME.pink) : "124, 58, 237",
+    "--app-accent-gradient": THEME.sidebar || THEME.grad || THEME.accent || THEME.pink || "var(--app-accent-gradient)",
+    maxWidth: 1400, margin: "0 auto", padding: "20px"
+  } : { maxWidth: 1400, margin: "0 auto", padding: "20px" };
+
   return (
-    <div style={{ maxWidth: 1400, margin: "0 auto", padding: "20px" }}>
+    <div style={wrapperStyle}>
       {/* Toast Notification */}
       {toast && (
         <div style={{

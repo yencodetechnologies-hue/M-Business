@@ -13,33 +13,32 @@ import AdminProposalManagement from "./AdminProposalManagement";
 
 const THEME_MAP = {
   light: {
-    bg: "#f8fafc",
+    bg: "#f5f3ff",
     sidebar: "#ffffff",
     card: "#ffffff",
-    surface: "#f1f5f9",
-    text: "#0f172a",
-    muted: "#64748b",
-    border: "#e2e8f0",
-    accent: "#3b82f6",
-    accentSecondary: "#10b981",
-    shadow: "0 10px 25px rgba(0,0,0,0.03)",
-    gradient: "linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%)",
+    surface: "#f5f3ff",
+    text: "#1e1b4b",
+    muted: "#6b7280",
+    border: "#ede9fe",
+    accent: "#7c3aed",
+    accentSecondary: "#a78bfa",
+    shadow: "0 10px 25px rgba(124,58,237,0.06)",
+    gradient: "linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)",
   },
   dark: {
-    bg: "#0f172a",
-    sidebar: "#1e293b",
-    card: "#1e293b",
-    surface: "rgba(255,255,255,0.05)",
-    text: "#f8fafc",
-    muted: "#94a3b8",
-    border: "#334155",
-    accent: "#6366f1",
-    accentSecondary: "#10b981",
+    bg: "#0a1628",           // deep navy page background
+    sidebar: "#0d1b2a",      // slightly lighter navy sidebar
+    card: "#112240",         // card surface
+    surface: "#0d1b2a",      // inner surface / table headers
+    text: "#e2e8f0",         // soft white text
+    muted: "#94a3b8",        // muted blue-gray
+    border: "#1e3a5f",       // dark navy border
+    accent: "#38bdf8",       // sky blue accent
+    accentSecondary: "#34d399", // teal green secondary
     shadow: "0 10px 30px rgba(0,0,0,0.4)",
-    gradient: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
+    gradient: "linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)",
   }
 };
-
 const sc = (s) => ({
   Active: "#22C55E",
   Inactive: "#EF4444",
@@ -107,7 +106,76 @@ export default function AdminDashboard({ user, setUser }) {
   const [tasks, setTasks] = useState([]);
   const [pkgError, setPkgError] = useState({});
 
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("adminDarkMode") === "true");
+const [darkMode, setDarkMode] = useState(
+  () => localStorage.getItem("empDarkMode") === "true"
+);
+const T = darkMode ? {
+  bg: "#0a1628",
+  surface: "#112240",
+  sidebar: "#0d1b2a",
+  sidebarActive: "rgba(56,189,248,0.12)",
+  sidebarText: "rgba(255,255,255,0.45)",
+  sidebarTextActive: "#38bdf8",
+  border: "#1e3a5f",
+  borderDark: "#2a4a7f",
+  text: "#e2e8f0",
+  textMuted: "#94a3b8",
+  textFaint: "#4a6fa5",
+  accent: "#38bdf8",
+  accentLight: "rgba(56,189,248,0.1)",
+  success: "#34d399",
+  successBg: "rgba(52,211,153,0.1)",
+  successBorder: "rgba(52,211,153,0.25)",
+  warning: "#fbbf24",
+  warningBg: "rgba(251,191,36,0.1)",
+  warningBorder: "rgba(251,191,36,0.25)",
+  danger: "#f87171",
+  dangerBg: "rgba(248,113,113,0.1)",
+  dangerBorder: "rgba(248,113,113,0.25)",
+  info: "#38bdf8",
+  infoBg: "rgba(56,189,248,0.1)",
+  infoBorder: "rgba(56,189,248,0.25)",
+  radius: "14px",
+  radiusSm: "9px",
+  radiusLg: "20px",
+  shadow: "0 1px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
+  shadowMd: "0 4px 16px rgba(0,0,0,0.35)",
+  shadowLg: "0 12px 32px rgba(0,0,0,0.4)",
+} : {
+  // உங்கள் existing light T object இங்கே
+  bg: "#f5f3ff",
+  surface: "#ffffff",
+  sidebar: "#ffffff",
+  sidebarActive: "rgba(124,58,237,0.08)",
+  sidebarText: "#94a3b8",
+  sidebarTextActive: "#7c3aed",
+  border: "#ede9fe",
+  borderDark: "#ddd6fe",
+  text: "#1e1b4b",
+  textMuted: "#6b7280",
+  textFaint: "#a5b4fc",
+  accent: "#7c3aed",
+  accentLight: "#f5f3ff",
+  success: "#16a34a",
+  successBg: "#f0fdf4",
+  successBorder: "#bbf7d0",
+  warning: "#b45309",
+  warningBg: "#fffbeb",
+  warningBorder: "#fde68a",
+  danger: "#dc2626",
+  dangerBg: "#fef2f2",
+  dangerBorder: "#fecaca",
+  info: "#7c3aed",
+  infoBg: "#f5f3ff",
+  infoBorder: "#ddd6fe",
+  radius: "14px",
+  radiusSm: "9px",
+  radiusLg: "20px",
+  shadow: "0 1px 4px rgba(124,58,237,0.06)",
+  shadowMd: "0 4px 16px rgba(124,58,237,0.10)",
+  shadowLg: "0 12px 32px rgba(124,58,237,0.13)",
+};
+
   const THEME = darkMode ? THEME_MAP.dark : THEME_MAP.light;
 
   useEffect(() => {
@@ -297,7 +365,6 @@ export default function AdminDashboard({ user, setUser }) {
     });
     setModal("package_add");
   };
-
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
@@ -385,10 +452,30 @@ export default function AdminDashboard({ user, setUser }) {
         </nav>
 
         <div style={{ padding: "20px 16px", borderTop: `1px solid ${THEME.border}` }}>
-          <div onClick={() => setDarkMode(!darkMode)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)", padding: "12px 16px", borderRadius: 14, cursor: "pointer", marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: darkMode ? "rgba(255,255,255,0.6)" : "#64748b" }}>Dark Mode</div>
-            <div style={{ width: 36, height: 20, background: darkMode ? "#10b981" : "#e2e8f0", borderRadius: 20, position: "relative", transition: "0.3s" }}>
-              <div style={{ width: 14, height: 14, background: "#fff", borderRadius: "50%", position: "absolute", top: 3, left: darkMode ? 19 : 3, transition: "0.3s" }} />
+          <div onClick={() => {
+            setDarkMode(v => {
+              localStorage.setItem("empDarkMode", !v);
+              return !v;
+            });
+          }} style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "10px 14px", borderRadius: T.radiusSm, cursor: "pointer",
+            background: darkMode ? "rgba(56,189,248,0.08)" : "rgba(0,0,0,0.03)",
+            marginBottom: 12
+          }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>
+              {darkMode ? "🌙 Dark Mode" : "☀️ Light Mode"}
+            </span>
+            <div style={{
+              width: 36, height: 20,
+              background: darkMode ? "#38bdf8" : "#e2e8f0",
+              borderRadius: 20, position: "relative", transition: "0.3s"
+            }}>
+              <div style={{
+                width: 14, height: 14, background: "#fff", borderRadius: "50%",
+                position: "absolute", top: 3,
+                left: darkMode ? 19 : 3, transition: "0.3s"
+              }} />
             </div>
           </div>
           <button onClick={handleLogout} style={{ width: "100%", background: "rgba(239,68,68,0.1)", border: "none", borderRadius: 12, padding: "12px", color: "#f87171", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>🚪 Logout</button>
@@ -810,8 +897,7 @@ function OverviewPage({ THEME, subadmins, clients, employees, managers, projects
             cursor: "pointer"
           }}>
             <div style={{
-              width: 54, height: 54, borderRadius: 16, background: s.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: s.iconColor, flexShrink: 0,
-              boxShadow: `0 8px 16px ${s.iconBg}`
+              width: 54, height: 54, borderRadius: 16, background: s.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: s.iconColor, flexShrink: 0
             }}>
               {s.icon}
             </div>

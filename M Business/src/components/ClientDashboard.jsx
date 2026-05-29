@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import SettingsPage from "./SettingsPage";
 
 // ── Color System (from image: dark navy + pink-purple gradient) ──
 const C = {
@@ -745,7 +746,7 @@ export default function ClientDashboard({ user, setUser }) {
           {active==="calendar"  && <PlaceholderPage icon="ti-calendar"       title="Business Calendar" sub="Deadlines, meetings, and milestones — all in one view."/>}
           {active==="messages"  && <PlaceholderPage icon="ti-message-circle" title="Messages"          sub="Communicate directly with your project team."/>}
           {active==="reports"   && <PlaceholderPage icon="ti-chart-bar"      title="Reports"           sub="Detailed financial and project performance analytics."/>}
-          {active==="settings"  && <PlaceholderPage icon="ti-settings"       title="Settings"          sub="Manage your account, notifications and preferences."/>}
+          {active==="settings"  && <SettingsPage user={user} THEME={C} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; if (setUser) setUser(updated); localStorage.setItem("user", JSON.stringify(updated)); }} />}
         </div>
       </div>
     </div>

@@ -30,7 +30,7 @@ const formatCurrency = (amount, currency = "₹", compact = false, disableCompac
   const sym = currency || "₹";
   const num = Number(amount) || 0;
   const absNum = Math.abs(num);
-  
+
   if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
     try {
       const formatter = new Intl.NumberFormat('en-IN', {
@@ -43,7 +43,7 @@ const formatCurrency = (amount, currency = "₹", compact = false, disableCompac
       // Fallback
     }
   }
-  
+
   return sym + (/[A-Za-z]/.test(sym) ? " " : "") + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 const TRACKING_SEED = [{ id: "PRJ001", name: "Website Redesign", client: "TechNova Pvt Ltd", deadline: "2024-05-30", pct: 65, status: "In Progress", note: "Design done, dev ongoing" }, { id: "PRJ002", name: "Mobile App Dev", client: "Bloom Creatives", deadline: "2024-08-15", pct: 15, status: "Pending", note: "Requirements gathering" }, { id: "PRJ003", name: "ERP Integration", client: "Infra Solutions", deadline: "2024-04-30", pct: 100, status: "Completed", note: "Signed off by Company Name" }];
@@ -537,7 +537,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
       {editClient && (
         <Mdl title="Edit Company" onClose={() => setEditClient(null)}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-            <div 
+            <div
               onClick={() => {
                 const input = document.createElement('input');
                 input.type = 'file';
@@ -545,8 +545,8 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                 input.onchange = (e) => triggerCrop(e, (croppedImage) => setEditForm(p => ({ ...p, logoUrl: croppedImage })), 1);
                 input.click();
               }}
-              style={{ 
-                position: "relative", 
+              style={{
+                position: "relative",
                 cursor: "pointer",
                 width: "auto",
                 height: "auto",
@@ -556,10 +556,10 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                 alignItems: "center"
               }}
             >
-              <div style={{ 
-                padding: editForm.logoUrl ? 4 : 24, 
-                borderRadius: 20, 
-                background: "#fff", 
+              <div style={{
+                padding: editForm.logoUrl ? 4 : 24,
+                borderRadius: 20,
+                background: "#fff",
                 border: "2.5px dashed var(--app-border)",
                 display: "flex",
                 alignItems: "center",
@@ -571,18 +571,18 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                 transition: "all 0.3s ease"
               }}>
                 {editForm.logoUrl ? (
-                  <img 
-                    src={editForm.logoUrl} 
-                    alt="Logo" 
-                    style={{ 
-                      width: "auto", 
-                      height: "auto", 
-                      maxWidth: "240px", 
-                      maxHeight: "120px", 
+                  <img
+                    src={editForm.logoUrl}
+                    alt="Logo"
+                    style={{
+                      width: "auto",
+                      height: "auto",
+                      maxWidth: "240px",
+                      maxHeight: "120px",
                       objectFit: "contain",
                       display: "block",
                       borderRadius: 12
-                    }} 
+                    }}
                   />
                 ) : (
                   <div style={{ textAlign: "center" }}>
@@ -591,11 +591,11 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                   </div>
                 )}
               </div>
-              <div style={{ 
-                position: "absolute", bottom: -10, right: -10, 
-                width: 36, height: 36, borderRadius: "50%", 
-                background: "var(--app-accent)", color: "#fff", 
-                display: "flex", alignItems: "center", justifyContent: "center", 
+              <div style={{
+                position: "absolute", bottom: -10, right: -10,
+                width: 36, height: 36, borderRadius: "50%",
+                background: "var(--app-accent)", color: "#fff",
+                display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
                 border: "3px solid #fff"
               }}>📷</div>
@@ -1155,10 +1155,10 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
   const filtered = subadmins.filter(s => (s.name || "").toLowerCase().includes(search.toLowerCase()) || (s.email || "").toLowerCase().includes(search.toLowerCase()));
 
   const openEdit = (s) => {
-    setEditForm({ 
-      name: s.name || "", 
-      email: s.email || "", 
-      phone: s.phone || "", 
+    setEditForm({
+      name: s.name || "",
+      email: s.email || "",
+      phone: s.phone || "",
       status: s.status || "Active",
       clientLimit: s.clientLimit || "",
       employeeLimit: s.employeeLimit || ""
@@ -2379,10 +2379,10 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
     return (
       <button
         data-nav-key={n.key}
-        onClick={() => { 
+        onClick={() => {
           if (n.key === "tasks") setSelectedProjectForTasks(null);
-          setActive(n.key); 
-          onClose(); 
+          setActive(n.key);
+          onClose();
         }}
         style={{
           width: "100%",
@@ -2504,7 +2504,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
       border: `1.5px solid ${THEME.border}`
     }}>
       <div style={{ position: "absolute", top: -100, right: -100, width: 300, height: 300, background: `${THEME.accent}05`, borderRadius: "50%", filter: "blur(60px)" }} />
-      
+
       <div style={{ textAlign: "center", marginBottom: 44, position: "relative", zIndex: 1 }}>
         <div style={{ display: "inline-block", padding: "6px 16px", background: `${THEME.accent}12`, borderRadius: 100, color: THEME.accent, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 14 }}>💎 Choose Plan</div>
         <h1 style={{ fontSize: 34, fontWeight: 900, color: "#1e1b4b", margin: "0 0 10px", letterSpacing: "-1px", lineHeight: 1 }}>Choose your Plan</h1>
@@ -2517,16 +2517,16 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "#94a3b8", marginBottom: 8 }}>No Packages Available</h2>
         </div>
       ) : (
-        <div style={{ 
-          display: "flex", 
-          flexWrap: "wrap", 
-          justifyContent: "center", 
-          gap: 32, 
-          maxWidth: 1200, 
-          margin: "0 auto", 
-          position: "relative", 
-          zIndex: 1, 
-          width: "100%" 
+        <div style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 32,
+          maxWidth: 1200,
+          margin: "0 auto",
+          position: "relative",
+          zIndex: 1,
+          width: "100%"
         }}>
           {displayedPackages.map((p, idx) => {
             const isPro = (p.title || "").toLowerCase().includes("pro") || (p.title || "").toLowerCase().includes("premium") || idx === 1;
@@ -2537,42 +2537,42 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
                 style={{
                   background: "#fff",
                   border: isPro ? `2px solid ${THEME.accent}` : `1.5px solid ${THEME.border}`,
-                  borderRadius: 24, 
-                  padding: "32px 24px", 
+                  borderRadius: 24,
+                  padding: "32px 24px",
                   position: "relative",
                   width: "100%",
                   maxWidth: 320,
                   boxShadow: isPro ? `0 15px 40px ${THEME.accent}12` : "0 8px 24px rgba(0,0,0,0.03)",
-                  display: "flex", 
-                  flexDirection: "column", 
+                  display: "flex",
+                  flexDirection: "column",
                   transition: "all 0.2s ease"
                 }}
                 onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
                 onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
               >
                 {isPro && (
-                  <div style={{ 
-                    position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", 
-                    background: THEME.accent, color: "#fff", padding: "4px 16px", borderRadius: 100, 
+                  <div style={{
+                    position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)",
+                    background: THEME.accent, color: "#fff", padding: "4px 16px", borderRadius: 100,
                     fontSize: 9, fontWeight: 900, letterSpacing: 1, textTransform: "uppercase",
                     boxShadow: `0 4px 12px ${THEME.accent}40`, zIndex: 2
                   }}>POPULAR</div>
                 )}
-                
+
                 <div style={{ width: 48, height: 48, borderRadius: 14, background: `${THEME.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, marginBottom: 20 }}>{p.icon || "🚀"}</div>
-                
+
                 <div style={{ fontSize: 20, fontWeight: 900, color: "#1e1b4b", marginBottom: 4, letterSpacing: "-0.4px" }}>{p.title}</div>
                 <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 20, fontWeight: 700, textTransform: "uppercase" }}>Monthly Plan</div>
-                
+
                 <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
                   <span style={{ fontSize: 42, fontWeight: 900, color: "#1e1b4b", lineHeight: 1, letterSpacing: "-2px" }}>
                     {p.type === "free" ? "Free" : p.price ? `₹${parseFloat(p.price).toLocaleString("en-IN")}` : "Custom"}
                   </span>
                   {p.price > 0 && <span style={{ fontSize: 13, color: "#94a3b8", marginBottom: 6, fontWeight: 600 }}>/mo</span>}
                 </div>
-                
+
                 <div style={{ height: 1, background: "#f1f5f9", margin: "20px 0" }} />
-                
+
                 <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1, marginBottom: 24 }}>
                   {features.map((f, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -2581,15 +2581,15 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
                     </div>
                   ))}
                 </div>
-                
-                <button 
-                  onClick={() => onSubscribe(p)} 
-                  style={{ 
-                    width: "100%", padding: "12px", borderRadius: 12, fontSize: 14, 
-                    fontWeight: 800, cursor: "pointer", transition: "all 0.15s", 
-                    fontFamily: "inherit", 
-                    background: isPro ? THEME.accent : "#f8fafc", 
-                    border: isPro ? "none" : `1.5px solid ${THEME.border}`, 
+
+                <button
+                  onClick={() => onSubscribe(p)}
+                  style={{
+                    width: "100%", padding: "12px", borderRadius: 12, fontSize: 14,
+                    fontWeight: 800, cursor: "pointer", transition: "all 0.15s",
+                    fontFamily: "inherit",
+                    background: isPro ? THEME.accent : "#f8fafc",
+                    border: isPro ? "none" : `1.5px solid ${THEME.border}`,
                     color: isPro ? "#fff" : "#1e1b4b"
                   }}
                   onMouseEnter={e => {
@@ -3445,7 +3445,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setProjSaveLoading(true);
       const res = await axios.post(BASE_URL + "/api/projects/add", np);
       await fetchProjects();
-      
+
       // Notify assigned employees
       if (np.assignedTo && np.assignedTo.length > 0) {
         notifyAssigned(res.data._id, np.name, np.assignedTo);
@@ -3766,7 +3766,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div>
               <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: T.text }}>{page?.icon} {page?.label}</h1>
             </div>
-            <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 ,fontSize:"14px"}}>
+            <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, fontSize: "14px" }}>
               {validActive === "clients" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
@@ -4296,6 +4296,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "settings" && (
             <SettingsPage
               user={user}
+              THEME={T}
               appTheme={appTheme}
               setAppTheme={setAppTheme}
               themes={THEMES}
@@ -4306,7 +4307,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               onProfileUpdate={(updates) => {
                 const updated = { ...user, ...updates };
                 setUser(updated);
-                try { localStorage.setItem("user", JSON.stringify(updated)); } catch {}
+                try { localStorage.setItem("user", JSON.stringify(updated)); } catch { }
               }}
             />
           )}
@@ -4425,43 +4426,43 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             >
               <span style={{ fontSize: 14 }}>👤</span> Profile
             </button>
-            {(isAdmin || 
-              user?.businessLimit?.toLowerCase().includes("multiple") || 
+            {(isAdmin ||
+              user?.businessLimit?.toLowerCase().includes("multiple") ||
               user?.businessLimit?.toLowerCase().includes("unlimited") ||
               subscription?.businessLimit?.toLowerCase().includes("multiple") ||
               subscription?.businessLimit?.toLowerCase().includes("unlimited") ||
               subscription?.features?.some(f => f.toLowerCase().includes("multiple")) ||
-              packages.some(p => p.assignedSubadmins?.includes(user?.id || user?._id) && 
-                (p.businessLimit?.toLowerCase().includes("multiple") || 
-                 p.features?.some(f => f.toLowerCase().includes("multiple"))))
-              ) && (
-              <button
-                onClick={() => {
-                  setProfileDropdownOpen(false);
-                  setAccountAuthTab("login");
-                  setAccountAuthOpen(true);
-                }}
-                style={{
-                  width: "100%",
-                  background: "none",
-                  border: "none",
-                  padding: "10px 14px",
-                  cursor: "pointer",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  fontFamily: "inherit",
-                  color: T.text,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  borderTop: "1px solid #f8fafc",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-              >
-                <span style={{ fontSize: 14 }}>➕</span> Add account
-              </button>
-            )}
+              packages.some(p => p.assignedSubadmins?.includes(user?.id || user?._id) &&
+                (p.businessLimit?.toLowerCase().includes("multiple") ||
+                  p.features?.some(f => f.toLowerCase().includes("multiple"))))
+            ) && (
+                <button
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    setAccountAuthTab("login");
+                    setAccountAuthOpen(true);
+                  }}
+                  style={{
+                    width: "100%",
+                    background: "none",
+                    border: "none",
+                    padding: "10px 14px",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    fontFamily: "inherit",
+                    color: T.text,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    borderTop: "1px solid #f8fafc",
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                >
+                  <span style={{ fontSize: 14 }}>➕</span> Add account
+                </button>
+              )}
             <button
               onClick={() => {
                 setProfileDropdownOpen(false);
@@ -4587,7 +4588,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         ) : (
           <>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-              <div 
+              <div
                 onClick={() => {
                   const input = document.createElement('input');
                   input.type = 'file';
@@ -4595,8 +4596,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   input.onchange = (e) => triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
                   input.click();
                 }}
-                style={{ 
-                  position: "relative", 
+                style={{
+                  position: "relative",
                   cursor: "pointer",
                   width: "auto",
                   height: "auto",
@@ -4606,10 +4607,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   alignItems: "center"
                 }}
               >
-                <div style={{ 
-                  padding: nc.logoUrl ? 4 : 24, 
-                  borderRadius: 20, 
-                  background: "#fff", 
+                <div style={{
+                  padding: nc.logoUrl ? 4 : 24,
+                  borderRadius: 20,
+                  background: "#fff",
                   border: "2.5px dashed var(--app-border)",
                   display: "flex",
                   alignItems: "center",
@@ -4621,18 +4622,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   transition: "all 0.3s ease"
                 }}>
                   {nc.logoUrl ? (
-                    <img 
-                      src={nc.logoUrl} 
-                      alt="Logo" 
-                      style={{ 
-                        width: "auto", 
-                        height: "auto", 
-                        maxWidth: "240px", 
-                        maxHeight: "120px", 
+                    <img
+                      src={nc.logoUrl}
+                      alt="Logo"
+                      style={{
+                        width: "auto",
+                        height: "auto",
+                        maxWidth: "240px",
+                        maxHeight: "120px",
                         objectFit: "contain",
                         display: "block",
                         borderRadius: 12
-                      }} 
+                      }}
                     />
                   ) : (
                     <div style={{ textAlign: "center" }}>
@@ -4641,11 +4642,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                   )}
                 </div>
-                <div style={{ 
-                  position: "absolute", bottom: -10, right: -10, 
-                  width: 36, height: 36, borderRadius: "50%", 
-                  background: "var(--app-accent)", color: "#fff", 
-                  display: "flex", alignItems: "center", justifyContent: "center", 
+                <div style={{
+                  position: "absolute", bottom: -10, right: -10,
+                  width: 36, height: 36, borderRadius: "50%",
+                  background: "var(--app-accent)", color: "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
                   border: "3px solid #fff"
                 }}>📷</div>
@@ -4784,17 +4785,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
             <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 0 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400 }}></span></label>
-            <button 
-              onClick={async () => { 
+            <button
+              onClick={async () => {
                 await fetchSubscription();
                 const limit = getSubscriptionLimit("employee");
                 if (subscription && employees.length >= limit) {
                   setLimitModal({ type: "employee", limit });
                   return;
                 }
-                setReturnToModal(modal); 
-                setModal("employee"); 
-              }} 
+                setReturnToModal(modal);
+                setModal("employee");
+              }}
               style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
             >
               <span style={{ fontSize: 14 }}>+</span> Add Employee

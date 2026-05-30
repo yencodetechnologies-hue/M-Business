@@ -83,16 +83,20 @@ const getDaysLeft = (endDate) => {
 const getStatusColor = (s) => ({ active: T.success, completed: T.success, paid: T.success, cancelled: T.danger, expired: T.danger, failed: T.danger, pending: T.warning, refunded: T.warning }[s?.toLowerCase()] || T.muted);
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function MySubscriptions({ user, onSubscriptionSuccess }) {
+export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview" }) {
   const [subscription, setSubscription] = useState(null);
   const [payments, setPayments] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [quotations, setQuotations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [payLoading, setPayLoading] = useState(null); // plan name being processed
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [viewPayment, setViewPayment] = useState(null);
   const [viewInvoice, setViewInvoice] = useState(null);
+  
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
   const [toast, setToast] = useState("");
   const [mockGatewayOpen, setMockGatewayOpen] = useState(null);
   const [paymentSuccessData, setPaymentSuccessData] = useState(null);
@@ -110,8 +114,16 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
       setLoading(true);
       // Fetch subscription first (this triggers retroactive trial invoice creation if needed)
       const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${userId}`);
-      if (subRes.data.hasSubscription) setSubscription(subRes.data.subscription);
-      else setSubscription(null);
+      if (subRes.data.hasSubscription) {
+        const sub = subRes.data.subscription;
+        setSubscription(sub);
+        const days = getDaysLeft(sub.endDate);
+        if (sub.status === "hidden" || sub.status === "expired" || (days !== null && days <= 10)) {
+          setActiveTab("upgrade");
+        }
+      } else {
+        setSubscription(null);
+      }
 
       // Now fetch payments
       let payRes = await axios.get(`${BASE_URL}/api/subscriptions/payments/${userId}`);
@@ -534,23 +546,27 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
   const isExpiredOver60 = subscription.status === "hidden" || (subscription.status === "expired" && daysSinceExpiry > 60);
 
   if (isExpiredOver60) {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, gap: 20, textAlign: "center", padding: 40 }}>
-        <div style={{ fontSize: 60 }}>🔒</div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: 0 }}>Subscription Access Restricted</h2>
-        <p style={{ color: "#64748b", fontSize: 14, maxWidth: 420, lineHeight: 1.7, margin: 0 }}>
-          Your subscription expired {daysSinceExpiry} days ago. Access has been restricted. Please contact your administrator to renew your plan.
-        </p>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-          <a href={`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`} style={{ display: "inline-block", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>
-            📧 Contact Administrator
-          </a>
-          <a href="tel:+919876543210" style={{ display: "inline-block", background: "#f1f5f9", color: "var(--app-sidebar)", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "1.5px solid #e2e8f0" }}>
-            📞 Call Support
-          </a>
+    if (activeTab === "upgrade") {
+      // Allow them to see the upgrade tab to renew
+    } else {
+      return (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, gap: 20, textAlign: "center", padding: 40 }}>
+          <div style={{ fontSize: 60 }}>🔒</div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: 0 }}>Subscription Access Restricted</h2>
+          <p style={{ color: "#64748b", fontSize: 14, maxWidth: 420, lineHeight: 1.7, margin: 0 }}>
+            Your subscription expired {daysSinceExpiry} days ago. Access has been restricted. Please renew your plan to restore access.
+          </p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+            <button onClick={() => setActiveTab("upgrade")} style={{ display: "inline-block", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+              🚀 Renew Subscription
+            </button>
+            <a href="tel:+919876543210" style={{ display: "inline-block", background: "#f1f5f9", color: "var(--app-sidebar)", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "1.5px solid #e2e8f0" }}>
+              📞 Call Support
+            </a>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 
   return (
@@ -819,19 +835,19 @@ export default function MySubscriptions({ user, onSubscriptionSuccess }) {
             <p style={{ color: T.muted, fontSize: 13, margin: 0 }}>Current plan: <strong>{subscription.planName}</strong> • Expires: <strong>{formatDate(subscription.endDate)}</strong></p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-            {assignedPackages.filter(p => p.type !== "free" || (p.title !== subscription.planName)).sort((a,b) => (parseFloat(a.price)||0)-(parseFloat(b.price)||0)).map(pkg => {
+            {(assignedPackages.length > 0 ? assignedPackages : PLANS).filter(p => (p.type !== "free" && !p.isTrial) || ((p.title || p.name) !== subscription.planName)).sort((a,b) => (parseFloat(a.price)||0)-(parseFloat(b.price)||0)).map(pkg => {
               const plan = {
-                name: pkg.title,
-                price: pkg.type === "free" ? 0 : parseFloat(pkg.price) || 0,
+                name: pkg.title || pkg.name,
+                price: pkg.type === "free" || pkg.isTrial ? 0 : parseFloat(pkg.price) || 0,
                 icon: pkg.icon || "📦",
-                features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n"),
-                isTrial: pkg.type === "free",
+                features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n").filter(Boolean),
+                isTrial: pkg.type === "free" || pkg.isTrial,
                 clientLimit: pkg.clientLimit,
                 employeeLimit: pkg.employeeLimit,
                 managerLimit: pkg.managerLimit,
                 businessLimit: pkg.businessLimit,
                 noOfDays: parseInt(pkg.no_of_days || pkg.noOfDays) || 30,
-                color: (pkg.title || "").toLowerCase().includes("pro") ? "var(--app-accent)" : "#6366f1"
+                color: (pkg.title || pkg.name || "").toLowerCase().includes("pro") ? "var(--app-accent)" : "#6366f1"
               };
               const isProcessing = payLoading === plan.name;
               const isCurrent = subscription.planName === plan.name;

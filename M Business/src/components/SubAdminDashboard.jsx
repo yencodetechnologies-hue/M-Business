@@ -3760,7 +3760,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         </div>
 
         <div className="main-content" style={{ flex: 1, padding: "22px 24px", overflowY: "auto" }}>
-          <EmployeeSubscriptionWarning user={user} />
+          <EmployeeSubscriptionWarning user={user} onRenew={() => setActive("mysubscriptions")} />
           {/* Page Header */}
           <div className="page-header no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
             <div>

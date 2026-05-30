@@ -129,3 +129,27 @@ img {
   word-break: break-word;
   overflow-wrap: anywhere;
 }
+
+/* Print Styles */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  @page {
+    size: A4 portrait;
+    margin: 5mm;
+  }
+
+  body {
+    background-color: white !important;
+  }
+
+  /* Prevent page breaks inside important containers */
+  .no-break, 
+  .print-container {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}

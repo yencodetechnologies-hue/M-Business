@@ -75,7 +75,8 @@ const NAV = [
 ];
 
 export default function AdminDashboard({ user, setUser }) {
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState(() => localStorage.getItem("activeTab_admin") || "dashboard");
+  useEffect(() => { localStorage.setItem("activeTab_admin", active); }, [active]);
   const [subadmins, setSubadmins] = useState([]);
   const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);

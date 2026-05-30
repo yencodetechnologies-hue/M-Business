@@ -1266,7 +1266,8 @@ function ProposalsPage({ proposals }) {
 // ── ROOT ──────────────────────────────────────────────────────
 
 export default function EmployeeDashboard({ user, setUser }) {
-  const [page, setPage] = useState("dashboard");
+  const [page, setPage] = useState(() => localStorage.getItem("activeTab_employee") || "dashboard");
+  useEffect(() => { localStorage.setItem("activeTab_employee", page); }, [page]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);

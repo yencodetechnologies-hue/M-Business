@@ -928,16 +928,17 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // ════════════════════════════════════════════════════════════
   if (step === "preview") {
     return (
-      <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "20px 12px" }}>
+      <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "20px 12px" }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
-          .invoice-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25); overflow: hidden; }
+          .invoice-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
           @media print {
             @page { size: A4 portrait; margin: 0; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
             .no-print, .no-print * { display: none !important; }
-            .invoice-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+            .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; }
+            .invoice-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: flex !important; min-height: 297mm !important; }
             /* Hide every sibling of the paper to ensure no extra space */
             body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
           }
@@ -960,7 +961,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
-        <div className="invoice-paper">
+        <div className="invoice-paper print-container">
           {/* Header */}
           <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
             <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(var(--app-accent-rgb, 124, 58, 237),0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
@@ -1126,10 +1127,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div style={{ flex: 1 }} />
 
           {/* Footer */}
-          <div style={{ background: "linear-gradient(135deg,#0f0528,#2d0a6e)", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>{inv.footerMessage}</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{inv.invoiceNo}</div>
+          <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+            <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{effectiveCompanyName}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{inv.footerMessage}</div>
+            <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{inv.invoiceNo}</div>
           </div>
         </div>
       </div>

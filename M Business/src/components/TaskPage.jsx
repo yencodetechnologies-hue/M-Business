@@ -2598,7 +2598,7 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
 
-            {!loading && allTasks.length > 0 && (<div style={{ display: "flex", alignItems: "center", gap: 7, paddingLeft: 6, borderLeft: `1px solid ${P.border}` }}><div style={{ width: 60, height: 5, borderRadius: 3, background: P.border, overflow: "hidden" }}><div style={{ width: `${Math.round(doneCnt / allTasks.length * 100)}%`, height: "100%", background: `linear-gradient(90deg,${P.accent},var(--app-accent))`, borderRadius: 3 }} /></div><span style={{ fontSize: 11, color: P.muted, fontWeight: 600 }}>{doneCnt}/{allTasks.length}</span></div>)}
+
           </div>
         </div>
 

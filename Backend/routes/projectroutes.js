@@ -87,6 +87,29 @@ router.post("/add", async (req, res) => {
 
     console.log("Attempting to save project...");
     const saved = await project.save();
+    
+    // Auto-create Project Status tracking entry
+    try {
+      const ProjectStatus = mongoose.models.ProjectStatus;
+      if (ProjectStatus) {
+        const ps = new ProjectStatus({
+          name: saved.name,
+          client: saved.client,
+          manager: saved.manager || "",
+          employee: (saved.assignedTo && saved.assignedTo.length) ? saved.assignedTo.join(", ") : "",
+          deadline: saved.deadline || saved.end || new Date().toISOString().split("T")[0],
+          status: saved.status || "Pending",
+          progress: saved.progress || 0,
+          notes: saved.description || "",
+          companyId: saved.companyId || "",
+        });
+        await ps.save();
+        console.log("✅ Auto-created ProjectStatus for:", saved.name);
+      }
+    } catch (err) {
+      console.error("Auto-create ProjectStatus error:", err.message);
+    }
+
     console.log("✅ Project saved:", saved._id);
     res.status(201).json({ msg: "Project created", project: saved });
 
@@ -146,6 +169,28 @@ router.put("/:id", async (req, res) => {
       { new: true }
     );
     if (!project) return res.status(404).json({ msg: "Project not found or unauthorized" });
+
+    // Auto-update Project Status tracking entry
+    try {
+      const ProjectStatus = mongoose.models.ProjectStatus;
+      if (ProjectStatus) {
+        await ProjectStatus.findOneAndUpdate(
+          { name: project.name, companyId: project.companyId },
+          { $set: { 
+              client: project.client,
+              manager: project.manager || "",
+              employee: (project.assignedTo && project.assignedTo.length) ? project.assignedTo.join(", ") : "",
+              deadline: project.deadline || project.end || new Date().toISOString().split("T")[0],
+              status: project.status || "Pending",
+              progress: project.progress || 0,
+            } 
+          }
+        );
+      }
+    } catch (err) {
+      console.error("Auto-update ProjectStatus error:", err.message);
+    }
+
     res.json({ project });
   } catch (err) {
     console.error("PUT project error:", err.message);
@@ -159,6 +204,17 @@ router.delete("/:id", async (req, res) => {
     const companyId = req.companyId || "NONE";
     const project = await Project.findOneAndDelete({ _id: req.params.id, companyId });
     if (!project) return res.status(404).json({ msg: "Project not found or unauthorized" });
+
+    // Auto-delete Project Status tracking entry
+    try {
+      const ProjectStatus = mongoose.models.ProjectStatus;
+      if (ProjectStatus) {
+        await ProjectStatus.findOneAndDelete({ name: project.name, companyId: project.companyId });
+      }
+    } catch (err) {
+      console.error("Auto-delete ProjectStatus error:", err.message);
+    }
+
     res.json({ msg: "Project deleted" });
   } catch (err) {
     console.error("DELETE project error:", err.message);

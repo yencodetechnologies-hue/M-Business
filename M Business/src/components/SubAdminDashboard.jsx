@@ -2770,7 +2770,8 @@ function VendorsPage({ vendors, setVendors }) {
 // ═══════════════════════════════════════════════════════════
 export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "M Business";
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState(() => localStorage.getItem("activeTab_subadmin") || "dashboard");
+  useEffect(() => { localStorage.setItem("activeTab_subadmin", active); }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
@@ -4728,7 +4729,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       {/* ── Add Project Modal ── */}
       {modal === "project" && <Mdl title="Create New Project" onClose={() => setModal(null)}>
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-          <Fld label="Project Name *" value={np.name} onChange={v => setNp({ ...np, name: v })} error={npError.name} />
+          <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
             <ClientDropdown
@@ -4742,6 +4743,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   contactPersonName: sel?.contactPersonName || "",
                   contactPersonNo: sel?.contactPersonNo || ""
                 });
+                setNpError(p => ({ ...p, client: "" }));
               }}
               error={npError.client}
               onAddClient={() => {

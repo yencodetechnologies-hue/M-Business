@@ -675,7 +675,8 @@ function PlaceholderPage({ icon, title, sub }) {
 // ── Main ──────────────────────────────────────────────────────
 export default function ClientDashboard({ user, setUser }) {
   useAssets();
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState(() => localStorage.getItem("activeTab_client") || "dashboard");
+  useEffect(() => { localStorage.setItem("activeTab_client", active); }, [active]);
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [invoices, setInvoices] = useState([]);

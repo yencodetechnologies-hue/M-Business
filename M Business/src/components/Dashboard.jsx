@@ -1619,7 +1619,8 @@ function Sidebar({ active, setActive, onLogout, open, onClose, navItems, initial
 // MAIN DASHBOARD
 // ═══════════════════════════════════════════════════════════
 export default function Dashboard({ setUser, user, fixedLogo }) {
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState(() => localStorage.getItem("activeTab_dashboard") || "dashboard");
+  useEffect(() => { localStorage.setItem("activeTab_dashboard", active); }, [active]);
   const [modal, setModal] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -2081,10 +2082,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       {/* ── Add Project Modal ── */}
       {modal === "project" && <Mdl title="Create New Project" onClose={() => setModal(null)}>
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-          <Fld label="Project Name *" value={np.name} onChange={v => setNp({ ...np, name: v })} error={npError.name} />
+          <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
-            <ClientDropdown clients={clients} value={np.client} onChange={v => setNp({ ...np, client: v })} error={npError.client} onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }} />
+            <ClientDropdown clients={clients} value={np.client} onChange={v => { setNp({ ...np, client: v }); setNpError(p => ({ ...p, client: "" })); }} error={npError.client} onAddClient={() => { setModal("client"); setNcError({}); setShowClientPass(false); }} />
             {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}
           </div>
           <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />

@@ -515,7 +515,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
-        <div className="qt-paper">
+        <div className="qt-paper print-container">
           {/* Header */}
           <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
             <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(5,150,105,0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
@@ -673,10 +673,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <div style={{ flex: 1 }} />
 
           {/* Footer */}
-          <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "1px solid #e2e8f0" }}>
-            <div style={{ fontSize: 11, color: "#94a3b8" }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-accent)" }}>{qt.footerMessage}</div>
-            <div style={{ fontSize: 11, color: "#94a3b8" }}>{qt.quoteNo}</div>
+          <div style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #f1f5f9" }}>
+            <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{effectiveCompanyName}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{qt.footerMessage}</div>
+            <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{qt.quoteNo}</div>
           </div>
         </div>
       </div>

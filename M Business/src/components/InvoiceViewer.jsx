@@ -123,16 +123,17 @@ export default function InvoiceViewer() {
   const qrData = window.location.href;
 
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#f1f5f9", minHeight: "100vh", padding: "20px 12px" }}>
+    <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#f1f5f9", minHeight: "100vh", padding: "20px 12px" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
-        .inv-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(99,102,241,0.15); overflow: hidden; display: flex; flex-direction: column; }
+        .inv-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(99,102,241,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
         @media print {
           @page { size: A4 portrait; margin: 0; }
           html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
           .no-print, .no-print * { display: none !important; }
-          .inv-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+          .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; }
+          .inv-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: flex !important; min-height: 297mm !important; }
           body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
         }
         @media (max-width:600px) { .inv-hgrid { flex-direction:column!important; } .inv-btgrid { grid-template-columns:1fr!important; } }

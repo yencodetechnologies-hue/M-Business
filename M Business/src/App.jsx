@@ -23,26 +23,22 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
-  const [user, setUser] = useState(undefined);
-
-  // ── Read from localStorage on refresh ──────────────────────────────────────
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("user");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setUser({
+        return {
           ...parsed,
           role: (parsed.role || "").toLowerCase().trim(),
-        });
+        };
       } catch {
         localStorage.removeItem("user");
-        setUser(null);
+        return null;
       }
-    } else {
-      setUser(null);
     }
-  }, []);
+    return null;
+  });
 
   // ── Normalize role on every login / logout ──────────────────────────────────
   const handleSetUser = (userData) => {
@@ -70,7 +66,7 @@ export default function App() {
   };
 
   // ── Loading state ───────────────────────────────────────────────────────────
-  if (user === undefined) return null;
+  // No longer needed, user is loaded synchronously
 
   // ── Role-based root page ────────────────────────────────────────────────────
   const role = (user?.role || "").toLowerCase().trim();

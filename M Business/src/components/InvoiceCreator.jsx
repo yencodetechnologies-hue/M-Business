@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import axios from "axios";
 import { BASE_URL, FRONTEND_URL } from "../config";
+import html2pdf from "html2pdf.js";
 
 const GST_RATES = [0, 5, 12, 18, 28];
 const DEFAULT_LOGO_URL = "";
@@ -441,54 +442,62 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   };
   const qrData = `${FRONTEND_URL}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
-  const shareInvoice = async (entry) => {
-    const invData = entry.inv || inv;
-    const itemsData = entry.items || items;
-    const slimPayload = {
-      no: entry.invoiceNo, date: invData.date, due: invData.dueDate,
-      co: invData.companyName, email: invData.companyEmail, phone: invData.companyPhone, addr: invData.companyAddress,
-      cl: entry.client || invData.client, proj: invData.project, gst: invData.gstRate, notes: invData.notes, terms: invData.terms,
-      incGst: invData.isGstIncluded,
-      paid: entry.amountPaid || invData.amountPaid || 0,
-      upi: invData.upiId,
-      cur: invData.currency,
-      items: itemsData.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
-      history: entry.paymentHistory || invData.paymentHistory || [],
-      cid: user?.companyId || user?.company || user?._id || "",
+  const triggerPDFShare = async (entry, type) => {
+    if (step !== "preview") {
+      loadEntry(entry);
+      setTimeout(() => {
+        setStep("preview");
+        showToast("⏳ Loading invoice for PDF generation...");
+        setTimeout(() => triggerPDFShare(entry, type), 1000);
+      }, 0);
+      return;
+    }
+    const element = document.querySelector(".invoice-paper");
+    if (!element) return;
+    
+    showToast("⏳ Generating PDF...");
+    const opt = {
+      margin:       0,
+      filename:     `Invoice_${entry.invoiceNo}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
-    const link = `${window.location.origin}/invoice-view?d=${encoded}`;
-
-    const text = `*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`;
-    if (navigator.share) {
-      try { await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, url: link }); } catch (err) { console.log(err); }
-    } else {
-      navigator.clipboard.writeText(text);
-      showToast("📋 Link copied to clipboard!");
+    
+    try {
+      const blob = await html2pdf().set(opt).from(element).output('blob');
+      const file = new File([blob], `Invoice_${entry.invoiceNo}.pdf`, { type: 'application/pdf' });
+      const invData = entry.inv || inv;
+      const text = `*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}`;
+      
+      if (type === "wa") {
+         if (navigator.canShare && navigator.canShare({ files: [file] })) {
+             await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, files: [file] });
+         } else {
+             const url = URL.createObjectURL(blob);
+             const a = document.createElement("a");
+             a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+             showToast("PDF downloaded! Attach it in WhatsApp.");
+             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+         }
+      } else {
+         if (navigator.canShare && navigator.canShare({ files: [file] })) {
+             await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, files: [file] });
+         } else {
+             const url = URL.createObjectURL(blob);
+             const a = document.createElement("a");
+             a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+             showToast("PDF downloaded!");
+         }
+      }
+    } catch (err) {
+      console.log(err);
+      showToast("❌ Failed to generate PDF");
     }
   };
 
-  const shareWhatsApp = (entry) => {
-    const invData = entry.inv || inv;
-    const itemsData = entry.items || items;
-    const slimPayload = {
-      no: entry.invoiceNo, date: invData.date, due: invData.dueDate,
-      co: invData.companyName, email: invData.companyEmail, phone: invData.companyPhone, addr: invData.companyAddress,
-      cl: entry.client || invData.client, proj: invData.project, gst: invData.gstRate, notes: invData.notes, terms: invData.terms,
-      incGst: invData.isGstIncluded,
-      paid: entry.amountPaid || invData.amountPaid || 0,
-      upi: invData.upiId,
-      cur: invData.currency,
-      items: itemsData.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
-      history: entry.paymentHistory || invData.paymentHistory || [],
-      cid: user?.companyId || user?.company || user?._id || "",
-    };
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))));
-    const link = `${window.location.origin}/invoice-view?d=${encoded}`;
-
-    const text = encodeURIComponent(`*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}\n\n${invData.companyAddress ? `Address: ${invData.companyAddress}\n` : ""}${invData.companyPhone ? `Contact: ${invData.companyPhone}\n` : ""}\nView here: ${link}\n\n${invData.footerMessage || "🙏 Thank you for considering us!"}`);
-    window.open(`https://wa.me/?text=${text}`, "_blank");
-  };
+  const shareInvoice = (entry) => triggerPDFShare(entry, "link");
+  const shareWhatsApp = (entry) => triggerPDFShare(entry, "wa");
 
   // ── Shared styles ────────────────────────────────────────────
   const inp = (err) => ({

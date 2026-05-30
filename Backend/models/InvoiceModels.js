@@ -27,6 +27,7 @@ const invoiceSchema = new mongoose.Schema({
   accountName:    { type: String, default: "" },
   accountNumber:  { type: String, default: "" },
   ifscCode:       { type: String, default: "" },
+  footerMessage:  { type: String, default: "" },
   items:          [itemSchema],
   subtotal:       Number,
   gstAmt:         Number,

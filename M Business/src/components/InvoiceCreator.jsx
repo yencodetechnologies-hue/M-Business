@@ -803,9 +803,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
         {/* Table */}
         <div style={{ background: "var(--app-card)", borderRadius: 20, border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)", overflow: "hidden" }}>
-
-          {/* Table header */}
-          <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr", padding: "12px 20px", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", borderBottom: "2px solid var(--app-border)", alignItems: "center" }}>
+          <div style={{ overflowX: "auto" }}>
+            <div style={{ minWidth: 1050 }}>
+              {/* Table header */}
+              <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr", padding: "12px 20px", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", borderBottom: "2px solid var(--app-border)", alignItems: "center" }}>
             {["Invoice No", "Company Name", "Project", "Date", "Due Date", "Amount", "Paid", "Status", "Actions"].map((h) => (
               <div key={h} style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", letterSpacing: 0.5, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h}</div>
             ))}
@@ -913,6 +914,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               </div>
             );
           })}
+            </div>
+          </div>
         </div>
 
 

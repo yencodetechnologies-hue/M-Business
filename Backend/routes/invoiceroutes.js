@@ -46,6 +46,7 @@ router.get("/", async (req, res) => {
         accountName:    doc.accountName    || "",
         accountNumber:  doc.accountNumber  || "",
         ifscCode:       doc.ifscCode       || "",
+        footerMessage:  doc.footerMessage  || "",
         paymentHistory: history,
       };
 
@@ -139,6 +140,7 @@ router.get("/client/:clientName", async (req, res) => {
         accountName: doc.accountName,
         accountNumber: doc.accountNumber,
         ifscCode: doc.ifscCode,
+        footerMessage: doc.footerMessage,
       };
     }));
     res.json(normalised);
@@ -212,6 +214,7 @@ router.post("/", async (req, res) => {
       accountName:    inv.accountName            || "",
       accountNumber:  inv.accountNumber          || "",
       ifscCode:       inv.ifscCode               || "",
+      footerMessage:  inv.footerMessage          || "",
       companyId: req.companyId || "",
     };
 
@@ -309,6 +312,7 @@ router.put("/:id", async (req, res) => {
       accountName: inv.accountName || "",
       accountNumber: inv.accountNumber || "",
       ifscCode: inv.ifscCode || "",
+      footerMessage: inv.footerMessage || "",
       companyId: req.companyId || "",
     };
 

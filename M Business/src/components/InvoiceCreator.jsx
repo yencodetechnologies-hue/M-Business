@@ -263,13 +263,37 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // ── Validate ────────────────────────────────────────────────
   const validate = () => {
     const errs = {};
-    if (!inv.client) errs.client = "Company Name is required";
+    let firstErrId = null;
+
+    if (!inv.client) {
+      errs.client = "Company Name is required";
+      firstErrId = "field-client";
+    }
     items.forEach((item, idx) => {
-      if (!item.description.trim()) errs[`item_${item.id}_description`] = `Item ${idx + 1}: description required`;
-      if (!item.rate || parseFloat(item.rate) <= 0) errs[`item_${item.id}_rate`] = `Item ${idx + 1}: rate required`;
+      if (!item.description.trim()) {
+        errs[`item_${item.id}_description`] = `Item ${idx + 1}: description required`;
+        if (!firstErrId) firstErrId = `item_${item.id}_description`;
+      }
+      if (!item.rate || parseFloat(item.rate) <= 0) {
+        errs[`item_${item.id}_rate`] = `Item ${idx + 1}: rate required`;
+        if (!firstErrId) firstErrId = `item_${item.id}_rate`;
+      }
     });
     setErrors(errs);
-    return Object.keys(errs).length === 0;
+    
+    if (Object.keys(errs).length > 0) {
+      setTimeout(() => {
+        if (firstErrId) {
+          const el = document.getElementById(firstErrId);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.focus && el.focus();
+          }
+        }
+      }, 100);
+      return false;
+    }
+    return true;
   };
 
   // ── Load entry into form (EDIT) ─────────────────────────────
@@ -1045,7 +1069,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   <div style={{ fontSize: 12, color: "var(--app-text)", opacity: 0.8, lineHeight: 1.7 }}>{inv.terms}</div>
                 </div>
               )}
-              {(inv.upiId || inv.bankName) && (
+              {(inv.upiId || inv.bankName || inv.accountName || inv.accountNumber || inv.ifscCode) && (
                 <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
                   <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 PAYMENT INSTRUCTIONS</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
@@ -1055,24 +1079,32 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                         <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)" }}>{inv.upiId}</div>
                       </div>
                     )}
-                    {inv.bankName && (
+                    {(inv.bankName || inv.accountName || inv.accountNumber || inv.ifscCode) && (
                       <>
-                        <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>BANK NAME</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)" }}>{inv.bankName}</div>
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NAME</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)" }}>{inv.accountName}</div>
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NUMBER</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)", fontFamily: "monospace" }}>{inv.accountNumber}</div>
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>IFSC CODE</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)", fontFamily: "monospace" }}>{inv.ifscCode}</div>
-                        </div>
+                        {inv.bankName && (
+                          <div>
+                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>BANK NAME</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)" }}>{inv.bankName}</div>
+                          </div>
+                        )}
+                        {inv.accountName && (
+                          <div>
+                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NAME</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)" }}>{inv.accountName}</div>
+                          </div>
+                        )}
+                        {inv.accountNumber && (
+                          <div>
+                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NUMBER</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)", fontFamily: "monospace" }}>{inv.accountNumber}</div>
+                          </div>
+                        )}
+                        {inv.ifscCode && (
+                          <div>
+                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>IFSC CODE</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)", fontFamily: "monospace" }}>{inv.ifscCode}</div>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
@@ -1264,7 +1296,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: errors.client ? "1.5px solid #fca5a5" : "1px solid #f3f4f6", marginBottom: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Company & Project</div>
           <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <div>
+            <div id="field-client">
               <label style={{ ...lbl, color: errors.client ? "#ef4444" : "#6b7280" }}>Company Name *</label>
               <CompanyDropdown clients={clients} value={inv.client}
                 onChange={(val) => { upd("client", val); upd("project", ""); setErrors((p) => { const n = { ...p }; delete n.client; return n; }); }}
@@ -1305,7 +1337,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             return (
               <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 36px", gap: 8, marginBottom: 8, alignItems: "flex-start" }}>
                 <div>
-                  <input value={item.description} onChange={(e) => updItem(item.id, "description", e.target.value)}
+                  <input id={`item_${item.id}_description`} value={item.description} onChange={(e) => updItem(item.id, "description", e.target.value)}
                     placeholder={`Item ${idx + 1} description`} style={{ ...inp(dErr), fontSize: 13 }} />
                   {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                 </div>
@@ -1315,7 +1347,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                   onWheel={(e) => e.target.blur()}
                   placeholder="0" style={{ ...inp(), textAlign: "center", fontSize: 13 }} />
                 <div>
-                  <input type="number"
+                  <input type="number" id={`item_${item.id}_rate`}
                     value={item.rate === 0 ? "" : item.rate}
                     onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))}
                     onWheel={(e) => e.target.blur()}

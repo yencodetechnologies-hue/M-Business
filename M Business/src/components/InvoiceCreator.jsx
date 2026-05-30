@@ -1005,7 +1005,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
-          .invoice-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
+          .invoice-paper { position: relative; max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
           @media print {
             @page { size: A4 portrait; margin: 0; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
@@ -1203,10 +1203,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
           </div>
 
-          <div className="flex-spacer" style={{ flex: 1 }} />
+          <div style={{ height: 80 }} /> {/* Spacer to prevent overlap */}
 
           {/* Footer */}
-          <div className="avoid-break" style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div className="avoid-break" style={{ position: "absolute", bottom: 0, left: 0, width: "100%", background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
             <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{effectiveCompanyName}</div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{inv.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{inv.invoiceNo}</div>

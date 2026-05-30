@@ -567,7 +567,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
-          .qt-paper { max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
+          .qt-paper { position: relative; max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(5,150,105,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
           @media print {
             @page { size: A4 portrait; margin: 0; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
@@ -749,10 +749,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             </div>
           </div>
 
-          <div className="flex-spacer" style={{ flex: 1 }} />
+          <div style={{ height: 80 }} /> {/* Spacer to prevent overlap */}
 
           {/* Footer */}
-          <div className="avoid-break" style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #f1f5f9" }}>
+          <div className="avoid-break" style={{ position: "absolute", bottom: 0, left: 0, width: "100%", background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "2px solid #f1f5f9" }}>
             <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{effectiveCompanyName}</div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{qt.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{qt.quoteNo}</div>

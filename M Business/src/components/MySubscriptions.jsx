@@ -819,7 +819,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                     <span style={{ fontSize: 12 }}>🔒</span>
                     <span style={{ fontSize: 11, color: T.muted, fontWeight: 700 }}>Secure Payment Gateway</span>
                   </div>
-                  <button onClick={() => plan.isTrial ? startTrial(pkg) : startRazorpayPayment(plan)} disabled={!!payLoading} style={{ width: "100%", padding: "14px", borderRadius: 12, background: isCurrent ? "linear-gradient(135deg,var(--app-accent),var(--app-muted))" : "var(--app-bg)", color: isCurrent ? "#fff" : T.accent, border: isCurrent ? "none" : `2px solid ${T.accent}`, fontSize: 14, fontWeight: 800, cursor: payLoading ? "wait" : "pointer", transition: "0.2s" }}>
+                  <button onClick={() => plan.isTrial ? startTrial(pkg) : startPayUPayment(plan)} disabled={!!payLoading} style={{ width: "100%", padding: "14px", borderRadius: 12, background: isCurrent ? "linear-gradient(135deg,var(--app-accent),var(--app-muted))" : "var(--app-bg)", color: isCurrent ? "#fff" : T.accent, border: isCurrent ? "none" : `2px solid ${T.accent}`, fontSize: 14, fontWeight: 800, cursor: payLoading ? "wait" : "pointer", transition: "0.2s" }}>
                     {isProcessing ? "Processing..." : isCurrent ? "🔄 Renew Plan" : (plan.isTrial ? "🎁 Get Started" : "⬆️ Switch to " + plan.name)}
                   </button>
                 </div>

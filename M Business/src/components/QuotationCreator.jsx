@@ -247,12 +247,12 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     setStep("preview");
   };
 
-  const triggerPDFShare = async (entry, type) => {
-    if (step !== "preview") {
+  const triggerPDFShare = async (entry, type, force = false) => {
+    if (step !== "preview" && !force) {
       loadEntry(entry);
       setTimeout(() => {
         setStep("preview");
-        setTimeout(() => triggerPDFShare(entry, type), 1000);
+        setTimeout(() => triggerPDFShare(entry, type, true), 1000);
       }, 0);
       return;
     }

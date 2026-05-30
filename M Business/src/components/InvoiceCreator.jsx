@@ -442,13 +442,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   };
   const qrData = `${FRONTEND_URL}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
-  const triggerPDFShare = async (entry, type) => {
-    if (step !== "preview") {
+  const triggerPDFShare = async (entry, type, force = false) => {
+    if (step !== "preview" && !force) {
       loadEntry(entry);
       setTimeout(() => {
         setStep("preview");
         showToast("⏳ Loading invoice for PDF generation...");
-        setTimeout(() => triggerPDFShare(entry, type), 1000);
+        setTimeout(() => triggerPDFShare(entry, type, true), 1000);
       }, 0);
       return;
     }

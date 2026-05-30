@@ -4317,7 +4317,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
-          {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} />}
+          {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} />}
           {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
           {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
           {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}

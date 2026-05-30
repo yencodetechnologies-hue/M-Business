@@ -83,12 +83,12 @@ const getDaysLeft = (endDate) => {
 const getStatusColor = (s) => ({ active: T.success, completed: T.success, paid: T.success, cancelled: T.danger, expired: T.danger, failed: T.danger, pending: T.warning, refunded: T.warning }[s?.toLowerCase()] || T.muted);
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview" }) {
-  const [subscription, setSubscription] = useState(null);
+export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview", preloadedSubscription = null }) {
+  const [subscription, setSubscription] = useState(preloadedSubscription);
   const [payments, setPayments] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [quotations, setQuotations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!preloadedSubscription);
   const [payLoading, setPayLoading] = useState(null); // plan name being processed
   const [activeTab, setActiveTab] = useState(initialTab);
   const [viewPayment, setViewPayment] = useState(null);
@@ -111,7 +111,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   const fetchData = useCallback(async () => {
     if (!userId) return;
     try {
-      setLoading(true);
+      if (!preloadedSubscription) setLoading(true);
       // Fetch subscription first (this triggers retroactive trial invoice creation if needed)
       const subRes = await axios.get(`${BASE_URL}/api/subscriptions/current/${userId}`);
       if (subRes.data.hasSubscription) {
@@ -414,16 +414,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     );
   }
 
-  // ── Loading ──────────────────────────────────────────────────────────────────
-  if (loading) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: 80, flexDirection: "column", gap: 16 }}>
-        <div style={{ width: 48, height: 48, border: "4px solid var(--app-border)", borderTop: "4px solid var(--app-accent)", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        <div style={{ color: T.muted, fontSize: 14, fontWeight: 600 }}>Loading subscription data...</div>
-      </div>
-    );
-  }
+  // ── Loading removed to prevent spinner from showing ──────────────────────────
 
   // ── No Subscription → Show Plans (Screenshot 2 Style) ─────────────────────────
   if (!subscription) {

@@ -42,6 +42,10 @@ router.get("/", async (req, res) => {
         transactionId:  doc.transactionId  || "",
         currency:       doc.currency       || "₹",
         upiId:          doc.upiId          || "",
+        bankName:       doc.bankName       || "",
+        accountName:    doc.accountName    || "",
+        accountNumber:  doc.accountNumber  || "",
+        ifscCode:       doc.ifscCode       || "",
         paymentHistory: history,
       };
 
@@ -131,6 +135,10 @@ router.get("/client/:clientName", async (req, res) => {
         isGstIncluded: doc.isGstIncluded,
         gstRate: doc.gstRate,
         upiId: doc.upiId,
+        bankName: doc.bankName,
+        accountName: doc.accountName,
+        accountNumber: doc.accountNumber,
+        ifscCode: doc.ifscCode,
       };
     }));
     res.json(normalised);
@@ -200,6 +208,10 @@ router.post("/", async (req, res) => {
       paymentDate:    inv.paymentDate            || "",
       currency:       inv.currency               || "₹",
       upiId:          inv.upiId                  || "",
+      bankName:       inv.bankName               || "",
+      accountName:    inv.accountName            || "",
+      accountNumber:  inv.accountNumber          || "",
+      ifscCode:       inv.ifscCode               || "",
       companyId: req.companyId || "",
     };
 
@@ -293,6 +305,10 @@ router.put("/:id", async (req, res) => {
       paymentDate: inv.paymentDate || "",
       currency: inv.currency || "₹",
       upiId: inv.upiId || "",
+      bankName: inv.bankName || "",
+      accountName: inv.accountName || "",
+      accountNumber: inv.accountNumber || "",
+      ifscCode: inv.ifscCode || "",
       companyId: req.companyId || "",
     };
 

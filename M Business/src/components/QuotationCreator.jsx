@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { BASE_URL, FRONTEND_URL } from "../config";
-import html2pdf from "html2pdf.js";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 import axios from "axios";
 
 const GST_RATES = [0, 5, 12, 18, 28];
@@ -259,16 +260,79 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     const element = document.querySelector(".qt-paper");
     if (!element) return;
     
-    const opt = {
-      margin:       0,
-      filename:     `Quotation_${entry.quoteNo}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    showToast("⏳ Generating PDF...");
+
+    // Helper: resolve CSS variables so html2canvas captures correct colours on all OS/browsers
+    const resolveCssVars = (el) => {
+      const computed = getComputedStyle(document.documentElement);
+      const walk = (node) => {
+        if (node.nodeType === 1) {
+          const st = node.getAttribute('style') || '';
+          if (st.includes('var(')) {
+            node.setAttribute('style', st.replace(/var\(([^)]+)\)/g, (_, n) =>
+              computed.getPropertyValue(n.trim()).trim() || ''));
+          }
+          Array.from(node.children).forEach(walk);
+        }
+      };
+      walk(el);
     };
-    
+
     try {
-      const blob = await html2pdf().set(opt).from(element).output('blob');
+      // Capture full element including footer
+      const elemH = element.scrollHeight;
+      const elemW = element.scrollWidth;
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        letterRendering: true,
+        width: elemW,
+        height: elemH,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        onclone: (doc) => {
+          const el = doc.querySelector('.qt-paper');
+          if (el) {
+            resolveCssVars(el);
+            el.style.width = elemW + 'px';
+            el.style.maxWidth = 'none';
+            el.style.overflow = 'visible';
+            el.style.borderRadius = '0';
+            el.style.boxShadow = 'none';
+          }
+        }
+      });
+
+      // Always fit image onto exactly one A4 page
+      const A4_W = 210;
+      const A4_H = 297;
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+
+      // Calculate dimensions that fit within A4 maintaining aspect ratio
+      const imgAspect = canvas.width / canvas.height;
+      let finalW = A4_W;
+      let finalH = A4_W / imgAspect;
+
+      // If still taller than A4, scale down by height
+      if (finalH > A4_H) {
+        finalH = A4_H;
+        finalW = A4_H * imgAspect;
+      }
+
+      // Center on the page
+      const xOff = (A4_W - finalW) / 2;
+      const yOff = (A4_H - finalH) / 2;
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      pdf.addImage(imgData, 'JPEG', xOff, yOff, finalW, finalH);
+      // Safety net: delete any extra pages
+      while (pdf.internal.getNumberOfPages() > 1) {
+        pdf.deletePage(pdf.internal.getNumberOfPages());
+      }
+
+      const blob = pdf.output('blob');
       const file = new File([blob], `Quotation_${entry.quoteNo}.pdf`, { type: 'application/pdf' });
       const qtData = entry.qt || qt;
       const text = `*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || total, qtData.currency)}`;
@@ -289,6 +353,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
              const url = URL.createObjectURL(blob);
              const a = document.createElement("a");
              a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+             showToast("PDF downloaded!");
          }
       }
     } catch (err) {
@@ -507,10 +572,17 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             @page { size: A4 portrait; margin: 0; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
             .no-print, .no-print * { display: none !important; }
-            .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; }
-            .qt-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: flex !important; min-height: 297mm !important; }
+            .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; display: block !important; }
+            .qt-paper { 
+              position: relative !important; top: auto !important; left: auto !important; 
+              width: 100% !important; max-width: 100% !important; margin: 0 !important; 
+              border-radius: 0 !important; box-shadow: none !important; 
+              overflow: visible !important; min-height: 0 !important; height: auto !important;
+            }
+            .flex-spacer { display: none !important; }
             body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
           }
+          .avoid-break { page-break-inside: avoid; break-inside: avoid; }
           @media (max-width:600px) { .qt-hgrid { flex-direction:column!important; } .qt-btgrid { grid-template-columns:1fr!important; } }
         `}</style>
 
@@ -524,7 +596,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
         <div className="qt-paper print-container">
           {/* Header */}
-          <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
+          <div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
             <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(5,150,105,0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
             <div className="qt-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
               <div>
@@ -559,7 +631,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           {/* Prepared for */}
-          <div className="qt-btgrid" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4", flexShrink: 0 }}>
+          <div className="qt-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: qt.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid #f0fdf4", flexShrink: 0 }}>
             <div style={{ padding: "20px 32px", borderRight: qt.project ? "1px solid #f0fdf4" : "none" }}>
               <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PREPARED FOR</div>
               <div style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{qt.client || "—"}</div>
@@ -580,7 +652,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
+                <tr className="avoid-break" style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
                     <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid #d1fae5", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
@@ -588,7 +660,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               </thead>
               <tbody>
                 {items.map((item, idx) => (
-                  <tr key={item.id} style={{ borderBottom: "1px solid #f0fdf4" }}>
+                  <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid #f0fdf4" }}>
                     <td style={{ padding: "12px 11px", color: "#6ee7b7", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
                     <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#111827" }}>{item.description || "—"}</td>
                     <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
@@ -598,7 +670,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                 ))}
               </tbody>
             </table>
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+            <div className="avoid-break" style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
               <div style={{ width: "min(280px,100%)" }}>
                 {[
                   ["Subtotal", formatCurrency(subtotal, qt.currency)],
@@ -620,7 +692,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           {/* Notes + QR */}
-          <div style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
+          <div className="avoid-break" style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {qt.notes && (
                 <div style={{ background: "#f0fdf4", borderRadius: 11, padding: "14px 16px", border: "1px solid #d1fae5" }}>
@@ -677,10 +749,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             </div>
           </div>
 
-          <div style={{ flex: 1 }} />
+          <div className="flex-spacer" style={{ flex: 1 }} />
 
           {/* Footer */}
-          <div style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #f1f5f9" }}>
+          <div className="avoid-break" style={{ background: "#ffffff", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: "2px solid #f1f5f9" }}>
             <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{effectiveCompanyName}</div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{qt.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{qt.quoteNo}</div>

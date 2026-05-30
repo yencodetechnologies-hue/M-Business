@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import axios from "axios";
 import { BASE_URL, FRONTEND_URL } from "../config";
-import html2pdf from "html2pdf.js";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 const GST_RATES = [0, 5, 12, 18, 28];
 const DEFAULT_LOGO_URL = "";
@@ -456,16 +457,78 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     if (!element) return;
     
     showToast("⏳ Generating PDF...");
-    const opt = {
-      margin:       0,
-      filename:     `Invoice_${entry.invoiceNo}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+
+    // Helper: resolve CSS variables so html2canvas captures correct colours on all OS/browsers
+    const resolveCssVars = (el) => {
+      const computed = getComputedStyle(document.documentElement);
+      const walk = (node) => {
+        if (node.nodeType === 1) {
+          const st = node.getAttribute('style') || '';
+          if (st.includes('var(')) {
+            node.setAttribute('style', st.replace(/var\(([^)]+)\)/g, (_, n) =>
+              computed.getPropertyValue(n.trim()).trim() || ''));
+          }
+          Array.from(node.children).forEach(walk);
+        }
+      };
+      walk(el);
     };
-    
+
     try {
-      const blob = await html2pdf().set(opt).from(element).output('blob');
+      // Capture full element including footer
+      const elemH = element.scrollHeight;
+      const elemW = element.scrollWidth;
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        letterRendering: true,
+        width: elemW,
+        height: elemH,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        onclone: (doc) => {
+          const el = doc.querySelector('.invoice-paper');
+          if (el) {
+            resolveCssVars(el);
+            el.style.width = elemW + 'px';
+            el.style.maxWidth = 'none';
+            el.style.overflow = 'visible';
+            el.style.borderRadius = '0';
+            el.style.boxShadow = 'none';
+          }
+        }
+      });
+
+      // Always fit image onto exactly one A4 page
+      const A4_W = 210;
+      const A4_H = 297;
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+
+      // Calculate dimensions that fit within A4 maintaining aspect ratio
+      const imgAspect = canvas.width / canvas.height;
+      let finalW = A4_W;
+      let finalH = A4_W / imgAspect;
+
+      // If still taller than A4, scale down by height
+      if (finalH > A4_H) {
+        finalH = A4_H;
+        finalW = A4_H * imgAspect;
+      }
+
+      // Center on the page
+      const xOff = (A4_W - finalW) / 2;
+      const yOff = (A4_H - finalH) / 2;
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      pdf.addImage(imgData, 'JPEG', xOff, yOff, finalW, finalH);
+      // Verify single page (safety net)
+      while (pdf.internal.getNumberOfPages() > 1) {
+        pdf.deletePage(pdf.internal.getNumberOfPages());
+      }
+
+      const blob = pdf.output('blob');
       const file = new File([blob], `Invoice_${entry.invoiceNo}.pdf`, { type: 'application/pdf' });
       const invData = entry.inv || inv;
       const text = `*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}`;
@@ -487,6 +550,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
              const url = URL.createObjectURL(blob);
              const a = document.createElement("a");
              a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+
              showToast("PDF downloaded!");
          }
       }
@@ -904,7 +968,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     <option value="part_paid">💰 Part Payment</option>
                     <option value="paid">✅ Paid</option>
                     <option value="unpaid">⏳ Unpaid</option>
-                    <option value="overdue">🔴 Overdue</option>
+                  <option value="overdue">🔴 Overdue</option>
                   </select>
                 </div>
 
@@ -918,7 +982,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                     }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700 }}>🧾 </button>
                   )}
 
-                  <button onClick={() => setDeleteTarget(entry)} style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#ef4444", cursor: "pointer", fontWeight: 700 }}>    Delete️️️️️️️️️️</button>
+                  <button onClick={() => setDeleteTarget(entry)} style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#ef4444", cursor: "pointer", fontWeight: 700 }}>Delete</button>
                 </div>
               </div>
             );
@@ -946,11 +1010,17 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             @page { size: A4 portrait; margin: 0; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
             .no-print, .no-print * { display: none !important; }
-            .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; }
-            .invoice-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: flex !important; min-height: 297mm !important; }
-            /* Hide every sibling of the paper to ensure no extra space */
+            .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; display: block !important; }
+            .invoice-paper { 
+              position: relative !important; top: auto !important; left: auto !important; 
+              width: 100% !important; max-width: 100% !important; margin: 0 !important; 
+              border-radius: 0 !important; box-shadow: none !important; 
+              overflow: visible !important; min-height: 0 !important; height: auto !important;
+            }
+            .flex-spacer { display: none !important; }
             body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
           }
+          .avoid-break { page-break-inside: avoid; break-inside: avoid; }
           @media (max-width:600px) {
             .inv-hgrid { flex-direction:column!important;gap:16px!important; }
             .inv-hright { text-align:left!important; }
@@ -966,13 +1036,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <button onClick={() => setStep("form")} style={{ padding: "10px 18px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>Edit</button>
           <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗 Share</button>
           <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WA</button>
-          <button onClick={() => { setDeleteTarget({ id: editingId, invoiceNo: inv.invoiceNo }); }} style={{ padding: "10px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ef4444", fontFamily: "inherit" }}>     Delete️️️️️️️️️️️️️️️️</button>
+          <button onClick={() => { setDeleteTarget({ id: editingId, invoiceNo: inv.invoiceNo }); }} style={{ padding: "10px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ef4444", fontFamily: "inherit" }}>Delete</button>
           <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
         <div className="invoice-paper print-container">
           {/* Header */}
-          <div style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
+          <div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
             <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(var(--app-accent-rgb, 124, 58, 237),0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
             <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
               <div>
@@ -1007,7 +1077,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           </div>
 
           {/* Bill To */}
-          <div className="inv-btgrid" style={{ display: "grid", gridTemplateColumns: inv.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
+          <div className="inv-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: inv.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
             <div style={{ padding: "20px 32px", borderRight: inv.project ? "1px solid var(--app-border)" : "none" }}>
               <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
               <div style={{ fontSize: 17, fontWeight: 800, color: "var(--app-text)" }}>{inv.client || "—"}</div>
@@ -1028,7 +1098,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
+                <tr className="avoid-break" style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
                     <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
@@ -1036,7 +1106,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               </thead>
               <tbody>
                 {items.map((item, idx) => (
-                  <tr key={item.id} style={{ borderBottom: "1px solid var(--app-bg)" }}>
+                  <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-bg)" }}>
                     <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
                     <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>{item.description || "—"}</td>
                     <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
@@ -1046,7 +1116,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 ))}
               </tbody>
             </table>
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+            <div className="avoid-break" style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
               <div style={{ width: "min(280px,100%)" }}>
                 {[
                   ["Subtotal", formatCurrency(subtotal, inv.currency)],
@@ -1068,7 +1138,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           </div>
 
           {/* Notes + QR */}
-          <div style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
+          <div className="avoid-break" style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {inv.notes && (
                 <div style={{ background: "var(--app-bg)", borderRadius: 11, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
@@ -1133,10 +1203,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
           </div>
 
-          <div style={{ flex: 1 }} />
+          <div className="flex-spacer" style={{ flex: 1 }} />
 
           {/* Footer */}
-          <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div className="avoid-break" style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
             <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{effectiveCompanyName}</div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{inv.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{inv.invoiceNo}</div>

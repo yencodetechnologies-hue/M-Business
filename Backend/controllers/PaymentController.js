@@ -11,6 +11,159 @@ const razorpay = new Razorpay({
 
 class PaymentController {
 
+  // ─── PayU Integration ────────────────────────────────────────────────────────
+  static async initPayUPayment(req, res) {
+    try {
+      const { plan, userId, userEmail, userName } = req.body;
+      const amount = plan.price;
+      const txnid = `PAYU-${Date.now()}-${Math.floor(Math.random() * 9999).toString().padStart(4, "0")}`;
+      
+      const key = process.env.PAYU_KEY;
+      const salt = process.env.PAYU_SALT;
+      const productinfo = plan.name;
+      const firstname = userName || "User";
+      const email = userEmail || "test@test.com";
+      const phone = "9999999999";
+
+      // 1. Cancel previous pending/active subscriptions for this user
+      await Subscription.updateMany(
+        { userId, status: { $in: ["active", "pending"] } },
+        { status: "cancelled", updatedAt: new Date() }
+      );
+
+      // 2. Create a "pending" subscription
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 30);
+      const sub = new Subscription({
+        userId, companyId: userId,
+        userEmail, userName,
+        planName: plan.name,
+        planPrice: plan.price,
+        billingCycle: "monthly",
+        status: "pending", // Will activate on success
+        isFullyPaid: false,
+        startDate: new Date(),
+        endDate,
+        nextBillingDate: endDate,
+        usageLimit: 999,
+        features: plan.features,
+        clientLimit: plan.clientLimit,
+        employeeLimit: plan.employeeLimit,
+        managerLimit: plan.managerLimit,
+        businessLimit: plan.businessLimit,
+        paymentMethod: "payu"
+      });
+      await sub.save();
+
+      // 3. Create a "pending" payment history record
+      const payment = new PaymentHistory({
+        userId, userEmail, amount, currency: "INR",
+        type: "subscription", description: `${plan.name} Plan Subscription`,
+        status: "pending", paymentId: txnid, subscriptionId: sub._id,
+        planName: plan.name, planDuration: "monthly",
+        notes: JSON.stringify({ gateway: "payu", txnid })
+      });
+      await payment.save();
+
+      // 4. Generate Hash
+      // Hash sequence: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||SALT
+      const hashString = `${key}|${txnid}|${amount}|${productinfo}|${firstname}|${email}|||||||||||${salt}`;
+      const hash = crypto.createHash('sha512').update(hashString).digest('hex');
+
+      res.json({
+        success: true,
+        key,
+        txnid,
+        amount,
+        productinfo,
+        firstname,
+        email,
+        phone,
+        hash,
+        surl: `${process.env.BASE_URL || 'http://localhost:5008'}/api/payments/payu/success`,
+        furl: `${process.env.BASE_URL || 'http://localhost:5008'}/api/payments/payu/failure`,
+        env: process.env.PAYU_ENV || "test"
+      });
+
+    } catch (error) {
+      console.error("PayU Init Error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  static async payuSuccessCallback(req, res) {
+    try {
+      const {
+        txnid, status, hash, amount, productinfo, firstname, email,
+        mihpayid, bank_ref_num, unmappedstatus, mode
+      } = req.body;
+
+      const key = process.env.PAYU_KEY;
+      const salt = process.env.PAYU_SALT;
+      const frontEndUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+
+      // Reverse hash verification
+      // status||||||||||udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key
+      const reverseHashString = `${salt}|${status}|||||||||||${email}|${firstname}|${productinfo}|${amount}|${txnid}|${key}`;
+      const reverseHash = crypto.createHash('sha512').update(reverseHashString).digest('hex');
+
+      if (reverseHash !== hash) {
+        return res.redirect(`${frontEndUrl}/dashboard?payment=invalid_hash`);
+      }
+
+      if (status === "success") {
+        const ts = Date.now();
+        const payment = await PaymentHistory.findOneAndUpdate(
+          { paymentId: txnid },
+          {
+            status: "completed",
+            paymentMethod: mode || "payu",
+            paymentDetails: { mihpayid, bank_ref_num, unmappedstatus },
+            paymentDate: new Date(),
+            invoiceNo: `INV-SUB-${ts}`,
+            quotationNo: `QUO-SUB-${ts}`,
+            updatedAt: new Date()
+          },
+          { returnDocument: 'after' }
+        );
+
+        if (payment && payment.subscriptionId) {
+          await Subscription.findByIdAndUpdate(payment.subscriptionId, {
+            status: "active",
+            isFullyPaid: true,
+            invoiceRefs: [`INV-SUB-${ts}`],
+            quotationRefs: [`QUO-SUB-${ts}`],
+            updatedAt: new Date()
+          });
+        }
+        res.redirect(`${frontEndUrl}/dashboard?payment=success&txnid=${txnid}&plan=${encodeURIComponent(productinfo)}`);
+      } else {
+        res.redirect(`${frontEndUrl}/dashboard?payment=failed&txnid=${txnid}`);
+      }
+    } catch (error) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard?payment=error`);
+    }
+  }
+
+  static async payuFailureCallback(req, res) {
+    try {
+      const { txnid, error_Message } = req.body;
+      const frontEndUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+
+      await PaymentHistory.findOneAndUpdate(
+        { paymentId: txnid },
+        {
+          status: "failed",
+          notes: `PayU Failure: ${error_Message}`,
+          updatedAt: new Date()
+        }
+      );
+      res.redirect(`${frontEndUrl}/dashboard?payment=failed&txnid=${txnid}`);
+    } catch (error) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard?payment=error`);
+    }
+  }
+
   static async createPaymentOrder(req, res) {
     try {
       const { amount, currency = "INR", receipt, notes } = req.body;

@@ -102,6 +102,23 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   const [paymentSuccessData, setPaymentSuccessData] = useState(null);
   const [assignedPackages, setAssignedPackages] = useState([]);
 
+  // Check URL for PayU success/failure redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentStatus = params.get("payment");
+    if (paymentStatus === "success") {
+      showToast("🎉 Payment Successful! Your plan is active.");
+      const planName = params.get("plan");
+      setPaymentSuccessData({ name: planName || "Subscription" });
+      
+      // Clean up URL without reloading
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (paymentStatus === "failed") {
+      showToast("❌ Payment failed. Please try again.");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   const userId = user?._id || user?.id;
   const userEmail = user?.email;
   const userName = user?.name || user?.clientName || "User";
@@ -296,100 +313,51 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     }
   };
 
-  // ── Razorpay Payment for Paid Plans ─────────────────────────────────────────
-  const startRazorpayPayment = async (plan) => {
+  // ── PayU Payment for Paid Plans ─────────────────────────────────────────────
+  const startPayUPayment = async (plan) => {
     if (plan.isTrial) { startTrial(plan); return; }
     if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
 
     try {
       setPayLoading(plan.name);
-      const loaded = await loadRazorpayScript();
-      if (!loaded) { showToast("❌ Razorpay failed to load. Check connection."); return; }
 
-      // Create order on backend
-      const orderRes = await axios.post(`${BASE_URL}/api/payments/create-order`, {
-        amount: plan.price,
-        currency: "INR",
-        userId, userEmail,
-        type: "subscription",
-        planName: plan.name,
-        planDuration: "monthly",
-        description: `${plan.name} Plan - Monthly Subscription`
+      // Call backend to initialize PayU and get hash
+      const initRes = await axios.post(`${BASE_URL}/api/payments/payu/init`, {
+        plan,
+        userId,
+        userEmail,
+        userName
       });
 
-      if (!orderRes.data.success) throw new Error("Order creation failed");
-      const order = orderRes.data.order;
+      if (!initRes.data.success) throw new Error("Payment initialization failed");
 
-      if (orderRes.data.isMock) {
-        setMockGatewayOpen({ plan, orderId: order.id });
-        setPayLoading(null);
-        return;
-      }
+      const { key, txnid, amount, productinfo, firstname, email, phone, hash, surl, furl, env } = initRes.data;
 
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SiQ9gcKvWsbGiX",
-        amount: order.amount,
-        currency: order.currency,
-        name: "M Business",
-        description: `${plan.name} Plan Subscription`,
-        image: "/logo.png",
-        order_id: order.id,
-        handler: async (response) => {
-          try {
-            // Verify payment
-            const verifyRes = await axios.post(`${BASE_URL}/api/payments/verify`, {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              paymentId: order.id,
-              paymentMethod: "card"
-            });
+      // Determine PayU URL based on environment
+      const payuUrl = env === "secure" ? "https://secure.payu.in/_payment" : "https://test.payu.in/_payment";
 
-            if (verifyRes.data.success) {
-              // Create subscription
-              const endDate = new Date();
-              endDate.setDate(endDate.getDate() + 30);
-              await axios.post(`${BASE_URL}/api/subscriptions/create`, {
-                userId, companyId: userId,
-                userEmail, userName,
-                planName: plan.name,
-                planPrice: plan.price,
-                billingCycle: "monthly",
-                status: "active",
-                isFullyPaid: true,
-                startDate: new Date(),
-                endDate,
-                nextBillingDate: endDate,
-                usageLimit: 999,
-                features: plan.features,
-                clientLimit: plan.clientLimit,
-                employeeLimit: plan.employeeLimit,
-                managerLimit: plan.managerLimit,
-                businessLimit: plan.businessLimit,
-                paymentMethod: "card",
-                invoiceRefs: [verifyRes.data.payment?.invoiceNo].filter(Boolean),
-                quotationRefs: [verifyRes.data.payment?.quotationNo].filter(Boolean)
-              });
+      // Create a form dynamically and submit it
+      const form = document.createElement("form");
+      form.setAttribute("method", "POST");
+      form.setAttribute("action", payuUrl);
 
-              await fetchData();
-              setPaymentSuccessData(plan);
-            }
-          } catch (err) {
-            showToast("❌ Payment verification failed. Contact support.");
-          }
-        },
-        prefill: { name: userName, email: userEmail, contact: "" },
-        notes: { userId, planName: plan.name },
-        theme: { color: "var(--app-accent)" },
-        modal: { ondismiss: () => setPayLoading(null) }
+      const params = {
+        key, txnid, amount, productinfo, firstname, email, phone, surl, furl, hash
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.on("payment.failed", () => { showToast("❌ Payment failed. Try again."); setPayLoading(null); });
-      rzp.open();
+      for (const [k, v] of Object.entries(params)) {
+        const hiddenField = document.createElement("input");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", k);
+        hiddenField.setAttribute("value", v);
+        form.appendChild(hiddenField);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+
     } catch (err) {
       showToast("❌ " + (err.response?.data?.error || err.message));
-    } finally {
       setPayLoading(null);
     }
   };
@@ -492,7 +460,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
                 </div>
 
                 <button
-                  onClick={() => startRazorpayPayment(plan)}
+                  onClick={() => startPayUPayment(plan)}
                   disabled={!!payLoading}
                   style={{
                     width: "100%", padding: "14px", borderRadius: 12, fontSize: 14, fontWeight: 800,

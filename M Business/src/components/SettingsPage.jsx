@@ -14,31 +14,53 @@ function hexToRgb(hex) {
 // ─────────────────────────────────────────────────────────────
 //  Reusable Components
 // ─────────────────────────────────────────────────────────────
-const Input = ({ label, value, onChange, type = "text", placeholder, required = false }) => (
-  <div style={{ marginBottom: 20 }}>
-    <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--app-text)", marginBottom: 6 }}>
-      {label} {required && <span style={{ color: "#ef4444" }}>*</span>}
-    </label>
-    <input
-      type={type}
-      value={value || ""}
-      onChange={e => {
-        let val = e.target.value;
-        if (type === "tel" && val && !/^\d*$/.test(val)) return;
-        onChange(val);
-      }}
-      placeholder={placeholder}
-      style={{
-        width: "100%", padding: "12px 14px", borderRadius: 12,
-        border: "1.5px solid var(--app-border)", background: "var(--app-bg)",
-        fontSize: 14, color: "var(--app-text)", outline: "none",
-        transition: "border-color 0.2s, box-shadow 0.2s"
-      }}
-      onFocus={e => { e.target.style.borderColor = "var(--app-accent)"; e.target.style.boxShadow = `0 0 0 3px rgba(var(--app-accent-rgb), 0.1)`; }}
-      onBlur={e => { e.target.style.borderColor = "var(--app-border)"; e.target.style.boxShadow = "none"; }}
-    />
-  </div>
-);
+const Input = ({ label, value, onChange, type = "text", placeholder, required = false }) => {
+  const [show, setShow] = useState(false);
+  const isPassword = type === "password";
+  const inputType = isPassword ? (show ? "text" : "password") : type;
+
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--app-text)", marginBottom: 6 }}>
+        {label} {required && <span style={{ color: "#ef4444" }}>*</span>}
+      </label>
+      <div style={{ position: "relative" }}>
+        <input
+          type={inputType}
+          value={value || ""}
+          onChange={e => {
+            let val = e.target.value;
+            if (type === "tel" && val && !/^\d*$/.test(val)) return;
+            onChange(val);
+          }}
+          placeholder={placeholder}
+          style={{
+            width: "100%", padding: "12px 14px", paddingRight: isPassword ? 40 : 14, borderRadius: 12,
+            border: "1.5px solid var(--app-border)", background: "var(--app-bg)",
+            fontSize: 14, color: "var(--app-text)", outline: "none",
+            transition: "border-color 0.2s, box-shadow 0.2s"
+          }}
+          onFocus={e => { e.target.style.borderColor = "var(--app-accent)"; e.target.style.boxShadow = `0 0 0 3px rgba(var(--app-accent-rgb), 0.1)`; }}
+          onBlur={e => { e.target.style.borderColor = "var(--app-border)"; e.target.style.boxShadow = "none"; }}
+        />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShow(!show)}
+            style={{
+              position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+              background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "var(--app-muted)",
+              padding: 4, display: "flex", alignItems: "center", justifyContent: "center"
+            }}
+            title={show ? "Hide password" : "Show password"}
+          >
+            {show ? "👁️‍🗨️" : "👁️"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const Toggle = ({ label, desc, checked, onChange }) => (
   <div style={{
@@ -268,9 +290,8 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   // Sidebar navigation items
   const navItems = [
     { id: "profile", icon: "👤", label: "Profile" },
-    { id: "notifications", icon: "🔔", label: "Notifications" },
     { id: "branding", icon: "🎨", label: "Branding" },
-    { id: "config", icon: "⚙️", label: "Platform Config" },
+ 
     { id: "security", icon: "🔒", label: "Security" }
   ];
 
@@ -350,7 +371,6 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             </div>
             <div style={{ marginTop: 12, fontWeight: 700, fontSize: 16, color: "var(--app-text)" }}>{displayName}</div>
             <div style={{ fontSize: 12, color: "var(--app-muted)" }}>{user?.email}</div>
-            <div style={{ marginTop: 8, fontSize: 11, background: "rgba(var(--app-accent-rgb), 0.1)", display: "inline-block", padding: "4px 12px", borderRadius: 99, color: "var(--app-accent)" }}>{roleLabel}</div>
           </div>
 
           {/* Navigation */}
@@ -386,7 +406,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
               <p style={{ fontSize: 14, color: "var(--app-muted)", marginBottom: 32 }}>Update your account information</p>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-                <Input label="Company / Display Name" value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} placeholder="Your company name" required />
+                <Input label="Company Name" value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} placeholder="Your company name" required />
                 <Input label="Email" type="email" value={profile.email} onChange={v => setProfile(p => ({ ...p, email: v }))} placeholder="Email address" />
                 <Input label="Phone" type="tel" value={profile.phone} onChange={v => setProfile(p => ({ ...p, phone: v }))} placeholder="Contact number" />
               </div>
@@ -448,20 +468,8 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
               </div>
 
               <div>
-                <label style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, display: "block" }}>Custom Brand Color</label>
-                <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-                  <input
-                    type="color"
-                    value={customColor || "#7c3aed"}
-                    onChange={(e) => { setCustomColor(e.target.value); setAppTheme("custom"); }}
-                    style={{ width: 60, height: 60, borderRadius: 16, border: "2px solid var(--app-border)", cursor: "pointer" }}
-                  />
-                  <div>
-                    <div style={{ fontWeight: 600 }}>Your primary color</div>
-                    <div style={{ fontSize: 13, color: "var(--app-muted)" }}>Used for buttons, links, and accents</div>
-                    <div style={{ fontFamily: "monospace", fontSize: 12, marginTop: 6 }}>{(customColor || "#7C3AED").toUpperCase()}</div>
-                  </div>
-                </div>
+              
+               
               </div>
             </div>
           )}

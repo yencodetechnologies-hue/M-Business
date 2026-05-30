@@ -43,7 +43,7 @@ managerLimit:  { type: String, default: "" },
 businessLimit: { type: String, default: "" },
 
   // Payment provider info
-  paymentMethod: { type: String, enum: ["card", "upi", "netbanking", "cash", "other"], default: "other" },
+  paymentMethod: { type: String, enum: ["card", "upi", "netbanking", "cash", "other", "payu", "razorpay"], default: "other" },
 
   // M Business as provider
   providerCompany: { type: String, default: "M Business" },

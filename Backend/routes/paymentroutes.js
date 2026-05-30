@@ -12,6 +12,11 @@ router.post("/verify", PaymentController.verifyPayment);
 // Payment Failure Handler
 router.post("/failure", PaymentController.handlePaymentFailure);
 
+// PayU Endpoints
+router.post("/payu/init", PaymentController.initPayUPayment);
+router.post("/payu/success", PaymentController.payuSuccessCallback);
+router.post("/payu/failure", PaymentController.payuFailureCallback);
+
 // Process Refund
 router.post("/refund", PaymentController.processRefund);
 

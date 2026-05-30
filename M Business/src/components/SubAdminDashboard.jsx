@@ -3626,7 +3626,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // (b) subadmin and no active subscription (blocked)
   let enforceMySubscriptions = false;
   if (!isAdmin && isSubAdmin) {
-    if (subLoading || (!subLoading && subStatus.blocked)) {
+    if (!subLoading && subStatus.blocked) {
       enforceMySubscriptions = true;
     }
   }

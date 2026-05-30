@@ -466,37 +466,6 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             </div>
           )}
 
-          {/* PLATFORM CONFIG TAB */}
-          {activeTab === "config" && (
-            <div style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 24, padding: "28px 32px" }}>
-              <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6, color: "var(--app-text)" }}>Platform Configuration</h2>
-              <p style={{ fontSize: 14, color: "var(--app-muted)", marginBottom: 28 }}>Manage statuses, priorities, and more</p>
-
-              {loading ? (
-                <div style={{ textAlign: "center", padding: 40, color: "var(--app-muted)" }}>Loading configuration...</div>
-              ) : !config ? (
-                <div style={{ textAlign: "center", padding: 40, color: "#ef4444" }}>Failed to load config</div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-                  {[
-                    { key: "projectStatuses", title: "Project Statuses", placeholder: "New status (e.g. Planning)" },
-                    { key: "taskStatuses", title: "Task Statuses", placeholder: "New status (e.g. In Review)" },
-                    { key: "taskPriorities", title: "Task Priorities", placeholder: "New priority (e.g. Critical)" }
-                  ].map(({ key, title, placeholder }) => (
-                    <div key={key}>
-                      <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 16 }}>{title}</div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
-                        {config[key].map((item, idx) => (
-                          <Chip key={idx} onRemove={() => removeItem(key, idx)}>{item}</Chip>
-                        ))}
-                      </div>
-                      <AddInput onAdd={val => addItem(key, val)} placeholder={placeholder} />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
           {/* SECURITY TAB (new) */}
           {activeTab === "security" && (

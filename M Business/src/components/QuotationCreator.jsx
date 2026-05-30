@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { BASE_URL, FRONTEND_URL } from "../config";
+import html2pdf from "html2pdf.js";
 import axios from "axios";
 
 const GST_RATES = [0, 5, 12, 18, 28];
@@ -246,52 +247,58 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     setStep("preview");
   };
 
-  const shareQuotation = async (entry) => {
-    const qtData = entry.qt || qt;
-    const itemsData = entry.items || items;
-    const slimPayload = {
-      no: entry.quoteNo, date: qtData.date, exp: qtData.expiryDate,
-      co: qtData.companyName, email: qtData.companyEmail, phone: qtData.companyPhone, addr: qtData.companyAddress,
-      cl: entry.client || qtData.client, proj: qtData.project, gst: qtData.gstRate, notes: qtData.notes, terms: qtData.terms,
-      incGst: qtData.isGstIncluded,
-      paid: qtData.amountPaid,
-      upi: qtData.upiId,
-      cur: qtData.currency,
-      items: itemsData.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
-      cid: user?.companyId || user?.company || user?._id || "",
+  const triggerPDFShare = async (entry, type) => {
+    if (step !== "preview") {
+      loadEntry(entry);
+      setTimeout(() => {
+        setStep("preview");
+        setTimeout(() => triggerPDFShare(entry, type), 1000);
+      }, 0);
+      return;
+    }
+    const element = document.querySelector(".qt-paper");
+    if (!element) return;
+    
+    const opt = {
+      margin:       0,
+      filename:     `Quotation_${entry.quoteNo}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
-    const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
-    const link = `${window.location.origin}/quotation-view?d=${encodedData}`;
-
-    const text = `*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`;
-    if (navigator.share) {
-      try { await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, url: link }); } catch (err) { console.log(err); }
-    } else {
-      navigator.clipboard.writeText(text);
-      alert("📋 Link copied to clipboard!");
+    
+    try {
+      const blob = await html2pdf().set(opt).from(element).output('blob');
+      const file = new File([blob], `Quotation_${entry.quoteNo}.pdf`, { type: 'application/pdf' });
+      const qtData = entry.qt || qt;
+      const text = `*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || total, qtData.currency)}`;
+      
+      if (type === "wa") {
+         if (navigator.canShare && navigator.canShare({ files: [file] })) {
+             await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, files: [file] });
+         } else {
+             const url = URL.createObjectURL(blob);
+             const a = document.createElement("a");
+             a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+         }
+      } else {
+         if (navigator.canShare && navigator.canShare({ files: [file] })) {
+             await navigator.share({ title: `Quotation ${entry.quoteNo}`, text, files: [file] });
+         } else {
+             const url = URL.createObjectURL(blob);
+             const a = document.createElement("a");
+             a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+         }
+      }
+    } catch (err) {
+      console.log(err);
+      alert("❌ Failed to generate PDF");
     }
   };
 
-  const shareWhatsApp = (entry) => {
-    const qtData = entry.qt || qt;
-    const itemsData = entry.items || items;
-    const slimPayload = {
-      no: entry.quoteNo, date: qtData.date, exp: qtData.expiryDate,
-      co: qtData.companyName, email: qtData.companyEmail, phone: qtData.companyPhone, addr: qtData.companyAddress,
-      cl: entry.client || qtData.client, proj: qtData.project, gst: qtData.gstRate, notes: qtData.notes, terms: qtData.terms,
-      incGst: qtData.isGstIncluded,
-      paid: qtData.amountPaid,
-      upi: qtData.upiId,
-      cur: qtData.currency,
-      items: itemsData.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
-      cid: user?._id || "",
-    };
-    const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))));
-    const link = `${window.location.origin}/quotation-view?d=${encodedData}`;
-
-    const text = encodeURIComponent(`*${qtData.companyName || "Your Business"}*\n\nQuotation: ${entry.quoteNo}\nTotal: ${formatCurrency(entry.total || total, qtData.currency)}\n\n${qtData.companyAddress ? `Address: ${qtData.companyAddress}\n` : ""}${qtData.companyPhone ? `Contact: ${qtData.companyPhone}\n` : ""}\nView here: ${link}\n\n${qtData.footerMessage || "🙏 Thank you for considering us!"}`);
-    window.open(`https://wa.me/?text=${text}`, "_blank");
-  };
+  const shareQuotation = (entry) => triggerPDFShare(entry, "link");
+  const shareWhatsApp = (entry) => triggerPDFShare(entry, "wa");
 
   const loadEntry = (entry) => {
     setQt(entry.qt || blank);

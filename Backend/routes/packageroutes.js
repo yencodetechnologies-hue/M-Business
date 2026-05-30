@@ -22,7 +22,12 @@ router.get("/subadmin/:subadminId", async (req, res) => {
     const { subadminId } = req.params;
     // Find packages assigned to this specific subadmin OR any package targeted at subadmins
     const packages = await Package.find({
-      assignedSubadmins: { $in: [subadminId] },
+      $or: [
+        { assignedSubadmins: { $in: [subadminId] } },
+        { targetRole: "subadmin" },
+        { targetRole: "all" },
+        { targetRole: { $exists: false } }
+      ],
       status: "Active"
     }).sort({ createdAt: 1 });
     res.json(packages);

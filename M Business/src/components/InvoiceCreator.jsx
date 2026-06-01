@@ -486,6 +486,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         letterRendering: true,
         width: elemW,
         height: elemH,
+        windowWidth: elemW,
+        windowHeight: elemH,
         scrollX: 0,
         scrollY: -window.scrollY,
         onclone: (doc) => {
@@ -532,6 +534,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       const file = new File([blob], `Invoice_${entry.invoiceNo}.pdf`, { type: 'application/pdf' });
       const invData = entry.inv || inv;
       const text = `*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}`;
+      
+      if (type === "print") {
+         pdf.autoPrint();
+         const blobURL = pdf.output('bloburl');
+         window.open(blobURL, '_blank');
+         return;
+      }
       
       if (type === "wa") {
          if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -1005,7 +1014,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
           * { box-sizing: border-box; }
-          .invoice-paper { position: relative; max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25); overflow: hidden; display: flex; flex-direction: column; min-height: 1122px; }
+          .invoice-paper { position: relative; max-width: 794px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25); display: flex; flex-direction: column; min-height: 1122px; }
           @media print {
             @page { size: A4 portrait; margin: 0; }
             html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
@@ -1037,7 +1046,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }}>🔗 Share</button>
           <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "10px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }}>💬 WA</button>
           <button onClick={() => { setDeleteTarget({ id: editingId, invoiceNo: inv.invoiceNo }); }} style={{ padding: "10px 18px", background: "#fee2e2", border: "1.5px solid #fecaca", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#ef4444", fontFamily: "inherit" }}>Delete</button>
-          <button onClick={() => window.print()} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
+          <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
         <div className="invoice-paper print-container">
@@ -1203,13 +1212,13 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
             </div>
           </div>
 
-          <div style={{ height: 80 }} /> {/* Spacer to prevent overlap */}
+          <div className="flex-spacer" style={{ flex: 1 }} />
 
           {/* Footer */}
-          <div className="avoid-break" style={{ position: "absolute", bottom: 0, left: 0, width: "100%", background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-            <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>{inv.footerMessage}</div>
-            <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600 }}>{inv.invoiceNo}</div>
+          <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, pageBreakBefore: "auto", breakBefore: "auto" }}>
+            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>{inv.footerMessage}</div>
+            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{inv.invoiceNo}</div>
           </div>
         </div>
       </div>

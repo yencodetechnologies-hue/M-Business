@@ -2489,8 +2489,23 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
 // ═══════════════════════════════════════════════════════════
 // PACKAGES PAGE
 // ═══════════════════════════════════════════════════════════
+const DEFAULT_PLANS = [
+  {
+    title: "Trial", price: 0, icon: "✨", type: "free",
+    features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"]
+  },
+  {
+    title: "Starter", price: 999, icon: "🌱",
+    features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 1", "Clients: 3", "Employees: 10", "Email Support"]
+  },
+  {
+    title: "Professional", price: 2999, icon: "🚀", type: "pro",
+    features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"]
+  }
+];
+
 function PackagesPage({ packages, onSubscribe, THEME }) {
-  const displayedPackages = (packages && packages.length > 0) ? [...packages].sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)) : [];
+  const displayedPackages = (packages && packages.length > 0) ? [...packages].sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)) : DEFAULT_PLANS;
 
   return (
     <div style={{

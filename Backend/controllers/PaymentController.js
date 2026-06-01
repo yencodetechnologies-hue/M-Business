@@ -2,6 +2,7 @@ const PaymentHistory = require("../models/PaymentHistoryModel");
 const Subscription = require("../models/SubscriptionModel");
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
+const { sendSubscriptionSuccess } = require('../config/email');
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -25,11 +26,8 @@ class PaymentController {
       const email = userEmail || "test@test.com";
       const phone = "9999999999";
 
-      // 1. Cancel previous pending/active subscriptions for this user
-      await Subscription.updateMany(
-        { userId, status: { $in: ["active", "pending"] } },
-        { status: "cancelled", updatedAt: new Date() }
-      );
+      // Only create the pending subscription, do NOT cancel the active one yet!
+
 
       // 2. Create a "pending" subscription
       const endDate = new Date();
@@ -128,13 +126,31 @@ class PaymentController {
         );
 
         if (payment && payment.subscriptionId) {
-          await Subscription.findByIdAndUpdate(payment.subscriptionId, {
+          // Cancel previous subscriptions now that payment is successful
+          await Subscription.updateMany(
+            { userId: payment.userId, _id: { $ne: payment.subscriptionId }, status: { $in: ["active", "pending"] } },
+            { status: "cancelled", updatedAt: new Date() }
+          );
+
+          const activatedSub = await Subscription.findByIdAndUpdate(payment.subscriptionId, {
             status: "active",
             isFullyPaid: true,
             invoiceRefs: [`INV-SUB-${ts}`],
             quotationRefs: [`QUO-SUB-${ts}`],
             updatedAt: new Date()
-          });
+          }, { new: true });
+          
+          if (activatedSub) {
+            try {
+              await sendSubscriptionSuccess(
+                activatedSub.userEmail, 
+                activatedSub.userName || "User", 
+                activatedSub.planName, 
+                activatedSub.startDate, 
+                activatedSub.endDate
+              );
+            } catch(e) { console.error("Email error:", e.message); }
+          }
         }
         res.redirect(`${frontEndUrl}/dashboard?payment=success&txnid=${txnid}&plan=${encodeURIComponent(productinfo)}`);
       } else {
@@ -258,11 +274,29 @@ class PaymentController {
       }
 
       if (payment.type === "subscription" && payment.subscriptionId) {
-        await Subscription.findByIdAndUpdate(payment.subscriptionId, {
+        // Cancel previous subscriptions now that payment is successful
+        await Subscription.updateMany(
+          { userId: payment.userId, _id: { $ne: payment.subscriptionId }, status: { $in: ["active", "pending"] } },
+          { status: "cancelled", updatedAt: new Date() }
+        );
+
+        const activatedSub = await Subscription.findByIdAndUpdate(payment.subscriptionId, {
           status: "active",
           isFullyPaid: true,
           updatedAt: new Date()
-        });
+        }, { new: true });
+        
+        if (activatedSub) {
+          try {
+            await sendSubscriptionSuccess(
+              activatedSub.userEmail, 
+              activatedSub.userName || "User", 
+              activatedSub.planName, 
+              activatedSub.startDate, 
+              activatedSub.endDate
+            );
+          } catch(e) { console.error("Email error:", e.message); }
+        }
       }
 
       res.json({

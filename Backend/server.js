@@ -23,10 +23,11 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (isLocalhost(origin) || allowedOrigins.includes(origin)) {
+    if (!origin || origin === "null") return callback(null, true);
+    if (isLocalhost(origin) || allowedOrigins.includes(origin) || origin.endsWith("payu.in")) {
       callback(null, true);
     } else {
+      console.error("[CORS BLOCKED] Origin not allowed:", origin);
       callback(new Error('Not allowed by CORS'));
     }
   },

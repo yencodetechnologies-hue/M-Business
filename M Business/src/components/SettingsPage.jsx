@@ -312,7 +312,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   } : { maxWidth: 1400, margin: "0 auto", padding: "20px" };
 
   return (
-    <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)" }}>
+    <div style={{ ...wrapperStyle, fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--app-bg, var(--bg, #F5FAFA))" }}>
       {toast && (
         <div style={{
           position: "fixed", bottom: 24, right: 24, zIndex: 9999,
@@ -352,7 +352,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             {activeTab === "profile" && (
               <div className="settings-section">
                 <div className="ss-header">
-                  <div className="ss-header-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}>👤</div>
+                  <div className="ss-header-icon" style={{ background: "rgba(var(--app-accent-rgb), 0.15)", color: "var(--app-accent)" }}>👤</div>
                   <div>
                     <div className="ss-title">Profile & Company</div>
                     <div className="ss-sub">Update your personal and business information</div>
@@ -404,7 +404,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             {activeTab === "branding" && (
               <div className="settings-section">
                 <div className="ss-header">
-                  <div className="ss-header-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}>🎨</div>
+                  <div className="ss-header-icon" style={{ background: "rgba(var(--app-accent-rgb), 0.15)", color: "var(--app-accent)" }}>🎨</div>
                   <div>
                     <div className="ss-title">Branding & Theme</div>
                     <div className="ss-sub">Customize the look and feel of your app</div>
@@ -433,7 +433,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
             {activeTab === "security" && (
               <div className="settings-section">
                 <div className="ss-header">
-                  <div className="ss-header-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}>🔒</div>
+                  <div className="ss-header-icon" style={{ background: "rgba(var(--app-accent-rgb), 0.15)", color: "var(--app-accent)" }}>🔒</div>
                   <div>
                     <div className="ss-title">Security & Passwords</div>
                     <div className="ss-sub">Manage your password and security settings</div>

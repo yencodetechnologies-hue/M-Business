@@ -86,6 +86,7 @@ const NAV = [
   { key: "tasks", icon: "◉", label: "Active Tasks" },
   { key: "calendar", icon: "◷", label: "Calendar" },
   { key: "messaging", icon: "✉", label: "Messages" },
+  { key: "documents", icon: "📄", label: "Documents" },
   { key: "reports", icon: "▦", label: "Reports" },
   { key: "settings", icon: "◌", label: "Settings" },
 ];
@@ -218,7 +219,7 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
             )}
             <div>
               <div style={{ fontWeight: 800, fontSize: 14, color: "#fff", letterSpacing: "-0.3px" }}>{displayName}</div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", letterSpacing: 1.5, fontWeight: 600, textTransform: "uppercase", marginTop: 2 }}>{user?.role || "EMPLOYEE"}</div>
+              <div style={{ fontSize: 9, color: "#ffffff", letterSpacing: 1.5, fontWeight: 600, textTransform: "uppercase", marginTop: 2 }}>{user?.role || "EMPLOYEE"}</div>
             </div>
           </div>
           <button onClick={onClose} className="emp-sb-close" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)", width: 26, height: 26, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 11 }}>✕</button>
@@ -226,14 +227,14 @@ function Sidebar({ active, setActive, open, onClose, onLogout, user, navItems })
 
         {/* Nav */}
         <nav style={{ flex: 1, padding: "12px 14px", marginTop: 6, overflowY: "auto" }}>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", padding: "0 8px", marginBottom: 8 }}>Main Menu</div>
+          <div style={{ fontSize: 9, color: "#ffffff", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", padding: "0 8px", marginBottom: 8 }}>Main Menu</div>
           {(navItems || NAV).map(n => {
             const on = active === n.key;
             return (
               <button key={n.key} onClick={() => { setActive(n.key); onClose(); }}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", background: on ? "rgba(255,255,255,0.1)" : "transparent", border: on ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent", borderRadius: 10, color: on ? "#fff" : "rgba(255,255,255,0.45)", fontWeight: on ? 900 : 700, fontSize: 13, cursor: "pointer", marginBottom: 3, textAlign: "left", fontFamily: "inherit", transition: "all 0.18s" }}
-                onMouseEnter={e => { if (!on) { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; } }}
-                onMouseLeave={e => { if (!on) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.45)"; } }}>
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 11, padding: "10px 12px", background: on ? "rgba(255,255,255,0.1)" : "transparent", border: on ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent", borderRadius: 10, color: "#ffffff", fontWeight: on ? 900 : 700, fontSize: 13, cursor: "pointer", marginBottom: 3, textAlign: "left", fontFamily: "inherit", transition: "all 0.18s" }}
+                onMouseEnter={e => { if (!on) { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#ffffff"; } }}
+                onMouseLeave={e => { if (!on) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#ffffff"; } }}>
                 <span style={{ fontSize: 15, opacity: on ? 1 : 0.5, minWidth: 18, textAlign: "center" }}>{n.icon}</span>
                 <span style={{ flex: 1 }}>{n.label}</span>
                 {on && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#fff", opacity: 0.7 }} />}
@@ -316,6 +317,74 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
 }
 
 // ── DASHBOARD PAGE ───────────────────────────────────────────
+
+// ── Employee Documents Page ──────────────────────────────────
+function EmployeeDocumentsPage({ user }) {
+  const [docs, setDocs] = useState([]);
+  const [selectedDoc, setSelectedDoc] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDocs = async () => {
+      try {
+        const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
+        const displayName = user?.name || "Employee";
+        const res = await axios.get(`${BASE_URL}/api/documents?companyId=${companyId}&client=${encodeURIComponent(displayName)}&sendTo=employee`);
+        setDocs(res.data);
+      } catch (err) {
+        console.error("Failed to fetch documents:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDocs();
+  }, [user]);
+
+  if (selectedDoc) {
+    return (
+      <div style={{ display:"flex", flexDirection:"column", height:"100%" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+          <button onClick={() => setSelectedDoc(null)} style={{ background:T.surface, border:`1px solid ${T.border}`, color:T.text, padding:"8px 16px", borderRadius:8, cursor:"pointer", display:"flex", alignItems:"center", gap:8 }}>
+            <i className="ti ti-arrow-left"></i> Back to Documents
+          </button>
+          <div style={{ fontSize:16, fontWeight:700, color:T.text }}>{selectedDoc.docType.toUpperCase()} Document</div>
+        </div>
+        <div className="document-preview-content" style={{ flex:1, background:"#fff", borderRadius:12, padding:"30px", overflowY:"auto", color:"#000" }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent }} />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:16, padding:24 }}>
+      <div style={{ fontSize:22, fontWeight:800, color:T.text }}>My Documents</div>
+      <div style={{ display:"grid", gap:12 }}>
+        {loading ? (
+          <div style={{ color:T.textMuted, padding: 20 }}>Loading documents...</div>
+        ) : docs.length === 0 ? (
+          <div style={{ background:T.surface, border:`1px solid ${T.border}`, padding:40, borderRadius:16, textAlign:"center" }}>
+            <div style={{ fontSize:40, marginBottom:16 }}>📭</div>
+            <div style={{ fontSize:16, fontWeight:700, color:T.text, marginBottom:8 }}>No Documents</div>
+            <div style={{ color:T.textMuted, fontSize:14 }}>You haven't received any documents or letters yet.</div>
+          </div>
+        ) : (
+          docs.map(doc => (
+          <div key={doc._id || doc.id} onClick={() => setSelectedDoc(doc)} style={{ background:T.surface, border:`1px solid ${T.border}`, padding:20, borderRadius:12, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center", transition:"all 0.2s" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+              <div style={{ width:40, height:40, borderRadius:10, background:T.accentLight, display:"flex", alignItems:"center", justifyContent:"center", color:T.accent }}>
+                <i className="ti ti-file-text" style={{ fontSize:20 }}></i>
+              </div>
+              <div>
+                <div style={{ fontSize:15, fontWeight:700, color:T.text, textTransform:"capitalize" }}>{doc.docType} received</div>
+                <div style={{ fontSize:12, color:T.textMuted }}>Sent on {new Date(doc.dateSent).toLocaleString()}</div>
+              </div>
+            </div>
+            <i className="ti ti-chevron-right" style={{ color:T.textMuted }}></i>
+          </div>
+        )))}
+      </div>
+    </div>
+  );
+}
 
 function DashboardPage({ user, projects, tasks, proposals, attendance, salary, setPage, docStatus, onOpenProfile }) {
   const name = user?.name || "Employee";
@@ -1659,6 +1728,7 @@ export default function EmployeeDashboard({ user, setUser }) {
               />
             )}
             {page === "messaging" && <MessagingPage user={resolvedUser} />}
+            {page === "documents" && <EmployeeDocumentsPage user={resolvedUser} />}
             {page === "settings" && (
               <SettingsPage
                 user={resolvedUser}

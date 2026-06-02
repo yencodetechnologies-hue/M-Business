@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { BASE_URL, FRONTEND_URL } from "../config";
 import html2canvas from "html2canvas";
@@ -126,6 +126,44 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || user?.companyName || "M Business";
   const [step, setStep] = useState("list");
+
+  const iframeRef = useRef(null);
+
+  useEffect(() => {
+    const handleMsg = (e) => {
+      if (e.data?.type === 'SAVE_DOCUMENT' && e.data?.payload?.docType === 'quo') {
+        const payload = e.data.payload;
+        const newDoc = {
+          id: Date.now(),
+          invoiceNo: payload.invoiceNo || `QUO-${Date.now()}`,
+          quotationNo: payload.invoiceNo || `QUO-${Date.now()}`,
+          proposalNo: payload.invoiceNo || `QUO-${Date.now()}`,
+          client: payload.client || 'Unknown Client',
+          date: payload.date || new Date().toISOString().split('T')[0],
+          dueDate: payload.dueDate || new Date().toISOString().split('T')[0],
+          status: 'draft',
+          amount: payload.amount || 0,
+          total: payload.amount || 0,
+          currency: 'INR',
+          htmlContent: payload.htmlContent,
+          type: 'quotation',
+          title: payload.client + ' - Quotation'
+        };
+        setQuotations(prev => [newDoc, ...prev]);
+        setStep("list");
+        if(typeof showToast === 'function') showToast("Quotation saved successfully!");
+      }
+    };
+    window.addEventListener('message', handleMsg);
+    return () => window.removeEventListener('message', handleMsg);
+  }, []);
+
+  const sendThemeToIframe = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || '#00BCD4';
+      iframeRef.current.contentWindow.postMessage({ type: 'SET_THEME', color }, '*');
+    }
+  };
   const [qtList, setQtList] = useState([]);
   const [listLoading, setListLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -898,6 +936,19 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   }
 
   // ══════════ FORM ══════════
+  if (step === "template") {
+    return (
+      <div style={{ width: "100%", height: "80vh", display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "10px 0", display: "flex", gap: 10, alignItems: "center" }}>
+          <button onClick={() => setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "var(--app-muted)" }}>← Back to List</button>
+        </div>
+        <div style={{ flex: 1, overflow: "hidden", borderRadius: 16 }}>
+          <iframe src="/template-designer.html#quo" ref={iframeRef} onLoad={sendThemeToIframe} style={{ width: "100%", height: "100%", border: "none" }} title="Template Designer" />
+        </div>
+      </div>
+    );
+  }
+
   const hasErrors = Object.keys(errors).length > 0;
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 }}>

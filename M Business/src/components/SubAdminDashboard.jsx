@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import React from "react";
+import "./DashboardModern.css";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import InvoiceCreator from "./InvoiceCreator";
@@ -81,6 +82,8 @@ const NAV = [
         { key: "accounts", icon: "ti-wallet", label: "Accounts" },
         { key: "payments", icon: "ti-arrows-right-left", label: "Payments" },
         { key: "expenses", icon: "ti-cash", label: "Expenses" },
+        { key: "templates", icon: "ti-template", label: "Templates" },
+        { key: "letterhead", icon: "ti-letter-a", label: "Letterhead" },
       ]
     },
     {
@@ -103,7 +106,7 @@ function getNavForRole(role) {
   const allowedKeys = [];
 
   if (r === "subadmin" || r === "sub_admin" || r === "sub-admin") {
-    allowedKeys.push("dashboard", "clients", "subadmins", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "payments", "expenses", "interviews", "reports", "mysubscriptions", "packages", "vendors", "rolePermissions", "messaging", "settings");
+    allowedKeys.push("dashboard", "templates", "letterhead", "clients", "subadmins", "employees", "managers", "projects", "quotations", "proposals", "invoices", "tracking", "tasks", "calendar", "accounts", "payments", "expenses", "interviews", "reports", "mysubscriptions", "packages", "vendors", "rolePermissions", "messaging", "settings");
   } else if (r === "manager") {
     allowedKeys.push("dashboard", "employees", "projects", "tracking", "tasks", "calendar", "interviews", "reports", "vendors", "messaging");
   } else if (r === "employee") {
@@ -452,7 +455,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         {c.logoUrl ? (
-                          <img src={c.logoUrl} alt="logo" style={{ height: 28, width: "auto", maxWidth: "80px", borderRadius: 6, objectFit: "cover", border: "1px solid var(--app-border)", background: "#fff", display: "block" }} />
+                          <img src={c.logoUrl} alt="logo" style={{ height: 28, width: "auto", maxWidth: "80px", borderRadius: 6, objectFit: "contain", flexShrink: 0, border: "1px solid var(--app-border)", background: "#fff", display: "block" }} />
                         ) : (
                           <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(c.clientName || c.name || "?")[0].toUpperCase()}</div>
                         )}
@@ -484,7 +487,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
         <Mdl title="Client Details" onClose={() => setViewClient(null)} maxWidth={500}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
             {viewClient.logoUrl ? (
-              <img src={viewClient.logoUrl} alt="logo" style={{ height: 52, width: "auto", maxWidth: "120px", borderRadius: 10, objectFit: "cover", border: "1px solid var(--app-border)", background: "#fff", display: "block" }} />
+              <img src={viewClient.logoUrl} alt="logo" style={{ height: 52, width: "auto", maxWidth: "120px", borderRadius: 10, objectFit: "contain", flexShrink: 0, border: "1px solid var(--app-border)", background: "#fff", display: "block" }} />
             ) : (
               <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800 }}>{(viewClient.clientName || viewClient.name || "?")[0].toUpperCase()}</div>
             )}
@@ -752,14 +755,14 @@ function EmployeesPage({ employees, setEmployees }) {
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       {/* Share Onboarding Link Card */}
-      <div style={{ background: "linear-gradient(135deg,var(--app-sidebar),#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)" }}>
+      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)" }}>
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Employee Onboarding Link</div>
-          <div style={{ fontSize: 12, color: "var(--app-accent)", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
+          <div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
         </div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
           <button onClick={() => {
             const text = `Hi,\n\nPlease fill in your onboarding details at the following link to join our team:\n\n${onboardingLink}`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
@@ -1963,11 +1966,11 @@ function InterviewPage({ companyId, companyName }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
-      <div style={{ background: "linear-gradient(135deg,var(--app-sidebar),#2d1057)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.25)" }}>
+      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.25)" }}>
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
-        <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "var(--app-accent)", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
+        <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(var(--app-accent-rgb, 124, 58, 237),0.5)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
           <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
         </div>
       </div>
@@ -2114,7 +2117,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
           <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>✕</button>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 8, margin: "0 auto 12px", position: "relative", width: "fit-content" }}>
             {companyLogo ? (
-              <img src={companyLogo} alt="logo" style={{ height: 72, width: "auto", maxWidth: "180px", borderRadius: 16, objectFit: "cover", border: "3px solid rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.22)", display: "block" }} />
+              <img src={companyLogo} alt="logo" style={{ height: 72, width: "auto", maxWidth: "180px", borderRadius: 16, objectFit: "contain", flexShrink: 0, border: "3px solid rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.22)", display: "block" }} />
             ) : (
               <div style={{ width: 72, height: 72, borderRadius: 16, background: "rgba(255,255,255,0.22)", border: "3px solid rgba(255,255,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 24, fontWeight: 800 }}>{initials}</div>
             )}
@@ -2224,7 +2227,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
               {projects.length === 0 ? (
                 <div style={{ textAlign: "center", padding: 20, color: "var(--app-muted)", fontSize: 12 }}>No projects in progress</div>
               ) : (
-                projects.slice(0, 3).map(p => (
+                projects.filter(p => !dashSearch || (p.name || p.projectName || p.id || "").toLowerCase().includes(dashSearch.toLowerCase())).slice(0, 3).map(p => (
                   <div key={p._id} style={{ marginBottom: 12, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                       <span style={{ fontSize: 11, fontWeight: 700, color: "var(--app-sidebar)" }}>{p.name}</span>
@@ -2296,10 +2299,10 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
           alignItems: "center",
           gap: 9,
           padding: isSub ? "8px 12px 8px 32px" : "9px 12px",
-          background: on ? "linear-gradient(90deg,rgba(var(--app-accent-rgb),0.35),rgba(var(--app-accent-rgb),0.15))" : "transparent",
-          border: on ? "1px solid rgba(var(--app-accent-rgb),0.35)" : "1px solid transparent",
+          background: on ? "linear-gradient(90deg,rgba(255,255,255,0.25),rgba(255,255,255,0.05))" : "transparent",
+          border: on ? "1px solid rgba(255,255,255,0.35)" : "1px solid transparent",
           borderRadius: 11,
-          color: on ? "#fff" : "rgba(255,255,255,0.75)",
+          color: "#ffffff",
           fontWeight: on ? 800 : 700,
           fontSize: isSub ? 12.5 : 13,
           cursor: "pointer",
@@ -2322,7 +2325,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
       <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
         <div className="logo">
           {companyLogo ? (
-            <img onClick={onLogoUploadClick} src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "cover", cursor: "pointer" }} />
+            <img onClick={onLogoUploadClick} src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "contain", flexShrink: 0, cursor: "pointer" }} />
           ) : (
             <span className="logo-mark" onClick={onLogoUploadClick} style={{ cursor: "pointer" }}>{companyName || "MBusiness"}</span>
           )}
@@ -2381,8 +2384,19 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
           })}
         </nav>
         
-        <div className="sidebar-bottom">
-          <button className="upload-btn" onClick={() => setActive("invoices")}><i className="ti ti-plus" style={{fontSize:15}}></i> New Invoice</button>
+        <div className="sidebar-bottom" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '20px' }}>
+
+          <button onClick={() => document.getElementById('global-file-upload')?.click()} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: 'var(--app-accent)', color: '#fff', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 4px 12px rgba(var(--app-accent-rgb), 0.3)', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+            <i className="ti ti-upload" style={{ fontSize: 18 }}></i> Upload File
+          </button>
+          <input type="file" id="global-file-upload" style={{ display: 'none' }} onChange={(e) => {
+            if(e.target.files && e.target.files[0]) {
+              setUploadFileTarget(e.target.files[0]);
+              setUploadTargetRole("client");
+              setUploadTargetUser("");
+            }
+            e.target.value = null;
+          }} />
         </div>
       </aside>
       <div className="sidebar-spacer" style={{ width: 210, minWidth: 210, flexShrink: 0 }} />
@@ -2689,6 +2703,7 @@ function VendorsPage({ vendors, setVendors }) {
 // ═══════════════════════════════════════════════════════════
 export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "M Business";
+  const [dashSearch, setDashSearch] = useState("");
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_subadmin") || "dashboard");
   useEffect(() => { localStorage.setItem("activeTab_subadmin", active); }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
@@ -2748,7 +2763,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const accentColor = hslToHex(h, accentS, accentL);
 
     return {
-      sidebar: hslToHex(h, Math.min(s + 20, 100), 12), // Very deep color for sidebar
+      sidebar: accentColor, // Use the vibrant color directly for sidebar as requested
       accent: accentColor,
       bg: hslToHex(h, 30, 95), // Clearer tinted background
       muted: hslToHex(h, 60, 30), // Much darker muted text (30% vs 35%)
@@ -2758,15 +2773,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const THEMES = {
-    purple: { label: "Purple", sidebar: "#1e0a3c", accent: "#7c3aed", bg: "#f5f3ff", muted: "#7c3aed", border: "#ddd6fe", dot: "#7c3aed" },
-    ocean: { label: "Ocean", sidebar: "#0a3552", accent: "#0284c7", bg: "#f0f9ff", muted: "#0369a1", border: "#93c5fd", dot: "#0284c7" },
-    forest: { label: "Forest", sidebar: "#0f3d22", accent: "#16a34a", bg: "#f0fdf4", muted: "#15803d", border: "#86efac", dot: "#16a34a" },
-    sunset: { label: "Sunset", sidebar: "#5c1f0a", accent: "#ea580c", bg: "#fff7ed", muted: "#c2410c", border: "#fdba74", dot: "#ea580c" },
-    rose: { label: "Rose", sidebar: "#5f0f28", accent: "#e11d48", bg: "#fff1f2", muted: "#be123c", border: "#fda4af", dot: "#e11d48" },
-    slate: { label: "Slate", sidebar: "#0f172a", accent: "#475569", bg: "#f8fafc", muted: "#334155", border: "#94a3b8", dot: "#475569" },
-    mint: { label: "Mint", sidebar: "#0d3b37", accent: "#0d9488", bg: "#f0fdfa", muted: "#0f766e", border: "#5eead4", dot: "#0d9488" },
-    candy: { label: "Candy", sidebar: "#4a0d4e", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f5d0fe", dot: "#c026d3" },
-    teal: { label: "Teal", sidebar: "#1A2E35", accent: "#00BCD4", bg: "#F5FAFA", muted: "#607D86", border: "#E0EEF0", dot: "#00BCD4" },
+    purple: { label: "Purple", sidebar: "#7c3aed", accent: "#7c3aed", bg: "#f5f3ff", muted: "#7c3aed", border: "#ddd6fe", dot: "#7c3aed" },
+    ocean: { label: "Ocean", sidebar: "#0284c7", accent: "#0284c7", bg: "#f0f9ff", muted: "#0369a1", border: "#93c5fd", dot: "#0284c7" },
+    forest: { label: "Forest", sidebar: "#16a34a", accent: "#16a34a", bg: "#f0fdf4", muted: "#15803d", border: "#86efac", dot: "#16a34a" },
+    sunset: { label: "Sunset", sidebar: "#ea580c", accent: "#ea580c", bg: "#fff7ed", muted: "#c2410c", border: "#fdba74", dot: "#ea580c" },
+    rose: { label: "Rose", sidebar: "#e11d48", accent: "#e11d48", bg: "#fff1f2", muted: "#be123c", border: "#fda4af", dot: "#e11d48" },
+    slate: { label: "Slate", sidebar: "#475569", accent: "#475569", bg: "#f8fafc", muted: "#334155", border: "#94a3b8", dot: "#475569" },
+    mint: { label: "Mint", sidebar: "#0d9488", accent: "#0d9488", bg: "#f0fdfa", muted: "#0f766e", border: "#5eead4", dot: "#0d9488" },
+    candy: { label: "Candy", sidebar: "#c026d3", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f5d0fe", dot: "#c026d3" },
+    teal: { label: "Teal", sidebar: "#00BCD4", accent: "#00BCD4", bg: "#F5FAFA", muted: "#607D86", border: "#E0EEF0", dot: "#00BCD4" },
   };
 
   // Apply theme whenever appTheme or customColor changes
@@ -2787,6 +2802,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     document.documentElement.style.setProperty("--teal2", t.dot);
     document.documentElement.style.setProperty("--teal-light", `rgba(${hexToRgb(t.accent)}, 0.1)`);
     document.documentElement.style.setProperty("--teal-lighter", `rgba(${hexToRgb(t.accent)}, 0.04)`);
+
+    // Broadcast theme to any open iframes (Template Designer)
+    const frames = document.querySelectorAll('iframe');
+    frames.forEach(f => {
+      if (f.contentWindow) {
+        try {
+          f.contentWindow.postMessage({ type: 'SET_THEME', color: t.accent }, '*');
+        } catch(e) {}
+      }
+    });
+
 
     localStorage.setItem("appTheme", appTheme);
 
@@ -2859,6 +2885,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [saveLoading, setSaveLoading] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
   const [clientSuccessData, setClientSuccessData] = useState(null);
+
+  const [uploadFileTarget, setUploadFileTarget] = useState(null);
+  const [uploadTargetRole, setUploadTargetRole] = useState("client");
+  const [uploadTargetUser, setUploadTargetUser] = useState("");
+  const [uploadIsSending, setUploadIsSending] = useState(false);
 
   const [employees, setEmployees] = useState([]);
   const [ne, setNe] = useState({ name: "", email: "", phone: "", role: "employee", department: "", salary: "", status: "Pending", password: "" });
@@ -2940,6 +2971,36 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     fetchProfile();
     fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
   }, []);
+
+  // ── Listen for SEND_DOCUMENT from template designer iframe ──
+  useEffect(() => {
+    const handleMessage = async (e) => {
+      if (e.data && e.data.type === "SEND_DOCUMENT") {
+        const payload = e.data.payload;
+        if (!payload) return;
+        
+        const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
+        
+        try {
+          await axios.post(`${BASE_URL}/api/documents`, {
+            docType: payload.docType || "lh",
+            sendTo: payload.sendTo || "client",
+            client: payload.client || "Client",
+            recipientEmail: payload.recipientEmail || "",
+            htmlContent: payload.htmlContent || "",
+            senderCompany: companyNameStr,
+            companyId
+          });
+          toast.success(`Document sent to ${payload.client || "Client"} successfully!`);
+        } catch (err) {
+          console.error("Failed to send document:", err);
+          toast.error("Failed to send document. Check connection.");
+        }
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [companyNameStr, user]);
 
   // Redirect to packages ONLY ONCE if no subscription found and currently on dashboard
   const hasRedirected = useRef(false);
@@ -3677,7 +3738,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} style={{ cursor: "pointer", position: "relative" }}>
                   <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} title="Click to upload logo">
                     {companyLogo ? (
-                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "cover", display: "block", borderRadius: 10, background: "#fff", border: "1.5px solid var(--app-border)" }} />
+                      <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, display: "block", borderRadius: 10, background: "#fff", border: "1.5px solid var(--app-border)" }} />
                     ) : (
                       <div style={{ width: 38, height: 38, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", fontWeight: 800, fontSize: 13 }}>{initials}</div>
                     )}
@@ -3784,7 +3845,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0, marginLeft: 8 }}>
                 <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ cursor: "pointer" }} title="Click to upload logo">
                   {companyLogo ? (
-                    <img src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "cover", borderRadius: 6 }} onError={() => setCompanyLogo(null)} />
+                    <img src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "contain", flexShrink: 0, borderRadius: 6 }} onError={() => setCompanyLogo(null)} />
                   ) : (
                     <div style={{ width: 28, height: 28, background: "var(--teal)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 10 }}>{initials}</div>
                   )}
@@ -4011,119 +4072,217 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 </div>
               )}
 
-              {/* Top Section: Company Info & Stats Grid */}
-              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(450px, 1fr))", gap: 20, marginBottom: 20 }}>
-                {/* Left Column: Company Information */}
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <SC>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 20, padding: 4 }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center", background: "linear-gradient(180deg,#ffffff,#fdfbff)", borderRadius: 20, padding: "24px 16px", border: "1.5px solid var(--app-border)", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.03)", textAlign: "center" }}>
-                        <div style={{ position: "relative", width: "fit-content", height: "auto", flexShrink: 0, marginBottom: 4 }}>
-                          <div onClick={() => headerLogoRef.current?.click()} style={{ cursor: "pointer" }} title="Update Company Logo">
-                            {companyLogo ? (
-                              <img src={companyLogo} alt="logo" style={{ width: "auto", height: "auto", maxWidth: "280px", maxHeight: "160px", objectFit: "cover", display: "block", borderRadius: 24, background: "#fff", border: "2px solid var(--app-border)", boxShadow: "0 8px 16px rgba(var(--app-accent-rgb, 124, 58, 237),0.12)" }} />
-                            ) : (
-                              <div style={{ width: 90, height: 90, borderRadius: 24, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 36, fontWeight: 800 }}>{initials}</div>
-                            )}
-                          </div>
-                          <button
-                            onClick={() => headerLogoRef.current?.click()}
-                            style={{ position: "absolute", bottom: -2, right: -2, width: 30, height: 30, borderRadius: "50%", background: "#fff", border: "1.5px solid var(--app-border)", color: "var(--app-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.2s" }}
-                            title="Update Company Logo"
-                          >
-                            📷
-                          </button>
-                        </div>
-                        <div style={{ width: "100%" }}>
-                          <div style={{ fontSize: 24, fontWeight: 800, color: T.text, marginBottom: 6, letterSpacing: "-0.5px", lineHeight: 1.2 }}>
-                            {displayName}
-                          </div>
-                          {user?.role && !user.role.toLowerCase().includes("subadmin") && (
-                            <div style={{ display: "inline-block", padding: "4px 14px", background: "var(--app-border)", borderRadius: 20, fontSize: 10, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2 }}>
-                              {user.role}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#fcfaff", borderRadius: 16, border: "1.5px solid var(--app-border)" }}>
-                          <div style={{ width: 36, height: 36, borderRadius: 10, background: "#fff", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📧</div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase", marginBottom: 2 }}>Official Email</div>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: T.text, wordBreak: "break-all" }}>{user?.email}</div>
-                          </div>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#fcfaff", borderRadius: 16, border: "1.5px solid var(--app-border)" }}>
-                          <div style={{ width: 36, height: 36, borderRadius: 10, background: "#fff", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📞</div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase", marginBottom: 2 }}>Contact Number</div>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{user?.phone || "Not provided"}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </SC>
+              
+              {/* MODERN DASHBOARD CONTENT */}
+              <div className="modern-dash-topbar">
+                <div className="search-wrap">
+                  <i className="ti ti-search"></i>
+                  <input type="text" placeholder="Search projects, invoices, clients..." value={dashSearch} onChange={(e) => setDashSearch(e.target.value)} />
                 </div>
-
-                {/* Right Column: Statistics Grid */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 }}>
-                  {[
-                    { t: "Total Company Names", v: `${clients.length} / ${getSubscriptionLimit("client") === Infinity ? "Unlimited" : getSubscriptionLimit("client")} Used`, i: "👥", c: "var(--app-accent)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
-                    { t: "Employees", v: `${employees.length} / ${getSubscriptionLimit("employee") === Infinity ? "Unlimited" : getSubscriptionLimit("employee")} Used`, i: "👨‍💼", c: "var(--app-muted)", bg: "linear-gradient(135deg,var(--app-border),var(--app-bg))" },
-                    { t: "Managers", v: `${managers.length} / ${getSubscriptionLimit("manager") === Infinity ? "Unlimited" : getSubscriptionLimit("manager")} Used`, i: "🧑‍💼", c: "#f59e0b", bg: "linear-gradient(135deg,#fef3c7,#fffbeb)" },
-                    { t: "Projects", v: projects.length, i: "📁", c: "var(--app-accent)", bg: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" },
-                    { t: "Invoices", v: invoices.length, i: "🧾", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
-                    { t: "Total Income", v: formatCurrency(income.reduce((s, x) => s + (Number(x.amount) || 0), 0), user?.currency), i: "💰", c: "#22C55E", bg: "linear-gradient(135deg,#dcfce7,#f0fdf4)" },
-                    { t: "Total Expenses", v: formatCurrency(expenses.reduce((s, x) => s + (Number(x.amount) || 0), 0), user?.currency), i: "💸", c: "#EF4444", bg: "linear-gradient(135deg,#fee2e2,#fff1f1)" }
-                  ].map(({ t, v, i, c, bg }) => (
-                    <div key={t} style={{ background: "#fff", borderRadius: 16, padding: "16px", boxShadow: "0 4px 20px rgba(var(--app-accent-rgb, 124, 58, 237),0.05)", border: "1.5px solid var(--app-border)", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: 8 }}>
-                      <div key={t}
-                      />
-                      <div style={{ width: 36, height: 36, borderRadius: 10, background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, boxShadow: `0 4px 10px ${c}15` }}>{i}</div>
-                      <div>
-                        <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 }}>{t}</div>
-                        <div className="stat-value" style={{ fontSize: 24, fontWeight: 800, color: T.text, lineHeight: 1 }}>{v}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <button className="create-btn" onClick={() => setActive("projects")}><i className="ti ti-plus" style={{fontSize:15}}></i> Create New</button>
               </div>
-              <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))", gap: 20 }}>
-                <SC title="Recent Projects">
-                  <ModernProjectsView projects={projects.slice(0, 5)} compact={true} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />
-                </SC>
-                <SC title="Recent Transactions" action={<button onClick={() => setActive("accounts")} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 8, padding: "4px 12px", fontSize: 11, fontWeight: 700, color: "var(--app-muted)", cursor: "pointer" }}>View All →</button>}>
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 600 }}>
-                      <thead>
-                        <tr style={{ background: "var(--app-bg)" }}>
-                          {["Type", "Title", "Category", "Amount", "Date"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(() => {
-                          const all = [
-                            ...income.map(i => ({ ...i, _t: "Income", _c: "#22C55E" })),
-                            ...expenses.map(e => ({ ...e, _t: "Expense", _c: "#EF4444" }))
-                          ].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)).slice(0, 5);
 
-                          return all.length === 0 ? <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "var(--app-muted)" }}>No recent transactions</td></tr> : all.map((t, i) => (
-                            <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)" }}>
-                              <td style={{ padding: "12px 12px" }}><span style={{ color: t._c, fontWeight: 800, fontSize: 10 }}>{t._t.toUpperCase()}</span></td>
-                              <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>{t.title}</td>
-                              <td style={{ padding: "12px 12px", color: "var(--app-muted)" }}>{t.category}</td>
-                              <td style={{ padding: "12px 12px", fontWeight: 700, color: t._c }}>₹{Number(t.amount || 0).toLocaleString()}</td>
-                              <td style={{ padding: "12px 12px", color: "#94a3b8" }}>{t.date ? new Date(t.date).toLocaleDateString() : "—"}</td>
-                            </tr>
-                          ));
-                        })()}
-                      </tbody>
-                    </table>
+              <div className="modern-dash-content">
+                {/* LEFT COL */}
+                <div className="col-left">
+                  {/* STORAGE / PLATFORM CARDS */}
+                  <div className="storage-row">
+                    <div className="storage-card active-card">
+                      <div className="storage-card-top">
+                        <div className="storage-icon teal"><i className="ti ti-briefcase"></i></div>
+                        <div>
+                          <div className="storage-name white">Active Projects</div>
+                          <div className="storage-sub white">Open folder</div>
+                        </div>
+                      </div>
+                      <div className="storage-sizes white"><span>{projects.length} Projects</span><span>{projects.length} Total</span></div>
+                      <div className="storage-bar white-bg"><div className="storage-fill white" style={{width: "67%"}}></div></div>
+                      <div className="storage-date white"><i className="ti ti-clock" style={{fontSize: 11}}></i> Last update</div>
+                    </div>
+                    <div className="storage-card" onClick={() => setActive("invoices")}>
+                      <div className="storage-card-top">
+                        <div className="storage-icon dropbox"><i className="ti ti-receipt-2"></i></div>
+                        <div>
+                          <div className="storage-name dark">Invoices</div>
+                          <div className="storage-sub muted">Open folder</div>
+                        </div>
+                      </div>
+                      <div className="storage-sizes dark"><span>{invoices.length} Pending</span><span>{invoices.length} Total</span></div>
+                      <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{width: "40%"}}></div></div>
+                      <div className="storage-date muted"><i className="ti ti-clock" style={{fontSize: 11}}></i> Last update</div>
+                    </div>
+                    <div className="storage-card" onClick={() => setActive("invoices")}>
+                      <div className="storage-card-top">
+                        <div className="storage-icon revenue"><i className="ti ti-cash"></i></div>
+                        <div>
+                          <div className="storage-name dark">Revenue</div>
+                          <div className="storage-sub muted">Open folder</div>
+                        </div>
+                      </div>
+                      <div className="storage-sizes dark"><span>₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</span><span>₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</span></div>
+                      <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{width: "42%"}}></div></div>
+                      <div className="storage-date muted"><i className="ti ti-clock" style={{fontSize: 11}}></i> Last update</div>
+                    </div>
                   </div>
-                </SC>
+
+                  {/* TEAM / CO-OWNERS */}
+                  <div>
+                    <div className="section-header">
+                      <span className="section-title">Team Members</span>
+                      <div className="section-more" onClick={() => setActive("employees")}><i className="ti ti-dots"></i></div>
+                    </div>
+                    <div className="coowners-row">
+                      {employees.slice(0,4).map(e => (
+                        <div key={e.id} className="coowner">
+                          <div className="coowner-avatar">{e.name?.[0]?.toUpperCase() || "E"}</div>
+                          <div>
+                            <div className="coowner-name">{e.name}</div>
+                            <div className="coowner-role">{e.role}</div>
+                          </div>
+                        </div>
+                      ))}
+                      {employees.length === 0 && <div style={{color:"var(--app-muted)", fontSize: 13}}>No employees added yet.</div>}
+                    </div>
+                  </div>
+
+                  {/* FOLDERS */}
+                  <div>
+                    <div className="section-header">
+                      <span className="section-title">Projects</span>
+                      <div className="section-more" onClick={() => setActive("projects")}><i className="ti ti-dots"></i></div>
+                    </div>
+                    <div className="folders-grid">
+                      {projects.slice(0,3).map(p => (
+                        <div key={p.id} className="folder-card" onClick={() => setActive("projects")}>
+                          <div className="folder-top">
+                            <div className="folder-avatars">
+                               <div className="fa">{p.title?.[0]?.toUpperCase() || "P"}</div>
+                            </div>
+                            <i className="ti ti-dots folder-more"></i>
+                          </div>
+                          <div className="folder-icon"><i className="ti ti-folder-filled"></i></div>
+                          <div className="folder-name">{p.title}</div>
+                          <div className="folder-date"><i className="ti ti-clock" style={{fontSize: 11}}></i> {p.status || "Active"}</div>
+                        </div>
+                      ))}
+                      {projects.length === 0 && <div style={{color:"var(--app-muted)", fontSize: 13}}>No projects added yet.</div>}
+                    </div>
+                  </div>
+
+                  {/* FILE TABLE */}
+                  <div>
+                    <div className="section-header">
+                      <span className="section-title">Recent Files</span>
+                      <div className="section-more" onClick={() => setActive("invoices")}><i className="ti ti-dots"></i></div>
+                    </div>
+                    <div className="table-panel">
+                      <table className="dash-table">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>Type</th>
+                            <th>Document Name</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {invoices.slice(0,4).map(inv => (
+                            <tr key={inv.id}>
+                              <td><input type="checkbox" className="cb" /></td>
+                              <td><div className="file-type-icon doc"><i className="ti ti-file-text"></i></div></td>
+                              <td className="fname">{inv.invoiceNo || "Invoice"} — {inv.clientName}</td>
+                              <td>₹{inv.grandTotal || 0}</td>
+                              <td>{inv.date}</td>
+                              <td><Badge label={inv.status || "Pending"} /></td>
+                              <td><i className="ti ti-dots-vertical row-actions"></i></td>
+                            </tr>
+                          ))}
+                          {invoices.length === 0 && <tr><td colSpan="7" style={{textAlign:"center", padding:20}}>No recent invoices.</td></tr>}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* RIGHT COL */}
+                <div className="col-right">
+                  {/* DRIVE STORAGE PANEL */}
+                  <div className="drive-panel">
+                    <div className="drive-header">
+                      <div className="drive-icon"><i className="ti ti-briefcase" style={{color: "var(--app-accent)", fontSize: 15}}></i></div>
+                      <span className="drive-title">Overview</span>
+                    </div>
+                    <div className="drive-total"><span>{projects.length} Active</span><span>{projects.length} Total</span></div>
+                    <div className="drive-main-bar"><div className="drive-main-fill" style={{width: "67%"}}></div></div>
+
+                    <div className="file-type-row">
+                      <div className="ft-item" onClick={() => setActive("projects")} style={{cursor:"pointer"}}>
+                        <div className="ft-icon" style={{background: "#E8F3FF", color: "#0061FF"}}><i className="ti ti-world"></i></div>
+                        <div style={{flex: 1}}>
+                          <div style={{display: "flex", justifyContent: "space-between"}}><span className="ft-name">Projects</span><span className="ft-size">{projects.length}</span></div>
+                          <div className="ft-bar" style={{background: "#0061FF", width: "70%"}}></div>
+                        </div>
+                      </div>
+                      <div className="ft-item" onClick={() => setActive("employees")} style={{cursor:"pointer"}}>
+                        <div className="ft-icon" style={{background: "#E8FAF3", color: "#26C281"}}><i className="ti ti-users"></i></div>
+                        <div style={{flex: 1}}>
+                          <div style={{display: "flex", justifyContent: "space-between"}}><span className="ft-name">Employees</span><span className="ft-size">{employees.length}</span></div>
+                          <div className="ft-bar" style={{background: "#26C281", width: "35%"}}></div>
+                        </div>
+                      </div>
+                      <div className="ft-item" onClick={() => setActive("clients")} style={{cursor:"pointer"}}>
+                        <div className="ft-icon" style={{background: "#FEF5E6", color: "#F5A623"}}><i className="ti ti-building"></i></div>
+                        <div style={{flex: 1}}>
+                          <div style={{display: "flex", justifyContent: "space-between"}}><span className="ft-name">Clients</span><span className="ft-size">{clients.length}</span></div>
+                          <div className="ft-bar" style={{background: "#F5A623", width: "50%"}}></div>
+                        </div>
+                      </div>
+                      <div className="ft-item" onClick={() => setActive("invoices")} style={{cursor:"pointer"}}>
+                        <div className="ft-icon" style={{background: "#EEE9FF", color: "#7C5CFC"}}><i className="ti ti-receipt-2"></i></div>
+                        <div style={{flex: 1}}>
+                          <div style={{display: "flex", justifyContent: "space-between"}}><span className="ft-name">Invoices</span><span className="ft-size">{invoices.length}</span></div>
+                          <div className="ft-bar" style={{background: "#7C5CFC", width: "20%"}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* QUICK STATS */}
+                  <div className="stats-grid">
+                    <div className="mini-stat">
+                      <div className="mini-stat-icon" style={{background: "rgba(var(--app-accent-rgb,0,188,212),0.1)", color: "var(--app-accent)"}}><i className="ti ti-cash"></i></div>
+                      <div className="mini-stat-val">₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
+                      <div className="mini-stat-label">Income</div>
+                    </div>
+                    <div className="mini-stat">
+                      <div className="mini-stat-icon" style={{background: "#FEF2F2", color: "#F05C5C"}}><i className="ti ti-chart-pie"></i></div>
+                      <div className="mini-stat-val">₹{expenses.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
+                      <div className="mini-stat-label">Expenses</div>
+                    </div>
+                    <div className="mini-stat">
+                      <div className="mini-stat-icon" style={{background: "#E8FAF3", color: "#26C281"}}><i className="ti ti-users"></i></div>
+                      <div className="mini-stat-val">{employees.length}</div>
+                      <div className="mini-stat-label">Employees</div>
+                    </div>
+                    <div className="mini-stat">
+                      <div className="mini-stat-icon" style={{background: "#FEF5E6", color: "#F5A623"}}><i className="ti ti-building"></i></div>
+                      <div className="mini-stat-val">{clients.length}</div>
+                      <div className="mini-stat-label">Clients</div>
+                    </div>
+                  </div>
+
+                  {/* CLEAR MEMORY */}
+                  <div className="clear-panel">
+                    <div className="clear-icon"><i className="ti ti-refresh"></i></div>
+                    <div className="clear-text">Clear <strong>₹0.00</strong> in pending expense entries from temporary records</div>
+                    <button className="clear-btn"><i className="ti ti-trash" style={{fontSize: 13}}></i> CLEAR RECORDS</button>
+                  </div>
+                </div>
               </div>
-            </>)}
+</>)}
 
           {/* ── Pages using new components ── */}
           {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => {
@@ -4163,7 +4322,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             }
             setReturnToModal(modal); setModal("client");
           }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
-          {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
+          {validActive === "proposals" && (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
+              <iframe
+                key="proposal-frame"
+                id="proposal-frame"
+                src={`/template-designer.html?companyName=${encodeURIComponent(companyNameStr)}#prop`}
+                style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
+                title="Proposal Designer"
+              />
+            </div>
+          )}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
           {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
@@ -4192,6 +4361,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
+          {validActive === "templates" && (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+              <iframe
+                id="template-designer-frame"
+                src="/template-designer.html"
+                style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
+                title="Template Designer"
+              />
+            </div>
+          )}
+          
+          {validActive === "letterhead" && (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
+              <iframe
+                key="letterhead-frame"
+                id="letterhead-frame"
+                src="/template-designer.html#lh"
+                style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
+                title="Letterhead Designer"
+              />
+            </div>
+          )}
+          
           {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} />}
           {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
           {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
@@ -4221,7 +4413,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div style={{ padding: "12px 14px", borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               {companyLogo ? (
-                <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "cover", background: "#fff", display: "block", borderRadius: 10, border: "1px solid #f1f5f9" }} />
+                <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, background: "#fff", display: "block", borderRadius: 10, border: "1px solid #f1f5f9" }} />
               ) : (
                 <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14 }}>{initials}</div>
               )}
@@ -5066,6 +5258,73 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
             </div>
+          </div>
+        </Mdl>
+      )}
+
+      {/* Upload File Modal */}
+      {uploadFileTarget && (
+        <Mdl title="Upload Document" onClose={() => { setUploadFileTarget(null); setUploadTargetUser(""); }}>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 8 }}>Selected File</div>
+            <div style={{ padding: "12px 16px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, display: "flex", alignItems: "center", gap: 10 }}>
+              <i className="ti ti-file" style={{ fontSize: 20, color: "var(--app-accent)" }}></i>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{uploadFileTarget.name}</div>
+                <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{(uploadFileTarget.size / 1024 / 1024).toFixed(2)} MB</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SEND TO TYPE *</label>
+            <select value={uploadTargetRole} onChange={(e) => { setUploadTargetRole(e.target.value); setUploadTargetUser(""); }} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
+              <option value="client">Client</option>
+              <option value="employee">Employee</option>
+            </select>
+          </div>
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SELECT {uploadTargetRole.toUpperCase()} *</label>
+            <select value={uploadTargetUser} onChange={(e) => setUploadTargetUser(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
+              <option value="">-- Select --</option>
+              {uploadTargetRole === "client" 
+                ? clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)
+                : employees.map(e => <option key={e._id || e.id} value={e.name}>{e.name}</option>)
+              }
+            </select>
+          </div>
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <button onClick={() => { setUploadFileTarget(null); setUploadTargetUser(""); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: "var(--app-text)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
+            <button disabled={!uploadTargetUser || uploadIsSending} onClick={async () => {
+              setUploadIsSending(true);
+              try {
+                const reader = new FileReader();
+                reader.readAsDataURL(uploadFileTarget);
+                reader.onload = async () => {
+                  const base64Data = reader.result;
+                  const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
+                  
+                  await axios.post(`${BASE_URL}/api/documents`, {
+                    docType: "upload",
+                    sendTo: uploadTargetRole,
+                    client: uploadTargetUser,
+                    recipientEmail: "",
+                    htmlContent: base64Data,
+                    senderCompany: companyNameStr,
+                    companyId
+                  });
+                  toast.success("File uploaded successfully!");
+                  setUploadFileTarget(null);
+                  setUploadTargetUser("");
+                };
+              } catch (err) {
+                console.error(err);
+                toast.error("Upload failed.");
+              } finally {
+                setUploadIsSending(false);
+              }
+            }} style={{ flex: 1, padding: "11px", background: (!uploadTargetUser || uploadIsSending) ? "var(--app-border)" : "var(--app-accent)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: (!uploadTargetUser || uploadIsSending) ? "var(--app-muted)" : "#fff", cursor: (!uploadTargetUser || uploadIsSending) ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
+              {uploadIsSending ? "Uploading..." : "Upload File"}
+            </button>
           </div>
         </Mdl>
       )}

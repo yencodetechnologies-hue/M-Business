@@ -25,7 +25,7 @@ const STATUS_CFG = {
   "Manual": { bg: "#64748b", fg: "#fff" },
 };
 const STATUS_LIST = ["Not Started", "Working on it", "In Review", "Stuck", "Done", "On Hold", "Manual"];
-const GRP_COLORS = ["#e2445c", "#0073ea", "#fdab3d", "var(--app-accent)", "#00c875", "#a25ddc", "var(--app-accent)", "#ff642e", "#00d4c8"];
+const GRP_COLORS = ["#e2445c", "var(--app-accent)", "#fdab3d", "var(--app-accent)", "#00c875", "#a25ddc", "var(--app-accent)", "#ff642e", "#00d4c8"];
 
 const AVATAR_COLORS = [
   "linear-gradient(135deg,var(--app-accent),var(--app-accent))",
@@ -82,9 +82,9 @@ const PRIORITY_LIST = ["Critical", "High", "Medium", "Low", "Manual"];
    VIEW DEFINITIONS
 ══════════════════════════════════════════════════════════ */
 const VIEW_LIST = [
-  { id: "table", icon: "⊞", label: "Main table", color: "#0073ea" },
+  { id: "table", icon: "⊞", label: "Main table", color: "var(--app-accent)" },
   { id: "chart", icon: "◕", label: "Chart", color: "var(--app-accent)" },
-  { id: "gantt", icon: "≡", label: "Gantt", color: "#0073ea" },
+  { id: "gantt", icon: "≡", label: "Gantt", color: "var(--app-accent)" },
   { id: "calendar", icon: "📅", label: "Calendar", color: "#e2445c" },
   { id: "kanban", icon: "⊟", label: "Kanban", color: "#00c875" },
 ];
@@ -460,7 +460,7 @@ function KanbanView({ groups, onStatusChange, config }) {
    TOAST
 ══════════════════════════════════════════════════════════ */
 function Toast({ msg, type }) {
-  const c = type === "error" ? "#e2445c" : type === "info" ? "#0073ea" : "#00c875";
+  const c = type === "error" ? "#e2445c" : type === "info" ? "var(--app-accent)" : "#00c875";
   return (
     <div style={{
       position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff",
@@ -576,7 +576,7 @@ function ViewSwitcherDropdown({ anchor, currentView, onSelect, onClose }) {
           onMouseLeave={e => { e.currentTarget.style.background = currentView === v.id ? "#e8f4fd" : "transparent"; }}>
           <div style={{ width: 28, height: 28, borderRadius: 7, background: `${v.color}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: v.color }}>{v.icon}</div>
           <span style={{ fontSize: 13, color: P.text, fontWeight: currentView === v.id ? 700 : 400, flex: 1 }}>{v.label}</span>
-          {currentView === v.id && <span style={{ color: "#0073ea", fontSize: 13 }}>✓</span>}
+          {currentView === v.id && <span style={{ color: "var(--app-accent)", fontSize: 13 }}>✓</span>}
         </div>
       ))}
     </div>
@@ -849,7 +849,7 @@ function PersonPicker({ anchor, onSelect, onClose, employees, currentAssignee, o
                     fontSize: 14, color: P.text, flex: 1,
                     fontWeight: isActive ? 500 : 400
                   }}>{emp}</span>
-                  {isActive && <span style={{ color: "#0073ea", fontSize: 13 }}>✓</span>}
+                  {isActive && <span style={{ color: "var(--app-accent)", fontSize: 13 }}>✓</span>}
                 </div>
               );
             })
@@ -1043,7 +1043,7 @@ function NewTaskBtn({ onAddTask, onTriggerGroup, showToast, onImport, groups, on
 
   return (
     <div style={{ display: "flex", flexShrink: 0, position: "relative" }}>
-      <button onClick={() => quickAdd()} style={{ background: "#0073ea", color: "#fff", border: "none", borderRadius: "9px", padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+      <button onClick={() => quickAdd()} style={{ background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: "9px", padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
         onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.1)"}
         onMouseLeave={e => e.currentTarget.style.filter = "none"}>+ New task</button>
     </div>
@@ -1070,10 +1070,10 @@ function ImportModal({ onClose, onImportTasks }) {
         <div style={{ flex: 1, overflowY: "auto", padding: "18px 22px" }}>
           {!file ? (
             <div onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }} onClick={() => fileRef.current?.click()}
-              style={{ border: `2px dashed ${dragOver ? "#0073ea" : "#d0d4e4"}`, borderRadius: 12, padding: "36px 24px", textAlign: "center", cursor: "pointer", background: dragOver ? "#e8f4fd" : "#fafbfc" }}>
+              style={{ border: `2px dashed ${dragOver ? "var(--app-accent)" : "#d0d4e4"}`, borderRadius: 12, padding: "36px 24px", textAlign: "center", cursor: "pointer", background: dragOver ? "#e8f4fd" : "#fafbfc" }}>
               <div style={{ fontSize: 36, marginBottom: 10 }}>📂</div>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#323338", marginBottom: 6 }}>Drag & drop your file here</div>
-              <button style={{ background: "#0073ea", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Browse files</button>
+              <button style={{ background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Browse files</button>
               <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
             </div>
           ) : loading ? (
@@ -1084,7 +1084,7 @@ function ImportModal({ onClose, onImportTasks }) {
         </div>
         <div style={{ padding: "12px 22px", borderTop: "1px solid #eef0f4", display: "flex", justifyContent: "flex-end", gap: 8 }}>
           <button onClick={onClose} style={{ background: "#f5f6f8", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, color: "#676879", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
-          <button onClick={doImport} disabled={!preview || loading} style={{ background: preview && !loading ? "#0073ea" : "#c3d9f0", color: "#fff", border: "none", borderRadius: 8, padding: "8px 22px", fontSize: 13, fontWeight: 700, cursor: preview && !loading ? "pointer" : "default", fontFamily: "inherit" }}>Import {preview ? `${preview.totalRows} tasks` : ""}</button>
+          <button onClick={doImport} disabled={!preview || loading} style={{ background: preview && !loading ? "var(--app-accent)" : "#c3d9f0", color: "#fff", border: "none", borderRadius: 8, padding: "8px 22px", fontSize: 13, fontWeight: 700, cursor: preview && !loading ? "pointer" : "default", fontFamily: "inherit" }}>Import {preview ? `${preview.totalRows} tasks` : ""}</button>
         </div>
       </div>
     </div>
@@ -1182,7 +1182,7 @@ function ShareModal({ onClose }) {
         <div style={{ padding: "16px 24px 24px" }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <div style={{ flex: 1, background: "#f5f6f8", border: "1px solid #e6e9ef", borderRadius: 9, padding: "10px 14px", fontSize: 12, color: "#676879", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "monospace" }}>{shareLink}</div>
-            <button onClick={() => { navigator.clipboard.writeText(shareLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }} style={{ background: copied ? "#00c875" : "#0073ea", color: "#fff", border: "none", borderRadius: 9, padding: "10px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{copied ? "✓ Copied!" : "Copy link"}</button>
+            <button onClick={() => { navigator.clipboard.writeText(shareLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }} style={{ background: copied ? "#00c875" : "var(--app-accent)", color: "#fff", border: "none", borderRadius: 9, padding: "10px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{copied ? "✓ Copied!" : "Copy link"}</button>
           </div>
         </div>
       </div>
@@ -1299,10 +1299,10 @@ function FilterMenu({ anchor, onClose, groups, filters, onToggle, onClear }) {
       <div style={{ display: "flex", gap: 0, padding: "14px 20px", overflowX: "auto" }}>
         <div style={{ minWidth: 160, flexShrink: 0, paddingRight: 14, borderRight: "1px solid #f0f1f4", marginRight: 14 }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: "#9aadbd", letterSpacing: .7, textTransform: "uppercase", marginBottom: 8 }}>Employee</div>
-          {owners.map(o => { const on = filters.owner.has(o); return (<div key={o} onClick={() => onToggle("owner", o)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "#0073ea" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>{on ? "✓" : ""}</div><span style={{ fontSize: 13, color: on ? "#0073ea" : "#323338", fontWeight: on ? 600 : 400 }}>{o}</span></div>); })}</div>
+          {owners.map(o => { const on = filters.owner.has(o); return (<div key={o} onClick={() => onToggle("owner", o)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "var(--app-accent)" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>{on ? "✓" : ""}</div><span style={{ fontSize: 13, color: on ? "var(--app-accent)" : "#323338", fontWeight: on ? 600 : 400 }}>{o}</span></div>); })}</div>
         <div style={{ minWidth: 160, flexShrink: 0 }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: "#9aadbd", letterSpacing: .7, textTransform: "uppercase", marginBottom: 8 }}>Status</div>
-          {Object.entries(STATUS_CFG).map(([s, sc]) => { const on = filters.status.has(s); const n = allTasks.filter(t => t.status === s).length; return (<div key={s} onClick={() => onToggle("status", s)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "#0073ea" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>{on ? "✓" : ""}</div><div style={{ width: 10, height: 10, borderRadius: 3, background: sc.bg, flexShrink: 0 }} /><span style={{ fontSize: 13, color: on ? "#0073ea" : "#323338", fontWeight: on ? 600 : 400, flex: 1 }}>{s}</span><span style={{ fontSize: 11, color: "#9aadbd" }}>{n}</span></div>); })}
+          {Object.entries(STATUS_CFG).map(([s, sc]) => { const on = filters.status.has(s); const n = allTasks.filter(t => t.status === s).length; return (<div key={s} onClick={() => onToggle("status", s)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 6, cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "var(--app-accent)" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>{on ? "✓" : ""}</div><div style={{ width: 10, height: 10, borderRadius: 3, background: sc.bg, flexShrink: 0 }} /><span style={{ fontSize: 13, color: on ? "var(--app-accent)" : "#323338", fontWeight: on ? 600 : 400, flex: 1 }}>{s}</span><span style={{ fontSize: 11, color: "#9aadbd" }}>{n}</span></div>); })}
         </div>
       </div>
     </div>
@@ -1314,7 +1314,7 @@ function FilterMenu({ anchor, onClose, groups, filters, onToggle, onClear }) {
 ══════════════════════════════════════════════════════════ */
 function HideMenu({ anchor, onClose, extraCols, hiddenCols, onToggleHide }) {
   const ref = useRef(); const [pos, setPos] = useState({ top: 0, left: 0 }); const [search, setSearch] = useState("");
-  const builtins = [{ id: "person", label: "Employee", bg: "#0073ea", icon: "👤" }, { id: "status", label: "Status", bg: "#00c875", icon: "≡" }, { id: "date", label: "Due date", bg: "var(--app-accent)", icon: "📅" }];
+  const builtins = [{ id: "person", label: "Employee", bg: "var(--app-accent)", icon: "👤" }, { id: "status", label: "Status", bg: "#00c875", icon: "≡" }, { id: "date", label: "Due date", bg: "var(--app-accent)", icon: "📅" }];
   const allCols = [...builtins, ...(extraCols || []).map(ec => ({ id: ec.id, label: ec.label, bg: P.accent, icon: "📝" }))];
   const filtered = allCols.filter(c => !search || c.label.toLowerCase().includes(search.toLowerCase()));
   useEffect(() => { const calc = () => { if (anchor?.current) { const r = anchor.current.getBoundingClientRect(); let left = r.left; if (left + 290 > window.innerWidth - 8) left = window.innerWidth - 298; setPos({ top: r.bottom + 4, left }); } }; calc(); window.addEventListener('scroll', calc, true); window.addEventListener('resize', calc); return () => { window.removeEventListener('scroll', calc, true); window.removeEventListener('resize', calc); }; }, [anchor]);
@@ -1324,7 +1324,7 @@ function HideMenu({ anchor, onClose, extraCols, hiddenCols, onToggleHide }) {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px 10px", borderBottom: "1px solid #eef0f4" }}><span style={{ fontSize: 14, fontWeight: 800, color: "#323338" }}>Display columns</span></div>
       <div style={{ padding: "10px 12px 6px" }}><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Find columns..." style={{ width: "100%", border: "1px solid #e6e9ef", borderRadius: 8, padding: "7px 10px", fontSize: 12.5, fontFamily: "inherit", outline: "none", color: "#323338", background: "#f5f6f8" }} /></div>
       <div style={{ maxHeight: 320, overflowY: "auto", padding: "4px 0 8px" }}>
-        {filtered.map(col => { const shown = !hiddenCols.has(col.id); return (<div key={col.id} onClick={() => onToggleHide(col.id)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.background = "#f5f6f8"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}><div style={{ width: 16, height: 16, borderRadius: 3, background: shown ? "#0073ea" : "#fff", border: shown ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{shown ? "✓" : ""}</div><div style={{ width: 24, height: 24, borderRadius: 6, background: col.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#fff", fontWeight: 700 }}>{col.icon}</div><span style={{ fontSize: 13, color: shown ? "#323338" : "#676879" }}>{col.label}</span></div>); })}
+        {filtered.map(col => { const shown = !hiddenCols.has(col.id); return (<div key={col.id} onClick={() => onToggleHide(col.id)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer" }} onMouseEnter={e => e.currentTarget.style.background = "#f5f6f8"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}><div style={{ width: 16, height: 16, borderRadius: 3, background: shown ? "var(--app-accent)" : "#fff", border: shown ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{shown ? "✓" : ""}</div><div style={{ width: 24, height: 24, borderRadius: 6, background: col.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#fff", fontWeight: 700 }}>{col.icon}</div><span style={{ fontSize: 13, color: shown ? "#323338" : "#676879" }}>{col.label}</span></div>); })}
       </div>
     </div>
   );
@@ -1368,7 +1368,7 @@ function GrpByMenu({ anchor, groupBy, onGroupBy, onClose }) {
       <div style={{ padding: "8px 0 8px" }}>
         {opts.map(o => (
           <div key={o.key} onClick={() => { onGroupBy(o.key); onClose(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", cursor: "pointer", background: groupBy === o.key ? "#f0f7ff" : "transparent" }} onMouseEnter={e => { if (groupBy !== o.key) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = groupBy === o.key ? "#f0f7ff" : "transparent"; }}>
-            <div style={{ width: 18, height: 18, borderRadius: "50%", border: groupBy === o.key ? "none" : "2px solid #c5c9d6", background: groupBy === o.key ? "#0073ea" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>{groupBy === o.key && <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#fff" }} />}</div>
+            <div style={{ width: 18, height: 18, borderRadius: "50%", border: groupBy === o.key ? "none" : "2px solid #c5c9d6", background: groupBy === o.key ? "var(--app-accent)" : "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>{groupBy === o.key && <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#fff" }} />}</div>
             <span style={{ fontSize: 13, color: "#323338", fontWeight: groupBy === o.key ? 600 : 400 }}>{o.label}</span>
           </div>
         ))}
@@ -1452,7 +1452,7 @@ function Cell({ col, value, onChange }) {
       }
     }} style={{ width: "100%", border: `1.5px solid ${P.border}`, borderRadius: 7, padding: "6px 9px", fontSize: 12, fontFamily: "inherit", outline: "none" }} /></div>{tags.map(t => (<div key={t} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 8px", borderRadius: 6 }}><span style={{ fontSize: 11, background: "#e0e7ff", color: "#4338ca", borderRadius: 10, padding: "2px 8px", fontWeight: 600 }}>{t}</span><span onClick={e => { e.stopPropagation(); onChange(tags.filter(x => x !== t).join(",")); }} style={{ marginLeft: "auto", color: "#e2445c", fontSize: 12, cursor: "pointer" }}>✕</span></div>))}</DD>)}</div>);
   }
-  if (col.type === "link") { return (<input value={localVal} onChange={e => setLocalVal(e.target.value)} onBlur={() => onChange(localVal)} placeholder="https://…" style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 11, color: "#0073ea", fontFamily: "inherit", background: "transparent", padding: "0 8px", textAlign: "center" }} />); }
+  if (col.type === "link") { return (<input value={localVal} onChange={e => setLocalVal(e.target.value)} onBlur={() => onChange(localVal)} placeholder="https://…" style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 11, color: "var(--app-accent)", fontFamily: "inherit", background: "transparent", padding: "0 8px", textAlign: "center" }} />); }
   if (col.type === "timeline") { const parts = (value || "").split("→").map(s => s.trim()); return (<div style={{ display: "flex", alignItems: "center", gap: 2, padding: "0 4px", height: "100%" }}><input type="date" defaultValue={parts[0] || ""} onChange={e => onChange(`${e.target.value}→${parts[1] || ""}`)} style={{ flex: 1, border: "none", outline: "none", fontSize: 10, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer" }} /><span style={{ fontSize: 9, color: P.muted }}>→</span><input type="date" defaultValue={parts[1] || ""} onChange={e => onChange(`${parts[0] || ""}→${e.target.value}`)} style={{ flex: 1, border: "none", outline: "none", fontSize: 10, color: P.muted, fontFamily: "inherit", background: "transparent", cursor: "pointer" }} /></div>); }
   return (<input value={localVal} onChange={e => setLocalVal(e.target.value)} type={col.type === "number" ? "number" : "text"} placeholder={col.type === "number" ? "0" : "—"} style={{ width: "100%", height: "100%", border: "none", outline: "none", fontSize: 12, color: P.text, fontFamily: "inherit", background: "transparent", padding: "0 8px", textAlign: col.type === "number" ? "center" : "left" }} onFocus={e => { e.target.style.background = "#fff"; e.target.style.boxShadow = `inset 0 0 0 1.5px ${P.accent}`; }} onBlur={e => { onChange(localVal); e.target.style.background = "transparent"; e.target.style.boxShadow = "none"; }} />);
 }
@@ -1897,7 +1897,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
 //           <div style={{ margin: "12px 18px", border: `1.5px solid ${P.border}`, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
 //             <textarea value={updateText} onChange={e => setUpdateText(e.target.value)} placeholder="Write an update..." style={{ width: "100%", minHeight: 100, border: "none", outline: "none", resize: "none", padding: "12px 14px", fontSize: 13, fontFamily: "inherit", color: P.text, boxSizing: "border-box" }} />
 //             <div style={{ display: "flex", justifyContent: "flex-end", padding: "8px 10px", borderTop: `1px solid ${P.border}`, background: "var(--app-bg)" }}>
-//               <button onClick={postUpdate} style={{ background: updateText.trim() ? "#0073ea" : "#e2e8f0", color: updateText.trim() ? "#fff" : "#94a3b8", border: "none", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 700, cursor: updateText.trim() ? "pointer" : "default", fontFamily: "inherit" }}>Update</button>
+//               <button onClick={postUpdate} style={{ background: updateText.trim() ? "var(--app-accent)" : "#e2e8f0", color: updateText.trim() ? "#fff" : "#94a3b8", border: "none", borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 700, cursor: updateText.trim() ? "pointer" : "default", fontFamily: "inherit" }}>Update</button>
 //             </div>
 //           </div>
 //           <div style={{ flex: 1, padding: "0 18px 18px" }}>
@@ -2163,7 +2163,7 @@ function PersonFilterPanel({ anchor, onClose, groups, filters, onToggle, onClear
     <div ref={ref} style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 9500, background: "#fff", border: "1px solid #dde1ea", borderRadius: 12, boxShadow: "0 8px 40px rgba(0,0,0,0.14)", fontFamily: "inherit", width: 240, padding: "8px 0" }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: "#9aadbd", letterSpacing: .7, textTransform: "uppercase", padding: "4px 14px 8px" }}>Filter by person</div>
       {owners.length === 0 && <div style={{ padding: "8px 14px", fontSize: 12, color: P.muted }}>No people assigned yet</div>}
-      {owners.map(o => { const on = filters.owner.has(o); return (<div key={o} onClick={() => onToggle("owner", o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "#0073ea" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{on ? "✓" : ""}</div><div style={{ width: 26, height: 26, borderRadius: "50%", background: getAvatarColor(o), display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{o.slice(0, 2).toUpperCase()}</div><span style={{ fontSize: 13, color: on ? "#0073ea" : "#323338", fontWeight: on ? 600 : 400, flex: 1 }}>{o}</span><span style={{ fontSize: 11, color: "#9aadbd" }}>{allTasks.filter(t => t.assignTo === o).length}</span></div>); })}
+      {owners.map(o => { const on = filters.owner.has(o); return (<div key={o} onClick={() => onToggle("owner", o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", cursor: "pointer", background: on ? "#e8f4fd" : "transparent" }} onMouseEnter={e => { if (!on) e.currentTarget.style.background = "#f5f6f8"; }} onMouseLeave={e => { e.currentTarget.style.background = on ? "#e8f4fd" : "transparent"; }}><div style={{ width: 16, height: 16, borderRadius: 3, background: on ? "var(--app-accent)" : "#fff", border: on ? "none" : "1.5px solid #c5c9d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>{on ? "✓" : ""}</div><div style={{ width: 26, height: 26, borderRadius: "50%", background: getAvatarColor(o), display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{o.slice(0, 2).toUpperCase()}</div><span style={{ fontSize: 13, color: on ? "var(--app-accent)" : "#323338", fontWeight: on ? 600 : 400, flex: 1 }}>{o}</span><span style={{ fontSize: 11, color: "#9aadbd" }}>{allTasks.filter(t => t.assignTo === o).length}</span></div>); })}
       {filters.owner.size > 0 && (<div onClick={onClear} style={{ borderTop: "1px solid #eef0f4", padding: "8px 14px", cursor: "pointer", fontSize: 12, color: "#e2445c", fontWeight: 600 }} onMouseEnter={e => e.currentTarget.style.background = "#fff5f5"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>Clear person filter</div>)}
     </div>
   );

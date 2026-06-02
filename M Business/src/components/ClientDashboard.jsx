@@ -653,6 +653,74 @@ function PaymentsPage({ invoices }) {
   );
 }
 
+// ── Messages / Documents Page ──────────────────────────────────
+function MessagesPage({ user }) {
+  const [docs, setDocs] = useState([]);
+  const [selectedDoc, setSelectedDoc] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDocs = async () => {
+      try {
+        const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
+        const displayName = user?.clientName || user?.name || "Client";
+        const res = await axios.get(`${BASE_URL}/api/documents?companyId=${companyId}&client=${encodeURIComponent(displayName)}&sendTo=client`);
+        setDocs(res.data);
+      } catch (err) {
+        console.error("Failed to fetch documents:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDocs();
+  }, [user]);
+
+  if (selectedDoc) {
+    return (
+      <div style={{ display:"flex", flexDirection:"column", height:"100%" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+          <button onClick={() => setSelectedDoc(null)} style={{ background:C.surface, border:`1px solid ${C.border}`, color:C.text, padding:"8px 16px", borderRadius:8, cursor:"pointer", display:"flex", alignItems:"center", gap:8 }}>
+            <i className="ti ti-arrow-left"></i> Back to Messages
+          </button>
+          <div style={{ fontSize:16, fontWeight:700, color:C.text }}>{selectedDoc.docType.toUpperCase()} Document</div>
+        </div>
+        <div className="document-preview-content" style={{ flex:1, background:"#fff", borderRadius:12, padding:"30px", overflowY:"auto", color:"#000" }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent }} />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+      <div style={{ fontSize:18, fontWeight:700, color:C.text, fontFamily:"'Space Grotesk'" }}>Received Documents</div>
+      <div style={{ display:"grid", gap:12 }}>
+        {loading ? (
+          <div style={{ color:C.text3, padding: 20 }}>Loading documents...</div>
+        ) : docs.length === 0 ? (
+          <div style={{ background:C.surface, border:`1px solid ${C.border}`, padding:40, borderRadius:16, textAlign:"center" }}>
+            <div style={{ fontSize:40, marginBottom:16 }}>📭</div>
+            <div style={{ fontSize:16, fontWeight:700, color:C.text, marginBottom:8 }}>No Documents</div>
+            <div style={{ color:C.text3, fontSize:14 }}>You haven't received any documents or messages yet.</div>
+          </div>
+        ) : (
+          docs.map(doc => (
+          <div key={doc._id || doc.id} onClick={() => setSelectedDoc(doc)} style={{ background:C.card, border:`1px solid ${C.border}`, padding:20, borderRadius:12, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center", transition:"all 0.2s" }} onMouseEnter={e => e.currentTarget.style.borderColor = C.pink} onMouseLeave={e => e.currentTarget.style.borderColor = C.border}>
+            <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+              <div style={{ width:40, height:40, borderRadius:10, background:C.gradSoft, display:"flex", alignItems:"center", justifyContent:"center", color:C.pink }}>
+                <i className="ti ti-file-text" style={{ fontSize:20 }}></i>
+              </div>
+              <div>
+                <div style={{ fontSize:15, fontWeight:600, color:C.text, textTransform:"capitalize" }}>{doc.docType} received</div>
+                <div style={{ fontSize:12, color:C.muted }}>Sent on {new Date(doc.dateSent).toLocaleString()}</div>
+              </div>
+            </div>
+            <i className="ti ti-chevron-right" style={{ color:C.muted }}></i>
+          </div>
+        )))}
+      </div>
+    </div>
+  );
+}
+
 // ── Placeholder ───────────────────────────────────────────────
 function PlaceholderPage({ icon, title, sub }) {
   return (
@@ -745,7 +813,7 @@ export default function ClientDashboard({ user, setUser }) {
           {active==="tasks"     && <TasksPage tasks={tasks} />}
           {active==="payments"  && <PaymentsPage invoices={invoices} />}
           {active==="calendar"  && <PlaceholderPage icon="ti-calendar"       title="Business Calendar" sub="Deadlines, meetings, and milestones — all in one view."/>}
-          {active==="messages"  && <PlaceholderPage icon="ti-message-circle" title="Messages"          sub="Communicate directly with your project team."/>}
+          {active==="messages"  && <MessagesPage user={user} />}
           {active==="reports"   && <PlaceholderPage icon="ti-chart-bar"      title="Reports"           sub="Detailed financial and project performance analytics."/>}
           {active==="settings"  && <SettingsPage user={user} THEME={C} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; if (setUser) setUser(updated); localStorage.setItem("user", JSON.stringify(updated)); }} />}
         </div>

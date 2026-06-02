@@ -185,8 +185,70 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [receiptEntry, setReceiptEntry] = useState(null);
   const [editingReceipt, setEditingReceipt] = useState(false);
   const [listSearch, setListSearch] = useState("");
+  const [filterTab, setFilterTab] = useState("all");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [clientFilter, setClientFilter] = useState("all");
 
-  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
+  const handleExportCSV = (data) => {
+    if (!data.length) {
+      showToast({msg: "No data to export", type: "err"});
+      return;
+    }
+    const headers = ["Invoice ID", "Client", "Project", "Issue Date", "Due Date", "Status", "Amount", "Currency"];
+    const rows = data.map(e => [
+      e.invoiceNo, e.client, e.inv?.project || e.project || "", 
+      e.inv?.date || e.date, e.inv?.dueDate || e.dueDate, 
+      e.status, e.total || e.amount || 0, e.currency || "INR"
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(","), ...rows.map(r => r.map(c => `"${c}"`).join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `invoices_export_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
+
+  const iframeRef = useRef(null);
+
+  useEffect(() => {
+    const handleMsg = (e) => {
+      if (e.data?.type === 'SAVE_DOCUMENT' && e.data?.payload?.docType === 'inv') {
+        const payload = e.data.payload;
+        const newDoc = {
+          id: Date.now(),
+          invoiceNo: payload.invoiceNo || `INV-${Date.now()}`,
+          quotationNo: payload.invoiceNo || `INV-${Date.now()}`,
+          proposalNo: payload.invoiceNo || `INV-${Date.now()}`,
+          client: payload.client || 'Unknown Client',
+          date: payload.date || new Date().toISOString().split('T')[0],
+          dueDate: payload.dueDate || new Date().toISOString().split('T')[0],
+          status: 'draft',
+          amount: payload.amount || 0,
+          total: payload.amount || 0,
+          currency: 'INR',
+          htmlContent: payload.htmlContent,
+          type: 'invoice',
+          title: payload.client + ' - Invoice'
+        };
+        setInvoices(prev => [newDoc, ...prev]);
+        setStep("list");
+        if(typeof showToast === 'function') showToast("Invoice saved successfully!");
+      }
+    };
+    window.addEventListener('message', handleMsg);
+    return () => window.removeEventListener('message', handleMsg);
+  }, []);
+
+  const sendThemeToIframe = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || '#00BCD4';
+      iframeRef.current.contentWindow.postMessage({ type: 'SET_THEME', color }, '*');
+    }
+  };
 
   const today = new Date().toISOString().split("T")[0];
   const dueDefault = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
@@ -905,15 +967,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         </div>
 
         {/* TABS */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between", marginBottom: 20}}>
           <div className="tabs">
-            <button className="tab active">All</button>
-            <button className="tab">Paid</button>
-            <button className="tab">Pending</button>
-            <button className="tab">Overdue</button>
-            <button className="tab">Draft</button>
+            {["all", "paid", "pending", "overdue", "draft"].map(t => (
+              <button key={t} className={`tab ${filterTab === t ? "active" : ""}`} onClick={() => setFilterTab(t)} style={{ textTransform: "capitalize" }}>{t}</button>
+            ))}
           </div>
-          <div style={{fontSize:12,color:"var(--text3)",fontWeight:600}}>{enriched.length} invoices · {formatCurrency(totalAmt, inv.currency)} total</div>
+          <button onClick={() => { clearForm(); setStep("form"); }} style={{ padding: "8px 16px", background: "var(--teal)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+            <i className="ti ti-plus"></i> New Invoice
+          </button>
         </div>
 
         {/* INVOICE TABLE */}
@@ -924,10 +986,33 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <i className="ti ti-search" style={{fontSize:14,color:"var(--text3)"}}></i>
                 <input type="text" placeholder="Search by invoice ID, client…" value={listSearch} onChange={(e) => setListSearch(e.target.value)} />
               </div>
-              <button className="sort-btn"><i className="ti ti-arrows-sort" style={{fontSize:13}}></i> Sort by Date</button>
-              <button className="sort-btn"><i className="ti ti-building" style={{fontSize:13}}></i> All Clients</button>
-            </div>
-            <button className="export-btn"><i className="ti ti-download" style={{fontSize:13}}></i> Export CSV</button>
+              <button className="sort-btn" onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}><i className={sortOrder === "desc" ? "ti ti-sort-descending" : "ti ti-sort-ascending"} style={{fontSize:13}}></i> Sort by Date</button>
+                <div style={{ position: "relative" }}>
+                  <select className="sort-btn" value={clientFilter} onChange={e => setClientFilter(e.target.value)} style={{ appearance: "none", cursor: "pointer", paddingRight: 24, paddingLeft: 10 }}>
+                    <option value="all">All Clients</option>
+                    {[...new Set(enriched.map(e => e.client).filter(Boolean))].map(c => (
+                      <option key={c} value={c}>{c.substring(0, 15)}{c.length > 15 ? '...' : ''}</option>
+                    ))}
+                  </select>
+                  <i className="ti ti-chevron-down" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", fontSize: 14, color: "var(--text3)" }}></i>
+                </div>
+              </div>
+              <button className="export-btn" onClick={() => {
+                const filteredData = enriched.filter(e => {
+                  if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
+                  if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "part_paid") return false;
+                  if (filterTab === "overdue" && e.status !== "overdue") return false;
+                  if (filterTab === "draft" && e.status !== "draft") return false;
+                  if (clientFilter !== "all" && e.client !== clientFilter) return false;
+                  const term = listSearch.toLowerCase();
+                  return (e.invoiceNo || "").toLowerCase().includes(term) || (e.client || "").toLowerCase().includes(term) || (e.inv?.project || e.project || "").toLowerCase().includes(term);
+                }).sort((a, b) => {
+                  const dateA = new Date(a.inv?.date || a.date || 0).getTime();
+                  const dateB = new Date(b.inv?.date || b.date || 0).getTime();
+                  return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+                });
+                handleExportCSV(filteredData);
+              }}><i className="ti ti-download" style={{fontSize:13}}></i> Export CSV</button>
           </div>
 
           <div style={{overflowX:"auto"}}>
@@ -952,10 +1037,21 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 ) : enriched.length === 0 ? (
                   <tr><td colSpan={10} style={{textAlign:"center",padding:40,color:"var(--text3)"}}>No invoices yet</td></tr>
                 ) : enriched.filter(e => {
+                  if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
+                  if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "part_paid") return false;
+                  if (filterTab === "overdue" && e.status !== "overdue") return false;
+                  if (filterTab === "draft" && e.status !== "draft") return false;
+
+                  if (clientFilter !== "all" && e.client !== clientFilter) return false;
+
                   const term = listSearch.toLowerCase();
                   return (e.invoiceNo || "").toLowerCase().includes(term) ||
                     (e.client || "").toLowerCase().includes(term) ||
                     (e.inv?.project || e.project || "").toLowerCase().includes(term);
+                }).sort((a, b) => {
+                  const dateA = new Date(a.inv?.date || a.date || 0).getTime();
+                  const dateB = new Date(b.inv?.date || b.date || 0).getTime();
+                  return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
                 }).map((entry, idx) => {
                   const invD = entry.inv || {};
                   const isPaid = entry.status === "paid";
@@ -1369,6 +1465,19 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   // ════════════════════════════════════════════════════════════
   // FORM (Create / Edit)
   // ════════════════════════════════════════════════════════════
+  if (step === "template") {
+    return (
+      <div style={{ width: "100%", height: "80vh", display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "10px 0", display: "flex", gap: 10, alignItems: "center" }}>
+          <button onClick={() => setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "var(--app-muted)" }}>← Back to List</button>
+        </div>
+        <div style={{ flex: 1, overflow: "hidden", borderRadius: 16 }}>
+          <iframe src="/template-designer.html#inv" ref={iframeRef} onLoad={sendThemeToIframe} style={{ width: "100%", height: "100%", border: "none" }} title="Template Designer" />
+        </div>
+      </div>
+    );
+  }
+
   const hasErrors = Object.keys(errors).length > 0;
 
   return (

@@ -774,6 +774,39 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const [view, setView] = useState(new URLSearchParams(window.location.search).get("edit") || new URLSearchParams(window.location.search).get("view") ? "editor" : "list");    // list | editor
   const [proposals, setProposals] = useState([]);
   const [doc, setDoc] = useState(null);
+
+  const iframeRef = useRef(null);
+
+  useEffect(() => {
+    const handleMsg = (e) => {
+      if (e.data?.type === 'SAVE_DOCUMENT' && e.data?.payload?.docType === 'prop') {
+        const payload = e.data.payload;
+        const newDoc = {
+          _id: Date.now().toString(),
+          proposalNo: payload.invoiceNo || `PROP-${Date.now()}`,
+          clientName: payload.client || 'Unknown Client',
+          title: payload.client + ' - Proposal',
+          date: payload.date || new Date().toISOString().split('T')[0],
+          status: 'draft',
+          amount: payload.amount || 0,
+          htmlContent: payload.htmlContent,
+          type: 'proposal'
+        };
+        setProposals(prev => [newDoc, ...prev]);
+        setView("list");
+        if(typeof flash === 'function') flash(" Proposal saved successfully!");
+      }
+    };
+    window.addEventListener('message', handleMsg);
+    return () => window.removeEventListener('message', handleMsg);
+  }, []);
+
+  const sendThemeToIframe = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--app-accent').trim() || '#00BCD4';
+      iframeRef.current.contentWindow.postMessage({ type: 'SET_THEME', color }, '*');
+    }
+  };
   const [page, setPage] = useState(0);         // active slide index
   const [selectedElementId, setSelectedElementId] = useState(null);
   const [leftPanel, setLeftPanel] = useState("templates"); // templates | elements | text | brand | uploads | draw | projects | apps
@@ -942,21 +975,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   const openDoc = (d) => { setDoc({ ...d }); setPage(0); setView("editor"); };
   const createNew = () => {
-    const now = new Date().toISOString();
-    const d = { 
-      id: pid(), 
-      title: "", 
-      client: "", 
-      theme: null, 
-      status: "draft", 
-      created: now, 
-      updated: now, 
-      rejectNote: "", 
-      format: "a4-portrait", 
-      slides: [makeSlide("proposal", null, companyName)], 
-      currency: "₹" 
-    };
-    setDoc(d); setPage(0); setView("editor"); setLeftPanel("text");
+    setView("template");
   };
 
   const saveDoc = (d = doc) => { const nd = { ...d, updated: new Date().toISOString() }; persist(nd); setDoc(nd); flash("💾 Saved!"); };
@@ -1307,6 +1326,19 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const th = doc ? (THEMES.find(x => x.name === doc.theme) || THEMES[0]) : THEMES[0];
   const zf = zoom / 100;
 
+  if (view === "template") {
+    return (
+      <div style={{ width: "100%", height: "80vh", display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "10px 0", display: "flex", gap: 10, alignItems: "center" }}>
+          <button onClick={() => setView("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "var(--app-muted)" }}>← Back to List</button>
+        </div>
+        <div style={{ flex: 1, overflow: "hidden", borderRadius: 16 }}>
+          <iframe src="/template-designer.html#prop" ref={iframeRef} onLoad={sendThemeToIframe} style={{ width: "100%", height: "100%", border: "none" }} title="Template Designer" />
+        </div>
+      </div>
+    );
+  }
+
   // ══ LIST VIEW ══════════════════════════════════════════════════════════════
   if (view === "list") return (
     <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)", padding: "24px" }}>
@@ -1343,7 +1375,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 return (
                   <div key={p.id} className="proposal-card" onClick={() => openDoc(p)}>
                     <div className="pc-header">
-                      <div className="pc-cover" style={{ background: t2.g }}>??</div>
+                      <div className="pc-cover" style={{ background: t2.g }}>{(p.title || p.id).substring(0, 2).toUpperCase()}</div>
                       <div className="pc-info">
                         <div className="pc-id">{p.id}</div>
                         <div className="pc-title">{p.title}</div>
@@ -1364,7 +1396,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     <div className="pc-body">
                       <div className="pb-item">
                         <div className="pb-label">Value</div>
-                        <div className="pb-val">?{p.value?.toLocaleString() || "0"}</div>
+                        <div className="pb-val">₹{p.value?.toLocaleString() || "0"}</div>
                         <div className="pb-sub">Estimated</div>
                       </div>
                       <div className="pb-item">
@@ -1387,12 +1419,12 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                     
                     <div className="pc-footer">
                       <div className="pf-date">
-                        <span>?</span> valid until {new Date(new Date().setDate(new Date().getDate() + 30)).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
+                        <span><i className="ti ti-clock"></i></span> valid until {new Date(new Date().setDate(new Date().getDate() + 30)).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
                       </div>
                       <div className="pf-actions">
-                        <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposal(p); }}>??</button>
-                        <button className="pf-btn" onClick={e => { e.stopPropagation(); printProposal(p); }}>???</button>
-                        <button className="pf-btn" onClick={e => deleteProposal(p.id, p._id, e)} style={{ color:"var(--red)", borderColor:"var(--red-bg)" }}>???</button>
+                        <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposal(p); }}><i className="ti ti-share"></i> Share</button>
+                        <button className="pf-btn" onClick={e => { e.stopPropagation(); printProposal(p); }}><i className="ti ti-file-download"></i> PDF</button>
+                        <button className="pf-btn" onClick={e => deleteProposal(p.id, p._id, e)} style={{ color:"var(--red)", borderColor:"var(--red-bg)" }}><i className="ti ti-trash"></i></button>
                       </div>
                     </div>
                   </div>
@@ -1408,7 +1440,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             <div className="pp-sub">Overview of all active proposals</div>
             <div className="pipeline-value">
               <div className="pv-label">Total Value</div>
-              <div className="pv-val">?{(proposals.reduce((sum, p) => sum + (p.value || 0), 0)).toLocaleString("en-IN")}</div>
+              <div className="pv-val">₹{(proposals.reduce((sum, p) => sum + (p.value || 0), 0)).toLocaleString("en-IN")}</div>
               <div className="pv-sub">Across {proposals.length} proposals</div>
             </div>
             <div className="stage-list">

@@ -1,26 +1,12 @@
 import React from "react";
 
-const formatCurrency = (amount, symbol = "₹", compact = false, disableCompact = false) => {
-  const num = Number(amount) || 0;
-  const absNum = Math.abs(num);
+const formatCurrency = (val) => {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
+  };
   
-  if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
-    try {
-      const isINR = symbol === "₹";
-      const formatter = new Intl.NumberFormat(isINR ? 'en-IN' : 'en-US', {
-        notation: 'compact',
-        compactDisplay: 'short',
-        maximumFractionDigits: 2
-      });
-      return `${symbol}${formatter.format(num)}`;
-    } catch (e) {
-      // Fallback
-    }
-  }
-  
-  const isINR = symbol === "₹";
-  return `${symbol}${num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
+  const formatCompact = (val) => {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', notation: 'compact', maximumFractionDigits: 2 }).format(val);
+  };
 
 export default function ModernAccountsView({ THEME, income = [], expenses = [] }) {
   const totalIncome = income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
@@ -65,7 +51,7 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
           
           <div style={{ position: "relative", zIndex: 1 }}>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", fontWeight: 600, marginBottom: 4 }}>Available Balance</div>
-            <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1px" }}>{formatCurrency(primaryBal)}</div>
+            <div title={formatCurrency(primaryBal)} style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1px" }}>{formatCompact(primaryBal)}</div>
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 30, position: "relative", zIndex: 1 }}>
@@ -85,7 +71,7 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
           
           <div style={{ position: "relative", zIndex: 1 }}>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", fontWeight: 600, marginBottom: 4 }}>Available Balance</div>
-            <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1px" }}>{formatCurrency(secondaryBal)}</div>
+            <div title={formatCurrency(secondaryBal)} style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1px" }}>{formatCompact(secondaryBal)}</div>
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 30, position: "relative", zIndex: 1 }}>
@@ -103,7 +89,7 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
           
           <div>
             <div style={{ fontSize: 13, color: "var(--app-muted)", fontWeight: 600, marginBottom: 4 }}>Total Saved</div>
-            <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1px", color: "var(--app-text)" }}>{formatCurrency(savingsBal)}</div>
+            <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1px", color: "var(--app-text)" }}>{formatCompact(savingsBal)}</div>
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 30 }}>

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { BASE_URL } from '../config';
 
 function hexToRgb(hex) {
-  if (!hex || !hex.startsWith('#')) return "124, 58, 237";
+  if (!hex || !hex.startsWith('#')) return "0, 188, 212";
   const bigint = parseInt(hex.replace(/^#/, ''), 16);
   const r = (bigint >> 16) & 255;
   const g = (bigint >> 8) & 255;
@@ -305,9 +305,9 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     "--app-border": THEME.border || "var(--app-border)",
     "--app-text": THEME.text || "var(--app-text)",
     "--app-muted": THEME.textMuted || THEME.muted || "var(--app-muted)",
-    "--app-accent": THEME.accent || THEME.pink || "var(--app-accent)",
-    "--app-accent-rgb": THEME.accent ? hexToRgb(THEME.accent) : THEME.pink ? hexToRgb(THEME.pink) : "124, 58, 237",
-    "--app-accent-gradient": THEME.sidebar || THEME.grad || THEME.accent || THEME.pink || "var(--app-accent-gradient)",
+    "--app-accent": THEME.accent || THEME.pink || "var(--teal)",
+    "--app-accent-rgb": THEME.accent ? hexToRgb(THEME.accent) : THEME.pink ? hexToRgb(THEME.pink) : "0, 188, 212",
+    "--app-accent-gradient": THEME.sidebar || THEME.grad || THEME.accent || THEME.pink || "linear-gradient(135deg, var(--teal), var(--teal2))",
     maxWidth: 1400, margin: "0 auto", padding: "20px"
   } : { maxWidth: 1400, margin: "0 auto", padding: "20px" };
 

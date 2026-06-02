@@ -843,161 +843,302 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
           </div>
         )}
 
-        {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
+        {/* PAGE HEADER */}
+        <div className="page-header">
           <div>
-            <p style={{ margin: "3px 0 0", color: "var(--app-muted)", fontSize: 13 }}>{enriched.length} total invoice{enriched.length !== 1 ? "s" : ""}</p>
+            <div className="page-title">Invoices</div>
+            <div className="page-sub">Track, manage and send invoices to your clients</div>
           </div>
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 13 }}>🔍</span>
-              <input
-                type="text"
-                placeholder="Search invoices..."
-                value={listSearch}
-                onChange={(e) => setListSearch(e.target.value)}
-                style={{ padding: "9px 12px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, outline: "none", width: 220, background: "var(--app-surface)", color: "var(--app-text)", fontFamily: "inherit" }}
-              />
-            </div>
-            <button onClick={() => { clearForm(); setStep("form"); }}
-              style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>
-              + Create Invoice
-            </button>
+          <div className="header-actions">
+            <button className="filter-btn"><i className="ti ti-filter" style={{fontSize:14}}></i> Filter</button>
+            <button className="filter-btn"><i className="ti ti-calendar" style={{fontSize:14}}></i> May 2026</button>
+            <button className="filter-btn"><i className="ti ti-download" style={{fontSize:14}}></i> Export</button>
           </div>
         </div>
 
-        {/* Summary cards */}
-        <div className="inv-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
-          {[
-            { label: "Total Invoiced", value: formatCurrency(totalAmt, inv.currency), color: "var(--app-accent)", icon: "📊" },
-            { label: "Collected", value: formatCurrency(paidAmt, inv.currency), color: "#16a34a", icon: "✅" },
-            { label: "Awaiting", value: `${unpaidCnt}`, color: "#ea580c", icon: "⏳" },
-            { label: "Drafts", value: `${draftCnt}`, color: "#6b7280", icon: "📝" },
-          ].map((c) => (
-            <div key={c.label} style={{ background: "var(--app-card)", borderRadius: 18, padding: "20px", border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: c.color }} />
-              <div style={{ width: 42, height: 42, borderRadius: 12, background: `${c.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>{c.icon}</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: c.color }}>{c.value}</div>
-              <div style={{ fontSize: 12, color: "var(--app-muted)", marginTop: 4, fontWeight: 700, textTransform: "uppercase" }}>{c.label}</div>
+        {/* STATS */}
+        <div className="stats-row">
+          <div className="stat-card" onClick={() => { clearForm(); setStep("form"); }}>
+            <div className="stat-card-inner">
+              <div className="stat-icon" style={{background:"var(--teal-light)",color:"var(--teal)"}}><i className="ti ti-receipt-2"></i></div>
+              <div>
+                <div className="stat-num">{enriched.length}</div>
+                <div className="stat-label">Total Invoices</div>
+                <div className="stat-amount" style={{color:"var(--teal)"}}>{formatCurrency(totalAmt, inv.currency)} total</div>
+              </div>
             </div>
-          ))}
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{width:"100%",background:"var(--teal)"}}></div></div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-card-inner">
+              <div className="stat-icon" style={{background:"var(--green-bg)",color:"var(--green)"}}><i className="ti ti-circle-check"></i></div>
+              <div>
+                <div className="stat-num">{enriched.filter(e => e.status === "paid" || e.status === "part_paid").length}</div>
+                <div className="stat-label">Paid</div>
+                <div className="stat-amount" style={{color:"var(--green)"}}>{formatCurrency(paidAmt, inv.currency)} received</div>
+              </div>
+            </div>
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{width: (totalAmt > 0 ? (paidAmt/totalAmt)*100 : 0)+"%",background:"var(--green)"}}></div></div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-card-inner">
+              <div className="stat-icon" style={{background:"var(--amber-bg)",color:"var(--amber)"}}><i className="ti ti-clock"></i></div>
+              <div>
+                <div className="stat-num">{unpaidCnt}</div>
+                <div className="stat-label">Pending</div>
+                <div className="stat-amount" style={{color:"var(--amber)"}}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)} due</div>
+              </div>
+            </div>
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{width: (totalAmt > 0 ? (Math.max(0, totalAmt - paidAmt)/totalAmt)*100 : 0)+"%",background:"var(--amber)"}}></div></div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-card-inner">
+              <div className="stat-icon" style={{background:"var(--red-bg)",color:"var(--red)"}}><i className="ti ti-alert-circle"></i></div>
+              <div>
+                <div className="stat-num">{enriched.filter(e => e.status === "overdue").length}</div>
+                <div className="stat-label">Overdue</div>
+                <div className="stat-amount" style={{color:"var(--red)"}}>Action needed</div>
+              </div>
+            </div>
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{width:"11%",background:"var(--red)"}}></div></div>
+          </div>
         </div>
 
-        {/* Table */}
-        <div style={{ background: "var(--app-card)", borderRadius: 20, border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)", overflow: "hidden" }}>
-          <div style={{ overflowX: "auto" }}>
-            <div style={{ minWidth: 1050 }}>
-              {/* Table header */}
-              <div className="inv-th" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1fr", padding: "12px 20px", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", borderBottom: "2px solid var(--app-border)", alignItems: "center" }}>
-            {["Invoice No", "Company Name", "Project", "Date", "Due Date", "Amount", "Paid", "Status", "Actions"].map((h) => (
-              <div key={h} style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", letterSpacing: 0.5, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h}</div>
-            ))}
+        {/* TABS */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div className="tabs">
+            <button className="tab active">All</button>
+            <button className="tab">Paid</button>
+            <button className="tab">Pending</button>
+            <button className="tab">Overdue</button>
+            <button className="tab">Draft</button>
+          </div>
+          <div style={{fontSize:12,color:"var(--text3)",fontWeight:600}}>{enriched.length} invoices · {formatCurrency(totalAmt, inv.currency)} total</div>
+        </div>
+
+        {/* INVOICE TABLE */}
+        <div className="table-panel">
+          <div className="table-toolbar">
+            <div className="toolbar-left">
+              <div className="toolbar-search">
+                <i className="ti ti-search" style={{fontSize:14,color:"var(--text3)"}}></i>
+                <input type="text" placeholder="Search by invoice ID, client…" value={listSearch} onChange={(e) => setListSearch(e.target.value)} />
+              </div>
+              <button className="sort-btn"><i className="ti ti-arrows-sort" style={{fontSize:13}}></i> Sort by Date</button>
+              <button className="sort-btn"><i className="ti ti-building" style={{fontSize:13}}></i> All Clients</button>
+            </div>
+            <button className="export-btn"><i className="ti ti-download" style={{fontSize:13}}></i> Export CSV</button>
           </div>
 
-          {listLoading ? (
-            <div style={{ padding: "60px 20px", textAlign: "center", color: "#9ca3af", fontSize: 13 }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>⏳</div>
-              Loading invoices…
+          <div style={{overflowX:"auto"}}>
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" className="cb" /></th>
+                  <th>Invoice ID</th>
+                  <th>Client</th>
+                  <th>Project</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Issue Date</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listLoading ? (
+                  <tr><td colSpan={10} style={{textAlign:"center",padding:40,color:"var(--text3)"}}>Loading invoices...</td></tr>
+                ) : enriched.length === 0 ? (
+                  <tr><td colSpan={10} style={{textAlign:"center",padding:40,color:"var(--text3)"}}>No invoices yet</td></tr>
+                ) : enriched.filter(e => {
+                  const term = listSearch.toLowerCase();
+                  return (e.invoiceNo || "").toLowerCase().includes(term) ||
+                    (e.client || "").toLowerCase().includes(term) ||
+                    (e.inv?.project || e.project || "").toLowerCase().includes(term);
+                }).map((entry, idx) => {
+                  const invD = entry.inv || {};
+                  const isPaid = entry.status === "paid";
+                  const isPartPaid = entry.status === "part_paid";
+                  const isOverdue = entry.status === "overdue";
+                  const isSent = entry.status === "sent";
+                  const isDraft = entry.status === "draft";
+                  const isPending = !isPaid && !isPartPaid && !isDraft;
+
+                  return (
+                    <tr key={entry.id || idx} onClick={() => setViewEntry(entry)}>
+                      <td onClick={e => e.stopPropagation()}><input type="checkbox" className="cb" /></td>
+                      <td className="inv-id" style={{color: "var(--teal)", fontWeight: 800}}>{entry.invoiceNo || "—"}</td>
+                      <td>
+                        <div className="client-chip">
+                          <div className="client-av" style={{background:`linear-gradient(135deg,var(--teal),#006E7F)`}}>
+                            {(entry.client || "?")[0].toUpperCase()}
+                          </div>
+                          <span className="client-name">{entry.client || "—"}</span>
+                        </div>
+                      </td>
+                      <td style={{color: "var(--text2)"}}>{invD.project || entry.project || "—"}</td>
+                      <td>
+                        {isPaid ? <span className="badge advance">Advance</span> : 
+                         isDraft ? <span className="badge draft">Draft</span> : 
+                         <span className="badge" style={{background:"var(--purple-bg)",color:"var(--purple)"}}>Milestone</span>}
+                      </td>
+                      <td className={isPaid || isPartPaid ? "amount-pos" : ""}>{formatCurrency(entry.total, entry.inv?.currency || inv.currency)}</td>
+                      <td style={{color:"var(--text2)"}}>{formatDate(invD.date || entry.date)}</td>
+                      <td style={{color: isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text2)", fontWeight: isOverdue || isPending ? 700 : 400}}>
+                        {formatDate(invD.dueDate || entry.dueDate)}
+                      </td>
+                      <td onClick={e => e.stopPropagation()}>
+                        <select
+                          value={entry.status || "draft"}
+                          disabled={statusUpdating === entry.id}
+                          onChange={e => handleStatusChange(entry, e.target.value)}
+                          style={{
+                            background: "transparent", border: "none", fontSize: 10, fontWeight: 700, 
+                            cursor: "pointer", outline: "none", fontFamily: "inherit",
+                            color: isPaid ? "var(--green)" : isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text3)"
+                          }}>
+                          <option value="draft">Draft</option>
+                          <option value="sent">Sent</option>
+                          <option value="part_paid">Part Paid</option>
+                          <option value="paid">Paid</option>
+                          <option value="unpaid">Unpaid</option>
+                          <option value="overdue">Overdue</option>
+                        </select>
+                      </td>
+                      <td onClick={e => e.stopPropagation()}>
+                        <div className="row-actions">
+                          <button className="row-btn" onClick={() => { loadEntry(entry); setStep("preview"); }}><i className="ti ti-eye"></i></button>
+                          {(isPaid || isPartPaid) ? (
+                            <button className="row-btn" onClick={() => {
+                              setReceiptEntry({ ...entry, paymentData: { amountPaid: entry.amountPaid || entry.total, paymentMode: entry.paymentMode || "Other", paymentDate: entry.paymentDate || new Date().toISOString(), transactionId: entry.transactionId } });
+                              setStep("receipt");
+                            }}><i className="ti ti-download"></i></button>
+                          ) : (
+                            <button className="row-btn"><i className="ti ti-send"></i></button>
+                          )}
+                          <button className="row-btn danger" onClick={() => setDeleteTarget(entry)}><i className="ti ti-trash"></i></button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* PAGINATION */}
+          <div className="pagination">
+            <div className="page-info">Showing {enriched.length} of {enriched.length} invoices</div>
+            <div className="page-btns">
+              <button className="page-btn"><i className="ti ti-chevron-left" style={{fontSize:14}}></i></button>
+              <button className="page-btn active">1</button>
+              <button className="page-btn"><i className="ti ti-chevron-right" style={{fontSize:14}}></i></button>
             </div>
-          ) : enriched.length === 0 ? (
-            <div style={{ padding: "70px 20px", textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 10 }}>📭</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#111827", marginBottom: 4 }}>No invoices yet</div>
-              <div style={{ fontSize: 13, color: "#9ca3af" }}>Click "+ Create Invoice" to get started</div>
-            </div>
-          ) : enriched.filter(e => {
-            const term = listSearch.toLowerCase();
-            return (e.invoiceNo || "").toLowerCase().includes(term) ||
-              (e.client || "").toLowerCase().includes(term) ||
-              (e.inv?.project || e.project || "").toLowerCase().includes(term);
-          }).map((entry, idx, arr) => {
-            const invD = entry.inv || {};
-            const sc = statusColor[(entry.status || "draft").toLowerCase()] || "#6b7280";
-            const isUpdating = statusUpdating === entry.id;
+          </div>
+        </div>
 
-            return (
-              <div key={entry.id || idx} className="inv-row"
-                style={{ display: "grid", gridTemplateColumns: "1.2fr 1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 1.2fr 1.2fr", padding: "16px 20px", borderBottom: idx < arr.length - 1 ? "1px solid var(--app-border)" : "none", alignItems: "center", background: "transparent" }}>
+        {/* BOTTOM ROW */}
+        <div className="bottom-row">
 
-                {/* Invoice No */}
-                <div onClick={() => setViewEntry(entry)} style={{ overflow: "hidden" }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{entry.invoiceNo || "—"}</div>
-                  <div style={{ fontSize: 10, color: "#d1d5db", marginTop: 1, fontFamily: "monospace" }}>{formatDateTime(entry.savedAt || entry.createdAt)}</div>
-                </div>
-
-                {/* Client */}
-                <div onClick={() => setViewEntry(entry)} style={{ fontSize: 13, fontWeight: 600, color: "#111827", overflow: "hidden" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 7, overflow: "hidden" }}>
-                    <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
-                      {(entry.client || "?")[0].toUpperCase()}
-                    </div>
-                    <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{entry.client || "—"}</span>
-                  </div>
-                </div>
-
-                {/* Project */}
-                <div className="inv-col-hide" onClick={() => setViewEntry(entry)} style={{ fontSize: 12, color: "#6b7280", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {invD.project || entry.project || <span style={{ color: "#e5e7eb" }}>—</span>}
-                </div>
-
-                {/* Date */}
-                <div className="inv-col-hide" onClick={() => setViewEntry(entry)} style={{ fontSize: 12, color: "#374151" }}>
-                  {formatDate(invD.date || entry.date)}
-                </div>
-
-                {/* Due Date */}
-                <div className="inv-col-hide" onClick={() => setViewEntry(entry)} style={{ fontSize: 12, color: "#ea580c", fontWeight: 600 }}>
-                  {formatDate(invD.dueDate || entry.dueDate)}
-                </div>
-
-                {/* Amount */}
-                <div onClick={() => setViewEntry(entry)} style={{ fontSize: 14, fontWeight: 700, color: "#111827", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {formatCurrency(entry.total, entry.inv?.currency || inv.currency)}
-                </div>
-
-                {/* Paid Amount */}
-                <div onClick={() => setViewEntry(entry)} style={{ fontSize: 14, fontWeight: 700, color: "#22c55e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {formatCurrency(entry.amountPaid || 0, entry.currency || inv.currency)}
-                </div>
-
-                {/* Status dropdown */}
-                <div onClick={e => e.stopPropagation()}>
-                  <select
-                    value={entry.status || "draft"}
-                    disabled={isUpdating}
-                    onChange={e => handleStatusChange(entry, e.target.value)}
-                    style={{
-                      background: `${sc}12`, border: `1.5px solid ${sc}30`,
-                      borderRadius: 8, padding: "5px 8px", fontSize: 11, fontWeight: 700,
-                      color: sc, cursor: "pointer", outline: "none", fontFamily: "inherit",
-                      opacity: isUpdating ? 0.6 : 1,
-                    }}>
-                    <option value="draft">📝 Draft</option>
-                    <option value="sent">📤 Sent</option>
-                    <option value="part_paid">💰 Part Payment</option>
-                    <option value="paid">✅ Paid</option>
-                    <option value="unpaid">⏳ Unpaid</option>
-                  <option value="overdue">🔴 Overdue</option>
-                  </select>
-                </div>
-
-                {/* Action buttons */}
-                <div onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 4, flexWrap: "nowrap" }}>
-                  <button onClick={() => { loadEntry(entry); setStep("preview"); }} style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#374151", cursor: "pointer", fontWeight: 700 }}>View</button>
-                  {(entry.status === "paid" || entry.status === "part_paid") && (
-                    <button onClick={() => {
-                      setReceiptEntry({ ...entry, paymentData: { amountPaid: entry.amountPaid || entry.total, paymentMode: entry.paymentMode || "Other", paymentDate: entry.paymentDate || new Date().toISOString(), transactionId: entry.transactionId } });
-                      setStep("receipt");
-                    }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700 }}>🧾 </button>
-                  )}
-
-                  <button onClick={() => setDeleteTarget(entry)} style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 7px", fontSize: 11, color: "#ef4444", cursor: "pointer", fontWeight: 700 }}>Delete</button>
+          {/* SUMMARY PANEL */}
+          <div className="summary-panel">
+            <div className="summary-title">Invoice Summary</div>
+            <div className="summary-item">
+              <div className="si-left">
+                <div className="si-icon" style={{background:"var(--green-bg)",color:"var(--green)"}}><i className="ti ti-circle-check"></i></div>
+                <div>
+                  <div className="si-label">Total Collected</div>
+                  <div className="si-count">{enriched.filter(e => e.status === "paid" || e.status === "part_paid").length} invoices paid</div>
                 </div>
               </div>
-            );
-          })}
+              <div className="si-amount" style={{color:"var(--green)"}}>{formatCurrency(paidAmt, inv.currency)}</div>
+            </div>
+            <div className="summary-item">
+              <div className="si-left">
+                <div className="si-icon" style={{background:"var(--amber-bg)",color:"var(--amber)"}}><i className="ti ti-clock"></i></div>
+                <div>
+                  <div className="si-label">Awaiting Payment</div>
+                  <div className="si-count">{unpaidCnt} invoices pending</div>
+                </div>
+              </div>
+              <div className="si-amount" style={{color:"var(--amber)"}}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)}</div>
+            </div>
+            <div className="summary-item">
+              <div className="si-left">
+                <div className="si-icon" style={{background:"var(--red-bg)",color:"var(--red)"}}><i className="ti ti-alert-circle"></i></div>
+                <div>
+                  <div className="si-label">Overdue Amount</div>
+                  <div className="si-count">{enriched.filter(e => e.status === "overdue").length} invoice overdue</div>
+                </div>
+              </div>
+              <div className="si-amount" style={{color:"var(--red)"}}>{formatCurrency(0, inv.currency)}</div>
+            </div>
+            <div className="summary-item">
+              <div className="si-left">
+                <div className="si-icon" style={{background:"var(--surface2)",color:"var(--text3)"}}><i className="ti ti-file"></i></div>
+                <div>
+                  <div className="si-label">Draft Invoices</div>
+                  <div className="si-count">{draftCnt} not yet sent</div>
+                </div>
+              </div>
+              <div className="si-amount" style={{color:"var(--text3)"}}>{formatCurrency(0, inv.currency)}</div>
+            </div>
+            {/* mini bar chart */}
+            <div style={{marginTop:4}}>
+              <div style={{fontSize:11,fontWeight:700,color:"var(--text2)",marginBottom:10}}>Revenue Breakdown</div>
+              <div style={{display:"flex",gap:3,height:60,alignItems:"flex-end"}}>
+                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                  <div style={{width:"100%",background:"var(--teal)",borderRadius:"4px 4px 0 0",height:60,opacity:.9}}></div>
+                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>May</div>
+                </div>
+                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                  <div style={{width:"100%",background:"var(--green)",borderRadius:"4px 4px 0 0",height:42}}></div>
+                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>Apr</div>
+                </div>
+                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                  <div style={{width:"100%",background:"var(--amber)",borderRadius:"4px 4px 0 0",height:30}}></div>
+                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>Mar</div>
+                </div>
+                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                  <div style={{width:"100%",background:"var(--border)",borderRadius:"4px 4px 0 0",height:20}}></div>
+                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>Feb</div>
+                </div>
+                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                  <div style={{width:"100%",background:"var(--border)",borderRadius:"4px 4px 0 0",height:36}}></div>
+                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>Jan</div>
+                </div>
+              </div>
             </div>
           </div>
+
+          {/* ACTIVITY PANEL */}
+          <div className="activity-panel">
+            <div className="activity-title">Recent Activity</div>
+            <div className="activity-list">
+              {enriched.slice(0, 5).map((entry, i) => {
+                const isPaid = entry.status === "paid";
+                const isPartPaid = entry.status === "part_paid";
+                const isOverdue = entry.status === "overdue";
+                const isDraft = entry.status === "draft";
+                const dotColor = isPaid || isPartPaid ? "var(--green)" : isOverdue ? "var(--red)" : isDraft ? "var(--text3)" : "var(--amber)";
+                const statusStr = isPaid ? "Paid" : isPartPaid ? "Part Paid" : isOverdue ? "Overdue" : isDraft ? "Draft" : "Sent";
+                return (
+                  <div className="activity-item" key={entry.id || i}>
+                    <div className="act-dot-wrap">
+                      <div className="act-dot" style={{background: dotColor}}></div>
+                      <div className="act-line"></div>
+                    </div>
+                    <div>
+                      <div className="act-text">{entry.invoiceNo || "INV"} marked as <strong>{statusStr}</strong></div>
+                      <div className="act-meta">{formatCurrency(entry.total, inv.currency)} · {entry.client} · {formatDate(entry.savedAt || entry.createdAt)}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
 
 

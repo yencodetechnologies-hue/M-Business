@@ -1,0 +1,293 @@
+import React, { useState, useMemo } from 'react';
+import './ModernProjectsPage.css';
+
+const THEMES = {
+  teal: {
+    name: 'Teal',
+    primary: '#00BCD4',
+    primary2: '#00ACC1',
+    light: '#E0F7FA',
+    lighter: '#F0FDFE',
+    bg: '#F5FAFA',
+    surface: '#FFFFFF',
+    border: '#E0EEF0'
+  },
+  blue: {
+    name: 'Blue',
+    primary: '#2563EB',
+    primary2: '#1D4ED8',
+    light: '#EFF4FF',
+    lighter: '#F5F8FF',
+    bg: '#F5F8FF',
+    surface: '#FFFFFF',
+    border: '#E2E8F0'
+  },
+  purple: {
+    name: 'Purple',
+    primary: '#7C5CFC',
+    primary2: '#6D28D9',
+    light: '#EEE9FF',
+    lighter: '#F5F3FF',
+    bg: '#F9FAFB',
+    surface: '#FFFFFF',
+    border: '#E5E7EB'
+  },
+  green: {
+    name: 'Green',
+    primary: '#26C281',
+    primary2: '#059669',
+    light: '#E8FAF3',
+    lighter: '#ECFDF5',
+    bg: '#F6FDF9',
+    surface: '#FFFFFF',
+    border: '#D1FAE5'
+  }
+};
+
+const INITIAL_PROJECTS = [
+  { id: 1, name: 'M Business', company: 'YENCODE', initials: 'MB', desc: 'Full-stack business management platform with invoicing, project tracking and client management.', progress: 50, color: 'teal', status: 'In Progress', avatars: ['P', 'Y', 'S'], date: 'Due 30 Jun 2026' },
+  { id: 2, name: 'M Access', company: 'YENCODE', initials: 'MA', desc: 'Role-based access control system with multi-tenant support and audit logging.', progress: 50, color: 'purple', status: 'In Progress', avatars: ['P', 'Y'], date: 'Due 15 Jul 2026' },
+  { id: 3, name: 'YDMart App', company: 'YENCODE', initials: 'YD', desc: 'E-commerce mobile app for YDMart with product catalog, cart and payment integration.', progress: 75, color: 'green', status: 'Active', avatars: ['Y', 'D'], date: 'Due 10 Jun 2026' },
+  { id: 4, name: 'STA Website', company: 'STA Corp', initials: 'ST', desc: 'Corporate website redesign with CMS integration, SEO optimization and analytics dashboard.', progress: 90, color: 'amber', status: 'In Review', avatars: ['P', 'S'], date: 'Due 05 Jun 2026' },
+  { id: 5, name: 'YenCode CRM', company: 'YENCODE', initials: 'YC', desc: 'Customer relationship management system with lead tracking, pipeline and email automation.', progress: 100, color: 'blue', status: 'Completed', avatars: ['P', 'Y', 'C'], date: 'Delivered Apr 2026' },
+  { id: 6, name: 'NexPay Gateway', company: 'NexCorp', initials: 'NP', desc: 'Payment gateway integration with UPI, cards and wallet support. Pending client sign-off.', progress: 35, color: 'red', status: 'On Hold', avatars: ['P'], date: 'TBD' },
+];
+
+export default function ModernProjectsPage() {
+  const [themeKey, setThemeKey] = useState('teal');
+  const [activeTab, setActiveTab] = useState('All Projects');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [projects, setProjects] = useState(INITIAL_PROJECTS);
+  
+  const theme = THEMES[themeKey];
+
+  const filteredProjects = useMemo(() => {
+    return projects.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.company.toLowerCase().includes(searchQuery.toLowerCase());
+      if (!matchesSearch) return false;
+      if (activeTab === 'All Projects') return true;
+      if (activeTab === 'In Progress' && (p.status === 'In Progress' || p.status === 'Active' || p.status === 'In Review')) return true;
+      if (activeTab === 'Completed' && p.status === 'Completed') return true;
+      if (activeTab === 'On Hold' && p.status === 'On Hold') return true;
+      return false;
+    });
+  }, [projects, activeTab, searchQuery]);
+
+  const stats = {
+    total: projects.length,
+    inProgress: projects.filter(p => ['In Progress', 'Active', 'In Review'].includes(p.status)).length,
+    completed: projects.filter(p => p.status === 'Completed').length,
+    onHold: projects.filter(p => p.status === 'On Hold').length
+  };
+
+  const cssVars = {
+    '--theme-primary': theme.primary,
+    '--theme-primary2': theme.primary2,
+    '--theme-light': theme.light,
+    '--theme-lighter': theme.lighter,
+    '--theme-bg': theme.bg,
+    '--theme-surface': theme.surface,
+    '--theme-border': theme.border,
+  };
+
+  return (
+    <div className="modern-app" style={cssVars}>
+      {/* SIDEBAR */}
+      <aside className="m-sidebar">
+        <div className="m-logo">
+          <span className="m-logo-mark">MBusiness</span><span className="m-logo-badge">+</span>
+        </div>
+        <div className="m-profile-area">
+          <div className="m-profile-avatar">P</div>
+          <div>
+            <div className="m-profile-name">Prabhu</div>
+            <div className="m-profile-logout" onClick={() => window.location.href='/'}>Back Home →</div>
+          </div>
+        </div>
+        <nav className="m-nav">
+          <div className="m-nav-item"><i className="ti ti-layout-dashboard"></i>Dashboard</div>
+          <div className="m-nav-label">Management</div>
+          <div className="m-nav-item active"><i className="ti ti-briefcase"></i>Projects<span className="m-nav-badge">{stats.total}</span></div>
+          <div className="m-nav-item"><i className="ti ti-users"></i>Team</div>
+          <div className="m-nav-item"><i className="ti ti-building"></i>Companies</div>
+          <div className="m-nav-label">Finance</div>
+          <div className="m-nav-item"><i className="ti ti-file-text"></i>Quotations</div>
+          <div className="m-nav-item"><i className="ti ti-presentation"></i>Proposals</div>
+          <div className="m-nav-item"><i className="ti ti-receipt"></i>Invoices</div>
+          <div className="m-nav-item"><i className="ti ti-credit-card"></i>Accounts</div>
+          <div className="m-nav-item"><i className="ti ti-arrows-exchange"></i>Payments</div>
+          <div className="m-nav-item"><i className="ti ti-cash"></i>Expenses</div>
+          <div className="m-nav-label">Resources</div>
+          <div className="m-nav-item"><i className="ti ti-rocket"></i>Subscriptions</div>
+          <div className="m-nav-item"><i className="ti ti-settings"></i>Settings</div>
+        </nav>
+        <div className="m-sidebar-bottom">
+          <button className="m-upload-btn" onClick={() => alert("New Project Clicked")}><i className="ti ti-plus" style={{fontSize: '15px'}}></i> New Project</button>
+        </div>
+      </aside>
+
+      {/* MAIN */}
+      <div className="m-main">
+        <div className="m-topbar">
+          <div className="m-search-wrap">
+            <i className="ti ti-search"></i>
+            <input 
+              type="text" 
+              placeholder="Search projects…" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="m-topbar-right">
+            <div className="m-topbar-icon"><i className="ti ti-bell"></i><span className="m-notif-dot"></span></div>
+            <div className="m-topbar-icon" onClick={() => setShowThemeMenu(!showThemeMenu)} style={{position: 'relative'}}>
+              <i className="ti ti-palette"></i>
+              {showThemeMenu && (
+                <div className="m-theme-menu">
+                  <div style={{fontSize: 11, fontWeight: 'bold', color: 'var(--text3)', marginBottom: 8, textTransform: 'uppercase'}}>Select Theme</div>
+                  {Object.keys(THEMES).map(k => (
+                    <div key={k} className={`m-theme-option ${themeKey === k ? 'active' : ''}`} onClick={() => setThemeKey(k)}>
+                      <div className="m-theme-color-box" style={{background: THEMES[k].primary}}></div>
+                      {THEMES[k].name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <button className="m-create-btn" onClick={() => alert("New Project Clicked")}><i className="ti ti-plus" style={{fontSize: '15px'}}></i> New Project</button>
+          </div>
+        </div>
+
+        <div className="m-content">
+
+          {/* PAGE HEADER */}
+          <div className="m-page-header">
+            <div>
+              <div className="m-page-title">Projects</div>
+              <div className="m-page-sub">Manage and track all your active projects</div>
+            </div>
+            <div className="m-header-actions">
+              <button className="m-filter-btn"><i className="ti ti-filter" style={{fontSize: '14px'}}></i> Filter</button>
+              <button className="m-filter-btn"><i className="ti ti-calendar" style={{fontSize: '14px'}}></i> May 2026</button>
+              <div className="m-view-toggle">
+                <button className="m-view-btn active"><i className="ti ti-layout-grid"></i></button>
+                <button className="m-view-btn"><i className="ti ti-list"></i></button>
+              </div>
+            </div>
+          </div>
+
+          {/* STATS */}
+          <div className="m-stats-row">
+            <div className="m-stat-card" onClick={() => setActiveTab('All Projects')}>
+              <div className="m-stat-icon" style={{background: 'var(--theme-light)', color: 'var(--theme-primary)'}}><i className="ti ti-briefcase"></i></div>
+              <div>
+                <div className="m-stat-num">{stats.total}</div>
+                <div className="m-stat-label">Total Projects</div>
+                <div className="m-stat-trend up"><i className="ti ti-trending-up" style={{fontSize: '12px'}}></i> +2 this month</div>
+              </div>
+            </div>
+            <div className="m-stat-card" onClick={() => setActiveTab('In Progress')}>
+              <div className="m-stat-icon" style={{background: 'var(--amber-bg)', color: 'var(--amber)'}}><i className="ti ti-loader"></i></div>
+              <div>
+                <div className="m-stat-num">{stats.inProgress}</div>
+                <div className="m-stat-label">In Progress</div>
+                <div className="m-stat-trend neutral"><i className="ti ti-minus" style={{fontSize: '12px'}}></i> No change</div>
+              </div>
+            </div>
+            <div className="m-stat-card" onClick={() => setActiveTab('Completed')}>
+              <div className="m-stat-icon" style={{background: 'var(--green-bg)', color: 'var(--green)'}}><i className="ti ti-circle-check"></i></div>
+              <div>
+                <div className="m-stat-num">{stats.completed}</div>
+                <div className="m-stat-label">Completed</div>
+                <div className="m-stat-trend up"><i className="ti ti-trending-up" style={{fontSize: '12px'}}></i> +1 this week</div>
+              </div>
+            </div>
+            <div className="m-stat-card" onClick={() => setActiveTab('On Hold')}>
+              <div className="m-stat-icon" style={{background: 'var(--red-bg)', color: 'var(--red)'}}><i className="ti ti-clock-pause"></i></div>
+              <div>
+                <div className="m-stat-num">{stats.onHold}</div>
+                <div className="m-stat-label">On Hold</div>
+                <div className="m-stat-trend down"><i className="ti ti-trending-down" style={{fontSize: '12px'}}></i> Review needed</div>
+              </div>
+            </div>
+          </div>
+
+          {/* TABS */}
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+            <div className="m-tabs">
+              {['All Projects', 'In Progress', 'Completed', 'On Hold'].map(tab => (
+                <button 
+                  key={tab} 
+                  className={`m-tab ${activeTab === tab ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+            <div style={{fontSize: '12px', color: 'var(--text3)', fontWeight: 600}}>
+              Showing {filteredProjects.length} of {projects.length} projects
+            </div>
+          </div>
+
+          {/* PROJECTS GRID */}
+          <div className="m-projects-grid">
+
+            {filteredProjects.map(p => (
+              <div key={p.id} className={`m-project-card c-${p.color}`}>
+                <div className="m-pc-top">
+                  <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                    <div className="m-pc-icon">{p.initials}</div>
+                    <div>
+                      <div className="m-pc-name">{p.name}</div>
+                      <div className="m-pc-company"><i className="ti ti-building" style={{fontSize: '11px'}}></i> {p.company}</div>
+                    </div>
+                  </div>
+                  <i className="ti ti-dots-vertical m-pc-more"></i>
+                </div>
+                
+                <span className={`m-status-badge ${p.status.toLowerCase().replace(' ', '')}`}>
+                  {p.status}
+                </span>
+                
+                <div className="m-pc-desc">{p.desc}</div>
+                
+                <div className="m-pc-progress-label">
+                  <span className="m-pc-progress-text">Progress</span>
+                  <span className="m-pc-progress-pct" style={{color: `var(--${p.color})`}}>{p.progress}%</span>
+                </div>
+                
+                <div className="m-pc-bar">
+                  <div className={`m-pc-fill ${p.color}`} style={{width: `${p.progress}%`}}></div>
+                </div>
+                
+                <div className="m-pc-footer">
+                  <div className="m-pc-avatars">
+                    {p.avatars.map((av, idx) => (
+                      <div key={idx} className="m-pc-av">{av}</div>
+                    ))}
+                  </div>
+                  <div className="m-pc-deadline">
+                    {p.status === 'Completed' ? 
+                      <><i className="ti ti-circle-check" style={{fontSize: '11px', color: 'var(--green)'}}></i> {p.date}</> : 
+                      <><i className="ti ti-calendar" style={{fontSize: '11px'}}></i> {p.date}</>
+                    }
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* ADD NEW CARD */}
+            <div className="m-add-project-card" onClick={() => alert("New Project Clicked")}>
+              <div className="m-add-icon"><i className="ti ti-plus"></i></div>
+              <div className="m-add-text">Add New Project</div>
+              <div className="m-add-sub">Click to create a new project</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

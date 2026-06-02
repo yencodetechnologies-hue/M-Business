@@ -180,7 +180,7 @@ function Sidebar({ active, setActive, user, setUser }) {
   return (
     <div style={{ width:230, background:C.surface, borderRight:`1px solid ${C.border}`,
       display:"flex", flexDirection:"column", height:"100vh", position:"sticky", top:0, flexShrink:0,
-      overflow:"hidden", position:"relative" }}>
+      overflow:"hidden" }}>
       <GlowOrb color={C.pink} size={200} top={-80} left={-80} opacity={0.12}/>
       <GlowOrb color={C.purple} size={160} bottom={-60} right={-60} opacity={0.1}/>
 
@@ -557,7 +557,7 @@ function TasksPage({ tasks }) {
           </button>
         ))}
       </div>
-      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, overflow:"hidden", position:"relative" }}>
+      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, overflow:"hidden" }}>
         <GlowOrb color={C.purple} size={200} bottom={-60} right={-60} opacity={0.07}/>
         <div style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 110px",
           padding:"12px 20px", fontSize:9, fontWeight:700, color:"#ffffff", letterSpacing:1.3,

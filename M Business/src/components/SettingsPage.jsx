@@ -312,214 +312,158 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   } : { maxWidth: 1400, margin: "0 auto", padding: "20px" };
 
   return (
-    <div style={wrapperStyle}>
-      {/* Toast Notification */}
+    <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)" }}>
       {toast && (
         <div style={{
           position: "fixed", bottom: 24, right: 24, zIndex: 9999,
-          background: "var(--app-card)", borderLeft: `4px solid var(--app-accent)`,
+          background: "var(--surface)", borderLeft: "4px solid var(--teal)",
           borderRadius: 12, padding: "12px 20px", fontSize: 13,
-          fontWeight: 600, color: "var(--app-text)", boxShadow: "var(--app-shadow)"
+          fontWeight: 700, color: "var(--text)", boxShadow: "0 4px 16px rgba(0,0,0,.1)"
         }}>{toast}</div>
       )}
 
-      <div style={{ display: "flex", flexDirection: "row", gap: 28, flexWrap: "wrap" }}>
-        {/* ========= SIDEBAR ========= */}
-        <aside style={{
-          width: 260, background: "var(--app-bg)", borderRadius: 24,
-          border: "1px solid var(--app-border)", overflow: "hidden",
-          alignSelf: "start", position: "sticky", top: 20
-        }}>
-          {/* User Summary */}
-          <div style={{
-            padding: "24px 20px", textAlign: "center",
-            borderBottom: "1px solid var(--app-border)", background: "rgba(var(--app-accent-rgb), 0.05)"
-          }}>
-            <div style={{ position: "relative", display: "inline-block", maxWidth: "100%" }}>
-              {avatarUrl ? (
-                <img 
-                  src={avatarUrl} 
-                  alt="avatar" 
-                  style={{ 
-                    width: "auto", 
-                    height: "auto", 
-                    maxWidth: "180px", 
-                    maxHeight: "100px", 
-                    borderRadius: 16, 
-                    objectFit: "contain", 
-                    border: "2px solid var(--app-accent)",
-                    background: "var(--app-card)",
-                    boxShadow: "0 4px 12px rgba(var(--app-accent-rgb), 0.1)"
-                  }} 
-                />
-              ) : (
-                <div style={{
-                  width: 80, height: 80, borderRadius: 28, background: "var(--app-accent-gradient)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 32, fontWeight: 700, color: "#fff"
-                }}>{initials}</div>
-              )}
-              <label style={{
-                position: "absolute", bottom: -10, right: -10, background: "var(--app-card)",
-                borderRadius: 99, width: 32, height: 32, display: "flex", alignItems: "center", 
-                justifyContent: "center", cursor: "pointer", border: "1.5px solid var(--app-border)",
-                boxShadow: "var(--app-shadow)"
-              }}>
-                <span style={{ fontSize: 14 }}>📷</span>
-                <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: "none" }} />
-              </label>
-            </div>
-            <div style={{ marginTop: 12, fontWeight: 700, fontSize: 16, color: "var(--app-text)" }}>{displayName}</div>
-            <div style={{ fontSize: 12, color: "var(--app-muted)" }}>{user?.email}</div>
+      <div className="content" style={{ padding: "22px 28px 32px" }}>
+        <div className="page-header" style={{ marginBottom: 22 }}>
+          <div>
+            <div className="page-title" style={{ fontSize: 20, fontWeight: 800 }}>Settings</div>
+            <div className="page-sub" style={{ fontSize: 12, color: "var(--text3)", marginTop: 3 }}>Manage your account, company and preferences</div>
+          </div>
+        </div>
+
+        <div className="settings-layout">
+          {/* SETTINGS NAV */}
+          <div className="settings-nav">
+            {navItems.map((item, idx) => (
+              <React.Fragment key={item.id}>
+                <div 
+                  className={`sn-item ${activeTab === item.id ? "active" : ""}`}
+                  onClick={() => setActiveTab(item.id)}
+                >
+                  <span style={{ fontSize: 16 }}>{item.icon}</span> 
+                  {item.label}
+                </div>
+                {idx === 0 && <hr className="sn-divider" />}
+              </React.Fragment>
+            ))}
           </div>
 
-          {/* Navigation */}
-          <nav style={{ padding: "16px 12px" }}>
-            {navItems.map(item => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 12, width: "100%",
-                  padding: "12px 16px", marginBottom: 4, borderRadius: 14,
-                  background: activeTab === item.id ? "rgba(var(--app-accent-rgb), 0.15)" : "transparent",
-                  color: activeTab === item.id ? "var(--app-accent)" : "var(--app-text)",
-                  border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500,
-                  transition: "all 0.2s", fontFamily: "inherit"
-                }}
-                onMouseEnter={e => { if (activeTab !== item.id) e.currentTarget.style.background = "rgba(var(--app-accent-rgb), 0.05)"; }}
-                onMouseLeave={e => { if (activeTab !== item.id) e.currentTarget.style.background = "transparent"; }}
-              >
-                <span style={{ fontSize: 18 }}>{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </nav>
-        </aside>
+          {/* SETTINGS PANELS */}
+          <div className="settings-panels">
+            {activeTab === "profile" && (
+              <div className="settings-section">
+                <div className="ss-header">
+                  <div className="ss-header-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}>👤</div>
+                  <div>
+                    <div className="ss-title">Profile & Company</div>
+                    <div className="ss-sub">Update your personal and business information</div>
+                  </div>
+                </div>
+                <div className="ss-body">
+                  <div className="avatar-upload">
+                    <div className="avatar-big">
+                      {avatarUrl ? <img src={avatarUrl} alt="Avatar" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : initials}
+                      <label className="avatar-edit">
+                        <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: "none" }} />
+                        <i className="ti ti-pencil" style={{ fontSize: 11 }}></i>
+                      </label>
+                    </div>
+                    <div className="avatar-actions">
+                      <label className="avatar-upload-btn">
+                        <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: "none" }} />
+                        <i className="ti ti-upload"></i> Upload new photo
+                      </label>
+                      {avatarUrl && <div className="avatar-remove" onClick={() => { setAvatarUrl(""); if(onLogoChange) onLogoChange(""); }}>Remove photo</div>}
+                      <div className="avatar-note">Recommended size: 256x256px. Max 2MB.</div>
+                    </div>
+                  </div>
 
-        {/* ========= MAIN CONTENT ========= */}
-        <main style={{ flex: 1, minWidth: 280 }}>
-          {/* PROFILE TAB */}
-          {activeTab === "profile" && (
-            <div style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 24, padding: "28px 32px" }}>
-              <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6, color: "var(--app-text)" }}>Profile Details</h2>
-              <p style={{ fontSize: 14, color: "var(--app-muted)", marginBottom: 32 }}>Update your account information</p>
-
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-                <Input label="Company Name" value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} placeholder="Your company name" required />
-                <Input label="Email" type="email" value={profile.email} onChange={v => setProfile(p => ({ ...p, email: v }))} placeholder="Email address" />
-                <Input label="Phone" type="tel" value={profile.phone} onChange={v => setProfile(p => ({ ...p, phone: v }))} placeholder="Contact number" />
-              </div>
-
-              <button
-                onClick={saveProfile}
-                disabled={profileSaving}
-                style={{
-                  marginTop: 28, padding: "12px 28px", borderRadius: 40,
-                  background: profileSaved ? "#22c55e" : "var(--app-accent-gradient)",
-                  color: "white", border: "none", fontWeight: 700, cursor: "pointer",
-                  transition: "0.2s", opacity: profileSaving ? 0.7 : 1
-                }}
-              >
-                {profileSaving ? "Saving..." : profileSaved ? "✓ Saved!" : "Save Changes"}
-              </button>
-            </div>
-          )}
-
-          {/* NOTIFICATIONS TAB */}
-          {activeTab === "notifications" && (
-            <div style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 24, padding: "28px 32px" }}>
-              <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6, color: "var(--app-text)" }}>Notifications</h2>
-              <p style={{ fontSize: 14, color: "var(--app-muted)", marginBottom: 24 }}>Choose what alerts you want to receive</p>
-
-              <Toggle label="Email Notifications" desc="Receive email alerts for important events" checked={notifs.emailNotifications} onChange={v => updateNotif("emailNotifications", v)} />
-              <Toggle label="Invoice Payment Alerts" desc="Get notified when invoices are paid or overdue" checked={notifs.invoiceAlerts} onChange={v => updateNotif("invoiceAlerts", v)} />
-              <Toggle label="Task Reminders" desc="Receive reminders for upcoming task deadlines" checked={notifs.taskReminders} onChange={v => updateNotif("taskReminders", v)} />
-              <Toggle label="Weekly Progress Report" desc="Summary email every Monday morning" checked={notifs.weeklyReport} onChange={v => updateNotif("weeklyReport", v)} />
-
-              <button onClick={saveProfile} style={{ marginTop: 28, padding: "12px 28px", borderRadius: 40, background: "var(--app-accent-gradient)", color: "white", border: "none", fontWeight: 700, cursor: "pointer" }}>Save Preferences</button>
-            </div>
-          )}
-
-          {/* BRANDING TAB */}
-          {activeTab === "branding" && (
-            <div style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 24, padding: "28px 32px" }}>
-              <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6, color: "var(--app-text)" }}>Branding & Theme</h2>
-              <p style={{ fontSize: 14, color: "var(--app-muted)", marginBottom: 28 }}>Customize your dashboard look</p>
-
-              <div style={{ marginBottom: 32 }}>
-                <label style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, display: "block" }}>Preset Themes</label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-                  {themes && Object.entries(themes).map(([key, t]) => (
-                    <button
-                      key={key}
-                      onClick={() => setAppTheme(key)}
-                      style={{
-                        padding: "10px 18px", borderRadius: 40, border: appTheme === key ? `2px solid ${t.dot}` : "1px solid var(--app-border)",
-                        background: appTheme === key ? `${t.dot}10` : "transparent", cursor: "pointer",
-                        display: "flex", alignItems: "center", gap: 10, fontSize: 13, fontWeight: 500
-                      }}
-                    >
-                      <span style={{ width: 20, height: 20, borderRadius: 20, background: t.dot }}></span>
-                      {t.label}
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">Company Name *</label>
+                      <input className="form-input" value={profile.name} onChange={e => setProfile(p => ({ ...p, name: e.target.value }))} placeholder="Your company name" />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Email Address</label>
+                      <input className="form-input" type="email" value={profile.email} onChange={e => setProfile(p => ({ ...p, email: e.target.value }))} placeholder="Email address" />
+                    </div>
+                  </div>
+                  <div className="form-group" style={{ maxWidth: "50%" }}>
+                    <label className="form-label">Phone Number</label>
+                    <input className="form-input" type="tel" value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} placeholder="Contact number" />
+                  </div>
+                  
+                  <div className="section-save">
+                    <button className="sec-save-btn" onClick={saveProfile} disabled={profileSaving}>
+                      {profileSaving ? "Saving..." : <><i className="ti ti-device-floppy"></i> Save Changes</>}
                     </button>
-                  ))}
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div>
-              
-               
+            {activeTab === "branding" && (
+              <div className="settings-section">
+                <div className="ss-header">
+                  <div className="ss-header-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}>🎨</div>
+                  <div>
+                    <div className="ss-title">Branding & Theme</div>
+                    <div className="ss-sub">Customize the look and feel of your app</div>
+                  </div>
+                </div>
+                <div className="ss-body">
+                  <div className="form-group">
+                    <label className="form-label">App Theme</label>
+                    <div className="color-picker-row">
+                      {themes && Object.entries(themes).map(([key, t]) => (
+                        <div 
+                          key={key} 
+                          className={`color-swatch ${appTheme === key ? "selected" : ""}`}
+                          style={{ background: t.dot }}
+                          onClick={() => setAppTheme(key)}
+                          title={t.label}
+                        />
+                      ))}
+                    </div>
+                    <div className="form-hint">Choose a primary color for buttons and accents.</div>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-
-          {/* SECURITY TAB (new) */}
-          {activeTab === "security" && (
-            <div style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 24, padding: "28px 32px" }}>
-              <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6, color: "var(--app-text)" }}>Security</h2>
-
-
-              <div style={{ maxWidth: 500 }}>
-                <Input 
-                  label="Current Password" 
-                  type="password" 
-                  placeholder="Enter current password" 
-                  value={passwords.old} 
-                  onChange={v => setPasswords(p => ({ ...p, old: v }))} 
-                />
-                <Input 
-                  label="New Password" 
-                  type="password" 
-                  placeholder="Enter new password" 
-                  value={passwords.new} 
-                  onChange={v => setPasswords(p => ({ ...p, new: v }))} 
-                />
-                <Input 
-                  label="Confirm New Password" 
-                  type="password" 
-                  placeholder="Confirm new password" 
-                  value={passwords.confirm} 
-                  onChange={v => setPasswords(p => ({ ...p, confirm: v }))} 
-                />
-                <button 
-                  onClick={handleUpdatePassword}
-                  disabled={securityLoading}
-                  style={{ 
-                    marginTop: 8, padding: "12px 32px", borderRadius: 40, 
-                    background: "var(--app-accent-gradient)", color: "white", 
-                    border: "none", fontWeight: 700, cursor: "pointer",
-                    opacity: securityLoading ? 0.7 : 1,
-                    boxShadow: "0 4px 12px rgba(var(--app-accent-rgb), 0.2)"
-                  }}
-                >
-                  {securityLoading ? "Updating..." : "Update Password"}
-                </button>
+            {activeTab === "security" && (
+              <div className="settings-section">
+                <div className="ss-header">
+                  <div className="ss-header-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}>🔒</div>
+                  <div>
+                    <div className="ss-title">Security & Passwords</div>
+                    <div className="ss-sub">Manage your password and security settings</div>
+                  </div>
+                </div>
+                <div className="ss-body">
+                  <div className="form-group" style={{ maxWidth: 400 }}>
+                    <label className="form-label">Current Password</label>
+                    <input className="form-input" type="password" value={passwords.old} onChange={e => setPasswords(p => ({ ...p, old: e.target.value }))} placeholder="••••••••" />
+                  </div>
+                  <div className="form-group" style={{ maxWidth: 400 }}>
+                    <label className="form-label">New Password</label>
+                    <input className="form-input" type="password" value={passwords.new} onChange={e => setPasswords(p => ({ ...p, new: e.target.value }))} placeholder="••••••••" />
+                    <div className="form-hint">Must be at least 6 characters.</div>
+                  </div>
+                  <div className="form-group" style={{ maxWidth: 400 }}>
+                    <label className="form-label">Confirm New Password</label>
+                    <input className="form-input" type="password" value={passwords.confirm} onChange={e => setPasswords(p => ({ ...p, confirm: e.target.value }))} placeholder="••••••••" />
+                  </div>
+                  
+                  <div className="section-save" style={{ justifyContent: "flex-start", marginTop: 24, paddingTop: 0, borderTop: "none" }}>
+                    <button className="sec-save-btn" onClick={handleUpdatePassword} disabled={securityLoading}>
+                      {securityLoading ? "Updating..." : "Update Password"}
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-        </main>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

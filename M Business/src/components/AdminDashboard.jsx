@@ -10,6 +10,7 @@ import ReportsPage from "./ReportsPage";
 import QuotationCreator from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
 import AdminProposalManagement from "./AdminProposalManagement";
+import ModernProjectsView from "./ModernProjectsView";
 
 const THEME_MAP = {
   light: {
@@ -1647,35 +1648,7 @@ function ProjectsPage({ THEME, projects, setProjects, clients, employees }) {
           style={{ padding: "8px 16px", borderRadius: 10, fontSize: 13, minWidth: 240, background: THEME.surface, color: THEME.text, border: `1px solid ${THEME.border}` }}
         />
       </div>
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-          <thead>
-            <tr>
-              {["Project Name", "Client", "Progress", "Status", "Budget"].map(h => (
-                <th key={h} style={{ padding: "16px", textAlign: "left", fontWeight: 800, color: THEME.muted, borderBottom: `2px solid ${THEME.border}` }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((p, i) => (
-              <tr key={p._id || i} style={{ borderBottom: `1px solid ${THEME.border}` }}>
-                <td style={{ padding: "16px", fontWeight: 700, color: THEME.text }}>{p.name || "—"}</td>
-                <td style={{ padding: "16px", color: THEME.muted }}>{p.client || "—"}</td>
-                <td style={{ padding: "16px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ flex: 1, background: THEME.surface, height: 6, borderRadius: 10 }}>
-                      <div style={{ width: `${p.progress || 0}%`, background: THEME.accent, height: "100%", borderRadius: 10 }} />
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: THEME.accent }}>{p.progress || 0}%</span>
-                  </div>
-                </td>
-                <td style={{ padding: "16px" }}><Badge label={p.status || "Pending"} /></td>
-                <td style={{ padding: "16px", fontWeight: 700, color: THEME.text }}>₹{p.budget || 0}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ModernProjectsView projects={projects} searchQuery={search} />
     </div>
   );
 }

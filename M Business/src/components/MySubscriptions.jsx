@@ -529,431 +529,289 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--app-sidebar)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
+    <div style={{ fontFamily: "var(--font)", display: "flex", flexDirection: "column", gap: 24, paddingBottom: 40, animation: "fadeIn 0.4s ease-out" }}>
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
+      
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "var(--text)", color: "#fff", borderRadius: 12, padding: "14px 22px", fontSize: 14, fontWeight: 700, boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>{toast}</div>}
 
-      {/* ── 10-day warning banner ── */}
-      {subscription.status === "active" && daysLeft !== null && daysLeft <= 10 && daysLeft > 0 && (
-        <div style={{ background: "linear-gradient(135deg,#fef3c7,#fde68a)", border: "2px solid #f59e0b", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ fontSize: 28 }}>⏰</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: "#92400e", marginBottom: 3 }}>Subscription Expiring Soon!</div>
-            <div style={{ fontSize: 13, color: "#78350f" }}>Your <strong>{subscription.planName}</strong> plan expires in <strong style={{ color: "#d97706" }}>{daysLeft} day{daysLeft === 1 ? "" : "s"}</strong>. Please renew before it expires.</div>
-          </div>
-          <button onClick={() => setActiveTab("upgrade")} style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)", border: "none", borderRadius: 9, padding: "9px 18px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer" }}>Renew Now</button>
+      {!subscription ? (
+        <div className="plans-grid">
+          {PLANS.map(plan => (
+            <div key={plan.name} className={"plan-card " + (plan.popular ? "popular" : "")}>
+              {plan.popular && <div className="popular-ribbon">POPULAR</div>}
+              <div className="plan-icon">{plan.icon}</div>
+              <div className="plan-name">{plan.name}</div>
+              <div className="plan-desc">{plan.clientLimit}, {plan.employeeLimit}</div>
+              <div className="plan-price">
+                {plan.price === null ? "Contact us" : `₹${plan.price.toLocaleString("en-IN")}`}
+                {plan.price !== null && <span>/mo</span>}
+              </div>
+              <hr className="plan-divider" />
+              <div className="plan-features">
+                {plan.features.map((f, i) => (
+                  <div key={i} className="plan-feature included">
+                    <i>✓</i> {f}
+                  </div>
+                ))}
+              </div>
+              <button 
+                className={"plan-btn " + (plan.popular ? "popular-btn" : "upgrade-btn")} 
+                onClick={() => startPayUPayment(plan)}
+                disabled={!!payLoading}
+              >
+                {payLoading === plan.name ? "Processing..." : plan.btnLabel || "Get Started"}
+              </button>
+            </div>
+          ))}
         </div>
-      )}
-
-      {/* ── Stats Row ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-        {[
-          { label: "CURRENT PLAN", value: subscription.planName + (subscription.isTrial ? " (Trial)" : ""), sub: `₹${subscription.planPrice?.toLocaleString() || "0"}/${subscription.billingCycle}`, bg: "linear-gradient(135deg,var(--app-accent),var(--app-muted))" },
-          { label: "PAYMENT STATUS", value: subscription.isFullyPaid ? "✅ Fully Paid" : "⏳ Pending", sub: subscription.isFullyPaid ? "All payments cleared" : "Payment required", bg: subscription.isFullyPaid ? "linear-gradient(135deg,#22C55E,#16a34a)" : "linear-gradient(135deg,#F59E0B,#d97706)" },
-          { label: "STATUS", value: subscription.status?.toUpperCase(), sub: `Valid till ${formatDate(subscription.endDate)} · ${daysLeft || 0} days left`, bg: subscription.status === "active" ? "linear-gradient(135deg,#3b82f6,#2563eb)" : "linear-gradient(135deg,#6b7280,#4b5563)" },
-          { label: "USAGE REMAINING", value: usageRemaining.toLocaleString("en-IN"), sub: `Used: ${subscription.usageCount || 0} / ${subscription.usageLimit || 999}`, bg: "linear-gradient(135deg,var(--app-sidebar),var(--app-sidebar))" }
-        ].map(s => (
-          <div key={s.label} style={{ background: s.bg, borderRadius: 14, padding: "16px 14px", color: "#fff" }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, opacity: 0.85, marginBottom: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 2 }}>{s.value}</div>
-            <div style={{ fontSize: 11, opacity: 0.85 }}>{s.sub}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Usage Progress Bar ── */}
-      <div style={{ background: "#fff", borderRadius: 14, padding: "16px 20px", border: "1px solid var(--app-border)", boxShadow: "0 2px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.06)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>📊 Usage Limit</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: usagePct >= 80 ? T.warning : T.success }}>{usageRemaining} remaining of {subscription.usageLimit || 999}</div>
-        </div>
-        <div style={{ background: "#f3f4f6", borderRadius: 8, height: 10, overflow: "hidden" }}>
-          <div style={{ width: `${usagePct}%`, height: "100%", borderRadius: 8, background: usagePct >= 80 ? "linear-gradient(90deg,#f59e0b,#ef4444)" : "linear-gradient(90deg,var(--app-accent),#22c55e)", transition: "width 0.6s ease" }} />
-        </div>
-        <div style={{ fontSize: 11, color: T.muted, marginTop: 6 }}>{usagePct}% used {usagePct >= 80 && "⚠️ Approaching limit"}</div>
-      </div>
-
-      {/* ── Tabs ── */}
-      <div style={{ display: "flex", gap: 4, borderBottom: "2px solid var(--app-border)", paddingBottom: 0, flexWrap: "wrap" }}>
-        {[
-          { key: "overview", label: "📋 Overview" },
-          { key: "payments", label: `💳 Payments (${payments.length})` },
-          { key: "invoices", label: `🧾 Invoices (${invoices.length})` },
-          { key: "quotations", label: `📄 Quotations (${quotations.length})` },
-          { key: "upgrade", label: "⬆️ Upgrade" }
-        ].map(tab => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
-            padding: "10px 16px", background: activeTab === tab.key ? "var(--app-bg)" : "transparent",
-            border: "none", borderBottom: activeTab === tab.key ? "2px solid var(--app-accent)" : "2px solid transparent",
-            borderRadius: "8px 8px 0 0", color: activeTab === tab.key ? T.accent : "#94a3b8",
-            fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: -2
-          }}>
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Overview Tab ── */}
-      {activeTab === "overview" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <Card title="Current Plan Details" icon="⭐">
-            <InfoRow label="Plan Name" value={`${subscription.planName}${subscription.isTrial ? " (Free Trial)" : ""}`} icon="📦" />
-            <InfoRow label="Price" value={`${formatCurrency(subscription.planPrice)}/${subscription.billingCycle}`} icon="💵" />
-            <InfoRow label="Status" value={subscription.status} icon="🔵" />
-            <InfoRow label="Clients Limit" value={subscription.clientLimit || "Unlimited"} icon="🏢" />
-            <InfoRow label="Employees Limit" value={subscription.employeeLimit || "Unlimited"} icon="👥" />
-            <InfoRow label="Managers Limit" value={subscription.managerLimit || "Unlimited"} icon="👔" />
-            <InfoRow label="Start Date" value={formatDate(subscription.startDate)} icon="📅" />
-            <InfoRow label="End Date" value={formatDate(subscription.endDate)} icon="⏰" />
-            <InfoRow label="Days Remaining" value={`${daysLeft || 0} days`} icon="⌛" />
-            <InfoRow label="Payment Status" value={subscription.isFullyPaid ? "✅ Fully Paid" : "⏳ Pending"} icon="💳" />
-            <InfoRow label="Next Billing" value={formatDate(subscription.nextBillingDate)} icon="📆" />
-          </Card>
-
-          <Card title="Plan Features" icon="✨">
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {(subscription.features || []).map((f, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "#f0fdf4", borderRadius: 9, border: "1px solid #bbf7d0" }}>
-                  <span style={{ color: T.success, fontSize: 13 }}>✓</span>
-                  <span style={{ fontSize: 13, color: T.text, fontWeight: 500 }}>{f}</span>
+      ) : (
+        <>
+          <div className="plan-hero">
+            <div>
+              <div className="ph-badge">{subscription.status === "active" ? "🟢 ACTIVE PLAN" : "🔴 EXPIRED"}</div>
+              <div className="ph-title">{subscription.planName}</div>
+              <div className="ph-sub">Manage your plan limits, billing, and upgrade options. Valid until {formatDate(subscription.endDate)}.</div>
+              <div className="ph-stats">
+                <div className="ph-stat">
+                  <div className="ph-stat-val">{subscription.clientLimit || "Unlimited"}</div>
+                  <div className="ph-stat-label">Clients</div>
                 </div>
-              ))}
-              {(!subscription.features || subscription.features.length === 0) && (
-                <div style={{ color: T.muted, fontSize: 13, padding: 20, textAlign: "center" }}>No features listed</div>
+                <div className="ph-stat">
+                  <div className="ph-stat-val">{subscription.employeeLimit || "Unlimited"}</div>
+                  <div className="ph-stat-label">Employees</div>
+                </div>
+                <div className="ph-stat">
+                  <div className="ph-stat-val">{subscription.managerLimit || "Unlimited"}</div>
+                  <div className="ph-stat-label">Managers</div>
+                </div>
+              </div>
+            </div>
+            <div className="ph-right">
+              <div className="ph-price">
+                <div className="ph-price-val">₹{subscription.planPrice?.toLocaleString("en-IN") || "0"}</div>
+                <div className="ph-price-period">per {subscription.billingCycle}</div>
+              </div>
+              <button className="ph-btn" onClick={() => setActiveTab("upgrade")}>Upgrade Plan</button>
+              {daysLeft !== null && daysLeft <= 10 && daysLeft > 0 && (
+                <div className="ph-renew">⚠️ Expires in {daysLeft} days</div>
               )}
             </div>
-          </Card>
+          </div>
 
-          <Card title={`Provider — ${user?.companyName || ""}`} icon="🏢">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <InfoRow label="Company" value={subscription.providerCompany || user?.companyName || ""} icon="🏢" />
-              <InfoRow label="Email" value={subscription.providerEmail || "billing@business-suite.com"} icon="📧" />
-              <InfoRow label="Phone" value={subscription.providerPhone || "+91-9876543210"} icon="📱" />
-              <InfoRow label="GST" value={subscription.providerGst || "GSTIN-33AABCM1234Z1Z1"} icon="📋" />
+          <div className="usage-grid">
+            <div className="usage-card">
+              <div className="uc-top">
+                <div className="uc-icon" style={{ background:"var(--teal-light)", color:"var(--teal)" }}>📊</div>
+                <div className="uc-pct" style={{ color:"var(--teal)" }}>{usagePct}%</div>
+              </div>
+              <div className="uc-name">Plan Usage</div>
+              <div className="uc-vals">
+                <div className="uc-used">{subscription.usageCount || 0}</div>
+                <div className="uc-total">/ {subscription.usageLimit || 999} actions</div>
+              </div>
+              <div className="uc-bar"><div className="uc-fill" style={{ width: `${usagePct}%`, background:"var(--teal)" }} /></div>
             </div>
-          </Card>
-
-          <Card title="Invoice & Quotation Refs" icon="📎">
-            {subscription.invoiceRefs?.length > 0 && (
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Invoices</div>
-                {subscription.invoiceRefs.map((r, i) => (
-                  <div key={i} style={{ padding: "7px 12px", background: "var(--app-bg)", borderRadius: 8, fontSize: 13, fontWeight: 600, color: T.accent, marginBottom: 4, border: "1px solid var(--app-border)" }}>🧾 {r}</div>
-                ))}
+            
+            <div className="usage-card">
+              <div className="uc-top">
+                <div className="uc-icon" style={{ background:"var(--amber-bg)", color:"var(--amber)" }}>🏢</div>
               </div>
-            )}
-            {subscription.quotationRefs?.length > 0 && (
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Quotations</div>
-                {subscription.quotationRefs.map((r, i) => (
-                  <div key={i} style={{ padding: "7px 12px", background: "#fffbeb", borderRadius: 8, fontSize: 13, fontWeight: 600, color: "#d97706", marginBottom: 4, border: "1px solid #fde68a" }}>📄 {r}</div>
-                ))}
+              <div className="uc-name">Clients</div>
+              <div className="uc-vals">
+                <div className="uc-used">{subscription.clientLimit || "Unlimited"}</div>
+                <div className="uc-total">Limit</div>
               </div>
-            )}
-            {(!subscription.invoiceRefs?.length && !subscription.quotationRefs?.length) && (
-              <div style={{ textAlign: "center", padding: 20, color: T.muted, fontSize: 13 }}>No references yet</div>
-            )}
-          </Card>
-        </div>
-      )}
-
-      {/* ── Payments Tab ── */}
-      {activeTab === "payments" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {/* Payment Method Section (Same as Invoices for consistency) */}
-
-
-          <Card title={`Payment History`} icon="💰">
-            {payments.length === 0 ? (
-              <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
-                <div style={{ fontSize: 32, marginBottom: 12 }}>💳</div>
-                <p style={{ margin: 0 }}>No payment history found</p>
-              </div>
-            ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr>
-                      {["ID", "Date", "Description", "Amount", "Status", "Actions"].map(h => (
-                        <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 13, fontWeight: 700, color: T.muted, borderBottom: "1px solid var(--app-border)" }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {payments.map((p, i) => (
-                      <tr key={p._id || i} style={{ borderBottom: "1px solid #f8fafc" }}>
-                        <td style={{ padding: "16px", fontSize: 12, fontFamily: "monospace", color: T.muted }}>{(p.paymentId || "").slice(0, 10)}...</td>
-                        <td style={{ padding: "16px", fontSize: 14, color: T.text }}>{formatDate(p.paymentDate)}</td>
-                        <td style={{ padding: "16px", fontSize: 14, color: T.text }}>{p.description}</td>
-                        <td style={{ padding: "16px", fontSize: 14, fontWeight: 600, color: T.text }}>{formatCurrency(p.amount, p.currency)}</td>
-                        <td style={{ padding: "16px" }}>
-                          <Badge label={p.status} color={getStatusColor(p.status)} />
-                        </td>
-                        <td style={{ padding: "16px" }}>
-                          <button
-                            onClick={() => p.invoiceNo ? setViewInvoice(p) : setViewPayment(p)}
-                            style={{ background: "none", border: "none", color: "var(--app-accent)", fontWeight: 600, cursor: "pointer", fontSize: 14, padding: 0, textDecoration: "underline" }}
-                          >
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </Card>
-        </div>
-      )}
-
-      {/* ── Invoices Tab ── */}
-      {activeTab === "invoices" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-
-
-          <Card title={`Invoices`} icon="🧾">
-            {invoices.length === 0 ? (
-              <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
-                <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
-                <p style={{ margin: 0 }}>No invoices yet. Invoices are provided by M Business upon payment.</p>
-              </div>
-            ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr>
-                      {["Date", "Total", "Status", "Actions"].map(h => (
-                        <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 13, fontWeight: 700, color: T.muted, borderBottom: "1px solid var(--app-border)" }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {invoices.map((inv, i) => (
-                      <tr key={inv._id || i} style={{ borderBottom: "1px solid #f8fafc" }}>
-                        <td style={{ padding: "16px", fontSize: 14, color: T.text }}>{formatDate(inv.paymentDate)}</td>
-                        <td style={{ padding: "16px", fontSize: 14, fontWeight: 600, color: T.text }}>{formatCurrency(inv.amount, inv.currency)}</td>
-                        <td style={{ padding: "16px" }}>
-                          <span style={{ padding: "4px 12px", borderRadius: 12, fontSize: 12, fontWeight: 600, background: "#f0fdf4", color: "#16a34a", textTransform: "capitalize" }}>
-                            {inv.status || "Paid"}
-                          </span>
-                        </td>
-                        <td style={{ padding: "16px" }}>
-                          <button
-                            onClick={() => setViewInvoice(inv)}
-                            style={{ background: "none", border: "none", color: "var(--app-accent)", fontWeight: 600, cursor: "pointer", fontSize: 14, padding: 0, textDecoration: "underline" }}
-                          >
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </Card>
-        </div>
-      )}
-
-      {/* ── Quotations Tab ── */}
-      {activeTab === "quotations" && (
-        <Card title={`Quotations from ${user?.companyName || ""} (${quotations.length})`} icon="📄">
-          {quotations.length === 0 ? (
-            <div style={{ textAlign: "center", padding: 40, color: T.muted }}>
-              <div style={{ fontSize: 32, marginBottom: 10 }}>📋</div>
-              <p style={{ margin: 0 }}>No quotations yet. Quotations are provided by M Business before payment.</p>
             </div>
-          ) : (
-            <div style={{ display: "grid", gap: 12 }}>
-              {quotations.map((q, i) => (
-                <div key={q._id || i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: "#fffbeb", borderRadius: 12, border: "1px solid #fde68a" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                    <div style={{ width: 46, height: 46, borderRadius: 12, background: "linear-gradient(135deg,#f59e0b,#d97706)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📄</div>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>Quotation #{q.quotationNo}</div>
-                      <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>{q.description} • {formatDate(q.paymentDate)}</div>
-                      <div style={{ fontSize: 11, color: "#d97706", marginTop: 2, fontWeight: 600 }}>From: {q.providerCompany || "M Business"}</div>
+
+            <div className="usage-card">
+              <div className="uc-top">
+                <div className="uc-icon" style={{ background:"var(--purple-bg)", color:"var(--purple)" }}>👥</div>
+              </div>
+              <div className="uc-name">Employees</div>
+              <div className="uc-vals">
+                <div className="uc-used">{subscription.employeeLimit || "Unlimited"}</div>
+                <div className="uc-total">Limit</div>
+              </div>
+            </div>
+          </div>
+
+          {activeTab === "upgrade" && (
+            <div className="plans-grid" style={{ marginTop: 10 }}>
+              {PLANS.map(plan => {
+                const isCurrent = plan.name === subscription.planName;
+                return (
+                  <div key={plan.name} className={"plan-card " + (isCurrent ? "current" : plan.popular ? "popular" : "")}>
+                    {isCurrent && <div className="current-ribbon">CURRENT PLAN</div>}
+                    {!isCurrent && plan.popular && <div className="popular-ribbon">POPULAR</div>}
+                    <div className="plan-icon">{plan.icon}</div>
+                    <div className="plan-name">{plan.name}</div>
+                    <div className="plan-desc">{plan.clientLimit}, {plan.employeeLimit}</div>
+                    <div className="plan-price">
+                      {plan.price === null ? "Contact us" : `₹${plan.price.toLocaleString("en-IN")}`}
+                      {plan.price !== null && <span>/mo</span>}
                     </div>
+                    <hr className="plan-divider" />
+                    <div className="plan-features">
+                      {plan.features.map((f, i) => (
+                        <div key={i} className="plan-feature included">
+                          <i>✓</i> {f}
+                        </div>
+                      ))}
+                    </div>
+                    <button 
+                      className={"plan-btn " + (isCurrent ? "current-btn" : plan.popular ? "popular-btn" : "upgrade-btn")} 
+                      onClick={() => !isCurrent && startPayUPayment(plan)}
+                      disabled={!!payLoading || isCurrent}
+                    >
+                      {payLoading === plan.name ? "Processing..." : isCurrent ? "Current Plan" : plan.btnLabel || "Upgrade"}
+                    </button>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: "#f59e0b" }}>{formatCurrency(q.amount, q.currency)}</div>
-                    <div style={{ marginTop: 4 }}><Badge label={q.status} color={getStatusColor(q.status)} /></div>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
-        </Card>
-      )}
 
-      {/* ── Upgrade Tab ── */}
-      {activeTab === "upgrade" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ textAlign: "center", padding: "20px 0 8px" }}>
-            <h3 style={{ fontSize: 20, fontWeight: 800, color: T.text, margin: "0 0 6px" }}>⬆️ Upgrade or Renew Your Plan</h3>
-            <p style={{ color: T.muted, fontSize: 13, margin: 0 }}>Current plan: <strong>{subscription.planName}</strong> • Expires: <strong>{formatDate(subscription.endDate)}</strong></p>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-            {(assignedPackages.length > 0 ? assignedPackages : PLANS).filter(p => (p.type !== "free" && !p.isTrial) || ((p.title || p.name) !== subscription.planName)).sort((a,b) => (parseFloat(a.price)||0)-(parseFloat(b.price)||0)).map(pkg => {
-              const plan = {
-                name: pkg.title || pkg.name,
-                price: pkg.type === "free" || pkg.isTrial ? 0 : parseFloat(pkg.price) || 0,
-                icon: pkg.icon || "📦",
-                features: Array.isArray(pkg.features) ? pkg.features : (pkg.features || "").split("\n").filter(Boolean),
-                isTrial: pkg.type === "free" || pkg.isTrial,
-                clientLimit: pkg.clientLimit,
-                employeeLimit: pkg.employeeLimit,
-                managerLimit: pkg.managerLimit,
-                businessLimit: pkg.businessLimit,
-                noOfDays: parseInt(pkg.no_of_days || pkg.noOfDays) || 30,
-                color: (pkg.title || pkg.name || "").toLowerCase().includes("pro") ? "var(--app-accent)" : "#6366f1"
-              };
-              const isProcessing = payLoading === plan.name;
-              const isCurrent = subscription.planName === plan.name;
-              return (
-                <div key={plan.name} style={{ background: "#fff", borderRadius: 20, padding: "24px 22px", border: isCurrent ? `2px solid ${T.accent}` : "1.5px solid var(--app-border)", boxShadow: isCurrent ? "0 12px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)" : "0 4px 16px rgba(0,0,0,0.04)" }}>
-                  <div style={{ fontSize: 28, marginBottom: 12 }}>{plan.icon}</div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 4 }}>{plan.name}{isCurrent && <span style={{ marginLeft: 10, fontSize: 11, background: "var(--app-bg)", color: T.accent, padding: "3px 10px", borderRadius: 20, fontWeight: 800 }}>CURRENT</span>}</div>
-                  <div style={{ fontSize: 26, fontWeight: 800, color: plan.color, marginBottom: 16 }}>{plan.price === 0 ? "Free" : `₹${plan.price?.toLocaleString("en-IN")}`}<span style={{ fontSize: 14, color: T.muted, fontWeight: 600 }}>/mo</span></div>
-                  <div style={{ marginBottom: 16, background: "var(--app-bg)", borderRadius: 10, padding: "8px 12px", display: "flex", gap: 8, alignItems: "center" }}>
-                    <span style={{ fontSize: 12 }}>🔒</span>
-                    <span style={{ fontSize: 11, color: T.muted, fontWeight: 700 }}>Secure Payment Gateway</span>
-                  </div>
-                  <button onClick={() => plan.isTrial ? startTrial(pkg) : startPayUPayment(plan)} disabled={!!payLoading} style={{ width: "100%", padding: "14px", borderRadius: 12, background: isCurrent ? "linear-gradient(135deg,var(--app-accent),var(--app-muted))" : "var(--app-bg)", color: isCurrent ? "#fff" : T.accent, border: isCurrent ? "none" : `2px solid ${T.accent}`, fontSize: 14, fontWeight: 800, cursor: payLoading ? "wait" : "pointer", transition: "0.2s" }}>
-                    {isProcessing ? "Processing..." : isCurrent ? "🔄 Renew Plan" : (plan.isTrial ? "🎁 Get Started" : "⬆️ Switch to " + plan.name)}
-                  </button>
+          <div className="bottom-row">
+            <div className="panel">
+              <div className="panel-header">
+                <div className="panel-title">Billing History</div>
+                <button className="panel-action" onClick={() => setActiveTab(activeTab === "payments" ? "overview" : "payments")}>
+                  {activeTab === "payments" ? "Hide all" : "View all"} <span>→</span>
+                </button>
+              </div>
+              
+              {payments.length === 0 ? (
+                <div style={{ textAlign: "center", padding: 40, color: "var(--text3)", fontSize: 13, fontWeight: 600 }}>No payment history found</div>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(activeTab === "payments" ? payments : payments.slice(0, 5)).map((p, i) => (
+                        <tr key={p._id || i}>
+                          <td>{formatDate(p.paymentDate)}</td>
+                          <td>{p.description}</td>
+                          <td style={{ fontWeight: 800 }}>{formatCurrency(p.amount, p.currency)}</td>
+                          <td>
+                            <span className={"status-pill " + (p.status === "completed" || p.status === "paid" ? "success" : p.status === "pending" ? "pending" : "failed")}>
+                              {p.status}
+                            </span>
+                          </td>
+                          <td>
+                            <button 
+                              onClick={() => p.invoiceNo ? setViewInvoice(p) : setViewPayment(p)}
+                              style={{ background: "none", border: "none", color: "var(--teal)", fontWeight: 700, cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--font)" }}
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              );
-            })}
+              )}
+            </div>
+
+            <div className="panel" style={{ height: "fit-content" }}>
+              <div className="panel-header">
+                <div className="panel-title">Provider Info</div>
+              </div>
+              <div style={{ padding: "20px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-lighter)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🏢</div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text)" }}>{subscription.providerCompany || user?.companyName || "M Business"}</div>
+                    <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 600 }}>Service Provider</div>
+                  </div>
+                </div>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
+                    <span style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600 }}>Email</span>
+                    <span style={{ fontSize: 12, color: "var(--text)", fontWeight: 700 }}>{subscription.providerEmail || "billing@business-suite.com"}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
+                    <span style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600 }}>Phone</span>
+                    <span style={{ fontSize: 12, color: "var(--text)", fontWeight: 700 }}>{subscription.providerPhone || "+91-9876543210"}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600 }}>GST</span>
+                    <span style={{ fontSize: 12, color: "var(--text)", fontWeight: 700 }}>{subscription.providerGst || "GSTIN-33AABCM1234Z1Z1"}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* ── Payment Detail Modal ── */}
+      {/* MODALS */}
       {viewPayment && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 480, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
-            <div style={{ padding: "18px 24px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
-              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: T.text }}>Payment Details</h2>
-              <button onClick={() => setViewPayment(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: T.muted }}>✕</button>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setViewPayment(null)}>
+          <div style={{ background: "#fff", width: "100%", maxWidth: 440, borderRadius: 24, padding: 30, position: "relative", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, color: "var(--text)", display: "flex", justifyContent: "space-between" }}>
+              Payment Details
+              <button onClick={() => setViewPayment(null)} style={{ background: "var(--surface2)", border: "none", color: "var(--text2)", width: 28, height: 28, borderRadius: "50%", cursor: "pointer" }}>✕</button>
             </div>
-            <div style={{ padding: 24, overflowY: "auto" }}>
-              <div style={{ textAlign: "center", padding: 20, background: getStatusColor(viewPayment.status) + "14", borderRadius: 14, marginBottom: 20, border: `1px solid ${getStatusColor(viewPayment.status)}28` }}>
-                <div style={{ fontSize: 36, marginBottom: 8 }}>{viewPayment.status === "completed" ? "✅" : viewPayment.status === "pending" ? "⏳" : "❌"}</div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: getStatusColor(viewPayment.status) }}>{formatCurrency(viewPayment.amount, viewPayment.currency)}</div>
-                <div style={{ fontSize: 13, color: T.muted, marginTop: 4, textTransform: "capitalize" }}>{viewPayment.status}</div>
-              </div>
-              <InfoRow label="Payment ID" value={viewPayment.paymentId} icon="🆔" />
-              <InfoRow label="Description" value={viewPayment.description} icon="📝" />
-              <InfoRow label="Date" value={formatDate(viewPayment.paymentDate)} icon="📅" />
-              <InfoRow label="Method" value={viewPayment.paymentMethod} icon="💳" />
-              {viewPayment.invoiceNo && <InfoRow label="Invoice No" value={viewPayment.invoiceNo} icon="🧾" />}
-              {viewPayment.quotationNo && <InfoRow label="Quotation No" value={viewPayment.quotationNo} icon="📄" />}
-              <div style={{ marginTop: 16, padding: 14, background: "var(--app-bg)", borderRadius: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Provider — {user?.companyName || ""}</div>
-                <InfoRow label="Company" value={viewPayment.providerCompany} icon="🏢" />
-                <InfoRow label="GST" value={viewPayment.providerGst} icon="📋" />
-                <InfoRow label="Address" value={viewPayment.providerAddress} icon="📍" />
-              </div>
+            
+            <div style={{ textAlign: "center", padding: 20, background: "var(--bg)", borderRadius: 14, marginBottom: 20, border: `1px solid var(--border)` }}>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>{viewPayment.status === "completed" || viewPayment.status === "paid" ? "✅" : "⏳"}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>{formatCurrency(viewPayment.amount, viewPayment.currency)}</div>
+              <div style={{ fontSize: 13, color: "var(--text2)", marginTop: 4, textTransform: "capitalize" }}>{viewPayment.status}</div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 12, color: "var(--text3)" }}>ID</span><span style={{ fontSize: 13, fontWeight: 700, fontFamily: "monospace" }}>{viewPayment.paymentId}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 12, color: "var(--text3)" }}>Description</span><span style={{ fontSize: 13, fontWeight: 700 }}>{viewPayment.description}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 12, color: "var(--text3)" }}>Date</span><span style={{ fontSize: 13, fontWeight: 700 }}>{formatDate(viewPayment.paymentDate)}</span></div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Stripe-style Invoice Modal ── */}
       {viewInvoice && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setViewInvoice(null)}>
-          <div
-            style={{
-              background: "#fff",
-              width: "100%",
-              maxWidth: 440,
-              borderRadius: 24,
-              padding: 40,
-              position: "relative",
-              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-              animation: "modalFadeIn 0.3s ease-out"
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <style>{`
-              @keyframes modalFadeIn {
-                from { opacity: 0; transform: scale(0.95) translateY(10px); }
-                to { opacity: 1; transform: scale(1) translateY(0); }
-              }
-            `}</style>
-
-            <button
-              onClick={() => setViewInvoice(null)}
-              style={{ position: "absolute", top: 20, right: 20, background: "#f1f5f9", border: "none", color: "#64748b", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#e2e8f0"}
-              onMouseLeave={e => e.currentTarget.style.background = "#f1f5f9"}
-            >✕</button>
-
+          <div style={{ background: "#fff", width: "100%", maxWidth: 440, borderRadius: 24, padding: 40, position: "relative", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setViewInvoice(null)} style={{ position: "absolute", top: 20, right: 20, background: "#f1f5f9", border: "none", color: "#64748b", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
               <div style={{ position: "relative", marginBottom: 20 }}>
-                <div style={{ width: 80, height: 80, background: "#f8fafc", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: "1px solid #e2e8f0" }}>
-                  📄
-                </div>
+                <div style={{ width: 80, height: 80, background: "#f8fafc", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: "1px solid #e2e8f0" }}>🧾</div>
                 <div style={{ position: "absolute", bottom: -5, right: -5, width: 24, height: 24, background: "#22c55e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, border: "3px solid #fff" }}>✓</div>
               </div>
-
               <div style={{ fontSize: 15, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>Invoice paid</div>
               <div style={{ fontSize: 48, fontWeight: 800, color: "#1e293b", marginBottom: 12 }}>{formatCurrency(viewInvoice.amount, viewInvoice.currency)}</div>
-
-              <button style={{ background: "none", border: "none", color: "#64748b", fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, marginBottom: 40 }}>
-                View invoice and payment details <span style={{ fontSize: 18 }}>›</span>
-              </button>
-
-              <div style={{ width: "100%", textAlign: "left", display: "flex", flexDirection: "column", gap: 16, marginBottom: 40 }}>
+              
+              <div style={{ width: "100%", textAlign: "left", display: "flex", flexDirection: "column", gap: 16, marginBottom: 40, marginTop: 20 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "#94a3b8", fontSize: 14 }}>Invoice number</span>
-                  <span style={{ color: "#1e293b", fontSize: 14, fontWeight: 600 }}>{viewInvoice.invoiceNo || "LDBG06TE-0001"}</span>
+                  <span style={{ color: "#1e293b", fontSize: 14, fontWeight: 600 }}>{viewInvoice.invoiceNo || "INV-0001"}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "#94a3b8", fontSize: 14 }}>Payment date</span>
                   <span style={{ color: "#1e293b", fontSize: 14, fontWeight: 600 }}>{formatDate(viewInvoice.paymentDate)}</span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ color: "#94a3b8", fontSize: 14 }}>Payment method</span>
-                  <span style={{ color: "#1e293b", fontSize: 14, fontWeight: 600 }}>{viewInvoice.paymentMethod?.toUpperCase() || "Mastercard"} •••• {user?.last4 || "3867"}</span>
-                </div>
               </div>
 
               <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
-                <button
-                  onClick={() => handlePrint("receipt")}
-                  style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#1e293b", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "0.2s" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#0f172a"}
-                  onMouseLeave={e => e.currentTarget.style.background = "#1e293b"}
-                >
-                  Download receipt
-                </button>
-                <button
-                  onClick={() => handlePrint("invoice")}
-                  style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#fff", color: "#1e293b", border: "1.5px solid #e2e8f0", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "0.2s" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#f8fafc"}
-                  onMouseLeave={e => e.currentTarget.style.background = "#fff"}
-                >
-                  Download invoice
-                </button>
-              </div>
-
-              <div style={{ marginTop: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 4, color: "#94a3b8", fontSize: 12, fontWeight: 600 }}>
-                  Powered by <span style={{ color: "#64748b", fontWeight: 800 }}>M Business</span>
-                </div>
-                <div style={{ display: "flex", gap: 16 }}>
-                  <span style={{ color: "#94a3b8", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Terms</span>
-                  <span style={{ color: "#94a3b8", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Privacy</span>
-                </div>
+                <button onClick={() => handlePrint("receipt")} style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#1e293b", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Download receipt</button>
+                <button onClick={() => handlePrint("invoice")} style={{ width: "100%", padding: "14px", borderRadius: 12, background: "#fff", color: "#1e293b", border: "1.5px solid #e2e8f0", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Download invoice</button>
               </div>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }
-
-

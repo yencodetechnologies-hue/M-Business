@@ -1309,127 +1309,152 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   // ══ LIST VIEW ══════════════════════════════════════════════════════════════
   if (view === "list") return (
-    <div style={{ fontFamily: "'Outfit',sans-serif", minHeight: "100%", background: "var(--app-bg)", padding: "24px" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');.pc{transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);cursor:pointer;}.pc:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 25px 60px rgba(0,0,0,0.15)!important;}.pc:hover .pci{transform:scale(1.08);}.pci{transition:transform .5s cubic-bezier(0.4, 0, 0.2, 1);}.hb:hover{opacity:.9;transform:translateY(-2px) scale(1.05);}.hb:active{transform:translateY(0) scale(0.98);}@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}.fade-in{animation:fadeIn 0.6s ease-out;}`}</style>
-
-      {/* Header Section */}
-      <div style={{ background: `linear-gradient(135deg,var(--app-accent) 0%,var(--app-muted) 100%)`, borderRadius: "24px", padding: "32px", marginBottom: "32px", boxShadow: "var(--app-shadow)", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: "0", right: "0", width: "200px", height: "200px", background: "rgba(255,255,255,0.15)", borderRadius: "50%", transform: "translate(50px,-50px)" }} />
-        <div style={{ position: "absolute", bottom: "0", left: "0", width: "150px", height: "150px", background: "rgba(255,255,255,0.1)", borderRadius: "50%", transform: "translate(-30px,30px)" }} />
-
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", zIndex: 1, flexWrap: "wrap", gap: 20 }}>
-          <div style={{ flex: 1, minWidth: "250px" }}>
-            <h1 style={{ margin: 0, fontSize: 32, fontWeight: 900, color: "#fff", marginBottom: 8, textShadow: "0 2px 4px rgba(0,0,0,0.1)", fontFamily: "'Outfit',sans-serif" }}>Project Proposals</h1>
-            <p style={{ margin: 0, fontSize: 16, color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>Create, manage and track your professional proposals</p>
-            <div style={{ display: "flex", gap: 16, marginTop: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,0.8)", fontSize: 14 }}>
-                <div style={{ width: "8px", height: "8px", background: "#10b981", borderRadius: "50%" }} />
-                <span>{proposals.length} Total</span>
+    <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)", padding: "24px" }}>
+      <div className="main-grid">
+        <div className="left-col">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--text)" }}>Proposals</h1>
+              <p style={{ fontSize: 13, color: "var(--text2)", marginTop: 4 }}>Manage and track all project proposals</p>
+            </div>
+            <button className="add-proposal-card" onClick={createNew} style={{ padding: "12px 20px" }}>
+              <div className="add-icon" style={{ width: 32, height: 32, fontSize: 18 }}>+</div>
+              <div>
+                <div className="add-text">New Proposal</div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,0.8)", fontSize: 14 }}>
-                <div style={{ width: "8px", height: "8px", backgroundColor: "#f59e0b", borderRadius: "50%" }} />
-                <span>{proposals.filter(p => p.status === "pending").length} Pending</span>
+            </button>
+          </div>
+
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "100px 20px" }}>Loading...</div>
+          ) : proposals.length === 0 ? (
+            <div className="add-proposal-card" onClick={createNew}>
+              <div className="add-icon">+</div>
+              <div>
+                <div className="add-text">Create Your First Proposal</div>
+                <div className="add-sub">Use templates or start from scratch</div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,0.8)", fontSize: 14 }}>
-                <div style={{ width: "8px", height: "8px", background: "#10b981", borderRadius: "50%" }} />
-                <span>{proposals.filter(p => p.status === "approved").length} Approved</span>
+            </div>
+          ) : (
+            <div className="proposals-list">
+              {proposals.map(p => {
+                const cover = p.slides?.find(s => s.type === "cover");
+                const t2 = THEMES.find(x => x.name === p.theme) || THEMES[0];
+                return (
+                  <div key={p.id} className="proposal-card" onClick={() => openDoc(p)}>
+                    <div className="pc-header">
+                      <div className="pc-cover" style={{ background: t2.g }}>??</div>
+                      <div className="pc-info">
+                        <div className="pc-id">{p.id}</div>
+                        <div className="pc-title">{p.title}</div>
+                        <div className="pc-client-row">
+                          <div className="pc-av" style={{ background: "var(--teal)" }}>
+                            {p.client ? p.client.charAt(0).toUpperCase() : "?"}
+                          </div>
+                          <div className="pc-client-name">{p.client || "No client"}</div>
+                        </div>
+                      </div>
+                      <div className="pc-meta">
+                        <span className={"badge " + (p.status === "approved" ? "won" : p.status === "pending" ? "review" : "draft")}>
+                          {p.status || "draft"}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="pc-body">
+                      <div className="pb-item">
+                        <div className="pb-label">Value</div>
+                        <div className="pb-val">?{p.value?.toLocaleString() || "0"}</div>
+                        <div className="pb-sub">Estimated</div>
+                      </div>
+                      <div className="pb-item">
+                        <div className="pb-label">Date</div>
+                        <div className="pb-val">
+                          {(() => {
+                            const d = p.updated || p.createdAt || p.created || new Date().toISOString();
+                            const dateObj = new Date(d);
+                            return isNaN(dateObj.getTime()) ? "Unavailable" : dateObj.toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' });
+                          })()}
+                        </div>
+                        <div className="pb-sub">Last updated</div>
+                      </div>
+                      <div className="pb-item">
+                        <div className="pb-label">Slides</div>
+                        <div className="pb-val">{p.slides?.length || 0}</div>
+                        <div className="pb-sub">Pages included</div>
+                      </div>
+                    </div>
+                    
+                    <div className="pc-footer">
+                      <div className="pf-date">
+                        <span>?</span> valid until {new Date(new Date().setDate(new Date().getDate() + 30)).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
+                      <div className="pf-actions">
+                        <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposal(p); }}>??</button>
+                        <button className="pf-btn" onClick={e => { e.stopPropagation(); printProposal(p); }}>???</button>
+                        <button className="pf-btn" onClick={e => deleteProposal(p.id, p._id, e)} style={{ color:"var(--red)", borderColor:"var(--red-bg)" }}>???</button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="right-col">
+          <div className="pipeline-panel">
+            <div className="pp-title">Pipeline Summary</div>
+            <div className="pp-sub">Overview of all active proposals</div>
+            <div className="pipeline-value">
+              <div className="pv-label">Total Value</div>
+              <div className="pv-val">?{(proposals.reduce((sum, p) => sum + (p.value || 0), 0)).toLocaleString("en-IN")}</div>
+              <div className="pv-sub">Across {proposals.length} proposals</div>
+            </div>
+            <div className="stage-list">
+              <div className="stage-item">
+                <div className="stage-dot" style={{ background:"var(--teal)" }}></div>
+                <div className="stage-name">Approved</div>
+                <div className="stage-count">{proposals.filter(p=>p.status==="approved").length}</div>
+              </div>
+              <div className="stage-item">
+                <div className="stage-dot" style={{ background:"var(--amber)" }}></div>
+                <div className="stage-name">Pending</div>
+                <div className="stage-count">{proposals.filter(p=>p.status==="pending").length}</div>
+              </div>
+              <div className="stage-item">
+                <div className="stage-dot" style={{ background:"var(--text3)" }}></div>
+                <div className="stage-name">Drafts</div>
+                <div className="stage-count">{proposals.filter(p=>p.status==="draft" || !p.status).length}</div>
               </div>
             </div>
           </div>
-          <button className="hb" onClick={createNew} style={{ background: "#fff", color: "var(--app-accent)", border: "none", borderRadius: 16, padding: "16px 32px", fontSize: 16, fontWeight: 900, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 12px 32px rgba(0,0,0,0.2)", transition: "all .3s", minWidth: "180px", justifyContent: "center" }}>
-            <span style={{ fontSize: 20 }}>✨</span>
-            <span>Add Proposal</span>
-          </button>
+          
+          <div className="winrate-panel" style={{ marginTop: 16 }}>
+            <div className="wr-title">Win Rate</div>
+            <div className="wr-donut">
+              <svg viewBox="0 0 36 36">
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--border)" strokeWidth="3.5" />
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--green)" strokeWidth="3.5" strokeDasharray="65, 100" />
+              </svg>
+              <div className="wr-center">
+                <div className="wr-pct">65%</div>
+                <div className="wr-label">WIN RATE</div>
+              </div>
+            </div>
+            <div className="wr-stats">
+              <div className="wr-stat">
+                <div className="wr-stat-val" style={{ color:"var(--green)" }}>{proposals.filter(p=>p.status==="approved").length}</div>
+                <div className="wr-stat-label">WON</div>
+              </div>
+              <div className="wr-stat">
+                <div className="wr-stat-val" style={{ color:"var(--red)" }}>{proposals.filter(p=>p.status==="rejected").length}</div>
+                <div className="wr-stat-label">LOST</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {loading ? (
-        <div style={{ textAlign: "center", padding: "100px 20px", background: "var(--app-card)", borderRadius: 24, border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)" }}>
-          <div style={{ fontSize: 50, marginBottom: 20, animation: "pulse 2s infinite" }}>📡</div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--app-text)", marginBottom: 8 }}>Loading your proposals...</div>
-          <div style={{ fontSize: 14, color: "var(--app-muted)" }}>This will only take a moment</div>
-        </div>
-      ) : proposals.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "100px 40px", background: "var(--app-card)", borderRadius: 24, border: "2px dashed var(--app-border)", boxShadow: "var(--app-shadow)" }}>
-          <div style={{ fontSize: 80, marginBottom: 24, background: `linear-gradient(135deg,var(--app-accent),var(--app-muted))`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>✨</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: "var(--app-text)", marginBottom: 12 }}>No proposals yet</div>
-          <div style={{ fontSize: 16, color: "var(--app-muted)", marginBottom: 24, maxWidth: "400px", marginLeft: "auto", marginRight: "auto" }}>Start by creating your first professional proposal. It's quick and easy!</div>
-          <button onClick={createNew} style={{ background: `linear-gradient(135deg,var(--app-accent),var(--app-muted))`, color: "#fff", border: "none", borderRadius: 16, padding: "16px 32px", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: `0 8px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)`, transition: "all .3s", display: "inline-flex", alignItems: "center", gap: 10 }}>
-            <span>🚀</span>
-            <span>Create Your First Proposal</span>
-          </button>
-        </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 24 }}>
-          {proposals.map((p, index) => {
-            const cover = p.slides?.find(s => s.type === "cover");
-            const t2 = THEMES.find(x => x.name === p.theme) || THEMES[0];
-            return (
-              <div key={p.id} className="pc fade-in" onClick={() => openDoc(p)} style={{ background: "var(--app-card)", borderRadius: 20, border: "1px solid var(--app-border)", overflow: "hidden", boxShadow: "var(--app-shadow)", position: "relative", animationDelay: `${index * 0.1}s` }}>
-                {/* Status Badge */}
-                <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
-                  <Badge status={p.status} />
-                </div>
-
-                {/* Cover Image */}
-                <div style={{ height: 200, overflow: "hidden", position: "relative" }}>
-                  {cover?.coverImage ? <img src={cover.coverImage} className="pci" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg,${t2.p},${t2.g})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: 48, opacity: 0.3 }}>📄</span>
-                  </div>}
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.8),rgba(0,0,0,0.2))" }} />
-                  <div style={{ position: "absolute", bottom: 20, left: 20, right: 20 }}>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 700, letterSpacing: 1, marginBottom: 6, textTransform: "uppercase" }}>{p.id}</div>
-                    <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", lineHeight: 1.2, marginBottom: 4 }}>{p.title}</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>{p.client || "No client assigned"}</div>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div style={{ padding: "20px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ background: "var(--app-surface)", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--app-text)" }}>
-                        📊 {p.slides?.length || 0} slides
-                      </div>
-                      <div style={{ background: t2.l, padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, color: t2.t }}>
-                        🎨 {t2.name}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 16, borderTop: "1px solid var(--app-border)" }}>
-                    <div style={{ fontSize: 12, color: "var(--app-muted)", fontWeight: 500 }}>
-                      {(() => {
-                        const d = p.updated || p.createdAt || p.created || new Date().toISOString();
-                        const dateObj = new Date(d);
-                        return isNaN(dateObj.getTime()) 
-                          ? "Date Unavailable" 
-                          : dateObj.toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' });
-                      })()}
-                    </div>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button onClick={e => { e.stopPropagation(); shareProposal(p); }} style={{ background: "var(--app-surface)", border: "1.5px solid var(--app-border)", color: "var(--app-accent)", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Share Link">🔗</button>
-                      <button onClick={e => { e.stopPropagation(); shareWhatsApp(p); }} style={{ background: "#dcfce7", border: "none", color: "#16a34a", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="WhatsApp">💬</button>
-                      <button onClick={e => { e.stopPropagation(); printProposal(p); }} style={{ background: "var(--app-surface)", border: "1.5px solid var(--app-border)", color: "var(--app-text)", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Print">🖨️</button>
-                      <button onClick={e => deleteProposal(p.id, p._id, e)} style={{ background: "#fef2f2", border: "none", color: "#ef4444", borderRadius: 8, width: 32, height: 32, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }} title="Delete"> Delete️</button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Rejection Note */}
-                {p.status === "rejected" && p.rejectNote && (
-                  <div style={{ padding: "12px 20px", background: "#fef2f2", borderTop: "1px solid #fecaca" }}>
-                    <span style={{ fontSize: 12, color: "#991b1b", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-                      <span>❌</span>
-                      <span>{p.rejectNote}</span>
-                    </span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 
@@ -2052,5 +2077,6 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
     </div>
   );
 }
+
 
 

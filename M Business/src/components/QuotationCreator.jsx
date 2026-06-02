@@ -133,6 +133,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
   const [errors, setErrors] = useState({});
   const [convertingId, setConvertingId] = useState(null);
   const [listSearch, setListSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("All");
   const [viewEntry, setViewEntry] = useState(null);
 
   const today = new Date().toISOString().split("T")[0];
@@ -428,128 +429,259 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       if (status === "sent" && expiry && new Date(expiry) < new Date()) status = "expired";
       return { ...e, status };
     });
-    const totalAmt = enriched.reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
-    const approvedAmt = enriched.filter((e) => e.status === "approved").reduce((s, e) => s + (parseFloat(e.total) || 0), 0);
-    const pendingCnt = enriched.filter((e) => ["sent", "draft"].includes(e.status)).length;
-    const approvedCnt = enriched.filter((e) => e.status === "approved").length;
+    
+    // Derived values
+    const totalQuotes = enriched.length;
+    const totalValue = enriched.reduce((s, e) => s + (parseFloat(e.qt?.total || e.total) || 0), 0);
+    const wonList = enriched.filter(e => e.status === "approved" || e.status === "converted");
+    const wonCount = wonList.length;
+    const wonValue = wonList.reduce((s, e) => s + (parseFloat(e.qt?.total || e.total) || 0), 0);
+    const pendingList = enriched.filter(e => e.status === "sent" || e.status === "pending");
+    const pendingCount = pendingList.length;
+    const pendingValue = pendingList.reduce((s, e) => s + (parseFloat(e.qt?.total || e.total) || 0), 0);
+    
+    const sentCount = pendingCount + wonCount + enriched.filter(e => e.status === "rejected").length;
+    const winRate = sentCount > 0 ? Math.round((wonCount / sentCount) * 100) : 0;
+    
+    // Funnel stats
+    const rejectedCount = enriched.filter(e => e.status === "rejected").length;
+    const draftedCount = enriched.filter(e => e.status === "draft").length;
+
+    // Filter
+    const filtered = enriched.filter(e => {
+      if (activeTab !== "All" && e.status.toLowerCase() !== activeTab.toLowerCase() && !(activeTab === "Accepted" && (e.status === "converted" || e.status === "approved"))) return false;
+      if (!listSearch) return true;
+      const term = listSearch.toLowerCase();
+      return (e.quoteNo || "").toLowerCase().includes(term) ||
+             (e.client || "").toLowerCase().includes(term) ||
+             (e.qt?.project || e.project || "").toLowerCase().includes(term);
+    });
+
+    const getStatusTheme = (st) => {
+      switch(st) {
+        case "approved": case "converted": return "c-green";
+        case "sent": return "c-blue";
+        case "pending": return "c-amber";
+        case "rejected": return "c-red";
+        default: return "c-purple"; // draft
+      }
+    };
+    
+    const getBadge = (st) => {
+      switch(st) {
+        case "approved": return <span className="badge accepted">Accepted</span>;
+        case "converted": return <span className="badge converted">Converted</span>;
+        case "sent": return <span className="badge sent">Sent</span>;
+        case "pending": return <span className="badge pending">Pending</span>;
+        case "rejected": return <span className="badge rejected">Rejected</span>;
+        default: return <span className="badge draft">Draft</span>;
+      }
+    };
 
     return (
-      <>
-        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 }}>
-          <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
-          * { box-sizing: border-box; }
-          .qt-row:hover { background: #f0fdf4 !important; cursor: pointer; }
-          .qt-row { transition: background 0.15s; }
-          @media (max-width:700px) { .qt-th { display:none!important; } .qt-hide { display:none!important; } }
-        `}</style>
-
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
+      <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)" }}>
+        
+        <div className="content">
+          <div className="page-header">
             <div>
-              <p style={{ margin: "3px 0 0", color: "#9ca3af", fontSize: 13 }}>{enriched.length} total</p>
+              <div className="page-title">Quotations</div>
+              <div className="page-sub">Create, send and track client quotations</div>
             </div>
-            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 13 }}>🔍</span>
-                <input
-                  type="text"
-                  placeholder="Search quotations..."
-                  value={listSearch}
-                  onChange={(e) => setListSearch(e.target.value)}
-                  style={{ padding: "9px 12px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, outline: "none", width: 220, background: "var(--app-surface)", color: "var(--app-text)", fontFamily: "inherit" }}
+            <div className="header-actions">
+              <div className="search-wrap" style={{ width: 250 }}>
+                <i className="ti ti-search" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "var(--text3)", fontSize: 16 }}></i>
+                <input 
+                  type="text" 
+                  placeholder="Search quotations…" 
+                  value={listSearch} 
+                  onChange={e => setListSearch(e.target.value)} 
+                  style={{ width: "100%", padding: "11px 14px 11px 40px", background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 12, fontSize: 13, color: "var(--text)", fontFamily: "var(--font)", outline: "none", transition: "all .15s" }} 
                 />
               </div>
-              <button onClick={() => { clearForm(); setStep("form"); }}
-                style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>
-                + Create Quotation
+              <button className="create-btn" onClick={() => { clearForm(); setStep("form"); }}>
+                <i className="ti ti-plus" style={{ fontSize: 15 }}></i> New Quotation
               </button>
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12, marginBottom: 24 }}>
-            {[
-              { label: "Total Quoted", value: formatCurrency(totalAmt, qt.currency || "₹"), color: "var(--app-accent)", icon: "📊" },
-              { label: "Approved Value", value: formatCurrency(approvedAmt, qt.currency || "₹"), color: "#16a34a", icon: "✅" },
-              { label: "Pending", value: `${pendingCnt}`, color: "#d97706", icon: "⏳" },
-              { label: "Approved", value: `${approvedCnt}`, color: "#2563eb", icon: "💎" },
-            ].map((c) => (
-              <div key={c.label} style={{ background: "var(--app-card)", borderRadius: 18, padding: "20px", border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)", position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: c.color }} />
-                <div style={{ width: 42, height: 42, borderRadius: 12, background: `${c.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 12 }}>{c.icon}</div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: c.color }}>{c.value}</div>
-                <div style={{ fontSize: 12, color: "var(--app-muted)", marginTop: 4, fontWeight: 700, textTransform: "uppercase" }}>{c.label}</div>
+          <div className="stats-row">
+            <div className="stat-card">
+              <div className="stat-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}><i className="ti ti-file-text"></i></div>
+              <div>
+                <div className="stat-num">{totalQuotes}</div>
+                <div className="stat-label">Total Quotes</div>
+                <div className="stat-sub" style={{ color: "var(--teal)" }}>₹{totalValue.toLocaleString("en-IN")} value</div>
               </div>
-            ))}
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
+              <div>
+                <div className="stat-num">{wonCount}</div>
+                <div className="stat-label">Accepted</div>
+                <div className="stat-sub" style={{ color: "var(--green)" }}>₹{wonValue.toLocaleString("en-IN")} won</div>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
+              <div>
+                <div className="stat-num">{pendingCount}</div>
+                <div className="stat-label">Pending</div>
+                <div className="stat-sub" style={{ color: "var(--amber)" }}>₹{pendingValue.toLocaleString("en-IN")} pending</div>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}><i className="ti ti-percentage"></i></div>
+              <div>
+                <div className="stat-num">{winRate}%</div>
+                <div className="stat-label">Win Rate</div>
+                <div className="stat-sub" style={{ color: "var(--purple)" }}>{wonCount} of {sentCount} sent</div>
+              </div>
+            </div>
           </div>
 
-          <div style={{ background: "var(--app-card)", borderRadius: 20, border: "1px solid var(--app-border)", boxShadow: "var(--app-shadow)", overflow: "hidden" }}>
-            <div className="qt-th" style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 0.8fr 1.6fr 0.8fr 0.8fr 1fr 120px", padding: "12px 20px", background: "var(--app-bg)", borderBottom: "2px solid var(--app-border)", gap: 12, alignItems: "center" }}>
-              {["Quote No", "Company Name", "Project", "Amount", "Date", "Expiry", "Status", "Actions"].map((h) => (
-                <div key={h} style={{ fontSize: 11, fontWeight: 800, color: "var(--app-accent)", letterSpacing: 0.5, textAlign: h === "Amount" ? "right" : (h === "Date" || h === "Expiry") ? "center" : "left" }}>{h.toUpperCase()}</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div className="tabs">
+              {["All", "Draft", "Sent", "Accepted", "Rejected"].map(t => (
+                <button key={t} className={`tab ${activeTab === t ? "active" : ""}`} onClick={() => setActiveTab(t)}>{t}</button>
               ))}
             </div>
+            <div style={{ fontSize: 12, color: "var(--text3)", fontWeight: 600 }}>
+              {filtered.length} quotations · ₹{filtered.reduce((s, e) => s + (parseFloat(e.qt?.total || e.total) || 0), 0).toLocaleString("en-IN")} total value
+            </div>
+          </div>
 
-            {listLoading ? (
-              <div style={{ padding: "50px 20px", textAlign: "center", color: "#9ca3af", fontSize: 13 }}>Loading quotations…</div>
-            ) : enriched.length === 0 ? (
-              <div style={{ padding: "60px 20px", textAlign: "center" }}>
-                <div style={{ fontSize: 40, marginBottom: 10 }}>📭</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>No quotations yet</div>
-                <div style={{ fontSize: 13, color: "#9ca3af", marginTop: 4 }}>Click "+ Create Quotation" to get started</div>
-              </div>
-            ) : enriched.filter(e => {
-              const term = listSearch.toLowerCase();
-              return (e.quoteNo || "").toLowerCase().includes(term) ||
-                (e.client || "").toLowerCase().includes(term) ||
-                (e.qt?.project || e.project || "").toLowerCase().includes(term);
-            }).map((entry, idx, arr) => {
+          <div className="quotes-grid">
+            {filtered.map(entry => {
               const qtD = entry.qt || {};
+              const t = parseFloat(qtD.total || entry.total || 0).toLocaleString("en-IN");
+              const init = (entry.client || "U").substring(0,2).toUpperCase();
+              
               return (
-                <div key={entry.id || idx} className="qt-row" onClick={() => setViewEntry(entry)}
-                  style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr 0.8fr 1.6fr 0.8fr 0.8fr 1fr 120px", padding: "16px 20px", borderBottom: idx < arr.length - 1 ? "1px solid var(--app-border)" : "none", alignItems: "center", background: "transparent", gap: 12 }}>
-                  <div style={{ cursor: "pointer" }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{entry.quoteNo || "—"}</div>
-                    <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2, fontFamily: "monospace" }}>{formatDateTime(entry.savedAt)}</div>
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-accent)", cursor: "pointer" }}>{entry.client || "—"}</div>
-                  <div className="qt-hide" style={{ fontSize: 12, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{qtD.project || entry.project || "—"}</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#111827", cursor: "pointer", textAlign: "right", fontFamily: "monospace", letterSpacing: -0.5 }}>{formatCurrency(entry.total, qtD.currency || "₹")}</div>
-                  <div className="qt-hide" style={{ fontSize: 12, color: "#475569", textAlign: "center" }}>{formatDate(qtD.date || entry.date)}</div>
-                  <div className="qt-hide" style={{ fontSize: 12, color: "#ea580c", fontWeight: 700, textAlign: "center" }}>{formatDate(qtD.expiryDate || entry.expiryDate)}</div>
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <select value={entry.status} onChange={(e) => handleStatusChange(entry, e.target.value)}
-                      style={{ border: "1px solid #e2e8f0", borderRadius: 8, padding: "5px 8px", fontSize: 11, fontWeight: 700, color: "#374151", background: "#fff", cursor: "pointer", fontFamily: "inherit", width: "100%" }}>
-                      {["draft", "sent", "approved", "rejected", "expired", "converted"].map((s) => (
+                <div key={entry.id || entry.quoteNo} className={`quote-card ${getStatusTheme(entry.status)}`} onClick={() => setViewEntry(entry)}>
+                  <div className="qc-top">
+                    <span className="qc-id">#{entry.quoteNo || "QT-XXXX"}</span>
+                    <select 
+                      value={entry.status} 
+                      onChange={(e) => { e.stopPropagation(); handleStatusChange(entry, e.target.value); }}
+                      style={{ border: "1px solid #e2e8f0", borderRadius: 6, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#374151", background: "#fff", cursor: "pointer", outline: "none", marginLeft: "auto" }}
+                      onClick={e => e.stopPropagation()}
+                    >
+                      {["draft", "sent", "pending", "approved", "rejected", "expired", "converted"].map(s => (
                         <option key={s} value={s}>{s === "converted" ? "Invoiced" : s.charAt(0).toUpperCase() + s.slice(1)}</option>
                       ))}
                     </select>
                   </div>
-                  <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }} onClick={(e) => e.stopPropagation()}>
-                    <button onClick={() => shareQuotation(entry)} title="Share link" style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>🔗</button>
-                    <button onClick={() => shareWhatsApp(entry)} title="Share on WhatsApp" style={{ padding: "6px", background: "#dcfce7", border: "1px solid #bbf7d0", borderRadius: 7, cursor: "pointer", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center" }}>💬</button>
-                    {entry.status === "approved" && (
-                      <button onClick={() => handleConvert(entry)} disabled={convertingId === entry.id}
-                        style={{ padding: "6px 10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 7, fontWeight: 800, fontSize: 10, cursor: "pointer", color: "#fff", fontFamily: "inherit", whiteSpace: "nowrap" }}>
-                        {convertingId === entry.id ? "…" : "INV"}
+                  <div className="qc-title">{qtD.project || entry.project || "Untitled Project"}</div>
+                  <div className="qc-client">
+                    <div className="qc-av" style={{ background: "linear-gradient(135deg,var(--teal),#006E7F)" }}>{init}</div>
+                    <span className="qc-client-name">{entry.client || "Unknown Client"}</span>
+                  </div>
+                  <div className="qc-items">
+                    {Array.isArray(entry.items) && entry.items.slice(0, 3).map((it, i) => (
+                      <div className="qc-item-row" key={i}>
+                        <span className="qc-item-name">{it.d || it.description}</span>
+                        <span className="qc-item-price">₹{parseFloat((it.r || it.rate || 0) * (it.q || it.quantity || 1)).toLocaleString("en-IN")}</span>
+                      </div>
+                    ))}
+                    {Array.isArray(entry.items) && entry.items.length > 3 && (
+                      <div className="qc-item-row"><span className="qc-item-name" style={{ fontStyle: "italic" }}>+ {entry.items.length - 3} more items</span></div>
+                    )}
+                    <hr className="qc-divider" />
+                    <div className="qc-total">
+                      <span>Total</span>
+                      <span className="qc-total-amount">₹{t}</span>
+                    </div>
+                  </div>
+                  <div className="qc-footer">
+                    <div className="qc-date"><i className="ti ti-calendar" style={{ fontSize: 11 }}></i> {entry.status === "draft" ? "Draft · " : "Sent "}{formatDate(qtD.date || entry.date)}</div>
+                    {getBadge(entry.status)}
+                  </div>
+                  <div className="qc-actions" onClick={e => e.stopPropagation()}>
+                    <button className="qa-btn" onClick={() => loadEntry(entry)}><i className="ti ti-edit" style={{ fontSize: 13 }}></i> Edit</button>
+                    <button className="qa-btn" onClick={() => triggerPDFShare(entry, "print")}><i className="ti ti-download" style={{ fontSize: 13 }}></i> PDF</button>
+                    {(entry.status === "approved" || entry.status === "converted") ? (
+                      <button className="qa-btn primary" style={entry.status === "converted" ? { background: "var(--surface)", color: "var(--teal)", borderColor: "var(--teal)" } : {}} onClick={() => entry.status !== "converted" && handleConvert(entry)} disabled={entry.status === "converted" || convertingId === entry.id}>
+                        {entry.status === "converted" ? <><i className="ti ti-circle-check" style={{ fontSize: 13 }}></i> Done</> : <><i className="ti ti-receipt" style={{ fontSize: 13 }}></i> Invoice</>}
                       </button>
+                    ) : (
+                      <button className="qa-btn primary" onClick={() => shareQuotation(entry)}><i className="ti ti-send" style={{ fontSize: 13 }}></i> Send</button>
                     )}
-                    {entry.status === "converted" && (
-                      <span title="Converted to Invoice" style={{ fontSize: 10, fontWeight: 800, color: "#16a34a", padding: "6px", background: "#f0fdf4", borderRadius: 7, border: "1px solid #bbf7d0" }}>✓</span>
-                    )}
-                    <button onClick={() => loadEntry(entry)} title="Edit"
-                      style={{ padding: "6px", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 7, cursor: "pointer", color: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center" }}>Edit</button>
                   </div>
                 </div>
               );
             })}
+            
+            <div className="add-quote-card" onClick={() => { clearForm(); setStep("form"); }}>
+              <div className="add-icon"><i className="ti ti-plus"></i></div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--teal)" }}>Create New Quotation</div>
+              <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 600, textAlign: "center", maxWidth: 140 }}>Build and send professional quotes to clients</div>
+            </div>
+          </div>
+
+          <div className="bottom-row">
+            <div className="funnel-panel">
+              <div className="fp-title">Quotation Pipeline</div>
+              <div className="fp-sub">How quotes move through your sales funnel</div>
+              <div className="funnel-steps">
+                <div className="funnel-step">
+                  <span className="fs-label">Created</span>
+                  <div className="fs-bar-wrap">
+                    <div className="fs-bar" style={{ width: "100%", background: "var(--teal)" }}>{totalQuotes} quotes</div>
+                  </div>
+                  <span className="fs-count">{totalQuotes}</span>
+                  <span className="fs-pct">100%</span>
+                </div>
+                <div className="funnel-step">
+                  <span className="fs-label">Sent</span>
+                  <div className="fs-bar-wrap">
+                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (sentCount/totalQuotes)*100 : 0}%`, background: "var(--blue)" }}>{sentCount > 0 ? `${sentCount} sent` : ""}</div>
+                  </div>
+                  <span className="fs-count">{sentCount}</span>
+                  <span className="fs-pct">{totalQuotes > 0 ? Math.round((sentCount/totalQuotes)*100) : 0}%</span>
+                </div>
+                <div className="funnel-step">
+                  <span className="fs-label">Accepted</span>
+                  <div className="fs-bar-wrap">
+                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (wonCount/totalQuotes)*100 : 0}%`, background: "var(--green)" }}>{wonCount > 0 ? `${wonCount} won` : ""}</div>
+                  </div>
+                  <span className="fs-count">{wonCount}</span>
+                  <span className="fs-pct">{totalQuotes > 0 ? Math.round((wonCount/totalQuotes)*100) : 0}%</span>
+                </div>
+                <div className="funnel-step">
+                  <span className="fs-label">Rejected</span>
+                  <div className="fs-bar-wrap">
+                    <div className="fs-bar" style={{ width: `${totalQuotes > 0 ? (rejectedCount/totalQuotes)*100 : 0}%`, background: "var(--red)" }}></div>
+                  </div>
+                  <span className="fs-count">{rejectedCount}</span>
+                  <span className="fs-pct">{totalQuotes > 0 ? Math.round((rejectedCount/totalQuotes)*100) : 0}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="activity-panel">
+              <div className="ap-title">Recent Activity</div>
+              <div className="activity-list">
+                {enriched.slice(0, 5).map((e, idx, arr) => (
+                  <div className="act-item" key={e.id || idx}>
+                    <div className="act-dot-col">
+                      <div className="act-dot" style={{ background: e.status === "approved" || e.status === "converted" ? "var(--green)" : e.status === "sent" ? "var(--blue)" : e.status === "rejected" ? "var(--red)" : "var(--purple)" }}></div>
+                      {idx !== arr.length - 1 && <div className="act-line"></div>}
+                    </div>
+                    <div>
+                      <div className="act-text">{e.quoteNo || "QT-XXXX"} <strong>{e.status}</strong> {e.client ? `for ${e.client}` : ""}</div>
+                      <div className="act-meta">₹{parseFloat(e.qt?.total || e.total || 0).toLocaleString("en-IN")} · {formatDate(e.qt?.date || e.date)}</div>
+                    </div>
+                  </div>
+                ))}
+                {enriched.length === 0 && <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 10 }}>No activity found.</div>}
+              </div>
+            </div>
           </div>
         </div>
 
-
-      </>
+      </div>
     );
   }
-
   // ══════════ PREVIEW ══════════
   if (step === "preview") {
     const slimPayload = {
@@ -1017,5 +1149,6 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     </div>
   );
 }
+
 
 

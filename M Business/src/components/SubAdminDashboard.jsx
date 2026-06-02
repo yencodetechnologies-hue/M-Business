@@ -22,6 +22,7 @@ import AuthPage from "./AuthPage";
 import MySubscriptions from "./MySubscriptions";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
 import ImageCropModal from "./ImageCropModal";
+import ModernProjectsView from "./ModernProjectsView";
 
 
 
@@ -258,7 +259,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onCancel} style={{ flex: 1, padding: "10px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, fontSize: 13, fontWeight: 600, color: T.text, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
           <button onClick={onConfirm} style={{ flex: 1, padding: "10px", background: danger ? "linear-gradient(135deg,#EF4444,#dc2626)" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>{confirmLabel}</button>
-        </div>
+          </div>
       </div>
     </div>
   );
@@ -281,7 +282,10 @@ function InfoRow({ icon, label, value }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
       <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{icon}</div>
-      <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{label}</div><div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", marginTop: 1 }}>{value}</div></div>
+      <div>
+        <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>{label}</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", marginTop: 1 }}>{value}</div>
+      </div>
     </div>
   );
 }
@@ -1500,110 +1504,14 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        {[{ t: "Total", v: projects.length, i: "📁", c: "var(--app-accent)" }, { t: "Active", v: projects.filter(p => p.status === "In Progress").length, i: "⚡", c: "var(--app-accent)" }, { t: "Completed", v: projects.filter(p => p.status === "Completed").length, i: "✅", c: "#22C55E" }, { t: "Pending", v: projects.filter(p => p.status === "Pending").length, i: "⏳", c: "#F59E0B" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
-            <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
-          </div>
-        ))}
-      </div>
-
-      <SC title={`All Projects (${filtered.length})`}>
-        <Search value={search} onChange={setSearch} placeholder="Search by project name, company name..." />
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 800 }}>
-            <thead><tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
-              {["#", "Name", "Company Name", "Budget", "Status", "Assigned To", "Actions"].map(c => (
-                <th key={c} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{c.toUpperCase()}</th>
-              ))}
-            </tr></thead>
-            <tbody>
-              {paginated.length === 0 ? <tr><td colSpan={7} style={{ padding: 30, textAlign: "center", color: "var(--app-muted)" }}>No projects found</td></tr>
-                : paginated.map((p, i) => (
-                  <tr
-                    key={p._id || i}
-                    style={{ borderBottom: "1px solid #f3f0ff", cursor: "pointer" }}
-                    onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"}
-                    onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}
-                    onClick={(e) => { e.stopPropagation(); if (onViewTasks) onViewTasks(p); }}
-                  >
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
-                    <td style={{ padding: "12px 14px", fontWeight: 700, color: T.text }}>{p.name}</td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)" }}>{p.client || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{formatCurrency(p.budget, p.currency)}</td>
-                    <td style={{ padding: "12px 14px" }} onClick={e => e.stopPropagation()}>
-                      <select
-                        value={p.status || "Pending"}
-                        onChange={async (e) => {
-                          const newStatus = e.target.value;
-                          try {
-                            await axios.put(`${BASE_URL}/api/projects/${p._id}`, { status: newStatus });
-                            setProjects(prev => prev.map(proj => proj._id === p._id ? { ...proj, status: newStatus } : proj));
-                            showToast("✅ Status updated!");
-                          } catch {
-                            showToast("❌ Update failed");
-                          }
-                        }}
-                        style={{
-                          background: `${sc(p.status)}18`,
-                          color: sc(p.status),
-                          border: `1px solid ${sc(p.status)}33`,
-                          padding: "3px 8px",
-                          borderRadius: 20,
-                          fontSize: 11,
-                          fontWeight: 700,
-                          outline: "none",
-                          cursor: "pointer"
-                        }}
-                      >
-                        {(config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]).map(s => <option key={s} value={s}>{s}</option>)}
-                      </select>
-                    </td>
-                    <td style={{ padding: "12px 14px" }}>
-                      {(() => {
-                        const assignedEmployees = Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []);
-                        return assignedEmployees.length > 0
-                          ? <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                            {assignedEmployees.slice(0, 2).map((emp, idx) => (
-                              <div key={idx} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <div style={{ width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700, flexShrink: 0 }}>{emp[0].toUpperCase()}</div>
-                                <span style={{ color: "var(--app-accent)", fontWeight: 600, fontSize: 11 }}>{emp}</span>
-                              </div>
-                            ))}
-                            {assignedEmployees.length > 2 && <div style={{ fontSize: 10, color: "var(--app-muted)", fontStyle: "italic" }}>+{assignedEmployees.length - 2} more</div>}
-                          </div>
-                          : <button onClick={(e) => { e.stopPropagation(); setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Assign</button>
-                      })()}
-                    </td>
-                    <td style={{ padding: "12px 14px" }}>
-                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                        <ActionBtns onView={() => setViewProj(p)} onEdit={() => openEdit(p)} onDelete={() => setDeleteTarget(p)} />
-                        <button onClick={(e) => {
-                          e.stopPropagation();
-                          if (onViewTasks) onViewTasks(p);
-                        }} style={{ padding: "6px 10px", background: "rgba(var(--app-accent-rgb, 124, 58, 237), 0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", borderRadius: 7, cursor: "pointer", color: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 700 }}>
-                          <span>+</span> Task
-                        </button>
-                        <button onClick={(e) => {
-                          e.stopPropagation();
-                          const text = `📁 *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${formatCurrency(p.budget, p.currency)}`;
-                          const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                          window.open(wpUrl, "_blank");
-                        }} style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <span>🔗</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-
-
-        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
-      </SC>
+      <ModernProjectsView 
+        projects={projects}
+        searchQuery={search}
+        onViewTasks={onViewTasks}
+        onEdit={openEdit}
+        onDelete={setDeleteTarget}
+        onAssign={(p) => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }}
+      />
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={550}>
@@ -2413,75 +2321,73 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
   return (
     <>
       {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998, display: "block" }} className="mob-overlay" />}
-      <div style={{ width: 225, background: `linear-gradient(180deg,var(--app-sidebar, var(--app-sidebar)) 0%,var(--app-sidebar, var(--app-sidebar)) 100%)`, color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 999, flexShrink: 0, overflow: "hidden", boxShadow: "4px 0 24px rgba(0,0,0,0.25)", transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }} className="sidebar">
-        <div style={{ padding: "20px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "relative", zIndex: 1, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
-            <div
-              onClick={onLogoUploadClick}
-              style={{ cursor: "pointer", flexShrink: 0 }}
-              title="Click to change logo"
-            >
-              {companyLogo ? (
-                <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "120px", objectFit: "cover", display: "block", borderRadius: 8, background: "#fff", border: "1.5px solid rgba(255,255,255,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }} />
-              ) : (
-                <div style={{ width: 38, height: 38, borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid rgba(255,255,255,0.2)" }}>
-                  <span style={{ fontSize: 18, fontWeight: 900, color: "var(--app-accent)", padding: "0 8px" }}>{initials}</span>
-                </div>
-              )}
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-              <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: "0.2px", textShadow: "0 2px 4px rgba(0,0,0,0.2)" }}>{companyName}</div>
-              {roleDisplay && <div style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", letterSpacing: 1.2, textTransform: "uppercase", fontWeight: 800, marginTop: -1 }}>{roleDisplay}</div>}
-            </div>
-          </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#fff", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }} className="sidebar-close">✕</button>
+      <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
+        <div className="logo">
+          {companyLogo ? (
+            <img onClick={onLogoUploadClick} src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "cover", cursor: "pointer" }} />
+          ) : (
+            <span className="logo-mark" onClick={onLogoUploadClick} style={{ cursor: "pointer" }}>{companyName || "MBusiness"}</span>
+          )}
+          <span className="logo-badge">+</span>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">✕</button>
         </div>
-        <nav style={{ flex: 1, minHeight: 0, padding: "10px 8px", overflowY: "auto", position: "relative", zIndex: 1 }}>
+        
+        <div className="profile-area">
+          <div className="profile-avatar">{initials || "P"}</div>
+          <div>
+            <div className="profile-name">{user?.name || "Admin"}</div>
+            <div className="profile-logout" onClick={onLogout}>Logout →</div>
+          </div>
+        </div>
+
+        <nav className="nav">
           {items.map(n => {
             if (n.type === "group") {
-              const isExpanded = expanded[n.label];
               const hasActive = n.items.some(i => i.key === active);
               return (
-                <div key={n.label} style={{ marginBottom: 4 }}>
-                  <button
-                    onClick={() => toggleGroup(n.label)}
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 9,
-                      padding: "10px 12px",
-                      background: "transparent",
-                      border: "none",
-                      color: hasActive || isExpanded ? "#fff" : "rgba(255,255,255,0.65)",
-                      fontWeight: 800,
-                      fontSize: 11.5,
-                      cursor: "pointer",
-                      textAlign: "left",
-                      fontFamily: "inherit",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.8
-                    }}
-                  >
-                    <span style={{ flex: 1 }}>{n.label}</span>
-                    <span style={{ fontSize: 8, transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "0.2s" }}>▼</span>
-                  </button>
-                  {isExpanded && (
-                    <div style={{ marginTop: 2 }}>
-                      {n.items.map(sub => <NavItem key={sub.key} n={sub} isSub={true} />)}
-                    </div>
-                  )}
+                <div key={n.label}>
+                  <div className="nav-label">{n.label}</div>
+                  {n.items.map(sub => {
+                    const on = active === sub.key;
+                    return (
+                      <div 
+                        key={sub.key} 
+                        className={`nav-item ${on ? 'active' : ''}`}
+                        onClick={() => {
+                          if (sub.key === "tasks") setSelectedProjectForTasks(null);
+                          setActive(sub.key);
+                          onClose();
+                        }}
+                      >
+                        <i className={`ti ti-${sub.icon?.includes('ti-') ? sub.icon.split('ti-')[1] : 'point'}`}></i> {sub.label}
+                      </div>
+                    );
+                  })}
                 </div>
               );
             }
-            return <NavItem key={n.key} n={n} />;
+            const on = active === n.key;
+            return (
+              <div 
+                key={n.key} 
+                className={`nav-item ${on ? 'active' : ''}`}
+                onClick={() => {
+                  if (n.key === "tasks") setSelectedProjectForTasks(null);
+                  setActive(n.key);
+                  onClose();
+                }}
+              >
+                <i className={`ti ti-${n.icon?.includes('ti-') ? n.icon.split('ti-')[1] : 'point'}`}></i> {n.label}
+              </div>
+            );
           })}
         </nav>
-        <div style={{ padding: "10px 14px 14px", borderTop: "1px solid rgba(255,255,255,0.07)", position: "relative", zIndex: 1, flexShrink: 0 }}>
-          <button onClick={onLogout} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: "10px 12px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 11, color: "#fca5a5", fontSize: 12.5, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }}>🚪 Logout</button>
+        
+        <div className="sidebar-bottom">
+          <button className="upload-btn" onClick={() => setActive("invoices")}><i className="ti ti-plus" style={{fontSize:15}}></i> New Invoice</button>
         </div>
-      </div>
-      <div className="sidebar-spacer" style={{ width: 225, flexShrink: 0 }} />
+      </aside>
+      <div className="sidebar-spacer" style={{ width: 210, minWidth: 210, flexShrink: 0 }} />
     </>
   );
 }
@@ -2844,7 +2750,6 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     const accentColor = hslToHex(h, accentS, accentL);
 
     return {
-      label: "Custom",
       sidebar: hslToHex(h, Math.min(s + 20, 100), 12), // Very deep color for sidebar
       accent: accentColor,
       bg: hslToHex(h, 30, 95), // Clearer tinted background
@@ -2863,6 +2768,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     slate: { label: "Slate", sidebar: "#0f172a", accent: "#475569", bg: "#f8fafc", muted: "#334155", border: "#94a3b8", dot: "#475569" },
     mint: { label: "Mint", sidebar: "#0d3b37", accent: "#0d9488", bg: "#f0fdfa", muted: "#0f766e", border: "#5eead4", dot: "#0d9488" },
     candy: { label: "Candy", sidebar: "#4a0d4e", accent: "#c026d3", bg: "#fdf4ff", muted: "#a21caf", border: "#f5d0fe", dot: "#c026d3" },
+    teal: { label: "Teal", sidebar: "#1A2E35", accent: "#00BCD4", bg: "#F5FAFA", muted: "#607D86", border: "#E0EEF0", dot: "#00BCD4" },
   };
 
   // Apply theme whenever appTheme or customColor changes
@@ -3697,7 +3603,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const roleDisplay = user?.role || "Admin";
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+<div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
@@ -3715,7 +3621,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       `}</style>
 
       {!enforceMySubscriptions && (
-        <div className="no-print">
+        <div className="no-print" style={{ display: "contents" }}>
           <Sidebar
             user={user}
             active={validActive}
@@ -3775,14 +3681,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           )}
         </div>
 
-        <div className="main-content" style={{ flex: 1, padding: "22px 24px", overflowY: "auto" }}>
-          <EmployeeSubscriptionWarning user={user} onRenew={() => setActive("mysubscriptions")} />
-          {/* Page Header */}
-          <div className="page-header no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
-            <div>
-              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: T.text }}>{page?.icon} {page?.label}</h1>
+        <div className="main">
+          {/* Topbar */}
+          <div className="topbar no-print">
+            <div className="search-wrap">
+              <i className="ti ti-search"></i>
+              <input type="text" placeholder="Search..." />
             </div>
-            <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, fontSize: "14px" }}>
+            <div className="topbar-right">
+              <div className="topbar-icon"><i className="ti ti-bell"></i><span className="notif-dot"></span></div>
+              <div className="topbar-icon" onClick={() => setActive("settings")}><i className="ti ti-settings"></i></div>
+              
+              {/* Dynamic Action Buttons based on validActive */}
               {validActive === "clients" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
@@ -3791,7 +3701,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </span>
                   )}
                   <button
-                    title={isUsageAtLimit("client", clients.length) ? `Plan limit reached: ${getSubscriptionLimit("client")} clients (Click to upgrade)` : "Add new client"}
+                    className="create-btn"
+                    title={isUsageAtLimit("client", clients.length) ? `Plan limit reached` : "Add new client"}
                     onClick={async () => {
                       await fetchSubscription();
                       const limit = getSubscriptionLimit("client");
@@ -3801,9 +3712,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       }
                       setNcError({}); setShowClientPass(false); setModal("client");
                     }}
-                    style={{ ...B(isUsageAtLimit("client", clients.length) ? "#94a3b8" : "var(--app-accent)"), cursor: isUsageAtLimit("client", clients.length) ? "not-allowed" : "pointer", opacity: 1 }}
+                    style={{ opacity: isUsageAtLimit("client", clients.length) ? 0.5 : 1 }}
                   >
-                    + Add Client
+                    <i className="ti ti-plus"></i> Add Client
                   </button>
                 </div>
               )}
@@ -3814,9 +3725,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       {employees.length} / {getSubscriptionLimit("employee") === Infinity ? "Unlimited" : getSubscriptionLimit("employee")} Used
                     </span>
                   )}
-
                   <button
-                    title={isUsageAtLimit("employee", employees.length) ? `Plan limit reached: ${getSubscriptionLimit("employee")} employees (Click to upgrade)` : "Add new employee"}
+                    className="create-btn"
+                    title={isUsageAtLimit("employee", employees.length) ? `Plan limit reached` : "Add new employee"}
                     onClick={async () => {
                       await fetchSubscription();
                       const limit = getSubscriptionLimit("employee");
@@ -3826,18 +3737,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       }
                       setNeError({}); setModal("employee");
                     }}
-                    style={{ ...B(isUsageAtLimit("employee", employees.length) ? "#94a3b8" : "var(--app-accent)"), cursor: isUsageAtLimit("employee", employees.length) ? "not-allowed" : "pointer", opacity: 1 }}
+                    style={{ opacity: isUsageAtLimit("employee", employees.length) ? 0.5 : 1 }}
                   >
-                    + Add Employee
+                    <i className="ti ti-plus"></i> Add Employee
                   </button>
                 </div>
               )}
               {validActive === "projects" && (
-                <>
-                  <button onClick={() => { setNpError({}); setModal("project"); }} style={B("var(--app-accent)")}>+ New Project</button>
-                </>
+                <button className="create-btn" onClick={() => { setNpError({}); setModal("project"); }}><i className="ti ti-plus"></i> New Project</button>
               )}
-
               {validActive === "managers" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
@@ -3846,7 +3754,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </span>
                   )}
                   <button
-                    title={isUsageAtLimit("manager", managers.length) ? `Plan limit reached: ${getSubscriptionLimit("manager")} managers (Click to upgrade)` : "Add new manager"}
+                    className="create-btn"
                     onClick={async () => {
                       await fetchSubscription();
                       const limit = getSubscriptionLimit("manager");
@@ -3855,35 +3763,32 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         return;
                       }
                       setNmError({}); setShowMgrPass(false); setModal("manager");
-                    }} style={{ ...B(isUsageAtLimit("manager", managers.length) ? "#94a3b8" : "var(--app-accent)"), cursor: isUsageAtLimit("manager", managers.length) ? "not-allowed" : "pointer" }}>
-                    + Add Manager
+                    }} 
+                    style={{ opacity: isUsageAtLimit("manager", managers.length) ? 0.5 : 1 }}
+                  >
+                    <i className="ti ti-plus"></i> Add Manager
                   </button>
                 </div>
               )}
-              {validActive === "subadmins" && <button onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }} style={B("var(--app-accent)")}>+ Add Partner</button>}
+              {validActive === "subadmins" && <button className="create-btn" onClick={() => { setNsError({}); setShowSubPass(false); setModal("subadmin"); }}><i className="ti ti-plus"></i> Add Partner</button>}
+              {validActive === "vendors" && <button className="create-btn" onClick={() => { setNvError({}); setModal("vendor_add"); }}><i className="ti ti-plus"></i> Add Vendor</button>}
 
-              {validActive === "vendors" && <button onClick={() => { setNvError({}); setModal("vendor_add"); }} style={B("var(--app-accent)")}>+ Add Vendor</button>}
-
-              {user?.email !== "admin@gmail.com" && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {enforceMySubscriptions && (
-                    <button onClick={handleLogout} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "8px 16px", color: "#ef4444", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.15)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.1)"}>Logout</button>
+              {/* Profile Toggle (re-using topbar logic) */}
+              <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", flexShrink: 0, marginLeft: 8 }}>
+                <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ cursor: "pointer" }} title="Click to upload logo">
+                  {companyLogo ? (
+                    <img src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "cover", borderRadius: 6 }} onError={() => setCompanyLogo(null)} />
+                  ) : (
+                    <div style={{ width: 28, height: 28, background: "var(--teal)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 10 }}>{initials}</div>
                   )}
-                  <div data-profile-anchor="true" onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(v => !v); setShowProfile(false); }} className="mob-topbar-hide" style={{ background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer", boxShadow: "0 2px 10px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", flexShrink: 0 }}>
-                    <div onClick={(e) => { e.stopPropagation(); headerLogoRef.current?.click(); }} style={{ cursor: "pointer" }} title="Click to upload logo">
-                      {companyLogo ? (
-                        <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "cover", background: "#fff", display: "block", borderRadius: 10, border: "1px solid var(--app-border)" }} onError={() => setCompanyLogo(null)} />
-                      ) : (
-                        <div style={{ width: 38, height: 38, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12 }}>{initials}</div>
-                      )}
-                    </div>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: T.text, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</span>
-                    <span style={{ fontSize: 10, color: "var(--app-muted)" }}>▾</span>
-                  </div>
                 </div>
-              )}
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text)" }}>{displayName}</span>
+              </div>
             </div>
           </div>
+
+          <div className="content">
+            <EmployeeSubscriptionWarning user={user} onRenew={() => setActive("mysubscriptions")} />
 
           {/* ── Dashboard ── */}
           {validActive === "dashboard" && (
@@ -4179,60 +4084,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               </div>
               <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))", gap: 20 }}>
                 <SC title="Recent Projects">
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 600 }}>
-                      <thead>
-                        <tr style={{ background: "var(--app-bg)" }}>
-                          {["Project", "Company Name", "Status", "Progress", "Share", "View"].map(c => <th key={c} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)" }}>{c.toUpperCase()}</th>)}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {projects.length === 0 ? <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "var(--app-muted)" }}>No recent projects</td></tr> : projects.slice(0, 5).map((p, i) => {
-                          const pTasks = tasks.filter(t => (t.project === p.name || t.projectId === p._id || t.projectId === p.id));
-                          const doneTasks = pTasks.length > 0 ? pTasks.filter(t => t.status === "Done").length : 0;
-                          return (
-                            <tr key={i} style={{ borderBottom: "1px solid var(--app-bg)", cursor: "pointer" }} onClick={() => { setSelectedProjectForTasks(p); setActive("tasks"); }}>
-                              <td style={{ padding: "12px 12px", fontWeight: 600, color: T.text }}>
-                                <div style={{ fontSize: 13 }}>{p.name}</div>
-                                <div style={{ fontSize: 11, color: "#22C55E" }}>{formatCurrency(p.budget, p.currency)}</div>
-                              </td>
-                              <td style={{ padding: "12px 12px", color: "var(--app-muted)" }}>{p.client}</td>
-                              <td style={{ padding: "12px 12px" }}><Badge label={p.status} /></td>
-                              <td style={{ padding: "12px 12px" }}>
-                                {(() => {
-                                  const s = (p.status || "").toLowerCase();
-                                  let pct = 0;
-                                  if (s === "done" || s === "completed") pct = 100;
-                                  else if (pTasks.length > 0) pct = Math.round((pTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length / pTasks.length) * 100);
-                                  else if (s === "in progress") pct = 50;
-                                  else if (s === "on hold") pct = 30;
-                                  else if (s === "pending" || s === "not started") pct = 0;
-                                  else if (s === "review" || s === "in review") pct = 90;
-                                  else pct = (p.progress || 0);
-                                  return (
-                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                      <div style={{ flex: 1, minWidth: 60, height: 6, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)", overflow: "hidden" }}>
-                                        <div style={{ width: `${pct}%`, height: "100%", background: "var(--app-accent)", borderRadius: 10 }} />
-                                      </div>
-                                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--app-muted)" }}>{pct}%</span>
-                                    </div>
-                                  );
-                                })()}
-                              </td>
-                              <td style={{ padding: "12px 12px" }} onClick={e => e.stopPropagation()}>
-                                <button onClick={() => {
-                                  const text = `📁 *Project Details*\n\nProject: ${p.name}\nCompany: ${p.client}\nStatus: ${p.status}\nDeadline: ${p.end ? new Date(p.end).toLocaleDateString() : "—"}\nBudget: ${formatCurrency(p.budget, p.currency)}`;
-                                  const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                                  window.open(wpUrl, "_blank");
-                                }} style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 6, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Share</button>
-                              </td>
-                              <td style={{ padding: "12px 12px" }} onClick={e => e.stopPropagation()}><button onClick={() => setViewProject(p)} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>View</button></td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                  <ModernProjectsView projects={projects.slice(0, 5)} compact={true} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />
                 </SC>
                 <SC title="Recent Transactions" action={<button onClick={() => setActive("accounts")} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 8, padding: "4px 12px", fontSize: 11, fontWeight: 700, color: "var(--app-muted)", cursor: "pointer" }}>View All →</button>}>
                   <div style={{ overflowX: "auto" }}>
@@ -5210,9 +5062,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </div>
         </Mdl>
       )}
-    </div>
+            </div>
+  </div>
   );
 }
-
 
 

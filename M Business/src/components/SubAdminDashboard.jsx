@@ -4322,17 +4322,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             }
             setReturnToModal(modal); setModal("client");
           }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
-          {validActive === "proposals" && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
-              <iframe
-                key="proposal-frame"
-                id="proposal-frame"
-                src={`/template-designer.html?companyName=${encodeURIComponent(companyNameStr)}#prop`}
-                style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
-                title="Proposal Designer"
-              />
-            </div>
-          )}
+          {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
           {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
           {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
           {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}

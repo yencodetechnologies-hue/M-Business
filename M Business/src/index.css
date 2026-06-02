@@ -28,13 +28,13 @@
   --app-sidebar: #00BCD4;
   --app-accent: #00BCD4;
   --app-accent-rgb: 0, 188, 212;
-  --app-accent2: #00ACC1;
+  --app-accent2: var(--teal2);
   --app-bg: #F5FAFA;
   --app-card: #FFFFFF;
   --app-text: #1A2E35;
   --app-muted: #607D86;
   --app-border: #E0EEF0;
-  --app-accent-gradient: linear-gradient(135deg, #00BCD4, #00ACC1);
+  --app-accent-gradient: linear-gradient(135deg, var(--teal), var(--teal2));
 }
 
 body {
@@ -311,13 +311,13 @@ td.exp-name{color:var(--text);font-weight:600}
 /* Sidebar Styles */
 .sidebar {
   width: 250px;
-  background: var(--app-sidebar);
+  background: var(--app-card);
   display: flex;
   flex-direction: column;
   height: 100vh;
   position: sticky;
   top: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid var(--app-border);
   overflow-y: auto;
   flex-shrink: 0;
 }
@@ -358,7 +358,7 @@ td.exp-name{color:var(--text);font-weight:600}
   margin: 12px 16px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--app-border);
 }
 
 .profile-avatar {
@@ -375,7 +375,7 @@ td.exp-name{color:var(--text);font-weight:600}
 }
 
 .profile-name {
-  color: #fff;
+    color: var(--app-text);
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 4px;
@@ -415,7 +415,7 @@ td.exp-name{color:var(--text);font-weight:600}
   gap: 12px;
   padding: 10px 14px;
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--app-muted);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -428,30 +428,30 @@ td.exp-name{color:var(--text);font-weight:600}
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: var(--app-bg);
+  color: var(--app-accent);
 }
 
 .nav-item.active {
-  background: var(--app-accent-gradient);
-  color: #fff;
+  background: rgba(var(--app-accent-rgb), 0.1);
+  color: var(--app-accent);
   font-weight: 700;
 }
 
 .sidebar-bottom {
   padding: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--app-border);
 }
 
 .upload-btn {
   width: 100%;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background: var(--app-bg);
+  border: 1px dashed var(--app-border);
   border-radius: 12px;
-  color: #fff;
-  font-size: 13px;
+  color: var(--app-muted);
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -460,8 +460,9 @@ td.exp-name{color:var(--text);font-weight:600}
   transition: all 0.2s;
 }
 .upload-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(var(--app-accent-rgb), 0.05);
+  color: var(--app-accent);
+  border-color: var(--app-accent);
 }
 
 /* Main Layout & Topbar */

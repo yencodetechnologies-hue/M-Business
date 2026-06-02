@@ -4,10 +4,10 @@ import './ModernProjectsPage.css';
 const THEMES = {
   teal: {
     name: 'Teal',
-    primary: '#00BCD4',
-    primary2: '#00ACC1',
-    light: '#E0F7FA',
-    lighter: '#F0FDFE',
+    primary: 'var(--teal)',
+    primary2: 'var(--teal2)',
+    light: 'var(--teal-light)',
+    lighter: 'var(--teal-lighter)',
     bg: '#F5FAFA',
     surface: '#FFFFFF',
     border: '#E0EEF0'

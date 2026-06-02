@@ -51,54 +51,52 @@ const TRACKING_SEED = [{ id: "PRJ001", name: "Website Redesign", client: "TechNo
 const INVOICES = [{ id: "INV001", client: "TechNova Pvt Ltd", project: "Website Redesign", date: "2024-04-01", due: "2024-04-30", total: "1,47,500", status: "Paid" }, { id: "INV002", client: "Infra Solutions", project: "ERP Integration", date: "2024-05-01", due: "2024-05-15", total: "4,24,800", status: "Overdue" }, { id: "INV003", client: "Bloom Creatives", project: "Mobile App Dev", date: "2024-05-10", due: "2024-06-10", total: "1,18,000", status: "Pending" }];
 
 const NAV = [
-  { key: "dashboard", icon: "🏠", label: "Dashboard" },
-  {
-    label: "Internal Management",
-    type: "group",
-    items: [
-      { key: "clients", icon: "🏢", label: "Clients" },
-
-      { key: "employees", icon: "👔", label: "Employees" },
-
-      { key: "vendors", icon: "🏬", label: "Vendors" },
-    ]
-  },
-  {
-    label: "Projects",
-    type: "group",
-    items: [
-      { key: "projects", icon: "📁", label: "Projects" },
-      { key: "tasks", icon: "📋", label: "Tasks" },
-      { key: "tracking", icon: "📊", label: "Project Status" },
-      { key: "calendar", icon: "📅", label: "Calendar" },
-    ]
-  },
-  {
-    label: "Finance",
-    type: "group",
-    items: [
-      { key: "quotations", icon: "📋", label: "Quotations" },
-      { key: "proposals", icon: "🎨", label: "Project Proposals" },
-      { key: "invoices", icon: "🧾", label: "Invoices" },
-      { key: "accounts", icon: "🏛️", label: "Accounts" },
-      { key: "payments", icon: "💰", label: "Payments" },
-      { key: "expenses", icon: "💸", label: "Expenses" },
-    ]
-  },
-  {
-    label: "Resources",
-    type: "group",
-    items: [
-      { key: "interviews", icon: "🎯", label: "Interviews" },
-      { key: "reports", icon: "📈", label: "Reports" },
-      { key: "messaging", icon: "💬", label: "Messages" },
-      { key: "settings", icon: "⚙️", label: "Settings" },
-      { key: "packages", icon: "📦", label: "Packages" },
-      { key: "rolePermissions", icon: "🛡️", label: "Role Permissions" },
-    ]
-  },
-  { key: "mysubscriptions", icon: "🚀", label: "My Subscriptions" }
-];
+    { key: "dashboard", icon: "ti-layout-dashboard", label: "Dashboard" },
+    {
+      label: "Internal Management",
+      type: "group",
+      items: [
+        { key: "clients", icon: "ti-building", label: "Clients" },
+        { key: "employees", icon: "ti-users", label: "Employees" },
+        { key: "vendors", icon: "ti-truck-delivery", label: "Vendors" },
+      ]
+    },
+    {
+      label: "Projects",
+      type: "group",
+      items: [
+        { key: "projects", icon: "ti-briefcase", label: "Projects" },
+        { key: "tasks", icon: "ti-checkbox", label: "Tasks" },
+        { key: "tracking", icon: "ti-chart-pie", label: "Project Status" },
+        { key: "calendar", icon: "ti-calendar-event", label: "Calendar" },
+      ]
+    },
+    {
+      label: "Finance",
+      type: "group",
+      items: [
+        { key: "quotations", icon: "ti-file-invoice", label: "Quotations" },
+        { key: "proposals", icon: "ti-presentation-analytics", label: "Project Proposals" },
+        { key: "invoices", icon: "ti-receipt", label: "Invoices" },
+        { key: "accounts", icon: "ti-wallet", label: "Accounts" },
+        { key: "payments", icon: "ti-arrows-right-left", label: "Payments" },
+        { key: "expenses", icon: "ti-cash", label: "Expenses" },
+      ]
+    },
+    {
+      label: "Resources",
+      type: "group",
+      items: [
+        { key: "interviews", icon: "ti-microphone", label: "Interviews" },
+        { key: "reports", icon: "ti-chart-bar", label: "Reports" },
+        { key: "messaging", icon: "ti-messages", label: "Messages" },
+        { key: "settings", icon: "ti-settings", label: "Settings" },
+        { key: "packages", icon: "ti-package", label: "Packages" },
+        { key: "rolePermissions", icon: "ti-shield-lock", label: "Role Permissions" },
+      ]
+    },
+    { key: "mysubscriptions", icon: "ti-rocket", label: "My Subscriptions" }
+  ];
 
 function getNavForRole(role) {
   const r = (role || "").toLowerCase().trim();
@@ -2773,7 +2771,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // Apply theme whenever appTheme or customColor changes
   useEffect(() => {
-    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : THEMES[appTheme];
+    
+    const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.purple);
     if (!t) return;
     document.documentElement.style.setProperty("--app-sidebar", t.sidebar);
     document.documentElement.style.setProperty("--app-accent", t.accent);
@@ -2782,7 +2781,15 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     document.documentElement.style.setProperty("--app-bg", t.bg);
     document.documentElement.style.setProperty("--app-muted", t.muted);
     document.documentElement.style.setProperty("--app-border", t.border);
+    
+    // Override template hardcoded colors to match theme
+    document.documentElement.style.setProperty("--teal", t.accent);
+    document.documentElement.style.setProperty("--teal2", t.dot);
+    document.documentElement.style.setProperty("--teal-light", `rgba(${hexToRgb(t.accent)}, 0.1)`);
+    document.documentElement.style.setProperty("--teal-lighter", `rgba(${hexToRgb(t.accent)}, 0.04)`);
+
     localStorage.setItem("appTheme", appTheme);
+
     if (appTheme === "custom") localStorage.setItem("appCustomColor", customColor);
   }, [appTheme, customColor]);
 
@@ -3807,7 +3814,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
                       {Object.entries(THEMES).map(([key, t]) => (
-                        <button key={key} onClick={() => { setAppTheme(key); setShowColorPicker(false); }}
+                        <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
                           style={{
                             border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
                             borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
@@ -3873,8 +3880,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                       {/* Quick custom color presets */}
                       <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-                        {["var(--app-accent)", "#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c", "var(--app-accent)"].map(c => (
-                          <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); }}
+                        {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
+                          <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
                             style={{
                               width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
                               border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",

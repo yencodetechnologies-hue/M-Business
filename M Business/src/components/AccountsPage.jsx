@@ -720,8 +720,8 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
             <svg viewBox="0 0 560 120" preserveAspectRatio="none" width="100%" height="100%">
               <defs>
                 <linearGradient id="gReceived" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#00BCD4" stopOpacity=".2"/>
-                  <stop offset="100%" stopColor="#00BCD4" stopOpacity="0"/>
+                  <stop offset="0%" stopColor="var(--teal)" stopOpacity=".2"/>
+                  <stop offset="100%" stopColor="var(--teal)" stopOpacity="0"/>
                 </linearGradient>
                 <linearGradient id="gPending" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#F5A623" stopOpacity=".15"/>
@@ -733,14 +733,14 @@ export function IncomePage({ THEME, income = [], setIncome, fetchIncome }) {
               <line x1="0" y1="90" x2="560" y2="90" stroke="#E0EEF0" strokeWidth="1"/>
               {/* Received */}
               <path d="M0,90 C60,75 100,45 160,40 C220,35 260,55 320,30 C380,10 420,50 480,25 C510,15 535,30 560,20 L560,120 L0,120Z" fill="url(#gReceived)"/>
-              <path d="M0,90 C60,75 100,45 160,40 C220,35 260,55 320,30 C380,10 420,50 480,25 C510,15 535,30 560,20" stroke="#00BCD4" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <path d="M0,90 C60,75 100,45 160,40 C220,35 260,55 320,30 C380,10 420,50 480,25 C510,15 535,30 560,20" stroke="var(--teal)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
               {/* Pending */}
               <path d="M0,100 C60,95 100,85 160,80 C220,75 260,85 320,70 C380,60 420,75 480,65 C510,60 535,70 560,60 L560,120 L0,120Z" fill="url(#gPending)"/>
               <path d="M0,100 C60,95 100,85 160,80 C220,75 260,85 320,70 C380,60 420,75 480,65 C510,60 535,70 560,60" stroke="#F5A623" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="6,3"/>
               {/* Dots */}
-              <circle cx="160" cy="40" r="4" fill="#fff" stroke="#00BCD4" strokeWidth="2"/>
-              <circle cx="320" cy="30" r="4" fill="#00BCD4" stroke="#fff" strokeWidth="2"/>
-              <circle cx="480" cy="25" r="4" fill="#fff" stroke="#00BCD4" strokeWidth="2"/>
+              <circle cx="160" cy="40" r="4" fill="#fff" stroke="var(--teal)" strokeWidth="2"/>
+              <circle cx="320" cy="30" r="4" fill="var(--teal)" stroke="#fff" strokeWidth="2"/>
+              <circle cx="480" cy="25" r="4" fill="#fff" stroke="var(--teal)" strokeWidth="2"/>
               {/* Labels */}
               <text x="56" y="118" fill="#A0B8BE" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 1</text>
               <text x="168" y="118" fill="#A0B8BE" fontSize="9" fontFamily="Nunito" textAnchor="middle">Week 2</text>

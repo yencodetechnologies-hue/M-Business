@@ -975,7 +975,11 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
   const openDoc = (d) => { setDoc({ ...d }); setPage(0); setView("editor"); };
   const createNew = () => {
-    setView("template");
+    const nd = makeInitialProposal(THEMES[0].name, companyName || "");
+    setProposals(prev => [nd, ...prev]);
+    setDoc(nd);
+    setPage(0);
+    setView("editor");
   };
 
   const saveDoc = (d = doc) => { const nd = { ...d, updated: new Date().toISOString() }; persist(nd); setDoc(nd); flash("💾 Saved!"); };

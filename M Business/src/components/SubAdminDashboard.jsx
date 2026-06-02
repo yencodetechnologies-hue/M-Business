@@ -357,42 +357,44 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject, triggerCrop }) {
 
   const [search, setSearch] = useState("");
-  const [viewClient, setViewClient] = useState(null);
+  const [filterMode, setFilterMode] = useState("all");
+  const [activeClientId, setActiveClientId] = useState(null);
+  const [activeTab, setActiveTab] = useState("overview");
   const [editClient, setEditClient] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [editForm, setEditForm] = useState({ clientName: "", companyName: "", email: "", phone: "", address: "", status: "Active", gstNumber: "", logoUrl: "", contactPersonName: "", contactPersonNo: "", password: "" });
   const [editErr, setEditErr] = useState({});
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [statusDropOpen, setStatusDropOpen] = useState(false);
+  const statusDropRef = useRef(null);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
-  const filtered = clients.filter(c =>
-    (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) ||
-    (c.email || "").toLowerCase().includes(search.toLowerCase()) ||
-    (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = clients.filter(c => {
+    const q = search.toLowerCase();
+    const matchQ = !search || (c.clientName || c.name || "").toLowerCase().includes(q) || (c.companyName || c.company || "").toLowerCase().includes(q) || (c.email || "").toLowerCase().includes(q);
+    const s = (c.status || "Active").toLowerCase();
+    const matchF = filterMode === "all" || s === filterMode;
+    return matchQ && matchF;
+  });
 
-  useEffect(() => { setCurrentPage(1); }, [search, clients.length]);
-  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const activeClient = clients.find(c => c._id === activeClientId) || filtered[0] || null;
+
+  useEffect(() => {
+    if (!activeClientId && filtered.length > 0) setActiveClientId(filtered[0]._id);
+  }, [clients]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (statusDropRef.current && !statusDropRef.current.contains(e.target)) setStatusDropOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const openEdit = (c) => {
-    setEditForm({
-      clientName: c.clientName || c.name || "",
-      companyName: c.companyName || c.company || "",
-      email: c.email || "",
-      phone: c.phone || "",
-      address: c.address || "",
-      status: c.status || "Active",
-      gstNumber: c.gstNumber || "",
-      logoUrl: c.logoUrl || "",
-      contactPersonName: c.contactPersonName || "",
-      contactPersonNo: c.contactPersonNo || "",
-      password: "", // Leave blank for editing
-    });
+    setEditForm({ clientName: c.clientName || c.name || "", companyName: c.companyName || c.company || "", email: c.email || "", phone: c.phone || "", address: c.address || "", status: c.status || "Active", gstNumber: c.gstNumber || "", logoUrl: c.logoUrl || "", contactPersonName: c.contactPersonName || "", contactPersonNo: c.contactPersonNo || "", password: "" });
     setEditErr({});
     setEditClient(c);
   };
@@ -408,8 +410,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
       setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...(res.data.client || editForm) } : c));
       setEditClient(null);
       showToast("✅ Client updated!");
-    } catch (err) {
-      // fallback local update
+    } catch {
       setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm } : c));
       setEditClient(null);
       showToast("✅ Updated locally!");
@@ -417,230 +418,425 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
   };
 
   const doDelete = async () => {
-    try {
-      await axios.delete(`${BASE_URL}/api/clients/${deleteTarget._id}`);
-    } catch { }
+    try { await axios.delete(`${BASE_URL}/api/clients/${deleteTarget._id}`); } catch { }
     setClients(prev => prev.filter(c => c._id !== deleteTarget._id));
+    if (activeClientId === deleteTarget._id) setActiveClientId(null);
     setDeleteTarget(null);
-    showToast("  Delete️ Client deleted!");
+    showToast("🗑️ Client deleted!");
   };
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+  const updateStatus = async (c, newStatus) => {
+    try {
+      await axios.put(`${BASE_URL}/api/clients/${c._id}`, { ...c, status: newStatus });
+    } catch { }
+    setClients(prev => prev.map(x => x._id === c._id ? { ...x, status: newStatus } : x));
+    setStatusDropOpen(false);
+    showToast(`✅ Status changed to ${newStatus}`);
+  };
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
-        {[{ t: "Total Clients", v: clients.length, i: "👥", c: "var(--app-accent)" }, { t: "Active", v: clients.filter(c => c.status === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: clients.filter(c => c.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
-            <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
+  const getStatusCfg = (status) => {
+    const s = (status || "Active").toLowerCase();
+    if (s === "active") return { bg: "#E8FAF3", color: "#26C281", dot: "#26C281", label: "Active" };
+    if (s === "pending") return { bg: "#FEF5E6", color: "#F5A623", dot: "#F5A623", label: "Pending" };
+    return { bg: "#F8FAFB", color: "#A0B8BE", dot: "#A0B8BE", label: "Inactive" };
+  };
+
+  const getAvatar = (c) => {
+    const name = c.clientName || c.name || "?";
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const getAvatarColor = (c, idx = 0) => {
+    const colors = ["#F5A623", "#26C281", "#7C5CFC", "#2563EB", "#F05C5C", "#00BCD4", "#E91E63"];
+    const key = c._id || c.email || "";
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) hash = key.charCodeAt(i) + ((hash << 5) - hash);
+    return colors[Math.abs(hash) % colors.length];
+  };
+
+  const clientProjects = activeClient ? projects.filter(p => {
+    const cName = (activeClient.clientName || activeClient.name || "").toLowerCase();
+    return (p.client || "").toLowerCase() === cName || (p.clientId === activeClient._id);
+  }) : [];
+
+  const activeSection = filtered.filter(c => (c.status || "Active").toLowerCase() === "active");
+  const otherSection = filtered.filter(c => (c.status || "Active").toLowerCase() !== "active");
+
+  const renderClientItem = (c) => {
+    const st = getStatusCfg(c.status);
+    const isActive = c._id === activeClientId;
+    const color = getAvatarColor(c);
+    const revenue = c.totalRevenue || c.revenue || 0;
+    return (
+      <div key={c._id} onClick={() => { setActiveClientId(c._id); setActiveTab("overview"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", cursor: "pointer", transition: "all .15s", borderBottom: "1px solid rgba(224,238,240,.5)", position: "relative", background: isActive ? "#F0FDFE" : "transparent", borderRight: isActive ? "3px solid #00BCD4" : "3px solid transparent" }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "#F0FDFE"; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
+        <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${color},${color}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0, position: "relative" }}>
+          {c.logoUrl ? <img src={c.logoUrl} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "contain", background: "#fff" }} /> : getAvatar(c)}
+          <div style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: st.dot, border: "1.5px solid #fff" }} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
+          <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#1A2E35" }}>{revenue ? "₹" + Number(revenue).toLocaleString("en-IN") : "—"}</div>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: st.dot }} />
+        </div>
+      </div>
+    );
+  };
+
+  const renderOverview = () => {
+    if (!activeClient) return null;
+    const cProjs = clientProjects.slice(0, 3);
+    return (
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {/* Contact Info */}
+        <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
+          <div style={{ padding: "13px 16px", borderBottom: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: "#1A2E35", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 26, height: 26, borderRadius: 7, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#00BCD4" }}><i className="ti ti-user-circle" /></div>
+              Contact Information
+            </span>
+            <span onClick={() => openEdit(activeClient)} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>Edit</span>
+          </div>
+          <div style={{ padding: "14px 16px" }}>
+            {[
+              { icon: "ti-mail", label: "Email", val: activeClient.email, bg: "#E0F7FA", col: "#00BCD4" },
+              { icon: "ti-phone", label: "Phone", val: activeClient.phone, bg: "#E0F7FA", col: "#00BCD4" },
+              { icon: "ti-map-pin", label: "Location", val: activeClient.address, bg: "#FEF5E6", col: "#F5A623" },
+              activeClient.gstNumber && { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber, bg: "#EFF4FF", col: "#2563EB" },
+              { icon: "ti-briefcase", label: "Industry", val: activeClient.industry || "—", bg: "#E8FAF3", col: "#26C281" },
+            ].filter(Boolean).map((row, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 4 ? 10 : 0 }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: row.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: row.col, flexShrink: 0 }}><i className={`ti ${row.icon}`} /></div>
+                <div><div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", marginTop: 1 }}>{row.val || "—"}</div></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Projects */}
+        <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 14, overflow: "hidden" }}>
+          <div style={{ padding: "13px 16px", borderBottom: "1px solid #E0EEF0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: "#1A2E35", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 26, height: 26, borderRadius: 7, background: "#EFF4FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#2563EB" }}><i className="ti ti-briefcase" /></div>
+              Projects
+            </span>
+            <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>View all</span>
+          </div>
+          <div style={{ padding: "14px 16px" }}>
+            {cProjs.length === 0 ? (
+              <div style={{ textAlign: "center", color: "#A0B8BE", fontSize: 12, padding: "20px 0" }}>No projects yet</div>
+            ) : cProjs.map((p, i) => {
+              const pct = p.progress || 0;
+              return (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < cProjs.length - 1 ? "1px solid #E0EEF0" : "none" }}>
+                  <div style={{ width: 4, height: 36, borderRadius: 2, background: "#00BCD4", flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35" }}>{p.name}</div>
+                    <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 1 }}>{p.type || p.status}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: "#00BCD4" }}>{pct}%</div>
+                    <div style={{ width: 60, height: 4, background: "#E0EEF0", borderRadius: 2, overflow: "hidden", marginTop: 4 }}>
+                      <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#00BCD4,#26D0CE)", width: `${pct}%` }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderProjects = () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {clientProjects.length === 0 ? (
+        <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE" }}>No projects for this client</div>
+      ) : clientProjects.map((p, i) => (
+        <div key={i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35" }}>{p.name}</div>
+            <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 2 }}>{p.type || "—"} · {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#26C281" }}>{p.status || "Active"}</span>
+            {onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderDocuments = () => {
+    const docs = activeClient?.documents || activeClient?.docs || [];
+    return (
+      <div>
+        {docs.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE", fontSize: 12 }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
+            No documents uploaded yet
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10 }}>
+            {docs.map((d, i) => (
+              <div key={i} style={{ padding: 12, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, cursor: "pointer", transition: "all .15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.boxShadow = "0 3px 10px rgba(0,188,212,.1)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.boxShadow = "none"; }}>
+                <div style={{ fontSize: 22, marginBottom: 8 }}>📄</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#1A2E35", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.name || d.fileName || "Document"}</div>
+                <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{d.size || d.type || "—"}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderActivity = () => {
+    const activity = [
+      { icon: "ti-user-plus", bg: "#E0F7FA", color: "#00BCD4", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
+      ...clientProjects.map(p => ({ icon: "ti-briefcase", bg: "#EFF4FF", color: "#2563EB", title: `Project <b>${p.name}</b> created`, time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "—" })),
+    ];
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+        {activity.map((a, i) => (
+          <div key={i} style={{ display: "flex", gap: 12, paddingBottom: 14 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+              <div style={{ width: 30, height: 30, borderRadius: "50%", background: a.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: a.color }}><i className={`ti ${a.icon}`} /></div>
+              {i < activity.length - 1 && <div style={{ width: 2, background: "#E0EEF0", flex: 1, margin: "4px 0", minHeight: 12 }} />}
+            </div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", lineHeight: 1.4 }} dangerouslySetInnerHTML={{ __html: a.title }} />
+              <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{a.time}</div>
+            </div>
           </div>
         ))}
       </div>
+    );
+  };
 
-      <SC title={`All Clients (${filtered.length})`}>
-        <Search value={search} onChange={setSearch} placeholder="Search by name, email, company..." />
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 700 }}>
-            <thead><tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
-              {["#", "Company Name", "Contact Person", "Email", "Phone", "Status", "Joined", "Actions"].map(c => (
-                <th key={c} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{c.toUpperCase()}</th>
-              ))}
-            </tr></thead>
-            <tbody>
-              {paginated.length === 0 ? <tr><td colSpan={8} style={{ padding: 30, textAlign: "center", color: "var(--app-muted)" }}>No clients found</td></tr>
-                : paginated.map((c, i) => (
-                  <tr key={c._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`CLT${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
-                    <td style={{ padding: "12px 14px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        {c.logoUrl ? (
-                          <img src={c.logoUrl} alt="logo" style={{ height: 28, width: "auto", maxWidth: "80px", borderRadius: 6, objectFit: "contain", flexShrink: 0, border: "1px solid var(--app-border)", background: "#fff", display: "block" }} />
-                        ) : (
-                          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(c.clientName || c.name || "?")[0].toUpperCase()}</div>
-                        )}
-                        <span style={{ fontWeight: 700, color: T.text }}>{c.clientName || c.name || "—"}</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)" }}>{c.contactPersonName || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{c.email || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{c.phone || "—"}</td>
-                    <td style={{ padding: "12px 14px" }}><Badge label={c.status || "Active"} /></td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
-                    <td style={{ padding: "12px 14px" }}>
-                      <ActionBtns
-                        onView={() => setViewClient(c)}
-                        onEdit={() => openEdit(c)}
-                        onDelete={() => setDeleteTarget(c)}
-                      />
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+  const renderPortal = () => {
+    const c = activeClient;
+    if (!c) return null;
+    const portalUrl = `${window.location.origin}/client-portal/${c._id}`;
+    return (
+      <div>
+        <div style={{ background: "linear-gradient(135deg,#004D5E,#00BCD4)", borderRadius: 14, padding: 20, color: "#fff", marginBottom: 16 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, opacity: .6, textTransform: "uppercase", letterSpacing: .6, marginBottom: 6 }}>Client Portal</div>
+          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>{c.clientName || c.name}</div>
+          <div style={{ fontSize: 11, opacity: .7, marginBottom: 14, wordBreak: "break-all" }}>{portalUrl}</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={() => { navigator.clipboard.writeText(portalUrl); showToast("📋 Portal link copied!"); }} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-copy" style={{ fontSize: 13 }} />Copy Link</button>
+            <button onClick={() => window.open(portalUrl, "_blank")} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-external-link" style={{ fontSize: 13 }} />Open Portal</button>
+          </div>
         </div>
-        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
-      </SC>
-
-      {/* View Modal */}
-      {viewClient && (
-        <Mdl title="Client Details" onClose={() => setViewClient(null)} maxWidth={500}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
-            {viewClient.logoUrl ? (
-              <img src={viewClient.logoUrl} alt="logo" style={{ height: 52, width: "auto", maxWidth: "120px", borderRadius: 10, objectFit: "contain", flexShrink: 0, border: "1px solid var(--app-border)", background: "#fff", display: "block" }} />
-            ) : (
-              <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800 }}>{(viewClient.clientName || viewClient.name || "?")[0].toUpperCase()}</div>
-            )}
-            <div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewClient.clientName || viewClient.name}</div>
-              <div style={{ fontSize: 13, color: "var(--app-accent)", marginTop: 2 }}>{viewClient.companyName || viewClient.company || "—"}</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+          {[{ val: clientProjects.length, label: "Projects" }, { val: "—", label: "Last Login" }, { val: c.status || "Active", label: "Status" }].map((s, i) => (
+            <div key={i} style={{ padding: "10px 12px", background: "#fff", borderRadius: 9, border: "1.5px solid #E0EEF0" }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#1A2E35" }}>{s.val}</div>
+              <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{s.label}</div>
             </div>
-            <div style={{ marginLeft: "auto" }}><Badge label={viewClient.status || "Active"} /></div>
-          </div>
-          <InfoRow icon="📧" label="Email" value={viewClient.email} />
-          <InfoRow icon="📱" label="Phone" value={viewClient.phone} />
-          <InfoRow icon="📍" label="Address" value={viewClient.address} />
-          <InfoRow icon="📅" label="Joined" value={viewClient.createdAt ? new Date(viewClient.createdAt).toLocaleDateString() : "—"} />
+          ))}
+        </div>
+      </div>
+    );
+  };
 
-          <div style={{ marginTop: 18 }}>
-            <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 10, textTransform: "uppercase" }}>Recent Projects</div>
-            {(() => {
-              const clientProjects = projects.filter(p => (p.client || "").toLowerCase() === (viewClient.clientName || viewClient.name || "").toLowerCase());
-              return clientProjects.length === 0 ? (
-                <div style={{ padding: "12px", background: "#f8fafc", borderRadius: 10, border: "1px solid #f1f5f9", textAlign: "center", color: "var(--app-muted)", fontSize: 12 }}>No projects found for this company</div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {clientProjects.slice(0, 3).map((p, idx) => (
-                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "#fff", borderRadius: 10, border: "1px solid var(--app-border)" }}>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{p.name}</div>
-                        <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{p.end ? new Date(p.end).toLocaleDateString() : "No deadline"}</div>
+  const renderTabContent = () => {
+    if (activeTab === "overview") return renderOverview();
+    if (activeTab === "projects") return renderProjects();
+    if (activeTab === "documents") return renderDocuments();
+    if (activeTab === "activity") return renderActivity();
+    if (activeTab === "portal") return renderPortal();
+    return <div style={{ padding: 40, textAlign: "center", color: "#A0B8BE" }}>Coming soon...</div>;
+  };
+
+  const st = getStatusCfg(activeClient?.status);
+  const acColor = getAvatarColor(activeClient || {});
+  const cRevenue = activeClient?.totalRevenue || activeClient?.revenue || 0;
+
+  return (
+    <div style={{ display: "flex", height: "100%", overflow: "hidden", background: "#F5FAFA" }}>
+      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+
+      {/* ── CLIENT LIST ── */}
+      <div style={{ width: 300, minWidth: 300, background: "#fff", borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ padding: "14px 16px 10px", borderBottom: "1px solid #E0EEF0", flexShrink: 0 }}>
+          <div style={{ position: "relative", marginBottom: 10 }}>
+            <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#A0B8BE", fontSize: 14 }} />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clients…" style={{ width: "100%", padding: "8px 12px 8px 32px", background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, color: "#1A2E35", fontFamily: "inherit", outline: "none" }} onFocus={e => e.target.style.borderColor = "#00BCD4"} onBlur={e => e.target.style.borderColor = "#E0EEF0"} />
+          </div>
+          <div style={{ display: "flex", gap: 4, overflowX: "auto" }}>
+            {["all", "active", "pending", "inactive"].map(f => (
+              <button key={f} onClick={() => setFilterMode(f)} style={{ padding: "5px 11px", borderRadius: 20, fontSize: 10, fontWeight: 700, cursor: "pointer", border: "1.5px solid", borderColor: filterMode === f ? "#00BCD4" : "#E0EEF0", background: filterMode === f ? "#00BCD4" : "none", color: filterMode === f ? "#fff" : "#607D86", fontFamily: "inherit", whiteSpace: "nowrap", transition: "all .15s", flexShrink: 0 }}>{f.charAt(0).toUpperCase() + f.slice(1)}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {activeSection.length > 0 && (
+            <>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: .8, padding: "10px 16px 4px" }}>Active Clients ({activeSection.length})</div>
+              {activeSection.map(c => renderClientItem(c))}
+            </>
+          )}
+          {otherSection.length > 0 && (
+            <>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: .8, padding: "10px 16px 4px" }}>Other</div>
+              {otherSection.map(c => renderClientItem(c))}
+            </>
+          )}
+          {filtered.length === 0 && <div style={{ padding: 32, textAlign: "center", color: "#A0B8BE", fontSize: 12, fontWeight: 600 }}>No clients found</div>}
+        </div>
+        <div style={{ padding: "10px 16px", borderTop: "1px solid #E0EEF0", flexShrink: 0 }}>
+          <button onClick={onAddClient} style={{ width: "100%", padding: "9px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            <i className="ti ti-plus" style={{ fontSize: 14 }} />Add Client
+          </button>
+        </div>
+      </div>
+
+      {/* ── DETAIL PANEL ── */}
+      {activeClient ? (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+
+          {/* HERO */}
+          <div style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "20px 28px", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 16 }}>
+              <div style={{ width: 64, height: 64, borderRadius: "50%", background: activeClient.logoUrl ? "#f1f5f9" : `linear-gradient(135deg,${acColor},${acColor}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 900, color: "#fff", flexShrink: 0, position: "relative", boxShadow: "0 4px 14px rgba(0,0,0,.15)", overflow: "hidden" }}>
+                {activeClient.logoUrl ? <img src={activeClient.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : getAvatar(activeClient)}
+                <div style={{ position: "absolute", bottom: 2, right: 2, width: 16, height: 16, borderRadius: "50%", background: st.dot, border: "2px solid #fff" }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2E35", letterSpacing: "-.3px" }}>{activeClient.clientName || activeClient.name || "—"}</div>
+                  {/* Status badge with dropdown */}
+                  <div style={{ position: "relative" }} ref={statusDropRef}>
+                    <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px 5px 9px", background: st.bg, border: `1.5px solid ${st.dot}`, borderRadius: 20, fontSize: 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
+                      <span style={{ width: 7, height: 7, borderRadius: "50%", background: st.dot, display: "inline-block" }} />
+                      {st.label}
+                      <i className="ti ti-chevron-down" style={{ fontSize: 11, opacity: .7 }} />
+                    </button>
+                    {statusDropOpen && (
+                      <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)", zIndex: 100, minWidth: 160, overflow: "hidden" }}>
+                        <div style={{ padding: "6px 12px 4px", fontSize: 9, fontWeight: 700, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: .7, background: "#F8FAFB", borderBottom: "1px solid #E0EEF0" }}>Set Client Status</div>
+                        {["Active", "Pending", "Inactive"].map(s => {
+                          const sc = getStatusCfg(s);
+                          const isCurrentStatus = (activeClient.status || "Active") === s;
+                          return (
+                            <div key={s} onClick={() => updateStatus(activeClient, s)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", fontSize: 12, fontWeight: 700, color: sc.color, background: isCurrentStatus ? sc.bg : "transparent", transition: "background .12s" }} onMouseEnter={e => e.currentTarget.style.background = sc.bg} onMouseLeave={e => e.currentTarget.style.background = isCurrentStatus ? sc.bg : "transparent"}>
+                              <span style={{ width: 9, height: 9, borderRadius: "50%", background: sc.dot, display: "inline-block" }} />
+                              <span style={{ flex: 1 }}>{s}</span>
+                              {isCurrentStatus && <i className="ti ti-check" style={{ fontSize: 13, opacity: .8 }} />}
+                            </div>
+                          );
+                        })}
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <Badge label={p.status || "Pending"} />
-                        <button
-                          onClick={() => onViewProject && onViewProject(p)}
-                          style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700 }}
-                        >
-                          View →
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    )}
+                  </div>
+                  <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}>
+                    <i className="ti ti-edit" style={{ fontSize: 12 }} />Edit
+                  </button>
                 </div>
-              );
-            })()}
+                <div style={{ fontSize: 13, color: "#607D86", marginTop: 2, fontWeight: 600 }}>{activeClient.companyName || activeClient.company || "—"}</div>
+                <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+                  {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E0F7FA", color: "#00BCD4" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
+                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 6, flexShrink: 0, flexWrap: "wrap" }}>
+                <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-edit" style={{ fontSize: 13 }} />Edit</button>
+                <button onClick={() => setDeleteTarget(activeClient)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .15s", border: "1.5px solid #E0EEF0", background: "#F5FAFA", color: "#607D86" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#F05C5C"; e.currentTarget.style.color = "#F05C5C"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}><i className="ti ti-trash" style={{ fontSize: 13 }} />Delete</button>
+              </div>
+            </div>
+
+            {/* Stats bar */}
+            <div style={{ display: "flex", gap: 0, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, overflow: "hidden" }}>
+              {[
+                { val: cRevenue ? "₹" + Number(cRevenue).toLocaleString("en-IN") : "₹0", label: "Total Revenue", color: "#00BCD4" },
+                { val: clientProjects.length, label: "Projects" },
+                { val: (activeClient?.invoiceCount || 0), label: "Invoices" },
+                { val: (activeClient?.documents?.length || 0), label: "Documents" },
+              ].map((s, i, arr) => (
+                <div key={i} style={{ flex: 1, padding: "10px 14px", textAlign: "center", borderRight: i < arr.length - 1 ? "1px solid #E0EEF0" : "none" }}>
+                  <div style={{ fontSize: 17, fontWeight: 900, color: s.color || "#1A2E35", letterSpacing: "-.3px" }}>{s.val}</div>
+                  <div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600, marginTop: 2, textTransform: "uppercase", letterSpacing: .4 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewClient(null); openEdit(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
-            <button onClick={() => { setViewClient(null); setDeleteTarget(viewClient); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>  Delete </button>
+
+          {/* TABS */}
+          <div style={{ background: "#fff", borderBottom: "1.5px solid #E0EEF0", padding: "0 28px", display: "flex", flexShrink: 0, overflowX: "auto" }}>
+            {[
+              { key: "overview", icon: "ti-layout-dashboard", label: "Overview" },
+              { key: "projects", icon: "ti-briefcase", label: "Projects" },
+              { key: "documents", icon: "ti-files", label: "Documents" },
+              { key: "portal", icon: "ti-globe", label: "Portal" },
+              { key: "activity", icon: "ti-history", label: "Activity" },
+            ].map(tab => (
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ padding: "12px 16px", fontSize: 12, fontWeight: 700, color: activeTab === tab.key ? "#00BCD4" : "#607D86", cursor: "pointer", border: "none", background: "none", fontFamily: "inherit", borderBottom: `2.5px solid ${activeTab === tab.key ? "#00BCD4" : "transparent"}`, transition: "all .15s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 5 }}>
+                <i className={`ti ${tab.icon}`} style={{ fontSize: 14 }} />{tab.label}
+              </button>
+            ))}
           </div>
-        </Mdl>
+
+          {/* TAB CONTENT */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+            {renderTabContent()}
+          </div>
+        </div>
+      ) : (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}>👥</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2E35" }}>Select a Client</div>
+          <div style={{ fontSize: 12, color: "#A0B8BE" }}>Choose a client from the list to view details</div>
+          <button onClick={onAddClient} style={{ padding: "9px 20px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", marginTop: 8 }}>+ Add First Client</button>
+        </div>
       )}
 
       {/* Edit Modal */}
       {editClient && (
-        <Mdl title="Edit Company" onClose={() => setEditClient(null)}>
+        <Mdl title="Edit Client" onClose={() => setEditClient(null)}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-            <div
-              onClick={() => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = (e) => triggerCrop(e, (croppedImage) => setEditForm(p => ({ ...p, logoUrl: croppedImage })), 1);
-                input.click();
-              }}
-              style={{
-                position: "relative",
-                cursor: "pointer",
-                width: "auto",
-                height: "auto",
-                maxWidth: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center"
-              }}
-            >
-              <div style={{
-                padding: editForm.logoUrl ? 4 : 24,
-                borderRadius: 20,
-                background: "#fff",
-                border: "2.5px dashed var(--app-border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minWidth: 100,
-                minHeight: 100,
-                overflow: "hidden",
-                boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
-                transition: "all 0.3s ease"
-              }}>
-                {editForm.logoUrl ? (
-                  <img
-                    src={editForm.logoUrl}
-                    alt="Logo"
-                    style={{
-                      width: "auto",
-                      height: "auto",
-                      maxWidth: "240px",
-                      maxHeight: "120px",
-                      objectFit: "contain",
-                      display: "block",
-                      borderRadius: 12
-                    }}
-                  />
-                ) : (
-                  <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Change Logo</div>
-                  </div>
-                )}
-              </div>
-              <div style={{
-                position: "absolute", bottom: -10, right: -10,
-                width: 36, height: 36, borderRadius: "50%",
-                background: "var(--app-accent)", color: "#fff",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
-                border: "3px solid #fff"
-              }}>📷</div>
+            <div onClick={() => { const input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.onchange = (e) => triggerCrop(e, (img) => setEditForm(p => ({ ...p, logoUrl: img })), 1); input.click(); }} style={{ cursor: "pointer", padding: editForm.logoUrl ? 4 : 24, borderRadius: 20, background: "#fff", border: "2.5px dashed #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", minWidth: 100, minHeight: 100, overflow: "hidden" }}>
+              {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{ width: "auto", height: "auto", maxWidth: 240, maxHeight: 120, objectFit: "contain", display: "block", borderRadius: 12 }} /> : <div style={{ textAlign: "center" }}><div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div><div style={{ fontSize: 10, fontWeight: 800, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: 1 }}>Change Logo</div></div>}
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-            <Fld label="Company Name *" value={editForm.clientName} onChange={v => { setEditForm(p => ({ ...p, clientName: v })); setEditErr(p => ({ ...p, clientName: "" })); }} error={editErr.clientName} />
-            <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
-            <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
-            <Fld label="Contact Person No." value={editForm.contactPersonNo} onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
-            <Fld label="Office No" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
-            <Fld label="Company Tax/GST" value={editForm.gstNumber} onChange={v => setEditForm(p => ({ ...p, gstNumber: v }))} />
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
+          {[
+            { key: "clientName", label: "Client Name*", placeholder: "Full name" },
+            { key: "companyName", label: "Company", placeholder: "Company name" },
+            { key: "email", label: "Email*", placeholder: "email@example.com" },
+            { key: "phone", label: "Phone", placeholder: "+91 XXXXX XXXXX" },
+            { key: "address", label: "Address", placeholder: "City, State" },
+            { key: "gstNumber", label: "GST Number", placeholder: "GST number" },
+            { key: "contactPersonName", label: "Contact Person", placeholder: "Contact name" },
+            { key: "contactPersonNo", label: "Contact Phone", placeholder: "Contact number" },
+          ].map(f => (
+            <div key={f.key} style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "#607D86", textTransform: "uppercase", letterSpacing: .5, marginBottom: 5, display: "block" }}>{f.label}</label>
+              <input value={editForm[f.key] || ""} onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder} style={{ width: "100%", padding: "9px 12px", background: "#F5FAFA", border: `1.5px solid ${editErr[f.key] ? "#F05C5C" : "#E0EEF0"}`, borderRadius: 9, fontSize: 13, color: "#1A2E35", fontFamily: "inherit", outline: "none" }} />
+              {editErr[f.key] && <div style={{ color: "#F05C5C", fontSize: 11, marginTop: 3 }}>{editErr[f.key]}</div>}
+            </div>
+          ))}
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 11, fontWeight: 700, color: "#607D86", textTransform: "uppercase", letterSpacing: .5, marginBottom: 5, display: "block" }}>Status</label>
+            <select value={editForm.status} onChange={e => setEditForm(p => ({ ...p, status: e.target.value }))} style={{ width: "100%", padding: "9px 12px", background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 13, color: "#1A2E35", fontFamily: "inherit", outline: "none" }}>
+              <option>Active</option><option>Pending</option><option>Inactive</option>
+            </select>
           </div>
-          <Fld label="Company Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD</label>
-            <input
-              type="password"
-              value={editForm.password}
-              onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))}
-              style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }}
-              placeholder="Leave blank to keep current password"
-            />
-          </div>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
-            <button onClick={() => setEditClient(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
+          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+            <button onClick={() => setEditClient(null)} style={{ flex: 1, padding: 10, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{ flex: 1, padding: 10, background: "#00BCD4", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>{saving ? "Saving..." : "Save Changes"}</button>
           </div>
         </Mdl>
       )}
 
-      {deleteTarget && <ConfirmModal title="Delete Company" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
+      {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
     </div>
   );
 }
-
-// ═══════════════════════════════════════════════════════════
-// EMPLOYEES PAGE
-// ═══════════════════════════════════════════════════════════
 function EmployeesPage({ employees, setEmployees }) {
   const [search, setSearch] = useState("");
   const [viewEmp, setViewEmp] = useState(null);
@@ -2323,13 +2519,13 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
     <>
       {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998, display: "block" }} className="mob-overlay" />}
       <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
-        <div className="logo">
+        <div className="logo" style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
           {companyLogo ? (
-            <img onClick={onLogoUploadClick} src={companyLogo} alt="logo" style={{ height: 28, width: "auto", objectFit: "contain", flexShrink: 0, cursor: "pointer" }} />
+            <img onClick={onLogoUploadClick} src={companyLogo} alt="logo" style={{ height: 64, width: "100%", maxWidth: 180, objectFit: "contain", flexShrink: 0, cursor: "pointer", borderRadius: 8, padding: 4, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }} />
           ) : (
             <span className="logo-mark" onClick={onLogoUploadClick} style={{ cursor: "pointer" }}>{companyName || "MBusiness"}</span>
           )}
-          <span className="logo-badge">+</span>
+          <span className="logo-badge" style={{ position: "absolute", bottom: -2, right: 10, width: 20, height: 20, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }} onClick={onLogoUploadClick}>+</span>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">✕</button>
         </div>
         
@@ -2386,17 +2582,9 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
         
         <div className="sidebar-bottom" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '20px' }}>
 
-          <button onClick={() => document.getElementById('global-file-upload')?.click()} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: 'var(--app-accent)', color: '#fff', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 4px 12px rgba(var(--app-accent-rgb), 0.3)', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-            <i className="ti ti-upload" style={{ fontSize: 18 }}></i> Upload File
+          <button onClick={onLogout} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '14px', fontSize: '14px', fontWeight: '800', color: '#fff', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}>
+            <i className="ti ti-logout" style={{ fontSize: 18 }}></i> Logout
           </button>
-          <input type="file" id="global-file-upload" style={{ display: 'none' }} onChange={(e) => {
-            if(e.target.files && e.target.files[0]) {
-              setUploadFileTarget(e.target.files[0]);
-              setUploadTargetRole("client");
-              setUploadTargetUser("");
-            }
-            e.target.value = null;
-          }} />
         </div>
       </aside>
       <div className="sidebar-spacer" style={{ width: 210, minWidth: 210, flexShrink: 0 }} />

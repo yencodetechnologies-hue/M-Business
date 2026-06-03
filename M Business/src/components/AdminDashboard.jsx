@@ -249,7 +249,15 @@ const T = darkMode ? {
   const fetchQuotations = async () => {
     try {
       const res = await axios.get(BASE_URL + "/api/quotations");
-      setQuotations(res.data);
+      let apiDocs = res.data?.quotations || res.data || [];
+      if (!Array.isArray(apiDocs)) apiDocs = [];
+      let localDocs = [];
+      try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) {}
+      const combined = [...apiDocs];
+      localDocs.forEach(ld => {
+        if (!combined.some(c => (c.quoteNo || c.qt?.quoteNo) === (ld.quoteNo || ld.qt?.quoteNo))) combined.push(ld);
+      });
+      setQuotations(combined);
     } catch (e) { console.error(e); }
   };
   const fetchPackages = async () => {

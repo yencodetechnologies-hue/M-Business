@@ -542,6 +542,19 @@ body{display:flex}
       <!-- SEND TO SECTION - now moved inside ctrl-lh above -->
 
 <div id="ctrl-quo" style="display:none">
+
+        <!-- QUOTATION SELECTOR DROPDOWN -->
+        <div style="padding:10px 14px 8px;border-bottom:1px solid var(--border);background:var(--surface2)">
+          <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Select / Load Quotation</div>
+          <div style="position:relative">
+            <select id="quoSelector" onchange="loadQuoFromSelector(this.value)"
+              style="width:100%;padding:9px 32px 9px 12px;background:var(--bg);border:1.5px solid var(--teal);border-radius:9px;font-size:12px;font-weight:700;color:var(--teal);font-family:var(--font);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none">
+              <option value="new">✚ New Quotation</option>
+            </select>
+            <i class="ti ti-chevron-down" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--teal);pointer-events:none"></i>
+          </div>
+        </div>
+
         <div class="acc-item">
           <div class="acc-hdr" onclick="toggleAcc(this)">
             <div class="acc-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-file-description"></i></div>
@@ -954,6 +967,7 @@ body{display:flex}
       <div class="prev-actions">
         <button class="btn-sm outline" onclick="clearContent()"><i class="ti ti-eraser" style="font-size:12px"></i> Clear</button>
         <button class="btn-sm outline"><i class="ti ti-download" style="font-size:12px"></i> PDF</button>
+        <button class="btn-sm" onclick="saveQuotationToApp()" id="btn-save-quo" style="display:none;background:#2ecc71;color:#fff;border:none"><i class="ti ti-device-floppy" style="font-size:12px"></i> Save</button>
         <button class="btn-sm" onclick="openSendModal()"><i class="ti ti-send" style="font-size:12px"></i> Send</button>
         <button class="btn-sm solid" onclick="printDoc()"><i class="ti ti-printer" style="font-size:12px"></i> Print</button>
       </div>
@@ -1011,6 +1025,36 @@ function switchDoc(btn, type) {
   document.getElementById('editorToolbar').style.display = type==='lh' ? 'flex' : 'none';
   const titles = {lh:'Letterhead Preview',quo:'Quotation Preview',prop:'Proposal Preview',inv:'Invoice Preview'};
   document.getElementById('prevTitle').textContent = titles[type];
+  const btnSaveQuo = document.getElementById('btn-save-quo');
+  if (btnSaveQuo) btnSaveQuo.style.display = type === 'quo' ? '' : 'none';
+
+  // Scroll the left panel to top on every tab switch
+  const cpScroll = document.querySelector('.cp-scroll');
+  if (cpScroll) cpScroll.scrollTop = 0;
+
+  // When switching to Quotation tab: collapse Header Style, expand Client Details first
+  if (type === 'quo') {
+    // Collapse shared-brand so Quotation tools are visible at the top
+    const sharedBrand = document.getElementById('shared-brand');
+    if (sharedBrand) {
+      const bBody = sharedBrand.querySelector('.acc-body');
+      const bArrow = sharedBrand.querySelector('.acc-arrow');
+      if (bBody) bBody.classList.remove('open');
+      if (bArrow) bArrow.classList.remove('open');
+    }
+
+    // Collapse "Quotation Header Style" accordion
+    const quoCtrl = document.getElementById('ctrl-quo');
+    if (quoCtrl) {
+      const allBodies = quoCtrl.querySelectorAll('.acc-body');
+      const allArrows = quoCtrl.querySelectorAll('.acc-arrow');
+      allBodies.forEach((b, i) => {
+        if (i === 0) { b.classList.remove('open'); if(allArrows[i]) allArrows[i].classList.remove('open'); }
+        else { b.classList.add('open'); if(allArrows[i]) allArrows[i].classList.add('open'); }
+      });
+    }
+  }
+
   render();
 }
 
@@ -1838,6 +1882,76 @@ function updateLhRecipientList() {
   });
 }
 
+// Store quotations list received from parent app
+let appQuotations = [];
+
+function populateQuoSelector() {
+  const sel = document.getElementById('quoSelector');
+  if (!sel) return;
+  // Keep first option (New Quotation)
+  sel.innerHTML = '<option value="new">✚ New Quotation</option>';
+  appQuotations.forEach((q, i) => {
+    const qt = q.qt || {};
+    const label = `#${q.quoteNo || qt.quoteNo || 'QT-???'} – ${q.client || qt.client || 'No Client'}`;
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  });
+}
+
+function clearQuoForm() {
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  set('f-quo-num', 'QUO-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*9000)+1000));
+  set('f-quo-date', new Date().toISOString().split('T')[0]);
+  set('f-quo-valid', new Date(Date.now()+30*86400000).toISOString().split('T')[0]);
+  set('f-quo-title', '');
+  set('f-quo-client', '');
+  set('f-quo-cemail', '');
+  set('f-quo-gst', '18');
+  set('f-quo-disc', '0');
+  // Reset items to one blank
+  const container = document.getElementById('quoItems');
+  if (container) {
+    container.innerHTML = `<div class="dyn-item"><div class="di-icon"><i class="ti ti-package"></i></div><input type="text" class="di-input" placeholder="Item description" oninput="calcQuo()"><input type="number" class="di-input" value="0" style="width:70px;text-align:right" oninput="calcQuo()"><i class="ti ti-x di-del" onclick="removeQI(this)"></i></div>`;
+  }
+  calcQuo();
+  render();
+}
+
+function loadQuoFromSelector(val) {
+  if (val === 'new') { clearQuoForm(); return; }
+  const idx = parseInt(val);
+  const entry = appQuotations[idx];
+  if (!entry) return;
+  const qt = entry.qt || {};
+  const items = entry.items || [];
+  const set = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined && v !== null) el.value = v; };
+  set('f-quo-num', qt.quoteNo || entry.quoteNo || '');
+  set('f-quo-date', qt.date || entry.date || '');
+  set('f-quo-valid', qt.expiryDate || '');
+  set('f-quo-title', qt.project || '');
+  set('f-quo-client', qt.client || entry.client || '');
+  set('f-quo-cemail', qt.companyEmail || '');
+  set('f-quo-gst', qt.gstRate !== undefined ? qt.gstRate : 18);
+  set('f-quo-disc', qt.discount || 0);
+  // Rebuild items
+  const container = document.getElementById('quoItems');
+  if (container && items.length > 0) {
+    container.innerHTML = '';
+    items.forEach(it => {
+      const desc = it.description || it.d || '';
+      const rate = it.rate || it.r || 0;
+      const div = document.createElement('div');
+      div.className = 'dyn-item';
+      div.innerHTML = `<div class="di-icon"><i class="ti ti-package"></i></div><input type="text" class="di-input" value="${desc.replace(/"/g,'&quot;')}" oninput="calcQuo()"><input type="number" class="di-input" value="${rate}" style="width:70px;text-align:right" oninput="calcQuo()"><i class="ti ti-x di-del" onclick="removeQI(this)"></i>`;
+      container.appendChild(div);
+    });
+  }
+  calcQuo();
+  render();
+}
+
 window.addEventListener('message', (e) => {
   if (e.data?.type === 'SET_DATA') {
     if (e.data.clients) appClients = e.data.clients;
@@ -1860,6 +1974,12 @@ window.addEventListener('message', (e) => {
       }
     }
     
+    // Load quotations list into the selector dropdown
+    if (e.data.quotations && Array.isArray(e.data.quotations)) {
+      appQuotations = e.data.quotations;
+      populateQuoSelector();
+    }
+
     updateRecipientDropdown();
     updateLhRecipientList();
     // Re-render to apply filled fields
@@ -1900,7 +2020,38 @@ function saveDocumentToApp() {
   window.parent.postMessage({ type: 'SAVE_DOCUMENT', payload: data }, '*');
 }
 // ----------------------------------
+// Save Quotation to React App
+function saveQuotationToApp() {
+  if (docType !== 'quo') return;
+  const v = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  
+  const qt = {
+    quoteNo: v('f-quo-num'),
+    date: v('f-quo-date'),
+    expiryDate: v('f-quo-valid'),
+    project: v('f-quo-title'),
+    client: v('f-quo-client'),
+    companyEmail: v('f-quo-cemail'),
+    gstRate: parseFloat(v('f-quo-gst')) || 0,
+    discount: parseFloat(v('f-quo-disc')) || 0
+  };
 
+  const items = [];
+  document.querySelectorAll('#quoItems .dyn-item').forEach((item, index) => {
+    const inputs = item.querySelectorAll('.di-input');
+    if (inputs.length >= 2) {
+      items.push({
+        id: Date.now() + index,
+        description: inputs[0].value,
+        quantity: 1,
+        rate: inputs[1].value
+      });
+    }
+  });
+
+  window.parent.postMessage({ type: 'SAVE_QUOTATION', payload: { qt, items } }, '*');
+}
+// ----------------------------------
 // INIT
 document.documentElement.style.setProperty('--lh-color', color);
 render();

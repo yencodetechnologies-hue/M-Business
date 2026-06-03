@@ -3184,6 +3184,37 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           toast.error("Failed to send document. Check connection.");
         }
       }
+      if (e.data && e.data.type === "SAVE_QUOTATION") {
+        const { qt, items } = e.data.payload;
+        if (!qt || !qt.quoteNo) return;
+        
+        // 1. Save to backend API
+        try {
+          await axios.post(`${BASE_URL}/api/quotations`, { qt, items, status: "draft" });
+        } catch (err) {
+          console.error("API Save Error", err);
+        }
+
+        // 2. Save to local drafts to update the UI
+        try {
+          const LOCAL_KEY = "quotation_drafts";
+          const all = localStorage.getItem(LOCAL_KEY) ? JSON.parse(localStorage.getItem(LOCAL_KEY)) : [];
+          const id = qt.quoteNo;
+          const idx = all.findIndex((d) => d.id === id || (d.qt && d.qt.quoteNo === id));
+          const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
+          const total = subtotal * (1 + (qt.gstRate || 0) / 100);
+          const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "—", total, savedAt: Date.now(), qt, items, status: "draft" };
+          
+          if (idx >= 0) all[idx] = entry; 
+          else all.unshift(entry);
+          
+          localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
+          toast.success("Quotation saved successfully!");
+          fetchQuotations(); // Refresh list to update the Template Designer dropdown
+        } catch (err) {
+          toast.error("Failed to save quotation locally.");
+        }
+      }
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
@@ -3443,7 +3474,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }
   };
 
-  const fetchQuotations = async () => { try { const res = await axios.get(BASE_URL + "/api/quotations"); setQuotations(res.data); } catch (e) { console.log(e); } };
+  const fetchQuotations = async () => { 
+    try { 
+      const res = await axios.get(BASE_URL + "/api/quotations"); 
+      let apiDocs = res.data?.quotations || res.data || [];
+      if (!Array.isArray(apiDocs)) apiDocs = [];
+      let localDocs = [];
+      try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) {}
+      // Combine avoiding duplicates by quoteNo
+      const combined = [...apiDocs];
+      localDocs.forEach(ld => {
+        if (!combined.some(c => (c.quoteNo || c.qt?.quoteNo) === (ld.quoteNo || ld.qt?.quoteNo))) combined.push(ld);
+      });
+      setQuotations(combined); 
+    } catch (e) { 
+      console.log(e); 
+      try { const d = localStorage.getItem("quotation_drafts"); setQuotations(d ? JSON.parse(d) : []); } catch (e) {}
+    } 
+  };
   const fetchVendors = async () => {
     try {
       console.log('Fetching vendors from:', BASE_URL + "/api/vendors");
@@ -3833,6 +3881,27 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const page = findNavItem(validActive) || navItems[0];
 
   useEffect(() => { if (!enforceMySubscriptions && validActive !== active) setActive(validActive); }, [user?.role, enforceMySubscriptions, validActive]);
+
+  useEffect(() => {
+    if (validActive === "templates") {
+      const frame = document.getElementById('template-designer-frame');
+      if (frame && frame.contentWindow) {
+        // Send data if the frame is already loaded, otherwise onLoad will catch it later
+        frame.contentWindow.postMessage({
+          type: 'SET_DATA',
+          clients: clients.map(c => c.clientName || c.name),
+          employees: employees.map(emp => emp.name),
+          quotations: quotations,
+          company: {
+            name: user?.companyName || "",
+            logoUrl: user?.logoUrl || "",
+            email: user?.email || "",
+            phone: user?.phone || "",
+          }
+        }, '*');
+      }
+    }
+  }, [quotations, clients, employees, user, validActive]);
 
   const displayName = companyNameStr;
   const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
@@ -4542,7 +4611,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
               <iframe
                 id="template-designer-frame"
-                src={`/template-designer.html?v=1`}
+                src={`/template-designer.html?v=2`}
                 style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
                 title="Template Designer"
                 onLoad={(e) => {
@@ -4551,6 +4620,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     type: 'SET_DATA',
                     clients: clients.map(c => c.clientName || c.name),
                     employees: employees.map(emp => emp.name),
+                    quotations: quotations,
                     company: {
                       name: user?.companyName || "",
                       logoUrl: user?.logoUrl || "",

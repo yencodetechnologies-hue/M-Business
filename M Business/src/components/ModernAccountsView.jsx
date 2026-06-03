@@ -41,9 +41,6 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, marginBottom: 32 }}>
         {/* PRIMARY */}
         <div style={{ background: "linear-gradient(135deg, #1e293b, #0f172a)", borderRadius: 24, padding: 24, color: "#fff", position: "relative", overflow: "hidden", boxShadow: "0 10px 30px rgba(15, 23, 42, 0.2)" }}>
-          <div style={{ position: "absolute", top: -20, right: -20, width: 120, height: 120, background: "rgba(255,255,255,0.05)", borderRadius: "50%", pointerEvents: "none" }}></div>
-          <div style={{ position: "absolute", bottom: -40, right: -10, width: 100, height: 100, background: "rgba(var(--app-accent-rgb, 99, 102, 241), 0.2)", borderRadius: "50%", pointerEvents: "none" }}></div>
-          
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30, position: "relative", zIndex: 1 }}>
             <div style={{ background: "rgba(255,255,255,0.1)", padding: "6px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>Primary Account</div>
             <div style={{ fontSize: 24 }}>💳</div>
@@ -56,14 +53,11 @@ export default function ModernAccountsView({ THEME, income = [], expenses = [] }
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 30, position: "relative", zIndex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: 2, color: "rgba(255,255,255,0.8)" }}>•••• •••• •••• 4289</div>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1200px-Mastercard-logo.svg.png" alt="mc" style={{ height: 24, opacity: 0.9 }} />
           </div>
         </div>
 
         {/* SECONDARY */}
         <div style={{ background: "linear-gradient(135deg, var(--app-accent), var(--app-accent2, var(--app-accent)))", borderRadius: 24, padding: 24, color: "#fff", position: "relative", overflow: "hidden", boxShadow: "0 10px 30px rgba(var(--app-accent-rgb, 99, 102, 241), 0.25)" }}>
-          <div style={{ position: "absolute", top: -30, right: 10, width: 140, height: 140, background: "rgba(255,255,255,0.1)", borderRadius: "50%", pointerEvents: "none" }}></div>
-          
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30, position: "relative", zIndex: 1 }}>
             <div style={{ background: "rgba(255,255,255,0.2)", padding: "6px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>Secondary Account</div>
             <div style={{ fontSize: 24 }}>🏦</div>

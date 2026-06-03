@@ -34,11 +34,12 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const { companyId, client, sendTo } = req.query;
-        if (!companyId) {
-            return res.status(400).json({ msg: "Company ID required" });
+        if (!companyId && !sendTo && !client) {
+            return res.status(400).json({ msg: "Company ID or specific filter required" });
         }
         
-        let query = { companyId };
+        let query = {};
+        if (companyId) query.companyId = companyId;
         
         // If a client name is provided, filter by it (case-insensitive)
         if (client) {

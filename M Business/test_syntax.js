@@ -224,7 +224,7 @@ function renderInv() {
       </div>
       <div style="text-align:right">
         <div style="width:80px;height:1.5px;background:${color};margin:0 0 4px auto"></div>
-        <div style="font-size:11px;font-weight:800;color:#1A2E35">${v('f-sig')||'Prabhu R'}</div>
+        <div style="font-size:11px;font-weight:800;color:#1A2E35">${v('f-sig')||'Sign'}</div>
         <div style="font-size:9px;color:#A0B8BE">${co}</div>
       </div>
     </div>`;

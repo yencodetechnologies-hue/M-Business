@@ -1111,7 +1111,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                               setStep("receipt");
                             }}><i className="ti ti-download"></i></button>
                           ) : (
-                            <button className="row-btn"><i className="ti ti-send"></i></button>
+                            <button className="row-btn" onClick={(e) => { e.stopPropagation(); shareInvoice({ id: entry.id, invoiceNo: entry.invoiceNo || entry.inv?.invoiceNo, total: entry.total }); }}><i className="ti ti-send"></i></button>
                           )}
                           <button className="row-btn danger" onClick={() => setDeleteTarget(entry)}><i className="ti ti-trash"></i></button>
                         </div>

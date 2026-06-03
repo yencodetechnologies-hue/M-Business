@@ -12,10 +12,9 @@ const API = `${BASE_URL}/api/reports`;
 function StatCard({ THEME, icon, label, value, color, sub }) {
   return (
     <div style={{ background:THEME.card, borderRadius:16, padding:"18px 16px",
-      boxShadow: THEME.shadow, border:`1.5px solid ${THEME.border}`,
+      boxShadow: THEME.shadow, border: `1.5px solid rgba(0,0,0,0.1)`,
+
       position:"relative", overflow:"hidden" }}>
-      <div style={{ position:"absolute", top:-15, right:-15, width:70, height:70,
-        borderRadius:"50%", background:`radial-gradient(circle,${color}20,transparent)` }}/>
       <div style={{ width:40, height:40, borderRadius:11, background:`${color}15`,
         display:"flex", alignItems:"center", justifyContent:"center",
         fontSize:19, marginBottom:10 }}>{icon}</div>
@@ -34,12 +33,10 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
 
   return (
     <div style={{ background: THEME.card, borderRadius: 24, padding: 28,
-      boxShadow: THEME.shadow, border: `1.5px solid ${THEME.border}`,
+      boxShadow: THEME.shadow, border: `1.5px solid rgba(0,0,0,0.1)`,
       position: "relative", overflow: "hidden" }}>
 
-      {/* BG decoration */}
-      <div style={{ position:"absolute", top:-25, right:-25, width:100, height:100,
-        borderRadius:"50%", background:`radial-gradient(circle,${color}12,transparent)` }}/>
+      {/* BG decoration removed */}
 
       {/* Header */}
       <div style={{ display:"flex", alignItems:"flex-start", gap:12, marginBottom:16 }}>
@@ -85,7 +82,7 @@ function ReportCard({ THEME, r, idx, RPT_COLORS }) {
           { k: "Pending ⏳", v: r.pending, c: "#f59e0b" },
         ].map(({ k, v, c }) => (
           <div key={k} style={{ background: THEME.surface, borderRadius: 14,
-            padding: "12px 14px", border: `1.5px solid ${THEME.border}` }}>
+            padding: "12px 14px", border: `1.5px solid rgba(0,0,0,0.1)` }}>
             <div style={{ fontSize: 10, color: THEME.muted, fontWeight: 800,
               letterSpacing: 0.8, marginBottom: 6, textTransform: "uppercase" }}>{k}</div>
             <div style={{ fontSize: typeof v === "number" ? 22 : 14,
@@ -294,7 +291,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
       {/* ── Quick summary table ── */}
       {reports.length > 0 && !selectedReport && (
         <div style={{ background:"var(--app-card)", borderRadius:16, padding:22,
-          boxShadow:"0 10px 30px rgba(0,0,0,0.05)", border:"1px solid var(--app-border)" }}>
+          boxShadow:"0 10px 30px rgba(0,0,0,0.05)", border:"1.5px solid rgba(0,0,0,0.1)" }}>
           <h3 style={{ margin:"0 0 16px", fontSize:15, fontWeight:700, color:"var(--app-text)" }}>
             📋 Summary Table
           </h3>
@@ -317,7 +314,7 @@ export default function ReportsPage({ THEME, clients=[], projects=[], employees=
                   return (
                     <tr key={r.id}
                       onClick={() => setSelectedReport(r.type)}
-                      style={{ borderBottom:`1.5px solid ${THEME.border}`, cursor: "pointer" }}
+                      style={{ borderBottom:`1.5px solid rgba(0,0,0,0.1)`, cursor: "pointer" }}
                       onMouseEnter={e=>e.currentTarget.style.background=THEME.surface}
                       onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                       <td style={{ padding:"12px 14px" }}>

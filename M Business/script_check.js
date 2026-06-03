@@ -198,7 +198,7 @@ function renderLetter() {
   const toCo = v('f-to-co');
   const salute = v('f-salute') || 'Dear Sir/Madam,';
   const closing = v('f-closing') || 'Yours sincerely,';
-  const sig = v('f-sig') || 'Prabhu R';
+  const sig = v('f-sig') || 'Sign';
   const sigRole = v('f-sig-role') || '';
 
   document.getElementById('docBodyZone').innerHTML = `
@@ -293,7 +293,7 @@ function renderQuo() {
     ${validDate ? `<div class="validity-banner" style="background:${h2r('#F5A623',.08)};border-color:#F5A623;color:#D97706;font-size:10px;font-weight:700">⏰ This quotation is valid until ${validDate}</div>` : ''}
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid #E0EEF0;display:flex;justify-content:space-between;align-items:flex-end">
       <div style="font-size:10px;color:#A0B8BE;max-width:280px;line-height:1.6">Thank you for considering ${co}. For queries contact ${v('f-email')||'us'}.</div>
-      <div style="text-align:right"><div style="width:80px;height:1px;background:#A0B8BE;margin:0 0 4px auto"></div><div style="font-size:11px;font-weight:800">Prabhu R</div><div style="font-size:9px;color:#A0B8BE">${co}</div></div>
+      <div style="text-align:right"><div style="width:80px;height:1px;background:#A0B8BE;margin:0 0 4px auto"></div><div style="font-size:11px;font-weight:800">Sign</div><div style="font-size:9px;color:#A0B8BE">${co}</div></div>
     </div>`;
   document.getElementById('docFooterZone').innerHTML = '';
   setTimeout(() => calcQuo(), 10);
@@ -395,7 +395,7 @@ function renderProp() {
     </div>
     <div style="padding-top:14px;border-top:1px solid #E0EEF0">
       <div class="signoff-grid">
-        <div class="sob"><div class="sob-line" style="background:${color}"></div><div class="sob-name">Prabhu R</div><div class="sob-role">${co}</div></div>
+        <div class="sob"><div class="sob-line" style="background:${color}"></div><div class="sob-name">Sign</div><div class="sob-role">${co}</div></div>
         <div class="sob"><div class="sob-line"></div><div class="sob-name" ${!client?'style=\"color:#A0B8BE\"':''}>${client||'— Client —'}</div><div class="sob-role">Authorised Signatory</div></div>
       </div>
     </div>`;
@@ -735,7 +735,7 @@ function renderInv() {
       </div>
       <div style="text-align:right">
         <div style="width:80px;height:1.5px;background:${color};margin:0 0 4px auto"></div>
-        <div style="font-size:11px;font-weight:800;color:#1A2E35">${v('f-sig')||'Prabhu R'}</div>
+        <div style="font-size:11px;font-weight:800;color:#1A2E35">${v('f-sig')||'Sign'}</div>
         <div style="font-size:9px;color:#A0B8BE">${co}</div>
       </div>
     </div>`;

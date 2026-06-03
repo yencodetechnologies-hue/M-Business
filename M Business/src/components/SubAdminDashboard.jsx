@@ -2521,11 +2521,11 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
       <aside className={`sidebar ${open ? 'open' : ''}`} style={{ transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)" }}>
         <div className="logo" style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
           {companyLogo ? (
-            <img onClick={onLogoUploadClick} src={companyLogo} alt="logo" style={{ height: 64, width: "100%", maxWidth: 180, objectFit: "contain", flexShrink: 0, cursor: "pointer", borderRadius: 8, padding: 4, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }} />
+            <img onClick={onLogoUploadClick} src={companyLogo} alt="logo" style={{ height: 64, width: "100%", maxWidth: 180, objectFit: "contain", flexShrink: 0, cursor: "pointer" }} />
           ) : (
             <span className="logo-mark" onClick={onLogoUploadClick} style={{ cursor: "pointer" }}>{companyName || "MBusiness"}</span>
           )}
-          <span className="logo-badge" style={{ position: "absolute", bottom: -2, right: 10, width: 20, height: 20, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }} onClick={onLogoUploadClick}>+</span>
+          <span className="logo-badge" style={{ position: "absolute", bottom: 2, right: 10, width: 20, height: 20, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }} onClick={onLogoUploadClick}>+</span>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">✕</button>
         </div>
         
@@ -2582,7 +2582,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
         
         <div className="sidebar-bottom" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '20px' }}>
 
-          <button onClick={onLogout} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '14px', fontSize: '14px', fontWeight: '800', color: '#fff', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}>
+          <button onClick={onLogout} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '14px', fontSize: '14px', fontWeight: '800', color: '#fff', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}>
             <i className="ti ti-logout" style={{ fontSize: 18 }}></i> Logout
           </button>
         </div>
@@ -3167,7 +3167,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         const payload = e.data.payload;
         if (!payload) return;
         
-        const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
+        const companyId = resolveSubadminId();
         
         try {
           await axios.post(`${BASE_URL}/api/documents`, {
@@ -4543,9 +4543,24 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
               <iframe
                 id="template-designer-frame"
-                src="/template-designer.html"
+                src={`/template-designer.html?v=1`}
                 style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
                 title="Template Designer"
+                onLoad={(e) => {
+                  const frame = e.target.contentWindow;
+                  frame.postMessage({
+                    type: 'SET_DATA',
+                    clients: clients.map(c => c.clientName || c.name),
+                    employees: employees.map(emp => emp.name),
+                    company: {
+                      name: user?.companyName || "",
+                      logoUrl: user?.logoUrl || "",
+                      email: user?.email || "",
+                      phone: user?.phone || "",
+                    }
+                  }, '*');
+                  frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
+                }}
               />
             </div>
           )}
@@ -4555,9 +4570,27 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <iframe
                 key="letterhead-frame"
                 id="letterhead-frame"
-                src="/template-designer.html#lh"
+                src={`/template-designer.html?v=1#lh`}
                 style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
                 title="Letterhead Designer"
+                onLoad={(e) => {
+                  const frame = e.target.contentWindow;
+                  // Small delay to ensure iframe is fully ready
+                  setTimeout(() => {
+                    frame.postMessage({
+                      type: 'SET_DATA',
+                      clients: clients.map(c => c.clientName || c.name),
+                      employees: employees.map(emp => emp.name),
+                      company: {
+                        name: user?.companyName || "",
+                        logoUrl: user?.logoUrl || "",
+                        email: user?.email || "",
+                        phone: user?.phone || "",
+                      }
+                    }, '*');
+                    frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
+                  }, 300);
+                }}
               />
             </div>
           )}

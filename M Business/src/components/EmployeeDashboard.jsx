@@ -328,11 +328,22 @@ function EmployeeDocumentsPage({ user }) {
     const fetchDocs = async () => {
       try {
         const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
-        const displayName = user?.name || "Employee";
-        const res = await axios.get(`${BASE_URL}/api/documents?companyId=${companyId}&client=${encodeURIComponent(displayName)}&sendTo=employee`);
-        setDocs(res.data);
+        const displayName = (user?.name || "").trim().toLowerCase();
+        console.log("[EmployeeDocs] user=", user);
+        console.log("[EmployeeDocs] companyId=", companyId, "displayName=", displayName);
+        // Fetch all employee docs (bypassing strict companyId requirement) then filter by name client-side
+        const res = await axios.get(`${BASE_URL}/api/documents?sendTo=employee`);
+        const allDocs = Array.isArray(res.data) ? res.data : (res.data?.value || []);
+        console.log("[EmployeeDocs] allDocs=", allDocs);
+        // Filter: show docs where client name matches this employee (case-insensitive)
+        const myDocs = allDocs.filter(d => {
+          const docClient = (d.client || "").trim().toLowerCase();
+          return !displayName || docClient === displayName || docClient.includes(displayName) || displayName.includes(docClient);
+        });
+        console.log("[EmployeeDocs] myDocs=", myDocs);
+        setDocs(myDocs);
       } catch (err) {
-        console.error("Failed to fetch documents:", err);
+        console.error("[EmployeeDocs] Failed to fetch documents:", err);
       } finally {
         setLoading(false);
       }
@@ -1376,7 +1387,7 @@ export default function EmployeeDashboard({ user, setUser }) {
   const empName = resolvedUser?.name || "";
 
   const filteredNav = NAV.filter(item => {
-    if (item.key === 'dashboard' || item.key === 'settings') return true;
+    if (['dashboard', 'settings', 'documents', 'messaging'].includes(item.key)) return true;
     if (Object.keys(permissions).length === 0) return true;
     return permissions[item.key] === true;
   });

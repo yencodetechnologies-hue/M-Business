@@ -252,6 +252,169 @@ body{display:flex}
 .quo-cta-btn.negotiate{background:none;border:1.5px solid var(--purple);color:var(--purple)}
 
 
+/* INVOICE PREVIEW DOC */
+.invoice-preview{padding:24px;font-family:var(--font);font-size:12px;color:#1A2E35;background:#fff;min-height:560px}
+.inv-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid var(--teal)}
+.inv-logo-area{}
+.inv-logo-box{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal4));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;margin-bottom:8px}
+.inv-company-name{font-size:14px;font-weight:800;color:var(--text)}
+.inv-company-details{font-size:10px;color:var(--text3);line-height:1.7;margin-top:3px}
+.inv-title-area{text-align:right}
+.inv-title-word{font-size:28px;font-weight:900;color:var(--teal);letter-spacing:-.5px}
+.inv-id{font-size:12px;font-weight:700;color:var(--text);margin-top:4px}
+.inv-dates{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.8}
+.inv-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-top:6px}
+.inv-status.draft{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.inv-status.sent{background:var(--blue-bg);color:var(--blue)}
+.inv-status.paid{background:var(--green-bg);color:var(--green)}
+
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.inv-party-label{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.inv-party-name{font-size:13px;font-weight:800;color:var(--text)}
+.inv-party-detail{font-size:10px;color:var(--text3);line-height:1.7;margin-top:2px}
+
+.inv-items-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+.inv-items-table thead tr{background:linear-gradient(135deg,var(--teal),var(--teal4))}
+.inv-items-table thead th{padding:8px 10px;font-size:10px;font-weight:700;color:#fff;text-align:left;letter-spacing:.4px}
+.inv-items-table thead th:last-child{text-align:right}
+.inv-items-table tbody tr{border-bottom:1px solid var(--border)}
+.inv-items-table tbody tr:nth-child(even){background:var(--surface2)}
+.inv-items-table tbody td{padding:8px 10px;font-size:11px;color:var(--text)}
+.inv-items-table tbody td:last-child{text-align:right;font-weight:700}
+
+.inv-totals{margin-left:auto;width:200px}
+.inv-total-row{display:flex;justify-content:space-between;padding:5px 0;font-size:11px;border-bottom:1px solid var(--border)}
+.inv-total-row:last-child{border-bottom:none}
+.inv-total-row .lbl{color:var(--text2)}
+.inv-total-row .val{font-weight:700;color:var(--text)}
+.inv-grand-row{display:flex;justify-content:space-between;padding:8px 10px;background:linear-gradient(135deg,var(--teal),var(--teal4));border-radius:8px;margin-top:6px}
+.inv-grand-row .lbl{font-size:12px;font-weight:800;color:#fff}
+.inv-grand-row .val{font-size:14px;font-weight:900;color:#fff}
+
+.inv-footer{margin-top:20px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end}
+.inv-notes{flex:1}
+.inv-notes-title{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.inv-notes-text{font-size:10px;color:var(--text3);line-height:1.6}
+.inv-sig{text-align:right}
+.inv-sig-line{width:100px;height:1px;background:var(--text3);margin-left:auto;margin-bottom:4px}
+.inv-sig-name{font-size:10px;font-weight:700;color:var(--text)}
+.inv-sig-role{font-size:9px;color:var(--text3)}
+.inv-bank{margin-top:14px;padding:10px 12px;background:var(--teal-lighter);border-radius:8px;border-left:3px solid var(--teal)}
+.inv-bank-title{font-size:10px;font-weight:700;color:var(--teal);margin-bottom:4px}
+.inv-bank-detail{font-size:10px;color:var(--text2);line-height:1.7}
+
+
+/* PROPOSAL DOC */
+.prop-doc{max-height:82vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;font-family:var(--font);font-size:12px;color:#1A2E35}
+
+/* COVER */
+.p-cover{background:linear-gradient(135deg,#003E4E 0%,#005F73 35%,#0096B4 70%,#26D0CE 100%);padding:26px 22px;position:relative;overflow:hidden;flex-shrink:0}
+.p-cover::after{content:'';position:absolute;right:-50px;top:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06)}
+.p-cover::before{content:'';position:absolute;left:-20px;bottom:-60px;width:140px;height:140px;border-radius:50%;background:rgba(0,0,0,.1)}
+.p-logo{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;margin-bottom:14px;position:relative;z-index:1}
+.p-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;position:relative;z-index:1}
+.p-title{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1.25;margin-bottom:5px;position:relative;z-index:1}
+.p-subtitle{font-size:11px;color:rgba(255,255,255,.7);margin-bottom:14px;position:relative;z-index:1}
+.p-meta{display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
+.p-meta-i{display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,.7);font-weight:600}
+.p-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);margin-top:9px;position:relative;z-index:1}
+
+/* DOC SECTIONS */
+.ps{padding:14px 18px;border-bottom:1px solid var(--border)}
+.ps:last-child{border-bottom:none}
+.ps-lbl{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.ps-lbl i{font-size:12px}
+
+/* PARTIES GRID */
+.party-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.party-b{padding:9px 11px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
+.pb-lbl{font-size:8px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.pb-name{font-size:11px;font-weight:800;color:var(--text)}
+.pb-detail{font-size:9px;color:var(--text3);line-height:1.7;margin-top:1px}
+
+/* EXEC SUMMARY */
+.exec-block{margin-bottom:8px;padding:9px 11px;border-radius:8px;border-left:3px solid var(--border2)}
+.exec-block.problem{border-left-color:var(--red);background:var(--red-bg)}
+.exec-block.solution{border-left-color:var(--teal);background:var(--teal-lighter)}
+.exec-block.whyus{border-left-color:var(--green);background:var(--green-bg)}
+.eb-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.exec-block.problem .eb-lbl{color:var(--red)}
+.exec-block.solution .eb-lbl{color:var(--teal)}
+.exec-block.whyus .eb-lbl{color:var(--green)}
+.eb-text{font-size:10px;color:var(--text2);line-height:1.6}
+
+/* DELIVERABLES IN PREVIEW */
+.del-list{display:flex;flex-direction:column;gap:4px}
+.del-item-p{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2)}
+.del-item-p::before{content:'✓';color:var(--teal);font-weight:800;font-size:11px;flex-shrink:0}
+
+/* TIMELINE PREVIEW */
+.tl-p{display:flex;flex-direction:column;gap:0}
+.tl-pi{display:flex;gap:8px;padding-bottom:8px}
+.tl-pi:last-child{padding-bottom:0}
+.tl-dot{width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0}
+.tl-line-p{width:2px;background:var(--teal-light);flex:1;margin:2px 0;min-height:10px}
+.tl-pi:last-child .tl-line-p{display:none}
+.tl-pi-title{font-size:10px;font-weight:700;color:var(--text)}
+.tl-pi-date{font-size:9px;color:var(--teal);font-weight:600}
+.tl-pi-desc{font-size:9px;color:var(--text3);margin-top:1px;line-height:1.5}
+
+/* TEAM PREVIEW */
+.team-p{display:flex;flex-wrap:wrap;gap:7px}
+.tp-card{padding:7px 9px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
+.tp-av-p{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0}
+.tp-name-p{font-size:10px;font-weight:700;color:var(--text)}
+.tp-role-p{font-size:9px;color:var(--text3)}
+
+/* PRICING PREVIEW */
+.pricing-tbl{width:100%;border-collapse:collapse}
+.pricing-tbl thead tr{background:linear-gradient(135deg,var(--teal),var(--teal4))}
+.pricing-tbl thead th{padding:6px 8px;font-size:9px;font-weight:700;color:#fff;text-align:left}
+.pricing-tbl thead th:last-child{text-align:right}
+.pricing-tbl tbody tr{border-bottom:1px solid var(--border)}
+.pricing-tbl tbody tr:nth-child(even){background:var(--surface2)}
+.pricing-tbl tbody td{padding:5px 8px;font-size:10px;color:var(--text)}
+.pricing-tbl tbody td:last-child{text-align:right;font-weight:700}
+.pricing-grand{display:flex;justify-content:space-between;padding:6px 8px;background:linear-gradient(135deg,var(--teal),var(--teal4));border-radius:6px;margin-top:5px}
+.pricing-grand span:first-child{font-size:10px;font-weight:800;color:#fff}
+.pricing-grand span:last-child{font-size:12px;font-weight:900;color:#fff}
+
+/* VALUE PREVIEW */
+.val-p{display:flex;flex-direction:column;gap:4px}
+.val-pi{display:flex;align-items:flex-start;gap:6px;font-size:10px;color:var(--text2)}
+.val-pi::before{content:'→';color:var(--amber);font-weight:800;font-size:11px;flex-shrink:0}
+
+/* CASE STUDY PREVIEW */
+.cs-p{padding:8px 10px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--teal);margin-bottom:7px}
+.cs-p:last-child{margin-bottom:0}
+.cs-p-title{font-size:10px;font-weight:800;color:var(--text);margin-bottom:3px}
+.cs-p-detail{font-size:9px;color:var(--text3);line-height:1.6}
+
+/* TESTIMONIAL PREVIEW */
+.tm-p{padding:8px 10px;background:var(--teal-lighter);border-radius:8px;border:1px solid var(--teal-light);margin-bottom:7px;font-style:italic}
+.tm-p:last-child{margin-bottom:0}
+.tm-p-text{font-size:10px;color:var(--text2);margin-bottom:5px}
+.tm-p-author{font-size:9px;font-weight:700;color:var(--teal)}
+
+/* RISK PREVIEW */
+.risk-p{display:flex;flex-direction:column;gap:4px}
+.risk-pi{display:flex;align-items:flex-start;gap:7px;padding:5px 8px;border-radius:7px;background:var(--surface2);border:1px solid var(--border)}
+.risk-badge-p{font-size:8px;font-weight:800;padding:1px 6px;border-radius:20px;flex-shrink:0}
+.risk-badge-p.h{background:var(--red-bg);color:var(--red)}
+.risk-badge-p.m{background:var(--amber-bg);color:var(--amber)}
+.risk-badge-p.l{background:var(--green-bg);color:var(--green)}
+.risk-pi-text{font-size:9px;color:var(--text2);flex:1}
+.risk-pi-mit{font-size:9px;color:var(--text3);font-style:italic}
+
+/* SIGN OFF PREVIEW */
+.sop{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sob{padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);text-align:center}
+.sob-line{width:70px;height:1px;background:var(--text3);margin:0 auto 4px}
+.sob-name{font-size:10px;font-weight:700;color:var(--text)}
+.sob-role{font-size:9px;color:var(--text3)}
+
+/* MOBILE */
+
 /* PROPOSAL PREVIEW */
 .prop-cover-zone{}
 .prop-exec{margin-bottom:12px}
@@ -784,7 +947,56 @@ body{display:flex}
         </div>
 
         <!-- MILESTONES -->
+        
         <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            <div class="acc-icon" style="background:#E8F5E9;color:#2E7D32"><i class="ti ti-calendar-event"></i></div>
+            <div class="acc-title">Timeline & Terms</div>
+            <i class="ti ti-chevron-up acc-arrow open"></i>
+          </div>
+          <div class="acc-body open">
+            <div class="fg"><label class="fl">Project Start</label><input class="fi" type="date" id="f-prop-start" oninput="safeRender()"></div>
+            <div class="fg"><label class="fl">Project End</label><input class="fi" type="date" id="f-prop-end" oninput="safeRender()"></div>
+            <div class="fg"><label class="fl">Duration</label><input class="fi" type="text" id="f-prop-duration" placeholder="e.g. 4 Months" oninput="safeRender()"></div>
+            <div class="fg"><label class="fl">Engagement Model</label>
+              <select class="fi" id="f-prop-engagement" oninput="safeRender()">
+                <option>Fixed Price</option><option>Time &amp; Material</option><option>Retainer</option><option>Milestone Based</option>
+              </select>
+            </div>
+            <div class="fg"><label class="fl">Payment Schedule</label>
+              <select class="fi" id="f-prop-paysched" oninput="safeRender()">
+                <option>50/50 Split</option><option>30/40/30 Split</option><option>Monthly</option><option>On Delivery</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            <div class="acc-icon" style="background:#FFF3E0;color:#E65100"><i class="ti ti-user-check"></i></div>
+            <div class="acc-title">Client Details</div>
+            <i class="ti ti-chevron-up acc-arrow open"></i>
+          </div>
+          <div class="acc-body open">
+            <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="f-prop-cperson" placeholder="Client's name" oninput="safeRender()"></div>
+            <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="f-prop-cemail" placeholder="client@email.com" oninput="safeRender()"></div>
+            <div class="fg"><label class="fl">Phone</label><input class="fi" type="tel" id="f-prop-cphone" placeholder="+91 XXXXX XXXXX" oninput="safeRender()"></div>
+            <div class="fg"><label class="fl">Address</label><input class="fi" type="text" id="f-prop-caddr" placeholder="City, Country" oninput="safeRender()"></div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            <div class="acc-icon" style="background:#EDE7F6;color:#4527A0"><i class="ti ti-file-description"></i></div>
+            <div class="acc-title">Closing & Terms</div>
+            <i class="ti ti-chevron-up acc-arrow open"></i>
+          </div>
+          <div class="acc-body open">
+            <div class="fg"><label class="fl">Closing Note</label><textarea class="fi" id="f-prop-closing" rows="2" style="resize:vertical" oninput="safeRender()">We are excited about the opportunity to work with you on this project.</textarea></div>
+            <div class="fg"><label class="fl">Terms &amp; Conditions</label><textarea class="fi" id="f-prop-terms" rows="3" style="resize:vertical;min-height:70px" oninput="safeRender()">1. 50% advance payment required before commencement.
+2. Remaining 50% upon project delivery.
+3. Source code delivered after full payment.</textarea></div>
+          </div>
+        </div>
+<div class="acc-item">
           <div class="acc-hdr" onclick="toggleAcc(this)">
             <div class="acc-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-calendar-stats"></i></div>
             <div class="acc-title">Milestones</div>
@@ -801,6 +1013,66 @@ body{display:flex}
           </div>
         </div>
 
+
+        <!-- OUR TEAM (PORTED) -->
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-users"></i></div>
+            <div class="acc-title">Team Members</div>
+            <i class="ti ti-chevron-up acc-arrow"></i>
+          </div>
+          <div class="acc-body" style="display:none">
+            <div id="td-teamList" class="dyn-items">
+              <div class="team-card">
+                <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">PR</div>
+                <div style="flex:1;min-width:0">
+                  <div class="tc-name">Prabhu R</div>
+                  <div class="tc-role">Lead Developer & Project Manager</div>
+                  <div class="tc-exp">8+ years · Web & Mobile Applications</div>
+                  <div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span></div>
+                </div>
+                <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>
+              </div>
+            </div>
+            <button class="add-dyn-btn" onclick="addTeamMember()"><i class="ti ti-plus" style="font-size:12px"></i>Add Member</button>
+          </div>
+        </div>
+
+        <!-- VALUE PROPOSITION (PORTED) -->
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            <div class="acc-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
+            <div class="acc-title">Value Propositions</div>
+            <i class="ti ti-chevron-up acc-arrow"></i>
+          </div>
+          <div class="acc-body" style="display:none">
+            <div id="td-valueList" class="dyn-items">
+              <div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div><input type="text" class="dv-input" value="300% increase in organic traffic within 6 months" oninput="propUp()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();propUp()"></i></div>
+            </div>
+            <button class="add-dyn-btn" onclick="addValue()"><i class="ti ti-plus" style="font-size:12px"></i>Add Point</button>
+          </div>
+        </div>
+
+        <!-- RISKS & MITIGATION (PORTED) -->
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            <div class="acc-icon" style="background:var(--red-bg);color:var(--red)"><i class="ti ti-shield-exclamation"></i></div>
+            <div class="acc-title">Risks & Mitigation</div>
+            <i class="ti ti-chevron-up acc-arrow"></i>
+          </div>
+          <div class="acc-body" style="display:none">
+            <div id="td-riskList" class="dyn-items">
+              <div class="risk-row-g">
+                <input type="text" class="pr-inp" value="Scope creep beyond deliverables" oninput="propUp()">
+                <select class="pr-inp" style="padding:7px 8px;font-size:11px" onchange="propUp()"><option>High</option><option selected>Medium</option><option>Low</option></select>
+                <input type="text" class="pr-inp" value="Formal change request process" oninput="propUp()">
+                <button class="pr-del" onclick="this.closest('.risk-row-g').remove();propUp()"><i class="ti ti-trash"></i></button>
+              </div>
+            </div>
+            <button class="add-dyn-btn" onclick="addRisk()"><i class="ti ti-plus" style="font-size:12px"></i>Add Risk</button>
+          </div>
+        </div>
+
         <!-- PRICING -->
         <div class="acc-item">
           <div class="acc-hdr" onclick="toggleAcc(this)">
@@ -810,15 +1082,21 @@ body{display:flex}
           </div>
           <div class="acc-body open">
             <div id="propPricing">
-              <div class="dyn-item"><div class="di-icon"><i class="ti ti-palette"></i></div><input type="text" class="di-input" value="UI/UX Design" oninput="calcProp()"><input type="number" class="di-input" value="18000" style="width:70px;text-align:right" oninput="calcProp()"><i class="ti ti-x di-del" onclick="this.parentElement.remove();calcProp()"></i></div>
-              <div class="dyn-item"><div class="di-icon"><i class="ti ti-code"></i></div><input type="text" class="di-input" value="Development" oninput="calcProp()"><input type="number" class="di-input" value="50000" style="width:70px;text-align:right" oninput="calcProp()"><i class="ti ti-x di-del" onclick="this.parentElement.remove();calcProp()"></i></div>
-              <div class="dyn-item"><div class="di-icon"><i class="ti ti-headset"></i></div><input type="text" class="di-input" value="Support (3 mo)" oninput="calcProp()"><input type="number" class="di-input" value="12000" style="width:70px;text-align:right" oninput="calcProp()"><i class="ti ti-x di-del" onclick="this.parentElement.remove();calcProp()"></i></div>
+              <div class="dyn-item"><div class="di-icon"><i class="ti ti-palette"></i></div><input type="text" class="di-input" value="UI/UX Design" oninput="calcTotal()"><input type="number" class="di-input" value="18000" style="width:70px;text-align:right" oninput="calcTotal()"><i class="ti ti-x di-del" onclick="this.parentElement.remove();calcTotal()"></i></div>
+              <div class="dyn-item"><div class="di-icon"><i class="ti ti-code"></i></div><input type="text" class="di-input" value="Development" oninput="calcTotal()"><input type="number" class="di-input" value="50000" style="width:70px;text-align:right" oninput="calcTotal()"><i class="ti ti-x di-del" onclick="this.parentElement.remove();calcTotal()"></i></div>
+              <div class="dyn-item"><div class="di-icon"><i class="ti ti-headset"></i></div><input type="text" class="di-input" value="Support (3 mo)" oninput="calcTotal()"><input type="number" class="di-input" value="12000" style="width:70px;text-align:right" oninput="calcTotal()"><i class="ti ti-x di-del" onclick="this.parentElement.remove();calcTotal()"></i></div>
             </div>
             <button class="add-dyn-btn" onclick="addPropPrice()"><i class="ti ti-plus" style="font-size:12px"></i>Add Item</button>
             <div class="form-row" style="margin-top:8px">
-              <div class="fg"><label class="fl">GST %</label><input class="fi" type="number" id="f-prop-gst" value="18" oninput="calcProp()"></div>
-              <div class="fg"><label class="fl">Discount %</label><input class="fi" type="number" id="f-prop-disc" value="0" oninput="calcProp()"></div>
+              <div class="fg"><label class="fl">GST %</label><input class="fi" type="number" id="f-prop-gst" value="18" oninput="calcTotal()"></div>
+              <div class="fg"><label class="fl">Discount %</label><input class="fi" type="number" id="f-prop-disc" value="0" oninput="calcTotal()"></div>
             </div>
+
+            <div class="total-box" style="margin-top:10px">
+              <div class="total-row" style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span>Subtotal</span><span id="propSub">₹0</span></div>
+              <div class="grand-box" style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--teal);border-radius:6px;color:#fff;font-weight:bold;font-size:12px;margin-top:6px"><span>Total Investment</span><span id="propGrand">₹0</span></div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -952,7 +1230,422 @@ body{display:flex}
         </div>
 
         <!-- PAYMENT DETAILS -->
-        <div class="acc-item">
+        
+          <!-- ITEMS TABLE (dynamic) -->
+          <div class="acc-item">
+            <div class="acc-hdr" onclick="toggleAcc(this)">
+              <div class="acc-icon" style="background:#FFF3E0;color:#F57C00"><i class="ti ti-list-details"></i></div>
+              <div class="acc-title">Invoice Items</div>
+              <i class="ti ti-chevron-up acc-arrow open"></i>
+            </div>
+            <div class="acc-body open">
+              <table class="items-table">
+            <thead>
+              <tr>
+                <th style="width:36%">Description</th>
+                <th style="width:12%">Qty</th>
+                <th style="width:18%">Unit Price</th>
+                <th style="width:14%">Tax %</th>
+                <th style="width:16%;text-align:right">Total</th>
+                <th style="width:4%"></th>
+              </tr>
+            </thead>
+            <tbody id="td-inv-itemsBody">
+              <tr>
+                <td><input type="text" class="item-input desc" placeholder="e.g. Website Design" value="UI/UX Design" oninput="invCalcTotals()"></td>
+                <td><input type="number" class="item-input num" value="1" min="1" oninput="invCalcTotals()"></td>
+                <td><input type="number" class="item-input num" value="20000" oninput="invCalcTotals()" style="width:90px"></td>
+                <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="invCalcTotals()" style="width:55px"></td>
+                <td class="item-total" id="total_0">₹23,600</td>
+                <td><button class="del-row-btn" onclick="invRemoveRow(this)"><i class="ti ti-trash"></i></button></td>
+              </tr>
+              <tr>
+                <td><input type="text" class="item-input desc" placeholder="e.g. Frontend Development" value="Frontend Development" oninput="invCalcTotals()"></td>
+                <td><input type="number" class="item-input num" value="1" min="1" oninput="invCalcTotals()"></td>
+                <td><input type="number" class="item-input num" value="30000" oninput="invCalcTotals()" style="width:90px"></td>
+                <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="invCalcTotals()" style="width:55px"></td>
+                <td class="item-total" id="total_1">₹35,400</td>
+                <td><button class="del-row-btn" onclick="invRemoveRow(this)"><i class="ti ti-trash"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button class="add-item-btn" onclick="invAddRow()"><i class="ti ti-plus" style="font-size:14px"></i> Add Line Item</button>
+
+          <!-- TOTALS -->
+          <div class="totals-section">
+            <div class="form-row" style="margin-bottom:10px">
+              <div class="form-group">
+                <label class="form-label">Discount (%)</label>
+                <input class="form-input" type="number" id="discountPct" placeholder="0" value="0" min="0" max="100" oninput="invCalcTotals()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Shipping / Extra Charges</label>
+                <input class="form-input" type="number" id="extraCharges" placeholder="0" value="0" oninput="invCalcTotals()">
+              </div>
+            </div>
+            <div class="total-row"><span class="total-label">Subtotal</span><span class="total-val" id="subtotalVal">₹50,000</span></div>
+            <div class="total-row discount"><span class="total-label">Discount</span><span class="total-val" id="discountVal">- ₹0</span></div>
+            <div class="total-row tax"><span class="total-label">GST / Tax</span><span class="total-val" id="taxVal">+ ₹9,000</span></div>
+            <div class="total-row"><span class="total-label">Extra Charges</span><span class="total-val" id="extraVal">+ ₹0</span></div>
+            <div class="total-row grand"><span class="total-label">Total Amount</span><span class="total-val" id="grandTotal">₹59,000</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYMENT TERMS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-clock"></i></div>
+          <div class="card-title">Payment Terms & Bank Details</div>
+        </div>
+        <div class="card-body">
+          <label class="form-label">Payment Due</label>
+          <div class="payment-terms-grid">
+            <div class="pt-opt selected" onclick="selectTerm(this,'Immediate')">
+              <div class="pt-opt-days">NOW</div>
+              <div class="pt-opt-label">Immediate</div>
+            </div>
+            <div class="pt-opt" onclick="selectTerm(this,'Net 7')">
+              <div class="pt-opt-days">7</div>
+              <div class="pt-opt-label">Net 7 days</div>
+            </div>
+            <div class="pt-opt" onclick="selectTerm(this,'Net 15')">
+              <div class="pt-opt-days">15</div>
+              <div class="pt-opt-label">Net 15 days</div>
+            </div>
+            <div class="pt-opt" onclick="selectTerm(this,'Net 30')">
+              <div class="pt-opt-days">30</div>
+              <div class="pt-opt-label">Net 30 days</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select class="form-select">
+                <option>Bank Transfer / NEFT</option>
+                <option>UPI</option>
+                <option>Cheque</option>
+                <option>Cash</option>
+                <option>Online Payment Link</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Currency</label>
+              <select class="form-select">
+                <option>₹ INR – Indian Rupee</option>
+                <option>$ USD – US Dollar</option>
+                <option>€ EUR – Euro</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Bank Name</label>
+              <input class="form-input" type="text" placeholder="e.g. HDFC Bank" value="HDFC Bank">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account Number</label>
+              <input class="form-input" type="text" placeholder="Account number" value="5020123456789">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">IFSC Code</label>
+              <input class="form-input" type="text" placeholder="IFSC code" value="HDFC0001234">
+            </div>
+            <div class="form-group">
+              <label class="form-label">UPI ID</label>
+              <input class="form-input" type="text" placeholder="your@upi" value="yencode@okaxis">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES & SIGNATURE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-notes"></i></div>
+          <div class="card-title">Notes, Terms & Signature</div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Invoice Notes</label>
+            <textarea class="form-textarea" id="invNotes" oninput="updatePreview()">Thank you for your business! Please make payment within the due date.
+For queries contact: yencodetechnologies@gmail.com</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Terms & Conditions</label>
+            <textarea class="form-textarea" id="invTerms">1. Payment is due within the agreed terms.
+2. Late payments are subject to 2% monthly interest.
+3. All disputes subject to Chennai jurisdiction.</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Authorised Signature</label>
+            <div class="sig-pad" onclick="this.innerHTML='<i class=\'ti ti-check\' style=\'font-size:22px;color:var(--teal)\'></i><div style=\'font-size:11px;color:var(--teal);font-weight:700;margin-top:4px\'>Signature Added</div>'">
+              <i class="ti ti-signature" style="font-size:24px;color:var(--text3)"></i>
+              <div style="font-size:11px;color:var(--text3);font-weight:600">Click to add signature</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── PREVIEW SIDE ── -->
+    <div class="preview-side">
+      <div class="preview-card">
+        <div class="preview-toolbar">
+          <div class="pt-title">📄 Live Preview</div>
+          <div class="pt-actions">
+            <button class="pt-btn"><i class="ti ti-download" style="font-size:12px"></i> PDF</button>
+            <button class="pt-btn"><i class="ti ti-printer" style="font-size:12px"></i> Print</button>
+          </div>
+        </div>
+
+        <!-- LIVE INVOICE PREVIEW -->
+        <div class="invoice-preview" id="invoicePreview">
+
+          <!-- HEADER -->
+          <div class="inv-header">
+            <div class="inv-logo-area">
+              <div class="inv-logo-box">YT</div>
+              <div class="inv-company-name" id="pFromCompany">YENCODE Technologies</div>
+              <div class="inv-company-details" id="pFromDetails">
+                yencodetechnologies@gmail.com<br>
+                +91 89254 33533<br>
+                Chennai, Tamil Nadu, India
+              </div>
+            </div>
+            <div class="inv-title-area">
+              <div class="inv-title-word">INVOICE</div>
+              <div class="inv-id" id="pInvNumber">#INV-2026-1262</div>
+              <div class="inv-dates">
+                <span id="pInvDate">Issue: 01 Jun 2026</span><br>
+                <span id="pDueDate">Due: 15 Jun 2026</span>
+              </div>
+              <div class="inv-status draft" id="pStatus">DRAFT</div>
+            </div>
+          </div>
+
+          <!-- PARTIES -->
+          <div class="inv-parties">
+            <div>
+              <div class="inv-party-label">From</div>
+              <div class="inv-party-name" id="pFromName">YENCODE Technologies</div>
+              <div class="inv-party-detail" id="pFromDetail2">
+                GST: 33ABCDE1234F1Z5<br>
+                Chennai, Tamil Nadu, India
+              </div>
+            </div>
+            <div>
+              <div class="inv-party-label">Bill To</div>
+              <div class="inv-party-name" id="pToName" style="color:var(--text3)">— Client Name —</div>
+              <div class="inv-party-detail" id="pToDetail">
+                <span style="color:var(--text3)">Enter client details in the form</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ITEMS TABLE -->
+          <table class="inv-items-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Tax</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="previewItems">
+              <tr>
+                <td>1</td>
+                <td>UI/UX Design</td>
+                <td>1</td>
+                <td>₹20,000</td>
+                <td>18%</td>
+                <td>₹23,600</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Frontend Development</td>
+                <td>1</td>
+                <td>₹30,000</td>
+                <td>18%</td>
+                <td>₹35,400</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- TOTALS -->
+          <div class="inv-totals">
+            <div class="inv-total-row"><span class="lbl">Subtotal</span><span class="val" id="pSubtotal">₹50,000</span></div>
+            <div class="inv-total-row"><span class="lbl">GST (18%)</span><span class="val" id="pTax">₹9,000</span></div>
+            <div class="inv-total-row" id="pDiscountRow" style="display:none"><span class="lbl">Discount</span><span class="val" id="pDiscount" style="color:var(--green)">-₹0</span></div>
+            <div class="inv-grand-row"><span class="lbl">Total Due</span><span class="val" id="pGrand">₹59,000</span></div>
+          </div>
+
+          <!-- BANK -->
+          <div class="inv-bank">
+            <div class="inv-bank-title">Payment Details</div>
+            <div class="inv-bank-detail">
+              Bank: HDFC Bank &nbsp;|&nbsp; A/C: 5020123456789 &nbsp;|&nbsp; IFSC: HDFC0001234<br>
+              UPI: yencode@okaxis
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="inv-footer">
+            <div class="inv-notes">
+              <div class="inv-notes-title">Notes</div>
+              <div class="inv-notes-text" id="pNotes">Thank you for your business! Please make payment within the due date.</div>
+            </div>
+            <div class="inv-sig">
+              <div class="inv-sig-line"></div>
+              <div class="inv-sig-name">Prabhu R</div>
+              <div class="inv-sig-role">YENCODE Technologies</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let rowCount=2;
+
+function fmt(n){return'₹'+Number(n).toLocaleString('en-IN')}
+
+function calcTotals(){
+  const rows=document.querySelectorAll('#itemsBody tr');
+  let subtotal=0,tax=0;
+  const previewBody=document.getElementById('previewItems');
+  previewBody.innerHTML='';
+  rows.forEach((r,i)=>{
+    const inputs=r.querySelectorAll('.item-input');
+    const desc=inputs[0].value||'—';
+    const qty=parseFloat(inputs[1].value)||0;
+    const price=parseFloat(inputs[2].value)||0;
+    const taxPct=parseFloat(inputs[3].value)||0;
+    const lineBase=qty*price;
+    const lineTax=lineBase*taxPct/100;
+    const lineTotal=lineBase+lineTax;
+    subtotal+=lineBase;
+    tax+=lineTax;
+    if(r.querySelector('.item-total'))r.querySelector('.item-total').textContent=fmt(lineTotal);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${desc}</td><td>${qty}</td><td>${fmt(price)}</td><td>${taxPct}%</td><td>${fmt(lineTotal)}</td>`;
+    previewBody.appendChild(tr);
+  });
+  const discPct=parseFloat(document.getElementById('discountPct').value)||0;
+  const extra=parseFloat(document.getElementById('extraCharges').value)||0;
+  const discount=subtotal*discPct/100;
+  const grand=subtotal-discount+tax+extra;
+  document.getElementById('subtotalVal').textContent=fmt(subtotal);
+  document.getElementById('discountVal').textContent='- '+fmt(discount);
+  document.getElementById('taxVal').textContent='+ '+fmt(tax);
+  document.getElementById('extraVal').textContent='+ '+fmt(extra);
+  document.getElementById('propGrand').textContent=fmt(grand);
+  // Preview
+  document.getElementById('pSubtotal').textContent=fmt(subtotal);
+  document.getElementById('pTax').textContent=fmt(tax);
+  document.getElementById('pGrand').textContent=fmt(grand);
+  const discRow=document.getElementById('pDiscountRow');
+  if(discount>0){discRow.style.display='flex';document.getElementById('pDiscount').textContent='-'+fmt(discount);}else{discRow.style.display='none';}
+}
+
+function addRow(){
+  const tbody=document.getElementById('itemsBody');
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input type="text" class="item-input desc" placeholder="Item description" oninput="invCalcTotals()"></td>
+    <td><input type="number" class="item-input num" value="1" min="1" oninput="invCalcTotals()"></td>
+    <td><input type="number" class="item-input num" value="0" oninput="invCalcTotals()" style="width:90px"></td>
+    <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="invCalcTotals()" style="width:55px"></td>
+    <td class="item-total" id="total_${rowCount}">₹0</td>
+    <td><button class="del-row-btn" onclick="invRemoveRow(this)"><i class="ti ti-trash"></i></button></td>`;
+  tbody.appendChild(tr);
+  rowCount++;
+  calcTotals();
+}
+
+function removeRow(btn){
+  const rows=document.querySelectorAll('#itemsBody tr');
+  if(rows.length<=1)return;
+  btn.closest('tr').remove();
+  calcTotals();
+}
+
+function updatePreview(){
+  const fc=document.getElementById('fromCompany').value;
+  const fe=document.getElementById('fromEmail').value;
+  const fp=document.getElementById('fromPhone').value;
+  const fa=document.getElementById('fromAddress').value;
+  const fg=document.getElementById('fromGST').value;
+  document.getElementById('pFromCompany').textContent=fc||'Your Company';
+  document.getElementById('pFromName').textContent=fc||'Your Company';
+  document.getElementById('pFromDetails').innerHTML=`${fe}<br>${fp}<br>${fa}`;
+  document.getElementById('pFromDetail2').innerHTML=`GST: ${fg}<br>${fa}`;
+  const tn=document.getElementById('toName').value;
+  const te=window._tdv('f-prop-cemail');
+  const tp=window._tdv('f-prop-cphone');
+  const ta=document.getElementById('toAddress').value;
+  const tg=document.getElementById('toGST').value;
+  document.getElementById('pToName').textContent=tn||'— Client Name —';
+  document.getElementById('pToName').style.color=tn?'var(--text)':'var(--text3)';
+  document.getElementById('pToDetail').innerHTML=tn?`${tg?'GST: '+tg+'<br>':''}${te?te+'<br>':''}${tp?tp+'<br>':''}${ta}`:'<span style="color:var(--text3)">Enter client details in the form</span>';
+  const id=document.getElementById('invNumber').value;
+  document.getElementById('pInvNumber').textContent='#'+id;
+  const d1=document.getElementById('invDate').value;
+  const d2=document.getElementById('dueDate').value;
+  if(d1)document.getElementById('pInvDate').textContent='Issue: '+new Date(d1).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  if(d2)document.getElementById('pDueDate').textContent='Due: '+new Date(d2).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const notes=document.getElementById('invNotes').value;
+  document.getElementById('pNotes').textContent=notes.split('\n')[0];
+}
+
+function selectTemplate(el){
+  document.querySelectorAll('.template-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectTerm(el,val){
+  document.querySelectorAll('.pt-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function saveDraft(){
+  const status=document.getElementById('pStatus');
+  status.textContent='DRAFT';
+  status.className='inv-status draft';
+  alert('Invoice saved as draft!');
+}
+
+function sendInvoice(){
+  const tn=document.getElementById('toName').value;
+  if(!tn){alert('Please enter client name before sending.');document.getElementById('toName').focus();return;}
+  const status=document.getElementById('pStatus');
+  status.textContent='SENT';
+  status.className='inv-status sent';
+  alert('Invoice sent successfully to '+tn+'!');
+}
+
+// Init
+calcTotals();
+updatePreview();
+</script>
+</body>
+</html>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                <div class="fg"><label class="fl">Discount %</label><input class="fi" type="number" id="f-inv-disc" value="0" oninput="invCalcTotals()"></div>
+                <div class="fg"><label class="fl">Extra Charges</label><input class="fi" type="number" id="f-inv-extra" value="0" oninput="invCalcTotals()"></div>
+              </div>
+            </div>
+          </div>
+<div class="acc-item">
           <div class="acc-hdr" onclick="toggleAcc(this)">
             <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-credit-card"></i></div>
             <div class="acc-title">Payment & Bank Details</div>
@@ -1440,22 +2133,7 @@ function renderQuo() {
   setTimeout(() => calcQuo(), 10);
 }
 
-// ── PROPOSAL ──
-function calcProp() {
-  const rows = document.querySelectorAll('#propPricing .dyn-item');
-  let sub = 0; let rowHtml = '';
-  rows.forEach(r => {
-    const inps = r.querySelectorAll('input');
-    if (inps.length >= 2) { const n = inps[0].value||'Item', val = parseFloat(inps[1].value)||0; sub += val; rowHtml += `<tr><td>${n}</td><td>${fmt(val)}</td></tr>`; }
-  });
-  const gst = parseFloat(v('f-prop-gst'))||0;
-  const disc = parseFloat(v('f-prop-disc'))||0;
-  const discount = sub*disc/100, tax = sub*gst/100, grand = sub-discount+tax;
-  const pr = document.getElementById('propPricingRows');
-  const g = document.getElementById('propGrand');
-  if (pr) pr.innerHTML = rowHtml;
-  if (g) g.textContent = fmt(grand);
-}
+// calcTotal() replaced by propUp()
 
 function renderProp() {
   const co = v('f-company') || 'YENCODE Technologies';
@@ -1503,45 +2181,209 @@ function renderProp() {
     </div>`;
   }
 
-  document.getElementById('docHeaderZone').innerHTML = coverHtml;
-
-  // DELIVERABLES
-  const delEls = document.querySelectorAll('#propDels .dyn-item input[type=text]');
-  let delHtml = '';
-  delEls.forEach(d => { if (d.value) delHtml += `<div class="prop-del-item" style="color:${color};">${d.value}</div>`; });
-
-  // MILESTONES
-  const msEls = document.querySelectorAll('#propMs .fg');
-  let msHtml = '';
-  msEls.forEach((m, i) => {
-    const inps = m.querySelectorAll('input');
-    if (!inps[0] || !inps[0].value) return;
-    const isLast = i === msEls.length - 1;
-    msHtml += `<div class="tlp"><div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0"><div class="tlp-dot" style="background:${color}">${i+1}</div>${!isLast?`<div class="tlp-line" style="background:${h2r(color,.2)}"></div>`:''}</div><div style="padding-top:1px"><div class="tlp-title">${inps[0].value}</div>${inps[1]&&inps[1].value?`<div class="tlp-date" style="color:${color}">${fmtDate(inps[1].value)}</div>`:''}</div></div>`;
-  });
-
-  const prob = v('f-prop-prob'), sol = v('f-prop-sol');
-
-  document.getElementById('docBodyZone').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-      <div style="padding:10px 12px;background:#F8FAFB;border-radius:8px;border:1px solid #E0EEF0"><div style="font-size:8px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Prepared By</div><div style="font-size:12px;font-weight:800">${co}</div><div style="margin-top:2px">${contactBlock('#607D86')}</div></div>
-      <div style="padding:10px 12px;background:#F8FAFB;border-radius:8px;border:1px solid #E0EEF0"><div style="font-size:8px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Prepared For</div><div style="font-size:12px;font-weight:800;${!client?'color:#A0B8BE':''}">${client||'— Client —'}</div></div>
-    </div>
-    ${prob||sol?`<div style="margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Executive Summary</div>${prob?`<div style="padding:9px 11px;border-radius:8px;border-left:3px solid ${color};background:${h2r(color,.06)};margin-bottom:7px"><div style="font-size:8px;font-weight:700;color:${color};margin-bottom:2px">CHALLENGE</div><div style="font-size:10.5px;color:#607D86">${prob}</div></div>`:''}${sol?`<div style="padding:9px 11px;border-radius:8px;border-left:3px solid #26C281;background:#E8FAF3;margin-bottom:7px"><div style="font-size:8px;font-weight:700;color:#26C281;margin-bottom:2px">SOLUTION</div><div style="font-size:10.5px;color:#607D86">${sol}</div></div>`:''}</div>`:''}
-    ${delHtml?`<div style="margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Scope & Deliverables</div><div class="prop-del-list">${delHtml}</div></div>`:''}
-    ${msHtml?`<div style="margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Project Timeline</div><div class="tl-preview">${msHtml}</div></div>`:''}
-    <div style="margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px">Investment</div>
-      <table class="pricing-tbl"><thead><tr style="background:${color}"><th>Service</th><th>Amount</th></tr></thead><tbody id="propPricingRows"></tbody></table>
-      <div style="display:flex;justify-content:space-between;padding:7px 10px;background:${color};border-radius:7px;margin-top:6px"><span style="font-size:10.5px;font-weight:800;color:#fff">Total Investment</span><span id="propGrand" style="font-size:13px;font-weight:900;color:#fff">₹0</span></div>
-    </div>
-    <div style="padding-top:14px;border-top:1px solid #E0EEF0">
-      <div class="signoff-grid">
-        <div class="sob"><div class="sob-line" style="background:${color}"></div><div class="sob-name">Sign</div><div class="sob-role">${co}</div></div>
-        <div class="sob"><div class="sob-line"></div><div class="sob-name" ${!client?'style=\"color:#A0B8BE\"':''}>${client||'— Client —'}</div><div class="sob-role">Authorised Signatory</div></div>
-      </div>
-    </div>`;
+  
+  document.getElementById('docHeaderZone').innerHTML = '';
   document.getElementById('docFooterZone').innerHTML = '';
-  setTimeout(() => calcProp(), 10);
+  document.getElementById('docBodyZone').innerHTML = `<div class="prop-doc">
+
+        <!-- COVER -->
+        <div class="p-cover">
+          <div class="p-logo">YT</div>
+          <div class="p-label">Project Proposal</div>
+          <div class="p-title" id="pv-title">— Proposal Title —</div>
+          <div class="p-subtitle" id="pv-sub">Prepared by YENCODE Technologies</div>
+          <div class="p-meta">
+            <div class="p-meta-i"><i class="ti ti-calendar" style="font-size:11px"></i><span id="pv-date">01 Jun 2026</span></div>
+            <div class="p-meta-i"><i class="ti ti-tag" style="font-size:11px"></i><span id="pv-type">Web Development</span></div>
+            <div class="p-meta-i"><i class="ti ti-clock" style="font-size:11px"></i><span id="pv-expiry">Expires 01 Jul 2026</span></div>
+          </div>
+          <div class="p-badge" id="pv-status">DRAFT</div>
+        </div>
+
+        <!-- PARTIES -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-building"></i>Parties</div>
+          <div class="party-grid">
+            <div class="party-b">
+              <div class="pb-lbl">Prepared By</div>
+              <div class="pb-name" id="pv-from">Prabhu R</div>
+              <div class="pb-detail" id="pv-from-d">YENCODE Technologies<br>yencodetechnologies@gmail.com</div>
+            </div>
+            <div class="party-b">
+              <div class="pb-lbl">Prepared For</div>
+              <div class="pb-name" id="pv-to" style="color:var(--text3)">— Client —</div>
+              <div class="pb-detail" id="pv-to-d"><span style="color:var(--text3)">Fill in client details</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXEC SUMMARY -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-align-left"></i>Executive Summary</div>
+          <div class="exec-block problem">
+            <div class="eb-lbl">Problem</div>
+            <div class="eb-text" id="pv-problem"><span style="color:var(--text3);font-style:italic">Describe the client's challenge…</span></div>
+          </div>
+          <div class="exec-block solution" style="margin-top:6px">
+            <div class="eb-lbl">Solution</div>
+            <div class="eb-text" id="pv-solution"><span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span></div>
+          </div>
+          <div class="exec-block whyus" style="margin-top:6px" id="pv-outcome-block">
+            <div class="eb-lbl">Expected Outcome</div>
+            <div class="eb-text" id="pv-outcome"><span style="color:var(--text3);font-style:italic">Describe expected results…</span></div>
+          </div>
+        </div>
+
+        <!-- DELIVERABLES -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-checklist"></i>Scope & Deliverables</div>
+          <div class="del-list" id="pv-del">
+            <div class="del-item-p">Fully responsive website (8 pages)</div>
+            <div class="del-item-p">Custom UI/UX design + brand guide</div>
+            <div class="del-item-p">CMS for easy content management</div>
+            <div class="del-item-p">SEO optimisation + Google Analytics</div>
+            <div class="del-item-p">3-month post-launch support</div>
+          </div>
+        </div>
+
+        <!-- TIMELINE -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-calendar-stats"></i>Project Timeline</div>
+          <div style="display:flex;gap:12px;margin-bottom:8px">
+            <span style="font-size:10px;font-weight:700;color:var(--text2)">Start: <span id="pv-start" style="color:var(--teal)">01 Jul 2026</span></span>
+            <span style="font-size:10px;font-weight:700;color:var(--text2)">End: <span id="pv-end" style="color:var(--teal)">31 Oct 2026</span></span>
+            <span style="font-size:10px;font-weight:700;color:var(--text2)">Duration: <span id="pv-dur" style="color:var(--teal)">4 Months</span></span>
+          </div>
+          <div class="tl-p" id="pv-timeline"></div>
+        </div>
+
+        <!-- TEAM (optional) -->
+        <div class="ps" id="pv-sec-team">
+          <div class="ps-lbl"><i class="ti ti-users"></i>Our Team</div>
+          <div class="team-p" id="pv-team"></div>
+        </div>
+
+        <!-- VALUE (optional) -->
+        <div class="ps" id="pv-sec-value">
+          <div class="ps-lbl"><i class="ti ti-trending-up"></i>Value Proposition & ROI</div>
+          <div class="val-p" id="pv-value"></div>
+        </div>
+
+        <!-- CASE STUDIES (optional) -->
+        <div class="ps" id="pv-sec-cs" style="display:none">
+          <div class="ps-lbl"><i class="ti ti-trophy"></i>Past Work & Case Studies</div>
+          <div id="pv-cs"></div>
+        </div>
+
+        <!-- TESTIMONIALS (optional) -->
+        <div class="ps" id="pv-sec-tm" style="display:none">
+          <div class="ps-lbl"><i class="ti ti-quote"></i>Client Testimonials</div>
+          <div id="pv-tm"></div>
+        </div>
+
+        <!-- RISKS (optional) -->
+        <div class="ps" id="pv-sec-risks">
+          <div class="ps-lbl"><i class="ti ti-shield-exclamation"></i>Risks & Mitigation</div>
+          <div class="risk-p" id="pv-risks"></div>
+        </div>
+
+
+        <!-- OUR TEAM (PORTED) -->
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            <div class="acc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-users"></i></div>
+            <div class="acc-title">Team Members</div>
+            <i class="ti ti-chevron-up acc-arrow"></i>
+          </div>
+          <div class="acc-body" style="display:none">
+            <div id="td-teamList" class="dyn-items">
+              <div class="team-card">
+                <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">PR</div>
+                <div style="flex:1;min-width:0">
+                  <div class="tc-name">Prabhu R</div>
+                  <div class="tc-role">Lead Developer & Project Manager</div>
+                  <div class="tc-exp">8+ years · Web & Mobile Applications</div>
+                  <div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span></div>
+                </div>
+                <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>
+              </div>
+            </div>
+            <button class="add-dyn-btn" onclick="addTeamMember()"><i class="ti ti-plus" style="font-size:12px"></i>Add Member</button>
+          </div>
+        </div>
+
+        <!-- VALUE PROPOSITION (PORTED) -->
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            <div class="acc-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
+            <div class="acc-title">Value Propositions</div>
+            <i class="ti ti-chevron-up acc-arrow"></i>
+          </div>
+          <div class="acc-body" style="display:none">
+            <div id="td-valueList" class="dyn-items">
+              <div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div><input type="text" class="dv-input" value="300% increase in organic traffic within 6 months" oninput="propUp()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();propUp()"></i></div>
+            </div>
+            <button class="add-dyn-btn" onclick="addValue()"><i class="ti ti-plus" style="font-size:12px"></i>Add Point</button>
+          </div>
+        </div>
+
+        <!-- RISKS & MITIGATION (PORTED) -->
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            <div class="acc-icon" style="background:var(--red-bg);color:var(--red)"><i class="ti ti-shield-exclamation"></i></div>
+            <div class="acc-title">Risks & Mitigation</div>
+            <i class="ti ti-chevron-up acc-arrow"></i>
+          </div>
+          <div class="acc-body" style="display:none">
+            <div id="td-riskList" class="dyn-items">
+              <div class="risk-row-g">
+                <input type="text" class="pr-inp" value="Scope creep beyond deliverables" oninput="propUp()">
+                <select class="pr-inp" style="padding:7px 8px;font-size:11px" onchange="propUp()"><option>High</option><option selected>Medium</option><option>Low</option></select>
+                <input type="text" class="pr-inp" value="Formal change request process" oninput="propUp()">
+                <button class="pr-del" onclick="this.closest('.risk-row-g').remove();propUp()"><i class="ti ti-trash"></i></button>
+              </div>
+            </div>
+            <button class="add-dyn-btn" onclick="addRisk()"><i class="ti ti-plus" style="font-size:12px"></i>Add Risk</button>
+          </div>
+        </div>
+
+        <!-- PRICING -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-currency-rupee"></i>Investment</div>
+          <table class="pricing-tbl">
+            <thead><tr><th>Service</th><th>Amount</th></tr></thead>
+            <tbody id="pv-pricing"></tbody>
+          </table>
+          <div class="pricing-grand" style="margin-top:7px"><span>Total Investment</span><span id="pv-grand">₹1,12,100</span></div>
+          <div style="margin-top:6px;font-size:10px;color:var(--text2);font-weight:600" id="pv-pay">Payment: 50% advance, 50% on delivery</div>
+        </div>
+
+        <!-- CLOSING -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-writing"></i>Closing</div>
+          <div id="pv-closing" style="font-size:10px;color:var(--text2);line-height:1.7">We are excited about the opportunity to work with you…</div>
+        </div>
+
+        <!-- SIGN OFF -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-signature"></i>Sign-off</div>
+          <div class="sop">
+            <div class="sob">
+              <div class="sob-line"></div>
+              <div class="sob-name" id="pv-sig1">Prabhu R</div>
+              <div class="sob-role">YENCODE Technologies</div>
+            </div>
+            <div class="sob">
+              <div class="sob-line" style="background:var(--amber)"></div>
+              <div class="sob-name" id="pv-sig2" style="color:var(--text3)">— Client —</div>
+              <div class="sob-role" id="pv-sig2-role">Awaiting</div>
+            </div>
+          </div>
+        </div>
+
+      </div>`;
+  setTimeout(() => { propUp(); }, 30);
+  // calcTotal now handled by propUp
 }
 
 // ── QUOTATION ITEMS ──
@@ -1595,10 +2437,10 @@ function addPropPrice() {
   const c = document.getElementById('propPricing');
   const d = document.createElement('div');
   d.className = 'dyn-item';
-  d.innerHTML = `<div class="di-icon"><i class="ti ti-tag"></i></div><input type="text" class="di-input" placeholder="Service…" oninput="calcProp()"><input type="number" class="di-input" value="0" style="width:70px;text-align:right" oninput="calcProp()"><i class="ti ti-x di-del" onclick="this.parentElement.remove();calcProp()"></i>`;
+  d.innerHTML = `<div class="di-icon"><i class="ti ti-tag"></i></div><input type="text" class="di-input" placeholder="Service…" oninput="calcTotal()"><input type="number" class="di-input" value="0" style="width:70px;text-align:right" oninput="calcTotal()"><i class="ti ti-x di-del" onclick="this.parentElement.remove();calcTotal()"></i>`;
   c.appendChild(d);
   d.querySelector('input').focus();
-  calcProp();
+  calcTotal();
 }
 
 // ── EDITOR ──
@@ -1869,74 +2711,118 @@ function renderInv() {
     </div>`;
   }
 
-  document.getElementById('docHeaderZone').innerHTML = hdr;
+  
+  
+  document.getElementById('docHeaderZone').innerHTML = '';
+  document.getElementById('docFooterZone').innerHTML = '';
+  document.getElementById('docBodyZone').innerHTML = `<div class="invoice-preview">
 
-  // BODY
-  document.getElementById('docBodyZone').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
-      <div style="padding:10px 12px;background:#F8FAFB;border-radius:8px;border:1px solid #E0EEF0">
-        <div style="font-size:8px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">From</div>
-        <div style="font-size:12px;font-weight:800;color:#1A2E35">${co}</div>
-        <div style="margin-top:2px">${contactBlock('#607D86')}</div>
-      </div>
-      <div style="padding:10px 12px;background:#F8FAFB;border-radius:8px;border:1px solid #E0EEF0">
-        <div style="font-size:8px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Bill To</div>
-        <div style="font-size:12px;font-weight:800;color:${client?'#1A2E35':'#A0B8BE'}">${client||'— Client Name —'}</div>
-        <div style="font-size:10px;color:#607D86;line-height:1.8;margin-top:2px">
-          ${cgst?'GST: '+cgst+'<br>':''}${cemail?cemail+'<br>':''}${cphone?cphone+'<br>':''}${caddr||''}
-        </div>
-      </div>
-    </div>
+          <!-- HEADER -->
+          <div class="inv-header">
+            <div class="inv-logo-area">
+              <div class="inv-logo-box">YT</div>
+              <div class="inv-company-name" id="pInvFromComp">YENCODE Technologies</div>
+              <div class="inv-company-details" id="pInvFromDet">
+                yencodetechnologies@gmail.com<br>
+                +91 89254 33533<br>
+                Chennai, Tamil Nadu, India
+              </div>
+            </div>
+            <div class="inv-title-area">
+              <div class="inv-title-word">INVOICE</div>
+              <div class="inv-id" id="pInvNum">#INV-2026-1262</div>
+              <div class="inv-dates">
+                <span id="pInvDate">Issue: 01 Jun 2026</span><br>
+                <span id="pInvDue">Due: 15 Jun 2026</span>
+              </div>
+              <div class="inv-status draft" id="pInvStatus">DRAFT</div>
+            </div>
+          </div>
 
-    ${cat?`<div style="display:inline-flex;align-items:center;padding:4px 12px;background:${h2r(color,.1)};border-radius:20px;font-size:10px;font-weight:700;color:${color};margin-bottom:14px">${cat}</div>`:''}
+          <!-- PARTIES -->
+          <div class="inv-parties">
+            <div>
+              <div class="inv-party-label">From</div>
+              <div class="inv-party-name" id="pInvFromName">YENCODE Technologies</div>
+              <div class="inv-party-detail" id="pInvFromDet2">
+                GST: 33ABCDE1234F1Z5<br>
+                Chennai, Tamil Nadu, India
+              </div>
+            </div>
+            <div>
+              <div class="inv-party-label">Bill To</div>
+              <div class="inv-party-name" id="pInvToName" style="color:var(--text3)">— Client Name —</div>
+              <div class="inv-party-detail" id="pInvToDet">
+                <span style="color:var(--text3)">Enter client details in the form</span>
+              </div>
+            </div>
+          </div>
 
-    <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
-      <thead><tr style="background:${color}">
-        <th style="padding:7px 9px;font-size:10px;font-weight:700;color:#fff;text-align:left">#</th>
-        <th style="padding:7px 9px;font-size:10px;font-weight:700;color:#fff;text-align:left">Description</th>
-        <th style="padding:7px 9px;font-size:10px;font-weight:700;color:#fff;text-align:center">Qty</th>
-        <th style="padding:7px 9px;font-size:10px;font-weight:700;color:#fff;text-align:right">Unit Price</th>
-        <th style="padding:7px 9px;font-size:10px;font-weight:700;color:#fff;text-align:right">Total</th>
-      </tr></thead>
-      <tbody id="invItemRows"></tbody>
-    </table>
+          <!-- ITEMS TABLE -->
+          <table class="inv-items-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Tax</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="invItemRows">
+              <tr>
+                <td>1</td>
+                <td>UI/UX Design</td>
+                <td>1</td>
+                <td>₹20,000</td>
+                <td>18%</td>
+                <td>₹23,600</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Frontend Development</td>
+                <td>1</td>
+                <td>₹30,000</td>
+                <td>18%</td>
+                <td>₹35,400</td>
+              </tr>
+            </tbody>
+          </table>
 
-    <div style="margin-left:auto;width:210px">
-      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #E0EEF0"><span style="color:#607D86">Subtotal</span><span id="invSub" style="font-weight:700">₹0</span></div>
-      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #E0EEF0"><span style="color:${color}">GST (${v('f-inv-gst')||0}%)</span><span id="invTax" style="font-weight:700;color:${color}">₹0</span></div>
-      <div id="invDiscRow" style="display:none;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #E0EEF0"><span style="color:#26C281">Discount</span><span id="invDisc" style="font-weight:700;color:#26C281">-₹0</span></div>
-      <div style="display:flex;justify-content:space-between;padding:8px 10px;background:${color};border-radius:7px;margin-top:6px"><span style="font-size:11px;font-weight:800;color:#fff">Total Due</span><span id="invGrand" style="font-size:14px;font-weight:900;color:#fff">₹0</span></div>
-    </div>
+          <!-- TOTALS -->
+          <div class="inv-totals">
+            <div class="inv-total-row"><span class="lbl">Subtotal</span><span class="val" id="invSub">₹50,000</span></div>
+            <div class="inv-total-row"><span class="lbl">GST (18%)</span><span class="val" id="invTax">₹9,000</span></div>
+            <div class="inv-total-row" id="invDiscRow" style="display:none"><span class="lbl">Discount</span><span class="val" id="invDisc" style="color:var(--green)">-₹0</span></div>
+            <div class="inv-grand-row"><span class="lbl">Total Due</span><span class="val" id="invGrand">₹59,000</span></div>
+          </div>
 
-    ${(bank||acct||upi) ? `<div style="margin-top:16px;padding:10px 12px;background:${h2r(color,.06)};border-radius:8px;border-left:3px solid ${color}">
-      <div style="font-size:9px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Payment Details</div>
-      <div style="font-size:10px;color:#607D86;line-height:2">
-        ${bank?'<b>Bank:</b> '+bank+'&nbsp;&nbsp;':''} ${acct?'<b>A/C:</b> '+acct:''}${ifsc?'&nbsp;&nbsp;<b>IFSC:</b> '+ifsc:''}<br>
-        ${upi?'<b>UPI:</b> '+upi+'&nbsp;&nbsp;':''} ${terms?'<b>Terms:</b> '+terms:''}
-      </div>
-    </div>` : ''}
+          <!-- BANK -->
+          <div class="inv-bank">
+            <div class="inv-bank-title">Payment Details</div>
+            <div class="inv-bank-detail">
+              Bank: HDFC Bank &nbsp;|&nbsp; A/C: 5020123456789 &nbsp;|&nbsp; IFSC: HDFC0001234<br>
+              UPI: yencode@okaxis
+            </div>
+          </div>
 
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid #E0EEF0;display:flex;justify-content:space-between;align-items:flex-end">
-      <div style="font-size:10px;color:#A0B8BE;line-height:1.7;max-width:280px">
-        ${notes||'Thank you for your business!'}
-      </div>
-      <div style="text-align:right">
-        <div style="width:80px;height:1.5px;background:${color};margin:0 0 4px auto"></div>
-        <div style="font-size:11px;font-weight:800;color:#1A2E35">${v('f-sig')||'Sign'}</div>
-        <div style="font-size:9px;color:#A0B8BE">${co}</div>
-      </div>
-    </div>`;
+          <!-- FOOTER -->
+          <div class="inv-footer">
+            <div class="inv-notes">
+              <div class="inv-notes-title">Notes</div>
+              <div class="inv-notes-text" id="pInvNotes">Thank you for your business! Please make payment within the due date.</div>
+            </div>
+            <div class="inv-sig">
+              <div class="inv-sig-line"></div>
+              <div class="inv-sig-name">Prabhu R</div>
+              <div class="inv-sig-role">YENCODE Technologies</div>
+            </div>
+          </div>
 
-  // FOOTER
-  document.getElementById('docFooterZone').innerHTML = `
-    <div style="height:3px;background:${color}"></div>
-    <div style="padding:8px 40px;background:#F8FAFB;display:flex;justify-content:space-between;font-size:9px;color:#A0B8BE;border-top:1px solid #E0EEF0">
-      <span style="font-weight:700">${co}</span>
-      <span>${v('f-web')||v('f-email')}</span>
-      <span>${v('f-phone')}</span>
-    </div>`;
-
-  setTimeout(() => calcInv(), 10);
+        </div>`;
+  setTimeout(() => { invCalcTotals(); invUpdatePreview(); }, 30);
+  // calcInv now handled by invCalcTotals
 }
 
 function addInvItem() {
@@ -2308,6 +3194,497 @@ window.addEventListener('DOMContentLoaded', function() {
 applyHash();
 window.addEventListener('DOMContentLoaded', applyHash);
 window.addEventListener('hashchange', applyHash);
+
+
+// ── HELPER: get value from template-designer input by id ──
+window._tdv = function(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+};
+
+// ══════════════════════════════════════════
+
+// Global format helper used by proposal JS
+function fmtINR(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
+
+// INVOICE JS (from new_invoice_ui.html)
+// ══════════════════════════════════════════
+let invRowCount=2;
+
+function invFmt(n){return'₹'+Number(n).toLocaleString('en-IN')}
+
+function invCalcTotals(){
+  const rows=document.querySelectorAll('#itemsBody tr');
+  let subtotal=0,tax=0;
+  const previewBody=document.getElementById('invItemRows');
+  previewBody.innerHTML='';
+  rows.forEach((r,i)=>{
+    const inputs=r.querySelectorAll('.item-input');
+    const desc=inputs[0].value||'—';
+    const qty=parseFloat(inputs[1].value)||0;
+    const price=parseFloat(inputs[2].value)||0;
+    const taxPct=parseFloat(inputs[3].value)||0;
+    const lineBase=qty*price;
+    const lineTax=lineBase*taxPct/100;
+    const lineTotal=lineBase+lineTax;
+    subtotal+=lineBase;
+    tax+=lineTax;
+    if(r.querySelector('.item-total'))r.querySelector('.item-total').textContent=invFmt(lineTotal);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${desc}</td><td>${qty}</td><td>${invFmt(price)}</td><td>${taxPct}%</td><td>${invFmt(lineTotal)}</td>`;
+    previewBody.appendChild(tr);
+  });
+  const discPct=parseFloat(window._tdv('f-inv-disc'))||0;
+  const extra=parseFloat(document.getElementById('f-inv-extra').value)||0;
+  const discount=subtotal*discPct/100;
+  const grand=subtotal-discount+tax+extra;
+  document.getElementById('invSub').textContent=invFmt(subtotal);
+  document.getElementById('invDisc').textContent='- '+invFmt(discount);
+  document.getElementById('invTax').textContent='+ '+invFmt(tax);
+  document.getElementById('extraVal').textContent='+ '+invFmt(extra);
+  document.getElementById('invGrand').textContent=invFmt(grand);
+  // Preview
+  document.getElementById('invSub').textContent=invFmt(subtotal);
+  document.getElementById('invTax').textContent=invFmt(tax);
+  document.getElementById('invGrand').textContent=invFmt(grand);
+  const discRow=document.getElementById('invDiscRow');
+  if(discount>0){discRow.style.display='flex';document.getElementById('invDisc').textContent='-'+invFmt(discount);}else{discRow.style.display='none';}
+}
+
+function invAddRow(){
+  const tbody=document.getElementById('td-inv-itemsBody');
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input type="text" class="item-input desc" placeholder="Item description" oninput="invCalcTotals()"></td>
+    <td><input type="number" class="item-input num" value="1" min="1" oninput="invCalcTotals()"></td>
+    <td><input type="number" class="item-input num" value="0" oninput="invCalcTotals()" style="width:90px"></td>
+    <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="invCalcTotals()" style="width:55px"></td>
+    <td class="item-total" id="total_${invRowCount}">₹0</td>
+    <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>`;
+  tbody.appendChild(tr);
+  invRowCount++;
+  invCalcTotals();
+}
+
+function invRemoveRow(btn){
+  const rows=document.querySelectorAll('#itemsBody tr');
+  if(rows.length<=1)return;
+  btn.closest('tr').remove();
+  invCalcTotals();
+}
+
+function invUpdatePreview(){
+  const fc=window._tdv('f-company');
+  const fe=window._tdv('f-email');
+  const fp=window._tdv('f-phone');
+  const fa=window._tdv('f-addr');
+  const fg=window._tdv('f-gst');
+  document.getElementById('pInvFromComp').textContent=fc||'Your Company';
+  document.getElementById('pInvFromName').textContent=fc||'Your Company';
+  document.getElementById('pInvFromDet').innerHTML=`${fe}<br>${fp}<br>${fa}`;
+  document.getElementById('pInvFromDet2').innerHTML=`GST: ${fg}<br>${fa}`;
+  const tn=window._tdv('f-inv-client');
+  const te=window._tdv('f-inv-cemail');
+  const tp=window._tdv('f-inv-cphone');
+  const ta=window._tdv('f-inv-caddr');
+  const tg=window._tdv('f-inv-cgst');
+  document.getElementById('pInvToName').textContent=tn||'— Client Name —';
+  document.getElementById('pInvToName').style.color=tn?'var(--text)':'var(--text3)';
+  document.getElementById('pInvToDet').innerHTML=tn?`${tg?'GST: '+tg+'<br>':''}${te?te+'<br>':''}${tp?tp+'<br>':''}${ta}`:'<span style="color:var(--text3)">Enter client details in the form</span>';
+  const id=window._tdv('f-inv-num');
+  document.getElementById('pInvNum').textContent='#'+id;
+  const d1=window._tdv('f-inv-date');
+  const d2=window._tdv('f-inv-due');
+  if(d1)document.getElementById('pInvDate').textContent='Issue: '+new Date(d1).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  if(d2)document.getElementById('pInvDue').textContent='Due: '+new Date(d2).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const notes=window._tdv('f-inv-notes');
+  document.getElementById('pInvNotes').textContent=notes.split('\n')[0];
+}
+
+function invSelectTemplate(el){
+  document.querySelectorAll('.template-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function invSelectTerm(el,val){
+  document.querySelectorAll('.pt-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function invSaveDraft(){
+  const status=document.getElementById('pInvStatus');
+  status.textContent='DRAFT';
+  status.className='inv-status draft';
+  alert('Invoice saved as draft!');
+}
+
+function invSendInvoice(){
+  const tn=window._tdv('f-inv-client');
+  if(!tn){alert('Please enter client name before sending.');document.getElementById('toName').focus();return;}
+  const status=document.getElementById('pInvStatus');
+  status.textContent='SENT';
+  status.className='inv-status sent';
+  alert('Invoice sent successfully to '+tn+'!');
+}
+
+
+
+// ══════════════════════════════════════════
+// PROPOSAL JS (from new_proposals_ui.html)
+// ══════════════════════════════════════════
+let msCount = 5;
+let currentStatus = 'DRAFT';
+
+
+
+
+/* ── SECTION TOGGLES ── */
+function toggleSection(btn, id) {
+  const sec = document.getElementById(id);
+  const pvSec = document.getElementById('pv-sec-' + id.replace('sec-',''));
+  btn.classList.toggle('on');
+  const show = btn.classList.contains('on');
+  if (sec) sec.style.display = show ? '' : 'none';
+  if (pvSec) pvSec.style.display = show ? '' : 'none';
+}
+
+/* ── STATUS ── */
+function selSt(el, val) {
+  document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won','lost','sent','neg','exp'].includes(x)).join(' '));
+  const classMap = { DRAFT:'active-sc', SENT:'sent', NEGOTIATION:'neg', WON:'won', LOST:'lost', EXPIRED:'exp' };
+  document.querySelectorAll('.sc').forEach(c => { c.className = 'sc'; });
+  el.classList.add(classMap[val] || 'active-sc');
+  currentStatus = val;
+  const b = document.getElementById('pv-status');
+  b.textContent = val;
+}
+
+/* ── MAIN UPDATE ── */
+function propUp() {
+  // Cover
+  const t = window._tdv('f-prop-title');
+  document.getElementById('pv-title').textContent = t || '— Proposal Title —';
+  document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
+  const tc = window._tdv('f-prop-client');
+  document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
+  document.getElementById('pv-date').textContent = fmtDate(window._tdv('f-prop-date'));
+  document.getElementById('pv-type').textContent = window._tdv('f-prop-type');
+  document.getElementById('pv-expiry').textContent = 'Expires ' + fmtDate(window._tdv('f-prop-expiry'));
+  // Parties
+  const fp = window._tdv('f-sig'), fc = window._tdv('f-company'), fe = window._tdv('f-email');
+  document.getElementById('pv-from').textContent = fp || 'Prabhu R';
+  document.getElementById('pv-from-d').innerHTML = `${fc}<br>${fe}`;
+  document.getElementById('pv-sig1').textContent = fp || 'Prabhu R';
+  document.getElementById('pv-to').textContent = tc || '— Client —';
+  document.getElementById('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
+  const tp = window._tdv('f-prop-cperson'), te = window._tdv('f-prop-cemail'), ta = window._tdv('f-prop-caddr');
+  document.getElementById('pv-to-d').innerHTML = tc ? `${tp ? tp+'<br>' : ''}${te ? te+'<br>' : ''}${ta}` : '<span style="color:var(--text3)">Fill in client details</span>';
+  document.getElementById('pv-sig2').textContent = tc || '— Client —';
+  document.getElementById('pv-sig2').style.color = tc ? 'var(--text)' : 'var(--text3)';
+  document.getElementById('pv-sig2-role').textContent = tc || 'Awaiting';
+  // Exec summary
+  const pr = window._tdv('f-prop-prob'), so = window._tdv('f-prop-sol'), oc = window._tdv('f-prop-sol');
+  document.getElementById('pv-problem').innerHTML = pr || '<span style="color:var(--text3);font-style:italic">Describe the client\'s challenge…</span>';
+  document.getElementById('pv-solution').innerHTML = so || '<span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span>';
+  document.getElementById('pv-outcome').innerHTML = oc || '<span style="color:var(--text3);font-style:italic">Describe expected results…</span>';
+  // Deliverables
+  let dHtml = '';
+  document.querySelectorAll('#delList .dv-input').forEach(d => { if (d.value.trim()) dHtml += `<div class="del-item-p">${d.value}</div>`; });
+  document.getElementById('pv-del').innerHTML = dHtml || '<span style="color:var(--text3);font-size:10px">No deliverables</span>';
+  // Timeline dates
+  document.getElementById('pv-start').textContent = fmtDate(window._tdv('f-prop-start'));
+  document.getElementById('pv-end').textContent = fmtDate(window._tdv('f-prop-end'));
+  document.getElementById('pv-dur').textContent = window._tdv('f-prop-duration');
+  updateMilestonesPreview();
+  updateTeamPreview();
+  updateValuePreview();
+  updateRisksPreview();
+  updateCasePreview();
+  updateTmPreview();
+  // Payment
+  document.getElementById('pv-pay').textContent = 'Payment: ' + window._tdv('f-prop-paysched');
+  // Closing
+  document.getElementById('pv-closing').innerHTML = (window._tdv('f-prop-closing') || '').replace(/\n/g,'<br>');
+}
+
+function updateMilestonesPreview() {
+  const items = document.querySelectorAll('#msList .ms-item');
+  let html = '';
+  items.forEach((it, i) => {
+    const ti = it.querySelector('.ms-inp'), di = it.querySelector('.ms-date'), de = it.querySelector('.ms-desc');
+    const isLast = i === items.length - 1;
+    html += `<div class="tl-pi"><div class="tl-left"><div class="tl-dot">${i+1}</div>${!isLast?'<div class="tl-line-p"></div>':''}</div>
+      <div><div class="tl-pi-title">${ti?ti.value:'Milestone'}</div>${di&&di.value?`<div class="tl-pi-date">${fmtDate(di.value)}</div>`:''}${de&&de.value?`<div class="tl-pi-desc">${de.value}</div>`:''}</div></div>`;
+  });
+  document.getElementById('pv-timeline').innerHTML = html;
+}
+
+function updateTeamPreview() {
+  const items = document.querySelectorAll('#td-teamList .team-card');
+  let html = '';
+  items.forEach(it => {
+    const n = it.querySelector('.tc-name').textContent;
+    const r = it.querySelector('.tc-role').textContent;
+    const av = it.querySelector('.tc-av');
+    const bg = av ? av.style.background : 'var(--teal)';
+    const init = n.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    html += `<div class="tp-card" style="display:flex;align-items:center;gap:7px"><div class="tp-av-p" style="background:${bg}">${init}</div><div><div class="tp-name-p">${n}</div><div class="tp-role-p">${r}</div></div></div>`;
+  });
+  document.getElementById('pv-team').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
+}
+
+function updateValuePreview() {
+  let html = '';
+  document.querySelectorAll('#td-valueList .dv-input').forEach(v => { if (v.value.trim()) html += `<div class="val-pi">${v.value}</div>`; });
+  document.getElementById('pv-value').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No value points</span>';
+}
+
+function updateRisksPreview() {
+  const rows = document.querySelectorAll('#td-riskList .risk-row-g');
+  let html = '';
+  rows.forEach(r => {
+    const inputs = r.querySelectorAll('input');
+    const sel = r.querySelector('select');
+    if (!inputs[0] || !inputs[0].value) return;
+    const lik = sel ? sel.value : 'Medium';
+    const cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
+    html += `<div class="risk-pi"><span class="risk-badge-p ${cls}">${lik}</span><div><div class="risk-pi-text">${inputs[0].value}</div>${inputs[1]?`<div class="risk-pi-mit">↳ ${inputs[1].value}</div>`:''}</div></div>`;
+  });
+  document.getElementById('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
+}
+
+function updateCasePreview() {
+  const items = document.querySelectorAll('#csList .cs-item');
+  let html = '';
+  items.forEach(it => {
+    const title = it.querySelector('input[type="text"]').value;
+    const ta = it.querySelector('textarea');
+    html += `<div class="cs-p"><div class="cs-p-title">${title}</div><div class="cs-p-detail">${ta ? ta.value : ''}</div></div>`;
+  });
+  document.getElementById('pv-cs').innerHTML = html;
+}
+
+function updateTmPreview() {
+  const items = document.querySelectorAll('#tmList .tm-item');
+  let html = '';
+  items.forEach(it => {
+    const ta = it.querySelector('textarea');
+    const nameInp = it.querySelectorAll('input')[0];
+    html += `<div class="tm-p"><div class="tm-p-text">"${ta ? ta.value : ''}"</div><div class="tm-p-author">— ${nameInp ? nameInp.value : ''}</div></div>`;
+  });
+  document.getElementById('pv-tm').innerHTML = html;
+}
+
+function calcTotal() {
+  const pl = document.getElementById('td-pricingList') || document.getElementById('propPricing');
+  const rows = pl ? pl.querySelectorAll('.pricing-row') : [];
+  let sub = 0;
+  let html = '';
+  rows.forEach(r => {
+    const inps = r.querySelectorAll('input');
+    if (inps.length >= 2) {
+      const n = inps[0].value || 'Item', v = parseFloat(inps[1].value) || 0;
+      sub += v;
+      html += `<tr><td>${n}</td><td>${fmtINR(v)}</td></tr>`;
+    }
+  });
+  const gst = parseFloat(window._tdv('f-prop-gst')) || 0;
+  const disc = parseFloat(window._tdv('f-prop-disc')) || 0;
+  const discount = sub * disc / 100;
+  const tax = sub * gst / 100;
+  const grand = sub - discount + tax;
+  // Update propDoc preview elements (exist when prop tab is active)
+  const pvGrand = document.getElementById('pv-grand');
+  const pvPricing = document.getElementById('pv-pricing');
+  if (pvGrand) pvGrand.textContent = fmtINR(grand);
+  if (pvPricing) pvPricing.innerHTML = html;
+  // Update sidebar totals
+  const propSub = document.getElementById('propSub');
+  const propGrand = document.getElementById('propGrand');
+  if (propSub) propSub.textContent = fmtINR(sub);
+  if (propGrand) propGrand.textContent = fmtINR(grand);
+}
+
+/* ── ADD FUNCTIONS ── */
+function addMilestone() {
+  msCount++;
+  const c = document.getElementById('propMs');
+  const d = document.createElement('div');
+  d.className = 'ms-item';
+  d.innerHTML = `<div class="ms-left"><div class="ms-dot">${msCount}</div><div class="ms-line"></div></div>
+    <div class="ms-body">
+      <div class="ms-row"><input type="text" class="ms-inp" placeholder="Milestone title" oninput="propUp()"><input type="date" class="ms-date" oninput="propUp()"><button class="icon-del" onclick="removeMilestone(this)"><i class="ti ti-trash"></i></button></div>
+      <input type="text" class="ms-desc" placeholder="Brief description…" oninput="propUp()">
+    </div>`;
+  c.appendChild(d);
+  updateMsNumbers();
+  propUp();
+}
+
+function removeMilestone(btn) {
+  if (document.querySelectorAll('#msList .ms-item').length <= 1) return;
+  btn.closest('.ms-item').remove();
+  updateMsNumbers();
+  propUp();
+}
+
+function updateMsNumbers() {
+  document.querySelectorAll('#msList .ms-item').forEach((it, i) => {
+    const dot = it.querySelector('.ms-dot');
+    if (dot) dot.textContent = i + 1;
+  });
+}
+
+function addDel() {
+  const c = document.getElementById('propDels');
+  const d = document.createElement('div');
+  d.className = 'dv-item';
+  d.innerHTML = `<div class="dv-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-check"></i></div>
+    <input type="text" class="dv-input" placeholder="Deliverable…" oninput="propUp()">
+    <i class="ti ti-x dv-del" onclick="this.parentElement.remove();propUp()"></i>`;
+  c.appendChild(d);
+  d.querySelector('.dv-input').focus();
+  propUp();
+}
+
+function addValue() {
+  const c = document.getElementById('td-valueList');
+  const d = document.createElement('div');
+  d.className = 'dv-item';
+  d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
+    <input type="text" class="dv-input" placeholder="Value point or ROI…" oninput="propUp()">
+    <i class="ti ti-x dv-del" onclick="this.parentElement.remove();propUp()"></i>`;
+  c.appendChild(d);
+  d.querySelector('.dv-input').focus();
+  propUp();
+}
+
+function addPricingRow() {
+  const c = document.getElementById('propPricing');
+  const d = document.createElement('div');
+  d.className = 'pricing-row';
+  d.innerHTML = `<input type="text" class="pr-inp" placeholder="Service / item" oninput="calcTotal()">
+    <input type="number" class="pr-inp" value="0" style="text-align:right" oninput="calcTotal()">
+    <button class="pr-del" onclick="this.closest('.pricing-row').remove();calcTotal()"><i class="ti ti-trash"></i></button>`;
+  c.appendChild(d);
+  d.querySelector('input').focus();
+  calcTotal();
+}
+
+function addRisk() {
+  const c = document.getElementById('td-riskList');
+  const d = document.createElement('div');
+  d.className = 'risk-row-g';
+  d.innerHTML = `<input type="text" class="pr-inp" placeholder="Risk description">
+    <select class="pr-inp" style="padding:7px 8px;font-size:11px"><option>High</option><option selected>Medium</option><option>Low</option></select>
+    <input type="text" class="pr-inp" placeholder="Mitigation">
+    <button class="pr-del" onclick="this.closest('.risk-row-g').remove()"><i class="ti ti-trash"></i></button>`;
+  c.appendChild(d);
+}
+
+function addCaseStudy() {
+  const c = document.getElementById('td-csList'), n = c.children.length + 1;
+  const d = document.createElement('div');
+  d.className = 'cs-item';
+  d.innerHTML = `<div class="cs-header"><div class="cs-num">${n}</div>
+    <input type="text" class="fi" style="flex:1" placeholder="Project name" oninput="updateCasePreview()">
+    <button class="icon-del" style="margin-left:6px" onclick="this.closest('.cs-item').remove();updateCasePreview()"><i class="ti ti-trash"></i></button></div>
+    <div class="form-row">
+      <div class="fg"><label class="fl">Client</label><input class="fi" type="text" placeholder="Client name" oninput="updateCasePreview()"></div>
+      <div class="fg"><label class="fl">Industry</label><input class="fi" type="text" placeholder="Industry" oninput="updateCasePreview()"></div>
+    </div>
+    <div class="fg"><label class="fl">Challenge & Result</label><textarea class="ta" style="min-height:60px" placeholder="Describe challenge and result…" oninput="updateCasePreview()"></textarea></div>`;
+  c.appendChild(d);
+  updateCasePreview();
+}
+
+function addTestimonial() {
+  const c = document.getElementById('td-tmList');
+  const d = document.createElement('div');
+  d.className = 'tm-item';
+  d.innerHTML = `<i class="ti ti-quote tm-quote-icon"></i>
+    <div class="fg"><label class="fl">Quote</label><textarea class="ta" style="min-height:56px" placeholder="Testimonial quote…" oninput="updateTmPreview()"></textarea></div>
+    <div class="form-row"><div class="fg"><label class="fl">Name & Role</label><input class="fi" type="text" placeholder="Name, Title – Company" oninput="updateTmPreview()"></div>
+    <div class="fg"><label class="fl">Rating</label><select class="fs"><option>⭐⭐⭐⭐⭐ 5/5</option><option>⭐⭐⭐⭐ 4/5</option></select></div></div>
+    <button class="icon-del" onclick="this.closest('.tm-item').remove();updateTmPreview()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>`;
+  c.appendChild(d);
+  updateTmPreview();
+}
+
+function addFaq() {
+  const c = document.getElementById('td-faqList');
+  const d = document.createElement('div');
+  d.style.cssText = 'padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px';
+  d.innerHTML = `<div class="fg"><label class="fl">Question</label><input class="fi" type="text" placeholder="Frequently asked question…"></div>
+    <div class="fg"><label class="fl">Answer</label><textarea class="ta" style="min-height:52px" placeholder="Clear, concise answer…"></textarea></div>
+    <button class="icon-del" onclick="this.closest('div[style]').remove()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>`;
+  c.appendChild(d);
+}
+
+function addWhyUs() {
+  const c = document.getElementById('td-whyList');
+  const d = document.createElement('div');
+  d.className = 'dv-item';
+  d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
+    <input type="text" class="dv-input" placeholder="Why choose YENCODE…">
+    <i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i>`;
+  c.appendChild(d);
+  d.querySelector('.dv-input').focus();
+}
+
+function addTeamMember() {
+  const name = prompt('Team member full name:');
+  if (!name) return;
+  const role = prompt('Their job role:') || 'Team Member';
+  const exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
+  const skills = prompt('Skills (comma-separated):') || '';
+  const c = document.getElementById('td-teamList');
+  const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))','linear-gradient(135deg,var(--purple),#4E35B0)','linear-gradient(135deg,var(--amber),#D4880A)','linear-gradient(135deg,var(--blue),#1A4DB5)'];
+  const col = colors[Math.floor(Math.random() * colors.length)];
+  const init = name.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const skillTags = skills ? skills.split(',').map(s => `<span class="tc-skill">${s.trim()}</span>`).join('') : '';
+  const d = document.createElement('div');
+  d.className = 'team-card';
+  d.innerHTML = `<div class="tc-av" style="background:${col}">${init}</div>
+    <div style="flex:1;min-width:0">
+      <div class="tc-name">${name}</div>
+      <div class="tc-role">${role}</div>
+      ${exp ? `<div class="tc-exp">${exp}</div>` : ''}
+      ${skillTags ? `<div class="tc-skills">${skillTags}</div>` : ''}
+    </div>
+    <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>`;
+  c.appendChild(d);
+  updateTeamPreview();
+}
+
+function fillClient() {
+  window._tdv('f-prop-client') = 'STA Corporation';
+  window._tdv('f-prop-cperson') = 'STA Admin';
+  window._tdv('f-prop-cemail') = 'sta@example.com';
+  window._tdv('f-prop-cphone') = '+91 98765 43210';
+  window._tdv('f-prop-caddr') = 'Chennai, Tamil Nadu, India';
+  propUp();
+}
+
+function uploadCover() {
+  const z = document.getElementById('coverZone');
+  z.style.background = 'var(--teal-lighter)';
+  z.style.borderColor = 'var(--teal)';
+  z.innerHTML = `<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div class="cover-zone-txt" style="color:var(--teal)">Cover image uploaded</div><div class="cover-zone-sub">Click to change</div>`;
+}
+
+function saveDraft() { selSt(document.querySelectorAll('.sc')[0],'DRAFT'); alert('Proposal saved as draft!'); }
+function sendProposal() {
+  const c = window._tdv('f-prop-client');
+  if (!c) { alert('Please enter client name first.'); document.getElementById('toComp').focus(); return; }
+  selSt(document.querySelectorAll('.sc')[1],'SENT');
+  alert('Proposal sent to ' + c + '!');
+}
+function markWon() { selSt(document.querySelectorAll('.sc')[3],'WON'); alert('Proposal marked as Won 🏆'); }
+
+updateMilestonesPreview();
+updateTeamPreview();
+updateValuePreview();
+updateRisksPreview();
 
 </script>
 

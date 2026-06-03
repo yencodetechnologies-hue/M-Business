@@ -1555,3 +1555,7 @@ tbody tr:last-child td{border-bottom:none}
 
 .inv-creator-sig-pad { border: 2px dashed #C5DDE0; border-radius: 10px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all .15s; background: #F5FAFA; }
 .inv-creator-sig-pad:hover { border-color: #00BCD4; background: #F0FDFE; }
+
+.inv-creator-items-table tbody tr:hover {
+  background: transparent !important;
+}

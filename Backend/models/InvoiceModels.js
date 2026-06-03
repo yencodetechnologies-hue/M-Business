@@ -41,6 +41,9 @@ const invoiceSchema = new mongoose.Schema({
   isGstIncluded:  { type: Boolean, default: false },
   status:         { type: String, enum: ["draft", "sent", "paid", "unpaid", "overdue", "part_paid"], default: "draft" },
   companyId:      { type: String, default: "" },
+  signature:      { type: String, default: "" },
+  signatureType:  { type: String, default: "text" },
+  template:       { type: String, default: "Classic" },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Invoice", invoiceSchema);

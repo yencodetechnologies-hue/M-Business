@@ -58,6 +58,9 @@ router.get("/", async (req, res) => {
         accountNumber:  doc.accountNumber  || "",
         ifscCode:       doc.ifscCode       || "",
         footerMessage:  doc.footerMessage  || "",
+        signature:      doc.signature      || "",
+        signatureType:  doc.signatureType  || "text",
+        template:       doc.template       || "Classic",
         paymentHistory: history,
       };
 
@@ -166,11 +169,75 @@ router.get("/client/:clientName", async (req, res) => {
         accountNumber: doc.accountNumber,
         ifscCode: doc.ifscCode,
         footerMessage: doc.footerMessage,
+        signature: doc.signature,
+        signatureType: doc.signatureType,
+        template: doc.template || "Classic",
       };
     }));
     res.json(normalised);
   } catch (err) {
     res.status(500).json({ msg: err.message });
+  }
+});
+
+// ── GET single invoice by invoiceNo ──────────────────────────────────────────
+router.get("/no/:invoiceNo", async (req, res) => {
+  try {
+    const doc = await Invoice.findOne({ invoiceNo: req.params.invoiceNo }).lean();
+    if (!doc) return res.status(404).json({ success: false, msg: "Invoice not found" });
+
+    const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
+
+    const inv = {
+      invoiceNo:      doc.invoiceNo      || "",
+      orderNo:        doc.orderNo        || "",
+      date:           doc.date           || "",
+      dueDate:        doc.dueDate        || "",
+      client:         doc.client         || "",
+      project:        doc.project        || "",
+      gstRate:        doc.gstRate        ?? 18,
+      notes:          doc.notes          || "",
+      terms:          doc.terms          || "",
+      companyName:    doc.companyName    || "",
+      companyEmail:   doc.companyEmail   || "",
+      companyPhone:   doc.companyPhone   || "",
+      companyAddress: doc.companyAddress || "",
+      amountPaid:     doc.amountPaid     || 0,
+      paymentMode:    doc.paymentMode    || "GPay",
+      transactionId:  doc.transactionId  || "",
+      currency:       doc.currency       || "₹",
+      upiId:          doc.upiId          || "",
+      bankName:       doc.bankName       || "",
+      accountName:    doc.accountName    || "",
+      accountNumber:  doc.accountNumber  || "",
+      ifscCode:       doc.ifscCode       || "",
+      footerMessage:  doc.footerMessage  || "",
+      signature:      doc.signature      || "",
+      signatureType:  doc.signatureType  || "text",
+      template:       doc.template       || "Classic",
+      paymentHistory: history,
+    };
+
+    return res.json({
+      success: true,
+      id:        doc._id.toString(),
+      invoiceNo: doc.invoiceNo || "—",
+      client:    doc.client    || "—",
+      project:   doc.project   || "",
+      date:      doc.date      || null,
+      dueDate:   doc.dueDate   || null,
+      status:    doc.status    || "draft",
+      total:     doc.total     || 0,
+      amountPaid: doc.amountPaid || 0,
+      currency:   doc.currency   || "₹",
+      savedAt:   doc.createdAt || Date.now(),
+      inv,
+      items:     doc.items || [],
+      paymentHistory: history,
+    });
+  } catch (err) {
+    console.error("GET /api/invoices/no/:invoiceNo error:", err);
+    return res.status(500).json({ success: false, msg: err.message });
   }
 });
 
@@ -255,6 +322,9 @@ router.post("/", async (req, res) => {
       accountNumber:  inv.accountNumber          || "",
       ifscCode:       inv.ifscCode               || "",
       footerMessage:  inv.footerMessage          || "",
+      signature:      inv.signature              || "",
+      signatureType:  inv.signatureType          || "text",
+      template:       inv.template               || "Classic",
       companyId: req.companyId || "",
     };
 
@@ -380,6 +450,9 @@ router.put("/:id", async (req, res) => {
       accountNumber: inv.accountNumber || "",
       ifscCode: inv.ifscCode || "",
       footerMessage: inv.footerMessage || "",
+      signature: inv.signature || "",
+      signatureType: inv.signatureType || "text",
+      template: inv.template || "Classic",
       companyId: req.companyId || "",
     };
 

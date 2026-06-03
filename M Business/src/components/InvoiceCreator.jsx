@@ -557,6 +557,40 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   ]);
   const [editingId, setEditingId] = useState(null); // backend _id if editing existing
 
+  const getTemplateStyles = (templateName) => {
+    switch (templateName) {
+      case "Minimal":
+        return {
+          primaryColor: "#111827",
+          primaryBg: "#F3F4F6",
+          logoColor: "linear-gradient(135deg, #374151, #111827)",
+          borderStyle: "1px solid #E5E7EB",
+          headerUnderline: "1px solid #E5E7EB",
+          fontFamily: "'Plus Jakarta Sans', sans-serif"
+        };
+      case "Classic":
+        return {
+          primaryColor: "#00BCD4",
+          primaryBg: "#E0F7FA",
+          logoColor: "linear-gradient(135deg, #00BCD4, #006E7F)",
+          borderStyle: "1px solid #E0EEF0",
+          headerUnderline: "3px solid #00BCD4",
+          fontFamily: "'Nunito', sans-serif"
+        };
+      case "Modern":
+      default:
+        return {
+          primaryColor: "#7C5CFC",
+          primaryBg: "#EEE9FF",
+          logoColor: "linear-gradient(135deg, #7C5CFC, #4C1D95)",
+          borderStyle: "1px solid #E5E7EB",
+          headerUnderline: "3px solid #7C5CFC",
+          fontFamily: "'Plus Jakarta Sans', sans-serif"
+        };
+    }
+  };
+  const currentT = getTemplateStyles(inv.template);
+
   const upd = (f, v) => setInv((p) => ({ ...p, [f]: v }));
   const selectedClient = clients.find((c) => (c.clientName || c.name) === inv.client);
   const filteredProjects = projects.filter((p) =>
@@ -801,6 +835,9 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
     items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
     history: inv.paymentHistory || [],
     cid: user?.companyId || user?.company || user?._id || "",
+    sig: inv.signatureType === "text" ? inv.signature : "",
+    sigType: inv.signatureType || "text",
+    temp: inv.template || "Classic",
   };
   const qrData = `${FRONTEND_URL}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
 
@@ -1587,14 +1624,14 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
 
         <div className="invoice-paper print-container">
           {/* Header */}
-          <div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid #e2e8f0" }}>
-            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(var(--app-accent-rgb, 124, 58, 237),0.05),transparent)", top: -80, right: -40, pointerEvents: "none" }} />
+          <div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
+            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, ${currentT.primaryColor}0d, transparent)`, top: -80, right: -40, pointerEvents: "none" }} />
             <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
               <div>
                 {effectiveLogo ? (
                   <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
                 ) : (
-                  <div style={{ height: 60, width: 60, background: "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                  <div style={{ height: 60, width: 60, background: currentT.logoColor || "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
                     {effectiveCompanyName[0] || "?"}
                   </div>
                 )}
@@ -1604,8 +1641,8 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 {inv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyAddress}</div>}
               </div>
               <div className="inv-hright" style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 36, fontWeight: 900, color: "rgba(124,58,237,0.1)", letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--app-accent)" }}>{inv.invoiceNo}</div>
+                <div style={{ fontSize: 36, fontWeight: 900, color: `${currentT.primaryColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{inv.invoiceNo}</div>
                 {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
                 <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                   <div style={{ textAlign: "right" }}>
@@ -1626,10 +1663,10 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
             <div style={{ padding: "20px 32px", borderRight: inv.project ? "1px solid var(--app-border)" : "none" }}>
               <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
               <div style={{ fontSize: 17, fontWeight: 800, color: "var(--app-text)" }}>{inv.client || "—"}</div>
-              {selectedClient?.companyName && <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
+              {selectedClient?.companyName && <div style={{ fontSize: 13, color: currentT.primaryColor || "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
               {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
               {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
-              {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: "var(--app-accent)", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
+              {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: currentT.primaryColor || "var(--app-accent)", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
             </div>
             {inv.project && (
               <div style={{ padding: "20px 32px" }}>
@@ -1643,9 +1680,9 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr className="avoid-break" style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
+                <tr className="avoid-break" style={{ background: currentT.logoColor || "var(--app-accent)" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
-                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
                 </tr>
               </thead>
@@ -1654,7 +1691,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                   const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
                   const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
                   return (
-                    <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-bg)" }}>
+                    <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-border)" }}>
                       <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
                       <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>{item.description || "—"}</td>
                       <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
@@ -1666,115 +1703,92 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 })}
               </tbody>
             </table>
-            <div className="avoid-break" style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
-              <div style={{ width: "min(280px,100%)" }}>
-                {[
-                  ["Subtotal", formatCurrency(subtotal, inv.currency)],
-                  ["GST / Tax", formatCurrency(gstAmt, inv.currency)],
-                  ["Total Amount", formatCurrency(total, inv.currency)],
-                  ["Advance Paid", formatCurrency(amountPaid, inv.currency)]
-                ].map(([l, v]) => (
-                  <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--app-border)" }}>
-                    <span style={{ fontSize: 12, color: "#6b7280" }}>{l}</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-text)" }}>{v}</span>
-                  </div>
-                ))}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", background: "#f8fafc", borderRadius: 12, marginTop: 8, border: "1.5px solid #e2e8f0" }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>BALANCE DUE</span>
-                  <span style={{ fontSize: 19, fontWeight: 900, color: "var(--app-text)" }}>{formatCurrency(balanceDue, inv.currency)}</span>
+          </div>
+
+          {/* Totals with QR Scanner */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", padding: "0 32px 16px" }}>
+            {/* QR Scanner */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
+              <div style={{ fontSize: "8px", color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
+              <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
+                <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="var(--app-text)" />
+              </div>
+            </div>
+
+            {/* Totals */}
+            <div className="inv-totals" style={{ width: "200px" }}>
+              <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
+                <span className="lbl" style={{ color: "var(--app-muted)" }}>Subtotal</span>
+                <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
+              </div>
+              <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
+                <span className="lbl" style={{ color: "var(--app-muted)" }}>GST / Tax</span>
+                <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
+              </div>
+              {amountPaid > 0 && (
+                <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
+                  <span className="lbl" style={{ color: "var(--app-muted)" }}>Paid (Advance)</span>
+                  <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
                 </div>
+              )}
+              <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: currentT.logoColor || "var(--app-accent)", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
+                <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
+                <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
               </div>
             </div>
           </div>
 
-          {/* Notes + QR */}
-          <div className="avoid-break" style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {/* Payment details */}
+          {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
+            <div className="inv-bank" style={{ margin: "12px 32px 0", padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}` }}>
+              <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
+              <div className="inv-bank-detail" style={{ fontSize: "9px", color: "var(--text)", lineHeight: "1.5" }}>
+                {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
+                {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
+                {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
+                {inv.upiId && <div style={{marginTop: "2px"}}>UPI: {inv.upiId}</div>}
+              </div>
+            </div>
+          )}
+
+          {/* Notes & Terms + Signature */}
+          <div className="inv-footer avoid-break" style={{ margin: "16px 32px 24px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+            <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
               {inv.notes && (
-                <div style={{ background: "var(--app-bg)", borderRadius: 11, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
-                  <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📝 NOTES</div>
-                  <div style={{ fontSize: 12, color: "var(--app-text)", opacity: 0.8, lineHeight: 1.7 }}>{inv.notes}</div>
+                <div>
+                  <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
+                  <div className="inv-notes-text" style={{ fontSize: "8px", color: "var(--app-muted)", lineHeight: "1.5" }}>{inv.notes}</div>
                 </div>
               )}
               {inv.terms && (
-                <div style={{ background: "var(--app-bg)", borderRadius: 11, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
-                  <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>📜 TERMS</div>
-                  <div style={{ fontSize: 12, color: "var(--app-text)", opacity: 0.8, lineHeight: 1.7 }}>{inv.terms}</div>
-                </div>
-              )}
-              {(inv.upiId || inv.bankName || inv.accountName || inv.accountNumber || inv.ifscCode) && (
-                <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
-                  <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 6 }}>💳 PAYMENT INSTRUCTIONS</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px" }}>
-                    {inv.upiId && (
-                      <div>
-                        <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>UPI ID</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)" }}>{inv.upiId}</div>
-                      </div>
-                    )}
-                    {(inv.bankName || inv.accountName || inv.accountNumber || inv.ifscCode) && (
-                      <>
-                        {inv.bankName && (
-                          <div>
-                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>BANK NAME</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)" }}>{inv.bankName}</div>
-                          </div>
-                        )}
-                        {inv.accountName && (
-                          <div>
-                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NAME</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)" }}>{inv.accountName}</div>
-                          </div>
-                        )}
-                        {inv.accountNumber && (
-                          <div>
-                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>ACCOUNT NUMBER</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)", fontFamily: "monospace" }}>{inv.accountNumber}</div>
-                          </div>
-                        )}
-                        {inv.ifscCode && (
-                          <div>
-                            <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700 }}>IFSC CODE</div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-text)", fontFamily: "monospace" }}>{inv.ifscCode}</div>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
+                <div>
+                  <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
+                  <div className="inv-notes-text" style={{ fontSize: "8px", color: "var(--app-muted)", lineHeight: "1.5" }}>{inv.terms}</div>
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)", minWidth: 110, height: "100%", justifyContent: "center" }}>
-              <div style={{ fontSize: 8, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN INVOICE</div>
-              <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid var(--app-border)" }}>
-                <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="var(--app-text)" />
-              </div>
-              <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)", minWidth: 140, minHeight: 145 }}>
-              <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+            <div className="inv-sig" style={{ textAlign: "right", minWidth: "120px" }}>
+              <div style={{ height: "35px", display: "flex", alignItems: "flex-end", justifyContent: "flex-end", marginBottom: "3px" }}>
                 {inv.signature ? (
                   inv.signatureType === "image" ? (
-                    <img src={inv.signature} alt="Signature" style={{ maxHeight: 45, maxWidth: 120, objectFit: "contain" }} />
+                    <img src={inv.signature} alt="Signature" style={{ maxHeight: "30px", maxWidth: "120px", objectFit: "contain" }} />
                   ) : (
-                    <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 24, fontWeight: "bold", color: "#1a2e35", textAlign: "center" }}>{inv.signature}</div>
+                    <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: "16px", fontWeight: "bold", color: "#1a2e35" }}>{inv.signature}</div>
                   )
-                ) : (
-                  <div style={{ height: 45 }} />
-                )}
+                ) : null}
               </div>
-              <div style={{ width: "100%", height: 1, background: "var(--app-border)", marginBottom: 4 }}></div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "var(--app-text)", textAlign: "center" }}>{inv.companyName || effectiveCompanyName}</div>
-              <div style={{ fontSize: 8, color: "var(--app-muted)", textAlign: "center", marginTop: 2 }}>Authorized Signatory</div>
+              <div className="inv-sig-line" style={{ width: "100%", height: "1px", background: "var(--app-border)", marginBottom: "3px" }}></div>
+              <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "var(--text)" }}>{inv.companyName || effectiveCompanyName}</div>
+              <div className="inv-sig-role" style={{ fontSize: "8px", color: "var(--app-muted)" }}>Authorized Signatory</div>
             </div>
           </div>
 
           <div className="flex-spacer" style={{ flex: 1 }} />
 
-          {/* Footer */}
+          {/* Footer message */}
           <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, pageBreakBefore: "auto", breakBefore: "auto" }}>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>{inv.footerMessage}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: currentT.primaryColor || "#7c3aed" }}>{inv.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{inv.invoiceNo}</div>
           </div>
         </div>
@@ -1799,40 +1813,6 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   }
 
   const hasErrors = Object.keys(errors).length > 0;
-
-  const getTemplateStyles = (templateName) => {
-    switch (templateName) {
-      case "Minimal":
-        return {
-          primaryColor: "#111827",
-          primaryBg: "#F3F4F6",
-          logoColor: "linear-gradient(135deg, #374151, #111827)",
-          borderStyle: "1px solid #E5E7EB",
-          headerUnderline: "1px solid #E5E7EB",
-          fontFamily: "'Plus Jakarta Sans', sans-serif"
-        };
-      case "Classic":
-        return {
-          primaryColor: "#00BCD4",
-          primaryBg: "#E0F7FA",
-          logoColor: "linear-gradient(135deg, #00BCD4, #006E7F)",
-          borderStyle: "1px solid #E0EEF0",
-          headerUnderline: "3px solid #00BCD4",
-          fontFamily: "'Nunito', sans-serif"
-        };
-      case "Modern":
-      default:
-        return {
-          primaryColor: "#7C5CFC",
-          primaryBg: "#EEE9FF",
-          logoColor: "linear-gradient(135deg, #7C5CFC, #4C1D95)",
-          borderStyle: "1px solid #E5E7EB",
-          headerUnderline: "3px solid #7C5CFC",
-          fontFamily: "'Plus Jakarta Sans', sans-serif"
-        };
-    }
-  };
-  const currentT = getTemplateStyles(inv.template);
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 }}>
       <style>{`
@@ -1951,7 +1931,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           </div>
 
           {/* FROM (SENDER) */}
-          <div className="inv-creator-card">
+          {/* <div className="inv-creator-card">
             <div className="inv-creator-card-header">
               <div className="inv-creator-card-icon" style={{background:"var(--teal-light)",color:"var(--teal)"}}><i className="ti ti-building"></i></div>
               <div className="inv-creator-card-title">From (Your Details)</div>
@@ -1982,7 +1962,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 <input className="inv-creator-form-input" type="text" value={inv.companyAddress} onChange={(e) => upd("companyAddress", e.target.value)} />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* BILL TO (CLIENT) */}
           <div className="inv-creator-card">
@@ -2164,6 +2144,17 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     <option value="₹">₹ INR – Indian Rupee</option>
                     <option value="$">$ USD – US Dollar</option>
                     <option value="€">€ EUR – Euro</option>
+                    <option value="£">£ GBP – British Pound</option>
+                    <option value="AED ">AED – UAE Dirham</option>
+                    <option value="SAR ">SAR – Saudi Riyal</option>
+                    <option value="S$">S$ SGD – Singapore Dollar</option>
+                    <option value="A$">A$ AUD – Australian Dollar</option>
+                    <option value="C$">C$ CAD – Canadian Dollar</option>
+                    <option value="¥">¥ JPY – Japanese Yen</option>
+                    <option value="QAR ">QAR – Qatari Riyal</option>
+                    <option value="KWD ">KWD – Kuwaiti Dinar</option>
+                    <option value="OMR ">OMR – Omani Rial</option>
+                    <option value="BHD ">BHD – Bahraini Dinar</option>
                   </select>
                 </div>
               </div>
@@ -2366,15 +2357,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               </div>
 
               {/* PARTIES */}
-              <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
-                <div>
-                  <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>From</div>
-                  <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: "var(--text)" }}>{inv.companyName || effectiveCompanyName}</div>
-                  <div className="inv-party-detail" style={{ fontSize: "9px", color: "var(--app-muted)", lineHeight: "1.6", marginTop: "2px" }}>
-                    {inv.companyAddress}<br/>
-                    {inv.companyPhone}
-                  </div>
-                </div>
+              <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: inv.project ? "1fr 1fr" : "1fr", gap: "16px", marginBottom: "16px" }}>
                 <div>
                   <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Bill To</div>
                   <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: inv.client ? "var(--text)" : "var(--app-muted)" }}>{inv.client || "— Client Name —"}</div>
@@ -2392,6 +2375,12 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     )}
                   </div>
                 </div>
+                {inv.project && (
+                  <div>
+                    <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Project</div>
+                    <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: "var(--text)" }}>{inv.project}</div>
+                  </div>
+                )}
               </div>
 
               {/* ITEMS TABLE */}
@@ -2424,25 +2413,36 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 </tbody>
               </table>
 
-              {/* TOTALS */}
-              <div className="inv-totals" style={{ marginLeft: "auto", width: "200px" }}>
-                <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                  <span className="lbl" style={{ color: "var(--app-muted)" }}>Subtotal</span>
-                  <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
-                </div>
-                <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                  <span className="lbl" style={{ color: "var(--app-muted)" }}>GST / Tax</span>
-                  <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
-                </div>
-                {amountPaid > 0 && (
-                  <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                    <span className="lbl" style={{ color: "var(--app-muted)" }}>Paid (Advance)</span>
-                    <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
+              {/* TOTALS WITH QR SCANNER */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "12px", marginBottom: "16px" }}>
+                {/* QR Scanner */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
+                  <div style={{ fontSize: "8px", color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
+                  <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
+                    <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="var(--app-text)" />
                   </div>
-                )}
-                <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: currentT.logoColor || "var(--app-accent)", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
-                  <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
-                  <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
+                </div>
+
+                {/* TOTALS */}
+                <div className="inv-totals" style={{ width: "200px" }}>
+                  <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
+                    <span className="lbl" style={{ color: "var(--app-muted)" }}>Subtotal</span>
+                    <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
+                  </div>
+                  <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
+                    <span className="lbl" style={{ color: "var(--app-muted)" }}>GST / Tax</span>
+                    <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
+                  </div>
+                  {amountPaid > 0 && (
+                    <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
+                      <span className="lbl" style={{ color: "var(--app-muted)" }}>Paid (Advance)</span>
+                      <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
+                    </div>
+                  )}
+                  <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: currentT.logoColor || "var(--app-accent)", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
+                    <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
+                    <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
+                  </div>
                 </div>
               </div>
 
@@ -2461,12 +2461,18 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
 
               {/* FOOTER */}
               <div className="inv-footer" style={{ marginTop: "16px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                <div className="inv-notes" style={{ flex: 1 }}>
+                <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
                   {inv.notes && (
-                    <>
+                    <div>
                       <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
                       <div className="inv-notes-text" style={{ fontSize: "8px", color: "var(--app-muted)", lineHeight: "1.5" }}>{inv.notes}</div>
-                    </>
+                    </div>
+                  )}
+                  {inv.terms && (
+                    <div>
+                      <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
+                      <div className="inv-notes-text" style={{ fontSize: "8px", color: "var(--app-muted)", lineHeight: "1.5" }}>{inv.terms}</div>
+                    </div>
                   )}
                 </div>
                 <div className="inv-sig" style={{ textAlign: "right", minWidth: "120px" }}>

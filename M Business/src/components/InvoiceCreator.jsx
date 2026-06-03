@@ -316,6 +316,7 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
 
 function CanvasSignature({ onSave }) {
   const canvasRef = React.useRef(null);
+  const pointsRef = React.useRef([]);
   const [isDrawing, setIsDrawing] = React.useState(false);
 
   React.useEffect(() => {
@@ -355,13 +356,9 @@ function CanvasSignature({ onSave }) {
   };
 
   const startDrawing = (e) => {
-    // Avoid scrolling on mobile
     if (e.touches) e.preventDefault();
     const pos = getPos(e);
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
+    pointsRef.current = [pos];
     setIsDrawing(true);
   };
 
@@ -371,12 +368,37 @@ function CanvasSignature({ onSave }) {
     const pos = getPos(e);
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
+    
+    const points = pointsRef.current;
+    points.push(pos);
+    
+    // Use quadratic curves for smooth lines
+    if (points.length > 2) {
+      const p1 = points[points.length - 3];
+      const p2 = points[points.length - 2];
+      const p3 = points[points.length - 1];
+      
+      const midPointX = (p2.x + p3.x) / 2;
+      const midPointY = (p2.y + p3.y) / 2;
+      
+      ctx.beginPath();
+      // Start from the previous midpoint
+      const prevMidPointX = (p1.x + p2.x) / 2;
+      const prevMidPointY = (p1.y + p2.y) / 2;
+      ctx.moveTo(prevMidPointX, prevMidPointY);
+      ctx.quadraticCurveTo(p2.x, p2.y, midPointX, midPointY);
+      ctx.stroke();
+    } else if (points.length === 2) {
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      ctx.lineTo(points[1].x, points[1].y);
+      ctx.stroke();
+    }
   };
 
   const stopDrawing = () => {
     setIsDrawing(false);
+    pointsRef.current = [];
   };
 
   const clear = () => {

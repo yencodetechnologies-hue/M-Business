@@ -360,7 +360,18 @@ function EmployeeDocumentsPage({ user }) {
           </button>
           <div style={{ fontSize:16, fontWeight:700, color:T.text }}>{selectedDoc.docType.toUpperCase()} Document</div>
         </div>
-        <div className="document-preview-content" style={{ flex:1, background:"#fff", borderRadius:12, padding:"30px", overflowY:"auto", color:"#000" }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent }} />
+        <div style={{ flex:1, background:"#f3f4f6", borderRadius:12, padding:"20px", overflowY:"auto" }}>
+          <style>{`
+            .emp-doc-view .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+            .emp-doc-view .lb-editor { min-height: 0 !important; }
+            .emp-doc-view .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
+            .emp-doc-view .lb-recip { display: block !important; }
+            .emp-doc-view .lb-ref { display: block !important; }
+            .emp-doc-view .lb-subj { display: block !important; }
+            .emp-doc-view [contenteditable] { outline: none; pointer-events: none; }
+          `}</style>
+          <div className="emp-doc-view" dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent }} />
+        </div>
       </div>
     );
   }

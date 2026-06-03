@@ -263,10 +263,16 @@ body{display:flex}
 (function(){
   var h = location.hash.substring(1);
   var validHashes = ['lh','quo','inv','prop'];
+  var styles = [];
   if(validHashes.includes(h)){
-    document.getElementById('hashStyle').textContent = '.doc-tabs{display:none!important}';
+    styles.push('.doc-tabs{display:none!important}');
     document.documentElement.setAttribute('data-hash', h);
   }
+  // Hide nav sidebar when embedded in an iframe (e.g. inside SubAdminDashboard)
+  if (window.self !== window.top) {
+    styles.push('.nav-sidebar{display:none!important}');
+  }
+  document.getElementById('hashStyle').textContent = styles.join('\n');
 })();
 </script>
 
@@ -1959,31 +1965,37 @@ function sendFromLetterhead() {
   // Inject styles to ensure it looks perfect in EmployeeDashboard
   const styleTag = document.createElement('style');
   styleTag.textContent = `
-    .lb-date{color:#607D86;margin-bottom:14px;font-size:11.5px}
-    .lb-recip{margin-bottom:14px}
-    .lb-recip-name{font-weight:800;font-size:12.5px}
-    .lb-recip-sub{color:#607D86;font-size:11.5px}
-    .lb-ref{font-size:11px;color:#607D86;margin-bottom:10px}
-    .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E0EEF0}
-    .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
-    .lb-subj-val{font-size:13px;font-weight:800}
-    .lb-salute{font-weight:600;margin-bottom:12px}
-    .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px}
-    .lb-closing{margin-top:28px}
-    .lb-close-text{margin-bottom:28px}
-    .lb-sig-line{width:90px;height:1.5px;margin-bottom:6px}
-    .lb-sig-name{font-weight:800;font-size:13px}
-    .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
-    .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+    .lh-wrap { max-width: 760px; margin: 0 auto; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 4px; display: flex; flex-direction: column; min-height: 900px; border: 1px solid #eaeaea; font-family: 'Nunito', sans-serif; overflow: hidden; }
+    .lh-wrap * { box-sizing: border-box; }
+    .lh-wrap .doc-body { padding: 28px 40px; font-size: 12.5px; line-height: 1.8; color: #1A2E35; flex: 1; }
+    .lh-wrap .lb-date{color:#607D86;margin-bottom:14px;font-size:11.5px}
+    .lh-wrap .lb-recip{margin-bottom:14px}
+    .lh-wrap .lb-recip-name{font-weight:800;font-size:12.5px}
+    .lh-wrap .lb-recip-sub{color:#607D86;font-size:11.5px}
+    .lh-wrap .lb-ref{font-size:11px;color:#607D86;margin-bottom:10px}
+    .lh-wrap .lb-subj{margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E0EEF0}
+    .lh-wrap .lb-subj-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#A0B8BE;margin-bottom:2px}
+    .lh-wrap .lb-subj-val{font-size:13px;font-weight:800}
+    .lh-wrap .lb-salute{font-weight:600;margin-bottom:12px}
+    .lh-wrap .lb-editor{color:#1A2E35;line-height:1.8;font-size:12.5px}
+    .lh-wrap .lb-closing{margin-top:28px}
+    .lh-wrap .lb-close-text{margin-bottom:28px}
+    .lh-wrap .lb-sig-line{width:90px;height:1.5px;margin-bottom:6px}
+    .lh-wrap .lb-sig-name{font-weight:800;font-size:13px}
+    .lh-wrap .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
+    .lh-wrap .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
   `;
   paperClone.prepend(styleTag);
+
+  const finalHtml = '<div class="lh-wrap">' + paperClone.innerHTML + '</div>';
 
   const data = {
     docType: 'lh',
     sendTo: type,
     client: name,
     recipientEmail: email,
-    htmlContent: paperClone.innerHTML,
+    htmlContent: finalHtml,
     dateSent: new Date().toISOString()
   };
   

@@ -1491,7 +1491,7 @@ tbody tr:last-child td{border-bottom:none}
    INVOICE CREATOR CUSTOM PREFIXED STYLES
    ========================================================================== */
 .inv-creator-form-side { display: flex; flex-direction: column; gap: 16px; }
-.inv-creator-card { background: #FFFFFF; border: 1.5px solid #E0EEF0; border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
+.inv-creator-card { background: #FFFFFF; border: 1.5px solid #E0EEF0; border-radius: 14px; margin-bottom: 12px; }
 .inv-creator-card-header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #E0EEF0; }
 .inv-creator-card-title { font-size: 13px; font-weight: 800; color: #1A2E35; }
 .inv-creator-card-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }

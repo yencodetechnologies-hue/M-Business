@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import axios from "axios";
 import { BASE_URL, FRONTEND_URL } from "../config";
@@ -297,6 +297,99 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
   );
 }
 
+function CanvasSignature({ onSave }) {
+  const canvasRef = React.useRef(null);
+  const [isDrawing, setIsDrawing] = React.useState(false);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    ctx.strokeStyle = "#1a2e35";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+  }, []);
+
+  const getPos = (e) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    
+    // Support mouse and touch coords
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+  };
+
+  const startDrawing = (e) => {
+    // Avoid scrolling on mobile
+    if (e.touches) e.preventDefault();
+    const pos = getPos(e);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing) return;
+    if (e.touches) e.preventDefault();
+    const pos = getPos(e);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clear = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const save = () => {
+    const canvas = canvasRef.current;
+    onSave(canvas.toDataURL());
+  };
+
+  return (
+    <div style={{ background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, padding: 12 }}>
+      <canvas
+        ref={canvasRef}
+        width={340}
+        height={90}
+        style={{ border: "1.5px dashed #C5DDE0", borderRadius: 8, background: "#fff", cursor: "crosshair", width: "100%", height: 90, display: "block" }}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseLeave={stopDrawing}
+        onTouchStart={startDrawing}
+        onTouchMove={draw}
+        onTouchEnd={stopDrawing}
+      />
+      <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+        <button type="button" onClick={clear} style={{ padding: "5px 12px", fontSize: 11, background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 6, cursor: "pointer", fontWeight: "700", color: "#374151" }}>Clear</button>
+        <button type="button" onClick={save} style={{ padding: "5px 12px", fontSize: 11, background: "var(--teal)", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: "800" }}>Apply Signature</button>
+      </div>
+    </div>
+  );
+}
+
 // ════════════════════════════════════════════════════════════
 export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
@@ -322,6 +415,8 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const [filterTab, setFilterTab] = useState("all");
   const [sortOrder, setSortOrder] = useState("desc");
   const [clientFilter, setClientFilter] = useState("all");
+  const [sigTab, setSigTab] = useState("draw");
+  const [typedSig, setTypedSig] = useState("");
 
   const handleExportCSV = (data) => {
     if (!data.length) {
@@ -406,6 +501,8 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
     accountName: "YENCODE Technologies",
     accountNumber: "5020123456789",
     ifscCode: "HDFC0001234",
+    signature: "",
+    signatureType: "text",
   };
 
   const [inv, setInv] = useState(blank);
@@ -1524,7 +1621,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           </div>
 
           {/* Notes + QR */}
-          <div className="avoid-break" style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
+          <div className="avoid-break" style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {inv.notes && (
                 <div style={{ background: "var(--app-bg)", borderRadius: 11, padding: "14px 16px", border: "1px solid var(--app-border)" }}>
@@ -1580,12 +1677,28 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)", minWidth: 110 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)", minWidth: 110, height: "100%", justifyContent: "center" }}>
               <div style={{ fontSize: 8, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN INVOICE</div>
               <div style={{ background: "#fff", padding: 6, borderRadius: 8, border: "1px solid var(--app-border)" }}>
                 <QRCodeSVG value={qrData} size={88} bgColor="#ffffff" fgColor="var(--app-text)" />
               </div>
               <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", background: "var(--app-bg)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--app-border)", minWidth: 140, minHeight: 145 }}>
+              <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+                {inv.signature ? (
+                  inv.signatureType === "image" ? (
+                    <img src={inv.signature} alt="Signature" style={{ maxHeight: 45, maxWidth: 120, objectFit: "contain" }} />
+                  ) : (
+                    <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 24, fontWeight: "bold", color: "#1a2e35", textAlign: "center" }}>{inv.signature}</div>
+                  )
+                ) : (
+                  <div style={{ height: 45 }} />
+                )}
+              </div>
+              <div style={{ width: "100%", height: 1, background: "var(--app-border)", marginBottom: 4 }}></div>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "var(--app-text)", textAlign: "center" }}>{inv.companyName || effectiveCompanyName}</div>
+              <div style={{ fontSize: 8, color: "var(--app-muted)", textAlign: "center", marginTop: 2 }}>Authorized Signatory</div>
             </div>
           </div>
 
@@ -2003,12 +2116,115 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               </div>
               <div className="inv-creator-form-group">
                 <label className="inv-creator-form-label">Authorised Signature</label>
-                <div className="inv-creator-sig-pad" onClick={(e) => {
-                  e.currentTarget.innerHTML = '<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div style="font-size:11px;color:var(--teal);font-weight:700;margin-top:4px">Signature Added</div>';
-                }}>
-                  <i className="ti ti-signature" style={{fontSize:"24px",color:"var(--text3)"}}></i>
-                  <div style={{fontSize:"11px",color:"var(--text3)",fontWeight:"600"}}>Click to add signature</div>
-                </div>
+                {inv.signature ? (
+                  <div style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 18px", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
+                    <button type="button" onClick={() => { upd("signature", ""); setTypedSig(""); }} style={{ position: "absolute", top: 10, right: 10, border: "none", background: "none", color: "#ef4444", fontSize: 12, cursor: "pointer", fontWeight: "800" }}>✕ Clear Signature</button>
+                    <div style={{ minHeight: 60, display: "flex", alignItems: "center", justifyContent: "center", width: "100%", marginTop: 12 }}>
+                      {inv.signatureType === "image" ? (
+                        <img src={inv.signature} alt="Signature Preview" style={{ maxHeight: 50, maxWidth: "100%", objectFit: "contain" }} />
+                      ) : (
+                        <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 28, fontWeight: "bold", color: "#1a2e35" }}>{inv.signature}</div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {/* Tabs */}
+                    <div style={{ display: "flex", borderBottom: "1.5px solid #E0EEF0", marginBottom: 12, gap: 16 }}>
+                      {["draw", "type", "upload"].map((tab) => (
+                        <button
+                          key={tab}
+                          type="button"
+                          onClick={() => setSigTab(tab)}
+                          style={{
+                            padding: "6px 12px 8px",
+                            border: "none",
+                            background: "none",
+                            fontSize: 12,
+                            fontWeight: "800",
+                            color: sigTab === tab ? "var(--teal)" : "#607D86",
+                            borderBottom: sigTab === tab ? "2px solid var(--teal)" : "2px solid transparent",
+                            cursor: "pointer",
+                            textTransform: "capitalize"
+                          }}
+                        >
+                          {tab === "draw" ? "✍️ Draw" : tab === "type" ? "⌨️ Type" : "📁 Upload"}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Tab contents */}
+                    {sigTab === "draw" && (
+                      <CanvasSignature onSave={(dataUrl) => { upd("signature", dataUrl); upd("signatureType", "image"); }} />
+                    )}
+
+                    {sigTab === "type" && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <input
+                            type="text"
+                            className="inv-creator-form-input"
+                            placeholder="Type signatory name..."
+                            value={typedSig}
+                            onChange={(e) => setTypedSig(e.target.value)}
+                            style={{ fontFamily: "'Dancing Script', cursive", fontSize: 18, fontWeight: "bold" }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const val = typedSig.trim() || inv.companyName || effectiveCompanyName;
+                              upd("signature", val);
+                              upd("signatureType", "text");
+                            }}
+                            style={{
+                              padding: "10px 14px",
+                              background: "var(--teal)",
+                              border: "none",
+                              borderRadius: 10,
+                              color: "#fff",
+                              fontSize: 12,
+                              fontWeight: "800",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap"
+                            }}
+                          >
+                            Apply Signature
+                          </button>
+                        </div>
+                        {typedSig && (
+                          <div style={{ fontSize: 11, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 8 }}>
+                            <span>Preview:</span>
+                            <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 22, color: "#1a2e35", fontWeight: "bold" }}>{typedSig}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {sigTab === "upload" && (
+                      <div style={{ background: "#F5FAFA", border: "1.5px dashed #C5DDE0", borderRadius: 10, padding: "16px", textAlign: "center", cursor: "pointer", position: "relative" }}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer", width: "100%" }}
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              const r = new FileReader();
+                              r.onload = (ev) => {
+                                upd("signature", ev.target.result);
+                                upd("signatureType", "image");
+                              };
+                              r.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                        <i className="ti ti-upload" style={{ fontSize: 24, color: "#607D86" }}></i>
+                        <div style={{ fontSize: 12, fontWeight: "700", color: "#607D86", marginTop: 4 }}>Click to upload signature image</div>
+                        <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>PNG or JPG with transparent background preferred</div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -2156,8 +2372,17 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     </>
                   )}
                 </div>
-                <div className="inv-sig" style={{ textAlign: "right" }}>
-                  <div className="inv-sig-line" style={{ width: "80px", height: "1px", background: "var(--app-border)", marginLeft: "auto", marginBottom: "3px" }}></div>
+                <div className="inv-sig" style={{ textAlign: "right", minWidth: "120px" }}>
+                  <div style={{ height: "35px", display: "flex", alignItems: "flex-end", justifyContent: "flex-end", marginBottom: "3px" }}>
+                    {inv.signature ? (
+                      inv.signatureType === "image" ? (
+                        <img src={inv.signature} alt="Signature" style={{ maxHeight: "30px", maxWidth: "120px", objectFit: "contain" }} />
+                      ) : (
+                        <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: "16px", fontWeight: "bold", color: "#1a2e35" }}>{inv.signature}</div>
+                      )
+                    ) : null}
+                  </div>
+                  <div className="inv-sig-line" style={{ width: "100%", height: "1px", background: "var(--app-border)", marginBottom: "3px" }}></div>
                   <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "var(--text)" }}>{inv.companyName || effectiveCompanyName}</div>
                   <div className="inv-sig-role" style={{ fontSize: "8px", color: "var(--app-muted)" }}>Authorized Signatory</div>
                 </div>

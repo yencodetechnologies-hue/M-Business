@@ -8,6 +8,7 @@ import TaskPage from "./TaskPage";
 import CalendarPage from "./CalendarPage";
 import AccountsPage, { ExpensesPage } from "./AccountsPage";
 import ReportsPage from "./ReportsPage";
+import QuotationCreatorModern from "./QuotationCreatorModern";
 import QuotationCreator from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
 import AdminProposalManagement from "./AdminProposalManagement";
@@ -4570,7 +4571,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             }
             setReturnToModal(modal); setModal("client");
           }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
-          {validActive === "quotations" && <QuotationCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
+          {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
             const limit = getSubscriptionLimit("client");
             if (subscription && clients.length >= limit) {
               setLimitModal({ type: "client", limit });

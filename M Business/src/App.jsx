@@ -14,6 +14,7 @@ import TasksPage          from "./components/TaskPage";
 import CalendarPage       from "./components/CalendarPage";
 import { ExpensesPage }   from "./components/AccountsPage";
 import ReportsPage        from "./components/ReportsPage";
+import QuotationCreatorModern from "./components/QuotationCreatorModern";
 import QuotationCreator   from "./components/QuotationCreator";
 import ProjectProposalCreator from "./components/ProjectProposalCreator";
 import InterviewApplyForm from "./components/InterviewApplyForm";
@@ -122,7 +123,7 @@ const getRootPage = () => {
         <Route path="/calendar"          element={<CalendarPage />} />
         <Route path="/expenses"          element={<ExpensesPage />} />
         <Route path="/reports"           element={<ReportsPage />} />
-        <Route path="/quotation-creator" element={<QuotationCreator />} />
+        <Route path="/quotation-creator" element={<QuotationCreatorModern />} />
         <Route path="/project-proposal" element={<ProjectProposalCreator />} />
         <Route path="/interview-apply/:companySlug" element={<InterviewApplyForm />} />
         <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />

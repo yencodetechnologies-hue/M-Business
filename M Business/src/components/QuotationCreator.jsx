@@ -122,7 +122,7 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
   );
 }
 
-export default function QuotationCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onConvertToInvoice, onAddClient, onAddProject }) {
+export default function QuotationCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onConvertToInvoice, onAddClient, onAddProject, onNewQuotation, onEditQuotation }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || user?.companyName || "M Business";
   const [step, setStep] = useState("list");
@@ -540,7 +540,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                   style={{ width: "100%", padding: "11px 14px 11px 40px", background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 12, fontSize: 13, color: "var(--text)", fontFamily: "var(--font)", outline: "none", transition: "all .15s" }} 
                 />
               </div>
-              <button className="create-btn" onClick={() => { clearForm(); setStep("form"); }}>
+              <button className="create-btn" onClick={() => { clearForm(); if (onNewQuotation) { onNewQuotation(); } else { setStep("form"); } }}>
                 <i className="ti ti-plus" style={{ fontSize: 15 }}></i> New Quotation
               </button>
             </div>
@@ -639,7 +639,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
                     {getBadge(entry.status)}
                   </div>
                   <div className="qc-actions" onClick={e => e.stopPropagation()}>
-                    <button className="qa-btn" onClick={() => loadEntry(entry)}><i className="ti ti-edit" style={{ fontSize: 13 }}></i> Edit</button>
+                    <button className="qa-btn" onClick={() => { if (onEditQuotation) { onEditQuotation(entry); } else { loadEntry(entry); } }}><i className="ti ti-edit" style={{ fontSize: 13 }}></i> Edit</button>
                     <button className="qa-btn" onClick={() => triggerPDFShare(entry, "print")}><i className="ti ti-download" style={{ fontSize: 13 }}></i> PDF</button>
                     {(entry.status === "approved" || entry.status === "converted") ? (
                       <button className="qa-btn primary" style={entry.status === "converted" ? { background: "var(--surface)", color: "var(--teal)", borderColor: "var(--teal)" } : {}} onClick={() => entry.status !== "converted" && handleConvert(entry)} disabled={entry.status === "converted" || convertingId === entry.id}>
@@ -653,7 +653,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               );
             })}
             
-            <div className="add-quote-card" onClick={() => { clearForm(); setStep("form"); }}>
+            <div className="add-quote-card" onClick={() => { clearForm(); if (onNewQuotation) { onNewQuotation(); } else { setStep("form"); } }}>
               <div className="add-icon"><i className="ti ti-plus"></i></div>
               <div style={{ fontSize: 13, fontWeight: 700, color: "var(--teal)" }}>Create New Quotation</div>
               <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 600, textAlign: "center", maxWidth: 140 }}>Build and send professional quotes to clients</div>
@@ -989,11 +989,11 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           ⚠️ Please fill all required fields before saving.
         </div>
       )}
-
+                                                                                                                                                                               
       {/* Quote Details */}
       <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Quotation Details</div>
-        <div className="f3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+        <div className="f2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={lbl}>Quote Number</label>
             <div style={{ display: "flex", gap: 6 }}>
@@ -1005,99 +1005,10 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             <label style={lbl}>Quote Date</label>
             <input type="date" value={qt.date} onChange={(e) => upd("date", e.target.value)} style={inp()} />
           </div>
-          <div>
-            <label style={lbl}>Valid Until (Expiry)</label>
-            <input type="date" value={qt.expiryDate} onChange={(e) => upd("expiryDate", e.target.value)} style={inp()} />
-          </div>
-          <div>
-            <label style={lbl}>Reference No <span style={{ color: "#d1d5db" }}></span></label>
-            <input value={qt.refNo} onChange={(e) => upd("refNo", e.target.value)} placeholder="REF-001" style={inp()} />
-          </div>
-          <div>
-            <label style={lbl}>GST Rate</label>
-            <select value={qt.gstRate} onChange={(e) => upd("gstRate", Number(e.target.value))} style={inp()}>
-              {GST_RATES.map((r) => <option key={r} value={r}>{r === 0 ? "No GST (0%)" : `GST ${r}%`}</option>)}
-            </select>
-            <select value={qt.isGstIncluded ? "including" : "excluding"}
-              onChange={(e) => upd("isGstIncluded", e.target.value === "including")}
-              style={{ ...inp(), marginTop: 6, fontSize: 11, fontWeight: 700, color: "var(--app-accent)" }}>
-              <option value="excluding">Excluding GST</option>
-              <option value="including">Including GST</option>
-            </select>
-          </div>
-          <div>
-            <label style={lbl}>Currency</label>
-            <div style={{ display: "flex", gap: 8 }}>
-              <select value={["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].includes(qt.currency) ? qt.currency : "Custom"} onChange={(e) => upd("currency", e.target.value === "Custom" ? "" : e.target.value)} style={{ ...inp(), flex: 1 }}>
-                <option value="₹">INR (₹)</option>
-                <option value="$">USD ($)</option>
-                <option value="€">EUR (€)</option>
-                <option value="£">GBP (£)</option>
-                <option value="¥">JPY (¥)</option>
-                <option value="AED">AED (Dh)</option>
-                <option value="SAR">SAR (SR)</option>
-                <option value="QAR">QAR (QR)</option>
-                <option value="CAD">CAD (C$)</option>
-                <option value="AUD">AUD (A$)</option>
-                <option value="SGD">SGD (S$)</option>
-                <option value="KWD">KWD (KD)</option>
-                <option value="BHD">BHD (BD)</option>
-                <option value="OMR">OMR (RO)</option>
-                <option value="Custom">Custom...</option>
-              </select>
-              {!["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].includes(qt.currency) && (
-                <input value={qt.currency} onChange={(e) => upd("currency", e.target.value)} style={{ ...inp(), flex: 1 }} placeholder="e.g. AUD" />
-              )}
-            </div>
-          </div>
-          <div>
-            <label style={lbl}>Template</label>
-            <select value={qt.template} onChange={(e) => upd("template", e.target.value)} style={inp()}>
-              <option value="Modern">Modern Purple</option>
-              <option value="Classic">Classic Professional</option>
-              <option value="Minimal">Minimalist</option>
-            </select>
-          </div>
         </div>
       </div>
 
-      {/* Payment Details */}
-      <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: "1px solid #f3f4f6", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 16 }}>Payment & Advance Details</div>
-        <div className="f3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-          <div>
-            <label style={lbl}>Amount Paid (Advance)</label>
-            <input type="number"
-              value={qt.amountPaid === 0 ? "" : qt.amountPaid}
-              onChange={(e) => upd("amountPaid", e.target.value === "" ? 0 : Number(e.target.value))}
-              onWheel={(e) => e.target.blur()}
-              placeholder="0"
-              style={inp()} />
-          </div>
-          <div>
-            <label style={lbl}>Payment Date</label>
-            <input type="date" value={qt.paymentDate} onChange={(e) => upd("paymentDate", e.target.value)} style={inp()} />
-          </div>
-          <div>
-            <label style={lbl}>Payment Mode</label>
-            <select value={qt.paymentMode} onChange={(e) => upd("paymentMode", e.target.value)} style={inp()}>
-              <option value="GPay">GPay</option>
-              <option value="PhonePe">PhonePe</option>
-              <option value="NEFT">NEFT</option>
-              <option value="RTGS">RTGS</option>
-              <option value="Cash">Cash</option>
-              <option value="Cheque">Cheque</option>
-              <option value="Card">Card</option>
-              <option value="UPI">UPI</option>
-              <option value="Bank Transfer">Bank Transfer</option>
-            </select>
-          </div>
-        </div>
-        <div style={{ marginTop: 12 }}>
-          <label style={lbl}>Transaction ID / Ref</label>
-          <input value={qt.transactionId} onChange={(e) => upd("transactionId", e.target.value)} placeholder="TXN123456" style={inp()} />
-        </div>
-      </div>
+
 
       {/* Company Name */}
       <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", border: errors.client ? "1.5px solid #fca5a5" : "1px solid #f3f4f6", marginBottom: 12 }}>

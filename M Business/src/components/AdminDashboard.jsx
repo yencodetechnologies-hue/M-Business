@@ -7,6 +7,7 @@ import AccountsPage, { ExpensesPage } from "./AccountsPage";
 import TaskPage from "./TaskPage";
 import CalendarPage from "./CalendarPage";
 import ReportsPage from "./ReportsPage";
+import QuotationCreatorModern from "./QuotationCreatorModern";
 import QuotationCreator from "./QuotationCreator";
 import ProjectProposalCreator from "./ProjectProposalCreator";
 import AdminProposalManagement from "./AdminProposalManagement";
@@ -514,7 +515,7 @@ const T = darkMode ? {
           {active === "employees" && <EmployeesPage THEME={THEME} employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage THEME={THEME} managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
-          {active === "quotations" && <QuotationCreator THEME={THEME} clients={clients} projects={projects} />}
+          {active === "quotations" && <QuotationCreatorModern THEME={THEME} clients={clients} projects={projects} />}
           {active === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {active === "invoices" && <InvoiceCreator THEME={THEME} clients={clients} projects={projects} />}
           {active === "tasks" && <TaskPage projects={projects} employees={employees} />}

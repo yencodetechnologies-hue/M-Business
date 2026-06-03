@@ -188,25 +188,69 @@ body{display:flex}
 .lb-sig-role{color:#607D86;font-size:11px;margin-top:2px}
 .lb-sig-dept{color:#A0B8BE;font-size:10px;margin-top:1px}
 
-/* QUOTATION PREVIEW BODY */
+/* QUOTATION DOC */
+.quo-preview{padding:22px;font-family:var(--font);font-size:12px;color:#1A2E35;background:#fff;min-height:600px}
+
+.quo-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:3px solid var(--teal)}
+.quo-logo-box{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal4));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;margin-bottom:7px}
+.quo-company{font-size:13px;font-weight:800;color:var(--text)}
+.quo-company-sub{font-size:10px;color:var(--text3);line-height:1.7;margin-top:2px}
+.quo-title-area{text-align:right}
+.quo-word{font-size:22px;font-weight:900;color:var(--teal);letter-spacing:-.4px}
+.quo-id{font-size:11px;font-weight:700;color:var(--text);margin-top:3px}
+.quo-dates{font-size:10px;color:var(--text3);line-height:1.8;margin-top:2px}
+.quo-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-top:5px}
+.quo-badge.draft{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.quo-badge.sent{background:var(--blue-bg);color:var(--blue)}
+.quo-badge.accepted{background:var(--green-bg);color:var(--green)}
+.quo-badge.negotiation{background:var(--purple-bg);color:var(--purple)}
+
 .quo-parties{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
-.qp-block{padding:10px 12px;background:#F8FAFB;border-radius:8px;border:1px solid #E0EEF0}
-.qp-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
-.qp-name{font-size:12px;font-weight:800}
-.qp-detail{font-size:10px;color:#607D86;line-height:1.7;margin-top:2px}
-.quo-items-tbl{width:100%;border-collapse:collapse;margin-bottom:14px}
-.quo-items-tbl thead tr{color:#fff}
-.quo-items-tbl thead th{padding:7px 9px;font-size:10px;font-weight:700;text-align:left}
-.quo-items-tbl thead th:last-child{text-align:right}
-.quo-items-tbl tbody tr{border-bottom:1px solid #E0EEF0}
-.quo-items-tbl tbody tr:nth-child(even){background:#F8FAFB}
-.quo-items-tbl tbody td{padding:7px 9px;font-size:11px}
-.quo-items-tbl tbody td:last-child{text-align:right;font-weight:700}
-.quo-totals{margin-left:auto;width:200px}
-.quo-tot-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #E0EEF0}
+.quo-party-lbl{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.quo-party-name{font-size:12px;font-weight:800;color:var(--text)}
+.quo-party-detail{font-size:10px;color:var(--text3);line-height:1.7;margin-top:2px}
+
+/* SCOPE SECTION IN PREVIEW */
+.quo-scope{margin-bottom:14px;padding:10px 12px;background:var(--teal-lighter);border-radius:9px;border-left:3px solid var(--teal)}
+.quo-scope-title{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px}
+.quo-scope-tags{display:flex;flex-wrap:wrap;gap:5px}
+.quo-scope-tag{padding:2px 8px;background:var(--teal-light);border-radius:20px;font-size:10px;font-weight:700;color:var(--teal)}
+
+.quo-items-table{width:100%;border-collapse:collapse;margin-bottom:14px}
+.quo-items-table thead tr{background:linear-gradient(135deg,var(--teal),var(--teal4))}
+.quo-items-table thead th{padding:7px 9px;font-size:10px;font-weight:700;color:#fff;text-align:left;letter-spacing:.3px}
+.quo-items-table thead th:last-child{text-align:right}
+.quo-items-table tbody tr{border-bottom:1px solid var(--border)}
+.quo-items-table tbody tr:nth-child(even){background:var(--surface2)}
+.quo-items-table tbody td{padding:7px 9px;font-size:11px;color:var(--text)}
+.quo-items-table tbody td:last-child{text-align:right;font-weight:700}
+
+.quo-totals{margin-left:auto;width:200px;margin-bottom:14px}
+.quo-tot-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid var(--border)}
 .quo-tot-row:last-child{border-bottom:none}
-.quo-grand{display:flex;justify-content:space-between;padding:7px 10px;border-radius:7px;margin-top:5px}
-.validity-banner{padding:8px 10px;border-radius:8px;border-left:3px solid;margin-bottom:12px;margin-top:14px}
+.quo-tot-row .lbl{color:var(--text2)}
+.quo-tot-row .val{font-weight:700;color:var(--text)}
+.quo-grand-row{display:flex;justify-content:space-between;padding:7px 10px;background:linear-gradient(135deg,var(--teal),var(--teal4));border-radius:7px;margin-top:5px}
+.quo-grand-row .lbl{font-size:11px;font-weight:800;color:#fff}
+.quo-grand-row .val{font-size:13px;font-weight:900;color:#fff}
+
+.quo-validity{padding:8px 10px;background:var(--amber-bg);border-radius:8px;border-left:3px solid var(--amber);margin-bottom:12px}
+.quo-validity-text{font-size:10px;color:var(--amber);font-weight:700}
+
+.quo-footer{display:flex;justify-content:space-between;align-items:flex-end;padding-top:12px;border-top:1px solid var(--border)}
+.quo-notes-lbl{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.quo-notes-text{font-size:10px;color:var(--text3);line-height:1.6;max-width:220px}
+.quo-sig-line{width:90px;height:1px;background:var(--text3);margin-left:auto;margin-bottom:3px}
+.quo-sig-name{font-size:10px;font-weight:700;color:var(--text);text-align:right}
+.quo-sig-role{font-size:9px;color:var(--text3);text-align:right}
+
+.quo-cta{margin-top:12px;padding:10px 12px;background:var(--teal-lighter);border-radius:8px;border:1px solid var(--teal-light);text-align:center}
+.quo-cta-text{font-size:10px;color:var(--text2);margin-bottom:6px;font-weight:600}
+.quo-cta-btns{display:flex;gap:8px;justify-content:center}
+.quo-cta-btn{padding:5px 14px;border-radius:20px;font-size:10px;font-weight:800;cursor:pointer;font-family:var(--font)}
+.quo-cta-btn.accept{background:var(--green);color:#fff;border:none}
+.quo-cta-btn.negotiate{background:none;border:1.5px solid var(--purple);color:var(--purple)}
+
 
 /* PROPOSAL PREVIEW */
 .prop-cover-zone{}
@@ -1096,6 +1140,10 @@ function setCustomColor(v) {
     document.getElementById('cpicker').value = v;
     document.getElementById('colorHex').value = v;
     document.documentElement.style.setProperty('--lh-color', color);
+    document.documentElement.style.setProperty('--teal', color);
+    document.documentElement.style.setProperty('--teal4', color); // Simplified for now
+    document.documentElement.style.setProperty('--teal-light', h2r(color, 0.15));
+    document.documentElement.style.setProperty('--teal-lighter', h2r(color, 0.05));
     render();
   }
 }
@@ -1275,56 +1323,120 @@ function calcQuo() {
 
 function renderQuo() {
   const co = v('f-company') || 'YENCODE Technologies';
-  const nameSz = parseInt(document.getElementById('nameSz').value) || 16;
-  const hdrBg = v('f-quo-hdr-bg') || 'white';
-  const bg = bgCfg(hdrBg);
   const logo = makeLogoEl();
-  const pad = 22;
+  const quoTitle = v('f-quo-title') || '— Project Title —';
+  const client = v('f-quo-client') || '— Client Name —';
+  const cemail = v('f-quo-cemail') || '';
+  const validDate = fmtDate(v('f-quo-valid'));
+  const bg = bgCfg(v('f-quo-hdr-bg') || 'white');
 
-  // Tags from the scope tag section
   const tagEls = document.querySelectorAll('#quoScopeTags span');
   let tagsHtml = '';
-  tagEls.forEach(t => { tagsHtml += `<span style="padding:2px 9px;background:${h2r(color,.15)};border-radius:20px;font-size:10px;font-weight:700;color:${color};margin-right:4px">${t.textContent.replace(' ×','')}</span>`; });
+  tagEls.forEach(t => { tagsHtml += `<span style="padding:4px 10px;background:${h2r(color,.15)};color:${color};border-radius:20px;font-size:10px;font-weight:700;margin-right:6px;display:inline-block">${t.textContent.replace(' ×','')}</span>`; });
 
-  let hdrHtml = '';
-  if (quoLayout === 'classic') {
-    hdrHtml = `<div style="background:${bg.bg};padding:${pad}px ${pad+16}px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px"><div style="display:flex;align-items:center;gap:12px">${logo}<div><div style="font-size:${nameSz}px;font-weight:900;color:${bg.text}">${co}</div>${v('f-tagline')?`<div style="font-size:10px;color:${bg.sub}">${v('f-tagline')}</div>`:''}</div></div><div style="text-align:right"><div style="font-size:26px;font-weight:900;color:${color};letter-spacing:-.5px">QUOTATION</div><div style="font-size:11px;font-weight:700;color:${bg.text}">#${v('f-quo-num')}</div><div style="font-size:10px;color:${bg.sub}">${fmtDate(v('f-quo-date'))}</div></div></div></div><div style="height:3px;background:${color}"></div>`;
-  } else if (quoLayout === 'modern') {
-    hdrHtml = `<div style="background:${color};padding:${pad}px ${pad+16}px;display:flex;justify-content:space-between;align-items:center;gap:14px"><div style="display:flex;align-items:center;gap:12px">${logo}<div><div style="font-size:${nameSz}px;font-weight:900;color:#fff">${co}</div>${v('f-tagline')?`<div style="font-size:10px;color:rgba(255,255,255,.65)">${v('f-tagline')}</div>`:''}</div></div><div style="text-align:right"><div style="font-size:22px;font-weight:900;color:#fff;opacity:.9">QUOTATION</div><div style="font-size:11px;color:rgba(255,255,255,.75)">#${v('f-quo-num')} · ${fmtDate(v('f-quo-date'))}</div></div></div>`;
-  } else if (quoLayout === 'minimal') {
-    hdrHtml = `<div style="height:4px;background:${color}"></div><div style="background:${bg.bg};padding:${pad}px ${pad+16}px;display:flex;align-items:center;justify-content:space-between;gap:14px"><div style="display:flex;align-items:center;gap:10px">${logo}<div style="font-size:${nameSz}px;font-weight:900;color:${bg.text}">${co}</div></div><div style="text-align:right"><div style="font-size:20px;font-weight:900;color:${color}">QUOTATION</div><div style="font-size:10px;color:${bg.sub}">#${v('f-quo-num')}</div></div></div><div style="height:1px;background:#E0EEF0"></div>`;
-  }
-
-  document.getElementById('docHeaderZone').innerHTML = hdrHtml;
-
-  const quoTitle = v('f-quo-title');
-  const client = v('f-quo-client');
-  const cemail = v('f-quo-cemail');
-  const validDate = fmtDate(v('f-quo-valid'));
+  
+  document.getElementById('docHeaderZone').innerHTML = '';
+  document.getElementById('docFooterZone').innerHTML = '';
 
   document.getElementById('docBodyZone').innerHTML = `
-    ${quoTitle ? `<div style="padding:10px 12px;background:${h2r(color,.06)};border-radius:8px;border-left:3px solid ${color};margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Project</div><div style="font-size:14px;font-weight:800;color:#1A2E35">${quoTitle}</div></div>` : ''}
-    <div class="quo-parties">
-      <div class="qp-block"><div class="qp-lbl" style="color:${color}">Prepared By</div><div class="qp-name">${co}</div>${contactBlock('#607D86')}</div>
-      <div class="qp-block"><div class="qp-lbl" style="color:${color}">Prepared For</div><div class="qp-name" ${!client?'style=\"color:#A0B8BE\"':''}>${client||'— Client Name —'}</div><div class="qp-detail">${cemail||''}</div></div>
-    </div>
-    ${tagsHtml ? `<div style="margin-bottom:14px;padding:8px 12px;background:${h2r(color,.06)};border-radius:8px"><div style="font-size:9px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Scope of Work</div><div>${tagsHtml}</div></div>` : ''}
-    <table class="quo-items-tbl">
-      <thead><tr style="background:${color}"><th>#</th><th>Description</th><th>Amount</th></tr></thead>
-      <tbody id="quoItemRows"></tbody>
-    </table>
-    <div class="quo-totals">
-      <div class="quo-tot-row"><span style="color:#607D86">Subtotal</span><span id="quoSub" style="font-weight:700">₹0</span></div>
-      <div class="quo-tot-row"><span style="color:${color}">GST</span><span id="quoTax" style="font-weight:700;color:${color}">₹0</span></div>
-      <div class="quo-tot-row" id="quoDiscRow" style="display:none"><span style="color:#26C281">Discount</span><span id="quoDisc" style="color:#26C281;font-weight:700">-₹0</span></div>
-      <div class="quo-grand" style="background:${color};margin-top:6px"><span style="font-size:11px;font-weight:800;color:#fff">Total Quoted</span><span id="quoGrand" style="font-size:13px;font-weight:900;color:#fff">₹0</span></div>
-    </div>
-    ${validDate ? `<div class="validity-banner" style="background:${h2r('#F5A623',.08)};border-color:#F5A623;color:#D97706;font-size:10px;font-weight:700">⏰ This quotation is valid until ${validDate}</div>` : ''}
-    <div style="margin-top:20px;padding-top:16px;border-top:1px solid #E0EEF0;display:flex;justify-content:space-between;align-items:flex-end">
-      <div style="font-size:10px;color:#A0B8BE;max-width:280px;line-height:1.6">Thank you for considering ${co}. For queries contact ${v('f-email')||'us'}.</div>
-      <div style="text-align:right"><div style="width:80px;height:1px;background:#A0B8BE;margin:0 0 4px auto"></div><div style="font-size:11px;font-weight:800">Sign</div><div style="font-size:9px;color:#A0B8BE">${co}</div></div>
-    </div>`;
-  document.getElementById('docFooterZone').innerHTML = '';
+          <!-- HEADER -->
+          <div class="quo-header">
+            <div>
+              ${logo}
+              <div class="quo-company" id="pFromCompany">${co}</div>
+              <div class="quo-company-sub" id="pFromSub">
+                ${v("f-email")||""}<br>
+                ${v("f-phone")||""}
+              </div>
+            </div>
+            <div class="quo-title-area">
+              <div class="quo-word">QUOTATION</div>
+              <div class="quo-id" id="pQuoNum">#${v("f-quo-num")}</div>
+              <div class="quo-dates">
+                <span id="pQuoDate">Date: ${fmtDate(v("f-quo-date"))}</span><br>
+                <span id="pValidity" style="color:var(--amber)">Valid until: ${validDate}</span>
+              </div>
+              <div class="quo-badge draft" id="pStatus">DRAFT</div>
+            </div>
+          </div>
+
+          <!-- PARTIES -->
+          <div class="quo-parties">
+            <div>
+              <div class="quo-party-lbl">Prepared By</div>
+              <div class="quo-party-name" id="pFromName">${v("f-sig")||co}</div>
+              <div class="quo-party-detail" id="pFromDetail">${co}<br></div>
+            </div>
+            <div>
+              <div class="quo-party-lbl">Prepared For</div>
+              <div class="quo-party-name" id="pToName" style="color:var(--text3)">${client}</div>
+              <div class="quo-party-detail" id="pToDetail">${cemail}</div>
+            </div>
+          </div>
+
+          <!-- PROJECT TITLE -->
+          <div style="padding:8px 10px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--teal);margin-bottom:12px">
+            <div style="font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px">Project</div>
+            <div style="font-size:13px;font-weight:800;color:var(--text)" id="pTitle">${quoTitle}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px" id="pType">Web Development</div>
+          </div>
+
+          <!-- SCOPE TAGS -->
+          <div class="quo-scope">
+            <div class="quo-scope-title">Scope of Work</div>
+            <div class="quo-scope-tags" id="pScopeTags">${tagsHtml}</div>
+          </div>
+
+          <!-- SCOPE PHASES -->
+          <div id="pScopePhases" style="margin-bottom:14px"></div>
+
+          <!-- ITEMS TABLE -->
+          <table class="quo-items-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Description</th><th>Qty</th><th>Price</th><th>Tax</th><th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="quoItemRows"></tbody>
+          </table>
+
+          <!-- TOTALS -->
+          <div class="quo-totals">
+            <div class="quo-tot-row"><span class="lbl">Subtotal</span><span class="val" id="quoSub">₹40,000</span></div>
+            <div class="quo-tot-row"><span class="lbl">GST (18%)</span><span class="val" id="quoTax" style="color:var(--amber)">₹7,200</span></div>
+            <div class="quo-tot-row" id="quoDiscRow" style="display:none"><span class="lbl">Discount</span><span class="val" id="quoDisc" style="color:var(--green)">-₹0</span></div>
+            <div class="quo-grand-row"><span class="lbl">Total Quoted</span><span class="val" id="quoGrand">₹47,200</span></div>
+          </div>
+
+          <!-- TIMELINE & VALIDITY -->
+          <div class="quo-validity" id="pValidityBlock">
+            <div class="quo-validity-text">⏰ This quotation is valid for <strong>15 days</strong> from the date of issue &nbsp;|&nbsp; 🗓️ Project: Jul 2026 – Sep 2026 (3 Months)</div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="quo-footer">
+            <div class="inv-notes">
+              <div class="quo-notes-lbl">Notes</div>
+              <div class="quo-notes-text" id="pNotes">Thank you for considering ${co}. This quotation is valid for 15 days.</div>
+            </div>
+            <div style="text-align:right">
+              <div class="quo-sig-line"></div>
+              <div class="quo-sig-name" id="pSigName">${v("f-sig")||co}</div>
+              <div class="quo-sig-role">${v("f-sig-role")||"Authorised Signatory"}</div>
+            </div>
+          </div>
+
+          <!-- CTA FOR CLIENT -->
+          <div class="quo-cta">
+            <div class="quo-cta-text">Client action on this quotation:</div>
+            <div class="quo-cta-btns">
+              <button class="quo-cta-btn accept" onclick="markAccepted()">✅ Accept Quote</button>
+              <button class="quo-cta-btn negotiate">🤝 Negotiate</button>
+            </div>
+          </div>
+
+        `;
+
   setTimeout(() => calcQuo(), 10);
 }
 

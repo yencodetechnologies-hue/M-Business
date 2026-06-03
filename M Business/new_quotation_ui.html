@@ -1,0 +1,1306 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>M Business – Create Quotation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --teal:#00BCD4;--teal2:#00ACC1;--teal3:#26D0CE;--teal4:#006E7F;
+  --teal-light:#E0F7FA;--teal-lighter:#F0FDFE;
+  --bg:#F5FAFA;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#E0EEF0;--border2:#C5DDE0;
+  --text:#1A2E35;--text2:#607D86;--text3:#A0B8BE;
+  --green:#26C281;--green-bg:#E8FAF3;
+  --amber:#F5A623;--amber-bg:#FEF5E6;
+  --red:#F05C5C;--red-bg:#FEF2F2;
+  --purple:#7C5CFC;--purple-bg:#EEE9FF;
+  --blue:#2563EB;--blue-bg:#EFF4FF;
+  --sidebar-grad:linear-gradient(180deg,#26D0CE 0%,#00BCD4 35%,#00ACC1 65%,#006E7F 100%);
+  --font:'Nunito',sans-serif;--radius:14px;
+}
+html,body{min-height:100%;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text);overflow-x:hidden}
+body{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:210px;min-width:210px;background:var(--sidebar-grad);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow:hidden;z-index:100;box-shadow:4px 0 20px rgba(0,188,212,.2)}
+.sb-profile{padding:20px 18px 17px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.18)}
+.sb-avatar{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.3)}
+.sb-name{font-size:13px;font-weight:800;color:#fff}
+.sb-role{font-size:9px;color:rgba(255,255,255,.65);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-top:1px}
+.nav{display:flex;flex-direction:column;gap:2px;padding:14px 10px;flex:1}
+.nav-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.1px;padding:8px 10px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;transition:all .15s}
+.nav-item:hover{background:rgba(255,255,255,.14);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.24);color:#fff}
+.nav-item i{font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--teal);color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:20px}
+.sb-footer{padding:12px 10px 20px;border-top:1px solid rgba(255,255,255,.15)}
+.logout-btn{width:100%;padding:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:9px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px}
+.logout-btn:hover{background:rgba(255,255,255,.2)}
+
+/* MAIN */
+.main{flex:1;margin-left:210px;display:flex;flex-direction:column;min-width:0}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(0,188,212,.06)}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.back-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.back-btn:hover{border-color:var(--teal);color:var(--teal)}
+.topbar-title{font-size:16px;font-weight:800;color:var(--text)}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.btn-outline{display:flex;align-items:center;gap:5px;padding:8px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.btn-outline:hover{border-color:var(--teal);color:var(--teal)}
+.btn-teal{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .15s;box-shadow:0 3px 10px rgba(0,188,212,.25)}
+.btn-teal:hover{background:var(--teal2)}
+.btn-green{background:var(--green);box-shadow:0 3px 10px rgba(38,194,129,.25)}
+.btn-green:hover{background:#1da86e}
+.btn-amber{background:var(--amber);box-shadow:0 3px 10px rgba(245,166,35,.2)}
+.btn-amber:hover{opacity:.9}
+
+/* CONTENT */
+.content{padding:20px 28px 40px;display:grid;grid-template-columns:1fr 440px;gap:20px;align-items:start}
+
+/* CARDS */
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.card:last-child{margin-bottom:0}
+.card-header{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.card-title{font-size:13px;font-weight:800;color:var(--text)}
+.card-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.card-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--amber-bg);color:var(--amber)}
+.card-body{padding:18px}
+
+/* FORM */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+.form-group{margin-bottom:14px}
+.form-group:last-child{margin-bottom:0}
+.form-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.form-label-hint{font-size:9px;color:var(--text3);font-weight:600;text-transform:none;letter-spacing:0}
+.form-input{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
+.form-input:focus{border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
+.form-input::placeholder{color:var(--text3)}
+.form-input:read-only{background:var(--surface2);color:var(--text3)}
+.form-select{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
+.form-textarea{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;resize:vertical;min-height:80px;transition:all .15s;line-height:1.6}
+.form-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,188,212,.08)}
+.form-textarea::placeholder{color:var(--text3)}
+
+/* STATUS CHIPS */
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.status-chip{padding:9px 8px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--font)}
+.status-chip:hover{border-color:var(--teal)}
+.status-chip.sel{border-color:var(--teal);background:var(--teal-lighter)}
+.sc-icon{font-size:18px;margin-bottom:3px}
+.sc-label{font-size:10px;font-weight:700;color:var(--text2)}
+.status-chip.sel .sc-label{color:var(--teal)}
+
+/* SCOPE TAGS */
+.scope-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.scope-tag{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--teal-lighter);border:1.5px solid var(--teal-light);border-radius:20px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer}
+.scope-tag i{font-size:12px;cursor:pointer}
+.scope-tag i:hover{color:var(--red)}
+.add-tag-row{display:flex;gap:8px;margin-top:8px}
+.add-tag-input{flex:1;padding:8px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
+.add-tag-input:focus{border-color:var(--teal)}
+.add-tag-input::placeholder{color:var(--text3)}
+.add-tag-btn{padding:8px 14px;background:var(--teal-light);border:1.5px solid var(--teal);border-radius:9px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap}
+.add-tag-btn:hover{background:var(--teal);color:#fff}
+
+/* LINE ITEMS */
+.items-table{width:100%;border-collapse:collapse;margin-bottom:12px}
+.items-table thead tr th{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:8px 8px;text-align:left;background:var(--surface2);border-bottom:1px solid var(--border)}
+.items-table tbody tr td{padding:5px 5px;border-bottom:1px solid var(--border);vertical-align:middle}
+.items-table tbody tr:last-child td{border-bottom:none}
+.item-input{width:100%;padding:8px 9px;background:var(--bg);border:1.5px solid transparent;border-radius:8px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
+.item-input:focus{border-color:var(--teal);background:var(--surface)}
+.item-input::placeholder{color:var(--text3)}
+.item-input.desc{min-width:140px}
+.item-input.num{width:65px;text-align:right}
+.item-total{font-size:12px;font-weight:700;color:var(--text);padding:0 8px;text-align:right;min-width:75px}
+.del-row-btn{width:25px;height:25px;border-radius:6px;background:none;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--text3);transition:all .15s}
+.del-row-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+.add-item-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;background:var(--teal-lighter);border:1.5px dashed var(--teal);border-radius:9px;font-size:12px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font);transition:all .15s}
+.add-item-btn:hover{background:var(--teal-light)}
+
+/* TOTALS */
+.totals-block{border-top:1px solid var(--border);padding-top:14px;margin-top:4px}
+.tot-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid var(--border)}
+.tot-row:last-child{border-bottom:none}
+.tot-label{color:var(--text2);font-weight:600}
+.tot-val{font-weight:700;color:var(--text)}
+.tot-discount .tot-val{color:var(--green)}
+.tot-grand{padding:10px 14px;background:linear-gradient(135deg,var(--teal-lighter),var(--teal-light));border-radius:10px;border:1.5px solid var(--teal-light);margin-top:6px}
+.tot-grand .tot-label{font-size:14px;font-weight:800;color:var(--text)}
+.tot-grand .tot-val{font-size:18px;font-weight:900;color:var(--teal)}
+
+/* VALIDITY OPTIONS */
+.validity-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.val-opt{padding:9px 6px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;text-align:center;transition:all .15s}
+.val-opt:hover{border-color:var(--teal)}
+.val-opt.sel{border-color:var(--teal);background:var(--teal-lighter);color:var(--teal)}
+.val-days{font-size:15px;font-weight:800;color:var(--text)}
+.val-opt.sel .val-days{color:var(--teal)}
+.val-label{font-size:9px;color:var(--text3);font-weight:600}
+.val-opt.sel .val-label{color:var(--teal)}
+
+/* SIGNATURE */
+.sig-pad{border:2px dashed var(--border2);border-radius:10px;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+.sig-pad:hover{border-color:var(--teal);background:var(--teal-lighter)}
+
+/* ── PREVIEW ── */
+.preview-side{position:sticky;top:78px}
+.preview-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.preview-toolbar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.pt-title{font-size:12px;font-weight:800;color:var(--text)}
+.pt-actions{display:flex;gap:6px}
+.pt-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:7px;font-size:10px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.pt-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+/* QUOTATION DOC */
+.quo-preview{padding:22px;font-family:var(--font);font-size:12px;color:#1A2E35;background:#fff;min-height:600px}
+
+.quo-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:3px solid var(--teal)}
+.quo-logo-box{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal4));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;margin-bottom:7px}
+.quo-company{font-size:13px;font-weight:800;color:var(--text)}
+.quo-company-sub{font-size:10px;color:var(--text3);line-height:1.7;margin-top:2px}
+.quo-title-area{text-align:right}
+.quo-word{font-size:22px;font-weight:900;color:var(--teal);letter-spacing:-.4px}
+.quo-id{font-size:11px;font-weight:700;color:var(--text);margin-top:3px}
+.quo-dates{font-size:10px;color:var(--text3);line-height:1.8;margin-top:2px}
+.quo-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-top:5px}
+.quo-badge.draft{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.quo-badge.sent{background:var(--blue-bg);color:var(--blue)}
+.quo-badge.accepted{background:var(--green-bg);color:var(--green)}
+.quo-badge.negotiation{background:var(--purple-bg);color:var(--purple)}
+
+.quo-parties{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.quo-party-lbl{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.quo-party-name{font-size:12px;font-weight:800;color:var(--text)}
+.quo-party-detail{font-size:10px;color:var(--text3);line-height:1.7;margin-top:2px}
+
+/* SCOPE SECTION IN PREVIEW */
+.quo-scope{margin-bottom:14px;padding:10px 12px;background:var(--teal-lighter);border-radius:9px;border-left:3px solid var(--teal)}
+.quo-scope-title{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px}
+.quo-scope-tags{display:flex;flex-wrap:wrap;gap:5px}
+.quo-scope-tag{padding:2px 8px;background:var(--teal-light);border-radius:20px;font-size:10px;font-weight:700;color:var(--teal)}
+
+.quo-items-table{width:100%;border-collapse:collapse;margin-bottom:14px}
+.quo-items-table thead tr{background:linear-gradient(135deg,var(--teal),var(--teal4))}
+.quo-items-table thead th{padding:7px 9px;font-size:10px;font-weight:700;color:#fff;text-align:left;letter-spacing:.3px}
+.quo-items-table thead th:last-child{text-align:right}
+.quo-items-table tbody tr{border-bottom:1px solid var(--border)}
+.quo-items-table tbody tr:nth-child(even){background:var(--surface2)}
+.quo-items-table tbody td{padding:7px 9px;font-size:11px;color:var(--text)}
+.quo-items-table tbody td:last-child{text-align:right;font-weight:700}
+
+.quo-totals{margin-left:auto;width:200px;margin-bottom:14px}
+.quo-tot-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid var(--border)}
+.quo-tot-row:last-child{border-bottom:none}
+.quo-tot-row .lbl{color:var(--text2)}
+.quo-tot-row .val{font-weight:700;color:var(--text)}
+.quo-grand-row{display:flex;justify-content:space-between;padding:7px 10px;background:linear-gradient(135deg,var(--teal),var(--teal4));border-radius:7px;margin-top:5px}
+.quo-grand-row .lbl{font-size:11px;font-weight:800;color:#fff}
+.quo-grand-row .val{font-size:13px;font-weight:900;color:#fff}
+
+.quo-validity{padding:8px 10px;background:var(--amber-bg);border-radius:8px;border-left:3px solid var(--amber);margin-bottom:12px}
+.quo-validity-text{font-size:10px;color:var(--amber);font-weight:700}
+
+.quo-footer{display:flex;justify-content:space-between;align-items:flex-end;padding-top:12px;border-top:1px solid var(--border)}
+.quo-notes-lbl{font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.quo-notes-text{font-size:10px;color:var(--text3);line-height:1.6;max-width:220px}
+.quo-sig-line{width:90px;height:1px;background:var(--text3);margin-left:auto;margin-bottom:3px}
+.quo-sig-name{font-size:10px;font-weight:700;color:var(--text);text-align:right}
+.quo-sig-role{font-size:9px;color:var(--text3);text-align:right}
+
+.quo-cta{margin-top:12px;padding:10px 12px;background:var(--teal-lighter);border-radius:8px;border:1px solid var(--teal-light);text-align:center}
+.quo-cta-text{font-size:10px;color:var(--text2);margin-bottom:6px;font-weight:600}
+.quo-cta-btns{display:flex;gap:8px;justify-content:center}
+.quo-cta-btn{padding:5px 14px;border-radius:20px;font-size:10px;font-weight:800;cursor:pointer;font-family:var(--font)}
+.quo-cta-btn.accept{background:var(--green);color:#fff;border:none}
+.quo-cta-btn.negotiate{background:none;border:1.5px solid var(--purple);color:var(--purple)}
+
+/* SCOPE PHASES */
+.scope-phase-block{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;transition:all .15s}
+.scope-phase-block:last-child{margin-bottom:0}
+.scope-phase-block:hover{border-color:var(--teal)}
+.spb-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);cursor:pointer}
+.spb-num{font-size:10px;font-weight:800;color:var(--teal);background:var(--teal-light);padding:2px 8px;border-radius:20px;flex-shrink:0;white-space:nowrap}
+.spb-title-input{flex:1;padding:6px 10px;background:var(--bg);border:1.5px solid transparent;border-radius:8px;font-size:13px;font-weight:700;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
+.spb-title-input:focus{border-color:var(--teal);background:var(--surface)}
+.spb-toggle{width:26px;height:26px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--text3);transition:all .15s;flex-shrink:0}
+.spb-toggle:hover{border-color:var(--teal);color:var(--teal)}
+.spb-del{width:26px;height:26px;border-radius:7px;background:none;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--text3);transition:all .15s;flex-shrink:0}
+.spb-del:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+.spb-body{padding:14px}
+.spb-features-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.spb-features{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.spb-feature-row{display:flex;align-items:center;gap:7px}
+.sf-check{width:14px;height:14px;border-radius:4px;background:var(--teal-light);border:1.5px solid var(--teal);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sf-check::after{content:'✓';font-size:9px;color:var(--teal);font-weight:800}
+.sf-input{flex:1;padding:7px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
+.sf-input:focus{border-color:var(--teal)}
+.sf-del{width:22px;height:22px;border-radius:5px;background:none;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--text3);transition:color .15s;flex-shrink:0}
+.sf-del:hover{color:var(--red)}
+.add-feature-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:var(--teal-lighter);border:1.5px dashed var(--teal);border-radius:8px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font);transition:all .15s}
+.add-feature-btn:hover{background:var(--teal-light)}
+
+/* INCLUSIONS / EXCLUSIONS */
+.incl-row{display:flex;align-items:center;gap:7px}
+.incl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.incl-input{flex:1;padding:7px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;transition:all .15s}
+.incl-input:focus{border-color:var(--teal)}
+.incl-del{width:20px;height:20px;border-radius:5px;background:none;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--text3);flex-shrink:0;transition:color .15s}
+.incl-del:hover{color:var(--red)}
+
+/* PREVIEW SCOPE SECTIONS */
+.pv-phase-block{margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.pvpb-header{display:flex;align-items:center;gap:8px;padding:7px 10px;background:linear-gradient(90deg,var(--teal-lighter),var(--surface))}
+.pvpb-num{font-size:9px;font-weight:800;color:var(--teal);background:var(--teal-light);padding:1px 7px;border-radius:20px}
+.pvpb-title{font-size:12px;font-weight:800;color:var(--text)}
+.pvpb-body{padding:8px 10px}
+.pvpb-desc{font-size:10px;color:var(--text2);line-height:1.6;margin-bottom:7px}
+.pvpb-features{display:flex;flex-direction:column;gap:3px}
+.pvpb-feat{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2)}
+.pvpb-feat::before{content:'✓';color:var(--teal);font-size:10px;font-weight:800;flex-shrink:0}
+
+/* MOBILE */
+@media(max-width:1100px){.content{grid-template-columns:1fr}.preview-side{position:static}}
+@media(max-width:768px){
+  .sidebar{display:none}.main{margin-left:0}
+  .content{padding:14px 16px 40px;grid-template-columns:1fr}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .validity-grid{grid-template-columns:repeat(2,1fr)}
+  .status-grid{grid-template-columns:repeat(3,1fr)}
+  .quo-parties{grid-template-columns:1fr}
+  .topbar-actions .btn-outline:nth-child(1),.topbar-actions .btn-outline:nth-child(2){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-profile">
+    <div class="sb-avatar">P</div>
+    <div><div class="sb-name">prabhu</div><div class="sb-role">Owner</div></div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+    <div class="nav-label">Management</div>
+    <div class="nav-item"><i class="ti ti-briefcase"></i>Projects</div>
+    <div class="nav-item"><i class="ti ti-users"></i>Team</div>
+    <div class="nav-label">Finance</div>
+    <div class="nav-item active"><i class="ti ti-file-text"></i>Quotations<span class="nav-badge">4</span></div>
+    <div class="nav-item"><i class="ti ti-presentation"></i>Proposals</div>
+    <div class="nav-item"><i class="ti ti-receipt"></i>Invoices</div>
+    <div class="nav-item"><i class="ti ti-credit-card"></i>Accounts</div>
+    <div class="nav-item"><i class="ti ti-arrows-exchange"></i>Payments</div>
+    <div class="nav-item"><i class="ti ti-cash"></i>Expenses</div>
+    <div class="nav-label">Resources</div>
+    <div class="nav-item"><i class="ti ti-rocket"></i>Subscriptions</div>
+    <div class="nav-item"><i class="ti ti-settings"></i>Settings</div>
+  </nav>
+  <div class="sb-footer">
+    <button class="logout-btn"><i class="ti ti-logout" style="font-size:14px"></i> Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn"><i class="ti ti-arrow-left" style="font-size:13px"></i> Quotations</button>
+      <div class="topbar-title">Create Quotation</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-outline"><i class="ti ti-copy" style="font-size:13px"></i> Duplicate</button>
+      <button class="btn-outline" onclick="saveDraft()"><i class="ti ti-device-floppy" style="font-size:13px"></i> Save Draft</button>
+      <button class="btn-outline"><i class="ti ti-download" style="font-size:13px"></i> PDF</button>
+      <button class="btn-teal btn-amber" onclick="sendQuote()"><i class="ti ti-send" style="font-size:13px"></i> Send Quote</button>
+      <button class="btn-teal btn-green" onclick="convertToInvoice()"><i class="ti ti-receipt" style="font-size:13px"></i> → Invoice</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ── FORM SIDE ── -->
+    <div class="form-side">
+
+      <!-- QUOTE DETAILS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-file-description"></i></div>
+          <div class="card-title">Quotation Details</div>
+          <span class="card-badge">Auto-numbered</span>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Quotation Number</label>
+              <input class="form-input" type="text" id="quoNumber" value="QUO-2026-0022" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quote Date</label>
+              <input class="form-input" type="date" id="quoDate" value="2026-06-01" oninput="updatePreview()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Project / Work Title</label>
+              <input class="form-input" type="text" id="quoTitle" placeholder="e.g. Corporate Website Redesign" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Project Type</label>
+              <select class="form-select" id="quoType" onchange="updatePreview()">
+                <option>Web Development</option>
+                <option>Mobile App</option>
+                <option>UI/UX Design</option>
+                <option>Digital Marketing</option>
+                <option>Custom Software</option>
+                <option>Maintenance & Support</option>
+                <option>Consulting</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Brief Description</label>
+            <textarea class="form-textarea" id="quoDesc" placeholder="Describe the project scope briefly…" oninput="updatePreview()"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- FROM -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-building"></i></div>
+          <div class="card-title">From (Your Details)</div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Company Name</label>
+              <input class="form-input" type="text" id="fromCompany" value="YENCODE Technologies" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Name</label>
+              <input class="form-input" type="text" id="fromName" value="Prabhu R" oninput="updatePreview()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="fromEmail" value="yencodetechnologies@gmail.com" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input class="form-input" type="tel" id="fromPhone" value="+91 89254 33533" oninput="updatePreview()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TO (CLIENT) -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-user-circle"></i></div>
+          <div class="card-title">Prepared For (Client)</div>
+          <button onclick="fillSampleClient()" style="margin-left:auto;display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--teal-lighter);border:1.5px solid var(--teal);border-radius:7px;font-size:10px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font)"><i class="ti ti-search" style="font-size:12px"></i> Select Client</button>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Client / Company Name</label>
+              <input class="form-input" type="text" id="toName" placeholder="e.g. STA Corporation" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact Person</label>
+              <input class="form-input" type="text" id="toContact" placeholder="Name of contact" oninput="updatePreview()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="toEmail" placeholder="client@email.com" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input class="form-input" type="tel" id="toPhone" placeholder="+91 XXXXX XXXXX" oninput="updatePreview()">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address / Location</label>
+            <input class="form-input" type="text" id="toAddress" placeholder="Client city or address" oninput="updatePreview()">
+          </div>
+        </div>
+      </div>
+
+      <!-- SCOPE OF WORK -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-tags"></i></div>
+          <div class="card-title">Scope of Work</div>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button onclick="addPhaseBlock()" style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--purple-bg);border:1.5px solid var(--purple);border-radius:7px;font-size:10px;font-weight:700;color:var(--purple);cursor:pointer;font-family:var(--font)"><i class="ti ti-plus" style="font-size:12px"></i> Add Phase</button>
+            <button onclick="addFeatureBlock()" style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--teal-lighter);border:1.5px solid var(--teal);border-radius:7px;font-size:10px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font)"><i class="ti ti-list" style="font-size:12px"></i> Add Feature</button>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <!-- TAGS -->
+          <label class="form-label">Deliverables / Tags</label>
+          <div id="scopeTags" class="scope-tags">
+            <div class="scope-tag">UI/UX Design <i class="ti ti-x" onclick="removeTag(this)"></i></div>
+            <div class="scope-tag">Frontend Dev <i class="ti ti-x" onclick="removeTag(this)"></i></div>
+            <div class="scope-tag">CMS Setup <i class="ti ti-x" onclick="removeTag(this)"></i></div>
+          </div>
+          <div class="add-tag-row">
+            <input class="add-tag-input" type="text" id="tagInput" placeholder="Add a deliverable…" onkeydown="if(event.key==='Enter'){addTag();event.preventDefault()}">
+            <button class="add-tag-btn" onclick="addTag()"><i class="ti ti-plus" style="font-size:13px"></i> Add</button>
+          </div>
+
+          <!-- OVERVIEW -->
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+            <label class="form-label">Project Overview <span class="form-label-hint">Visible to client</span></label>
+            <textarea class="form-textarea" id="scopeOverview" placeholder="Provide a high-level overview of the project, objectives and expected outcomes…" style="min-height:90px" oninput="updatePreview()"></textarea>
+          </div>
+
+          <!-- SCOPE PHASES / MODULES -->
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <label class="form-label" style="margin-bottom:0">Phases / Modules</label>
+              <span style="font-size:10px;color:var(--text3);font-weight:600" id="phaseCount">3 phases</span>
+            </div>
+            <div id="phasesContainer">
+
+              <!-- PHASE 1 -->
+              <div class="scope-phase-block" data-phase="1">
+                <div class="spb-header">
+                  <div class="spb-num">Phase 1</div>
+                  <input type="text" class="spb-title-input" value="Discovery & Design" placeholder="Phase title" oninput="updatePreview()">
+                  <div class="spb-toggle" onclick="togglePhase(this)"><i class="ti ti-chevron-up"></i></div>
+                  <button class="spb-del" onclick="removePhase(this)"><i class="ti ti-trash"></i></button>
+                </div>
+                <div class="spb-body">
+                  <textarea class="form-textarea spb-desc" placeholder="Describe what this phase covers…" style="min-height:64px;margin-bottom:10px" oninput="updatePreview()">Requirements gathering, wireframing, UI mockups, client review and design approval. Covers all pages of the website including homepage, about, services, contact and blog.</textarea>
+                  <div class="spb-features-label">Features / Deliverables in this phase:</div>
+                  <div class="spb-features" id="features_1">
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="Wireframes (all pages)" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="UI Design – Desktop + Mobile" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="Brand style guide" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                  </div>
+                  <button class="add-feature-btn" onclick="addFeatureToPhase('features_1')"><i class="ti ti-plus" style="font-size:12px"></i> Add Feature</button>
+                </div>
+              </div>
+
+              <!-- PHASE 2 -->
+              <div class="scope-phase-block" data-phase="2">
+                <div class="spb-header">
+                  <div class="spb-num">Phase 2</div>
+                  <input type="text" class="spb-title-input" value="Development" placeholder="Phase title" oninput="updatePreview()">
+                  <div class="spb-toggle" onclick="togglePhase(this)"><i class="ti ti-chevron-up"></i></div>
+                  <button class="spb-del" onclick="removePhase(this)"><i class="ti ti-trash"></i></button>
+                </div>
+                <div class="spb-body">
+                  <textarea class="form-textarea spb-desc" placeholder="Describe what this phase covers…" style="min-height:64px;margin-bottom:10px" oninput="updatePreview()">Full frontend development using React.js, backend integration, CMS setup with content management capabilities, responsive design for all screen sizes, and SEO optimisation.</textarea>
+                  <div class="spb-features-label">Features / Deliverables in this phase:</div>
+                  <div class="spb-features" id="features_2">
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="Responsive frontend (React.js)" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="CMS integration (WordPress / Strapi)" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="Contact form with email notifications" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="SEO meta tags & sitemap" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                  </div>
+                  <button class="add-feature-btn" onclick="addFeatureToPhase('features_2')"><i class="ti ti-plus" style="font-size:12px"></i> Add Feature</button>
+                </div>
+              </div>
+
+              <!-- PHASE 3 -->
+              <div class="scope-phase-block" data-phase="3">
+                <div class="spb-header">
+                  <div class="spb-num">Phase 3</div>
+                  <input type="text" class="spb-title-input" value="Testing & Launch" placeholder="Phase title" oninput="updatePreview()">
+                  <div class="spb-toggle" onclick="togglePhase(this)"><i class="ti ti-chevron-up"></i></div>
+                  <button class="spb-del" onclick="removePhase(this)"><i class="ti ti-trash"></i></button>
+                </div>
+                <div class="spb-body">
+                  <textarea class="form-textarea spb-desc" placeholder="Describe what this phase covers…" style="min-height:64px;margin-bottom:10px" oninput="updatePreview()">Cross-browser testing, performance optimisation, client review and feedback, final revisions, deployment to production server, and post-launch support for 30 days.</textarea>
+                  <div class="spb-features-label">Features / Deliverables in this phase:</div>
+                  <div class="spb-features" id="features_3">
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="Cross-browser & device testing" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="Performance & speed optimisation" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="Production deployment" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                    <div class="spb-feature-row">
+                      <div class="sf-check"></div>
+                      <input type="text" class="sf-input" value="30-day post-launch support" oninput="updatePreview()">
+                      <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                    </div>
+                  </div>
+                  <button class="add-feature-btn" onclick="addFeatureToPhase('features_3')"><i class="ti ti-plus" style="font-size:12px"></i> Add Feature</button>
+                </div>
+              </div>
+
+            </div><!-- /phasesContainer -->
+          </div>
+
+          <!-- INCLUSIONS & EXCLUSIONS -->
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+            <div class="form-row" style="margin-bottom:0">
+              <div class="form-group">
+                <label class="form-label" style="color:var(--green)"><i class="ti ti-circle-check" style="font-size:13px"></i> What's Included</label>
+                <div id="inclusionsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+                  <div class="incl-row">
+                    <div class="incl-dot" style="background:var(--green)"></div>
+                    <input type="text" class="incl-input" value="3 rounds of revisions" oninput="updatePreview()">
+                    <button class="incl-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                  </div>
+                  <div class="incl-row">
+                    <div class="incl-dot" style="background:var(--green)"></div>
+                    <input type="text" class="incl-input" value="Source code handover" oninput="updatePreview()">
+                    <button class="incl-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                  </div>
+                  <div class="incl-row">
+                    <div class="incl-dot" style="background:var(--green)"></div>
+                    <input type="text" class="incl-input" value="30-day support post launch" oninput="updatePreview()">
+                    <button class="incl-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                  </div>
+                </div>
+                <button class="add-feature-btn" onclick="addIncl('inclusionsList','green')"><i class="ti ti-plus" style="font-size:12px"></i> Add</button>
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="color:var(--red)"><i class="ti ti-circle-x" style="font-size:13px"></i> What's Excluded</label>
+                <div id="exclusionsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+                  <div class="incl-row">
+                    <div class="incl-dot" style="background:var(--red)"></div>
+                    <input type="text" class="incl-input" value="Domain & hosting charges" oninput="updatePreview()">
+                    <button class="incl-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                  </div>
+                  <div class="incl-row">
+                    <div class="incl-dot" style="background:var(--red)"></div>
+                    <input type="text" class="incl-input" value="Content writing / copywriting" oninput="updatePreview()">
+                    <button class="incl-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                  </div>
+                  <div class="incl-row">
+                    <div class="incl-dot" style="background:var(--red)"></div>
+                    <input type="text" class="incl-input" value="Third-party API costs" oninput="updatePreview()">
+                    <button class="incl-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>
+                  </div>
+                </div>
+                <button class="add-feature-btn" onclick="addIncl('exclusionsList','red')"><i class="ti ti-plus" style="font-size:12px"></i> Add</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ASSUMPTIONS -->
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+            <label class="form-label">Assumptions & Dependencies <span class="form-label-hint">Client must provide…</span></label>
+            <div id="assumptionsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+              <div class="incl-row">
+                <div class="incl-dot" style="background:var(--blue)"></div>
+                <input type="text" class="incl-input" value="Client to provide logo, brand assets and content" oninput="updatePreview()">
+                <button class="incl-del" onclick="this.parentElement.remove()"><i class="ti ti-x"></i></button>
+              </div>
+              <div class="incl-row">
+                <div class="incl-dot" style="background:var(--blue)"></div>
+                <input type="text" class="incl-input" value="Domain and hosting to be arranged by client" oninput="updatePreview()">
+                <button class="incl-del" onclick="this.parentElement.remove()"><i class="ti ti-x"></i></button>
+              </div>
+              <div class="incl-row">
+                <div class="incl-dot" style="background:var(--blue)"></div>
+                <input type="text" class="incl-input" value="Timely feedback within 48 hours required" oninput="updatePreview()">
+                <button class="incl-del" onclick="this.parentElement.remove()"><i class="ti ti-x"></i></button>
+              </div>
+            </div>
+            <button class="add-feature-btn" onclick="addIncl('assumptionsList','blue')"><i class="ti ti-plus" style="font-size:12px"></i> Add Assumption</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PRICING -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-currency-rupee"></i></div>
+          <div class="card-title">Pricing & Cost Breakdown</div>
+        </div>
+        <div class="card-body">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th style="width:35%">Item / Service</th>
+                <th style="width:12%">Qty</th>
+                <th style="width:18%">Unit Price</th>
+                <th style="width:12%">Tax %</th>
+                <th style="width:16%;text-align:right">Amount</th>
+                <th style="width:7%"></th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody">
+              <tr>
+                <td><input type="text" class="item-input desc" placeholder="e.g. Website Design" value="UI/UX Design" oninput="calcTotals()"></td>
+                <td><input type="number" class="item-input num" value="1" min="1" oninput="calcTotals()"></td>
+                <td><input type="number" class="item-input num" value="18000" oninput="calcTotals()" style="width:80px"></td>
+                <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="calcTotals()" style="width:50px"></td>
+                <td class="item-total">₹21,240</td>
+                <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+              </tr>
+              <tr>
+                <td><input type="text" class="item-input desc" placeholder="e.g. Frontend Development" value="Frontend Dev" oninput="calcTotals()"></td>
+                <td><input type="number" class="item-input num" value="1" min="1" oninput="calcTotals()"></td>
+                <td><input type="number" class="item-input num" value="12000" oninput="calcTotals()" style="width:80px"></td>
+                <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="calcTotals()" style="width:50px"></td>
+                <td class="item-total">₹14,160</td>
+                <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+              </tr>
+              <tr>
+                <td><input type="text" class="item-input desc" value="SEO Optimisation" oninput="calcTotals()"></td>
+                <td><input type="number" class="item-input num" value="1" min="1" oninput="calcTotals()"></td>
+                <td><input type="number" class="item-input num" value="10000" oninput="calcTotals()" style="width:80px"></td>
+                <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="calcTotals()" style="width:50px"></td>
+                <td class="item-total">₹11,800</td>
+                <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button class="add-item-btn" onclick="addRow()"><i class="ti ti-plus" style="font-size:14px"></i> Add Line Item</button>
+
+          <div class="totals-block">
+            <div class="form-row" style="margin-top:12px;margin-bottom:10px">
+              <div class="form-group">
+                <label class="form-label">Discount (%)</label>
+                <input class="form-input" type="number" id="discountPct" value="0" min="0" max="100" oninput="calcTotals()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Extra / Miscellaneous</label>
+                <input class="form-input" type="number" id="extraAmt" value="0" min="0" oninput="calcTotals()">
+              </div>
+            </div>
+            <div class="tot-row"><span class="tot-label">Subtotal</span><span class="tot-val" id="subtotalVal">₹40,000</span></div>
+            <div class="tot-row tot-discount"><span class="tot-label">Discount</span><span class="tot-val" id="discountVal">- ₹0</span></div>
+            <div class="tot-row"><span class="tot-label" style="color:var(--amber)">GST / Tax</span><span class="tot-val" style="color:var(--amber)" id="taxVal">+ ₹7,200</span></div>
+            <div class="tot-row"><span class="tot-label">Extra Charges</span><span class="tot-val" id="extraVal">+ ₹0</span></div>
+            <div class="tot-row tot-grand"><span class="tot-label">Total Quoted</span><span class="tot-val" id="grandTotal">₹47,200</span></div>
+          </div>
+
+          <!-- PRICING MODEL -->
+          <div style="margin-top:16px">
+            <label class="form-label">Pricing Model</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px">
+              <div class="val-opt sel" onclick="selModel(this)"><div class="val-days" style="font-size:13px">Fixed</div><div class="val-label">Fixed Price</div></div>
+              <div class="val-opt" onclick="selModel(this)"><div class="val-days" style="font-size:13px">Hourly</div><div class="val-label">Per Hour Rate</div></div>
+              <div class="val-opt" onclick="selModel(this)"><div class="val-days" style="font-size:13px">Monthly</div><div class="val-label">Retainer</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-calendar-stats"></i></div>
+          <div class="card-title">Project Timeline</div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Estimated Start</label>
+              <input class="form-input" type="date" id="startDate" value="2026-07-01" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estimated End</label>
+              <input class="form-input" type="date" id="endDate" value="2026-09-30" oninput="updatePreview()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Total Duration</label>
+              <input class="form-input" type="text" id="duration" placeholder="e.g. 3 months" value="3 Months" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">No. of Revisions</label>
+              <select class="form-select" id="revisions">
+                <option>1 Revision</option>
+                <option>2 Revisions</option>
+                <option selected>3 Revisions</option>
+                <option>Unlimited</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Milestones / Phases</label>
+            <textarea class="form-textarea" id="milestones" style="min-height:80px" placeholder="List key phases/milestones…">Phase 1: Discovery & Design (2 weeks)
+Phase 2: Development (6 weeks)
+Phase 3: Testing & Launch (2 weeks)</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- VALIDITY & PAYMENT -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-clock"></i></div>
+          <div class="card-title">Validity & Payment Terms</div>
+        </div>
+        <div class="card-body">
+          <label class="form-label">Quote Valid For</label>
+          <div class="validity-grid">
+            <div class="val-opt" onclick="selValidity(this,'7 days')"><div class="val-days">7</div><div class="val-label">Days</div></div>
+            <div class="val-opt sel" onclick="selValidity(this,'15 days')"><div class="val-days">15</div><div class="val-label">Days</div></div>
+            <div class="val-opt" onclick="selValidity(this,'30 days')"><div class="val-days">30</div><div class="val-label">Days</div></div>
+            <div class="val-opt" onclick="selValidity(this,'Custom')"><div class="val-days">—</div><div class="val-label">Custom</div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Advance Payment</label>
+              <select class="form-select">
+                <option>0% Advance</option>
+                <option>25% Advance</option>
+                <option selected>50% Advance</option>
+                <option>100% Advance</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Mode</label>
+              <select class="form-select">
+                <option>Bank Transfer / NEFT</option>
+                <option>UPI</option>
+                <option>Cheque</option>
+                <option>Online Link</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATUS & NOTES -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-adjustments"></i></div>
+          <div class="card-title">Status, Notes & Signature</div>
+        </div>
+        <div class="card-body">
+          <label class="form-label" style="margin-bottom:8px">Quote Status</label>
+          <div class="status-grid" style="margin-bottom:16px">
+            <div class="status-chip sel" onclick="selStatus(this,'DRAFT')"><div class="sc-icon">📝</div><div class="sc-label">Draft</div></div>
+            <div class="status-chip" onclick="selStatus(this,'SENT')"><div class="sc-icon">📤</div><div class="sc-label">Sent</div></div>
+            <div class="status-chip" onclick="selStatus(this,'NEGOTIATION')"><div class="sc-icon">🤝</div><div class="sc-label">Negotiation</div></div>
+            <div class="status-chip" onclick="selStatus(this,'ACCEPTED')"><div class="sc-icon">✅</div><div class="sc-label">Accepted</div></div>
+            <div class="status-chip" onclick="selStatus(this,'REJECTED')"><div class="sc-icon">❌</div><div class="sc-label">Rejected</div></div>
+            <div class="status-chip" onclick="selStatus(this,'EXPIRED')"><div class="sc-icon">⏰</div><div class="sc-label">Expired</div></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes to Client</label>
+            <textarea class="form-textarea" id="quoNotes" oninput="updatePreview()">Thank you for considering YENCODE Technologies. This quotation is valid for 15 days. For queries, reach us at yencodetechnologies@gmail.com</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Terms & Conditions</label>
+            <textarea class="form-textarea" id="quoTerms" style="min-height:80px">1. 50% advance payment required to start the project.
+2. Remaining 50% upon project completion.
+3. All disputes subject to Chennai jurisdiction.
+4. Prices are valid for the duration mentioned above.</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Authorised Signature</label>
+            <div class="sig-pad" onclick="this.innerHTML='<i class=\'ti ti-check\' style=\'font-size:22px;color:var(--teal)\'></i><div style=\'font-size:11px;color:var(--teal);font-weight:700;margin-top:4px\'>Signature Added</div>'">
+              <i class="ti ti-signature" style="font-size:22px;color:var(--text3)"></i>
+              <div style="font-size:11px;color:var(--text3);font-weight:600">Click to add signature</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── PREVIEW SIDE ── -->
+    <div class="preview-side">
+      <div class="preview-card">
+        <div class="preview-toolbar">
+          <div class="pt-title">📋 Live Preview</div>
+          <div class="pt-actions">
+            <button class="pt-btn"><i class="ti ti-download" style="font-size:11px"></i> PDF</button>
+            <button class="pt-btn"><i class="ti ti-share" style="font-size:11px"></i> Share Link</button>
+          </div>
+        </div>
+
+        <div class="quo-preview" id="quoPreview">
+
+          <!-- HEADER -->
+          <div class="quo-header">
+            <div>
+              <div class="quo-logo-box">YT</div>
+              <div class="quo-company" id="pFromCompany">YENCODE Technologies</div>
+              <div class="quo-company-sub" id="pFromSub">
+                yencodetechnologies@gmail.com<br>
+                +91 89254 33533
+              </div>
+            </div>
+            <div class="quo-title-area">
+              <div class="quo-word">QUOTATION</div>
+              <div class="quo-id" id="pQuoNum">#QUO-2026-0022</div>
+              <div class="quo-dates">
+                <span id="pQuoDate">Date: 01 Jun 2026</span><br>
+                <span id="pValidity" style="color:var(--amber)">Valid until: 16 Jun 2026</span>
+              </div>
+              <div class="quo-badge draft" id="pStatus">DRAFT</div>
+            </div>
+          </div>
+
+          <!-- PARTIES -->
+          <div class="quo-parties">
+            <div>
+              <div class="quo-party-lbl">Prepared By</div>
+              <div class="quo-party-name" id="pFromName">Prabhu R</div>
+              <div class="quo-party-detail" id="pFromDetail">YENCODE Technologies<br>Chennai, Tamil Nadu</div>
+            </div>
+            <div>
+              <div class="quo-party-lbl">Prepared For</div>
+              <div class="quo-party-name" id="pToName" style="color:var(--text3)">— Client Name —</div>
+              <div class="quo-party-detail" id="pToDetail"><span style="color:var(--text3)">Fill in client details</span></div>
+            </div>
+          </div>
+
+          <!-- PROJECT TITLE -->
+          <div style="padding:8px 10px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--teal);margin-bottom:12px">
+            <div style="font-size:9px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px">Project</div>
+            <div style="font-size:13px;font-weight:800;color:var(--text)" id="pTitle">— Project Title —</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px" id="pType">Web Development</div>
+          </div>
+
+          <!-- SCOPE TAGS -->
+          <div class="quo-scope">
+            <div class="quo-scope-title">Scope of Work</div>
+            <div class="quo-scope-tags" id="pScopeTags">
+              <span class="quo-scope-tag">UI/UX Design</span>
+              <span class="quo-scope-tag">Frontend Dev</span>
+              <span class="quo-scope-tag">CMS Setup</span>
+            </div>
+          </div>
+
+          <!-- SCOPE PHASES -->
+          <div id="pScopePhases" style="margin-bottom:14px"></div>
+
+          <!-- ITEMS TABLE -->
+          <table class="quo-items-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Description</th><th>Qty</th><th>Price</th><th>Tax</th><th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="pItems">
+              <tr><td>1</td><td>UI/UX Design</td><td>1</td><td>₹18,000</td><td>18%</td><td>₹21,240</td></tr>
+              <tr><td>2</td><td>Frontend Dev</td><td>1</td><td>₹12,000</td><td>18%</td><td>₹14,160</td></tr>
+              <tr><td>3</td><td>SEO Optimisation</td><td>1</td><td>₹10,000</td><td>18%</td><td>₹11,800</td></tr>
+            </tbody>
+          </table>
+
+          <!-- TOTALS -->
+          <div class="quo-totals">
+            <div class="quo-tot-row"><span class="lbl">Subtotal</span><span class="val" id="pSubtotal">₹40,000</span></div>
+            <div class="quo-tot-row"><span class="lbl">GST (18%)</span><span class="val" id="pTax" style="color:var(--amber)">₹7,200</span></div>
+            <div class="quo-tot-row" id="pDiscRow" style="display:none"><span class="lbl">Discount</span><span class="val" id="pDisc" style="color:var(--green)">-₹0</span></div>
+            <div class="quo-grand-row"><span class="lbl">Total Quoted</span><span class="val" id="pGrand">₹47,200</span></div>
+          </div>
+
+          <!-- TIMELINE & VALIDITY -->
+          <div class="quo-validity" id="pValidityBlock">
+            <div class="quo-validity-text">⏰ This quotation is valid for <strong>15 days</strong> from the date of issue &nbsp;|&nbsp; 🗓️ Project: Jul 2026 – Sep 2026 (3 Months)</div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="quo-footer">
+            <div class="inv-notes">
+              <div class="quo-notes-lbl">Notes</div>
+              <div class="quo-notes-text" id="pNotes">Thank you for considering YENCODE Technologies. This quotation is valid for 15 days.</div>
+            </div>
+            <div style="text-align:right">
+              <div class="quo-sig-line"></div>
+              <div class="quo-sig-name" id="pSigName">Prabhu R</div>
+              <div class="quo-sig-role">YENCODE Technologies</div>
+            </div>
+          </div>
+
+          <!-- CTA FOR CLIENT -->
+          <div class="quo-cta">
+            <div class="quo-cta-text">Client action on this quotation:</div>
+            <div class="quo-cta-btns">
+              <button class="quo-cta-btn accept" onclick="markAccepted()">✅ Accept Quote</button>
+              <button class="quo-cta-btn negotiate">🤝 Negotiate</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let rowCount=3;
+let currentValidity='15 days';
+let currentStatus='DRAFT';
+
+function fmt(n){return'₹'+Number(n).toLocaleString('en-IN')}
+
+function calcTotals(){
+  const rows=document.querySelectorAll('#itemsBody tr');
+  let subtotal=0,tax=0;
+  const pItems=document.getElementById('pItems');
+  pItems.innerHTML='';
+  rows.forEach((r,i)=>{
+    const inputs=r.querySelectorAll('.item-input');
+    const desc=inputs[0].value||'—';
+    const qty=parseFloat(inputs[1].value)||0;
+    const price=parseFloat(inputs[2].value)||0;
+    const taxPct=parseFloat(inputs[3].value)||0;
+    const lineBase=qty*price;
+    const lineTax=lineBase*taxPct/100;
+    const lineTotal=lineBase+lineTax;
+    subtotal+=lineBase;tax+=lineTax;
+    if(r.querySelector('.item-total'))r.querySelector('.item-total').textContent=fmt(lineTotal);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${desc}</td><td>${qty}</td><td>${fmt(price)}</td><td>${taxPct}%</td><td>${fmt(lineTotal)}</td>`;
+    pItems.appendChild(tr);
+  });
+  const disc=parseFloat(document.getElementById('discountPct').value)||0;
+  const extra=parseFloat(document.getElementById('extraAmt').value)||0;
+  const discount=subtotal*disc/100;
+  const grand=subtotal-discount+tax+extra;
+  document.getElementById('subtotalVal').textContent=fmt(subtotal);
+  document.getElementById('discountVal').textContent='- '+fmt(discount);
+  document.getElementById('taxVal').textContent='+ '+fmt(tax);
+  document.getElementById('extraVal').textContent='+ '+fmt(extra);
+  document.getElementById('grandTotal').textContent=fmt(grand);
+  document.getElementById('pSubtotal').textContent=fmt(subtotal);
+  document.getElementById('pTax').textContent=fmt(tax);
+  document.getElementById('pGrand').textContent=fmt(grand);
+  const dr=document.getElementById('pDiscRow');
+  if(discount>0){dr.style.display='flex';document.getElementById('pDisc').textContent='-'+fmt(discount);}else{dr.style.display='none';}
+  updateValidityBlock();
+}
+
+function addRow(){
+  const tbody=document.getElementById('itemsBody');
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input type="text" class="item-input desc" placeholder="Service / deliverable" oninput="calcTotals()"></td>
+    <td><input type="number" class="item-input num" value="1" min="1" oninput="calcTotals()"></td>
+    <td><input type="number" class="item-input num" value="0" oninput="calcTotals()" style="width:80px"></td>
+    <td><input type="number" class="item-input num" value="18" min="0" max="100" oninput="calcTotals()" style="width:50px"></td>
+    <td class="item-total">₹0</td>
+    <td><button class="del-row-btn" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>`;
+  tbody.appendChild(tr);rowCount++;calcTotals();
+}
+
+function removeRow(btn){
+  if(document.querySelectorAll('#itemsBody tr').length<=1)return;
+  btn.closest('tr').remove();calcTotals();
+}
+
+function updatePreview(){
+  // From
+  const fc=document.getElementById('fromCompany').value;
+  const fn=document.getElementById('fromName').value;
+  const fe=document.getElementById('fromEmail').value;
+  const fp=document.getElementById('fromPhone').value;
+  document.getElementById('pFromCompany').textContent=fc||'Your Company';
+  document.getElementById('pFromSub').innerHTML=`${fe}<br>${fp}`;
+  document.getElementById('pFromName').textContent=fn||'Your Name';
+  document.getElementById('pFromDetail').innerHTML=`${fc}<br>Chennai, Tamil Nadu`;
+  document.getElementById('pSigName').textContent=fn||'Your Name';
+  // To
+  const tn=document.getElementById('toName').value;
+  const tc=document.getElementById('toContact').value;
+  const te=document.getElementById('toEmail').value;
+  const ta=document.getElementById('toAddress').value;
+  document.getElementById('pToName').textContent=tn||'— Client Name —';
+  document.getElementById('pToName').style.color=tn?'var(--text)':'var(--text3)';
+  document.getElementById('pToDetail').innerHTML=tn?`${tc?tc+'<br>':''}${te?te+'<br>':''}${ta}`:'<span style="color:var(--text3)">Fill in client details</span>';
+  // Title
+  const title=document.getElementById('quoTitle').value;
+  const type=document.getElementById('quoType').value;
+  document.getElementById('pTitle').textContent=title||'— Project Title —';
+  document.getElementById('pTitle').style.color=title?'var(--text)':'var(--text3)';
+  document.getElementById('pType').textContent=type;
+  // Date
+  const d=document.getElementById('quoDate').value;
+  if(d)document.getElementById('pQuoDate').textContent='Date: '+new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  // Notes
+  const notes=document.getElementById('quoNotes').value;
+  document.getElementById('pNotes').textContent=notes.split('\n')[0]||'';
+  // Update scope tags
+  updateScopeTags();
+  updateValidityBlock();
+  updateScopePhasePreview();
+}
+
+function updateScopeTags(){
+  const tags=document.querySelectorAll('#scopeTags .scope-tag');
+  const pTags=document.getElementById('pScopeTags');
+  pTags.innerHTML='';
+  tags.forEach(t=>{
+    const span=document.createElement('span');
+    span.className='quo-scope-tag';
+    span.textContent=t.textContent.replace('×','').trim();
+    pTags.appendChild(span);
+  });
+}
+
+function updateValidityBlock(){
+  const dur=document.getElementById('duration').value||'—';
+  const sd=document.getElementById('startDate').value;
+  const ed=document.getElementById('endDate').value;
+  let timeline='';
+  if(sd&&ed){
+    const s=new Date(sd).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+    const e=new Date(ed).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+    timeline=` | 🗓️ Project: ${s} – ${e} (${dur})`;
+  }
+  document.getElementById('pValidityBlock').querySelector('.quo-validity-text').innerHTML=
+    `⏰ Valid for <strong>${currentValidity}</strong> from date of issue${timeline}`;
+}
+
+function addTag(){
+  const inp=document.getElementById('tagInput');
+  const val=inp.value.trim();
+  if(!val)return;
+  const container=document.getElementById('scopeTags');
+  const div=document.createElement('div');
+  div.className='scope-tag';
+  div.innerHTML=`${val} <i class="ti ti-x" onclick="removeTag(this)"></i>`;
+  container.appendChild(div);
+  inp.value='';
+  updateScopeTags();
+}
+
+function removeTag(el){el.parentElement.remove();updateScopeTags();}
+
+function selValidity(el,val){
+  document.querySelectorAll('.validity-grid .val-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  currentValidity=val;
+  // Update validity date in preview
+  const d=new Date(document.getElementById('quoDate').value||Date.now());
+  const days=parseInt(val)||15;
+  d.setDate(d.getDate()+days);
+  document.getElementById('pValidity').textContent='Valid until: '+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  updateValidityBlock();
+}
+
+function selStatus(el,val){
+  document.querySelectorAll('.status-chip').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  currentStatus=val;
+  const badge=document.getElementById('pStatus');
+  badge.textContent=val;
+  const classes={DRAFT:'draft',SENT:'sent',NEGOTIATION:'negotiation',ACCEPTED:'accepted',REJECTED:'rejected',EXPIRED:'draft'};
+  badge.className='quo-badge '+(classes[val]||'draft');
+}
+
+function selModel(el){
+  document.querySelectorAll('.card:nth-child(5) [onclick^=\'selModel\']').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function fillSampleClient(){
+  document.getElementById('toName').value='STA Corporation';
+  document.getElementById('toContact').value='STA Admin';
+  document.getElementById('toEmail').value='sta@example.com';
+  document.getElementById('toPhone').value='+91 98765 43210';
+  document.getElementById('toAddress').value='Chennai, Tamil Nadu';
+  updatePreview();
+}
+
+function saveDraft(){
+  selStatus(document.querySelector('.status-chip:nth-child(1)'),'DRAFT');
+  alert('Quotation saved as draft!');
+}
+
+function sendQuote(){
+  const tn=document.getElementById('toName').value;
+  if(!tn){alert('Please enter client name.');document.getElementById('toName').focus();return;}
+  selStatus(document.querySelector('.status-chip:nth-child(2)'),'SENT');
+  alert('Quotation sent to '+tn+'!');
+}
+
+function convertToInvoice(){
+  const tn=document.getElementById('toName').value;
+  if(!tn){alert('Please enter client name first.');return;}
+  if(confirm('Convert this quotation to an Invoice?')){
+    alert('Redirecting to Invoice creation with pre-filled data from this quotation…');
+  }
+}
+
+function markAccepted(){
+  selStatus(document.querySelector('.status-chip:nth-child(4)'),'ACCEPTED');
+}
+
+
+let phaseCounter = 3;
+
+function addPhaseBlock() {
+  phaseCounter++;
+  const container = document.getElementById('phasesContainer');
+  const div = document.createElement('div');
+  div.className = 'scope-phase-block';
+  div.setAttribute('data-phase', phaseCounter);
+  const fid = 'features_' + phaseCounter;
+  div.innerHTML = `
+    <div class="spb-header">
+      <div class="spb-num">Phase ${phaseCounter}</div>
+      <input type="text" class="spb-title-input" placeholder="Phase title" oninput="updatePreview()">
+      <div class="spb-toggle" onclick="togglePhase(this)"><i class="ti ti-chevron-up"></i></div>
+      <button class="spb-del" onclick="removePhase(this)"><i class="ti ti-trash"></i></button>
+    </div>
+    <div class="spb-body">
+      <textarea class="form-textarea spb-desc" placeholder="Describe what this phase covers…" style="min-height:64px;margin-bottom:10px" oninput="updatePreview()"></textarea>
+      <div class="spb-features-label">Features / Deliverables in this phase:</div>
+      <div class="spb-features" id="${fid}"></div>
+      <button class="add-feature-btn" onclick="addFeatureToPhase('${fid}')"><i class="ti ti-plus" style="font-size:12px"></i> Add Feature</button>
+    </div>`;
+  container.appendChild(div);
+  updatePhaseNumbers();
+  updatePreview();
+}
+
+function addFeatureBlock() {
+  // Add standalone feature to last phase, or first if none
+  const phases = document.querySelectorAll('.spb-features');
+  if (phases.length === 0) { addPhaseBlock(); return; }
+  const lastId = phases[phases.length - 1].id;
+  addFeatureToPhase(lastId);
+}
+
+function addFeatureToPhase(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'spb-feature-row';
+  row.innerHTML = `<div class="sf-check"></div>
+    <input type="text" class="sf-input" placeholder="Feature or deliverable…" oninput="updatePreview()">
+    <button class="sf-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>`;
+  container.appendChild(row);
+  row.querySelector('.sf-input').focus();
+  updatePreview();
+}
+
+function removePhase(btn) {
+  btn.closest('.scope-phase-block').remove();
+  updatePhaseNumbers();
+  updatePreview();
+}
+
+function togglePhase(btn) {
+  const body = btn.closest('.scope-phase-block').querySelector('.spb-body');
+  const icon = btn.querySelector('i');
+  if (body.style.display === 'none') {
+    body.style.display = '';
+    icon.className = 'ti ti-chevron-up';
+  } else {
+    body.style.display = 'none';
+    icon.className = 'ti ti-chevron-down';
+  }
+}
+
+function updatePhaseNumbers() {
+  const blocks = document.querySelectorAll('.scope-phase-block');
+  document.getElementById('phaseCount').textContent = blocks.length + ' phase' + (blocks.length !== 1 ? 's' : '');
+  blocks.forEach((b, i) => {
+    const num = b.querySelector('.spb-num');
+    if (num) num.textContent = 'Phase ' + (i + 1);
+  });
+  updatePreview();
+}
+
+function addIncl(containerId, color) {
+  const container = document.getElementById(containerId);
+  const row = document.createElement('div');
+  row.className = 'incl-row';
+  row.innerHTML = `<div class="incl-dot" style="background:var(--${color})"></div>
+    <input type="text" class="incl-input" placeholder="Add item…" oninput="updatePreview()">
+    <button class="incl-del" onclick="this.parentElement.remove();updatePreview()"><i class="ti ti-x"></i></button>`;
+  container.appendChild(row);
+  row.querySelector('.incl-input').focus();
+  updatePreview();
+}
+
+function updateScopePhasePreview() {
+  const pPhases = document.getElementById('pScopePhases');
+  if (!pPhases) return;
+  const blocks = document.querySelectorAll('.scope-phase-block');
+  if (blocks.length === 0) { pPhases.innerHTML = ''; return; }
+  let html = '';
+  blocks.forEach((b, i) => {
+    const titleInput = b.querySelector('.spb-title-input');
+    const descArea = b.querySelector('.spb-desc');
+    const features = b.querySelectorAll('.sf-input');
+    const title = titleInput ? titleInput.value || 'Phase ' + (i + 1) : 'Phase ' + (i + 1);
+    const desc = descArea ? descArea.value : '';
+    let featsHtml = '';
+    features.forEach(f => {
+      if (f.value.trim()) featsHtml += `<div class="pvpb-feat">${f.value}</div>`;
+    });
+    html += `<div class="pv-phase-block">
+      <div class="pvpb-header">
+        <span class="pvpb-num">Phase ${i + 1}</span>
+        <span class="pvpb-title">${title}</span>
+      </div>
+      <div class="pvpb-body">
+        ${desc ? `<div class="pvpb-desc">${desc}</div>` : ''}
+        ${featsHtml ? `<div class="pvpb-features">${featsHtml}</div>` : ''}
+      </div>
+    </div>`;
+  });
+  pPhases.innerHTML = html;
+}
+
+// Init
+calcTotals();
+updatePreview();
+updateScopePhasePreview();
+
+</script>
+</body>
+</html>

@@ -12,12 +12,23 @@ router.get("/", async (req, res) => {
     const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
     const normalised = await Promise.all(invoices.map(async (doc) => {
-      const subtotal = (doc.items || []).reduce(
-        (s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0),
-        0
-      );
-      const gstRate = parseFloat(doc.gstRate) || 0;
-      const total   = doc.total || subtotal * (1 + gstRate / 100);
+      let subtotal = 0;
+      let total = 0;
+      (doc.items || []).forEach((item) => {
+        const q = parseFloat(item.quantity) || 0;
+        const r = parseFloat(item.rate) || 0;
+        const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
+        const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
+
+        const itemBase = q * r;
+        if (isIncl) {
+          total += itemBase;
+          subtotal += itemBase / (1 + rateGst / 100);
+        } else {
+          subtotal += itemBase;
+          total += itemBase * (1 + rateGst / 100);
+        }
+      });
 
       // Fetch payment history for this invoice
       const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
@@ -107,9 +118,23 @@ router.get("/client/:clientName", async (req, res) => {
     const invoices = await Invoice.find(filter).sort({ createdAt: -1 }).lean();
 
     const normalised = await Promise.all(invoices.map(async (doc) => {
-      const subtotal = (doc.items || []).reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-      const gstRate = parseFloat(doc.gstRate) || 0;
-      const total = doc.total || subtotal * (1 + gstRate / 100);
+      let subtotal = 0;
+      let total = 0;
+      (doc.items || []).forEach((item) => {
+        const q = parseFloat(item.quantity) || 0;
+        const r = parseFloat(item.rate) || 0;
+        const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(doc.gstRate) || 18);
+        const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (doc.isGstIncluded || false);
+
+        const itemBase = q * r;
+        if (isIncl) {
+          total += itemBase;
+          subtotal += itemBase / (1 + rateGst / 100);
+        } else {
+          subtotal += itemBase;
+          total += itemBase * (1 + rateGst / 100);
+        }
+      });
       
       const history = await Income.find({ invoiceNo: doc.invoiceNo }).sort({ date: 1 }).lean();
 
@@ -161,23 +186,36 @@ router.post("/", async (req, res) => {
         .json({ success: false, msg: "inv and items are required" });
     }
 
-    // Calculate totals server-side
-    const subtotalRaw = items.reduce(
-      (s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0),
-      0
-    );
-    const gstRate = parseFloat(inv.gstRate) || 0;
-    const isGstIncluded = inv.isGstIncluded || false;
-    let subtotal, gstAmt, total;
-    if (isGstIncluded) {
-      total    = subtotalRaw;
-      subtotal = total / (1 + gstRate / 100);
-      gstAmt   = total - subtotal;
-    } else {
-      subtotal = subtotalRaw;
-      gstAmt   = subtotal * (gstRate / 100);
-      total    = subtotal + gstAmt;
-    }
+    // Calculate totals server-side (per-item)
+    let subtotal = 0;
+    let gstAmt = 0;
+    let total = 0;
+
+    items.forEach((item) => {
+      const q = parseFloat(item.quantity) || 0;
+      const r = parseFloat(item.rate) || 0;
+      const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+      const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
+
+      const itemBase = q * r;
+      if (isIncl) {
+        const itemTotal = itemBase;
+        const itemSubtotal = itemTotal / (1 + rateGst / 100);
+        const itemGst = itemTotal - itemSubtotal;
+
+        subtotal += itemSubtotal;
+        gstAmt += itemGst;
+        total += itemTotal;
+      } else {
+        const itemSubtotal = itemBase;
+        const itemGst = itemSubtotal * (rateGst / 100);
+        const itemTotal = itemSubtotal + itemGst;
+
+        subtotal += itemSubtotal;
+        gstAmt += itemGst;
+        total += itemTotal;
+      }
+    });
 
     // Flat payload — matches invoiceSchema exactly
     const flatData = {
@@ -199,6 +237,8 @@ router.post("/", async (req, res) => {
         description: i.description || "",
         quantity:    parseFloat(i.quantity) || 0,
         rate:        parseFloat(i.rate)     || 0,
+        gstRate:     i.gstRate !== undefined ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
+        isGstIncluded: i.isGstIncluded !== undefined ? i.isGstIncluded : (inv.isGstIncluded || false),
       })),
       subtotal,
       gstAmt,
@@ -288,10 +328,35 @@ router.put("/:id", async (req, res) => {
     const { inv, items, status } = req.body;
     if (!inv || !items) return res.status(400).json({ success: false, msg: "inv and items required" });
 
-    const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate)||0) * (parseFloat(i.quantity)||0), 0);
-    const gstRate = parseFloat(inv.gstRate) || 0;
-    const gstAmt = inv.isGstIncluded ? (subtotal - (subtotal / (1 + gstRate / 100))) : (subtotal * (gstRate / 100));
-    const total = inv.isGstIncluded ? subtotal : (subtotal + gstAmt);
+    let subtotal = 0;
+    let gstAmt = 0;
+    let total = 0;
+
+    items.forEach((item) => {
+      const q = parseFloat(item.quantity) || 0;
+      const r = parseFloat(item.rate) || 0;
+      const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+      const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
+
+      const itemBase = q * r;
+      if (isIncl) {
+        const itemTotal = itemBase;
+        const itemSubtotal = itemTotal / (1 + rateGst / 100);
+        const itemGst = itemTotal - itemSubtotal;
+
+        subtotal += itemSubtotal;
+        gstAmt += itemGst;
+        total += itemTotal;
+      } else {
+        const itemSubtotal = itemBase;
+        const itemGst = itemSubtotal * (rateGst / 100);
+        const itemTotal = itemSubtotal + itemGst;
+
+        subtotal += itemSubtotal;
+        gstAmt += itemGst;
+        total += itemTotal;
+      }
+    });
 
     const flatData = {
       ...inv,
@@ -299,6 +364,8 @@ router.put("/:id", async (req, res) => {
         description: i.description || "",
         quantity: parseFloat(i.quantity) || 0,
         rate: parseFloat(i.rate) || 0,
+        gstRate: i.gstRate !== undefined ? parseFloat(i.gstRate) : (parseFloat(inv.gstRate) || 18),
+        isGstIncluded: i.isGstIncluded !== undefined ? i.isGstIncluded : (inv.isGstIncluded || false),
       })),
       subtotal,
       gstAmt,

@@ -4,6 +4,8 @@ const itemSchema = new mongoose.Schema({
   description: String,
   quantity: Number,
   rate: Number,
+  gstRate: { type: Number, default: 18 },
+  isGstIncluded: { type: Boolean, default: false }
 });
 
 const invoiceSchema = new mongoose.Schema({

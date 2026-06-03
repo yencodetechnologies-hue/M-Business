@@ -233,8 +233,25 @@ function saveDraftLocal(inv, items, status = "draft") {
   const drafts = loadAllDrafts();
   const id = inv.invoiceNo;
   const existing = drafts.findIndex((d) => d.id === id);
-  const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-  const total = subtotal * (1 + inv.gstRate / 100);
+  
+  let subtotal = 0;
+  let total = 0;
+  items.forEach((item) => {
+    const q = parseFloat(item.quantity) || 0;
+    const r = parseFloat(item.rate) || 0;
+    const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+    const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
+
+    const itemBase = q * r;
+    if (isIncl) {
+      total += itemBase;
+      subtotal += itemBase / (1 + rateGst / 100);
+    } else {
+      subtotal += itemBase;
+      total += itemBase * (1 + rateGst / 100);
+    }
+  });
+
   const entry = { id, invoiceNo: inv.invoiceNo, client: inv.client || "—", total, savedAt: Date.now(), inv, items, status };
   if (existing >= 0) drafts[existing] = entry; else drafts.unshift(entry);
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts.slice(0, 50)));
@@ -304,9 +321,15 @@ function CanvasSignature({ onSave }) {
   React.useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    
+    // Set logical size to match physical display layout to remove blur
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width || 340;
+    canvas.height = rect.height || 150;
+    
     const ctx = canvas.getContext("2d");
     ctx.strokeStyle = "#1a2e35";
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
   }, []);
@@ -372,8 +395,8 @@ function CanvasSignature({ onSave }) {
       <canvas
         ref={canvasRef}
         width={340}
-        height={90}
-        style={{ border: "1.5px dashed #C5DDE0", borderRadius: 8, background: "#fff", cursor: "crosshair", width: "100%", height: 90, display: "block" }}
+        height={150}
+        style={{ border: "1.5px dashed #C5DDE0", borderRadius: 8, background: "#fff", cursor: "crosshair", width: "100%", height: 150, display: "block" }}
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
@@ -520,18 +543,35 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   );
 
   // totals
-  const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
-  let subtotal, gstAmt, total;
+  let subtotal = 0;
+  let gstAmt = 0;
+  let total = 0;
 
-  if (inv.isGstIncluded) {
-    total = subtotalRaw;
-    subtotal = total / (1 + (inv.gstRate / 100));
-    gstAmt = total - subtotal;
-  } else {
-    subtotal = subtotalRaw;
-    gstAmt = subtotal * (inv.gstRate / 100);
-    total = subtotal + gstAmt;
-  }
+  items.forEach((item) => {
+    const q = parseFloat(item.quantity) || 0;
+    const r = parseFloat(item.rate) || 0;
+    const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+    const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
+
+    const itemBase = q * r;
+    if (isIncl) {
+      const itemTotal = itemBase;
+      const itemSubtotal = itemTotal / (1 + rateGst / 100);
+      const itemGst = itemTotal - itemSubtotal;
+
+      subtotal += itemSubtotal;
+      gstAmt += itemGst;
+      total += itemTotal;
+    } else {
+      const itemSubtotal = itemBase;
+      const itemGst = itemSubtotal * (rateGst / 100);
+      const itemTotal = itemSubtotal + itemGst;
+
+      subtotal += itemSubtotal;
+      gstAmt += itemGst;
+      total += itemTotal;
+    }
+  });
 
   const amountPaid = parseFloat(inv.amountPaid) || 0;
   const balanceDue = total - amountPaid;
@@ -1582,28 +1622,33 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
                 <tr className="avoid-break" style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
-                  {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                  {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
+                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "var(--app-accent)", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {items.map((item, idx) => (
-                  <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-bg)" }}>
-                    <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
-                    <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>{item.description || "—"}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
-                    <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "var(--app-text)" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
-                  </tr>
-                ))}
+                {items.map((item, idx) => {
+                  const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+                  const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
+                  return (
+                    <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-bg)" }}>
+                      <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                      <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>{item.description || "—"}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#6b7280" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "var(--app-text)" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             <div className="avoid-break" style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
               <div style={{ width: "min(280px,100%)" }}>
                 {[
                   ["Subtotal", formatCurrency(subtotal, inv.currency)],
-                  [`GST (${inv.gstRate}%)${inv.isGstIncluded ? " (Incl.)" : ""}`, formatCurrency(gstAmt, inv.currency)],
+                  ["GST / Tax", formatCurrency(gstAmt, inv.currency)],
                   ["Total Amount", formatCurrency(total, inv.currency)],
                   ["Advance Paid", formatCurrency(amountPaid, inv.currency)]
                 ].map(([l, v]) => (
@@ -1976,8 +2021,10 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     const dErr = errors[`item_${item.id}_description`];
                     const rErr = errors[`item_${item.id}_rate`];
                     const lineBase = (parseFloat(item.quantity) || 0) * (parseFloat(item.rate) || 0);
-                    const lineTax = lineBase * (inv.gstRate / 100);
-                    const lineTotal = lineBase + (inv.isGstIncluded ? 0 : lineTax);
+                    const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+                    const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
+                    const lineTax = isIncl ? (lineBase - (lineBase / (1 + rateGst / 100))) : (lineBase * (rateGst / 100));
+                    const lineTotal = isIncl ? lineBase : (lineBase + lineTax);
                     return (
                       <tr key={item.id}>
                         <td>
@@ -1992,7 +2039,29 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                           {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                         </td>
                         <td>
-                          <input type="number" className="inv-creator-item-input num" value={inv.gstRate} onChange={(e) => upd("gstRate", Number(e.target.value))} style={{width:"55px"}} />
+                          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                            <select
+                              className="inv-creator-form-select"
+                              value={rateGst}
+                              onChange={(e) => updItem(item.id, "gstRate", Number(e.target.value))}
+                              style={{ width: "75px", padding: "6px 8px", fontSize: "11px", height: "32px", backgroundPosition: "right 6px center" }}
+                            >
+                              {GST_RATES.map((rate) => (
+                                <option key={rate} value={rate}>
+                                  {rate}%
+                                </option>
+                              ))}
+                            </select>
+                            <select
+                              className="inv-creator-form-select"
+                              value={isIncl ? "incl" : "excl"}
+                              onChange={(e) => updItem(item.id, "isGstIncluded", e.target.value === "incl")}
+                              style={{ width: "75px", padding: "4px 6px", fontSize: "9px", height: "26px", fontWeight: "700", backgroundPosition: "right 6px center" }}
+                            >
+                              <option value="excl">Excl</option>
+                              <option value="incl">Incl</option>
+                            </select>
+                          </div>
                         </td>
                         <td className="inv-creator-item-total">
                           {formatCurrency(lineTotal, inv.currency)}
@@ -2304,26 +2373,32 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               </div>
 
               {/* ITEMS TABLE */}
-              <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
+               <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
                 <thead>
                   <tr style={{ background: currentT.logoColor || "var(--app-accent)" }}>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "left" }}>#</th>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "left" }}>Description</th>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "right" }}>Qty</th>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "right" }}>Unit Price</th>
+                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "right" }}>Tax %</th>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "right" }}>Total</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((item, idx) => (
-                    <tr key={item.id} style={{ borderBottom: "1px solid var(--app-border)" }}>
-                      <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)" }}>{idx + 1}</td>
-                      <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)" }}>{item.description || "—"}</td>
-                      <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)", textAlign: "right" }}>{item.quantity}</td>
-                      <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency)}</td>
-                      <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
-                    </tr>
-                  ))}
+                  {items.map((item, idx) => {
+                    const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+                    const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
+                    return (
+                      <tr key={item.id} style={{ borderBottom: "1px solid var(--app-border)" }}>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)" }}>{idx + 1}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)" }}>{item.description || "—"}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)", textAlign: "right" }}>{item.quantity}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", textAlign: "right", color: "var(--app-muted)" }}>{rateGst}% {isIncl ? "Incl" : ""}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
 
@@ -2334,7 +2409,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                   <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
                 </div>
                 <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                  <span className="lbl" style={{ color: "var(--app-muted)" }}>GST ({inv.gstRate}%)</span>
+                  <span className="lbl" style={{ color: "var(--app-muted)" }}>GST / Tax</span>
                   <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
                 </div>
                 {amountPaid > 0 && (

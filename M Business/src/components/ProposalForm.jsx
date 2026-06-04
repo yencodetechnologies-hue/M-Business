@@ -5,21 +5,22 @@ export default function ProposalForm({ onBack, onSave }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    // Inject global functions
+    // Inject global functions safely
     const script = document.createElement('script');
     script.innerHTML = `
-let msCount = 5;
-let currentStatus = 'DRAFT';
+      
+var msCount = 5;
+var currentStatus = 'DRAFT';
 
-const fmtDate = v => { try { return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return v; } };
-const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+var fmtDate = v => { try { return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return v; } };
+var fmt = n => '₹' + Number(n).toLocaleString('en-IN');
 
 /* ── SECTION TOGGLES ── */
 window.toggleSection = function(btn, id) {
-  const sec = document.getElementById(id);
-  const pvSec = document.getElementById('pv-sec-' + id.replace('sec-',''));
+  var sec = document.getElementById(id);
+  var pvSec = document.getElementById('pv-sec-' + id.replace('sec-',''));
   btn.classList.toggle('on');
-  const show = btn.classList.contains('on');
+  var show = btn.classList.contains('on');
   if (sec) sec.style.display = show ? '' : 'none';
   if (pvSec) pvSec.style.display = show ? '' : 'none';
 }
@@ -27,44 +28,44 @@ window.toggleSection = function(btn, id) {
 /* ── STATUS ── */
 window.selSt = function(el, val) {
   document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won','lost','sent','neg','exp'].includes(x)).join(' '));
-  const classMap = { DRAFT:'active-sc', SENT:'sent', NEGOTIATION:'neg', WON:'won', LOST:'lost', EXPIRED:'exp' };
+  var classMap = { DRAFT:'active-sc', SENT:'sent', NEGOTIATION:'neg', WON:'won', LOST:'lost', EXPIRED:'exp' };
   document.querySelectorAll('.sc').forEach(c => { c.className = 'sc'; });
   el.classList.add(classMap[val] || 'active-sc');
   currentStatus = val;
-  const b = document.getElementById('pv-status');
+  var b = document.getElementById('pv-status');
   b.textContent = val;
 }
 
 /* ── MAIN UPDATE ── */
 window.up = function() {
   // Cover
-  const t = document.getElementById('propTitle').value;
+  var t = document.getElementById('propTitle').value;
   document.getElementById('pv-title').textContent = t || '— Proposal Title —';
   document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
-  const tc = document.getElementById('toComp').value;
+  var tc = document.getElementById('toComp').value;
   document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
   document.getElementById('pv-date').textContent = fmtDate(document.getElementById('propDate').value);
   document.getElementById('pv-type').textContent = document.getElementById('propType').value;
   document.getElementById('pv-expiry').textContent = 'Expires ' + fmtDate(document.getElementById('propExpiry').value);
   // Parties
-  const fp = document.getElementById('fromPerson').value, fc = document.getElementById('fromComp').value, fe = document.getElementById('fromEmail').value;
+  var fp = document.getElementById('fromPerson').value, fc = document.getElementById('fromComp').value, fe = document.getElementById('fromEmail').value;
   document.getElementById('pv-from').textContent = fp || 'Prabhu R';
   document.getElementById('pv-from-d').innerHTML = \`\${fc}<br>\${fe}\`;
   document.getElementById('pv-sig1').textContent = fp || 'Prabhu R';
   document.getElementById('pv-to').textContent = tc || '— Client —';
   document.getElementById('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
-  const tp = document.getElementById('toPerson').value, te = document.getElementById('toEmail').value, ta = document.getElementById('toAddr').value;
+  var tp = document.getElementById('toPerson').value, te = document.getElementById('toEmail').value, ta = document.getElementById('toAddr').value;
   document.getElementById('pv-to-d').innerHTML = tc ? \`\${tp ? tp+'<br>' : ''}\${te ? te+'<br>' : ''}\${ta}\` : '<span style="color:var(--text3)">Fill in client details</span>';
   document.getElementById('pv-sig2').textContent = tc || '— Client —';
   document.getElementById('pv-sig2').style.color = tc ? 'var(--text)' : 'var(--text3)';
   document.getElementById('pv-sig2-role').textContent = tc || 'Awaiting';
   // Exec summary
-  const pr = document.getElementById('problem').value, so = document.getElementById('solution').value, oc = document.getElementById('outcome').value;
+  var pr = document.getElementById('problem').value, so = document.getElementById('solution').value, oc = document.getElementById('outcome').value;
   document.getElementById('pv-problem').innerHTML = pr || '<span style="color:var(--text3);font-style:italic">Describe the client\'s challenge…</span>';
   document.getElementById('pv-solution').innerHTML = so || '<span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span>';
   document.getElementById('pv-outcome').innerHTML = oc || '<span style="color:var(--text3);font-style:italic">Describe expected results…</span>';
   // Deliverables
-  let dHtml = '';
+  var dHtml = '';
   document.querySelectorAll('#delList .dv-input').forEach(d => { if (d.value.trim()) dHtml += \`<div class="del-item-p">\${d.value}</div>\`; });
   document.getElementById('pv-del').innerHTML = dHtml || '<span style="color:var(--text3);font-size:10px">No deliverables</span>';
   // Timeline dates
@@ -84,11 +85,11 @@ window.up = function() {
 }
 
 window.updateMilestonesPreview = function() {
-  const items = document.querySelectorAll('#msList .ms-item');
-  let html = '';
+  var items = document.querySelectorAll('#msList .ms-item');
+  var html = '';
   items.forEach((it, i) => {
-    const ti = it.querySelector('.ms-inp'), di = it.querySelector('.ms-date'), de = it.querySelector('.ms-desc');
-    const isLast = i === items.length - 1;
+    var ti = it.querySelector('.ms-inp'), di = it.querySelector('.ms-date'), de = it.querySelector('.ms-desc');
+    var isLast = i === items.length - 1;
     html += \`<div class="tl-pi"><div class="tl-left"><div class="tl-dot">\${i+1}</div>\${!isLast?'<div class="tl-line-p"></div>':''}</div>
       <div><div class="tl-pi-title">\${ti?ti.value:'Milestone'}</div>\${di&&di.value?\`<div class="tl-pi-date">\${fmtDate(di.value)}</div>\`:''}\${de&&de.value?\`<div class="tl-pi-desc">\${de.value}</div>\`:''}</div></div>\`;
   });
@@ -96,92 +97,92 @@ window.updateMilestonesPreview = function() {
 }
 
 window.updateTeamPreview = function() {
-  const items = document.querySelectorAll('#teamList .team-card');
-  let html = '';
+  var items = document.querySelectorAll('#teamList .team-card');
+  var html = '';
   items.forEach(it => {
-    const n = it.querySelector('.tc-name').textContent;
-    const r = it.querySelector('.tc-role').textContent;
-    const av = it.querySelector('.tc-av');
-    const bg = av ? av.style.background : 'var(--teal)';
-    const init = n.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    var n = it.querySelector('.tc-name').textContent;
+    var r = it.querySelector('.tc-role').textContent;
+    var av = it.querySelector('.tc-av');
+    var bg = av ? av.style.background : 'var(--teal)';
+    var init = n.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     html += \`<div class="tp-card" style="display:flex;align-items:center;gap:7px"><div class="tp-av-p" style="background:\${bg}">\${init}</div><div><div class="tp-name-p">\${n}</div><div class="tp-role-p">\${r}</div></div></div>\`;
   });
   document.getElementById('pv-team').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
 }
 
 window.updateValuePreview = function() {
-  let html = '';
+  var html = '';
   document.querySelectorAll('#valueList .dv-input').forEach(v => { if (v.value.trim()) html += \`<div class="val-pi">\${v.value}</div>\`; });
   document.getElementById('pv-value').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No value points</span>';
 }
 
 window.updateRisksPreview = function() {
-  const rows = document.querySelectorAll('#riskList .risk-row-g');
-  let html = '';
+  var rows = document.querySelectorAll('#riskList .risk-row-g');
+  var html = '';
   rows.forEach(r => {
-    const inputs = r.querySelectorAll('input');
-    const sel = r.querySelector('select');
+    var inputs = r.querySelectorAll('input');
+    var sel = r.querySelector('select');
     if (!inputs[0] || !inputs[0].value) return;
-    const lik = sel ? sel.value : 'Medium';
-    const cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
+    var lik = sel ? sel.value : 'Medium';
+    var cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
     html += \`<div class="risk-pi"><span class="risk-badge-p \${cls}">\${lik}</span><div><div class="risk-pi-text">\${inputs[0].value}</div>\${inputs[1]?\`<div class="risk-pi-mit">↳ \${inputs[1].value}</div>\`:''}</div></div>\`;
   });
   document.getElementById('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
 }
 
 window.updateCasePreview = function() {
-  const items = document.querySelectorAll('#csList .cs-item');
-  let html = '';
+  var items = document.querySelectorAll('#csList .cs-item');
+  var html = '';
   items.forEach(it => {
-    const title = it.querySelector('input[type="text"]').value;
-    const ta = it.querySelector('textarea');
+    var title = it.querySelector('input[type="text"]').value;
+    var ta = it.querySelector('textarea');
     html += \`<div class="cs-p"><div class="cs-p-title">\${title}</div><div class="cs-p-detail">\${ta ? ta.value : ''}</div></div>\`;
   });
   document.getElementById('pv-cs').innerHTML = html;
 }
 
 window.updateTmPreview = function() {
-  const items = document.querySelectorAll('#tmList .tm-item');
-  let html = '';
+  var items = document.querySelectorAll('#tmList .tm-item');
+  var html = '';
   items.forEach(it => {
-    const ta = it.querySelector('textarea');
-    const nameInp = it.querySelectorAll('input')[0];
+    var ta = it.querySelector('textarea');
+    var nameInp = it.querySelectorAll('input')[0];
     html += \`<div class="tm-p"><div class="tm-p-text">"\${ta ? ta.value : ''}"</div><div class="tm-p-author">— \${nameInp ? nameInp.value : ''}</div></div>\`;
   });
   document.getElementById('pv-tm').innerHTML = html;
 }
 
 window.calcTotal = function() {
-  const rows = document.querySelectorAll('#pricingList .pricing-row');
-  let sub = 0;
-  let html = '';
+  var rows = document.querySelectorAll('#pricingList .pricing-row');
+  var sub = 0;
+  var html = '';
   rows.forEach(r => {
-    const inps = r.querySelectorAll('input');
+    var inps = r.querySelectorAll('input');
     if (inps.length >= 2) {
-      const n = inps[0].value || 'Item', v = parseFloat(inps[1].value) || 0;
+      var n = inps[0].value || 'Item', v = parseFloat(inps[1].value) || 0;
       sub += v;
       html += \`<tr><td>\${n}</td><td>\${fmt(v)}</td></tr>\`;
     }
   });
-  const gst = parseFloat(document.getElementById('gst').value) || 0;
-  const disc = parseFloat(document.getElementById('disc').value) || 0;
-  const discount = sub * disc / 100;
-  const tax = sub * gst / 100;
-  const grand = sub - discount + tax;
+  var gst = parseFloat(document.getElementById('gst').value) || 0;
+  var disc = parseFloat(document.getElementById('disc').value) || 0;
+  var discount = sub * disc / 100;
+  var tax = sub * gst / 100;
+  var grand = sub - discount + tax;
   document.getElementById('subtotal').textContent = fmt(sub);
   document.getElementById('taxAmt').textContent = fmt(tax);
   document.getElementById('grandTotal').textContent = fmt(grand);
   document.getElementById('pv-grand').textContent = fmt(grand);
   document.getElementById('pv-pricing').innerHTML = html;
-  const dr = document.getElementById('discRow');
+  var dr = document.getElementById('discRow');
   if (discount > 0) { dr.style.display = 'flex'; document.getElementById('discAmt').textContent = '-' + fmt(discount); } else { dr.style.display = 'none'; }
 }
 
 /* ── ADD FUNCTIONS ── */
 window.addMilestone = function() {
   msCount++;
-  const c = document.getElementById('msList');
-  const d = document.createElement('div');
+  var c = document.getElementById('msList');
+  var d = document.createElement('div');
   d.className = 'ms-item';
   d.innerHTML = \`<div class="ms-left"><div class="ms-dot">\${msCount}</div><div class="ms-line"></div></div>
     <div class="ms-body">
@@ -202,14 +203,14 @@ window.removeMilestone = function(btn) {
 
 window.updateMsNumbers = function() {
   document.querySelectorAll('#msList .ms-item').forEach((it, i) => {
-    const dot = it.querySelector('.ms-dot');
+    var dot = it.querySelector('.ms-dot');
     if (dot) dot.textContent = i + 1;
   });
 }
 
 window.addDel = function() {
-  const c = document.getElementById('delList');
-  const d = document.createElement('div');
+  var c = document.getElementById('delList');
+  var d = document.createElement('div');
   d.className = 'dv-item';
   d.innerHTML = \`<div class="dv-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-check"></i></div>
     <input type="text" class="dv-input" placeholder="Deliverable…" oninput="up()">
@@ -220,8 +221,8 @@ window.addDel = function() {
 }
 
 window.addValue = function() {
-  const c = document.getElementById('valueList');
-  const d = document.createElement('div');
+  var c = document.getElementById('valueList');
+  var d = document.createElement('div');
   d.className = 'dv-item';
   d.innerHTML = \`<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
     <input type="text" class="dv-input" placeholder="Value point or ROI…" oninput="up()">
@@ -232,8 +233,8 @@ window.addValue = function() {
 }
 
 window.addPricingRow = function() {
-  const c = document.getElementById('pricingList');
-  const d = document.createElement('div');
+  var c = document.getElementById('pricingList');
+  var d = document.createElement('div');
   d.className = 'pricing-row';
   d.innerHTML = \`<input type="text" class="pr-inp" placeholder="Service / item" oninput="calcTotal()">
     <input type="number" class="pr-inp" value="0" style="text-align:right" oninput="calcTotal()">
@@ -244,8 +245,8 @@ window.addPricingRow = function() {
 }
 
 window.addRisk = function() {
-  const c = document.getElementById('riskList');
-  const d = document.createElement('div');
+  var c = document.getElementById('riskList');
+  var d = document.createElement('div');
   d.className = 'risk-row-g';
   d.innerHTML = \`<input type="text" class="pr-inp" placeholder="Risk description">
     <select class="pr-inp" style="padding:7px 8px;font-size:11px"><option>High</option><option selected>Medium</option><option>Low</option></select>
@@ -255,8 +256,8 @@ window.addRisk = function() {
 }
 
 window.addCaseStudy = function() {
-  const c = document.getElementById('csList'), n = c.children.length + 1;
-  const d = document.createElement('div');
+  var c = document.getElementById('csList'), n = c.children.length + 1;
+  var d = document.createElement('div');
   d.className = 'cs-item';
   d.innerHTML = \`<div class="cs-header"><div class="cs-num">\${n}</div>
     <input type="text" class="fi" style="flex:1" placeholder="Project name" oninput="updateCasePreview()">
@@ -271,8 +272,8 @@ window.addCaseStudy = function() {
 }
 
 window.addTestimonial = function() {
-  const c = document.getElementById('tmList');
-  const d = document.createElement('div');
+  var c = document.getElementById('tmList');
+  var d = document.createElement('div');
   d.className = 'tm-item';
   d.innerHTML = \`<i class="ti ti-quote tm-quote-icon"></i>
     <div class="fg"><label class="fl">Quote</label><textarea class="ta" style="min-height:56px" placeholder="Testimonial quote…" oninput="updateTmPreview()"></textarea></div>
@@ -284,8 +285,8 @@ window.addTestimonial = function() {
 }
 
 window.addFaq = function() {
-  const c = document.getElementById('faqList');
-  const d = document.createElement('div');
+  var c = document.getElementById('faqList');
+  var d = document.createElement('div');
   d.style.cssText = 'padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px';
   d.innerHTML = \`<div class="fg"><label class="fl">Question</label><input class="fi" type="text" placeholder="Frequently asked question…"></div>
     <div class="fg"><label class="fl">Answer</label><textarea class="ta" style="min-height:52px" placeholder="Clear, concise answer…"></textarea></div>
@@ -294,8 +295,8 @@ window.addFaq = function() {
 }
 
 window.addWhyUs = function() {
-  const c = document.getElementById('whyList');
-  const d = document.createElement('div');
+  var c = document.getElementById('whyList');
+  var d = document.createElement('div');
   d.className = 'dv-item';
   d.innerHTML = \`<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
     <input type="text" class="dv-input" placeholder="Why choose YENCODE…">
@@ -305,17 +306,17 @@ window.addWhyUs = function() {
 }
 
 window.addTeamMember = function() {
-  const name = prompt('Team member full name:');
+  var name = prompt('Team member full name:');
   if (!name) return;
-  const role = prompt('Their job role:') || 'Team Member';
-  const exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
-  const skills = prompt('Skills (comma-separated):') || '';
-  const c = document.getElementById('teamList');
-  const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))','linear-gradient(135deg,var(--purple),#4E35B0)','linear-gradient(135deg,var(--amber),#D4880A)','linear-gradient(135deg,var(--blue),#1A4DB5)'];
-  const col = colors[Math.floor(Math.random() * colors.length)];
-  const init = name.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  const skillTags = skills ? skills.split(',').map(s => \`<span class="tc-skill">\${s.trim()}</span>\`).join('') : '';
-  const d = document.createElement('div');
+  var role = prompt('Their job role:') || 'Team Member';
+  var exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
+  var skills = prompt('Skills (comma-separated):') || '';
+  var c = document.getElementById('teamList');
+  var colors = ['linear-gradient(135deg,var(--teal),var(--teal4))','linear-gradient(135deg,var(--purple),#4E35B0)','linear-gradient(135deg,var(--amber),#D4880A)','linear-gradient(135deg,var(--blue),#1A4DB5)'];
+  var col = colors[Math.floor(Math.random() * colors.length)];
+  var init = name.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  var skillTags = skills ? skills.split(',').map(s => \`<span class="tc-skill">\${s.trim()}</span>\`).join('') : '';
+  var d = document.createElement('div');
   d.className = 'team-card';
   d.innerHTML = \`<div class="tc-av" style="background:\${col}">\${init}</div>
     <div style="flex:1;min-width:0">
@@ -339,7 +340,7 @@ window.fillClient = function() {
 }
 
 window.uploadCover = function() {
-  const z = document.getElementById('coverZone');
+  var z = document.getElementById('coverZone');
   z.style.background = 'var(--teal-lighter)';
   z.style.borderColor = 'var(--teal)';
   z.innerHTML = \`<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div class="cover-zone-txt" style="color:var(--teal)">Cover image uploaded</div><div class="cover-zone-sub">Click to change</div>\`;
@@ -347,7 +348,7 @@ window.uploadCover = function() {
 
 window.saveDraft = function() { selSt(document.querySelectorAll('.sc')[0],'DRAFT'); alert('Proposal saved as draft!'); }
 window.sendProposal = function() {
-  const c = document.getElementById('toComp').value;
+  var c = document.getElementById('toComp').value;
   if (!c) { alert('Please enter client name first.'); document.getElementById('toComp').focus(); return; }
   selSt(document.querySelectorAll('.sc')[1],'SENT');
   alert('Proposal sent to ' + c + '!');
@@ -361,8 +362,14 @@ updateMilestonesPreview();
 updateTeamPreview();
 updateValuePreview();
 updateRisksPreview();
-`;
-    document.body.appendChild(script);
+
+    `;
+    // We add an ID to avoid injecting multiple times if possible
+    script.id = 'proposal-form-logic';
+    
+    if (!document.getElementById('proposal-form-logic')) {
+      document.body.appendChild(script);
+    }
 
     // Hook up buttons
     const c = containerRef.current;
@@ -371,7 +378,9 @@ updateRisksPreview();
       if (backBtn) backBtn.onclick = onBack;
 
       const actions = c.querySelectorAll('.topbar-actions button');
-      actions.forEach(btn => {
+      actions.forEach((btn, idx) => {
+        // Skip Duplicate button
+        if (idx === 0) return;
         btn.onclick = () => {
           const title = document.getElementById('propTitle')?.value || 'New Proposal';
           const client = document.getElementById('toComp')?.value || '';
@@ -387,18 +396,20 @@ updateRisksPreview();
       });
     }
 
-    // Run initial update
+    // Run initial update safely
     setTimeout(() => {
-      if (window.calcTotal) window.calcTotal();
-      if (window.up) window.up();
-      if (window.updateMilestonesPreview) window.updateMilestonesPreview();
-      if (window.updateTeamPreview) window.updateTeamPreview();
-      if (window.updateValuePreview) window.updateValuePreview();
-      if (window.updateRisksPreview) window.updateRisksPreview();
-    }, 100);
+      try {
+        if (window.calcTotal) window.calcTotal();
+        if (window.up) window.up();
+        if (window.updateMilestonesPreview) window.updateMilestonesPreview();
+        if (window.updateTeamPreview) window.updateTeamPreview();
+        if (window.updateValuePreview) window.updateValuePreview();
+        if (window.updateRisksPreview) window.updateRisksPreview();
+      } catch(e) {}
+    }, 200);
 
     return () => {
-      document.body.removeChild(script);
+      // Don't remove script so that functions remain available if unmounted/remounted
     };
   }, [onBack, onSave]);
 

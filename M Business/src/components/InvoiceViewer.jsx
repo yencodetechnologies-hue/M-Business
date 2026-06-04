@@ -265,9 +265,9 @@ export default function InvoiceViewer() {
         <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
             <thead>
-              <tr style={{ background: currentT.logoColor || currentT.primaryColor }}>
+              <tr>
                 {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                  <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                  <th key={i} style={{ background: currentT.primaryColor, padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                 ))}
               </tr>
             </thead>

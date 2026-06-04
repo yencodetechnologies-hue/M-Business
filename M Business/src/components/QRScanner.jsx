@@ -8,8 +8,8 @@ export default function QRScanner({ onScanSuccess, onScanError }) {
     const scanner = new Html5QrcodeScanner(
       'qr-reader',
       {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
+        fps: 30,
+        qrbox: { width: 300, height: 300 },
         aspectRatio: 1.0,
       },
       false

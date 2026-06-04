@@ -22,66 +22,6 @@ export function toggleSection(btn, id) {
 
 /* ── STATUS ── */
 export function selSt(el, val) {
-  document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won','lost','sent','neg','exp'].includes(x)).join(' '));
-  const classMap = { DRAFT:'active-sc', SENT:'sent', NEGOTIATION:'neg', WON:'won', LOST:'lost', EXPIRED:'exp' };
-  document.querySelectorAll('.sc').forEach(c => { c.className = 'sc'; });
-  el.classList.add(classMap[val] || 'active-sc');
-  currentStatus = val;
-  const b = document.getElementById('pv-status');
-  b.textContent = val;
-}
-
-/* ── MAIN UPDATE ── */
-export function up() {
-  // Cover
-  const t = document.getElementById('propTitle').value;
-  document.getElementById('pv-title').textContent = t || '— Proposal Title —';
-  document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
-  const tc = document.getElementById('toComp').value;
-  document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
-  document.getElementById('pv-date').textContent = fmtDate(document.getElementById('propDate').value);
-  document.getElementById('pv-type').textContent = document.getElementById('propType').value;
-  document.getElementById('pv-expiry').textContent = 'Expires ' + fmtDate(document.getElementById('propExpiry').value);
-  // Parties
-  const fp = document.getElementById('fromPerson').value, fc = document.getElementById('fromComp').value, fe = document.getElementById('fromEmail').value;
-  document.getElementById('pv-from').textContent = fp || 'Prabhu R';
-  document.getElementById('pv-from-d').innerHTML = `${fc}<br>${fe}`;
-  document.getElementById('pv-sig1').textContent = fp || 'Prabhu R';
-  document.getElementById('pv-to').textContent = tc || '— Client —';
-  document.getElementById('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
-  const tp = document.getElementById('toPerson').value, te = document.getElementById('toEmail').value, ta = document.getElementById('toAddr').value;
-  document.getElementById('pv-to-d').innerHTML = tc ? `${tp ? tp+'<br>' : ''}${te ? te+'<br>' : ''}${ta}` : '<span style="color:var(--text3)">Fill in client details</span>';
-  document.getElementById('pv-sig2').textContent = tc || '— Client —';
-  document.getElementById('pv-sig2').style.color = tc ? 'var(--text)' : 'var(--text3)';
-  document.getElementById('pv-sig2-role').textContent = tc || 'Awaiting';
-  // Exec summary
-  const pr = document.getElementById('problem').value, so = document.getElementById('solution').value, oc = document.getElementById('outcome').value;
-  document.getElementById('pv-problem').innerHTML = pr || '<span style="color:var(--text3);font-style:italic">Describe the client\'s challenge…</span>';
-  document.getElementById('pv-solution').innerHTML = so || '<span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span>';
-  document.getElementById('pv-outcome').innerHTML = oc || '<span style="color:var(--text3);font-style:italic">Describe expected results…</span>';
-  // Deliverables
-  let dHtml = '';
-  document.querySelectorAll('#delList .dv-input').forEach(d => { if (d.value.trim()) dHtml += `<div class="del-item-p">${d.value}</div>`; });
-  document.getElementById('pv-del').innerHTML = dHtml || '<span style="color:var(--text3);font-size:10px">No deliverables</span>';
-  // Timeline dates
-  document.getElementById('pv-start').textContent = fmtDate(document.getElementById('startDate').value);
-  document.getElementById('pv-end').textContent = fmtDate(document.getElementById('endDate').value);
-  document.getElementById('pv-dur').textContent = document.getElementById('duration').value;
-  updateMilestonesPreview();
-  updateTeamPreview();
-  updateValuePreview();
-  updateRisksPreview();
-  updateCasePreview();
-  updateTmPreview();
-  // Payment
-  document.getElementById('pv-pay').textContent = 'Payment: ' + document.getElementById('paySchedule').value;
-  // Closing
-  document.getElementById('pv-closing').innerHTML = (document.getElementById('closing').value || '').replace(/\n/g,'<br>');
-}
-
-export function updateMilestonesPreview() {
-  const items = document.querySelectorAll('#msList .ms-item');
-  let html = '';
   items.forEach((it, i) => {
     const ti = it.querySelector('.ms-inp'), di = it.querySelector('.ms-date'), de = it.querySelector('.ms-desc');
     const isLast = i === items.length - 1;

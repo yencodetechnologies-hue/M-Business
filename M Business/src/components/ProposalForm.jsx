@@ -1,449 +1,88 @@
 
 import React, { useEffect, useRef } from 'react';
+import * as logic from './ProposalFormLogic';
 
 export default function ProposalForm({ onBack, onSave }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    // 1. Inject global functions safely
-    const script = document.createElement('script');
-    script.innerHTML = `
-      
-var msCount = 5;
-var currentStatus = 'DRAFT';
-
-var fmtDate = v => { try { return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return v; } };
-var fmt = n => '₹' + Number(n).toLocaleString('en-IN');
-
-/* ── SECTION TOGGLES ── */
-window.toggleSection = function(btn, id) {
-  var sec = document.getElementById(id);
-  var pvSec = document.getElementById('pv-sec-' + id.replace('sec-',''));
-  btn.classList.toggle('on');
-  var show = btn.classList.contains('on');
-  if (sec) sec.style.display = show ? '' : 'none';
-  if (pvSec) pvSec.style.display = show ? '' : 'none';
-}
-
-/* ── STATUS ── */
-window.selSt = function(el, val) {
-  document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won','lost','sent','neg','exp'].includes(x)).join(' '));
-  var classMap = { DRAFT:'active-sc', SENT:'sent', NEGOTIATION:'neg', WON:'won', LOST:'lost', EXPIRED:'exp' };
-  document.querySelectorAll('.sc').forEach(c => { c.className = 'sc'; });
-  el.classList.add(classMap[val] || 'active-sc');
-  currentStatus = val;
-  var b = document.getElementById('pv-status');
-  b.textContent = val;
-}
-
-/* ── MAIN UPDATE ── */
-window.up = function() {
-  // Cover
-  var t = document.getElementById('propTitle').value;
-  document.getElementById('pv-title').textContent = t || '— Proposal Title —';
-  document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
-  var tc = document.getElementById('toComp').value;
-  document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
-  document.getElementById('pv-date').textContent = fmtDate(document.getElementById('propDate').value);
-  document.getElementById('pv-type').textContent = document.getElementById('propType').value;
-  document.getElementById('pv-expiry').textContent = 'Expires ' + fmtDate(document.getElementById('propExpiry').value);
-  // Parties
-  var fp = document.getElementById('fromPerson').value, fc = document.getElementById('fromComp').value, fe = document.getElementById('fromEmail').value;
-  document.getElementById('pv-from').textContent = fp || 'Prabhu R';
-  document.getElementById('pv-from-d').innerHTML = \`\${fc}<br>\${fe}\`;
-  document.getElementById('pv-sig1').textContent = fp || 'Prabhu R';
-  document.getElementById('pv-to').textContent = tc || '— Client —';
-  document.getElementById('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
-  var tp = document.getElementById('toPerson').value, te = document.getElementById('toEmail').value, ta = document.getElementById('toAddr').value;
-  document.getElementById('pv-to-d').innerHTML = tc ? \`\${tp ? tp+'<br>' : ''}\${te ? te+'<br>' : ''}\${ta}\` : '<span style="color:var(--text3)">Fill in client details</span>';
-  document.getElementById('pv-sig2').textContent = tc || '— Client —';
-  document.getElementById('pv-sig2').style.color = tc ? 'var(--text)' : 'var(--text3)';
-  document.getElementById('pv-sig2-role').textContent = tc || 'Awaiting';
-  // Exec summary
-  var pr = document.getElementById('problem').value, so = document.getElementById('solution').value, oc = document.getElementById('outcome').value;
-  document.getElementById('pv-problem').innerHTML = pr || '<span style="color:var(--text3);font-style:italic">Describe the client\'s challenge…</span>';
-  document.getElementById('pv-solution').innerHTML = so || '<span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span>';
-  document.getElementById('pv-outcome').innerHTML = oc || '<span style="color:var(--text3);font-style:italic">Describe expected results…</span>';
-  // Deliverables
-  var dHtml = '';
-  document.querySelectorAll('#delList .dv-input').forEach(d => { if (d.value.trim()) dHtml += \`<div class="del-item-p">\${d.value}</div>\`; });
-  document.getElementById('pv-del').innerHTML = dHtml || '<span style="color:var(--text3);font-size:10px">No deliverables</span>';
-  // Timeline dates
-  document.getElementById('pv-start').textContent = fmtDate(document.getElementById('startDate').value);
-  document.getElementById('pv-end').textContent = fmtDate(document.getElementById('endDate').value);
-  document.getElementById('pv-dur').textContent = document.getElementById('duration').value;
-  updateMilestonesPreview();
-  updateTeamPreview();
-  updateValuePreview();
-  updateRisksPreview();
-  updateCasePreview();
-  updateTmPreview();
-  // Payment
-  document.getElementById('pv-pay').textContent = 'Payment: ' + document.getElementById('paySchedule').value;
-  // Closing
-  document.getElementById('pv-closing').innerHTML = (document.getElementById('closing').value || '').replace(/\n/g,'<br>');
-}
-
-window.updateMilestonesPreview = function() {
-  var items = document.querySelectorAll('#msList .ms-item');
-  var html = '';
-  items.forEach((it, i) => {
-    var ti = it.querySelector('.ms-inp'), di = it.querySelector('.ms-date'), de = it.querySelector('.ms-desc');
-    var isLast = i === items.length - 1;
-    html += \`<div class="tl-pi"><div class="tl-left"><div class="tl-dot">\${i+1}</div>\${!isLast?'<div class="tl-line-p"></div>':''}</div>
-      <div><div class="tl-pi-title">\${ti?ti.value:'Milestone'}</div>\${di&&di.value?\`<div class="tl-pi-date">\${fmtDate(di.value)}</div>\`:''}\${de&&de.value?\`<div class="tl-pi-desc">\${de.value}</div>\`:''}</div></div>\`;
-  });
-  document.getElementById('pv-timeline').innerHTML = html;
-}
-
-window.updateTeamPreview = function() {
-  var items = document.querySelectorAll('#teamList .team-card');
-  var html = '';
-  items.forEach(it => {
-    var n = it.querySelector('.tc-name').textContent;
-    var r = it.querySelector('.tc-role').textContent;
-    var av = it.querySelector('.tc-av');
-    var bg = av ? av.style.background : 'var(--teal)';
-    var init = n.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    html += \`<div class="tp-card" style="display:flex;align-items:center;gap:7px"><div class="tp-av-p" style="background:\${bg}">\${init}</div><div><div class="tp-name-p">\${n}</div><div class="tp-role-p">\${r}</div></div></div>\`;
-  });
-  document.getElementById('pv-team').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
-}
-
-window.updateValuePreview = function() {
-  var html = '';
-  document.querySelectorAll('#valueList .dv-input').forEach(v => { if (v.value.trim()) html += \`<div class="val-pi">\${v.value}</div>\`; });
-  document.getElementById('pv-value').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No value points</span>';
-}
-
-window.updateRisksPreview = function() {
-  var rows = document.querySelectorAll('#riskList .risk-row-g');
-  var html = '';
-  rows.forEach(r => {
-    var inputs = r.querySelectorAll('input');
-    var sel = r.querySelector('select');
-    if (!inputs[0] || !inputs[0].value) return;
-    var lik = sel ? sel.value : 'Medium';
-    var cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
-    html += \`<div class="risk-pi"><span class="risk-badge-p \${cls}">\${lik}</span><div><div class="risk-pi-text">\${inputs[0].value}</div>\${inputs[1]?\`<div class="risk-pi-mit">↳ \${inputs[1].value}</div>\`:''}</div></div>\`;
-  });
-  document.getElementById('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
-}
-
-window.updateCasePreview = function() {
-  var items = document.querySelectorAll('#csList .cs-item');
-  var html = '';
-  items.forEach(it => {
-    var title = it.querySelector('input[type="text"]').value;
-    var ta = it.querySelector('textarea');
-    html += \`<div class="cs-p"><div class="cs-p-title">\${title}</div><div class="cs-p-detail">\${ta ? ta.value : ''}</div></div>\`;
-  });
-  document.getElementById('pv-cs').innerHTML = html;
-}
-
-window.updateTmPreview = function() {
-  var items = document.querySelectorAll('#tmList .tm-item');
-  var html = '';
-  items.forEach(it => {
-    var ta = it.querySelector('textarea');
-    var nameInp = it.querySelectorAll('input')[0];
-    html += \`<div class="tm-p"><div class="tm-p-text">"\${ta ? ta.value : ''}"</div><div class="tm-p-author">— \${nameInp ? nameInp.value : ''}</div></div>\`;
-  });
-  document.getElementById('pv-tm').innerHTML = html;
-}
-
-window.calcTotal = function() {
-  var rows = document.querySelectorAll('#pricingList .pricing-row');
-  var sub = 0;
-  var html = '';
-  rows.forEach(r => {
-    var inps = r.querySelectorAll('input');
-    if (inps.length >= 2) {
-      var n = inps[0].value || 'Item', v = parseFloat(inps[1].value) || 0;
-      sub += v;
-      html += \`<tr><td>\${n}</td><td>\${fmt(v)}</td></tr>\`;
-    }
-  });
-  var gst = parseFloat(document.getElementById('gst').value) || 0;
-  var disc = parseFloat(document.getElementById('disc').value) || 0;
-  var discount = sub * disc / 100;
-  var tax = sub * gst / 100;
-  var grand = sub - discount + tax;
-  document.getElementById('subtotal').textContent = fmt(sub);
-  document.getElementById('taxAmt').textContent = fmt(tax);
-  document.getElementById('grandTotal').textContent = fmt(grand);
-  document.getElementById('pv-grand').textContent = fmt(grand);
-  document.getElementById('pv-pricing').innerHTML = html;
-  var dr = document.getElementById('discRow');
-  if (discount > 0) { dr.style.display = 'flex'; document.getElementById('discAmt').textContent = '-' + fmt(discount); } else { dr.style.display = 'none'; }
-}
-
-/* ── ADD FUNCTIONS ── */
-window.addMilestone = function() {
-  msCount++;
-  var c = document.getElementById('msList');
-  var d = document.createElement('div');
-  d.className = 'ms-item';
-  d.innerHTML = \`<div class="ms-left"><div class="ms-dot">\${msCount}</div><div class="ms-line"></div></div>
-    <div class="ms-body">
-      <div class="ms-row"><input type="text" class="ms-inp" placeholder="Milestone title" oninput="up()"><input type="date" class="ms-date" oninput="up()"><button class="icon-del" onclick="removeMilestone(this)"><i class="ti ti-trash"></i></button></div>
-      <input type="text" class="ms-desc" placeholder="Brief description…" oninput="up()">
-    </div>\`;
-  c.appendChild(d);
-  updateMsNumbers();
-  up();
-}
-
-window.removeMilestone = function(btn) {
-  if (document.querySelectorAll('#msList .ms-item').length <= 1) return;
-  btn.closest('.ms-item').remove();
-  updateMsNumbers();
-  up();
-}
-
-window.updateMsNumbers = function() {
-  document.querySelectorAll('#msList .ms-item').forEach((it, i) => {
-    var dot = it.querySelector('.ms-dot');
-    if (dot) dot.textContent = i + 1;
-  });
-}
-
-window.addDel = function() {
-  var c = document.getElementById('delList');
-  var d = document.createElement('div');
-  d.className = 'dv-item';
-  d.innerHTML = \`<div class="dv-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-check"></i></div>
-    <input type="text" class="dv-input" placeholder="Deliverable…" oninput="up()">
-    <i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i>\`;
-  c.appendChild(d);
-  d.querySelector('.dv-input').focus();
-  up();
-}
-
-window.addValue = function() {
-  var c = document.getElementById('valueList');
-  var d = document.createElement('div');
-  d.className = 'dv-item';
-  d.innerHTML = \`<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
-    <input type="text" class="dv-input" placeholder="Value point or ROI…" oninput="up()">
-    <i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i>\`;
-  c.appendChild(d);
-  d.querySelector('.dv-input').focus();
-  up();
-}
-
-window.addPricingRow = function() {
-  var c = document.getElementById('pricingList');
-  var d = document.createElement('div');
-  d.className = 'pricing-row';
-  d.innerHTML = \`<input type="text" class="pr-inp" placeholder="Service / item" oninput="calcTotal()">
-    <input type="number" class="pr-inp" value="0" style="text-align:right" oninput="calcTotal()">
-    <button class="pr-del" onclick="this.closest('.pricing-row').remove();calcTotal()"><i class="ti ti-trash"></i></button>\`;
-  c.appendChild(d);
-  d.querySelector('input').focus();
-  calcTotal();
-}
-
-window.addRisk = function() {
-  var c = document.getElementById('riskList');
-  var d = document.createElement('div');
-  d.className = 'risk-row-g';
-  d.innerHTML = \`<input type="text" class="pr-inp" placeholder="Risk description">
-    <select class="pr-inp" style="padding:7px 8px;font-size:11px"><option>High</option><option selected>Medium</option><option>Low</option></select>
-    <input type="text" class="pr-inp" placeholder="Mitigation">
-    <button class="pr-del" onclick="this.closest('.risk-row-g').remove()"><i class="ti ti-trash"></i></button>\`;
-  c.appendChild(d);
-}
-
-window.addCaseStudy = function() {
-  var c = document.getElementById('csList'), n = c.children.length + 1;
-  var d = document.createElement('div');
-  d.className = 'cs-item';
-  d.innerHTML = \`<div class="cs-header"><div class="cs-num">\${n}</div>
-    <input type="text" class="fi" style="flex:1" placeholder="Project name" oninput="updateCasePreview()">
-    <button class="icon-del" style="margin-left:6px" onclick="this.closest('.cs-item').remove();updateCasePreview()"><i class="ti ti-trash"></i></button></div>
-    <div class="form-row">
-      <div class="fg"><label class="fl">Client</label><input class="fi" type="text" placeholder="Client name" oninput="updateCasePreview()"></div>
-      <div class="fg"><label class="fl">Industry</label><input class="fi" type="text" placeholder="Industry" oninput="updateCasePreview()"></div>
-    </div>
-    <div class="fg"><label class="fl">Challenge & Result</label><textarea class="ta" style="min-height:60px" placeholder="Describe challenge and result…" oninput="updateCasePreview()"></textarea></div>\`;
-  c.appendChild(d);
-  updateCasePreview();
-}
-
-window.addTestimonial = function() {
-  var c = document.getElementById('tmList');
-  var d = document.createElement('div');
-  d.className = 'tm-item';
-  d.innerHTML = \`<i class="ti ti-quote tm-quote-icon"></i>
-    <div class="fg"><label class="fl">Quote</label><textarea class="ta" style="min-height:56px" placeholder="Testimonial quote…" oninput="updateTmPreview()"></textarea></div>
-    <div class="form-row"><div class="fg"><label class="fl">Name & Role</label><input class="fi" type="text" placeholder="Name, Title – Company" oninput="updateTmPreview()"></div>
-    <div class="fg"><label class="fl">Rating</label><select class="fs"><option>⭐⭐⭐⭐⭐ 5/5</option><option>⭐⭐⭐⭐ 4/5</option></select></div></div>
-    <button class="icon-del" onclick="this.closest('.tm-item').remove();updateTmPreview()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>\`;
-  c.appendChild(d);
-  updateTmPreview();
-}
-
-window.addFaq = function() {
-  var c = document.getElementById('faqList');
-  var d = document.createElement('div');
-  d.style.cssText = 'padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px';
-  d.innerHTML = \`<div class="fg"><label class="fl">Question</label><input class="fi" type="text" placeholder="Frequently asked question…"></div>
-    <div class="fg"><label class="fl">Answer</label><textarea class="ta" style="min-height:52px" placeholder="Clear, concise answer…"></textarea></div>
-    <button class="icon-del" onclick="this.closest('div[style]').remove()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>\`;
-  c.appendChild(d);
-}
-
-window.addWhyUs = function() {
-  var c = document.getElementById('whyList');
-  var d = document.createElement('div');
-  d.className = 'dv-item';
-  d.innerHTML = \`<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
-    <input type="text" class="dv-input" placeholder="Why choose YENCODE…">
-    <i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i>\`;
-  c.appendChild(d);
-  d.querySelector('.dv-input').focus();
-}
-
-window.addTeamMember = function() {
-  var name = prompt('Team member full name:');
-  if (!name) return;
-  var role = prompt('Their job role:') || 'Team Member';
-  var exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
-  var skills = prompt('Skills (comma-separated):') || '';
-  var c = document.getElementById('teamList');
-  var colors = ['linear-gradient(135deg,var(--teal),var(--teal4))','linear-gradient(135deg,var(--purple),#4E35B0)','linear-gradient(135deg,var(--amber),#D4880A)','linear-gradient(135deg,var(--blue),#1A4DB5)'];
-  var col = colors[Math.floor(Math.random() * colors.length)];
-  var init = name.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  var skillTags = skills ? skills.split(',').map(s => \`<span class="tc-skill">\${s.trim()}</span>\`).join('') : '';
-  var d = document.createElement('div');
-  d.className = 'team-card';
-  d.innerHTML = \`<div class="tc-av" style="background:\${col}">\${init}</div>
-    <div style="flex:1;min-width:0">
-      <div class="tc-name">\${name}</div>
-      <div class="tc-role">\${role}</div>
-      \${exp ? \`<div class="tc-exp">\${exp}</div>\` : ''}
-      \${skillTags ? \`<div class="tc-skills">\${skillTags}</div>\` : ''}
-    </div>
-    <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>\`;
-  c.appendChild(d);
-  updateTeamPreview();
-}
-
-window.fillClient = function() {
-  document.getElementById('toComp').value = 'STA Corporation';
-  document.getElementById('toPerson').value = 'STA Admin';
-  document.getElementById('toEmail').value = 'sta@example.com';
-  document.getElementById('toPhone').value = '+91 98765 43210';
-  document.getElementById('toAddr').value = 'Chennai, Tamil Nadu, India';
-  up();
-}
-
-window.uploadCover = function() {
-  var z = document.getElementById('coverZone');
-  z.style.background = 'var(--teal-lighter)';
-  z.style.borderColor = 'var(--teal)';
-  z.innerHTML = \`<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div class="cover-zone-txt" style="color:var(--teal)">Cover image uploaded</div><div class="cover-zone-sub">Click to change</div>\`;
-}
-
-window.saveDraft = function() { selSt(document.querySelectorAll('.sc')[0],'DRAFT'); alert('Proposal saved as draft!'); }
-window.sendProposal = function() {
-  var c = document.getElementById('toComp').value;
-  if (!c) { alert('Please enter client name first.'); document.getElementById('toComp').focus(); return; }
-  selSt(document.querySelectorAll('.sc')[1],'SENT');
-  alert('Proposal sent to ' + c + '!');
-}
-window.markWon = function() { selSt(document.querySelectorAll('.sc')[3],'WON'); alert('Proposal marked as Won 🏆'); }
-
-// Init
-calcTotal();
-up();
-updateMilestonesPreview();
-updateTeamPreview();
-updateValuePreview();
-updateRisksPreview();
-
-    `;
-    script.id = 'proposal-form-logic';
-    
-    if (!document.getElementById('proposal-form-logic')) {
-      document.body.appendChild(script);
-    }
-
-    // 2. Event Delegation for ALL inputs and clicks
     const c = containerRef.current;
-    if (c) {
-      // Handle all clicks safely
-      const handleClick = (e) => {
-        const btn = e.target.closest('[onclick]');
-        if (btn) {
-          const code = btn.getAttribute('onclick');
-          try {
-            // Using new Function to evaluate the string in global scope
-            new Function('event', code).call(btn, e);
-          } catch(err) {
-            console.error('Click error:', err);
+    if (!c) return;
+
+    // We no longer inject scripts! We use the imported logic module!
+
+    const handleClick = (e) => {
+      const btn = e.target.closest('[onclick]');
+      if (btn) {
+        const code = btn.getAttribute('onclick');
+        const funcMatch = code.match(/^([a-zA-Z0-9_]+)\(/);
+        if (funcMatch) {
+          const funcName = funcMatch[1];
+          if (typeof logic[funcName] === 'function') {
+            try {
+              if (code.includes('this')) {
+                logic[funcName](btn);
+              } else {
+                logic[funcName]();
+              }
+            } catch(err) {
+              console.error('Click error:', err);
+            }
           }
         }
-      };
+      }
+    };
 
-      // Handle all inputs safely
-      const handleInput = (e) => {
-        const el = e.target.closest('[oninput]');
-        if (el) {
-          const code = el.getAttribute('oninput');
-          try {
-            new Function('event', code).call(el, e);
-          } catch(err) {
-            console.error('Input error:', err);
-          }
-        }
-        // Fallback: Always try to update preview on any input just in case!
-        if (window.up) window.up();
-        if (window.calcTotal) window.calcTotal();
-      };
+    const handleInput = (e) => {
+      // Always update preview on any input in the form
+      try {
+        if (logic.up) logic.up();
+        if (logic.calcTotal) logic.calcTotal();
+      } catch (err) {
+        console.error('Input error:', err);
+      }
+    };
 
-      c.addEventListener('click', handleClick);
-      c.addEventListener('input', handleInput);
+    c.addEventListener('click', handleClick);
+    c.addEventListener('input', handleInput);
 
-      // Hook up topbar buttons explicitly
-      const backBtn = c.querySelector('.back-btn');
-      if (backBtn) backBtn.onclick = onBack;
+    // Hook up topbar buttons explicitly
+    const backBtn = c.querySelector('.back-btn');
+    if (backBtn) backBtn.onclick = onBack;
 
-      const actions = c.querySelectorAll('.topbar-actions button');
-      actions.forEach((btn, idx) => {
-        if (idx === 0) return; // Skip Duplicate
-        btn.onclick = () => {
-          const title = document.getElementById('propTitle')?.value || 'New Proposal';
-          const client = document.getElementById('toComp')?.value || '';
-          
-          let val = 0;
-          try {
-            const grandTotalStr = document.getElementById('grandTotal')?.textContent || '0';
-            val = Number(grandTotalStr.replace(/[^0-9.-]+/g,""));
-          } catch(err) {}
-          
-          onSave({ title, client, value: val });
-        };
-      });
-
-      // 3. Initial Render Update
-      setTimeout(() => {
+    const actions = c.querySelectorAll('.topbar-actions button');
+    actions.forEach((btn, idx) => {
+      if (idx === 0) return; // Skip Duplicate
+      btn.onclick = () => {
+        const title = document.getElementById('propTitle')?.value || 'New Proposal';
+        const client = document.getElementById('toComp')?.value || '';
+        
+        let val = 0;
         try {
-          if (window.calcTotal) window.calcTotal();
-          if (window.up) window.up();
-          if (window.updateMilestonesPreview) window.updateMilestonesPreview();
-          if (window.updateTeamPreview) window.updateTeamPreview();
-          if (window.updateValuePreview) window.updateValuePreview();
-          if (window.updateRisksPreview) window.updateRisksPreview();
-        } catch(e) {}
-      }, 300);
-
-      return () => {
-        c.removeEventListener('click', handleClick);
-        c.removeEventListener('input', handleInput);
+          const grandTotalStr = document.getElementById('grandTotal')?.textContent || '0';
+          val = Number(grandTotalStr.replace(/[^0-9.-]+/g,""));
+        } catch(err) {}
+        
+        onSave({ title, client, value: val });
       };
-    }
+    });
+
+    // Initial Render Update
+    setTimeout(() => {
+      try {
+        if (logic.calcTotal) logic.calcTotal();
+        if (logic.up) logic.up();
+        if (logic.updateMilestonesPreview) logic.updateMilestonesPreview();
+        if (logic.updateTeamPreview) logic.updateTeamPreview();
+        if (logic.updateValuePreview) logic.updateValuePreview();
+        if (logic.updateRisksPreview) logic.updateRisksPreview();
+      } catch(e) { console.error('Init error', e); }
+    }, 300);
+
+    return () => {
+      c.removeEventListener('click', handleClick);
+      c.removeEventListener('input', handleInput);
+    };
   }, [onBack, onSave]);
 
   return (
@@ -756,10 +395,6 @@ body{display:flex;min-height:100vh}
 `}</style>
       <div 
         ref={containerRef} 
-        onInput={() => {
-          if (window.up) window.up();
-          if (window.calcTotal) window.calcTotal();
-        }}
         dangerouslySetInnerHTML={{ __html: `<div class="main">
   <header class="topbar">
     <div class="topbar-left">
@@ -864,8 +499,8 @@ body{display:flex;min-height:100vh}
       <div class="card-body">
         <div style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Our Details</div>
         <div class="form-row">
-          <div class="fg"><label class="fl">Company Name</label><input class="fi" type="text" id="fromComp" value="YENCODE Technologies" oninput="up()"></div>
-          <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="fromPerson" value="Prabhu R" oninput="up()"></div>
+          <div class="fg"><label class="fl">Company Name</label><input class="fi" type="text" id="fromComp"  oninput="up()"></div>
+          <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="fromPerson"  oninput="up()"></div>
         </div>
         <div class="form-row">
           <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="fromEmail" value="yencodetechnologies@gmail.com" oninput="up()"></div>
@@ -1074,12 +709,12 @@ body{display:flex;min-height:100vh}
           <div class="cs-item">
             <div class="cs-header">
               <div class="cs-num">1</div>
-              <input type="text" class="fi" style="flex:1" placeholder="Project name" value="YDMart E-Commerce App">
+              <input type="text" class="fi" style="flex:1" placeholder="Project name" >
               <button class="icon-del" style="margin-left:6px" onclick="this.closest('.cs-item').remove();updateCasePreview()"><i class="ti ti-trash"></i></button>
             </div>
             <div class="form-row">
-              <div class="fg"><label class="fl">Client</label><input class="fi" type="text" placeholder="Client name" value="YDMart Group" oninput="updateCasePreview()"></div>
-              <div class="fg"><label class="fl">Industry</label><input class="fi" type="text" placeholder="e.g. Retail" value="E-Commerce / Retail" oninput="updateCasePreview()"></div>
+              <div class="fg"><label class="fl">Client</label><input class="fi" type="text" placeholder="Client name"  oninput="updateCasePreview()"></div>
+              <div class="fg"><label class="fl">Industry</label><input class="fi" type="text" placeholder="e.g. Retail"  oninput="updateCasePreview()"></div>
             </div>
             <div class="fg"><label class="fl">Challenge & Result</label><textarea class="ta" style="min-height:60px" placeholder="Describe the challenge and what you achieved…" oninput="updateCasePreview()">Built a full e-commerce platform with 500+ SKUs, cart, payments and admin panel. Launched in 3 months, resulting in ₹12L revenue in first quarter.</textarea></div>
           </div>

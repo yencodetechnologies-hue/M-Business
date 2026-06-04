@@ -1,7 +1,7 @@
 import React from 'react';
 import { DOC_TYPES } from './EmployeeProfilePanel';
 
-export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs, empDocsLoading }) {
+export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs, empDocsLoading, projects = [], tasks = [], onViewProject }) {
   if (!emp) return null;
 
   const getInitials = (name) => {
@@ -212,16 +212,31 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
           </div>
           <div className="ed-progress-group">
             <div className="ed-progress-header"><span>Leave Used</span><span>5 / 18 days</span></div>
-            <div className="ed-progress-bar"><div className="ed-progress-fill" style={{width: "28%", background: "var(--warning)"}}></div></div>
+            <div className="ed-progress-bar"><div className="ed-progress-fill" style={{width: "30%", background: "var(--warning)"}}></div></div>
           </div>
 
           <div style={{fontSize: "12px", fontWeight: "800", marginTop: "20px", display: "flex", alignItems: "center", gap: "6px"}}><i className="ti ti-plane-departure" style={{color: "var(--teal)"}}></i> Leave Requests</div>
           <table className="ed-table">
             <thead><tr><th>Type</th><th>Dates</th><th>Status</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td>Sick Leave</td><td>10–11 Jun</td><td><span className="ed-badge" style={{color: "var(--warning)", background: "#FFFBEB", borderColor: "#FDE68A"}}>Pending</span></td><td><span style={{color: "var(--success)", fontWeight: 800, cursor: "pointer", marginRight: 8}}>Approve</span><span style={{color: "var(--danger)", fontWeight: 800, cursor: "pointer"}}>Reject</span></td></tr>
-              <tr><td>Annual Leave</td><td>20–22 May</td><td><span className="ed-badge" style={{color: "var(--success)", background: "#ECFDF5", borderColor: "#A7F3D0"}}>Approved</span></td><td>—</td></tr>
-              <tr><td>Casual Leave</td><td>02 Apr</td><td><span className="ed-badge" style={{color: "var(--danger)", background: "#FEF2F2", borderColor: "#FECACA"}}>Rejected</span></td><td>—</td></tr>
+              <tr>
+                <td>Sick Leave</td>
+                <td style={{color: "var(--text-muted)", fontSize: "11px"}}>10–11 Jun</td>
+                <td><span style={{background: "#FFFBEB", color: "var(--warning)", padding: "4px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: "800"}}>Pending</span></td>
+                <td><button className="ed-btn" style={{padding: "4px 8px", fontSize: "10px", background: "#ECFDF5", color: "var(--success)", borderColor: "#D1FAE5"}}>Approve</button> <button className="ed-btn" style={{padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px"}}>Reject</button></td>
+              </tr>
+              <tr>
+                <td>Annual Leave</td>
+                <td style={{color: "var(--text-muted)", fontSize: "11px"}}>20–22 May</td>
+                <td><span style={{background: "#ECFDF5", color: "var(--success)", padding: "4px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: "800"}}>Approved</span></td>
+                <td style={{color: "var(--text-muted)"}}>—</td>
+              </tr>
+              <tr>
+                <td>Casual Leave</td>
+                <td style={{color: "var(--text-muted)", fontSize: "11px"}}>02 Apr</td>
+                <td><span style={{background: "#FEF2F2", color: "var(--danger)", padding: "4px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: "800"}}>Rejected</span></td>
+                <td style={{color: "var(--text-muted)"}}>—</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -237,12 +252,12 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div className="ed-proj-item">
-              <div className="ed-proj-info"><div className="ed-proj-icon"><i className="ti ti-world"></i></div><div><div className="ed-proj-name">Website Redesign</div><div className="ed-proj-role">Lead Developer</div></div></div>
+              <div className="ed-proj-info"><div className="ed-proj-icon" style={{background: "#F0FDFE", color: "var(--teal)"}}><i className="ti ti-world"></i></div><div><div className="ed-proj-name">Mankatha Website</div><div className="ed-proj-role">Lead Developer</div></div></div>
               <div className="ed-proj-stat"><div className="ed-proj-perc">72%</div><div className="ed-proj-lbl">In Progress</div></div>
             </div>
             <div className="ed-proj-item">
-              <div className="ed-proj-info"><div className="ed-proj-icon" style={{background: "#EFF6FF", color: "#3B82F6"}}><i className="ti ti-device-mobile"></i></div><div><div className="ed-proj-name">Mobile App v2</div><div className="ed-proj-role">Backend Dev</div></div></div>
-              <div className="ed-proj-stat"><div className="ed-proj-perc" style={{color: "#3B82F6"}}>45%</div><div className="ed-proj-lbl">In Progress</div></div>
+              <div className="ed-proj-info"><div className="ed-proj-icon" style={{background: "#EEF2FF", color: "#6366F1"}}><i className="ti ti-device-mobile"></i></div><div><div className="ed-proj-name">Mobile App v2</div><div className="ed-proj-role">Backend Dev</div></div></div>
+              <div className="ed-proj-stat"><div className="ed-proj-perc" style={{color: "#6366F1"}}>45%</div><div className="ed-proj-lbl">In Progress</div></div>
             </div>
             <div className="ed-proj-item" style={{borderBottom: "none"}}>
               <div className="ed-proj-info"><div className="ed-proj-icon" style={{background: "#ECFDF5", color: "var(--success)"}}><i className="ti ti-chart-bar"></i></div><div><div className="ed-proj-name">Analytics Dashboard</div><div className="ed-proj-role">Contributor</div></div></div>
@@ -259,33 +274,58 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-checkbox"></i> Tasks</div>
-            <span style={{fontSize: "11px", fontWeight: "700", color: "var(--text-muted)"}}>4 pending</span>
+            <span style={{fontSize: "11px", fontWeight: "700", color: "var(--text-muted)"}}>4 pending &nbsp; <button className="ed-btn" style={{padding: "6px 12px", background: "var(--teal)", color: "#fff", border: "none", fontSize: "11px", borderRadius: "8px"}}><i className="ti ti-plus"></i> Assign Task</button></span>
+          </div>
+          <div style={{display: "flex", gap: "16px", marginBottom: "16px", borderBottom: "1.5px solid var(--border)"}}>
+            <div style={{fontSize: "12px", fontWeight: "800", color: "var(--teal)", borderBottom: "2px solid var(--teal)", paddingBottom: "8px"}}>All</div>
+            <div style={{fontSize: "12px", fontWeight: "700", color: "var(--text-muted)", paddingBottom: "8px"}}>Pending</div>
+            <div style={{fontSize: "12px", fontWeight: "700", color: "var(--text-muted)", paddingBottom: "8px"}}>Completed</div>
           </div>
           <div>
             <div className="ed-task-item">
               <div className="ed-task-cb done"><i className="ti ti-check" style={{fontSize: 12}}></i></div>
-              <div className="ed-task-content"><div className="ed-task-title done">API integration for billing</div><div className="ed-task-due">Due: 01 Jun</div></div>
+              <div className="ed-task-content">
+                <div className="ed-task-title done">API integration for billing</div>
+                <div className="ed-task-due" style={{color: "var(--danger)"}}>Overdue - 01 Jun</div>
+              </div>
               <div className="ed-task-tag" style={{background: "#ECFDF5", color: "var(--success)"}}>Low</div>
+              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
             </div>
             <div className="ed-task-item">
               <div className="ed-task-cb"></div>
-              <div className="ed-task-content"><div className="ed-task-title">Fix checkout page bug</div><div className="ed-task-due">Due: 06 Jun</div></div>
+              <div className="ed-task-content">
+                <div className="ed-task-title">Fix checkout page bug</div>
+                <div className="ed-task-due">Due: 06 Jun</div>
+              </div>
               <div className="ed-task-tag" style={{background: "#FEF2F2", color: "var(--danger)"}}>High</div>
+              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
             </div>
             <div className="ed-task-item">
               <div className="ed-task-cb"></div>
-              <div className="ed-task-content"><div className="ed-task-title">Write unit tests for auth</div><div className="ed-task-due">Due: 08 Jun</div></div>
+              <div className="ed-task-content">
+                <div className="ed-task-title">Write unit tests for auth</div>
+                <div className="ed-task-due">Due: 08 Jun</div>
+              </div>
               <div className="ed-task-tag" style={{background: "#FFFBEB", color: "var(--warning)"}}>Mid</div>
+              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
             </div>
             <div className="ed-task-item">
               <div className="ed-task-cb"></div>
-              <div className="ed-task-content"><div className="ed-task-title">Update product catalogue DB</div><div className="ed-task-due">Due: 10 Jun</div></div>
+              <div className="ed-task-content">
+                <div className="ed-task-title">Update product catalogue DB</div>
+                <div className="ed-task-due">Due: 10 Jun</div>
+              </div>
               <div className="ed-task-tag" style={{background: "#FFFBEB", color: "var(--warning)"}}>Mid</div>
+              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
             </div>
             <div className="ed-task-item" style={{borderBottom: "none"}}>
               <div className="ed-task-cb"></div>
-              <div className="ed-task-content"><div className="ed-task-title">Code review for PR #47</div><div className="ed-task-due">Due: 12 Jun</div></div>
+              <div className="ed-task-content">
+                <div className="ed-task-title">Code review for PR #47</div>
+                <div className="ed-task-due">Due: 12 Jun</div>
+              </div>
               <div className="ed-task-tag" style={{background: "#ECFDF5", color: "var(--success)"}}>Low</div>
+              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
             </div>
           </div>
         </div>

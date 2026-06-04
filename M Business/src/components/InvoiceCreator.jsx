@@ -47,7 +47,7 @@ function StatusBadge({ status }) {
     paid: { bg: "#dcfce7", color: "#16a34a", label: "✅ Paid" },
     unpaid: { bg: "#fff7ed", color: "#ea580c", label: "⏳ Unpaid" },
     overdue: { bg: "#fee2e2", color: "#dc2626", label: "🔴 Overdue" },
-    draft: { bg: "var(--app-surface)", color: "var(--app-muted)", label: "📝 Draft" },
+    draft: { bg: "var(--app-surface)", color: "#64748b", label: "📝 Draft" },
     sent: { bg: "#eff6ff", color: "#2563eb", label: "📤 Sent" },
     part_paid: { bg: "var(--app-bg)", color: "var(--app-accent)", label: "💰 Part Payment" },
   };
@@ -65,12 +65,12 @@ function ConfirmModal({ invoiceNo, onConfirm, onCancel }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 380, padding: "32px", boxShadow: "var(--app-shadow)", textAlign: "center", border: "1px solid var(--app-border)" }}>
         <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, margin: "0 auto 20px" }}>Delete</div>
-        <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 800, color: "var(--app-text)" }}>Delete Invoice?</h3>
-        <p style={{ color: "var(--app-muted)", fontSize: 14, margin: "0 0 24px", lineHeight: 1.5 }}>
+        <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 800, color: "#0f1c2e" }}>Delete Invoice?</h3>
+        <p style={{ color: "#64748b", fontSize: 14, margin: "0 0 24px", lineHeight: 1.5 }}>
           Are you sure you want to delete <strong style={{ color: "var(--app-accent)" }}>{invoiceNo}</strong>? This cannot be undone.
         </p>
         <div style={{ display: "flex", gap: 12 }}>
-          <button onClick={onCancel} style={{ flex: 1, padding: "12px", background: "var(--app-surface)", border: "1px solid var(--app-border)", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "var(--app-text)", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+          <button onClick={onCancel} style={{ flex: 1, padding: "12px", background: "var(--app-surface)", border: "1px solid var(--app-border)", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "#0f1c2e", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
           <button onClick={onConfirm} style={{ flex: 1, padding: "12px", background: "#ef4444", border: "none", borderRadius: 12, fontSize: 14, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Delete</button>
         </div>
       </div>
@@ -261,7 +261,7 @@ function deleteDraftLocal(invoiceNo) {
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
 }
 
-const T = { primary: "var(--app-sidebar)", sidebar: "var(--app-text)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)" };
+const T = { primary: "var(--app-sidebar)", sidebar: "#0f1c2e", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "#0f1c2e", muted: "#64748b", border: "var(--app-border)" };
 
 function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
   const [search, setSearch] = useState("");
@@ -270,17 +270,17 @@ function CompanyDropdown({ clients, value, onChange, error, onAddCompany }) {
   const selected = clients.find(c => (c.clientName || c.name) === value);
   return (
     <div style={{ position: "relative" }}>
-      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
-        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
+      <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#64748b", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
+        {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "#64748b" }}>({selected.companyName})</span>}</div>) : "-- Select Company Name --"}
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#64748b", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search company name..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddCompany && <div onClick={() => { setOpen(false); setSearch(""); onAddCompany(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Company Name</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No companies found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#64748b", fontSize: 13 }}>No companies found</div>
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "#64748b" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
       )}
@@ -295,16 +295,16 @@ function ProjectDropdown({ projects, value, onChange, onAddProject, disabled }) 
   const filtered = projects.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()));
   return (
     <div style={{ position: "relative" }}>
-      <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
+      <div onClick={() => { if (!disabled) setOpen(!open) }} style={{ width: "100%", border: `1.5px solid ${open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "#64748b", background: "var(--app-bg)", cursor: disabled ? "not-allowed" : "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42, opacity: disabled ? 0.5 : 1 }}>
         {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span></div>) : "-- Select Project --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "#64748b", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "var(--app-shadow)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search project..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddProject && <div onClick={() => { setOpen(false); setSearch(""); onAddProject(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "var(--app-surface)", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Project</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
-            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No projects found</div>
+            {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "#64748b", fontSize: 13 }}>No projects found</div>
               : filtered.map((p, i) => { const name = p.name || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-surface)" : "transparent", borderBottom: "1px solid var(--app-border)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-surface)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-surface)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div></div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
           </div>
         </div>
@@ -441,6 +441,10 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   const effectiveCompanyName = companyName || "";
 
   const [step, setStep] = useState("list"); // "list" | "form" | "preview"
+
+  useEffect(() => {
+    if (step === "preview") window.scrollTo(0, 0);
+  }, [step]);
 
   useEffect(() => {
     if (jumpInvoice) {
@@ -977,10 +981,10 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   // ── Shared styles ────────────────────────────────────────────
   const inp = (err) => ({
     width: "100%", border: `1.5px solid ${err ? "#ef4444" : "var(--app-border)"}`, borderRadius: 10,
-    padding: "10px 12px", fontSize: 14, color: "var(--app-text)", background: err ? "#fff5f5" : "var(--app-surface)",
+    padding: "10px 12px", fontSize: 14, color: "#0f1c2e", background: err ? "#fff5f5" : "var(--app-surface)",
     boxSizing: "border-box", outline: "none", fontFamily: "inherit", transition: "all 0.2s",
   });
-  const lbl = { display: "block", fontSize: 12, color: "var(--app-muted)", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" };
+  const lbl = { display: "block", fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" };
 
   const statusColor = {
     paid: "#16a34a", unpaid: "#ea580c", overdue: "#dc2626", draft: "#6b7280", sent: "#2563eb", part_paid: "var(--app-accent)",
@@ -1028,7 +1032,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               )}
             </div>
             <div style={{ textAlign: "center", marginBottom: 32 }}>
-              <div style={{ fontSize: 36, fontWeight: 900, color: "var(--app-text)" }}>{formatCurrency(pd.amountPaid, invData.currency)}</div>
+              <div style={{ fontSize: 36, fontWeight: 900, color: "#0f1c2e" }}>{formatCurrency(pd.amountPaid, invData.currency)}</div>
               <div style={{ fontSize: 12, color: "var(--app-accent)", fontWeight: 700, marginTop: 4, textTransform: "uppercase", letterSpacing: 1 }}>Amount Received</div>
             </div>
 
@@ -1059,32 +1063,32 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                       await updateStatusBackend(r, r.status, receiptEntry.paymentData);
                       setEditingReceipt(false);
                       showToast("✅ Receipt updated!");
-                    }} style={{ flex: 1, padding: "10px", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Save Changes</button>
+                    }} style={{ flex: 1, padding: "10px", background: "#0f1c2e", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Save Changes</button>
                   </div>
                 </>
               ) : (
                 <>
                   <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                     <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Received From</span>
-                    <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{r.client}</span>
+                    <span style={{ fontSize: 13, color: "#0f1c2e", fontWeight: 700 }}>{r.client}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                     <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Date</span>
-                    <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{formatDate(pd.paymentDate)}</span>
+                    <span style={{ fontSize: 13, color: "#0f1c2e", fontWeight: 700 }}>{formatDate(pd.paymentDate)}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                     <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Payment Mode</span>
-                    <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{pd.paymentMode}</span>
+                    <span style={{ fontSize: 13, color: "#0f1c2e", fontWeight: 700 }}>{pd.paymentMode}</span>
                   </div>
                   {pd.transactionId && (
                     <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                       <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Transaction ID</span>
-                      <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700, fontFamily: "monospace" }}>{pd.transactionId}</span>
+                      <span style={{ fontSize: 13, color: "#0f1c2e", fontWeight: 700, fontFamily: "monospace" }}>{pd.transactionId}</span>
                     </div>
                   )}
                   <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
                     <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>Invoice Number</span>
-                    <span style={{ fontSize: 13, color: "var(--app-text)", fontWeight: 700 }}>{r.invoiceNo}</span>
+                    <span style={{ fontSize: 13, color: "#0f1c2e", fontWeight: 700 }}>{r.invoiceNo}</span>
                   </div>
                   {r.status === "part_paid" && (
                     <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 12, borderBottom: "1px dashed var(--app-border)" }}>
@@ -1102,7 +1106,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
             </div>
 
             <div style={{ marginTop: 32, textAlign: "center" }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-text)" }}>{invData.companyName || "M Business"}</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f1c2e" }}>{invData.companyName || "M Business"}</div>
               {invData.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{invData.companyEmail}</div>}
               {invData.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{invData.companyPhone}</div>}
             </div>
@@ -1159,14 +1163,14 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div style={{ background: "var(--app-card)", borderRadius: 24, width: "100%", maxWidth: 400, padding: "32px", boxShadow: "var(--app-shadow)", border: "1px solid var(--app-border)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "var(--app-text)" }}>Payment Information</h3>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0f1c2e" }}>Payment Information</h3>
                 <button onClick={() => setPaymentModalEntry(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-accent)", padding: "4px 8px" }}>✕</button>
               </div>
 
               <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "14px", marginBottom: 20, border: "1.5px solid var(--app-border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                   <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Total Amount:</span>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "var(--app-text)" }}>{formatCurrency(paymentModalEntry.total, paymentModalEntry.currency || inv.currency)}</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#0f1c2e" }}>{formatCurrency(paymentModalEntry.total, paymentModalEntry.currency || inv.currency)}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                   <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Previously Paid:</span>
@@ -1219,7 +1223,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, padding: "0 4px" }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>Send a receipt</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "#0f1c2e" }}>Send a receipt</span>
                 <label style={{ position: "relative", display: "inline-block", width: 42, height: 22 }}>
                   <input type="checkbox" checked={sendReceipt} onChange={e => setSendReceipt(e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
                   <span style={{ position: "absolute", cursor: "pointer", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: sendReceipt ? "#16a34a" : "#ccc", transition: ".4s", borderRadius: 34 }}>
@@ -1310,7 +1314,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between", marginBottom: 20}}>
           <div className="tabs" style={{ display: "flex", gap: 10, alignItems: "center" }}>
             {onBack && (
-              <button onClick={onBack} style={{ padding: "8px", background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "var(--app-text)", display: "flex", alignItems: "center" }} title="Back to Dashboard">
+              <button onClick={onBack} style={{ padding: "8px", background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#0f1c2e", display: "flex", alignItems: "center" }} title="Back to Dashboard">
                 <i className="ti ti-arrow-left"></i>
               </button>
             )}
@@ -1591,7 +1595,6 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   // PREVIEW / PRINT
   // ════════════════════════════════════════════════════════════
   if (step === "preview") {
-    React.useEffect(() => { if (step === "preview") window.scrollTo(0, 0); }, [step]);
     return (
       <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "20px 12px" }}>
         <style>{`
@@ -1669,7 +1672,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     {effectiveCompanyName[0] || "?"}
                   </div>
                 )}
-                <div style={{ fontSize: 24, fontWeight: 900, color: "var(--app-text)", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName || effectiveCompanyName}</div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: "#0f1c2e", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName || effectiveCompanyName}</div>
                 {inv.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{inv.companyEmail}</div>}
                 {inv.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyPhone}</div>}
                 {inv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyAddress}</div>}
@@ -1681,7 +1684,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                    <div style={{ fontSize: 12, color: "var(--app-text)", fontWeight: 700 }}>{formatDate(inv.date)}</div>
+                    <div style={{ fontSize: 12, color: "#0f1c2e", fontWeight: 700 }}>{formatDate(inv.date)}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
@@ -1706,7 +1709,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 {inv.project && (
                   <div style={{ marginTop: 24, textAlign: "right" }}>
                     <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>PROJECT</div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", lineHeight: 1.4 }}>{inv.project}</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", lineHeight: 1.4 }}>{inv.project}</div>
                   </div>
                 )}
               </div>
@@ -1716,8 +1719,8 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           {/* Bill To */}
           {isFirstPage && (<div className="inv-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
             <div style={{ padding: "20px 32px" }}>
-              <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--app-text)" }}>{inv.client || "—"}</div>
+              <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0f1c2e" }}>{inv.client || "—"}</div>
               {selectedClient?.companyName && <div style={{ fontSize: 13, color: currentT.primaryColor || "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
               {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
               {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
@@ -1729,7 +1732,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           <div style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr className="avoid-break" style={{ background: currentT.primaryColor || "#1A2E35" }}>
+                <tr className="avoid-break" style={{ background: "#0f1c2e" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
                     <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
@@ -1741,12 +1744,12 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                   const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
                   return (
                     <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-border)" }}>
-                      <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
-                      <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>{item.description || "—"}</td>
+                      <td style={{ padding: "12px 11px", color: "#64748b", fontWeight: 700, fontSize: 12 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
+                      <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0f1c2e" }}>{item.description || "—"}</td>
                       <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
                       <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
                       <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#6b7280" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
-                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "var(--app-text)" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
                     </tr>
                   );
                 })}
@@ -1759,29 +1762,29 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", padding: "0 32px 16px" }}>
             {/* QR Scanner */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
-              <div style={{ fontSize: "8px", color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
+              <div style={{ fontSize: "8px", color: "#64748b", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
               <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
-                <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="var(--app-text)" />
+                <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="#0f1c2e" />
               </div>
             </div>
 
             {/* Totals */}
             <div className="inv-totals" style={{ width: "200px" }}>
               <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                <span className="lbl" style={{ color: "var(--app-muted)" }}>Subtotal</span>
+                <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
                 <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
               </div>
               <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                <span className="lbl" style={{ color: "var(--app-muted)" }}>GST / Tax</span>
+                <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
                 <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
               </div>
               {amountPaid > 0 && (
                 <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                  <span className="lbl" style={{ color: "var(--app-muted)" }}>Paid (Advance)</span>
+                  <span className="lbl" style={{ color: "#64748b" }}>Paid (Advance)</span>
                   <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
                 </div>
               )}
-              <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: currentT.logoColor || "var(--app-accent)", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
+              <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
                 <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
                 <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
               </div>
@@ -1792,7 +1795,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
             <div className="inv-bank" style={{ margin: "12px 32px 0", padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}` }}>
               <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
-              <div className="inv-bank-detail" style={{ fontSize: "9px", color: "var(--text)", lineHeight: "1.5" }}>
+              <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
                 {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
                 {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
                 {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
@@ -1807,13 +1810,13 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               {inv.notes && (
                 <div>
                   <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
-                  <div className="inv-notes-text" style={{ fontSize: "8px", color: "var(--app-muted)", lineHeight: "1.5" }}>{inv.notes}</div>
+                  <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.notes}</div>
                 </div>
               )}
               {inv.terms && (
                 <div>
                   <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
-                  <div className="inv-notes-text" style={{ fontSize: "8px", color: "var(--app-muted)", lineHeight: "1.5" }}>{inv.terms}</div>
+                  <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
                 </div>
               )}
             </div>
@@ -1828,8 +1831,8 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 ) : null}
               </div>
               <div className="inv-sig-line" style={{ width: "100%", height: "1px", background: "var(--app-border)", marginBottom: "3px" }}></div>
-              <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "var(--text)" }}>{inv.companyName || effectiveCompanyName}</div>
-              <div className="inv-sig-role" style={{ fontSize: "8px", color: "var(--app-muted)" }}>Authorized Signatory</div>
+              <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
+              <div className="inv-sig-role" style={{ fontSize: "8px", color: "#64748b" }}>Authorized Signatory</div>
             </div>
           </div>
 
@@ -1860,7 +1863,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
     return (
       <div style={{ width: "100%", height: "80vh", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "10px 0", display: "flex", gap: 10, alignItems: "center" }}>
-          <button onClick={() => jumpInvoice ? onBack() : setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "var(--app-muted)" }}>{jumpInvoice ? "← Back to Dashboard" : "← Back to List"}</button>
+          <button onClick={() => jumpInvoice ? onBack() : setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "#64748b" }}>{jumpInvoice ? "← Back to Dashboard" : "← Back to List"}</button>
         </div>
         <div style={{ flex: 1, overflow: "hidden", borderRadius: 16 }}>
           <iframe src="/template-designer.html#inv" ref={iframeRef} onLoad={sendThemeToIframe} style={{ width: "100%", height: "100%", border: "none" }} title="Template Designer" />
@@ -1892,7 +1895,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           <button onClick={() => setStep("list")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--app-accent)", fontWeight: 700, padding: 0, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}>
             ← Back
           </button>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)" }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>
 
           </span>
           {editingId && (
@@ -2331,7 +2334,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                           </button>
                         </div>
                         {typedSig && (
-                          <div style={{ fontSize: 11, color: "var(--app-muted)", display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ fontSize: 11, color: "#64748b", display: "flex", alignItems: "center", gap: 8 }}>
                             <span>Preview:</span>
                             <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 22, color: "#1a2e35", fontWeight: "bold" }}>{typedSig}</span>
                           </div>
@@ -2372,9 +2375,9 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
         <div style={{ position: "sticky", top: "0px", display: "flex", flexDirection: "column", gap: 12 }}>
           <div className="preview-card" style={{ background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: "14px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
             <div className="preview-toolbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1.5px solid var(--app-border)", background: "var(--app-surface-variant)" }}>
-              <div style={{ fontSize: "12px", fontWeight: "800", color: "var(--app-text)" }}>📄 Live Preview</div>
+              <div style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>📄 Live Preview</div>
               <div style={{ display: "flex", gap: "6px" }}>
-                <button onClick={handleSavePreview} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "6px 10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: "8px", fontSize: "10px", fontWeight: "700", color: "var(--app-text)", cursor: "pointer", fontFamily: "inherit" }}>
+                <button onClick={handleSavePreview} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "6px 10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: "8px", fontSize: "10px", fontWeight: "700", color: "#0f1c2e", cursor: "pointer", fontFamily: "inherit" }}>
                   🖨️ Print / PDF
                 </button>
               </div>
@@ -2393,8 +2396,8 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                       {effectiveCompanyName ? effectiveCompanyName[0].toUpperCase() : "YT"}
                     </div>
                   )}
-                  <div className="inv-company-name" style={{ fontSize: "13px", fontWeight: "800", color: "var(--text)" }}>{inv.companyName || effectiveCompanyName}</div>
-                  <div className="inv-company-details" style={{ fontSize: "9px", color: "var(--app-muted)", lineHeight: "1.6", marginTop: "3px" }}>
+                  <div className="inv-company-name" style={{ fontSize: "13px", fontWeight: "800", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
+                  <div className="inv-company-details" style={{ fontSize: "9px", color: "#64748b", lineHeight: "1.6", marginTop: "3px" }}>
                     {inv.companyEmail && <div>{inv.companyEmail}</div>}
                     {inv.companyPhone && <div>{inv.companyPhone}</div>}
                     {inv.companyAddress && <div>{inv.companyAddress}</div>}
@@ -2402,8 +2405,8 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 </div>
                 <div className="inv-title-area" style={{ textAlign: "right" }}>
                   <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px" }}>INVOICE</div>
-                  <div className="inv-id" style={{ fontSize: "11px", fontWeight: "700", color: "var(--text)", marginTop: "4px" }}>#{inv.invoiceNo}</div>
-                  <div className="inv-dates" style={{ fontSize: "9px", color: "var(--app-muted)", marginTop: "2px", lineHeight: "1.6" }}>
+                  <div className="inv-id" style={{ fontSize: "11px", fontWeight: "700", color: "#0f1c2e", marginTop: "4px" }}>#{inv.invoiceNo}</div>
+                  <div className="inv-dates" style={{ fontSize: "9px", color: "#64748b", marginTop: "2px", lineHeight: "1.6" }}>
                     <span>Issue: {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : "—"}</span><br/>
                     <span>Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : "—"}</span>
                   </div>
@@ -2417,8 +2420,8 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               <div className="inv-parties" style={{ display: "grid", gridTemplateColumns: inv.project ? "1fr 1fr" : "1fr", gap: "16px", marginBottom: "16px" }}>
                 <div>
                   <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Bill To</div>
-                  <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: inv.client ? "var(--text)" : "var(--app-muted)" }}>{inv.client || "— Client Name —"}</div>
-                  <div className="inv-party-detail" style={{ fontSize: "9px", color: "var(--app-muted)", lineHeight: "1.6", marginTop: "2px" }}>
+                  <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: inv.client ? "#0f1c2e" : "#64748b" }}>{inv.client || "— Client Name —"}</div>
+                  <div className="inv-party-detail" style={{ fontSize: "9px", color: "#64748b", lineHeight: "1.6", marginTop: "2px" }}>
                     {selectedClient ? (
                       <>
                         {selectedClient.companyName && <div>{selectedClient.companyName}</div>}
@@ -2428,14 +2431,14 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                         {selectedClient.gstNumber && <div style={{fontWeight: 700, color: currentT.primaryColor}}>GST: {selectedClient.gstNumber}</div>}
                       </>
                     ) : (
-                      <span style={{ color: "var(--app-muted)" }}>Enter client details in the form</span>
+                      <span style={{ color: "#64748b" }}>Enter client details in the form</span>
                     )}
                   </div>
                 </div>
                 {inv.project && (
                   <div>
                     <div className="inv-party-label" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: "4px" }}>Project</div>
-                    <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: "var(--text)" }}>{inv.project}</div>
+                    <div className="inv-party-name" style={{ fontSize: "12px", fontWeight: "800", color: "#0f1c2e" }}>{inv.project}</div>
                   </div>
                 )}
               </div>
@@ -2443,7 +2446,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               {/* ITEMS TABLE */}
                <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
                 <thead>
-                  <tr style={{ background: currentT.logoColor || "var(--app-accent)" }}>
+                  <tr style={{ background: "#0f1c2e" }}>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "left" }}>#</th>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "left" }}>Description</th>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "right" }}>Qty</th>
@@ -2458,12 +2461,12 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
                     return (
                       <tr key={item.id} style={{ borderBottom: "1px solid var(--app-border)" }}>
-                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)" }}>{idx + 1}</td>
-                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)" }}>{item.description || "—"}</td>
-                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)", textAlign: "right" }}>{item.quantity}</td>
-                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency)}</td>
-                        <td style={{ padding: "6px 8px", fontSize: "10px", textAlign: "right", color: "var(--app-muted)" }}>{rateGst}% {isIncl ? "Incl" : ""}</td>
-                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "var(--text)", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e" }}>{idx + 1}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e" }}>{item.description || "—"}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right" }}>{item.quantity}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", textAlign: "right", color: "#64748b" }}>{rateGst}% {isIncl ? "Incl" : ""}</td>
+                        <td style={{ padding: "6px 8px", fontSize: "10px", color: "#0f1c2e", textAlign: "right", fontWeight: "700" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
                       </tr>
                     );
                   })}
@@ -2474,29 +2477,29 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "12px", marginBottom: "16px" }}>
                 {/* QR Scanner */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
-                  <div style={{ fontSize: "8px", color: "var(--app-muted)", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
+                  <div style={{ fontSize: "8px", color: "#64748b", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
                   <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
-                    <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="var(--app-text)" />
+                    <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="#0f1c2e" />
                   </div>
                 </div>
 
                 {/* TOTALS */}
                 <div className="inv-totals" style={{ width: "200px" }}>
                   <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                    <span className="lbl" style={{ color: "var(--app-muted)" }}>Subtotal</span>
+                    <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
                     <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
                   </div>
                   <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                    <span className="lbl" style={{ color: "var(--app-muted)" }}>GST / Tax</span>
+                    <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
                     <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
                   </div>
                   {amountPaid > 0 && (
                     <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                      <span className="lbl" style={{ color: "var(--app-muted)" }}>Paid (Advance)</span>
+                      <span className="lbl" style={{ color: "#64748b" }}>Paid (Advance)</span>
                       <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
                     </div>
                   )}
-                  <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: currentT.logoColor || "var(--app-accent)", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
+                  <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
                     <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
                     <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
                   </div>
@@ -2507,7 +2510,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
                 <div className="inv-bank" style={{ marginTop: "12px", padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}` }}>
                   <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
-                  <div className="inv-bank-detail" style={{ fontSize: "9px", color: "var(--text)", lineHeight: "1.5" }}>
+                  <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
                     {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
                     {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
                     {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
@@ -2522,13 +2525,13 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                   {inv.notes && (
                     <div>
                       <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
-                      <div className="inv-notes-text" style={{ fontSize: "8px", color: "var(--app-muted)", lineHeight: "1.5" }}>{inv.notes}</div>
+                      <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.notes}</div>
                     </div>
                   )}
                   {inv.terms && (
                     <div>
                       <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
-                      <div className="inv-notes-text" style={{ fontSize: "8px", color: "var(--app-muted)", lineHeight: "1.5" }}>{inv.terms}</div>
+                      <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
                     </div>
                   )}
                 </div>
@@ -2543,8 +2546,8 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     ) : null}
                   </div>
                   <div className="inv-sig-line" style={{ width: "100%", height: "1px", background: "var(--app-border)", marginBottom: "3px" }}></div>
-                  <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "var(--text)" }}>{inv.companyName || effectiveCompanyName}</div>
-                  <div className="inv-sig-role" style={{ fontSize: "8px", color: "var(--app-muted)" }}>Authorized Signatory</div>
+                  <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
+                  <div className="inv-sig-role" style={{ fontSize: "8px", color: "#64748b" }}>Authorized Signatory</div>
                 </div>
               </div>
 
@@ -2575,5 +2578,6 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
       </div>
   );
 }
+
 
 

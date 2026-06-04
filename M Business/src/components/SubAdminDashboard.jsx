@@ -839,8 +839,10 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
     </div>
   );
 }
-function EmployeesPage({ employees, setEmployees }) {
+function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], setActive, setJumpProject }) {
   const [search, setSearch] = useState("");
+  const [deptFilter, setDeptFilter] = useState("All Departments");
+  const [statusFilter, setStatusFilter] = useState("All Status");
   const [viewEmp, setViewEmp] = useState(null);
   const [editEmp, setEditEmp] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -850,91 +852,59 @@ function EmployeesPage({ employees, setEmployees }) {
   const [toast, setToast] = useState("");
   const [empDocs, setEmpDocs] = useState({});
   const [empDocsLoading, setEmpDocsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const loadEmpDocs = async (emp) => {
     setEmpDocs({});
     setEmpDocsLoading(true);
     try {
-      const r = await axios.get(
-        `${BASE_URL}/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`
-      );
-      const map = {};
-      (r.data || []).forEach(d => { map[d.docType] = d; });
-      setEmpDocs(map);
-    } catch { setEmpDocs({}); }
-    finally { setEmpDocsLoading(false); }
+      const r = await axios.get(`${BASE_URL}/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`);
+      if (r.data?.success) {
+        const dmap = {};
+        r.data.documents.forEach(d => { dmap[d.documentType] = d; });
+        setEmpDocs(dmap);
+      }
+    } catch(e) { console.error(e); }
+    setEmpDocsLoading(false);
   };
+
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
-  const filtered = employees.filter(e =>
-    (e.name || "").toLowerCase().includes(search.toLowerCase()) ||
-    (e.email || "").toLowerCase().includes(search.toLowerCase()) ||
-    (e.role || "").toLowerCase().includes(search.toLowerCase()) ||
-    (e.department || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = employees.filter(e => {
+    const mSearch = (e.name||"").toLowerCase().includes(search.toLowerCase()) || (e.email||"").toLowerCase().includes(search.toLowerCase()) || (e.role||"").toLowerCase().includes(search.toLowerCase());
+    const mDept = deptFilter === "All Departments" || e.department === deptFilter;
+    const mStatus = statusFilter === "All Status" || e.status === statusFilter;
+    return mSearch && mDept && mStatus;
+  });
 
-  useEffect(() => { setCurrentPage(1); }, [search, employees.length]);
-  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const getInitials = (n) => n ? n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2) : "?";
 
   const openEdit = (e) => {
-    setEditForm({
-      name: e.name || "",
-      email: e.email || "",
-      phone: e.phone || "",
-      role: e.role || "Employee",
-      department: e.department || "",
-      salary: e.salary || "",
-      status: e.status || "Pending",
-      dateOfBirth: e.dateOfBirth || "",
-      joiningDate: e.joiningDate || "",
-      maritalStatus: e.maritalStatus || "Unmarried",
-      address: e.address || "",
-      bankName: e.bankDetails?.bankName || "",
-      ifscCode: e.bankDetails?.ifscCode || "",
-      accountNumber: e.bankDetails?.accountNumber || ""
-    });
-    setEditErr({});
-    setEditEmp(e);
+    setEditForm({ name: e.name||"", email: e.email||"", phone: e.phone||"", role: e.role||"Employee", department: e.department||"", salary: e.salary||"", dateOfBirth: e.dateOfBirth?e.dateOfBirth.substring(0,10):"", joiningDate: e.joiningDate?e.joiningDate.substring(0,10):"", maritalStatus: e.maritalStatus||"Unmarried", status: e.status||"Pending", address: e.address||"", bankName: e.bankName||"", ifscCode: e.ifscCode||"", accountNumber: e.accountNumber||"" });
+    setEditErr({}); setEditEmp(e);
   };
-
   const saveEdit = async () => {
     const errs = {};
-    if (!editForm.name.trim()) errs.name = "Name required";
-    if (!editForm.email.trim()) errs.email = "Email required";
+    if (!editForm.name?.trim()) errs.name = "Name required";
+    if (!editForm.email?.trim()) errs.email = "Email required";
     if (Object.keys(errs).length) { setEditErr(errs); return; }
     try {
       setSaving(true);
       const res = await axios.put(`${BASE_URL}/api/employees/${editEmp._id}`, editForm);
-      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...(res.data || editForm) } : e));
-      setEditEmp(null);
-      showToast("✅ Employee updated!");
-    } catch (err) {
-      const errMsg = err.response?.data?.msg || err.response?.data?.message || "Failed to update on server";
-      showToast("❌ " + errMsg);
-      // Fallback local update if needed, or just let the user know it failed
-      console.error("Save Error:", err);
+      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...(res.data||editForm) } : e));
+      setEditEmp(null); showToast("✅ Employee updated successfully!");
+    } catch {
+      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...editForm } : e));
+      setEditEmp(null); showToast("✅ Updated locally!");
     } finally { setSaving(false); }
   };
-
   const doDelete = async () => {
     try {
       await axios.delete(`${BASE_URL}/api/employees/${deleteTarget._id}`);
-    } catch { }
-    setEmployees(prev => prev.filter(e => e._id !== deleteTarget._id));
-    setDeleteTarget(null);
-    showToast("  Delete️ Employee deleted!");
-  };
-
-  const handleStatusUpdate = async (id, newStatus) => {
-    try {
-      await axios.put(`${BASE_URL}/api/employees/status/${id}`, { status: newStatus });
-      setEmployees(prev => prev.map(e => e._id === id ? { ...e, status: newStatus } : e));
-      showToast(`✅ Employee ${newStatus} successfully!`);
-    } catch (err) {
-      console.error("Status update error:", err);
-      showToast("❌ Failed to update status");
+      setEmployees(p => p.filter(e => e._id !== deleteTarget._id));
+      setDeleteTarget(null); showToast("🗑️ Employee deleted!");
+    } catch {
+      setEmployees(p => p.filter(e => e._id !== deleteTarget._id));
+      setDeleteTarget(null); showToast("🗑️ Deleted locally!");
     }
   };
 
@@ -942,22 +912,22 @@ function EmployeesPage({ employees, setEmployees }) {
   const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
   const onboardingLink = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(user.companyName || "Our Company")}&companyId=${companyId}`;
   const [linkCopied, setLinkCopied] = useState(false);
-  const copyLink = () => {
-    navigator.clipboard.writeText(onboardingLink);
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2000);
-  };
+  const copyLink = () => { navigator.clipboard.writeText(onboardingLink); setLinkCopied(true); setTimeout(() => setLinkCopied(false), 2000); };
 
   if (viewEmp) {
-    return <EmployeeDetail emp={viewEmp} onBack={() => setViewEmp(null)} onEdit={() => { setViewEmp(null); openEdit(viewEmp); }} onDelete={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} empDocs={empDocs} empDocsLoading={empDocsLoading} />;
+    return <EmployeeDetail emp={viewEmp} onBack={() => setViewEmp(null)} onEdit={() => { setViewEmp(null); openEdit(viewEmp); }} onDelete={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} empDocs={empDocs} empDocsLoading={empDocsLoading} projects={projects} tasks={tasks} onViewProject={(p) => { setViewEmp(null); setJumpProject(p); setActive("projects"); }} />;
   }
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+  const activeCount = employees.filter(e => e.status === "Active" || e.status === "Approved").length;
+  const leaveCount = employees.filter(e => e.status === "On Leave").length;
+  const inactiveCount = employees.filter(e => e.status === "Inactive" || e.status === "Rejected").length;
 
-      {/* Share Onboarding Link Card */}
-      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)" }}>
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {toast && <div className="toast show"><i className="ti ti-check"></i> {toast}</div>}
+
+      {/* Share Onboarding Link Card (Kept as requested) */}
+      <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Employee Onboarding Link</div>
@@ -966,7 +936,11 @@ function EmployeesPage({ employees, setEmployees }) {
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
           <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
           <button onClick={() => {
-            const text = `Hi,\n\nPlease fill in your onboarding details at the following link to join our team:\n\n${onboardingLink}`;
+            const text = `Hi,
+
+Please fill in your onboarding details at the following link to join our team:
+
+${onboardingLink}`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
           }} style={{ background: "#25D366", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
             <span>💬</span> WhatsApp
@@ -974,138 +948,157 @@ function EmployeesPage({ employees, setEmployees }) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
-        {[{ t: "Total", v: employees.length, i: "👨‍💼", c: "var(--app-muted)" }, { t: "Approved", v: employees.filter(e => e.status === "Approved").length, i: "✅", c: "#22C55E" }, { t: "Rejected", v: employees.filter(e => e.status === "Rejected").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
-          <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
-            <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
-          </div>
-        ))}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "rgba(0,188,212,0.08)", color: "#00BCD4" }}><i className="ti ti-users"></i></div>
+          <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{employees.length}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Total Employees</div></div>
+        </div>
+        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#dcfce7", color: "#16a34a" }}><i className="ti ti-check"></i></div>
+          <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{activeCount}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Active</div></div>
+        </div>
+        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fef3c7", color: "#d97706" }}><i className="ti ti-clock"></i></div>
+          <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{leaveCount}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>On Leave</div></div>
+        </div>
+        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ width: 46, height: 46, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0, background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-user-off"></i></div>
+          <div><div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{inactiveCount}</div><div style={{ fontSize: 11, color: "var(--text-soft)", marginTop: 3, fontWeight: 600 }}>Inactive</div></div>
+        </div>
       </div>
 
-      <SC title={`All Employees (${filtered.length})`}>
-        <Search value={search} onChange={setSearch} placeholder="Search by name, email, role..." />
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
+          <i className="ti ti-search" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-soft)", fontSize: 16 }}></i>
+          <input type="text" placeholder="Search by name, email, role..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "10px 12px 10px 38px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none", transition: "border-color 0.2s" }} onFocus={e => e.target.style.borderColor = "#00BCD4"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
+        </div>
+        <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text-mid)", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+          <option>All Departments</option>
+          <option>Development</option>
+          <option>Design</option>
+          <option>Marketing</option>
+          <option>HR</option>
+        </select>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: "10px 32px 10px 12px", background: "#fff", border: "1.5px solid var(--border)", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text-mid)", outline: "none", cursor: "pointer", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+          <option>All Status</option>
+          <option value="Active">Active</option>
+          <option value="Approved">Approved</option>
+          <option value="Pending">Pending</option>
+          <option value="On Leave">On Leave</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
+
+      <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: "var(--text)" }}>All Employees</div>
+          <div style={{ background: "rgba(0,188,212,0.08)", color: "#00BCD4", fontSize: 11, fontWeight: 800, padding: "3px 12px", borderRadius: 20 }}>{filtered.length} employees</div>
+        </div>
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 750 }}>
-            <thead><tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>
-              {["#", "Name", "Email", "Phone", "Role", "Department", "Salary", "Status", "Actions"].map(c => (
-                <th key={c} style={{ padding: "10px 14px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 11, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{c.toUpperCase()}</th>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
+            <thead style={{ background: "#fafbfc" }}><tr>
+              {["Employee", "Role", "Department", "Email", "Joined", "Status", "Actions"].map(h => (
+                <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1.5, textTransform: "uppercase", borderBottom: "1px solid var(--border)" }}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
-              {paginated.length === 0 ? <tr><td colSpan={9} style={{ padding: 30, textAlign: "center", color: "var(--app-muted)" }}>No employees found</td></tr>
-                : paginated.map((e, i) => (
-                  <tr key={e._id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={ev => ev.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{`EMP${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
-                    <td style={{ padding: "12px 14px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(e.name || "?")[0].toUpperCase()}</div>
-                        <span style={{ fontWeight: 700, color: T.text }}>{e.name || "—"}</span>
+              {filtered.map((e, i) => {
+                const eid = e.employeeId || e._id?.substring(0,6).toUpperCase() || `EMP-${String(i+1).padStart(3,"0")}`;
+                const jDate = e.joiningDate ? new Date(e.joiningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "—";
+                let st = e.status || "Pending";
+                if(st === "Approved") st = "Active";
+                if(st === "Rejected") st = "Inactive";
+                let badgeClass = "badge";
+                let badgeStyle = { display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 11px", borderRadius: 20, fontSize: 11, fontWeight: 800 };
+                if(st === "Active") { badgeStyle.background = "#dcfce7"; badgeStyle.color = "#16a34a"; }
+                else if(st === "On Leave" || st === "Pending") { badgeStyle.background = "#fef3c7"; badgeStyle.color = "#d97706"; }
+                else { badgeStyle.background = "#fee2e2"; badgeStyle.color = "#dc2626"; }
+                const dotStyle = { width: 5, height: 5, borderRadius: "50%", background: "currentColor" };
+                
+                const avColors = ["linear-gradient(135deg,#00BCD4,#0097a7)", "linear-gradient(135deg,#7c3aed,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
+                const avBg = avColors[i % avColors.length];
+                
+                return (
+                  <tr key={e._id || i} style={{ cursor: "pointer", borderBottom: "1px solid var(--border)", transition: "background 0.12s" }} onMouseEnter={ev => ev.currentTarget.style.background = "#f8fbff"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"} onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }}>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+                        <div style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", background: avBg }}>{getInitials(e.name)}</div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text)" }}>{e.name}</div>
+                          <div style={{ fontSize: 11, color: "var(--text-soft)" }}>{eid}</div>
+                        </div>
                       </div>
                     </td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{e.email || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{e.phone || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12, fontWeight: 600 }}>{e.role || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{e.department || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#22C55E", fontSize: 12, fontWeight: 600 }}>{e.salary || "—"}</td>
-                    <td style={{ padding: "12px 14px" }}>
-                      <div style={{ position: "relative", display: "inline-block" }}>
-                        <select
-                          value={e.status || "Pending"}
-                          onChange={(ev) => handleStatusUpdate(e._id, ev.target.value)}
-                          style={{
-                            background: `${sc(e.status || "Pending")}18`,
-                            color: sc(e.status || "Pending"),
-                            border: `1px solid ${sc(e.status || "Pending")}33`,
-                            padding: "4px 24px 4px 12px",
-                            borderRadius: 20,
-                            fontSize: 11,
-                            fontWeight: 700,
-                            outline: "none",
-                            cursor: "pointer",
-                            fontFamily: "inherit",
-                            WebkitAppearance: "none",
-                            MozAppearance: "none",
-                            appearance: "none",
-                            textAlign: "left",
-                            minWidth: 100,
-                            transition: "all 0.2s"
-                          }}
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Approved">Approved</option>
-                          <option value="Rejected">Rejected</option>
-                        </select>
-                        <span style={{
-                          position: "absolute",
-                          right: "10px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          fontSize: "10px",
-                          color: sc(e.status || "Pending"),
-                          pointerEvents: "none",
-                          fontWeight: "bold"
-                        }}>▼</span>
-                      </div>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
+                      <span style={{ background: "#f1f5f9", color: "var(--text-mid)", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6 }}>{e.role || "Employee"}</span>
                     </td>
-                    <td style={{ padding: "12px 14px" }}>
-                      <ActionBtns
-                        onView={() => { setViewEmp(e); loadEmpDocs(e); }}
-                        onEdit={() => openEdit(e)}
-                        onDelete={() => setDeleteTarget(e)}
-                        onShare={() => {
-                          const text = `Hi ${e.name || ""},\n\nPlease fill in your onboarding details at the following link to join our team:\n\n${onboardingLink}`;
-                          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
-                        }}
-                      />
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 12, color: "var(--text-mid)", fontWeight: 600 }}>{e.department || "—"}</td>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{e.email || "—"}</td>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{jDate}</td>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
+                      <div style={badgeStyle}><div style={dotStyle}></div> {st}</div>
+                    </td>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "rgba(0,188,212,0.08)", color: "#00BCD4" }}><i className="ti ti-eye"></i></button>
+                        <button onClick={(ev) => { ev.stopPropagation(); openEdit(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#dbeafe", color: "#2563eb" }}><i className="ti ti-pencil"></i></button>
+                        <button onClick={(ev) => { ev.stopPropagation(); setDeleteTarget(e); }} style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", fontSize: 15, transition: "all 0.15s", background: "#fee2e2", color: "#dc2626" }}><i className="ti ti-trash"></i></button>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
-        <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
-      </SC>
-
-
+      </div>
 
       {editEmp && (
-        <Mdl title="Edit Employee" onClose={() => setEditEmp(null)}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-            <Fld label="Full Name *" value={editForm.name} onChange={v => { setEditForm(p => ({ ...p, name: v })); setEditErr(p => ({ ...p, name: "" })); }} error={editErr.name} />
-            <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
-            <Fld label="Phone" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
-            <Fld label="Role" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={["Employee", "Manager", "Admin"]} />
-            <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
-            <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
-            <Fld label="Date of Birth" value={editForm.dateOfBirth} onChange={v => setEditForm(p => ({ ...p, dateOfBirth: v }))} type="date" />
-            <Fld label="Joining Date" value={editForm.joiningDate} onChange={v => setEditForm(p => ({ ...p, joiningDate: v }))} type="date" />
-            <Fld label="Marital Status" value={editForm.maritalStatus} onChange={v => setEditForm(p => ({ ...p, maritalStatus: v }))} options={["Unmarried", "Married"]} />
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
-          </div>
-          <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
-
-          <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
-            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-              <Fld label="Bank Name" value={editForm.bankName} onChange={v => setEditForm(p => ({ ...p, bankName: v }))} />
-              <Fld label="IFSC Code" value={editForm.ifscCode} onChange={v => setEditForm(p => ({ ...p, ifscCode: v }))} />
-              <Fld label="Account Number" value={editForm.accountNumber} onChange={v => setEditForm(p => ({ ...p, accountNumber: v }))} />
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 490, maxWidth: "95vw", boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)" }}>
+            <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text)", marginBottom: 20 }}>Edit Employee</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                <label style={{ fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1, textTransform: "uppercase" }}>Full Name</label>
+                <input type="text" value={editForm.name} onChange={e => { setEditForm(p => ({ ...p, name: e.target.value })); setEditErr(p => ({ ...p, name: "" })); }} style={{ background: "#f8fafc", border: `1.5px solid ${editErr.name ? "#dc2626" : "var(--border)"}`, borderRadius: 8, padding: "9px 12px", fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none" }} />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                <label style={{ fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1, textTransform: "uppercase" }}>Email</label>
+                <input type="text" value={editForm.email} onChange={e => { setEditForm(p => ({ ...p, email: e.target.value })); setEditErr(p => ({ ...p, email: "" })); }} style={{ background: "#f8fafc", border: `1.5px solid ${editErr.email ? "#dc2626" : "var(--border)"}`, borderRadius: 8, padding: "9px 12px", fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none" }} />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                <label style={{ fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1, textTransform: "uppercase" }}>Role</label>
+                <input type="text" value={editForm.role} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))} style={{ background: "#f8fafc", border: "1.5px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none" }} />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                <label style={{ fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1, textTransform: "uppercase" }}>Department</label>
+                <input type="text" value={editForm.department} onChange={e => setEditForm(p => ({ ...p, department: e.target.value }))} style={{ background: "#f8fafc", border: "1.5px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none" }} />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
+              <button onClick={() => setEditEmp(null)} style={{ background: "#f1f5f9", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+              <button onClick={saveEdit} style={{ background: "#00BCD4", color: "#fff", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>{saving ? "Saving..." : "Save Changes"}</button>
             </div>
           </div>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
-            <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
-          </div>
-        </Mdl>
+        </div>
       )}
 
-      {deleteTarget && <ConfirmModal title="Delete Employee" message={`Delete "${deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
+      {deleteTarget && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 400, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)" }}>
+            <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text)", marginBottom: 12 }}>Delete Employee</div>
+            <div style={{ fontSize: 13, color: "var(--text-mid)" }}>Are you sure you want to delete {deleteTarget.name}? This action cannot be undone.</div>
+            <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
+              <button onClick={() => setDeleteTarget(null)} style={{ background: "#f1f5f9", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+              <button onClick={doDelete} style={{ background: "#dc2626", color: "#fff", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-// ═══════════════════════════════════════════════════════════
 // MANAGERS PAGE
 // ═══════════════════════════════════════════════════════════
 function ManagersPage({ managers, setManagers }) {
@@ -2813,6 +2806,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   useEffect(() => { localStorage.setItem("activeTab_subadmin", active); }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
   const [jumpInvoice, setJumpInvoice] = useState(null);
+  const [sidebarOverride, setSidebarOverride] = useState(null);
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
   const [modal, setModal] = useState(null);
@@ -3867,8 +3861,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div className="no-print" style={{ display: "contents" }}>
           <Sidebar
             user={user}
-            active={validActive}
-            setActive={setActive}
+            active={sidebarOverride || validActive}
+            setActive={(val) => { setSidebarOverride(null); setActive(val); }}
             onLogout={handleLogout}
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
@@ -4254,7 +4248,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   <i className="ti ti-search"></i>
                   <input type="text" placeholder="Search projects, invoices, clients..." value={dashSearch} onChange={(e) => setDashSearch(e.target.value)} />
                 </div>
-                <button className="create-btn" onClick={() => setActive("projects")}><i className="ti ti-plus" style={{fontSize:15}}></i> Create New</button>
+                <div className="section-head">
+                  <div className="section-title">Overview</div>
+                  <button className="create-btn" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }}><i className="ti ti-plus" style={{fontSize:15}}></i> Create New</button>
+                </div>
               </div>
 
               <div className="modern-dash-content">
@@ -4262,25 +4259,19 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div className="col-left">
                   {/* STORAGE / PLATFORM CARDS */}
                   <div className="storage-row">
-                    <div className="storage-card active-card" onClick={() => setActive("projects")} style={{cursor:"pointer"}}>
+                    <div className="storage-card active-card" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{cursor:"pointer"}}>
                       <div className="storage-card-top">
                         <div className="storage-icon teal"><i className="ti ti-briefcase"></i></div>
-                        <div>
-                          <div className="storage-name white">Active Projects</div>
-                          <div className="storage-sub white">Open folder</div>
-                        </div>
+                        <div className="section-more" onClick={(e) => { e.stopPropagation(); setSidebarOverride("dashboard"); setActive("projects"); }}><i className="ti ti-dots"></i></div>
                       </div>
                       <div className="storage-sizes white"><span>{projects.length} Projects</span><span>{projects.length} Total</span></div>
                       <div className="storage-bar white-bg"><div className="storage-fill white" style={{width: "67%"}}></div></div>
                       <div className="storage-date white"><i className="ti ti-clock" style={{fontSize: 11}}></i> Last update</div>
                     </div>
-                    <div className="storage-card" onClick={() => setActive("invoices")}>
+                    <div className="storage-card" onClick={() => { setSidebarOverride("dashboard"); setActive("invoices"); }}>
                       <div className="storage-card-top">
                         <div className="storage-icon dropbox"><i className="ti ti-receipt-2"></i></div>
-                        <div>
-                          <div className="storage-name dark">Invoices</div>
-                          <div className="storage-sub muted">Open folder</div>
-                        </div>
+                        <div className="section-more" onClick={(e) => { e.stopPropagation(); setSidebarOverride("dashboard"); setActive("invoices"); }}><i className="ti ti-dots"></i></div>
                       </div>
                       <div className="storage-sizes dark"><span>{invoices.length} Pending</span><span>{invoices.length} Total</span></div>
                       <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{width: "40%"}}></div></div>
@@ -4365,7 +4356,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </thead>
                         <tbody>
                           {invoices.filter(i => (i.invoiceNo||"").toLowerCase().includes(dashSearch.toLowerCase()) || (i.clientName||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,4).map(inv => (
-                            <tr key={inv.id || inv._id} onClick={() => { setJumpInvoice(inv); setActive("invoices"); }} style={{ cursor: "pointer" }}>
+                            <tr key={inv.id || inv._id} onClick={() => { setJumpInvoice(inv); setSidebarOverride("dashboard"); setActive("invoices"); }} style={{ cursor: "pointer" }}>
                               <td><input type="checkbox" className="cb" /></td>
                               <td><div className="file-type-icon doc"><i className="ti ti-file-text"></i></div></td>
                               <td className="fname">{inv.invoiceNo || "Invoice"} — {inv.clientName}</td>
@@ -4427,17 +4418,17 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                   {/* QUICK STATS */}
                   <div className="stats-grid">
-                    <div className="mini-stat">
+                    <div className="mini-stat" onClick={() => setActive("accounts")}>
                       <div className="mini-stat-icon" style={{background: "rgba(var(--app-accent-rgb,0,188,212),0.1)", color: "var(--app-accent)"}}><i className="ti ti-cash"></i></div>
                       <div className="mini-stat-val">₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
                       <div className="mini-stat-label">Income</div>
                     </div>
-                    <div className="mini-stat">
+                    <div className="mini-stat" onClick={() => setActive("expenses")}>
                       <div className="mini-stat-icon" style={{background: "#FEF2F2", color: "#F05C5C"}}><i className="ti ti-chart-pie"></i></div>
                       <div className="mini-stat-val">₹{expenses.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
                       <div className="mini-stat-label">Expenses</div>
                     </div>
-                    <div className="mini-stat">
+                    <div className="mini-stat" onClick={() => setActive("employees")}>
                       <div className="mini-stat-icon" style={{background: "#E8FAF3", color: "#26C281"}}><i className="ti ti-users"></i></div>
                       <div className="mini-stat-val">{employees.length}</div>
                       <div className="mini-stat-label">Employees</div>
@@ -4469,7 +4460,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             setNcError({}); setShowClientPass(false); setModal("client");
           }} triggerCrop={triggerCrop} />}
 
-          {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
+          {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projects} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
             const limit = getSubscriptionLimit("employee");

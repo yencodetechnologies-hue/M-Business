@@ -19,7 +19,8 @@ const allowedOrigins = [
   "https://mbusiness.octosofttechnologies.in",
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://www.mbusiness.cloud"
+  "https://www.mbusiness.cloud",
+  "https://mbusiness.cloud"
 ];
 
 app.use(cors({

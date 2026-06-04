@@ -147,12 +147,7 @@ export default function InvoiceViewer() {
   const qrData = window.location.href;
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("print") === "true") {
-      setTimeout(() => {
-        window.print();
-      }, 500);
-    }
+    // Only auto-print if data is loaded! We will move this logic below.
   }, []);
 
   const getTemplateStyles = (templateName) => {
@@ -204,6 +199,15 @@ export default function InvoiceViewer() {
       remaining = remaining.slice(ITEMS_PER_PAGE_REST);
     }
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("print") === "true" && data) {
+      setTimeout(() => {
+        window.print();
+      }, 800); // Wait for fonts and images to render
+    }
+  }, [data]);
 
   return (
     <div className="print-wrapper" style={{ fontFamily: currentT.fontFamily || "'Plus Jakarta Sans', sans-serif", background: "#f1f5f9", minHeight: "100vh", padding: "20px 12px" }}>

@@ -1828,6 +1828,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
             <div style={{ fontSize: 13, fontWeight: 700, color: currentT.primaryColor || "#7c3aed" }}>{inv.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{inv.invoiceNo}</div>
           </div>
+        </div>
                 );
               })}
             </div>

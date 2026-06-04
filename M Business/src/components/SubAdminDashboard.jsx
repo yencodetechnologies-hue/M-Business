@@ -2812,6 +2812,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_subadmin") || "dashboard");
   useEffect(() => { localStorage.setItem("activeTab_subadmin", active); }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
+  const [jumpInvoice, setJumpInvoice] = useState(null);
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
   const [modal, setModal] = useState(null);
@@ -4285,7 +4286,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{width: "40%"}}></div></div>
                       <div className="storage-date muted"><i className="ti ti-clock" style={{fontSize: 11}}></i> Last update</div>
                     </div>
-                    <div className="storage-card" onClick={() => setActive("invoices")}>
+                    <div className="storage-card" onClick={() => setActive("accounts")}>
                       <div className="storage-card-top">
                         <div className="storage-icon revenue"><i className="ti ti-cash"></i></div>
                         <div>
@@ -4327,7 +4328,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     </div>
                     <div className="folders-grid">
                       {projects.filter(p => (p.title||p.name||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,3).map(p => (
-                        <div key={p.id || p._id} className="folder-card" onClick={() => setActive("projects")}>
+                        <div key={p.id || p._id} className="folder-card" onClick={() => { setSelectedProjectForTasks(p); setActive("tasks"); }}>
                           <div className="folder-top">
                             <div className="folder-avatars">
                                <div className="fa">{p.title?.[0]?.toUpperCase() || "P"}</div>
@@ -4364,7 +4365,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </thead>
                         <tbody>
                           {invoices.filter(i => (i.invoiceNo||"").toLowerCase().includes(dashSearch.toLowerCase()) || (i.clientName||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,4).map(inv => (
-                            <tr key={inv.id || inv._id} onClick={() => setActive("invoices")} style={{ cursor: "pointer" }}>
+                            <tr key={inv.id || inv._id} onClick={() => { setJumpInvoice(inv); setActive("invoices"); }} style={{ cursor: "pointer" }}>
                               <td><input type="checkbox" className="cb" /></td>
                               <td><div className="file-type-icon doc"><i className="ti ti-file-text"></i></div></td>
                               <td className="fname">{inv.invoiceNo || "Invoice"} — {inv.clientName}</td>
@@ -4480,7 +4481,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           }} />}
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive("dashboard")} onAddClient={() => {
+          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive("dashboard")} jumpInvoice={jumpInvoice} onAddClient={() => {
             const limit = getSubscriptionLimit("client");
             if (subscription && clients.length >= limit) {
               setLimitModal({ type: "client", limit });

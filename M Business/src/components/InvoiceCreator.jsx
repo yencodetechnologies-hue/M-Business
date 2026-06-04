@@ -436,11 +436,19 @@ function CanvasSignature({ onSave }) {
 }
 
 // ════════════════════════════════════════════════════════════
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
   const [step, setStep] = useState("list"); // "list" | "form" | "preview"
+
+  useEffect(() => {
+    if (jumpInvoice) {
+      loadEntry(jumpInvoice);
+      setStep("preview");
+    }
+  }, [jumpInvoice]);
+
   const [invoiceList, setInvoiceList] = useState([]);
   const [listLoading, setListLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -998,7 +1006,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
         `}</style>
 
         <div className="no-print" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 30 }}>
-          <button onClick={() => { setEditingReceipt(false); setStep("list"); }} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>← Back to List</button>
+          <button onClick={() => jumpInvoice ? onBack() : (setEditingReceipt(false), setStep("list"))} style={{ padding: "12px 24px", background: "#fff", border: "1.5px solid #e5e7eb", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#374151", fontFamily: "inherit" }}>{jumpInvoice ? "← Back to Dashboard" : "← Back to List"}</button>
           {!editingReceipt && <button onClick={() => setEditingReceipt(true)} style={{ padding: "12px 24px", background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#ea580c", fontFamily: "inherit" }}>Edit</button>}
           {!editingReceipt && <button onClick={() => window.print()} style={{ padding: "12px 28px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)" }}>🖨️ Print Receipt</button>}
         </div>
@@ -1583,6 +1591,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   // PREVIEW / PRINT
   // ════════════════════════════════════════════════════════════
   if (step === "preview") {
+    React.useEffect(() => { if (step === "preview") window.scrollTo(0, 0); }, [step]);
     return (
       <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "var(--app-bg)", minHeight: "100vh", padding: "20px 12px" }}>
         <style>{`
@@ -1720,7 +1729,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           <div style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr className="avoid-break" style={{ background: "var(--app-accent)" }}>
+                <tr className="avoid-break" style={{ background: currentT.primaryColor || "#1A2E35" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
                     <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
@@ -1851,7 +1860,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
     return (
       <div style={{ width: "100%", height: "80vh", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "10px 0", display: "flex", gap: 10, alignItems: "center" }}>
-          <button onClick={() => setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "var(--app-muted)" }}>← Back to List</button>
+          <button onClick={() => jumpInvoice ? onBack() : setStep("list")} style={{ padding: "8px 14px", background: "var(--app-bg)", border: "1.5px solid var(--app-border)", borderRadius: 8, cursor: "pointer", fontWeight: 700, color: "var(--app-muted)" }}>{jumpInvoice ? "← Back to Dashboard" : "← Back to List"}</button>
         </div>
         <div style={{ flex: 1, overflow: "hidden", borderRadius: 16 }}>
           <iframe src="/template-designer.html#inv" ref={iframeRef} onLoad={sendThemeToIframe} style={{ width: "100%", height: "100%", border: "none" }} title="Template Designer" />

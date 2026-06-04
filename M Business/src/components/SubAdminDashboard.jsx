@@ -4344,7 +4344,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 <div className="col-left">
                   {/* STORAGE / PLATFORM CARDS */}
                   <div className="storage-row">
-                    <div className="storage-card active-card">
+                    <div className="storage-card active-card" onClick={() => setActive("projects")} style={{cursor:"pointer"}}>
                       <div className="storage-card-top">
                         <div className="storage-icon teal"><i className="ti ti-briefcase"></i></div>
                         <div>
@@ -4447,7 +4447,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </thead>
                         <tbody>
                           {invoices.slice(0,4).map(inv => (
-                            <tr key={inv.id}>
+                            <tr key={inv.id} onClick={() => setActive("invoices")} style={{ cursor: "pointer" }}>
                               <td><input type="checkbox" className="cb" /></td>
                               <td><div className="file-type-icon doc"><i className="ti ti-file-text"></i></div></td>
                               <td className="fname">{inv.invoiceNo || "Invoice"} — {inv.clientName}</td>
@@ -4563,7 +4563,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           }} />}
           {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
+          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive("dashboard")} onAddClient={() => {
             const limit = getSubscriptionLimit("client");
             if (subscription && clients.length >= limit) {
               setLimitModal({ type: "client", limit });

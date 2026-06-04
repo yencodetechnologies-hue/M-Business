@@ -436,7 +436,7 @@ function CanvasSignature({ onSave }) {
 }
 
 // ════════════════════════════════════════════════════════════
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
@@ -1300,7 +1300,12 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
 
         {/* TABS */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between", marginBottom: 20}}>
-          <div className="tabs">
+          <div className="tabs" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            {onBack && (
+              <button onClick={onBack} style={{ padding: "8px", background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "var(--app-text)", display: "flex", alignItems: "center" }} title="Back to Dashboard">
+                <i className="ti ti-arrow-left"></i>
+              </button>
+            )}
             {["all", "paid", "pending", "overdue", "draft"].map(t => (
               <button key={t} className={`tab ${filterTab === t ? "active" : ""}`} onClick={() => setFilterTab(t)} style={{ textTransform: "capitalize" }}>{t}</button>
             ))}
@@ -1715,7 +1720,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           <div style={{ padding: isFirstPage ? "22px 32px" : "40px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr className="avoid-break" style={{ background: currentT.primaryColor || "var(--app-accent)" }}>
+                <tr className="avoid-break" style={{ background: "var(--app-accent)" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
                     <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
@@ -1820,6 +1825,9 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           </div>
 
           </>)}
+
+          <div className="flex-spacer" style={{ flex: 1 }} />
+
           {/* Footer message */}
           <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, pageBreakBefore: "auto", breakBefore: "auto" }}>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>

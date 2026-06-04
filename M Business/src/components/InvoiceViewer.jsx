@@ -321,9 +321,9 @@ export default function InvoiceViewer() {
               <div style={{ padding: isFirstPage ? "22px 32px" : "40px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
                   <thead>
-                    <tr style={{ background: currentT.primaryColor }}>
+                    <tr style={{ background: "var(--app-accent)" }}>
                       {["#", "Description", "Qty", "Unit Rate", "Amount"].map((h, i) => (
-                        <th key={i} style={{ background: currentT.primaryColor, padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                        <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                       ))}
                     </tr>
                   </thead>
@@ -422,6 +422,8 @@ export default function InvoiceViewer() {
                 </div>
               </div>
             )}
+
+            <div className="flex-spacer" style={{ flex: 1 }} />
 
             {/* Footer */}
             <div style={{ background: "#f8fafc", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, borderTop: currentT.borderStyle || "1px solid #e2e8f0" }}>

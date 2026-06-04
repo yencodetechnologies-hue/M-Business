@@ -1558,3 +1558,14 @@ tbody tr:last-child td{border-bottom:none}
 .inv-creator-items-table tbody tr:hover {
   background: transparent !important;
 }
+
+
+.invoice-bottom-grid { display: grid; grid-template-columns: 1fr auto auto; gap: 16px; }
+@media (max-width: 768px) {
+  .invoice-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+  .invoice-bottom-grid > div {
+    width: 100%;
+  }
+}

@@ -7,13 +7,19 @@ export let currentStatus = 'DRAFT';
 export const fmtDate = v => { try { return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return v; } };
 export const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
 
+const getEl = (id) => {
+  const el = document.getElementById(id);
+  if (!el) return { value: '', textContent: '', innerHTML: '', style: {}, classList: { add: ()=>{}, remove: ()=>{}, toggle: ()=>{} }, focus: ()=>{} };
+  return el;
+};
+
 
 
 
 /* ── SECTION TOGGLES ── */
 export function toggleSection(btn, id) {
-  const sec = document.getElementById(id);
-  const pvSec = document.getElementById('pv-sec-' + id.replace('sec-',''));
+  const sec = getEl(id);
+  const pvSec = getEl('pv-sec-' + id.replace('sec-',''));
   btn.classList.toggle('on');
   const show = btn.classList.contains('on');
   if (sec) sec.style.display = show ? '' : 'none';
@@ -22,13 +28,73 @@ export function toggleSection(btn, id) {
 
 /* ── STATUS ── */
 export function selSt(el, val) {
+  document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won','lost','sent','neg','exp'].includes(x)).join(' '));
+  const classMap = { DRAFT:'active-sc', SENT:'sent', NEGOTIATION:'neg', WON:'won', LOST:'lost', EXPIRED:'exp' };
+  document.querySelectorAll('.sc').forEach(c => { c.className = 'sc'; });
+  el.classList.add(classMap[val] || 'active-sc');
+  currentStatus = val;
+  const b = getEl('pv-status');
+  b.textContent = val;
+}
+
+/* ── MAIN UPDATE ── */
+export function up() {
+  // Cover
+  const t = getEl('propTitle').value;
+  getEl('pv-title').textContent = t || '— Proposal Title —';
+  getEl('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
+  const tc = getEl('toComp').value;
+  getEl('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
+  getEl('pv-date').textContent = fmtDate(getEl('propDate').value);
+  getEl('pv-type').textContent = getEl('propType').value;
+  getEl('pv-expiry').textContent = 'Expires ' + fmtDate(getEl('propExpiry').value);
+  // Parties
+  const fp = getEl('fromPerson').value, fc = getEl('fromComp').value, fe = getEl('fromEmail').value;
+  getEl('pv-from').textContent = fp || 'Prabhu R';
+  getEl('pv-from-d').innerHTML = `${fc}<br>${fe}`;
+  getEl('pv-sig1').textContent = fp || 'Prabhu R';
+  getEl('pv-to').textContent = tc || '— Client —';
+  getEl('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
+  const tp = getEl('toPerson').value, te = getEl('toEmail').value, ta = getEl('toAddr').value;
+  getEl('pv-to-d').innerHTML = tc ? `${tp ? tp+'<br>' : ''}${te ? te+'<br>' : ''}${ta}` : '<span style="color:var(--text3)">Fill in client details</span>';
+  getEl('pv-sig2').textContent = tc || '— Client —';
+  getEl('pv-sig2').style.color = tc ? 'var(--text)' : 'var(--text3)';
+  getEl('pv-sig2-role').textContent = tc || 'Awaiting';
+  // Exec summary
+  const pr = getEl('problem').value, so = getEl('solution').value, oc = getEl('outcome').value;
+  getEl('pv-problem').innerHTML = pr || '<span style="color:var(--text3);font-style:italic">Describe the client\'s challenge…</span>';
+  getEl('pv-solution').innerHTML = so || '<span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span>';
+  getEl('pv-outcome').innerHTML = oc || '<span style="color:var(--text3);font-style:italic">Describe expected results…</span>';
+  // Deliverables
+  let dHtml = '';
+  document.querySelectorAll('#delList .dv-input').forEach(d => { if (d.value.trim()) dHtml += `<div class="del-item-p">${d.value}</div>`; });
+  getEl('pv-del').innerHTML = dHtml || '<span style="color:var(--text3);font-size:10px">No deliverables</span>';
+  // Timeline dates
+  getEl('pv-start').textContent = fmtDate(getEl('startDate').value);
+  getEl('pv-end').textContent = fmtDate(getEl('endDate').value);
+  getEl('pv-dur').textContent = getEl('duration').value;
+  updateMilestonesPreview();
+  updateTeamPreview();
+  updateValuePreview();
+  updateRisksPreview();
+  updateCasePreview();
+  updateTmPreview();
+  // Payment
+  getEl('pv-pay').textContent = 'Payment: ' + getEl('paySchedule').value;
+  // Closing
+  getEl('pv-closing').innerHTML = (getEl('closing').value || '').replace(/\n/g,'<br>');
+}
+
+export function updateMilestonesPreview() {
+  const items = document.querySelectorAll('#msList .ms-item');
+  let html = '';
   items.forEach((it, i) => {
     const ti = it.querySelector('.ms-inp'), di = it.querySelector('.ms-date'), de = it.querySelector('.ms-desc');
     const isLast = i === items.length - 1;
     html += `<div class="tl-pi"><div class="tl-left"><div class="tl-dot">${i+1}</div>${!isLast?'<div class="tl-line-p"></div>':''}</div>
       <div><div class="tl-pi-title">${ti?ti.value:'Milestone'}</div>${di&&di.value?`<div class="tl-pi-date">${fmtDate(di.value)}</div>`:''}${de&&de.value?`<div class="tl-pi-desc">${de.value}</div>`:''}</div></div>`;
   });
-  document.getElementById('pv-timeline').innerHTML = html;
+  getEl('pv-timeline').innerHTML = html;
 }
 
 export function updateTeamPreview() {
@@ -42,13 +108,13 @@ export function updateTeamPreview() {
     const init = n.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     html += `<div class="tp-card" style="display:flex;align-items:center;gap:7px"><div class="tp-av-p" style="background:${bg}">${init}</div><div><div class="tp-name-p">${n}</div><div class="tp-role-p">${r}</div></div></div>`;
   });
-  document.getElementById('pv-team').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
+  getEl('pv-team').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
 }
 
 export function updateValuePreview() {
   let html = '';
   document.querySelectorAll('#valueList .dv-input').forEach(v => { if (v.value.trim()) html += `<div class="val-pi">${v.value}</div>`; });
-  document.getElementById('pv-value').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No value points</span>';
+  getEl('pv-value').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No value points</span>';
 }
 
 export function updateRisksPreview() {
@@ -62,7 +128,7 @@ export function updateRisksPreview() {
     const cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
     html += `<div class="risk-pi"><span class="risk-badge-p ${cls}">${lik}</span><div><div class="risk-pi-text">${inputs[0].value}</div>${inputs[1]?`<div class="risk-pi-mit">↳ ${inputs[1].value}</div>`:''}</div></div>`;
   });
-  document.getElementById('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
+  getEl('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
 }
 
 export function updateCasePreview() {
@@ -73,7 +139,7 @@ export function updateCasePreview() {
     const ta = it.querySelector('textarea');
     html += `<div class="cs-p"><div class="cs-p-title">${title}</div><div class="cs-p-detail">${ta ? ta.value : ''}</div></div>`;
   });
-  document.getElementById('pv-cs').innerHTML = html;
+  getEl('pv-cs').innerHTML = html;
 }
 
 export function updateTmPreview() {
@@ -84,7 +150,7 @@ export function updateTmPreview() {
     const nameInp = it.querySelectorAll('input')[0];
     html += `<div class="tm-p"><div class="tm-p-text">"${ta ? ta.value : ''}"</div><div class="tm-p-author">— ${nameInp ? nameInp.value : ''}</div></div>`;
   });
-  document.getElementById('pv-tm').innerHTML = html;
+  getEl('pv-tm').innerHTML = html;
 }
 
 export function calcTotal() {
@@ -99,24 +165,24 @@ export function calcTotal() {
       html += `<tr><td>${n}</td><td>${fmt(v)}</td></tr>`;
     }
   });
-  const gst = parseFloat(document.getElementById('gst').value) || 0;
-  const disc = parseFloat(document.getElementById('disc').value) || 0;
+  const gst = parseFloat(getEl('gst').value) || 0;
+  const disc = parseFloat(getEl('disc').value) || 0;
   const discount = sub * disc / 100;
   const tax = sub * gst / 100;
   const grand = sub - discount + tax;
-  document.getElementById('subtotal').textContent = fmt(sub);
-  document.getElementById('taxAmt').textContent = fmt(tax);
-  document.getElementById('grandTotal').textContent = fmt(grand);
-  document.getElementById('pv-grand').textContent = fmt(grand);
-  document.getElementById('pv-pricing').innerHTML = html;
-  const dr = document.getElementById('discRow');
-  if (discount > 0) { dr.style.display = 'flex'; document.getElementById('discAmt').textContent = '-' + fmt(discount); } else { dr.style.display = 'none'; }
+  getEl('subtotal').textContent = fmt(sub);
+  getEl('taxAmt').textContent = fmt(tax);
+  getEl('grandTotal').textContent = fmt(grand);
+  getEl('pv-grand').textContent = fmt(grand);
+  getEl('pv-pricing').innerHTML = html;
+  const dr = getEl('discRow');
+  if (discount > 0) { dr.style.display = 'flex'; getEl('discAmt').textContent = '-' + fmt(discount); } else { dr.style.display = 'none'; }
 }
 
 /* ── ADD FUNCTIONS ── */
 export function addMilestone() {
   msCount++;
-  const c = document.getElementById('msList');
+  const c = getEl('msList');
   const d = document.createElement('div');
   d.className = 'ms-item';
   d.innerHTML = `<div class="ms-left"><div class="ms-dot">${msCount}</div><div class="ms-line"></div></div>
@@ -144,7 +210,7 @@ export function updateMsNumbers() {
 }
 
 export function addDel() {
-  const c = document.getElementById('delList');
+  const c = getEl('delList');
   const d = document.createElement('div');
   d.className = 'dv-item';
   d.innerHTML = `<div class="dv-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-check"></i></div>
@@ -156,7 +222,7 @@ export function addDel() {
 }
 
 export function addValue() {
-  const c = document.getElementById('valueList');
+  const c = getEl('valueList');
   const d = document.createElement('div');
   d.className = 'dv-item';
   d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
@@ -168,7 +234,7 @@ export function addValue() {
 }
 
 export function addPricingRow() {
-  const c = document.getElementById('pricingList');
+  const c = getEl('pricingList');
   const d = document.createElement('div');
   d.className = 'pricing-row';
   d.innerHTML = `<input type="text" class="pr-inp" placeholder="Service / item" oninput="calcTotal()">
@@ -180,7 +246,7 @@ export function addPricingRow() {
 }
 
 export function addRisk() {
-  const c = document.getElementById('riskList');
+  const c = getEl('riskList');
   const d = document.createElement('div');
   d.className = 'risk-row-g';
   d.innerHTML = `<input type="text" class="pr-inp" placeholder="Risk description">
@@ -191,7 +257,7 @@ export function addRisk() {
 }
 
 export function addCaseStudy() {
-  const c = document.getElementById('csList'), n = c.children.length + 1;
+  const c = getEl('csList'), n = c.children.length + 1;
   const d = document.createElement('div');
   d.className = 'cs-item';
   d.innerHTML = `<div class="cs-header"><div class="cs-num">${n}</div>
@@ -207,7 +273,7 @@ export function addCaseStudy() {
 }
 
 export function addTestimonial() {
-  const c = document.getElementById('tmList');
+  const c = getEl('tmList');
   const d = document.createElement('div');
   d.className = 'tm-item';
   d.innerHTML = `<i class="ti ti-quote tm-quote-icon"></i>
@@ -220,7 +286,7 @@ export function addTestimonial() {
 }
 
 export function addFaq() {
-  const c = document.getElementById('faqList');
+  const c = getEl('faqList');
   const d = document.createElement('div');
   d.style.cssText = 'padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px';
   d.innerHTML = `<div class="fg"><label class="fl">Question</label><input class="fi" type="text" placeholder="Frequently asked question…"></div>
@@ -230,7 +296,7 @@ export function addFaq() {
 }
 
 export function addWhyUs() {
-  const c = document.getElementById('whyList');
+  const c = getEl('whyList');
   const d = document.createElement('div');
   d.className = 'dv-item';
   d.innerHTML = `<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
@@ -246,7 +312,7 @@ export function addTeamMember() {
   const role = prompt('Their job role:') || 'Team Member';
   const exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
   const skills = prompt('Skills (comma-separated):') || '';
-  const c = document.getElementById('teamList');
+  const c = getEl('teamList');
   const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))','linear-gradient(135deg,var(--purple),#4E35B0)','linear-gradient(135deg,var(--amber),#D4880A)','linear-gradient(135deg,var(--blue),#1A4DB5)'];
   const col = colors[Math.floor(Math.random() * colors.length)];
   const init = name.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
@@ -266,16 +332,16 @@ export function addTeamMember() {
 }
 
 export function fillClient() {
-  document.getElementById('toComp').value = 'STA Corporation';
-  document.getElementById('toPerson').value = 'STA Admin';
-  document.getElementById('toEmail').value = 'sta@example.com';
-  document.getElementById('toPhone').value = '+91 98765 43210';
-  document.getElementById('toAddr').value = 'Chennai, Tamil Nadu, India';
+  getEl('toComp').value = 'STA Corporation';
+  getEl('toPerson').value = 'STA Admin';
+  getEl('toEmail').value = 'sta@example.com';
+  getEl('toPhone').value = '+91 98765 43210';
+  getEl('toAddr').value = 'Chennai, Tamil Nadu, India';
   up();
 }
 
 export function uploadCover() {
-  const z = document.getElementById('coverZone');
+  const z = getEl('coverZone');
   z.style.background = 'var(--teal-lighter)';
   z.style.borderColor = 'var(--teal)';
   z.innerHTML = `<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div class="cover-zone-txt" style="color:var(--teal)">Cover image uploaded</div><div class="cover-zone-sub">Click to change</div>`;
@@ -283,8 +349,8 @@ export function uploadCover() {
 
 export function saveDraft() { selSt(document.querySelectorAll('.sc')[0],'DRAFT'); alert('Proposal saved as draft!'); }
 export function sendProposal() {
-  const c = document.getElementById('toComp').value;
-  if (!c) { alert('Please enter client name first.'); document.getElementById('toComp').focus(); return; }
+  const c = getEl('toComp').value;
+  if (!c) { alert('Please enter client name first.'); getEl('toComp').focus(); return; }
   selSt(document.querySelectorAll('.sc')[1],'SENT');
   alert('Proposal sent to ' + c + '!');
 }

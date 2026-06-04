@@ -79,7 +79,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
     return docIcons.default;
   };
 
-  const docsToShow = empDocs || [];
+  const docsToShow = Array.isArray(empDocs) ? empDocs : (empDocs ? Object.values(empDocs) : []);
 
   return (
     <div style={{

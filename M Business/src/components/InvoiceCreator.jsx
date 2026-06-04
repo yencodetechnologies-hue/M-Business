@@ -1712,10 +1712,10 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           </div>)}
 
           {/* Items */}
-          <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
+          <div style={{ padding: isFirstPage ? "22px 32px" : "40px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr className="avoid-break" style={{ background: currentT.logoColor || "var(--app-accent)" }}>
+                <tr className="avoid-break" style={{ background: currentT.primaryColor || "var(--app-accent)" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
                     <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
@@ -1818,8 +1818,6 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               <div className="inv-sig-role" style={{ fontSize: "8px", color: "var(--app-muted)" }}>Authorized Signatory</div>
             </div>
           </div>
-
-          <div className="flex-spacer" style={{ flex: 1 }} />
 
           </>)}
           {/* Footer message */}

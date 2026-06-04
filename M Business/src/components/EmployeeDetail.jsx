@@ -1,26 +1,85 @@
-import React from 'react';
-import { DOC_TYPES } from './EmployeeProfilePanel';
+import React, { useState } from 'react';
 
 export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs, empDocsLoading, projects = [], tasks = [], onViewProject }) {
   if (!emp) return null;
+
+  const [taskTab, setTaskTab] = useState('all');
 
   const getInitials = (name) => {
     if (!name) return "?";
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const isImg = (url = "") => /\.(jpg|jpeg|png|gif|webp)$/i.test(url) || url.startsWith("data:image");
+  const empId = emp.employeeId || emp._id?.substring(0, 6).toUpperCase() || "—";
 
-  const empId = emp.employeeId || emp._id?.substring(0, 6).toUpperCase() || "EMP-001";
-  
   // Tenure calculation
-  const joinedDate = emp.joiningDate ? new Date(emp.joiningDate) : (emp.createdAt ? new Date(emp.createdAt) : new Date());
+  const joinedDate = emp.joiningDate ? new Date(emp.joiningDate) : (emp.createdAt ? new Date(emp.createdAt) : null);
   const now = new Date();
-  const diffTime = Math.abs(now - joinedDate);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const years = Math.floor(diffDays / 365);
-  const months = Math.floor((diffDays % 365) / 30);
-  const tenure = years > 0 ? `${years} yr ${months} mo` : `${months} mo`;
+  let tenure = "—";
+  if (joinedDate) {
+    const diffDays = Math.ceil(Math.abs(now - joinedDate) / (1000 * 60 * 60 * 24));
+    const years = Math.floor(diffDays / 365);
+    const months = Math.floor((diffDays % 365) / 30);
+    tenure = years > 0 ? `${years} yr ${months} mo` : `${months} mo`;
+  }
+
+  // Projects helpers
+  const activeProjects = projects.filter(p => (p.status || '').toLowerCase() !== 'completed');
+  const totalWorkload = projects.length > 0
+    ? Math.round(projects.reduce((sum, p) => sum + (p.progress || p.percentage || 0), 0) / projects.length)
+    : 0;
+
+  const projIcons = ['ti-world', 'ti-device-mobile', 'ti-chart-bar', 'ti-code', 'ti-building', 'ti-rocket'];
+  const projColors = [
+    { bg: '#F0FDFE', color: '#00BCD4' },
+    { bg: '#EEF2FF', color: '#6366F1' },
+    { bg: '#ECFDF5', color: '#10B981' },
+    { bg: '#FFF7ED', color: '#F59E0B' },
+    { bg: '#FDF4FF', color: '#A855F7' },
+    { bg: '#FFF1F2', color: '#EF4444' },
+  ];
+
+  // Tasks helpers
+  const pendingTasks = tasks.filter(t => !t.completed && !t.done && t.status !== 'completed');
+  const completedTasks = tasks.filter(t => t.completed || t.done || t.status === 'completed');
+  const filteredTasks = taskTab === 'all' ? tasks : taskTab === 'pending' ? pendingTasks : completedTasks;
+
+  const getPriorityStyle = (priority = '') => {
+    const p = priority.toLowerCase();
+    if (p === 'high') return { background: '#FEF2F2', color: '#EF4444' };
+    if (p === 'low') return { background: '#ECFDF5', color: '#10B981' };
+    return { background: '#FFFBEB', color: '#F59E0B' }; // mid/medium
+  };
+
+  const formatDue = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  };
+
+  const isOverdue = (date) => date && new Date(date) < now;
+
+  // Documents helpers
+  const docIcons = {
+    offer: { icon: 'ti-file-text', bg: '#EEF2FF', color: '#6366F1' },
+    id: { icon: 'ti-id', bg: '#E0F2FE', color: '#0ea5e9' },
+    contract: { icon: 'ti-file-certificate', bg: '#FFFBEB', color: '#f59e0b' },
+    degree: { icon: 'ti-certificate', bg: '#F5F3FF', color: '#8b5cf6' },
+    resume: { icon: 'ti-file-description', bg: '#FEF2F2', color: '#ef4444' },
+    default: { icon: 'ti-file', bg: '#F1F5F9', color: '#64748B' },
+  };
+
+  const getDocStyle = (doc) => {
+    const name = (doc.name || doc.documentName || doc.type || '').toLowerCase();
+    if (name.includes('offer')) return docIcons.offer;
+    if (name.includes('aadhar') || name.includes('id') || name.includes('pan')) return docIcons.id;
+    if (name.includes('contract')) return docIcons.contract;
+    if (name.includes('degree') || name.includes('education') || name.includes('cert')) return docIcons.degree;
+    if (name.includes('resume') || name.includes('cv')) return docIcons.resume;
+    return docIcons.default;
+  };
+
+  const docsToShow = empDocs || [];
 
   return (
     <div style={{
@@ -79,11 +138,6 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         .ed-info-item .lbl { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         .ed-info-item .val { font-size: 13px; font-weight: 800; color: #0F172A; word-break: break-all; }
 
-        .ed-att-blocks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-        .ed-att-block { background: #F1F5F9; border-radius: 12px; padding: 16px 10px; text-align: center; border: none; }
-        .ed-att-val { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
-        .ed-att-lbl { font-size: 11px; font-weight: 700; color: #64748B; }
-
         .ed-progress-group { margin-bottom: 16px; }
         .ed-progress-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 8px; color: #475569; }
         .ed-progress-bar { height: 6px; background: #E2E8F0; border-radius: 10px; overflow: hidden; }
@@ -94,7 +148,9 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         .ed-table td { padding: 12px 0; font-size: 12px; font-weight: 700; color: #334155; border-bottom: 1px solid #F1F5F9; }
         .ed-table tr:last-child td { border-bottom: none; }
 
-        .ed-proj-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F1F5F9; }
+        .ed-proj-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F1F5F9; cursor: pointer; }
+        .ed-proj-item:last-child { border-bottom: none; }
+        .ed-proj-item:hover { background: #FAFAFA; }
         .ed-proj-info { display: flex; align-items: center; gap: 12px; }
         .ed-proj-icon { width: 36px; height: 36px; border-radius: 8px; background: #F0FDFE; color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .ed-proj-name { font-size: 13px; font-weight: 800; color: #0F172A; }
@@ -104,13 +160,14 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         .ed-proj-lbl { font-size: 11px; font-weight: 600; color: #64748B; }
 
         .ed-task-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F1F5F9; }
-        .ed-task-cb { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; }
+        .ed-task-item:last-child { border-bottom: none; }
+        .ed-task-cb { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; flex-shrink: 0; }
         .ed-task-cb.done { background: var(--teal); }
         .ed-task-content { flex: 1; }
         .ed-task-title { font-size: 12px; font-weight: 800; margin-bottom: 2px; color: #0F172A; }
         .ed-task-title.done { text-decoration: line-through; color: #94A3B8; }
         .ed-task-due { font-size: 10px; font-weight: 700; color: #64748B; }
-        .ed-task-tag { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+        .ed-task-tag { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; flex-shrink: 0; }
 
         .ed-docs-list { display: flex; flex-direction: column; gap: 0; }
         .ed-doc-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #F1F5F9; }
@@ -127,6 +184,9 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         .ed-doc-btn.download:hover { background: #0097A7; }
         .ed-docs-sub { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
         .ed-docs-sub span { background: var(--teal); color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; }
+        .ed-empty { text-align: center; padding: 24px 0; color: #94A3B8; font-size: 12px; font-weight: 600; }
+        .ed-tab { font-size: 12px; font-weight: 700; padding-bottom: 8px; cursor: pointer; color: var(--text-muted); }
+        .ed-tab.active { color: var(--teal); border-bottom: 2px solid var(--teal); }
       `}</style>
 
       {/* HEADER */}
@@ -156,21 +216,27 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
               <span className="ed-badge">{empId}</span>
             </div>
             <div className="ed-contacts">
-              <span><i className="ti ti-mail"></i> {emp.email || "No email"}</span>
-              <span><i className="ti ti-phone"></i> {emp.phone || "No phone"}</span>
-              <span><i className="ti ti-map-pin"></i> {emp.address || "No Address"}</span>
+              {emp.email && <span><i className="ti ti-mail"></i> {emp.email}</span>}
+              {emp.phone && <span><i className="ti ti-phone"></i> {emp.phone}</span>}
+              {emp.address && <span><i className="ti ti-map-pin"></i> {emp.address}</span>}
             </div>
           </div>
         </div>
         <div className="ed-hero-right">
-          <div className="ed-status">
+          <div className="ed-status" style={
+            (emp.status || 'active').toLowerCase() === 'inactive'
+              ? { background: '#FEE2E2', color: '#DC2626' }
+              : { background: '#DCFCE7', color: '#16A34A' }
+          }>
             <div className="ed-status-dot"></div> {(emp.status || "Active").toUpperCase()}
           </div>
           <div style={{ display: "flex", gap: "32px", marginTop: "8px" }}>
-            <div className="ed-tenure">
-              {joinedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-              <span>Date Joined</span>
-            </div>
+            {joinedDate && (
+              <div className="ed-tenure">
+                {joinedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                <span>Date Joined</span>
+              </div>
+            )}
             <div className="ed-tenure">
               {tenure}
               <span>Tenure</span>
@@ -179,7 +245,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         </div>
       </div>
 
-      {/* TOP GRID */}
+      {/* TOP GRID: Personal Info + Leave/Info */}
       <div className="ed-grid">
         {/* PERSONAL INFO */}
         <div className="ed-card">
@@ -188,152 +254,151 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
             <button className="ed-btn" style={{padding: "6px 12px", fontSize: "11px", borderRadius: "8px"}} onClick={onEdit}><i className="ti ti-pencil"></i> Edit</button>
           </div>
           <div className="ed-info-grid">
-            <div className="ed-info-item"><div className="lbl">Full Name</div><div className="val">{emp.name}</div></div>
+            <div className="ed-info-item"><div className="lbl">Full Name</div><div className="val">{emp.name || "—"}</div></div>
             <div className="ed-info-item"><div className="lbl">Employee ID</div><div className="val" style={{color: "var(--teal)"}}>{empId}</div></div>
             <div className="ed-info-item"><div className="lbl">Role</div><div className="val">{emp.role || "—"}</div></div>
             <div className="ed-info-item"><div className="lbl">Department</div><div className="val">{emp.department || "—"}</div></div>
             <div className="ed-info-item"><div className="lbl">Email</div><div className="val">{emp.email || "—"}</div></div>
             <div className="ed-info-item"><div className="lbl">Phone</div><div className="val">{emp.phone || "—"}</div></div>
-            <div className="ed-info-item"><div className="lbl">Date Joined</div><div className="val">{joinedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div></div>
-            <div className="ed-info-item"><div className="lbl">Employment Type</div><div className="val">Full-Time</div></div>
+            <div className="ed-info-item"><div className="lbl">Date Joined</div><div className="val">{joinedDate ? joinedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "—"}</div></div>
+            <div className="ed-info-item"><div className="lbl">Employment Type</div><div className="val">{emp.employmentType || emp.type || "Full-Time"}</div></div>
+            {emp.salary && <div className="ed-info-item"><div className="lbl">Salary</div><div className="val">₹{Number(emp.salary).toLocaleString()}</div></div>}
+            {emp.address && <div className="ed-info-item"><div className="lbl">Address</div><div className="val">{emp.address}</div></div>}
           </div>
         </div>
 
-        {/* ATTENDANCE & LEAVE (Mock Data to match template) */}
+        {/* LEAVE REQUESTS */}
         <div className="ed-card">
           <div className="ed-card-header">
-            <div className="ed-card-title"><i className="ti ti-calendar-event"></i> Attendance & Leave</div>
-            <span style={{fontSize: "11px", fontWeight: "700", color: "var(--text-muted)"}}>This Month</span>
+            <div className="ed-card-title"><i className="ti ti-calendar-event"></i> Leave Requests</div>
+            <span style={{fontSize: "11px", fontWeight: "700", color: "var(--text-muted)"}}>
+              {(emp.leaveRequests || []).filter(l => l.status === 'pending').length} pending
+            </span>
           </div>
-          <div className="ed-att-blocks">
-            <div className="ed-att-block"><div className="ed-att-val" style={{color: "var(--success)"}}>22</div><div className="ed-att-lbl">Present</div></div>
-            <div className="ed-att-block"><div className="ed-att-val" style={{color: "var(--danger)"}}>2</div><div className="ed-att-lbl">Absent</div></div>
-            <div className="ed-att-block"><div className="ed-att-val" style={{color: "var(--warning)"}}>1</div><div className="ed-att-lbl">On Leave</div></div>
-            <div className="ed-att-block"><div className="ed-att-val" style={{color: "var(--teal)"}}>3</div><div className="ed-att-lbl">WFH</div></div>
-          </div>
-          
-          <div className="ed-progress-group">
-            <div className="ed-progress-header"><span>Attendance Rate</span><span>88%</span></div>
-            <div className="ed-progress-bar"><div className="ed-progress-fill" style={{width: "88%", background: "var(--success)"}}></div></div>
-          </div>
-          <div className="ed-progress-group">
-            <div className="ed-progress-header"><span>Leave Used</span><span>5 / 18 days</span></div>
-            <div className="ed-progress-bar"><div className="ed-progress-fill" style={{width: "30%", background: "var(--warning)"}}></div></div>
-          </div>
-
-          <div style={{fontSize: "12px", fontWeight: "800", marginTop: "20px", display: "flex", alignItems: "center", gap: "6px"}}><i className="ti ti-plane-departure" style={{color: "var(--teal)"}}></i> Leave Requests</div>
-          <table className="ed-table">
-            <thead><tr><th>Type</th><th>Dates</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody>
-              <tr>
-                <td>Sick Leave</td>
-                <td style={{color: "var(--text-muted)", fontSize: "11px"}}>10–11 Jun</td>
-                <td><span style={{background: "#FFFBEB", color: "var(--warning)", padding: "4px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: "800"}}>Pending</span></td>
-                <td><button className="ed-btn" style={{padding: "4px 8px", fontSize: "10px", background: "#ECFDF5", color: "var(--success)", borderColor: "#D1FAE5"}}>Approve</button> <button className="ed-btn" style={{padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px"}}>Reject</button></td>
-              </tr>
-              <tr>
-                <td>Annual Leave</td>
-                <td style={{color: "var(--text-muted)", fontSize: "11px"}}>20–22 May</td>
-                <td><span style={{background: "#ECFDF5", color: "var(--success)", padding: "4px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: "800"}}>Approved</span></td>
-                <td style={{color: "var(--text-muted)"}}>—</td>
-              </tr>
-              <tr>
-                <td>Casual Leave</td>
-                <td style={{color: "var(--text-muted)", fontSize: "11px"}}>02 Apr</td>
-                <td><span style={{background: "#FEF2F2", color: "var(--danger)", padding: "4px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: "800"}}>Rejected</span></td>
-                <td style={{color: "var(--text-muted)"}}>—</td>
-              </tr>
-            </tbody>
-          </table>
+          {(emp.leaveRequests || []).length === 0 ? (
+            <div className="ed-empty"><i className="ti ti-calendar-off" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>No leave requests</div>
+          ) : (
+            <table className="ed-table">
+              <thead><tr><th>Type</th><th>Dates</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                {(emp.leaveRequests || []).map((leave, i) => (
+                  <tr key={i}>
+                    <td>{leave.type || leave.leaveType || "Leave"}</td>
+                    <td style={{color: "var(--text-muted)", fontSize: "11px"}}>
+                      {leave.startDate ? new Date(leave.startDate).toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) : ""}
+                      {leave.endDate && leave.endDate !== leave.startDate ? ` – ${new Date(leave.endDate).toLocaleDateString('en-GB', {day:'2-digit', month:'short'})}` : ""}
+                    </td>
+                    <td>
+                      <span style={{
+                        background: leave.status === 'approved' ? '#ECFDF5' : leave.status === 'rejected' ? '#FEF2F2' : '#FFFBEB',
+                        color: leave.status === 'approved' ? 'var(--success)' : leave.status === 'rejected' ? 'var(--danger)' : 'var(--warning)',
+                        padding: "4px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: "800", textTransform: "capitalize"
+                      }}>{leave.status || "Pending"}</span>
+                    </td>
+                    <td>
+                      {(!leave.status || leave.status === 'pending') ? (
+                        <>
+                          <button className="ed-btn" style={{padding: "4px 8px", fontSize: "10px", background: "#ECFDF5", color: "var(--success)", borderColor: "#D1FAE5"}}>Approve</button>
+                          <button className="ed-btn" style={{padding: "4px 8px", fontSize: "10px", background: "#FEF2F2", color: "var(--danger)", borderColor: "#FEE2E2", marginLeft: "4px"}}>Reject</button>
+                        </>
+                      ) : <span style={{color: "var(--text-muted)"}}>—</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
-      {/* BOTTOM GRID */}
+      {/* BOTTOM GRID: Projects | Tasks | Documents */}
       <div className="ed-grid" style={{ gridTemplateColumns: "1fr 1fr 1.2fr" }}>
+
         {/* ASSIGNED PROJECTS */}
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-briefcase"></i> Assigned Projects</div>
-            <span style={{fontSize: "12px", fontWeight: "800", color: "var(--teal)"}}>3 active</span>
+            <span style={{fontSize: "12px", fontWeight: "800", color: "var(--teal)"}}>{activeProjects.length} active</span>
           </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div className="ed-proj-item">
-              <div className="ed-proj-info"><div className="ed-proj-icon" style={{background: "#F0FDFE", color: "var(--teal)"}}><i className="ti ti-world"></i></div><div><div className="ed-proj-name">Mankatha Website</div><div className="ed-proj-role">Lead Developer</div></div></div>
-              <div className="ed-proj-stat"><div className="ed-proj-perc">72%</div><div className="ed-proj-lbl">In Progress</div></div>
+          {projects.length === 0 ? (
+            <div className="ed-empty"><i className="ti ti-briefcase-off" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>No projects assigned</div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {projects.map((proj, i) => {
+                const pc = projColors[i % projColors.length];
+                const ic = projIcons[i % projIcons.length];
+                const perc = proj.progress || proj.percentage || proj.completion || 0;
+                const status = proj.status || (perc === 100 ? 'Completed' : 'In Progress');
+                return (
+                  <div key={proj._id || i} className="ed-proj-item" onClick={() => onViewProject && onViewProject(proj)}>
+                    <div className="ed-proj-info">
+                      <div className="ed-proj-icon" style={{background: pc.bg, color: pc.color}}><i className={`ti ${ic}`}></i></div>
+                      <div>
+                        <div className="ed-proj-name">{proj.name || proj.projectName || "Project"}</div>
+                        <div className="ed-proj-role">{proj.role || proj.memberRole || "Member"}</div>
+                      </div>
+                    </div>
+                    <div className="ed-proj-stat">
+                      <div className="ed-proj-perc" style={{color: pc.color}}>{perc}%</div>
+                      <div className="ed-proj-lbl">{status}</div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="ed-proj-item">
-              <div className="ed-proj-info"><div className="ed-proj-icon" style={{background: "#EEF2FF", color: "#6366F1"}}><i className="ti ti-device-mobile"></i></div><div><div className="ed-proj-name">Mobile App v2</div><div className="ed-proj-role">Backend Dev</div></div></div>
-              <div className="ed-proj-stat"><div className="ed-proj-perc" style={{color: "#6366F1"}}>45%</div><div className="ed-proj-lbl">In Progress</div></div>
+          )}
+          {projects.length > 0 && (
+            <div className="ed-progress-group" style={{marginTop: "16px", marginBottom: 0}}>
+              <div className="ed-progress-header"><span>Overall Workload</span><span>{totalWorkload}%</span></div>
+              <div className="ed-progress-bar"><div className="ed-progress-fill" style={{width: `${totalWorkload}%`, background: "var(--teal)"}}></div></div>
             </div>
-            <div className="ed-proj-item" style={{borderBottom: "none"}}>
-              <div className="ed-proj-info"><div className="ed-proj-icon" style={{background: "#ECFDF5", color: "var(--success)"}}><i className="ti ti-chart-bar"></i></div><div><div className="ed-proj-name">Analytics Dashboard</div><div className="ed-proj-role">Contributor</div></div></div>
-              <div className="ed-proj-stat"><div className="ed-proj-perc" style={{color: "var(--success)"}}>100%</div><div className="ed-proj-lbl">Completed</div></div>
-            </div>
-          </div>
-          <div className="ed-progress-group" style={{marginTop: "16px", marginBottom: 0}}>
-            <div className="ed-progress-header"><span>Overall Workload</span><span>68%</span></div>
-            <div className="ed-progress-bar"><div className="ed-progress-fill" style={{width: "68%", background: "var(--teal)"}}></div></div>
-          </div>
+          )}
         </div>
 
         {/* TASKS */}
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-checkbox"></i> Tasks</div>
-            <span style={{fontSize: "11px", fontWeight: "700", color: "var(--text-muted)"}}>4 pending &nbsp; <button className="ed-btn" style={{padding: "6px 12px", background: "var(--teal)", color: "#fff", border: "none", fontSize: "11px", borderRadius: "8px"}}><i className="ti ti-plus"></i> Assign Task</button></span>
+            <span style={{fontSize: "11px", fontWeight: "700", color: "var(--text-muted)"}}>
+              {pendingTasks.length} pending &nbsp;
+              <button className="ed-btn" style={{padding: "6px 12px", background: "var(--teal)", color: "#fff", border: "none", fontSize: "11px", borderRadius: "8px"}}>
+                <i className="ti ti-plus"></i> Assign Task
+              </button>
+            </span>
           </div>
           <div style={{display: "flex", gap: "16px", marginBottom: "16px", borderBottom: "1.5px solid var(--border)"}}>
-            <div style={{fontSize: "12px", fontWeight: "800", color: "var(--teal)", borderBottom: "2px solid var(--teal)", paddingBottom: "8px"}}>All</div>
-            <div style={{fontSize: "12px", fontWeight: "700", color: "var(--text-muted)", paddingBottom: "8px"}}>Pending</div>
-            <div style={{fontSize: "12px", fontWeight: "700", color: "var(--text-muted)", paddingBottom: "8px"}}>Completed</div>
+            <div className={`ed-tab ${taskTab === 'all' ? 'active' : ''}`} onClick={() => setTaskTab('all')}>All</div>
+            <div className={`ed-tab ${taskTab === 'pending' ? 'active' : ''}`} onClick={() => setTaskTab('pending')}>Pending</div>
+            <div className={`ed-tab ${taskTab === 'completed' ? 'active' : ''}`} onClick={() => setTaskTab('completed')}>Completed</div>
           </div>
-          <div>
-            <div className="ed-task-item">
-              <div className="ed-task-cb done"><i className="ti ti-check" style={{fontSize: 12}}></i></div>
-              <div className="ed-task-content">
-                <div className="ed-task-title done">API integration for billing</div>
-                <div className="ed-task-due" style={{color: "var(--danger)"}}>Overdue - 01 Jun</div>
-              </div>
-              <div className="ed-task-tag" style={{background: "#ECFDF5", color: "var(--success)"}}>Low</div>
-              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
+          {filteredTasks.length === 0 ? (
+            <div className="ed-empty"><i className="ti ti-checkbox" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>No tasks</div>
+          ) : (
+            <div>
+              {filteredTasks.map((task, i) => {
+                const done = task.completed || task.done || task.status === 'completed';
+                const overdue = !done && isOverdue(task.dueDate || task.due);
+                const priority = task.priority || task.tag || 'mid';
+                const tagStyle = getPriorityStyle(priority);
+                return (
+                  <div key={task._id || i} className="ed-task-item">
+                    <div className={`ed-task-cb ${done ? 'done' : ''}`}>
+                      {done && <i className="ti ti-check" style={{fontSize: 12}}></i>}
+                    </div>
+                    <div className="ed-task-content">
+                      <div className={`ed-task-title ${done ? 'done' : ''}`}>{task.title || task.taskName || "Task"}</div>
+                      <div className="ed-task-due" style={{color: overdue ? 'var(--danger)' : '#64748B'}}>
+                        {overdue ? 'Overdue - ' : 'Due: '}
+                        {formatDue(task.dueDate || task.due)}
+                      </div>
+                    </div>
+                    <div className="ed-task-tag" style={tagStyle}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</div>
+                    <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
+                  </div>
+                );
+              })}
             </div>
-            <div className="ed-task-item">
-              <div className="ed-task-cb"></div>
-              <div className="ed-task-content">
-                <div className="ed-task-title">Fix checkout page bug</div>
-                <div className="ed-task-due">Due: 06 Jun</div>
-              </div>
-              <div className="ed-task-tag" style={{background: "#FEF2F2", color: "var(--danger)"}}>High</div>
-              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
-            </div>
-            <div className="ed-task-item">
-              <div className="ed-task-cb"></div>
-              <div className="ed-task-content">
-                <div className="ed-task-title">Write unit tests for auth</div>
-                <div className="ed-task-due">Due: 08 Jun</div>
-              </div>
-              <div className="ed-task-tag" style={{background: "#FFFBEB", color: "var(--warning)"}}>Mid</div>
-              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
-            </div>
-            <div className="ed-task-item">
-              <div className="ed-task-cb"></div>
-              <div className="ed-task-content">
-                <div className="ed-task-title">Update product catalogue DB</div>
-                <div className="ed-task-due">Due: 10 Jun</div>
-              </div>
-              <div className="ed-task-tag" style={{background: "#FFFBEB", color: "var(--warning)"}}>Mid</div>
-              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
-            </div>
-            <div className="ed-task-item" style={{borderBottom: "none"}}>
-              <div className="ed-task-cb"></div>
-              <div className="ed-task-content">
-                <div className="ed-task-title">Code review for PR #47</div>
-                <div className="ed-task-due">Due: 12 Jun</div>
-              </div>
-              <div className="ed-task-tag" style={{background: "#ECFDF5", color: "var(--success)"}}>Low</div>
-              <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* DOCUMENTS */}
@@ -344,64 +409,37 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
               <i className="ti ti-download"></i> Request Document
             </button>
           </div>
-          <div className="ed-docs-sub">Uploaded Documents <span>5</span></div>
-          <div className="ed-docs-list">
-            <div className="ed-doc-row">
-              <div className="ed-doc-icon" style={{background: "#EEF2FF", color: "#6366F1"}}><i className="ti ti-file-text"></i></div>
-              <div className="ed-doc-info">
-                <div className="ed-doc-name">Offer Letter</div>
-                <div className="ed-doc-meta">Jan 2024 · PDF</div>
-              </div>
-              <div className="ed-doc-actions">
-                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
-                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
-              </div>
-            </div>
-            <div className="ed-doc-row">
-              <div className="ed-doc-icon" style={{background: "#E0F2FE", color: "#0ea5e9"}}><i className="ti ti-id"></i></div>
-              <div className="ed-doc-info">
-                <div className="ed-doc-name">Aadhaar Card</div>
-                <div className="ed-doc-meta">ID Proof · PDF</div>
-              </div>
-              <div className="ed-doc-actions">
-                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
-                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
-              </div>
-            </div>
-            <div className="ed-doc-row">
-              <div className="ed-doc-icon" style={{background: "#FFFBEB", color: "#f59e0b"}}><i className="ti ti-file-certificate"></i></div>
-              <div className="ed-doc-info">
-                <div className="ed-doc-name">Contract</div>
-                <div className="ed-doc-meta">Signed · PDF</div>
-              </div>
-              <div className="ed-doc-actions">
-                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
-                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
-              </div>
-            </div>
-            <div className="ed-doc-row">
-              <div className="ed-doc-icon" style={{background: "#F5F3FF", color: "#8b5cf6"}}><i className="ti ti-certificate"></i></div>
-              <div className="ed-doc-info">
-                <div className="ed-doc-name">Degree Cert</div>
-                <div className="ed-doc-meta">Education · PDF</div>
-              </div>
-              <div className="ed-doc-actions">
-                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
-                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
-              </div>
-            </div>
-            <div className="ed-doc-row">
-              <div className="ed-doc-icon" style={{background: "#FEF2F2", color: "#ef4444"}}><i className="ti ti-file-description"></i></div>
-              <div className="ed-doc-info">
-                <div className="ed-doc-name">Resume</div>
-                <div className="ed-doc-meta">Latest · PDF</div>
-              </div>
-              <div className="ed-doc-actions">
-                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
-                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
-              </div>
-            </div>
+          <div className="ed-docs-sub">
+            Uploaded Documents <span>{docsToShow.length}</span>
           </div>
+          {empDocsLoading ? (
+            <div className="ed-empty"><i className="ti ti-loader-2" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>Loading documents...</div>
+          ) : docsToShow.length === 0 ? (
+            <div className="ed-empty"><i className="ti ti-folder-off" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>No documents uploaded</div>
+          ) : (
+            <div className="ed-docs-list">
+              {docsToShow.map((doc, i) => {
+                const ds = getDocStyle(doc);
+                const docName = doc.name || doc.documentName || doc.fileName || "Document";
+                const docMeta = doc.type || doc.documentType || doc.category || "";
+                const uploadDate = doc.uploadedAt || doc.createdAt;
+                const metaStr = [uploadDate ? new Date(uploadDate).toLocaleDateString('en-GB', {month:'short', year:'numeric'}) : "", docMeta, "PDF"].filter(Boolean).join(' · ');
+                return (
+                  <div key={doc._id || i} className="ed-doc-row">
+                    <div className="ed-doc-icon" style={{background: ds.bg, color: ds.color}}><i className={`ti ${ds.icon}`}></i></div>
+                    <div className="ed-doc-info">
+                      <div className="ed-doc-name">{docName}</div>
+                      <div className="ed-doc-meta">{metaStr}</div>
+                    </div>
+                    <div className="ed-doc-actions">
+                      {doc.url && <button className="ed-doc-btn view" onClick={() => window.open(doc.url, '_blank')}><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>}
+                      {doc.url && <button className="ed-doc-btn download" onClick={() => { const a = document.createElement('a'); a.href = doc.url; a.download = docName; a.click(); }}><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
       </div>{/* END BOTTOM GRID */}

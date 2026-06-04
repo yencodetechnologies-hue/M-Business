@@ -66,7 +66,8 @@ export default function ModernProjectsView({
   onAssign, 
   onCreate,
   searchQuery = "",
-  compact = false
+  compact = false,
+  onBack
 }) {
   const [themeKey, setThemeKey] = useState('teal');
   const [activeTab, setActiveTab] = useState('All Projects');
@@ -110,6 +111,15 @@ export default function ModernProjectsView({
     <div className="modern-app" style={{ ...cssVars, background: 'transparent' }}>
       <div className="m-content" style={{ padding: '0', background: 'transparent', width: '100%' }}>
         
+        {onBack && !compact && (
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <button onClick={onBack} style={{ padding: "8px", background: "#E0F2FE", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 20, color: "var(--teal)", display: "flex", alignItems: "center", transition: "all 0.2s" }} title="Back to Dashboard" onMouseEnter={e => e.currentTarget.style.background = "#BAE6FD"} onMouseLeave={e => e.currentTarget.style.background = "#E0F2FE"}>
+              <i className="ti ti-arrow-left"></i>
+            </button>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "#0F172A" }}>Projects</div>
+          </div>
+        )}
+
         {/* STATS */}
         {!compact && (
           <div className="m-stats-row">

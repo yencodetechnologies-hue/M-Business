@@ -43,84 +43,83 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
       <style>{`
         .ed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
         .ed-title-area { display: flex; align-items: center; gap: 16px; }
-        .ed-back-btn { width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--card); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--teal); font-size: 18px; transition: all 0.2s; }
-        .ed-back-btn:hover { border-color: var(--teal); background: #F0FDFE; }
-        .ed-title { font-size: 20px; font-weight: 900; line-height: 1.2; }
+        .ed-back-btn { width: 40px; height: 40px; border-radius: 12px; background: #E0F2FE; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--teal); font-size: 18px; border: none; transition: all 0.2s; }
+        .ed-back-btn:hover { background: #BAE6FD; }
+        .ed-title { font-size: 20px; font-weight: 900; line-height: 1.2; color: #0F172A; }
         .ed-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         .ed-actions { display: flex; gap: 12px; }
-        .ed-btn { padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border: 1.5px solid var(--border); background: var(--card); color: var(--text); display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .ed-btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
         .ed-btn:hover { border-color: var(--text-muted); }
-        .ed-btn.danger { color: var(--danger); border-color: #FECACA; background: #FEF2F2; }
-        .ed-btn.danger:hover { background: #FEE2E2; }
-        .ed-btn.warning { color: var(--warning); border-color: #FDE68A; background: #FFFBEB; }
+        .ed-btn.danger { color: var(--danger); border-color: transparent; background: #FEE2E2; }
+        .ed-btn.danger:hover { background: #FECACA; }
+        .ed-btn.warning { color: #D97706; border-color: #FDE68A; background: #FEF3C7; }
 
-        .ed-hero { background: var(--card); border-radius: 20px; border: 1.5px solid var(--border); padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-        .ed-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--teal), #00e5ff, transparent); }
+        .ed-hero { background: var(--card); border-radius: 16px; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-top: 4px solid #00E5FF; border-bottom: none; border-left: none; border-right: none; }
         .ed-hero-left { display: flex; align-items: center; gap: 24px; }
-        .ed-avatar { width: 84px; height: 84px; border-radius: 50%; background: linear-gradient(135deg, var(--teal), #0097a7); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 32px; font-weight: 900; box-shadow: 0 8px 24px rgba(0,188,212,0.25); border: 4px solid #fff; flex-shrink: 0; }
-        .ed-name { font-size: 26px; font-weight: 900; margin-bottom: 6px; }
-        .ed-roles { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; }
-        .ed-badge { background: #F1F5F9; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; color: var(--text-muted); border: 1px solid var(--border); }
-        .ed-contacts { display: flex; gap: 20px; font-size: 13px; color: var(--text-muted); font-weight: 600; }
+        .ed-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 28px; font-weight: 800; flex-shrink: 0; }
+        .ed-name { font-size: 22px; font-weight: 900; color: #0F172A; margin-bottom: 6px; }
+        .ed-roles { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+        .ed-badge { background: #F1F5F9; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #475569; }
+        .ed-contacts { display: flex; gap: 20px; font-size: 12px; color: var(--text-muted); font-weight: 600; }
         .ed-contacts span { display: flex; align-items: center; gap: 6px; }
-        .ed-contacts i { color: var(--teal); font-size: 15px; }
+        .ed-contacts i { color: var(--teal); font-size: 14px; }
         .ed-hero-right { text-align: right; display: flex; flexDirection: column; gap: 16px; align-items: flex-end; }
-        .ed-status { display: inline-flex; align-items: center; gap: 6px; background: #ECFDF5; color: var(--success); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 800; border: 1px solid #A7F3D0; }
+        .ed-status { display: inline-flex; align-items: center; gap: 6px; background: #DCFCE7; color: #16A34A; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; }
         .ed-status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-        .ed-tenure { font-size: 14px; font-weight: 900; color: var(--text); }
-        .ed-tenure span { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-top: 2px; }
+        .ed-tenure { font-size: 14px; font-weight: 900; color: #0F172A; }
+        .ed-tenure span { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
 
         .ed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
-        .ed-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); }
+        .ed-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .ed-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .ed-card-title { font-size: 15px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+        .ed-card-title { font-size: 14px; font-weight: 900; color: #0F172A; display: flex; align-items: center; gap: 8px; }
         .ed-card-title i { color: var(--teal); font-size: 18px; }
         
         .ed-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .ed-info-item .lbl { font-size: 10px; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .ed-info-item .val { font-size: 14px; font-weight: 800; color: var(--text); word-break: break-all; }
+        .ed-info-item .lbl { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .ed-info-item .val { font-size: 13px; font-weight: 800; color: #0F172A; word-break: break-all; }
 
         .ed-att-blocks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-        .ed-att-block { background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 16px 10px; text-align: center; }
+        .ed-att-block { background: #F1F5F9; border-radius: 12px; padding: 16px 10px; text-align: center; border: none; }
         .ed-att-val { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
-        .ed-att-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+        .ed-att-lbl { font-size: 11px; font-weight: 700; color: #64748B; }
 
         .ed-progress-group { margin-bottom: 16px; }
-        .ed-progress-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; margin-bottom: 8px; color: var(--text); }
-        .ed-progress-bar { height: 6px; background: #F1F5F9; border-radius: 10px; overflow: hidden; }
-        .ed-progress-fill { height: "100%"; border-radius: 10px; }
+        .ed-progress-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 8px; color: #475569; }
+        .ed-progress-bar { height: 6px; background: #E2E8F0; border-radius: 10px; overflow: hidden; }
+        .ed-progress-fill { height: 100%; border-radius: 10px; }
 
         .ed-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .ed-table th { text-align: left; padding: 8px 0; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1.5px solid var(--border); }
-        .ed-table td { padding: 12px 0; font-size: 13px; font-weight: 700; border-bottom: 1px solid #F1F5F9; }
+        .ed-table th { text-align: left; padding: 8px 0; font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        .ed-table td { padding: 12px 0; font-size: 12px; font-weight: 700; color: #334155; border-bottom: 1px solid #F1F5F9; }
         .ed-table tr:last-child td { border-bottom: none; }
 
         .ed-proj-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F1F5F9; }
         .ed-proj-info { display: flex; align-items: center; gap: 12px; }
-        .ed-proj-icon { width: 36px; height: 36px; border-radius: 10px; background: #F0FDFE; color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .ed-proj-name { font-size: 14px; font-weight: 800; }
-        .ed-proj-role { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+        .ed-proj-icon { width: 36px; height: 36px; border-radius: 8px; background: #F0FDFE; color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .ed-proj-name { font-size: 13px; font-weight: 800; color: #0F172A; }
+        .ed-proj-role { font-size: 11px; font-weight: 600; color: #64748B; }
         .ed-proj-stat { text-align: right; }
-        .ed-proj-perc { font-size: 14px; font-weight: 900; color: var(--teal); }
-        .ed-proj-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+        .ed-proj-perc { font-size: 13px; font-weight: 900; color: var(--teal); }
+        .ed-proj-lbl { font-size: 11px; font-weight: 600; color: #64748B; }
 
         .ed-task-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F1F5F9; }
-        .ed-task-cb { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; }
+        .ed-task-cb { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; }
         .ed-task-cb.done { background: var(--teal); }
         .ed-task-content { flex: 1; }
-        .ed-task-title { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
-        .ed-task-title.done { text-decoration: line-through; color: var(--text-muted); }
-        .ed-task-due { font-size: 11px; font-weight: 700; color: var(--text-muted); }
-        .ed-task-tag { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+        .ed-task-title { font-size: 12px; font-weight: 800; margin-bottom: 2px; color: #0F172A; }
+        .ed-task-title.done { text-decoration: line-through; color: #94A3B8; }
+        .ed-task-due { font-size: 10px; font-weight: 700; color: #64748B; }
+        .ed-task-tag { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
 
         .ed-docs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .ed-doc-card { border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; background: #fff; }
-        .ed-doc-card:hover { border-color: var(--teal); box-shadow: 0 4px 12px rgba(0,188,212,0.08); }
-        .ed-doc-icon { width: 36px; height: 36px; border-radius: 8px; background: #F8FAFC; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .ed-doc-card { background: #F8FAFC; border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; border: none; }
+        .ed-doc-card:hover { background: #F1F5F9; }
+        .ed-doc-icon { width: 32px; height: 32px; border-radius: 6px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .ed-doc-info { flex: 1; }
-        .ed-doc-name { font-size: 13px; font-weight: 800; }
-        .ed-doc-meta { font-size: 10px; font-weight: 700; color: var(--text-muted); }
-        .ed-doc-add { border: 1.5px dashed var(--teal); background: #F0FDFE; color: var(--teal); justify-content: center; flex-direction: column; gap: 4px; padding: 16px; }
+        .ed-doc-name { font-size: 12px; font-weight: 800; color: #0F172A; }
+        .ed-doc-meta { font-size: 10px; font-weight: 600; color: #64748B; }
+        .ed-doc-add { border: 1px dashed var(--teal); background: #F0FDFE; color: var(--teal); justify-content: center; flex-direction: column; gap: 4px; padding: 16px; }
       `}</style>
 
       {/* HEADER */}
@@ -335,24 +334,47 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-folder"></i> Documents</div>
             <button className="ed-btn" style={{padding: "6px 12px", fontSize: "11px", borderRadius: "8px"}}><i className="ti ti-upload"></i> Upload</button>
-          </div>
           <div className="ed-docs-grid">
-            {DOC_TYPES.slice(0, 4).map((dt, i) => {
-              const doc = empDocs?.[dt.key];
-              const hasDoc = !!doc?.url;
-              return (
-                <div key={dt.key} className="ed-doc-card" onClick={() => hasDoc && window.open(doc.url, "_blank")} style={{opacity: hasDoc ? 1 : 0.7}}>
-                  <div className="ed-doc-icon" style={{color: hasDoc ? dt.color : "var(--text-muted)"}}>
-                    {hasDoc ? <i className="ti ti-file-check"></i> : <i className="ti ti-file-text"></i>}
-                  </div>
-                  <div className="ed-doc-info">
-                    <div className="ed-doc-name">{dt.label}</div>
-                    <div className="ed-doc-meta">{hasDoc ? "Uploaded · PDF" : "Missing"}</div>
-                  </div>
-                  {hasDoc && <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>}
-                </div>
-              );
-            })}
+            <div className="ed-doc-card">
+              <div className="ed-doc-icon" style={{color: "#6366F1"}}><i className="ti ti-file-text"></i></div>
+              <div className="ed-doc-info">
+                <div className="ed-doc-name">Offer Letter</div>
+                <div className="ed-doc-meta">Jan 2024 · PDF</div>
+              </div>
+              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
+            </div>
+            <div className="ed-doc-card">
+              <div className="ed-doc-icon" style={{color: "#0ea5e9"}}><i className="ti ti-id"></i></div>
+              <div className="ed-doc-info">
+                <div className="ed-doc-name">Aadhaar Card</div>
+                <div className="ed-doc-meta">ID Proof · PDF</div>
+              </div>
+              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
+            </div>
+            <div className="ed-doc-card">
+              <div className="ed-doc-icon" style={{color: "#f59e0b"}}><i className="ti ti-file-certificate"></i></div>
+              <div className="ed-doc-info">
+                <div className="ed-doc-name">Contract</div>
+                <div className="ed-doc-meta">Signed · PDF</div>
+              </div>
+              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
+            </div>
+            <div className="ed-doc-card">
+              <div className="ed-doc-icon" style={{color: "#8b5cf6"}}><i className="ti ti-certificate"></i></div>
+              <div className="ed-doc-info">
+                <div className="ed-doc-name">Degree Cert</div>
+                <div className="ed-doc-meta">Education · PDF</div>
+              </div>
+              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
+            </div>
+            <div className="ed-doc-card">
+              <div className="ed-doc-icon" style={{color: "#ef4444"}}><i className="ti ti-file-description"></i></div>
+              <div className="ed-doc-info">
+                <div className="ed-doc-name">Resume</div>
+                <div className="ed-doc-meta">Latest · PDF</div>
+              </div>
+              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
+            </div>
             <div className="ed-doc-card ed-doc-add">
               <i className="ti ti-plus" style={{fontSize: 24}}></i>
               <div style={{fontSize: 12, fontWeight: 800}}>Add Document</div>
@@ -361,6 +383,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

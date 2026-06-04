@@ -1539,7 +1539,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee }) {
+function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack }) {
   const [search, setSearch] = useState("");
   const [viewProj, setViewProj] = useState(null);
   const [editProj, setEditProj] = useState(null);
@@ -4292,24 +4292,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
 
                   {/* TEAM / CO-OWNERS */}
-                  <div>
-                    <div className="section-header">
-                      <span className="section-title">Team Members</span>
-                      <div className="section-more" onClick={() => setActive("employees")}><i className="ti ti-dots"></i></div>
-                    </div>
-                    <div className="coowners-row">
-                      {employees.filter(e => (e.name||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,4).map(e => (
-                        <div key={e.id || e._id} className="coowner">
-                          <div className="coowner-avatar">{e.name?.[0]?.toUpperCase() || "E"}</div>
-                          <div>
-                            <div className="coowner-name">{e.name}</div>
-                            <div className="coowner-role">{e.role}</div>
-                          </div>
-                        </div>
-                      ))}
-                      {employees.length === 0 && <div style={{color:"var(--app-muted)", fontSize: 13}}>No employees added yet.</div>}
-                    </div>
-                  </div>
+                
 
                   {/* FOLDERS */}
                   <div>
@@ -4332,6 +4315,26 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         </div>
                       ))}
                       {projects.length === 0 && <div style={{color:"var(--app-muted)", fontSize: 13}}>No projects added yet.</div>}
+                    </div>
+                  </div>
+                    {/* TEAM / CO-OWNERS */}
+  <div>
+
+                    <div className="section-header">
+                      <span className="section-title">Team Members</span>
+                      <div className="section-more" onClick={() => setActive("employees")}><i className="ti ti-dots"></i></div>
+                    </div>
+                    <div className="coowners-row">
+                      {employees.filter(e => (e.name||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,4).map(e => (
+                        <div key={e.id || e._id} className="coowner">
+                          <div className="coowner-avatar">{e.name?.[0]?.toUpperCase() || "E"}</div>
+                          <div>
+                            <div className="coowner-name">{e.name}</div>
+                            <div className="coowner-role">{e.role}</div>
+                          </div>
+                        </div>
+                      ))}
+                      {employees.length === 0 && <div style={{color:"var(--app-muted)", fontSize: 13}}>No employees added yet.</div>}
                     </div>
                   </div>
 
@@ -4462,7 +4465,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projects} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
+          {validActive === "projects" && <ProjectsPage onBack={() => setActive("dashboard")} projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
             const limit = getSubscriptionLimit("employee");
             if (subscription && employees.length >= limit) {
               setLimitModal({ type: "employee", limit });
@@ -4512,7 +4515,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             />
           )}
 
-          {validActive === "accounts" && <AccountsPage THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+          {validActive === "accounts" && <AccountsPage onBack={() => setActive("dashboard")} THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}

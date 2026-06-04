@@ -370,7 +370,7 @@ body{display:flex;min-height:100vh}
           </div>
           <div className="fg">
             <label className="fl">Proposal Date</label>
-            <input className="fi" type="date" id="propDate" value="2026-06-01" onChange={() => {}} />
+            <input className="fi" type="date" id="propDate" defaultValue="2026-06-01" onChange={() => {}} />
           </div>
         </div>
         <div className="form-row">
@@ -388,7 +388,7 @@ body{display:flex;min-height:100vh}
           </div>
           <div className="fg">
             <label className="fl">Expiry Date</label>
-            <input className="fi" type="date" id="propExpiry" value="2026-07-01" onChange={() => {}} />
+            <input className="fi" type="date" id="propExpiry" defaultValue="2026-07-01" onChange={() => {}} />
           </div>
         </div>
         <div className="fg">
@@ -414,14 +414,14 @@ body{display:flex;min-height:100vh}
       <div className="card-body">
         <div style={{"fontSize":"10px","fontWeight":800,"color":"var(--teal)","textTransform":"uppercase","letterSpacing":".7px","marginBottom":"10px"}}>Our Details</div>
         <div className="form-row">
-          <div className="fg"><label className="fl">Company Name</label><input className="fi" type="text" id="fromComp" value="YENCODE Technologies" onChange={() => {}} /></div>
-          <div className="fg"><label className="fl">Contact Person</label><input className="fi" type="text" id="fromPerson" value="Prabhu R" onChange={() => {}} /></div>
+          <div className="fg"><label className="fl">Company Name</label><input className="fi" type="text" id="fromComp" defaultValue="YENCODE Technologies" onChange={() => {}} /></div>
+          <div className="fg"><label className="fl">Contact Person</label><input className="fi" type="text" id="fromPerson" defaultValue="Prabhu R" onChange={() => {}} /></div>
         </div>
         <div className="form-row">
-          <div className="fg"><label className="fl">Email</label><input className="fi" type="email" id="fromEmail" value="yencodetechnologies@gmail.com" onChange={() => {}} /></div>
-          <div className="fg"><label className="fl">Phone</label><input className="fi" type="tel" id="fromPhone" value="+91 89254 33533" onChange={() => {}} /></div>
+          <div className="fg"><label className="fl">Email</label><input className="fi" type="email" id="fromEmail" defaultValue="yencodetechnologies@gmail.com" onChange={() => {}} /></div>
+          <div className="fg"><label className="fl">Phone</label><input className="fi" type="tel" id="fromPhone" defaultValue="+91 89254 33533" onChange={() => {}} /></div>
         </div>
-        <div className="fg"><label className="fl">Address</label><input className="fi" type="text" id="fromAddr" value="Chennai, Tamil Nadu, India" onChange={() => {}} /></div>
+        <div className="fg"><label className="fl">Address</label><input className="fi" type="text" id="fromAddr" defaultValue="Chennai, Tamil Nadu, India" onChange={() => {}} /></div>
         <div style={{"height":"1px","background":"var(--border)","margin":"14px 0"}}></div>
         <div style={{"display":"flex","alignItems":"center","justifyContent":"space-between","marginBottom":"10px"}}>
           <div style={{"fontSize":"10px","fontWeight":800,"color":"var(--amber)","textTransform":"uppercase","letterSpacing":".7px"}}>Client Details</div>
@@ -461,11 +461,11 @@ body{display:flex;min-height:100vh}
       </div>
       <div className="card-body">
         <div id="delList">
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-world"></i></div><input type="text" className="dv-input" value="Fully responsive website (8 pages)" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-palette"></i></div><input type="text" className="dv-input" value="Custom UI/UX design + brand guide" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--blue-bg)","color":"var(--blue)"}}><i className="ti ti-settings"></i></div><input type="text" className="dv-input" value="CMS for easy content management" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-chart-bar"></i></div><input type="text" className="dv-input" value="SEO optimisation + Google Analytics" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-headset"></i></div><input type="text" className="dv-input" value="3-month post-launch support" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-world"></i></div><input type="text" className="dv-input" defaultValue="Fully responsive website (8 pages)" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-palette"></i></div><input type="text" className="dv-input" defaultValue="Custom UI/UX design + brand guide" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--blue-bg)","color":"var(--blue)"}}><i className="ti ti-settings"></i></div><input type="text" className="dv-input" defaultValue="CMS for easy content management" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-chart-bar"></i></div><input type="text" className="dv-input" defaultValue="SEO optimisation + Google Analytics" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-headset"></i></div><input type="text" className="dv-input" defaultValue="3-month post-launch support" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
         </div>
         <button className="add-btn" onClick={() => {}}><i className="ti ti-plus" style={{"fontSize":"13px"}}></i>Add Deliverable</button>
       </div>
@@ -479,11 +479,11 @@ body{display:flex;min-height:100vh}
       </div>
       <div className="card-body">
         <div className="form-row" style={{"marginBottom":"14px"}}>
-          <div className="fg"><label className="fl">Project Start</label><input className="fi" type="date" id="startDate" value="2026-07-01" onChange={() => {}} /></div>
-          <div className="fg"><label className="fl">Project End</label><input className="fi" type="date" id="endDate" value="2026-10-31" onChange={() => {}} /></div>
+          <div className="fg"><label className="fl">Project Start</label><input className="fi" type="date" id="startDate" defaultValue="2026-07-01" onChange={() => {}} /></div>
+          <div className="fg"><label className="fl">Project End</label><input className="fi" type="date" id="endDate" defaultValue="2026-10-31" onChange={() => {}} /></div>
         </div>
         <div className="form-row" style={{"marginBottom":"14px"}}>
-          <div className="fg"><label className="fl">Total Duration</label><input className="fi" type="text" id="duration" value="4 Months" onChange={() => {}} /></div>
+          <div className="fg"><label className="fl">Total Duration</label><input className="fi" type="text" id="duration" defaultValue="4 Months" onChange={() => {}} /></div>
           <div className="fg"><label className="fl">Engagement Model</label>
             <select className="fs" id="engModel" onChange={() => {}}>
               <option>Fixed Price Project</option>
@@ -498,36 +498,36 @@ body{display:flex;min-height:100vh}
           <div className="ms-item">
             <div className="ms-left"><div className="ms-dot done">1</div><div className="ms-line"></div></div>
             <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" value="Kickoff & Discovery" onChange={() => {}} /><input type="date" className="ms-date" value="2026-07-07" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" value="Requirements gathering, stakeholder interviews, tech stack decision" placeholder="Description…" onChange={() => {}} />
+              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="Kickoff & Discovery" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-07-07" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+              <input type="text" className="ms-desc" defaultValue="Requirements gathering, stakeholder interviews, tech stack decision" placeholder="Description…" onChange={() => {}} />
             </div>
           </div>
           <div className="ms-item">
             <div className="ms-left"><div className="ms-dot">2</div><div className="ms-line"></div></div>
             <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" value="UI/UX Design Phase" onChange={() => {}} /><input type="date" className="ms-date" value="2026-07-28" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" value="Wireframes, high-fidelity mockups, design system, client review" placeholder="Description…" onChange={() => {}} />
+              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="UI/UX Design Phase" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-07-28" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+              <input type="text" className="ms-desc" defaultValue="Wireframes, high-fidelity mockups, design system, client review" placeholder="Description…" onChange={() => {}} />
             </div>
           </div>
           <div className="ms-item">
             <div className="ms-left"><div className="ms-dot">3</div><div className="ms-line"></div></div>
             <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" value="Development Sprint" onChange={() => {}} /><input type="date" className="ms-date" value="2026-09-15" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" value="Frontend, backend, CMS integration, API connections, responsive build" placeholder="Description…" onChange={() => {}} />
+              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="Development Sprint" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-09-15" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+              <input type="text" className="ms-desc" defaultValue="Frontend, backend, CMS integration, API connections, responsive build" placeholder="Description…" onChange={() => {}} />
             </div>
           </div>
           <div className="ms-item">
             <div className="ms-left"><div className="ms-dot">4</div><div className="ms-line"></div></div>
             <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" value="Testing & QA" onChange={() => {}} /><input type="date" className="ms-date" value="2026-10-15" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" value="Cross-browser testing, UAT, bug fixes, performance optimisation" placeholder="Description…" onChange={() => {}} />
+              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="Testing & QA" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-10-15" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+              <input type="text" className="ms-desc" defaultValue="Cross-browser testing, UAT, bug fixes, performance optimisation" placeholder="Description…" onChange={() => {}} />
             </div>
           </div>
           <div className="ms-item">
             <div className="ms-left"><div className="ms-dot">5</div></div>
             <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" value="Launch & Handover" onChange={() => {}} /><input type="date" className="ms-date" value="2026-10-31" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" value="Deployment, training, documentation, 3-month support begins" placeholder="Description…" onChange={() => {}} />
+              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="Launch & Handover" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-10-31" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+              <input type="text" className="ms-desc" defaultValue="Deployment, training, documentation, 3-month support begins" placeholder="Description…" onChange={() => {}} />
             </div>
           </div>
         </div>
@@ -601,11 +601,11 @@ body{display:flex;min-height:100vh}
       </div>
       <div className="card-body">
         <div id="valueList">
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-trending-up"></i></div><input type="text" className="dv-input" value="300% increase in organic traffic within 6 months" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-users"></i></div><input type="text" className="dv-input" value="2x lead generation with improved UX & CTAs" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--blue-bg)","color":"var(--blue)"}}><i className="ti ti-device-mobile"></i></div><input type="text" className="dv-input" value="Mobile-first design reaching 70%+ of your audience" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-clock"></i></div><input type="text" className="dv-input" value="50% faster content updates with intuitive CMS" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-certificate"></i></div><input type="text" className="dv-input" value="Brand credibility boost with modern, professional design" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-trending-up"></i></div><input type="text" className="dv-input" defaultValue="300% increase in organic traffic within 6 months" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-users"></i></div><input type="text" className="dv-input" defaultValue="2x lead generation with improved UX & CTAs" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--blue-bg)","color":"var(--blue)"}}><i className="ti ti-device-mobile"></i></div><input type="text" className="dv-input" defaultValue="Mobile-first design reaching 70%+ of your audience" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-clock"></i></div><input type="text" className="dv-input" defaultValue="50% faster content updates with intuitive CMS" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-certificate"></i></div><input type="text" className="dv-input" defaultValue="Brand credibility boost with modern, professional design" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
         </div>
       </div>
     </div>
@@ -624,12 +624,12 @@ body{display:flex;min-height:100vh}
           <div className="cs-item">
             <div className="cs-header">
               <div className="cs-num">1</div>
-              <input type="text" className="fi" style={{"flex":1}} placeholder="Project name" value="YDMart E-Commerce App" />
+              <input type="text" className="fi" style={{"flex":1}} placeholder="Project name" defaultValue="YDMart E-Commerce App" />
               <button className="icon-del" style={{"marginLeft":"6px"}} onClick={() => {}}><i className="ti ti-trash"></i></button>
             </div>
             <div className="form-row">
-              <div className="fg"><label className="fl">Client</label><input className="fi" type="text" placeholder="Client name" value="YDMart Group" onChange={() => {}} /></div>
-              <div className="fg"><label className="fl">Industry</label><input className="fi" type="text" placeholder="e.g. Retail" value="E-Commerce / Retail" onChange={() => {}} /></div>
+              <div className="fg"><label className="fl">Client</label><input className="fi" type="text" placeholder="Client name" defaultValue="YDMart Group" onChange={() => {}} /></div>
+              <div className="fg"><label className="fl">Industry</label><input className="fi" type="text" placeholder="e.g. Retail" defaultValue="E-Commerce / Retail" onChange={() => {}} /></div>
             </div>
             <div className="fg"><label className="fl">Challenge & Result</label><textarea className="ta" style={{"minHeight":"60px"}} placeholder="Describe the challenge and what you achieved…" onChange={() => {}}>Built a full e-commerce platform with 500+ SKUs, cart, payments and admin panel. Launched in 3 months, resulting in ₹12L revenue in first quarter.</textarea></div>
           </div>
@@ -652,7 +652,7 @@ body{display:flex;min-height:100vh}
             <i className="ti ti-quote tm-quote-icon"></i>
             <div className="fg"><label className="fl">Quote</label><textarea className="ta" style={{"minHeight":"56px"}} placeholder="Enter testimonial quote…" onChange={() => {}}>YENCODE delivered an exceptional product — on time, within budget, and beyond expectations. The team was professional and responsive throughout.</textarea></div>
             <div className="form-row">
-              <div className="fg"><label className="fl">Name & Role</label><input className="fi" type="text" value="Rajan M, CEO – NexCorp" onChange={() => {}} /></div>
+              <div className="fg"><label className="fl">Name & Role</label><input className="fi" type="text" defaultValue="Rajan M, CEO – NexCorp" onChange={() => {}} /></div>
               <div className="fg"><label className="fl">Rating</label>
                 <select className="fs" onChange={() => {}}>
                   <option>⭐⭐⭐⭐⭐ 5/5</option>
@@ -681,21 +681,21 @@ body{display:flex;min-height:100vh}
         </div>
         <div id="riskList">
           <div className="risk-row-g">
-            <input type="text" className="pr-inp" value="Scope creep beyond deliverables" />
+            <input type="text" className="pr-inp" defaultValue="Scope creep beyond deliverables" />
             <select className="pr-inp" style={{"padding":"7px 8px","fontSize":"11px"}}><option>High</option><option selected>Medium</option><option>Low</option></select>
-            <input type="text" className="pr-inp" value="Formal change request process" />
+            <input type="text" className="pr-inp" defaultValue="Formal change request process" />
             <button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button>
           </div>
           <div className="risk-row-g">
-            <input type="text" className="pr-inp" value="Delayed feedback from client" />
+            <input type="text" className="pr-inp" defaultValue="Delayed feedback from client" />
             <select className="pr-inp" style={{"padding":"7px 8px","fontSize":"11px"}}><option>High</option><option selected>Medium</option><option>Low</option></select>
-            <input type="text" className="pr-inp" value="48-hour SLA for feedback" />
+            <input type="text" className="pr-inp" defaultValue="48-hour SLA for feedback" />
             <button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button>
           </div>
           <div className="risk-row-g">
-            <input type="text" className="pr-inp" value="Third-party API unavailability" />
+            <input type="text" className="pr-inp" defaultValue="Third-party API unavailability" />
             <select className="pr-inp" style={{"padding":"7px 8px","fontSize":"11px"}}><option>High</option><option>Medium</option><option selected>Low</option></select>
-            <input type="text" className="pr-inp" value="Fallback APIs identified" />
+            <input type="text" className="pr-inp" defaultValue="Fallback APIs identified" />
             <button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button>
           </div>
         </div>
@@ -714,12 +714,12 @@ body{display:flex;min-height:100vh}
       <div className="card-body">
         <div id="faqList">
           <div style={{"padding":"10px 12px","background":"var(--surface2)","border":"1.5px solid var(--border)","borderRadius":"10px","marginBottom":"8px"}}>
-            <div className="fg"><label className="fl">Question</label><input className="fi" type="text" value="How long will the project take?" /></div>
+            <div className="fg"><label className="fl">Question</label><input className="fi" type="text" defaultValue="How long will the project take?" /></div>
             <div className="fg"><label className="fl">Answer</label><textarea className="ta" style={{"minHeight":"52px"}}>Based on the scope outlined, we estimate 4 months. This includes design, development, testing and launch phases.</textarea></div>
             <button className="icon-del" onClick={() => {}}><i className="ti ti-trash" style={{"fontSize":"13px"}}></i> Remove</button>
           </div>
           <div style={{"padding":"10px 12px","background":"var(--surface2)","border":"1.5px solid var(--border)","borderRadius":"10px","marginBottom":"8px"}}>
-            <div className="fg"><label className="fl">Question</label><input className="fi" type="text" value="What happens after project delivery?" /></div>
+            <div className="fg"><label className="fl">Question</label><input className="fi" type="text" defaultValue="What happens after project delivery?" /></div>
             <div className="fg"><label className="fl">Answer</label><textarea className="ta" style={{"minHeight":"52px"}}>We provide 3 months of complimentary post-launch support. After that, monthly maintenance packages are available.</textarea></div>
             <button className="icon-del" onClick={() => {}}><i className="ti ti-trash" style={{"fontSize":"13px"}}></i> Remove</button>
           </div>
@@ -735,10 +735,10 @@ body{display:flex;min-height:100vh}
       </div>
       <div className="card-body">
         <div id="whyList">
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-star"></i></div><input type="text" className="dv-input" value="8+ years delivering enterprise-grade products" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-users"></i></div><input type="text" className="dv-input" value="Dedicated team of experts — not freelancers" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-clock"></i></div><input type="text" className="dv-input" value="100% on-time delivery record" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-shield-check"></i></div><input type="text" className="dv-input" value="Transparent pricing, no hidden costs" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-star"></i></div><input type="text" className="dv-input" defaultValue="8+ years delivering enterprise-grade products" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-users"></i></div><input type="text" className="dv-input" defaultValue="Dedicated team of experts — not freelancers" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-clock"></i></div><input type="text" className="dv-input" defaultValue="100% on-time delivery record" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-shield-check"></i></div><input type="text" className="dv-input" defaultValue="Transparent pricing, no hidden costs" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
         </div>
         <button className="add-btn" onClick={() => {}}><i className="ti ti-plus" style={{"fontSize":"13px"}}></i>Add Point</button>
       </div>
@@ -755,18 +755,18 @@ body{display:flex;min-height:100vh}
           <div>Service / Item</div><div>Amount (₹)</div><div></div>
         </div>
         <div id="pricingList">
-          <div className="pricing-row"><input type="text" className="pr-inp" value="UI/UX Design" onChange={() => {}} /><input type="number" className="pr-inp" value="18000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" value="Frontend Development" onChange={() => {}} /><input type="number" className="pr-inp" value="30000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" value="Backend & CMS" onChange={() => {}} /><input type="number" className="pr-inp" value="20000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" value="SEO & Analytics Setup" onChange={() => {}} /><input type="number" className="pr-inp" value="8000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" value="Testing & QA" onChange={() => {}} /><input type="number" className="pr-inp" value="7000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" value="Post-Launch Support (3 mo)" onChange={() => {}} /><input type="number" className="pr-inp" value="12000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="UI/UX Design" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="18000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="Frontend Development" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="30000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="Backend & CMS" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="20000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="SEO & Analytics Setup" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="8000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="Testing & QA" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="7000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="Post-Launch Support (3 mo)" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="12000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
         </div>
         <button className="add-btn" onClick={() => {}}><i className="ti ti-plus" style={{"fontSize":"13px"}}></i>Add Item</button>
         <div className="total-box">
           <div className="form-row" style={{"marginBottom":"8px"}}>
-            <div className="fg"><label className="fl" style={{"fontSize":"10px"}}>GST %</label><input className="fi" type="number" id="gst" value="18" onChange={() => {}} style={{"padding":"7px 10px","fontSize":"12px"}} /></div>
-            <div className="fg"><label className="fl" style={{"fontSize":"10px"}}>Discount %</label><input className="fi" type="number" id="disc" value="0" onChange={() => {}} style={{"padding":"7px 10px","fontSize":"12px"}} /></div>
+            <div className="fg"><label className="fl" style={{"fontSize":"10px"}}>GST %</label><input className="fi" type="number" id="gst" defaultValue="18" onChange={() => {}} style={{"padding":"7px 10px","fontSize":"12px"}} /></div>
+            <div className="fg"><label className="fl" style={{"fontSize":"10px"}}>Discount %</label><input className="fi" type="number" id="disc" defaultValue="0" onChange={() => {}} style={{"padding":"7px 10px","fontSize":"12px"}} /></div>
           </div>
           <div className="total-row"><span style={{"color":"var(--text2)","fontWeight":600}}>Subtotal</span><span id="subtotal" style={{"fontWeight":700,"color":"var(--text)"}}>₹95,000</span></div>
           <div className="total-row"><span style={{"color":"var(--amber)","fontWeight":600}}>GST (18%)</span><span id="taxAmt" style={{"fontWeight":700,"color":"var(--amber)"}}>₹17,100</span></div>

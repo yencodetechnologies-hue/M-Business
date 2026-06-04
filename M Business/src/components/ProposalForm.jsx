@@ -1,7 +1,407 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export default function ProposalForm({ onBack, onSave }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    // Inject global functions
+    const script = document.createElement('script');
+    script.innerHTML = `
+let msCount = 5;
+let currentStatus = 'DRAFT';
+
+const fmtDate = v => { try { return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return v; } };
+const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+
+/* ── SECTION TOGGLES ── */
+window.toggleSection = function(btn, id) {
+  const sec = document.getElementById(id);
+  const pvSec = document.getElementById('pv-sec-' + id.replace('sec-',''));
+  btn.classList.toggle('on');
+  const show = btn.classList.contains('on');
+  if (sec) sec.style.display = show ? '' : 'none';
+  if (pvSec) pvSec.style.display = show ? '' : 'none';
+}
+
+/* ── STATUS ── */
+window.selSt = function(el, val) {
+  document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won','lost','sent','neg','exp'].includes(x)).join(' '));
+  const classMap = { DRAFT:'active-sc', SENT:'sent', NEGOTIATION:'neg', WON:'won', LOST:'lost', EXPIRED:'exp' };
+  document.querySelectorAll('.sc').forEach(c => { c.className = 'sc'; });
+  el.classList.add(classMap[val] || 'active-sc');
+  currentStatus = val;
+  const b = document.getElementById('pv-status');
+  b.textContent = val;
+}
+
+/* ── MAIN UPDATE ── */
+window.up = function() {
+  // Cover
+  const t = document.getElementById('propTitle').value;
+  document.getElementById('pv-title').textContent = t || '— Proposal Title —';
+  document.getElementById('pv-title').style.color = t ? '#fff' : 'rgba(255,255,255,.45)';
+  const tc = document.getElementById('toComp').value;
+  document.getElementById('pv-sub').textContent = tc ? 'Prepared for ' + tc + ' by YENCODE Technologies' : 'Prepared by YENCODE Technologies';
+  document.getElementById('pv-date').textContent = fmtDate(document.getElementById('propDate').value);
+  document.getElementById('pv-type').textContent = document.getElementById('propType').value;
+  document.getElementById('pv-expiry').textContent = 'Expires ' + fmtDate(document.getElementById('propExpiry').value);
+  // Parties
+  const fp = document.getElementById('fromPerson').value, fc = document.getElementById('fromComp').value, fe = document.getElementById('fromEmail').value;
+  document.getElementById('pv-from').textContent = fp || 'Prabhu R';
+  document.getElementById('pv-from-d').innerHTML = \`\${fc}<br>\${fe}\`;
+  document.getElementById('pv-sig1').textContent = fp || 'Prabhu R';
+  document.getElementById('pv-to').textContent = tc || '— Client —';
+  document.getElementById('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
+  const tp = document.getElementById('toPerson').value, te = document.getElementById('toEmail').value, ta = document.getElementById('toAddr').value;
+  document.getElementById('pv-to-d').innerHTML = tc ? \`\${tp ? tp+'<br>' : ''}\${te ? te+'<br>' : ''}\${ta}\` : '<span style="color:var(--text3)">Fill in client details</span>';
+  document.getElementById('pv-sig2').textContent = tc || '— Client —';
+  document.getElementById('pv-sig2').style.color = tc ? 'var(--text)' : 'var(--text3)';
+  document.getElementById('pv-sig2-role').textContent = tc || 'Awaiting';
+  // Exec summary
+  const pr = document.getElementById('problem').value, so = document.getElementById('solution').value, oc = document.getElementById('outcome').value;
+  document.getElementById('pv-problem').innerHTML = pr || '<span style="color:var(--text3);font-style:italic">Describe the client\'s challenge…</span>';
+  document.getElementById('pv-solution').innerHTML = so || '<span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span>';
+  document.getElementById('pv-outcome').innerHTML = oc || '<span style="color:var(--text3);font-style:italic">Describe expected results…</span>';
+  // Deliverables
+  let dHtml = '';
+  document.querySelectorAll('#delList .dv-input').forEach(d => { if (d.value.trim()) dHtml += \`<div class="del-item-p">\${d.value}</div>\`; });
+  document.getElementById('pv-del').innerHTML = dHtml || '<span style="color:var(--text3);font-size:10px">No deliverables</span>';
+  // Timeline dates
+  document.getElementById('pv-start').textContent = fmtDate(document.getElementById('startDate').value);
+  document.getElementById('pv-end').textContent = fmtDate(document.getElementById('endDate').value);
+  document.getElementById('pv-dur').textContent = document.getElementById('duration').value;
+  updateMilestonesPreview();
+  updateTeamPreview();
+  updateValuePreview();
+  updateRisksPreview();
+  updateCasePreview();
+  updateTmPreview();
+  // Payment
+  document.getElementById('pv-pay').textContent = 'Payment: ' + document.getElementById('paySchedule').value;
+  // Closing
+  document.getElementById('pv-closing').innerHTML = (document.getElementById('closing').value || '').replace(/\n/g,'<br>');
+}
+
+window.updateMilestonesPreview = function() {
+  const items = document.querySelectorAll('#msList .ms-item');
+  let html = '';
+  items.forEach((it, i) => {
+    const ti = it.querySelector('.ms-inp'), di = it.querySelector('.ms-date'), de = it.querySelector('.ms-desc');
+    const isLast = i === items.length - 1;
+    html += \`<div class="tl-pi"><div class="tl-left"><div class="tl-dot">\${i+1}</div>\${!isLast?'<div class="tl-line-p"></div>':''}</div>
+      <div><div class="tl-pi-title">\${ti?ti.value:'Milestone'}</div>\${di&&di.value?\`<div class="tl-pi-date">\${fmtDate(di.value)}</div>\`:''}\${de&&de.value?\`<div class="tl-pi-desc">\${de.value}</div>\`:''}</div></div>\`;
+  });
+  document.getElementById('pv-timeline').innerHTML = html;
+}
+
+window.updateTeamPreview = function() {
+  const items = document.querySelectorAll('#teamList .team-card');
+  let html = '';
+  items.forEach(it => {
+    const n = it.querySelector('.tc-name').textContent;
+    const r = it.querySelector('.tc-role').textContent;
+    const av = it.querySelector('.tc-av');
+    const bg = av ? av.style.background : 'var(--teal)';
+    const init = n.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    html += \`<div class="tp-card" style="display:flex;align-items:center;gap:7px"><div class="tp-av-p" style="background:\${bg}">\${init}</div><div><div class="tp-name-p">\${n}</div><div class="tp-role-p">\${r}</div></div></div>\`;
+  });
+  document.getElementById('pv-team').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
+}
+
+window.updateValuePreview = function() {
+  let html = '';
+  document.querySelectorAll('#valueList .dv-input').forEach(v => { if (v.value.trim()) html += \`<div class="val-pi">\${v.value}</div>\`; });
+  document.getElementById('pv-value').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No value points</span>';
+}
+
+window.updateRisksPreview = function() {
+  const rows = document.querySelectorAll('#riskList .risk-row-g');
+  let html = '';
+  rows.forEach(r => {
+    const inputs = r.querySelectorAll('input');
+    const sel = r.querySelector('select');
+    if (!inputs[0] || !inputs[0].value) return;
+    const lik = sel ? sel.value : 'Medium';
+    const cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
+    html += \`<div class="risk-pi"><span class="risk-badge-p \${cls}">\${lik}</span><div><div class="risk-pi-text">\${inputs[0].value}</div>\${inputs[1]?\`<div class="risk-pi-mit">↳ \${inputs[1].value}</div>\`:''}</div></div>\`;
+  });
+  document.getElementById('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
+}
+
+window.updateCasePreview = function() {
+  const items = document.querySelectorAll('#csList .cs-item');
+  let html = '';
+  items.forEach(it => {
+    const title = it.querySelector('input[type="text"]').value;
+    const ta = it.querySelector('textarea');
+    html += \`<div class="cs-p"><div class="cs-p-title">\${title}</div><div class="cs-p-detail">\${ta ? ta.value : ''}</div></div>\`;
+  });
+  document.getElementById('pv-cs').innerHTML = html;
+}
+
+window.updateTmPreview = function() {
+  const items = document.querySelectorAll('#tmList .tm-item');
+  let html = '';
+  items.forEach(it => {
+    const ta = it.querySelector('textarea');
+    const nameInp = it.querySelectorAll('input')[0];
+    html += \`<div class="tm-p"><div class="tm-p-text">"\${ta ? ta.value : ''}"</div><div class="tm-p-author">— \${nameInp ? nameInp.value : ''}</div></div>\`;
+  });
+  document.getElementById('pv-tm').innerHTML = html;
+}
+
+window.calcTotal = function() {
+  const rows = document.querySelectorAll('#pricingList .pricing-row');
+  let sub = 0;
+  let html = '';
+  rows.forEach(r => {
+    const inps = r.querySelectorAll('input');
+    if (inps.length >= 2) {
+      const n = inps[0].value || 'Item', v = parseFloat(inps[1].value) || 0;
+      sub += v;
+      html += \`<tr><td>\${n}</td><td>\${fmt(v)}</td></tr>\`;
+    }
+  });
+  const gst = parseFloat(document.getElementById('gst').value) || 0;
+  const disc = parseFloat(document.getElementById('disc').value) || 0;
+  const discount = sub * disc / 100;
+  const tax = sub * gst / 100;
+  const grand = sub - discount + tax;
+  document.getElementById('subtotal').textContent = fmt(sub);
+  document.getElementById('taxAmt').textContent = fmt(tax);
+  document.getElementById('grandTotal').textContent = fmt(grand);
+  document.getElementById('pv-grand').textContent = fmt(grand);
+  document.getElementById('pv-pricing').innerHTML = html;
+  const dr = document.getElementById('discRow');
+  if (discount > 0) { dr.style.display = 'flex'; document.getElementById('discAmt').textContent = '-' + fmt(discount); } else { dr.style.display = 'none'; }
+}
+
+/* ── ADD FUNCTIONS ── */
+window.addMilestone = function() {
+  msCount++;
+  const c = document.getElementById('msList');
+  const d = document.createElement('div');
+  d.className = 'ms-item';
+  d.innerHTML = \`<div class="ms-left"><div class="ms-dot">\${msCount}</div><div class="ms-line"></div></div>
+    <div class="ms-body">
+      <div class="ms-row"><input type="text" class="ms-inp" placeholder="Milestone title" oninput="up()"><input type="date" class="ms-date" oninput="up()"><button class="icon-del" onclick="removeMilestone(this)"><i class="ti ti-trash"></i></button></div>
+      <input type="text" class="ms-desc" placeholder="Brief description…" oninput="up()">
+    </div>\`;
+  c.appendChild(d);
+  updateMsNumbers();
+  up();
+}
+
+window.removeMilestone = function(btn) {
+  if (document.querySelectorAll('#msList .ms-item').length <= 1) return;
+  btn.closest('.ms-item').remove();
+  updateMsNumbers();
+  up();
+}
+
+window.updateMsNumbers = function() {
+  document.querySelectorAll('#msList .ms-item').forEach((it, i) => {
+    const dot = it.querySelector('.ms-dot');
+    if (dot) dot.textContent = i + 1;
+  });
+}
+
+window.addDel = function() {
+  const c = document.getElementById('delList');
+  const d = document.createElement('div');
+  d.className = 'dv-item';
+  d.innerHTML = \`<div class="dv-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-check"></i></div>
+    <input type="text" class="dv-input" placeholder="Deliverable…" oninput="up()">
+    <i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i>\`;
+  c.appendChild(d);
+  d.querySelector('.dv-input').focus();
+  up();
+}
+
+window.addValue = function() {
+  const c = document.getElementById('valueList');
+  const d = document.createElement('div');
+  d.className = 'dv-item';
+  d.innerHTML = \`<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
+    <input type="text" class="dv-input" placeholder="Value point or ROI…" oninput="up()">
+    <i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i>\`;
+  c.appendChild(d);
+  d.querySelector('.dv-input').focus();
+  up();
+}
+
+window.addPricingRow = function() {
+  const c = document.getElementById('pricingList');
+  const d = document.createElement('div');
+  d.className = 'pricing-row';
+  d.innerHTML = \`<input type="text" class="pr-inp" placeholder="Service / item" oninput="calcTotal()">
+    <input type="number" class="pr-inp" value="0" style="text-align:right" oninput="calcTotal()">
+    <button class="pr-del" onclick="this.closest('.pricing-row').remove();calcTotal()"><i class="ti ti-trash"></i></button>\`;
+  c.appendChild(d);
+  d.querySelector('input').focus();
+  calcTotal();
+}
+
+window.addRisk = function() {
+  const c = document.getElementById('riskList');
+  const d = document.createElement('div');
+  d.className = 'risk-row-g';
+  d.innerHTML = \`<input type="text" class="pr-inp" placeholder="Risk description">
+    <select class="pr-inp" style="padding:7px 8px;font-size:11px"><option>High</option><option selected>Medium</option><option>Low</option></select>
+    <input type="text" class="pr-inp" placeholder="Mitigation">
+    <button class="pr-del" onclick="this.closest('.risk-row-g').remove()"><i class="ti ti-trash"></i></button>\`;
+  c.appendChild(d);
+}
+
+window.addCaseStudy = function() {
+  const c = document.getElementById('csList'), n = c.children.length + 1;
+  const d = document.createElement('div');
+  d.className = 'cs-item';
+  d.innerHTML = \`<div class="cs-header"><div class="cs-num">\${n}</div>
+    <input type="text" class="fi" style="flex:1" placeholder="Project name" oninput="updateCasePreview()">
+    <button class="icon-del" style="margin-left:6px" onclick="this.closest('.cs-item').remove();updateCasePreview()"><i class="ti ti-trash"></i></button></div>
+    <div class="form-row">
+      <div class="fg"><label class="fl">Client</label><input class="fi" type="text" placeholder="Client name" oninput="updateCasePreview()"></div>
+      <div class="fg"><label class="fl">Industry</label><input class="fi" type="text" placeholder="Industry" oninput="updateCasePreview()"></div>
+    </div>
+    <div class="fg"><label class="fl">Challenge & Result</label><textarea class="ta" style="min-height:60px" placeholder="Describe challenge and result…" oninput="updateCasePreview()"></textarea></div>\`;
+  c.appendChild(d);
+  updateCasePreview();
+}
+
+window.addTestimonial = function() {
+  const c = document.getElementById('tmList');
+  const d = document.createElement('div');
+  d.className = 'tm-item';
+  d.innerHTML = \`<i class="ti ti-quote tm-quote-icon"></i>
+    <div class="fg"><label class="fl">Quote</label><textarea class="ta" style="min-height:56px" placeholder="Testimonial quote…" oninput="updateTmPreview()"></textarea></div>
+    <div class="form-row"><div class="fg"><label class="fl">Name & Role</label><input class="fi" type="text" placeholder="Name, Title – Company" oninput="updateTmPreview()"></div>
+    <div class="fg"><label class="fl">Rating</label><select class="fs"><option>⭐⭐⭐⭐⭐ 5/5</option><option>⭐⭐⭐⭐ 4/5</option></select></div></div>
+    <button class="icon-del" onclick="this.closest('.tm-item').remove();updateTmPreview()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>\`;
+  c.appendChild(d);
+  updateTmPreview();
+}
+
+window.addFaq = function() {
+  const c = document.getElementById('faqList');
+  const d = document.createElement('div');
+  d.style.cssText = 'padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px';
+  d.innerHTML = \`<div class="fg"><label class="fl">Question</label><input class="fi" type="text" placeholder="Frequently asked question…"></div>
+    <div class="fg"><label class="fl">Answer</label><textarea class="ta" style="min-height:52px" placeholder="Clear, concise answer…"></textarea></div>
+    <button class="icon-del" onclick="this.closest('div[style]').remove()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>\`;
+  c.appendChild(d);
+}
+
+window.addWhyUs = function() {
+  const c = document.getElementById('whyList');
+  const d = document.createElement('div');
+  d.className = 'dv-item';
+  d.innerHTML = \`<div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div>
+    <input type="text" class="dv-input" placeholder="Why choose YENCODE…">
+    <i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i>\`;
+  c.appendChild(d);
+  d.querySelector('.dv-input').focus();
+}
+
+window.addTeamMember = function() {
+  const name = prompt('Team member full name:');
+  if (!name) return;
+  const role = prompt('Their job role:') || 'Team Member';
+  const exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
+  const skills = prompt('Skills (comma-separated):') || '';
+  const c = document.getElementById('teamList');
+  const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))','linear-gradient(135deg,var(--purple),#4E35B0)','linear-gradient(135deg,var(--amber),#D4880A)','linear-gradient(135deg,var(--blue),#1A4DB5)'];
+  const col = colors[Math.floor(Math.random() * colors.length)];
+  const init = name.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const skillTags = skills ? skills.split(',').map(s => \`<span class="tc-skill">\${s.trim()}</span>\`).join('') : '';
+  const d = document.createElement('div');
+  d.className = 'team-card';
+  d.innerHTML = \`<div class="tc-av" style="background:\${col}">\${init}</div>
+    <div style="flex:1;min-width:0">
+      <div class="tc-name">\${name}</div>
+      <div class="tc-role">\${role}</div>
+      \${exp ? \`<div class="tc-exp">\${exp}</div>\` : ''}
+      \${skillTags ? \`<div class="tc-skills">\${skillTags}</div>\` : ''}
+    </div>
+    <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>\`;
+  c.appendChild(d);
+  updateTeamPreview();
+}
+
+window.fillClient = function() {
+  document.getElementById('toComp').value = 'STA Corporation';
+  document.getElementById('toPerson').value = 'STA Admin';
+  document.getElementById('toEmail').value = 'sta@example.com';
+  document.getElementById('toPhone').value = '+91 98765 43210';
+  document.getElementById('toAddr').value = 'Chennai, Tamil Nadu, India';
+  up();
+}
+
+window.uploadCover = function() {
+  const z = document.getElementById('coverZone');
+  z.style.background = 'var(--teal-lighter)';
+  z.style.borderColor = 'var(--teal)';
+  z.innerHTML = \`<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div class="cover-zone-txt" style="color:var(--teal)">Cover image uploaded</div><div class="cover-zone-sub">Click to change</div>\`;
+}
+
+window.saveDraft = function() { selSt(document.querySelectorAll('.sc')[0],'DRAFT'); alert('Proposal saved as draft!'); }
+window.sendProposal = function() {
+  const c = document.getElementById('toComp').value;
+  if (!c) { alert('Please enter client name first.'); document.getElementById('toComp').focus(); return; }
+  selSt(document.querySelectorAll('.sc')[1],'SENT');
+  alert('Proposal sent to ' + c + '!');
+}
+window.markWon = function() { selSt(document.querySelectorAll('.sc')[3],'WON'); alert('Proposal marked as Won 🏆'); }
+
+// Init
+calcTotal();
+up();
+updateMilestonesPreview();
+updateTeamPreview();
+updateValuePreview();
+updateRisksPreview();
+`;
+    document.body.appendChild(script);
+
+    // Hook up buttons
+    const c = containerRef.current;
+    if (c) {
+      const backBtn = c.querySelector('.back-btn');
+      if (backBtn) backBtn.onclick = onBack;
+
+      const actions = c.querySelectorAll('.topbar-actions button');
+      actions.forEach(btn => {
+        btn.onclick = () => {
+          const title = document.getElementById('propTitle')?.value || 'New Proposal';
+          const client = document.getElementById('toComp')?.value || '';
+          
+          let val = 0;
+          try {
+            const grandTotalStr = document.getElementById('grandTotal')?.textContent || '0';
+            val = Number(grandTotalStr.replace(/[^0-9.-]+/g,""));
+          } catch(e) {}
+          
+          onSave({ title, client, value: val });
+        };
+      });
+    }
+
+    // Run initial update
+    setTimeout(() => {
+      if (window.calcTotal) window.calcTotal();
+      if (window.up) window.up();
+      if (window.updateMilestonesPreview) window.updateMilestonesPreview();
+      if (window.updateTeamPreview) window.updateTeamPreview();
+      if (window.updateValuePreview) window.updateValuePreview();
+      if (window.updateRisksPreview) window.updateRisksPreview();
+    }, 100);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [onBack, onSave]);
+
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "var(--bg)", overflowY: "auto" }}>
       <style>{`
@@ -310,73 +710,73 @@ body{display:flex;min-height:100vh}
   .topbar-actions .btn-o{display:none}
 }
 `}</style>
-      <div className="main">
-  <header className="topbar">
-    <div className="topbar-left">
-      <button className="back-btn" onClick={onBack}><i className="ti ti-arrow-left" style={{"fontSize":"13px"}}></i> Proposals</button>
-      <div className="topbar-title">Create Proposal</div>
+      <div ref={containerRef} dangerouslySetInnerHTML={{ __html: `<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn"><i class="ti ti-arrow-left" style="font-size:13px"></i> Proposals</button>
+      <div class="topbar-title">Create Proposal</div>
     </div>
-    <div className="topbar-actions">
-      <button className="btn-o"><i className="ti ti-copy" style={{"fontSize":"13px"}}></i> Duplicate</button>
-      <button className="btn-o" onClick={() => onSave({ title: "New Proposal", client: "", value: "0" })}><i className="ti ti-device-floppy" style={{"fontSize":"13px"}}></i> Save Draft</button>
-      <button className="btn-o"><i className="ti ti-download" style={{"fontSize":"13px"}}></i> PDF</button>
-      <button className="btn-t" onClick={() => onSave({ title: "New Proposal", client: "", value: "0" })}><i className="ti ti-send" style={{"fontSize":"13px"}}></i> Send</button>
-      <button className="btn-t btn-g" onClick={() => onSave({ title: "New Proposal", client: "", value: "0" })}><i className="ti ti-trophy" style={{"fontSize":"13px"}}></i> Mark Won</button>
+    <div class="topbar-actions">
+      <button class="btn-o"><i class="ti ti-copy" style="font-size:13px"></i> Duplicate</button>
+      <button class="btn-o" onclick="saveDraft()"><i class="ti ti-device-floppy" style="font-size:13px"></i> Save Draft</button>
+      <button class="btn-o"><i class="ti ti-download" style="font-size:13px"></i> PDF</button>
+      <button class="btn-t" onclick="sendProposal()"><i class="ti ti-send" style="font-size:13px"></i> Send</button>
+      <button class="btn-t btn-g" onclick="markWon()"><i class="ti ti-trophy" style="font-size:13px"></i> Mark Won</button>
     </div>
   </header>
 
-  <div className="content">
-  {/*  ══ FORM SIDE ══  */}
+  <div class="content">
+  <!-- ══ FORM SIDE ══ -->
   <div id="formSide">
 
-    {/*  SECTION PICKER  */}
-    <div className="section-picker">
-      <div className="sp-title"><i className="ti ti-layout-grid" style={{"color":"var(--teal)","fontSize":"15px"}}></i> Proposal Sections — Toggle Optional Sections</div>
-      <div className="sp-grid">
-        <button className="sp-toggle required" disabled>📋 Basics</button>
-        <button className="sp-toggle required" disabled>🏢 Parties</button>
-        <button className="sp-toggle required" disabled>📝 Summary</button>
-        <button className="sp-toggle required" disabled>✅ Deliverables</button>
-        <button className="sp-toggle required" disabled>🗓️ Timeline</button>
-        <button className="sp-toggle required" disabled>💰 Pricing</button>
-        <button className="sp-toggle required" disabled>✍️ Sign-off</button>
-        <button className="sp-toggle on" onClick={() => {}}><i className="ti ti-users"></i> Our Team</button>
-        <button className="sp-toggle on" onClick={() => {}}><i className="ti ti-star"></i> Value & ROI</button>
-        <button className="sp-toggle" onClick={() => {}}><i className="ti ti-trophy"></i> Case Studies</button>
-        <button className="sp-toggle" onClick={() => {}}><i className="ti ti-quote"></i> Testimonials</button>
-        <button className="sp-toggle on" onClick={() => {}}><i className="ti ti-shield-exclamation"></i> Risks</button>
-        <button className="sp-toggle" onClick={() => {}}><i className="ti ti-help-circle"></i> FAQ</button>
-        <button className="sp-toggle" onClick={() => {}}><i className="ti ti-medal"></i> Why Us</button>
+    <!-- SECTION PICKER -->
+    <div class="section-picker">
+      <div class="sp-title"><i class="ti ti-layout-grid" style="color:var(--teal);font-size:15px"></i> Proposal Sections — Toggle Optional Sections</div>
+      <div class="sp-grid">
+        <button class="sp-toggle required" disabled>📋 Basics</button>
+        <button class="sp-toggle required" disabled>🏢 Parties</button>
+        <button class="sp-toggle required" disabled>📝 Summary</button>
+        <button class="sp-toggle required" disabled>✅ Deliverables</button>
+        <button class="sp-toggle required" disabled>🗓️ Timeline</button>
+        <button class="sp-toggle required" disabled>💰 Pricing</button>
+        <button class="sp-toggle required" disabled>✍️ Sign-off</button>
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-team')"><i class="ti ti-users"></i> Our Team</button>
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-value')"><i class="ti ti-star"></i> Value & ROI</button>
+        <button class="sp-toggle" onclick="toggleSection(this,'sec-casestudies')"><i class="ti ti-trophy"></i> Case Studies</button>
+        <button class="sp-toggle" onclick="toggleSection(this,'sec-testimonials')"><i class="ti ti-quote"></i> Testimonials</button>
+        <button class="sp-toggle on" onclick="toggleSection(this,'sec-risks')"><i class="ti ti-shield-exclamation"></i> Risks</button>
+        <button class="sp-toggle" onclick="toggleSection(this,'sec-faq')"><i class="ti ti-help-circle"></i> FAQ</button>
+        <button class="sp-toggle" onclick="toggleSection(this,'sec-whyus')"><i class="ti ti-medal"></i> Why Us</button>
       </div>
     </div>
 
-    {/*  ① BASICS  */}
-    <div className="card">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-file-description"></i></div>
-        <div className="card-title">Proposal Basics</div>
-        <span style={{"marginLeft":"auto","fontSize":"10px","fontWeight":700,"background":"var(--amber-bg)","color":"var(--amber)","padding":"3px 9px","borderRadius":"20px"}}>#PRO-2026-0015</span>
+    <!-- ① BASICS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-file-description"></i></div>
+        <div class="card-title">Proposal Basics</div>
+        <span style="margin-left:auto;font-size:10px;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:3px 9px;border-radius:20px">#PRO-2026-0015</span>
       </div>
-      <div className="card-body">
-        <div className="cover-zone" id="coverZone" onClick={() => {}}>
-          <i className="ti ti-photo-plus"></i>
-          <div className="cover-zone-txt">Upload Cover Image / Banner</div>
-          <div className="cover-zone-sub">PNG, JPG · Recommended 1200×400px</div>
+      <div class="card-body">
+        <div class="cover-zone" id="coverZone" onclick="uploadCover()">
+          <i class="ti ti-photo-plus"></i>
+          <div class="cover-zone-txt">Upload Cover Image / Banner</div>
+          <div class="cover-zone-sub">PNG, JPG · Recommended 1200×400px</div>
         </div>
-        <div className="form-row">
-          <div className="fg">
-            <label className="fl">Proposal Title</label>
-            <input className="fi" type="text" id="propTitle" placeholder="e.g. Corporate Website Redesign" onChange={() => {}} />
+        <div class="form-row">
+          <div class="fg">
+            <label class="fl">Proposal Title</label>
+            <input class="fi" type="text" id="propTitle" placeholder="e.g. Corporate Website Redesign" oninput="up()">
           </div>
-          <div className="fg">
-            <label className="fl">Proposal Date</label>
-            <input className="fi" type="date" id="propDate" defaultValue="2026-06-01" onChange={() => {}} />
+          <div class="fg">
+            <label class="fl">Proposal Date</label>
+            <input class="fi" type="date" id="propDate" value="2026-06-01" oninput="up()">
           </div>
         </div>
-        <div className="form-row">
-          <div className="fg">
-            <label className="fl">Project Type</label>
-            <select className="fs" id="propType" onChange={() => {}}>
+        <div class="form-row">
+          <div class="fg">
+            <label class="fl">Project Type</label>
+            <select class="fs" id="propType" onchange="up()">
               <option>Web Development</option>
               <option>Mobile App</option>
               <option>UI/UX Design</option>
@@ -386,106 +786,106 @@ body{display:flex;min-height:100vh}
               <option>Consulting</option>
             </select>
           </div>
-          <div className="fg">
-            <label className="fl">Expiry Date</label>
-            <input className="fi" type="date" id="propExpiry" defaultValue="2026-07-01" onChange={() => {}} />
+          <div class="fg">
+            <label class="fl">Expiry Date</label>
+            <input class="fi" type="date" id="propExpiry" value="2026-07-01" oninput="up()">
           </div>
         </div>
-        <div className="fg">
-          <label className="fl" style={{"marginBottom":"7px"}}>Status</label>
-          <div className="status-row">
-            <button className="sc active-sc" onClick={() => {}}>📝 Draft</button>
-            <button className="sc sent" onClick={() => {}}>📤 Sent</button>
-            <button className="sc neg" onClick={() => {}}>🤝 Negotiation</button>
-            <button className="sc won" onClick={() => {}}>🏆 Won</button>
-            <button className="sc lost" onClick={() => {}}>❌ Lost</button>
-            <button className="sc exp" onClick={() => {}}>⏰ Expired</button>
+        <div class="fg">
+          <label class="fl" style="margin-bottom:7px">Status</label>
+          <div class="status-row">
+            <button class="sc active-sc" onclick="selSt(this,'DRAFT')">📝 Draft</button>
+            <button class="sc sent" onclick="selSt(this,'SENT')">📤 Sent</button>
+            <button class="sc neg" onclick="selSt(this,'NEGOTIATION')">🤝 Negotiation</button>
+            <button class="sc won" onclick="selSt(this,'WON')">🏆 Won</button>
+            <button class="sc lost" onclick="selSt(this,'LOST')">❌ Lost</button>
+            <button class="sc exp" onclick="selSt(this,'EXPIRED')">⏰ Expired</button>
           </div>
         </div>
       </div>
     </div>
 
-    {/*  ② PARTIES  */}
-    <div className="card">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-building"></i></div>
-        <div className="card-title">Parties — From & Prepared For</div>
+    <!-- ② PARTIES -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-building"></i></div>
+        <div class="card-title">Parties — From & Prepared For</div>
       </div>
-      <div className="card-body">
-        <div style={{"fontSize":"10px","fontWeight":800,"color":"var(--teal)","textTransform":"uppercase","letterSpacing":".7px","marginBottom":"10px"}}>Our Details</div>
-        <div className="form-row">
-          <div className="fg"><label className="fl">Company Name</label><input className="fi" type="text" id="fromComp" defaultValue="YENCODE Technologies" onChange={() => {}} /></div>
-          <div className="fg"><label className="fl">Contact Person</label><input className="fi" type="text" id="fromPerson" defaultValue="Prabhu R" onChange={() => {}} /></div>
+      <div class="card-body">
+        <div style="font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Our Details</div>
+        <div class="form-row">
+          <div class="fg"><label class="fl">Company Name</label><input class="fi" type="text" id="fromComp" value="YENCODE Technologies" oninput="up()"></div>
+          <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="fromPerson" value="Prabhu R" oninput="up()"></div>
         </div>
-        <div className="form-row">
-          <div className="fg"><label className="fl">Email</label><input className="fi" type="email" id="fromEmail" defaultValue="yencodetechnologies@gmail.com" onChange={() => {}} /></div>
-          <div className="fg"><label className="fl">Phone</label><input className="fi" type="tel" id="fromPhone" defaultValue="+91 89254 33533" onChange={() => {}} /></div>
+        <div class="form-row">
+          <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="fromEmail" value="yencodetechnologies@gmail.com" oninput="up()"></div>
+          <div class="fg"><label class="fl">Phone</label><input class="fi" type="tel" id="fromPhone" value="+91 89254 33533" oninput="up()"></div>
         </div>
-        <div className="fg"><label className="fl">Address</label><input className="fi" type="text" id="fromAddr" defaultValue="Chennai, Tamil Nadu, India" onChange={() => {}} /></div>
-        <div style={{"height":"1px","background":"var(--border)","margin":"14px 0"}}></div>
-        <div style={{"display":"flex","alignItems":"center","justifyContent":"space-between","marginBottom":"10px"}}>
-          <div style={{"fontSize":"10px","fontWeight":800,"color":"var(--amber)","textTransform":"uppercase","letterSpacing":".7px"}}>Client Details</div>
-          <button onClick={() => {}} style={{"display":"flex","alignItems":"center","gap":"4px","padding":"4px 9px","background":"var(--teal-lighter)","border":"1.5px solid var(--teal)","borderRadius":"7px","fontSize":"10px","fontWeight":700,"color":"var(--teal)","cursor":"pointer","fontFamily":"var(--font)"}}><i className="ti ti-search" style={{"fontSize":"11px"}}></i>Select Client</button>
+        <div class="fg"><label class="fl">Address</label><input class="fi" type="text" id="fromAddr" value="Chennai, Tamil Nadu, India" oninput="up()"></div>
+        <div style="height:1px;background:var(--border);margin:14px 0"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:10px;font-weight:800;color:var(--amber);text-transform:uppercase;letter-spacing:.7px">Client Details</div>
+          <button onclick="fillClient()" style="display:flex;align-items:center;gap:4px;padding:4px 9px;background:var(--teal-lighter);border:1.5px solid var(--teal);border-radius:7px;font-size:10px;font-weight:700;color:var(--teal);cursor:pointer;font-family:var(--font)"><i class="ti ti-search" style="font-size:11px"></i>Select Client</button>
         </div>
-        <div className="form-row">
-          <div className="fg"><label className="fl">Client / Company</label><input className="fi" type="text" id="toComp" placeholder="e.g. STA Corporation" onChange={() => {}} /></div>
-          <div className="fg"><label className="fl">Contact Person</label><input className="fi" type="text" id="toPerson" placeholder="Contact name" onChange={() => {}} /></div>
+        <div class="form-row">
+          <div class="fg"><label class="fl">Client / Company</label><input class="fi" type="text" id="toComp" placeholder="e.g. STA Corporation" oninput="up()"></div>
+          <div class="fg"><label class="fl">Contact Person</label><input class="fi" type="text" id="toPerson" placeholder="Contact name" oninput="up()"></div>
         </div>
-        <div className="form-row">
-          <div className="fg"><label className="fl">Email</label><input className="fi" type="email" id="toEmail" placeholder="client@email.com" onChange={() => {}} /></div>
-          <div className="fg"><label className="fl">Phone</label><input className="fi" type="tel" id="toPhone" placeholder="+91 XXXXX XXXXX" onChange={() => {}} /></div>
+        <div class="form-row">
+          <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="toEmail" placeholder="client@email.com" oninput="up()"></div>
+          <div class="fg"><label class="fl">Phone</label><input class="fi" type="tel" id="toPhone" placeholder="+91 XXXXX XXXXX" oninput="up()"></div>
         </div>
-        <div className="fg"><label className="fl">Address / Location</label><input className="fi" type="text" id="toAddr" placeholder="City, Country" onChange={() => {}} /></div>
-      </div>
-    </div>
-
-    {/*  ③ EXECUTIVE SUMMARY  */}
-    <div className="card">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-align-left"></i></div>
-        <div className="card-title">Executive Summary</div>
-      </div>
-      <div className="card-body">
-        <div className="fg"><label className="fl">Problem / Challenge <span className="fl-hint">What is the client struggling with?</span></label><textarea className="ta" id="problem" placeholder="Describe the client's pain point or business challenge…" onChange={() => {}}></textarea></div>
-        <div className="fg"><label className="fl">Our Proposed Solution <span className="fl-hint">How do we solve it?</span></label><textarea className="ta" id="solution" placeholder="Describe your approach, methodology and solution…" onChange={() => {}}></textarea></div>
-        <div className="fg"><label className="fl">Expected Outcome <span className="fl-hint">What will the client gain?</span></label><textarea className="ta" id="outcome" placeholder="Describe the measurable results the client can expect…" style={{"minHeight":"64px"}} onChange={() => {}}></textarea></div>
+        <div class="fg"><label class="fl">Address / Location</label><input class="fi" type="text" id="toAddr" placeholder="City, Country" oninput="up()"></div>
       </div>
     </div>
 
-    {/*  ④ SCOPE & DELIVERABLES  */}
-    <div className="card">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-checklist"></i></div>
-        <div className="card-title">Scope & Deliverables</div>
-        <div className="card-actions"><button onClick={() => {}} className="add-btn" style={{"width":"auto","margin":0,"padding":"4px 9px","fontSize":"10px"}}><i className="ti ti-plus" style={{"fontSize":"11px"}}></i>Add</button></div>
+    <!-- ③ EXECUTIVE SUMMARY -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-align-left"></i></div>
+        <div class="card-title">Executive Summary</div>
       </div>
-      <div className="card-body">
+      <div class="card-body">
+        <div class="fg"><label class="fl">Problem / Challenge <span class="fl-hint">What is the client struggling with?</span></label><textarea class="ta" id="problem" placeholder="Describe the client's pain point or business challenge…" oninput="up()"></textarea></div>
+        <div class="fg"><label class="fl">Our Proposed Solution <span class="fl-hint">How do we solve it?</span></label><textarea class="ta" id="solution" placeholder="Describe your approach, methodology and solution…" oninput="up()"></textarea></div>
+        <div class="fg"><label class="fl">Expected Outcome <span class="fl-hint">What will the client gain?</span></label><textarea class="ta" id="outcome" placeholder="Describe the measurable results the client can expect…" style="min-height:64px" oninput="up()"></textarea></div>
+      </div>
+    </div>
+
+    <!-- ④ SCOPE & DELIVERABLES -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-checklist"></i></div>
+        <div class="card-title">Scope & Deliverables</div>
+        <div class="card-actions"><button onclick="addDel()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button></div>
+      </div>
+      <div class="card-body">
         <div id="delList">
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-world"></i></div><input type="text" className="dv-input" defaultValue="Fully responsive website (8 pages)" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-palette"></i></div><input type="text" className="dv-input" defaultValue="Custom UI/UX design + brand guide" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--blue-bg)","color":"var(--blue)"}}><i className="ti ti-settings"></i></div><input type="text" className="dv-input" defaultValue="CMS for easy content management" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-chart-bar"></i></div><input type="text" className="dv-input" defaultValue="SEO optimisation + Google Analytics" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-headset"></i></div><input type="text" className="dv-input" defaultValue="3-month post-launch support" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-world"></i></div><input type="text" class="dv-input" value="Fully responsive website (8 pages)" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-palette"></i></div><input type="text" class="dv-input" value="Custom UI/UX design + brand guide" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-settings"></i></div><input type="text" class="dv-input" value="CMS for easy content management" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-chart-bar"></i></div><input type="text" class="dv-input" value="SEO optimisation + Google Analytics" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-headset"></i></div><input type="text" class="dv-input" value="3-month post-launch support" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
         </div>
-        <button className="add-btn" onClick={() => {}}><i className="ti ti-plus" style={{"fontSize":"13px"}}></i>Add Deliverable</button>
+        <button class="add-btn" onclick="addDel()"><i class="ti ti-plus" style="font-size:13px"></i>Add Deliverable</button>
       </div>
     </div>
 
-    {/*  ⑤ TIMELINE & MILESTONES  */}
-    <div className="card">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--blue-bg)","color":"var(--blue)"}}><i className="ti ti-calendar-stats"></i></div>
-        <div className="card-title">Project Timeline & Milestones</div>
+    <!-- ⑤ TIMELINE & MILESTONES -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-calendar-stats"></i></div>
+        <div class="card-title">Project Timeline & Milestones</div>
       </div>
-      <div className="card-body">
-        <div className="form-row" style={{"marginBottom":"14px"}}>
-          <div className="fg"><label className="fl">Project Start</label><input className="fi" type="date" id="startDate" defaultValue="2026-07-01" onChange={() => {}} /></div>
-          <div className="fg"><label className="fl">Project End</label><input className="fi" type="date" id="endDate" defaultValue="2026-10-31" onChange={() => {}} /></div>
+      <div class="card-body">
+        <div class="form-row" style="margin-bottom:14px">
+          <div class="fg"><label class="fl">Project Start</label><input class="fi" type="date" id="startDate" value="2026-07-01" oninput="up()"></div>
+          <div class="fg"><label class="fl">Project End</label><input class="fi" type="date" id="endDate" value="2026-10-31" oninput="up()"></div>
         </div>
-        <div className="form-row" style={{"marginBottom":"14px"}}>
-          <div className="fg"><label className="fl">Total Duration</label><input className="fi" type="text" id="duration" defaultValue="4 Months" onChange={() => {}} /></div>
-          <div className="fg"><label className="fl">Engagement Model</label>
-            <select className="fs" id="engModel" onChange={() => {}}>
+        <div class="form-row" style="margin-bottom:14px">
+          <div class="fg"><label class="fl">Total Duration</label><input class="fi" type="text" id="duration" value="4 Months" oninput="up()"></div>
+          <div class="fg"><label class="fl">Engagement Model</label>
+            <select class="fs" id="engModel" onchange="up()">
               <option>Fixed Price Project</option>
               <option>Time & Material</option>
               <option>Monthly Retainer</option>
@@ -493,289 +893,289 @@ body{display:flex;min-height:100vh}
             </select>
           </div>
         </div>
-        <label className="fl" style={{"display":"block","marginBottom":"10px"}}>Milestone Plan</label>
+        <label class="fl" style="display:block;margin-bottom:10px">Milestone Plan</label>
         <div id="msList">
-          <div className="ms-item">
-            <div className="ms-left"><div className="ms-dot done">1</div><div className="ms-line"></div></div>
-            <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="Kickoff & Discovery" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-07-07" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" defaultValue="Requirements gathering, stakeholder interviews, tech stack decision" placeholder="Description…" onChange={() => {}} />
+          <div class="ms-item">
+            <div class="ms-left"><div class="ms-dot done">1</div><div class="ms-line"></div></div>
+            <div class="ms-body">
+              <div class="ms-row"><input type="text" class="ms-inp" value="Kickoff & Discovery" oninput="up()"><input type="date" class="ms-date" value="2026-07-07" oninput="up()"><button class="icon-del" onclick="removeMilestone(this)"><i class="ti ti-trash"></i></button></div>
+              <input type="text" class="ms-desc" value="Requirements gathering, stakeholder interviews, tech stack decision" placeholder="Description…" oninput="up()">
             </div>
           </div>
-          <div className="ms-item">
-            <div className="ms-left"><div className="ms-dot">2</div><div className="ms-line"></div></div>
-            <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="UI/UX Design Phase" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-07-28" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" defaultValue="Wireframes, high-fidelity mockups, design system, client review" placeholder="Description…" onChange={() => {}} />
+          <div class="ms-item">
+            <div class="ms-left"><div class="ms-dot">2</div><div class="ms-line"></div></div>
+            <div class="ms-body">
+              <div class="ms-row"><input type="text" class="ms-inp" value="UI/UX Design Phase" oninput="up()"><input type="date" class="ms-date" value="2026-07-28" oninput="up()"><button class="icon-del" onclick="removeMilestone(this)"><i class="ti ti-trash"></i></button></div>
+              <input type="text" class="ms-desc" value="Wireframes, high-fidelity mockups, design system, client review" placeholder="Description…" oninput="up()">
             </div>
           </div>
-          <div className="ms-item">
-            <div className="ms-left"><div className="ms-dot">3</div><div className="ms-line"></div></div>
-            <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="Development Sprint" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-09-15" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" defaultValue="Frontend, backend, CMS integration, API connections, responsive build" placeholder="Description…" onChange={() => {}} />
+          <div class="ms-item">
+            <div class="ms-left"><div class="ms-dot">3</div><div class="ms-line"></div></div>
+            <div class="ms-body">
+              <div class="ms-row"><input type="text" class="ms-inp" value="Development Sprint" oninput="up()"><input type="date" class="ms-date" value="2026-09-15" oninput="up()"><button class="icon-del" onclick="removeMilestone(this)"><i class="ti ti-trash"></i></button></div>
+              <input type="text" class="ms-desc" value="Frontend, backend, CMS integration, API connections, responsive build" placeholder="Description…" oninput="up()">
             </div>
           </div>
-          <div className="ms-item">
-            <div className="ms-left"><div className="ms-dot">4</div><div className="ms-line"></div></div>
-            <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="Testing & QA" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-10-15" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" defaultValue="Cross-browser testing, UAT, bug fixes, performance optimisation" placeholder="Description…" onChange={() => {}} />
+          <div class="ms-item">
+            <div class="ms-left"><div class="ms-dot">4</div><div class="ms-line"></div></div>
+            <div class="ms-body">
+              <div class="ms-row"><input type="text" class="ms-inp" value="Testing & QA" oninput="up()"><input type="date" class="ms-date" value="2026-10-15" oninput="up()"><button class="icon-del" onclick="removeMilestone(this)"><i class="ti ti-trash"></i></button></div>
+              <input type="text" class="ms-desc" value="Cross-browser testing, UAT, bug fixes, performance optimisation" placeholder="Description…" oninput="up()">
             </div>
           </div>
-          <div className="ms-item">
-            <div className="ms-left"><div className="ms-dot">5</div></div>
-            <div className="ms-body">
-              <div className="ms-row"><input type="text" className="ms-inp" defaultValue="Launch & Handover" onChange={() => {}} /><input type="date" className="ms-date" defaultValue="2026-10-31" onChange={() => {}} /><button className="icon-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-              <input type="text" className="ms-desc" defaultValue="Deployment, training, documentation, 3-month support begins" placeholder="Description…" onChange={() => {}} />
+          <div class="ms-item">
+            <div class="ms-left"><div class="ms-dot">5</div></div>
+            <div class="ms-body">
+              <div class="ms-row"><input type="text" class="ms-inp" value="Launch & Handover" oninput="up()"><input type="date" class="ms-date" value="2026-10-31" oninput="up()"><button class="icon-del" onclick="removeMilestone(this)"><i class="ti ti-trash"></i></button></div>
+              <input type="text" class="ms-desc" value="Deployment, training, documentation, 3-month support begins" placeholder="Description…" oninput="up()">
             </div>
           </div>
         </div>
-        <button className="add-btn" onClick={() => {}}><i className="ti ti-plus" style={{"fontSize":"13px"}}></i>Add Milestone</button>
+        <button class="add-btn" onclick="addMilestone()"><i class="ti ti-plus" style="font-size:13px"></i>Add Milestone</button>
       </div>
     </div>
 
-    {/*  ⑥ OUR TEAM (OPTIONAL)  */}
-    <div className="card optional-card active-card" id="sec-team">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-users"></i></div>
-        <div className="card-title">Our Team <span className="opt-badge">Optional</span></div>
-        <div className="card-actions">
-          <button onClick={() => {}} className="add-btn" style={{"width":"auto","margin":0,"padding":"4px 9px","fontSize":"10px"}}><i className="ti ti-user-plus" style={{"fontSize":"11px"}}></i>Add Member</button>
+    <!-- ⑥ OUR TEAM (OPTIONAL) -->
+    <div class="card optional-card active-card" id="sec-team">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-users"></i></div>
+        <div class="card-title">Our Team <span class="opt-badge">Optional</span></div>
+        <div class="card-actions">
+          <button onclick="addTeamMember()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-user-plus" style="font-size:11px"></i>Add Member</button>
         </div>
       </div>
-      <div className="card-body">
+      <div class="card-body">
         <div id="teamList">
-          <div className="team-card">
-            <div className="tc-av" style={{"background":"linear-gradient(135deg,var(--teal),var(--teal4))"}}>P</div>
-            <div style={{"flex":1,"minWidth":0}}>
-              <div className="tc-name">Prabhu R</div>
-              <div className="tc-role">Lead Developer & Project Manager</div>
-              <div className="tc-exp">8+ years · Web & Mobile Applications</div>
-              <div className="tc-skills"><span className="tc-skill">React.js</span><span className="tc-skill">Node.js</span><span className="tc-skill">Project Management</span></div>
+          <div class="team-card">
+            <div class="tc-av" style="background:linear-gradient(135deg,var(--teal),var(--teal4))">P</div>
+            <div style="flex:1;min-width:0">
+              <div class="tc-name">Prabhu R</div>
+              <div class="tc-role">Lead Developer & Project Manager</div>
+              <div class="tc-exp">8+ years · Web & Mobile Applications</div>
+              <div class="tc-skills"><span class="tc-skill">React.js</span><span class="tc-skill">Node.js</span><span class="tc-skill">Project Management</span></div>
             </div>
-            <i className="ti ti-x tc-del" onClick={() => {}}></i>
+            <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>
           </div>
-          <div className="team-card">
-            <div className="tc-av" style={{"background":"linear-gradient(135deg,var(--purple),#4E35B0)"}}>AN</div>
-            <div style={{"flex":1,"minWidth":0}}>
-              <div className="tc-name">Anitha N</div>
-              <div className="tc-role">Senior UI/UX Designer</div>
-              <div className="tc-exp">5+ years · SaaS & Corporate Design</div>
-              <div className="tc-skills"><span className="tc-skill">Figma</span><span className="tc-skill">Design Systems</span><span className="tc-skill">Prototyping</span></div>
+          <div class="team-card">
+            <div class="tc-av" style="background:linear-gradient(135deg,var(--purple),#4E35B0)">AN</div>
+            <div style="flex:1;min-width:0">
+              <div class="tc-name">Anitha N</div>
+              <div class="tc-role">Senior UI/UX Designer</div>
+              <div class="tc-exp">5+ years · SaaS & Corporate Design</div>
+              <div class="tc-skills"><span class="tc-skill">Figma</span><span class="tc-skill">Design Systems</span><span class="tc-skill">Prototyping</span></div>
             </div>
-            <i className="ti ti-x tc-del" onClick={() => {}}></i>
+            <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>
           </div>
-          <div className="team-card">
-            <div className="tc-av" style={{"background":"linear-gradient(135deg,var(--green),#00956A)"}}>RK</div>
-            <div style={{"flex":1,"minWidth":0}}>
-              <div className="tc-name">Ravi Kumar</div>
-              <div className="tc-role">Backend Developer</div>
-              <div className="tc-exp">6+ years · APIs & Cloud Architecture</div>
-              <div className="tc-skills"><span className="tc-skill">Python</span><span className="tc-skill">Django</span><span className="tc-skill">AWS</span></div>
+          <div class="team-card">
+            <div class="tc-av" style="background:linear-gradient(135deg,var(--green),#00956A)">RK</div>
+            <div style="flex:1;min-width:0">
+              <div class="tc-name">Ravi Kumar</div>
+              <div class="tc-role">Backend Developer</div>
+              <div class="tc-exp">6+ years · APIs & Cloud Architecture</div>
+              <div class="tc-skills"><span class="tc-skill">Python</span><span class="tc-skill">Django</span><span class="tc-skill">AWS</span></div>
             </div>
-            <i className="ti ti-x tc-del" onClick={() => {}}></i>
+            <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>
           </div>
-          <div className="team-card">
-            <div className="tc-av" style={{"background":"linear-gradient(135deg,var(--amber),#D4880A)"}}>SK</div>
-            <div style={{"flex":1,"minWidth":0}}>
-              <div className="tc-name">Suresh K</div>
-              <div className="tc-role">QA & Testing Engineer</div>
-              <div className="tc-exp">4+ years · Automation & Manual Testing</div>
-              <div className="tc-skills"><span className="tc-skill">Selenium</span><span className="tc-skill">Jest</span><span className="tc-skill">Cypress</span></div>
+          <div class="team-card">
+            <div class="tc-av" style="background:linear-gradient(135deg,var(--amber),#D4880A)">SK</div>
+            <div style="flex:1;min-width:0">
+              <div class="tc-name">Suresh K</div>
+              <div class="tc-role">QA & Testing Engineer</div>
+              <div class="tc-exp">4+ years · Automation & Manual Testing</div>
+              <div class="tc-skills"><span class="tc-skill">Selenium</span><span class="tc-skill">Jest</span><span class="tc-skill">Cypress</span></div>
             </div>
-            <i className="ti ti-x tc-del" onClick={() => {}}></i>
+            <i class="ti ti-x tc-del" onclick="this.closest('.team-card').remove();updateTeamPreview()"></i>
           </div>
         </div>
       </div>
     </div>
 
-    {/*  ⑦ VALUE PROPOSITION & ROI (OPTIONAL)  */}
-    <div className="card optional-card active-card" id="sec-value">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-trending-up"></i></div>
-        <div className="card-title">Value Proposition & ROI <span className="opt-badge">Optional</span></div>
-        <div className="card-actions">
-          <button onClick={() => {}} className="add-btn" style={{"width":"auto","margin":0,"padding":"4px 9px","fontSize":"10px"}}><i className="ti ti-plus" style={{"fontSize":"11px"}}></i>Add</button>
+    <!-- ⑦ VALUE PROPOSITION & ROI (OPTIONAL) -->
+    <div class="card optional-card active-card" id="sec-value">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div>
+        <div class="card-title">Value Proposition & ROI <span class="opt-badge">Optional</span></div>
+        <div class="card-actions">
+          <button onclick="addValue()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button>
         </div>
       </div>
-      <div className="card-body">
+      <div class="card-body">
         <div id="valueList">
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-trending-up"></i></div><input type="text" className="dv-input" defaultValue="300% increase in organic traffic within 6 months" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-users"></i></div><input type="text" className="dv-input" defaultValue="2x lead generation with improved UX & CTAs" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--blue-bg)","color":"var(--blue)"}}><i className="ti ti-device-mobile"></i></div><input type="text" className="dv-input" defaultValue="Mobile-first design reaching 70%+ of your audience" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-clock"></i></div><input type="text" className="dv-input" defaultValue="50% faster content updates with intuitive CMS" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-certificate"></i></div><input type="text" className="dv-input" defaultValue="Brand credibility boost with modern, professional design" onChange={() => {}} /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-trending-up"></i></div><input type="text" class="dv-input" value="300% increase in organic traffic within 6 months" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-users"></i></div><input type="text" class="dv-input" value="2x lead generation with improved UX & CTAs" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-device-mobile"></i></div><input type="text" class="dv-input" value="Mobile-first design reaching 70%+ of your audience" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-clock"></i></div><input type="text" class="dv-input" value="50% faster content updates with intuitive CMS" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-certificate"></i></div><input type="text" class="dv-input" value="Brand credibility boost with modern, professional design" oninput="up()"><i class="ti ti-x dv-del" onclick="this.parentElement.remove();up()"></i></div>
         </div>
       </div>
     </div>
 
-    {/*  ⑧ CASE STUDIES (OPTIONAL, HIDDEN)  */}
-    <div className="card optional-card" id="sec-casestudies" style={{"display":"none"}}>
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-trophy"></i></div>
-        <div className="card-title">Past Work & Case Studies <span className="opt-badge">Optional</span></div>
-        <div className="card-actions">
-          <button onClick={() => {}} className="add-btn" style={{"width":"auto","margin":0,"padding":"4px 9px","fontSize":"10px"}}><i className="ti ti-plus" style={{"fontSize":"11px"}}></i>Add</button>
+    <!-- ⑧ CASE STUDIES (OPTIONAL, HIDDEN) -->
+    <div class="card optional-card" id="sec-casestudies" style="display:none">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-trophy"></i></div>
+        <div class="card-title">Past Work & Case Studies <span class="opt-badge">Optional</span></div>
+        <div class="card-actions">
+          <button onclick="addCaseStudy()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button>
         </div>
       </div>
-      <div className="card-body">
+      <div class="card-body">
         <div id="csList">
-          <div className="cs-item">
-            <div className="cs-header">
-              <div className="cs-num">1</div>
-              <input type="text" className="fi" style={{"flex":1}} placeholder="Project name" defaultValue="YDMart E-Commerce App" />
-              <button className="icon-del" style={{"marginLeft":"6px"}} onClick={() => {}}><i className="ti ti-trash"></i></button>
+          <div class="cs-item">
+            <div class="cs-header">
+              <div class="cs-num">1</div>
+              <input type="text" class="fi" style="flex:1" placeholder="Project name" value="YDMart E-Commerce App">
+              <button class="icon-del" style="margin-left:6px" onclick="this.closest('.cs-item').remove();updateCasePreview()"><i class="ti ti-trash"></i></button>
             </div>
-            <div className="form-row">
-              <div className="fg"><label className="fl">Client</label><input className="fi" type="text" placeholder="Client name" defaultValue="YDMart Group" onChange={() => {}} /></div>
-              <div className="fg"><label className="fl">Industry</label><input className="fi" type="text" placeholder="e.g. Retail" defaultValue="E-Commerce / Retail" onChange={() => {}} /></div>
+            <div class="form-row">
+              <div class="fg"><label class="fl">Client</label><input class="fi" type="text" placeholder="Client name" value="YDMart Group" oninput="updateCasePreview()"></div>
+              <div class="fg"><label class="fl">Industry</label><input class="fi" type="text" placeholder="e.g. Retail" value="E-Commerce / Retail" oninput="updateCasePreview()"></div>
             </div>
-            <div className="fg"><label className="fl">Challenge & Result</label><textarea className="ta" style={{"minHeight":"60px"}} placeholder="Describe the challenge and what you achieved…" onChange={() => {}}>Built a full e-commerce platform with 500+ SKUs, cart, payments and admin panel. Launched in 3 months, resulting in ₹12L revenue in first quarter.</textarea></div>
+            <div class="fg"><label class="fl">Challenge & Result</label><textarea class="ta" style="min-height:60px" placeholder="Describe the challenge and what you achieved…" oninput="updateCasePreview()">Built a full e-commerce platform with 500+ SKUs, cart, payments and admin panel. Launched in 3 months, resulting in ₹12L revenue in first quarter.</textarea></div>
           </div>
         </div>
       </div>
     </div>
 
-    {/*  ⑨ TESTIMONIALS (OPTIONAL, HIDDEN)  */}
-    <div className="card optional-card" id="sec-testimonials" style={{"display":"none"}}>
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-quote"></i></div>
-        <div className="card-title">Client Testimonials <span className="opt-badge">Optional</span></div>
-        <div className="card-actions">
-          <button onClick={() => {}} className="add-btn" style={{"width":"auto","margin":0,"padding":"4px 9px","fontSize":"10px"}}><i className="ti ti-plus" style={{"fontSize":"11px"}}></i>Add</button>
+    <!-- ⑨ TESTIMONIALS (OPTIONAL, HIDDEN) -->
+    <div class="card optional-card" id="sec-testimonials" style="display:none">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-quote"></i></div>
+        <div class="card-title">Client Testimonials <span class="opt-badge">Optional</span></div>
+        <div class="card-actions">
+          <button onclick="addTestimonial()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button>
         </div>
       </div>
-      <div className="card-body">
+      <div class="card-body">
         <div id="tmList">
-          <div className="tm-item">
-            <i className="ti ti-quote tm-quote-icon"></i>
-            <div className="fg"><label className="fl">Quote</label><textarea className="ta" style={{"minHeight":"56px"}} placeholder="Enter testimonial quote…" onChange={() => {}}>YENCODE delivered an exceptional product — on time, within budget, and beyond expectations. The team was professional and responsive throughout.</textarea></div>
-            <div className="form-row">
-              <div className="fg"><label className="fl">Name & Role</label><input className="fi" type="text" defaultValue="Rajan M, CEO – NexCorp" onChange={() => {}} /></div>
-              <div className="fg"><label className="fl">Rating</label>
-                <select className="fs" onChange={() => {}}>
+          <div class="tm-item">
+            <i class="ti ti-quote tm-quote-icon"></i>
+            <div class="fg"><label class="fl">Quote</label><textarea class="ta" style="min-height:56px" placeholder="Enter testimonial quote…" oninput="updateTmPreview()">YENCODE delivered an exceptional product — on time, within budget, and beyond expectations. The team was professional and responsive throughout.</textarea></div>
+            <div class="form-row">
+              <div class="fg"><label class="fl">Name & Role</label><input class="fi" type="text" value="Rajan M, CEO – NexCorp" oninput="updateTmPreview()"></div>
+              <div class="fg"><label class="fl">Rating</label>
+                <select class="fs" oninput="updateTmPreview()">
                   <option>⭐⭐⭐⭐⭐ 5/5</option>
                   <option>⭐⭐⭐⭐ 4/5</option>
                 </select>
               </div>
             </div>
-            <button className="icon-del" style={{"marginTop":"4px"}} onClick={() => {}}><i className="ti ti-trash" style={{"fontSize":"13px"}}></i> Remove</button>
+            <button class="icon-del" style="margin-top:4px" onclick="this.closest('.tm-item').remove();updateTmPreview()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>
           </div>
         </div>
       </div>
     </div>
 
-    {/*  ⑩ RISKS & MITIGATION (OPTIONAL)  */}
-    <div className="card optional-card active-card" id="sec-risks">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--red-bg)","color":"var(--red)"}}><i className="ti ti-shield-exclamation"></i></div>
-        <div className="card-title">Risks & Mitigation <span className="opt-badge">Optional</span></div>
-        <div className="card-actions">
-          <button onClick={() => {}} className="add-btn" style={{"width":"auto","margin":0,"padding":"4px 9px","fontSize":"10px"}}><i className="ti ti-plus" style={{"fontSize":"11px"}}></i>Add</button>
+    <!-- ⑩ RISKS & MITIGATION (OPTIONAL) -->
+    <div class="card optional-card active-card" id="sec-risks">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--red-bg);color:var(--red)"><i class="ti ti-shield-exclamation"></i></div>
+        <div class="card-title">Risks & Mitigation <span class="opt-badge">Optional</span></div>
+        <div class="card-actions">
+          <button onclick="addRisk()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add</button>
         </div>
       </div>
-      <div className="card-body">
-        <div className="risk-row-g hdr" style={{"marginBottom":"6px"}}>
+      <div class="card-body">
+        <div class="risk-row-g hdr" style="margin-bottom:6px">
           <div>Risk Description</div><div>Likelihood</div><div>Mitigation</div><div></div>
         </div>
         <div id="riskList">
-          <div className="risk-row-g">
-            <input type="text" className="pr-inp" defaultValue="Scope creep beyond deliverables" />
-            <select className="pr-inp" style={{"padding":"7px 8px","fontSize":"11px"}}><option>High</option><option selected>Medium</option><option>Low</option></select>
-            <input type="text" className="pr-inp" defaultValue="Formal change request process" />
-            <button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button>
+          <div class="risk-row-g">
+            <input type="text" class="pr-inp" value="Scope creep beyond deliverables">
+            <select class="pr-inp" style="padding:7px 8px;font-size:11px"><option>High</option><option selected>Medium</option><option>Low</option></select>
+            <input type="text" class="pr-inp" value="Formal change request process">
+            <button class="pr-del" onclick="this.closest('.risk-row-g').remove()"><i class="ti ti-trash"></i></button>
           </div>
-          <div className="risk-row-g">
-            <input type="text" className="pr-inp" defaultValue="Delayed feedback from client" />
-            <select className="pr-inp" style={{"padding":"7px 8px","fontSize":"11px"}}><option>High</option><option selected>Medium</option><option>Low</option></select>
-            <input type="text" className="pr-inp" defaultValue="48-hour SLA for feedback" />
-            <button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button>
+          <div class="risk-row-g">
+            <input type="text" class="pr-inp" value="Delayed feedback from client">
+            <select class="pr-inp" style="padding:7px 8px;font-size:11px"><option>High</option><option selected>Medium</option><option>Low</option></select>
+            <input type="text" class="pr-inp" value="48-hour SLA for feedback">
+            <button class="pr-del" onclick="this.closest('.risk-row-g').remove()"><i class="ti ti-trash"></i></button>
           </div>
-          <div className="risk-row-g">
-            <input type="text" className="pr-inp" defaultValue="Third-party API unavailability" />
-            <select className="pr-inp" style={{"padding":"7px 8px","fontSize":"11px"}}><option>High</option><option>Medium</option><option selected>Low</option></select>
-            <input type="text" className="pr-inp" defaultValue="Fallback APIs identified" />
-            <button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button>
+          <div class="risk-row-g">
+            <input type="text" class="pr-inp" value="Third-party API unavailability">
+            <select class="pr-inp" style="padding:7px 8px;font-size:11px"><option>High</option><option>Medium</option><option selected>Low</option></select>
+            <input type="text" class="pr-inp" value="Fallback APIs identified">
+            <button class="pr-del" onclick="this.closest('.risk-row-g').remove()"><i class="ti ti-trash"></i></button>
           </div>
         </div>
       </div>
     </div>
 
-    {/*  ⑪ FAQ (OPTIONAL, HIDDEN)  */}
-    <div className="card optional-card" id="sec-faq" style={{"display":"none"}}>
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--blue-bg)","color":"var(--blue)"}}><i className="ti ti-help-circle"></i></div>
-        <div className="card-title">Frequently Asked Questions <span className="opt-badge">Optional</span></div>
-        <div className="card-actions">
-          <button onClick={() => {}} className="add-btn" style={{"width":"auto","margin":0,"padding":"4px 9px","fontSize":"10px"}}><i className="ti ti-plus" style={{"fontSize":"11px"}}></i>Add FAQ</button>
+    <!-- ⑪ FAQ (OPTIONAL, HIDDEN) -->
+    <div class="card optional-card" id="sec-faq" style="display:none">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-help-circle"></i></div>
+        <div class="card-title">Frequently Asked Questions <span class="opt-badge">Optional</span></div>
+        <div class="card-actions">
+          <button onclick="addFaq()" class="add-btn" style="width:auto;margin:0;padding:4px 9px;font-size:10px"><i class="ti ti-plus" style="font-size:11px"></i>Add FAQ</button>
         </div>
       </div>
-      <div className="card-body">
+      <div class="card-body">
         <div id="faqList">
-          <div style={{"padding":"10px 12px","background":"var(--surface2)","border":"1.5px solid var(--border)","borderRadius":"10px","marginBottom":"8px"}}>
-            <div className="fg"><label className="fl">Question</label><input className="fi" type="text" defaultValue="How long will the project take?" /></div>
-            <div className="fg"><label className="fl">Answer</label><textarea className="ta" style={{"minHeight":"52px"}}>Based on the scope outlined, we estimate 4 months. This includes design, development, testing and launch phases.</textarea></div>
-            <button className="icon-del" onClick={() => {}}><i className="ti ti-trash" style={{"fontSize":"13px"}}></i> Remove</button>
+          <div style="padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px">
+            <div class="fg"><label class="fl">Question</label><input class="fi" type="text" value="How long will the project take?"></div>
+            <div class="fg"><label class="fl">Answer</label><textarea class="ta" style="min-height:52px">Based on the scope outlined, we estimate 4 months. This includes design, development, testing and launch phases.</textarea></div>
+            <button class="icon-del" onclick="this.closest('div[style]').remove()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>
           </div>
-          <div style={{"padding":"10px 12px","background":"var(--surface2)","border":"1.5px solid var(--border)","borderRadius":"10px","marginBottom":"8px"}}>
-            <div className="fg"><label className="fl">Question</label><input className="fi" type="text" defaultValue="What happens after project delivery?" /></div>
-            <div className="fg"><label className="fl">Answer</label><textarea className="ta" style={{"minHeight":"52px"}}>We provide 3 months of complimentary post-launch support. After that, monthly maintenance packages are available.</textarea></div>
-            <button className="icon-del" onClick={() => {}}><i className="ti ti-trash" style={{"fontSize":"13px"}}></i> Remove</button>
+          <div style="padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px">
+            <div class="fg"><label class="fl">Question</label><input class="fi" type="text" value="What happens after project delivery?"></div>
+            <div class="fg"><label class="fl">Answer</label><textarea class="ta" style="min-height:52px">We provide 3 months of complimentary post-launch support. After that, monthly maintenance packages are available.</textarea></div>
+            <button class="icon-del" onclick="this.closest('div[style]').remove()"><i class="ti ti-trash" style="font-size:13px"></i> Remove</button>
           </div>
         </div>
       </div>
     </div>
 
-    {/*  ⑫ WHY US (OPTIONAL, HIDDEN)  */}
-    <div className="card optional-card" id="sec-whyus" style={{"display":"none"}}>
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-medal"></i></div>
-        <div className="card-title">Why Choose YENCODE? <span className="opt-badge">Optional</span></div>
+    <!-- ⑫ WHY US (OPTIONAL, HIDDEN) -->
+    <div class="card optional-card" id="sec-whyus" style="display:none">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-medal"></i></div>
+        <div class="card-title">Why Choose YENCODE? <span class="opt-badge">Optional</span></div>
       </div>
-      <div className="card-body">
+      <div class="card-body">
         <div id="whyList">
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--amber-bg)","color":"var(--amber)"}}><i className="ti ti-star"></i></div><input type="text" className="dv-input" defaultValue="8+ years delivering enterprise-grade products" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--teal-light)","color":"var(--teal)"}}><i className="ti ti-users"></i></div><input type="text" className="dv-input" defaultValue="Dedicated team of experts — not freelancers" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-clock"></i></div><input type="text" className="dv-input" defaultValue="100% on-time delivery record" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
-          <div className="dv-item"><div className="dv-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-shield-check"></i></div><input type="text" className="dv-input" defaultValue="Transparent pricing, no hidden costs" /><i className="ti ti-x dv-del" onClick={() => {}}></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-star"></i></div><input type="text" class="dv-input" value="8+ years delivering enterprise-grade products"><i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ti ti-users"></i></div><input type="text" class="dv-input" value="Dedicated team of experts — not freelancers"><i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-clock"></i></div><input type="text" class="dv-input" value="100% on-time delivery record"><i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i></div>
+          <div class="dv-item"><div class="dv-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-shield-check"></i></div><input type="text" class="dv-input" value="Transparent pricing, no hidden costs"><i class="ti ti-x dv-del" onclick="this.parentElement.remove()"></i></div>
         </div>
-        <button className="add-btn" onClick={() => {}}><i className="ti ti-plus" style={{"fontSize":"13px"}}></i>Add Point</button>
+        <button class="add-btn" onclick="addWhyUs()"><i class="ti ti-plus" style="font-size:13px"></i>Add Point</button>
       </div>
     </div>
 
-    {/*  ⑬ PRICING  */}
-    <div className="card">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--green-bg)","color":"var(--green)"}}><i className="ti ti-currency-rupee"></i></div>
-        <div className="card-title">Investment & Pricing</div>
+    <!-- ⑬ PRICING -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-currency-rupee"></i></div>
+        <div class="card-title">Investment & Pricing</div>
       </div>
-      <div className="card-body">
-        <div className="risk-row-g hdr" style={{"marginBottom":"6px","gridTemplateColumns":"1fr 90px 24px"}}>
+      <div class="card-body">
+        <div class="risk-row-g hdr" style="margin-bottom:6px;grid-template-columns:1fr 90px 24px">
           <div>Service / Item</div><div>Amount (₹)</div><div></div>
         </div>
         <div id="pricingList">
-          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="UI/UX Design" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="18000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="Frontend Development" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="30000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="Backend & CMS" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="20000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="SEO & Analytics Setup" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="8000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="Testing & QA" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="7000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
-          <div className="pricing-row"><input type="text" className="pr-inp" defaultValue="Post-Launch Support (3 mo)" onChange={() => {}} /><input type="number" className="pr-inp" defaultValue="12000" style={{"textAlign":"right"}} onChange={() => {}} /><button className="pr-del" onClick={() => {}}><i className="ti ti-trash"></i></button></div>
+          <div class="pricing-row"><input type="text" class="pr-inp" value="UI/UX Design" oninput="calcTotal()"><input type="number" class="pr-inp" value="18000" style="text-align:right" oninput="calcTotal()"><button class="pr-del" onclick="this.closest('.pricing-row').remove();calcTotal()"><i class="ti ti-trash"></i></button></div>
+          <div class="pricing-row"><input type="text" class="pr-inp" value="Frontend Development" oninput="calcTotal()"><input type="number" class="pr-inp" value="30000" style="text-align:right" oninput="calcTotal()"><button class="pr-del" onclick="this.closest('.pricing-row').remove();calcTotal()"><i class="ti ti-trash"></i></button></div>
+          <div class="pricing-row"><input type="text" class="pr-inp" value="Backend & CMS" oninput="calcTotal()"><input type="number" class="pr-inp" value="20000" style="text-align:right" oninput="calcTotal()"><button class="pr-del" onclick="this.closest('.pricing-row').remove();calcTotal()"><i class="ti ti-trash"></i></button></div>
+          <div class="pricing-row"><input type="text" class="pr-inp" value="SEO & Analytics Setup" oninput="calcTotal()"><input type="number" class="pr-inp" value="8000" style="text-align:right" oninput="calcTotal()"><button class="pr-del" onclick="this.closest('.pricing-row').remove();calcTotal()"><i class="ti ti-trash"></i></button></div>
+          <div class="pricing-row"><input type="text" class="pr-inp" value="Testing & QA" oninput="calcTotal()"><input type="number" class="pr-inp" value="7000" style="text-align:right" oninput="calcTotal()"><button class="pr-del" onclick="this.closest('.pricing-row').remove();calcTotal()"><i class="ti ti-trash"></i></button></div>
+          <div class="pricing-row"><input type="text" class="pr-inp" value="Post-Launch Support (3 mo)" oninput="calcTotal()"><input type="number" class="pr-inp" value="12000" style="text-align:right" oninput="calcTotal()"><button class="pr-del" onclick="this.closest('.pricing-row').remove();calcTotal()"><i class="ti ti-trash"></i></button></div>
         </div>
-        <button className="add-btn" onClick={() => {}}><i className="ti ti-plus" style={{"fontSize":"13px"}}></i>Add Item</button>
-        <div className="total-box">
-          <div className="form-row" style={{"marginBottom":"8px"}}>
-            <div className="fg"><label className="fl" style={{"fontSize":"10px"}}>GST %</label><input className="fi" type="number" id="gst" defaultValue="18" onChange={() => {}} style={{"padding":"7px 10px","fontSize":"12px"}} /></div>
-            <div className="fg"><label className="fl" style={{"fontSize":"10px"}}>Discount %</label><input className="fi" type="number" id="disc" defaultValue="0" onChange={() => {}} style={{"padding":"7px 10px","fontSize":"12px"}} /></div>
+        <button class="add-btn" onclick="addPricingRow()"><i class="ti ti-plus" style="font-size:13px"></i>Add Item</button>
+        <div class="total-box">
+          <div class="form-row" style="margin-bottom:8px">
+            <div class="fg"><label class="fl" style="font-size:10px">GST %</label><input class="fi" type="number" id="gst" value="18" oninput="calcTotal()" style="padding:7px 10px;font-size:12px"></div>
+            <div class="fg"><label class="fl" style="font-size:10px">Discount %</label><input class="fi" type="number" id="disc" value="0" oninput="calcTotal()" style="padding:7px 10px;font-size:12px"></div>
           </div>
-          <div className="total-row"><span style={{"color":"var(--text2)","fontWeight":600}}>Subtotal</span><span id="subtotal" style={{"fontWeight":700,"color":"var(--text)"}}>₹95,000</span></div>
-          <div className="total-row"><span style={{"color":"var(--amber)","fontWeight":600}}>GST (18%)</span><span id="taxAmt" style={{"fontWeight":700,"color":"var(--amber)"}}>₹17,100</span></div>
-          <div className="total-row" id="discRow" style={{"display":"none"}}><span style={{"color":"var(--green)","fontWeight":600}}>Discount</span><span id="discAmt" style={{"fontWeight":700,"color":"var(--green)"}}>-₹0</span></div>
-          <div className="grand-box" style={{"marginTop":"8px"}}><span style={{"fontSize":"13px","fontWeight":800,"color":"#fff"}}>Total Investment</span><span id="grandTotal" style={{"fontSize":"16px","fontWeight":900,"color":"#fff"}}>₹1,12,100</span></div>
+          <div class="total-row"><span style="color:var(--text2);font-weight:600">Subtotal</span><span id="subtotal" style="font-weight:700;color:var(--text)">₹95,000</span></div>
+          <div class="total-row"><span style="color:var(--amber);font-weight:600">GST (18%)</span><span id="taxAmt" style="font-weight:700;color:var(--amber)">₹17,100</span></div>
+          <div class="total-row" id="discRow" style="display:none"><span style="color:var(--green);font-weight:600">Discount</span><span id="discAmt" style="font-weight:700;color:var(--green)">-₹0</span></div>
+          <div class="grand-box" style="margin-top:8px"><span style="font-size:13px;font-weight:800;color:#fff">Total Investment</span><span id="grandTotal" style="font-size:16px;font-weight:900;color:#fff">₹1,12,100</span></div>
         </div>
-        <div className="form-row" style={{"marginTop":"12px"}}>
-          <div className="fg"><label className="fl">Payment Schedule</label>
-            <select className="fs" id="paySchedule" onChange={() => {}}>
+        <div class="form-row" style="margin-top:12px">
+          <div class="fg"><label class="fl">Payment Schedule</label>
+            <select class="fs" id="paySchedule" onchange="up()">
               <option>50% advance, 50% on delivery</option>
               <option>33% start / 33% midpoint / 33% end</option>
               <option>25% advance, 75% on delivery</option>
@@ -783,8 +1183,8 @@ body{display:flex;min-height:100vh}
               <option>Monthly retainer</option>
             </select>
           </div>
-          <div className="fg"><label className="fl">Pricing Model</label>
-            <select className="fs">
+          <div class="fg"><label class="fl">Pricing Model</label>
+            <select class="fs">
               <option>Fixed Price</option>
               <option>Hourly Rate</option>
               <option>Monthly Retainer</option>
@@ -794,200 +1194,200 @@ body{display:flex;min-height:100vh}
       </div>
     </div>
 
-    {/*  ⑭ SIGN-OFF  */}
-    <div className="card">
-      <div className="card-header">
-        <div className="card-icon" style={{"background":"var(--purple-bg)","color":"var(--purple)"}}><i className="ti ti-writing"></i></div>
-        <div className="card-title">Closing, Terms & Sign-off</div>
+    <!-- ⑭ SIGN-OFF -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-writing"></i></div>
+        <div class="card-title">Closing, Terms & Sign-off</div>
       </div>
-      <div className="card-body">
-        <div className="fg"><label className="fl">Closing Statement</label>
-          <textarea className="ta" id="closing" onChange={() => {}}>We are excited about the opportunity to work with you on this project. Our team is ready to begin immediately upon your acceptance.
+      <div class="card-body">
+        <div class="fg"><label class="fl">Closing Statement</label>
+          <textarea class="ta" id="closing" oninput="up()">We are excited about the opportunity to work with you on this project. Our team is ready to begin immediately upon your acceptance.
 
 YENCODE Technologies | yencodetechnologies@gmail.com | +91 89254 33533</textarea>
         </div>
-        <div className="fg"><label className="fl">Terms & Conditions</label>
-          <textarea className="ta" id="terms" style={{"minHeight":"90px"}}>1. 50% advance payment required before project commencement.
+        <div class="fg"><label class="fl">Terms & Conditions</label>
+          <textarea class="ta" id="terms" style="min-height:90px">1. 50% advance payment required before project commencement.
 2. All intellectual property transfers to the client upon full payment.
 3. Additional work beyond agreed scope will be quoted separately.
 4. Confidentiality of all shared information will be maintained.
 5. This proposal is valid for 30 days from the date of issue.</textarea>
         </div>
-        <div className="form-row">
-          <div className="fg"><label className="fl">Our Signature</label>
-            <div className="sig-box" onClick={() => {}}>
-              <i className="ti ti-signature" style={{"fontSize":"22px","color":"var(--text3)"}}></i>
-              <div style={{"fontSize":"11px","color":"var(--text3)","fontWeight":600}}>Click to sign</div>
+        <div class="form-row">
+          <div class="fg"><label class="fl">Our Signature</label>
+            <div class="sig-box" onclick="this.innerHTML='<i class=\'ti ti-check\' style=\'font-size:18px;color:var(--teal)\'></i><div style=\'font-size:11px;color:var(--teal);font-weight:700;margin-top:3px\'>Prabhu R — Signed</div>'">
+              <i class="ti ti-signature" style="font-size:22px;color:var(--text3)"></i>
+              <div style="font-size:11px;color:var(--text3);font-weight:600">Click to sign</div>
             </div>
           </div>
-          <div className="fg"><label className="fl">Client Signature</label>
-            <div className="sig-box" style={{"borderColor":"var(--amber)","background":"var(--amber-bg)"}}>
-              <i className="ti ti-user-check" style={{"fontSize":"22px","color":"var(--amber)"}}></i>
-              <div style={{"fontSize":"11px","color":"var(--amber)","fontWeight":600}}>Awaiting client</div>
+          <div class="fg"><label class="fl">Client Signature</label>
+            <div class="sig-box" style="border-color:var(--amber);background:var(--amber-bg)">
+              <i class="ti ti-user-check" style="font-size:22px;color:var(--amber)"></i>
+              <div style="font-size:11px;color:var(--amber);font-weight:600">Awaiting client</div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-  </div>{/*  /formSide  */}
+  </div><!-- /formSide -->
 
-  {/*  ══ PREVIEW SIDE ══  */}
-  <div className="preview-side">
-    <div className="preview-card">
-      <div className="preview-toolbar">
-        <div className="pt-title-label">📋 Live Preview</div>
-        <div className="pt-btns">
-          <button className="pt-b"><i className="ti ti-download" style={{"fontSize":"11px"}}></i>PDF</button>
-          <button className="pt-b"><i className="ti ti-share" style={{"fontSize":"11px"}}></i>Share</button>
+  <!-- ══ PREVIEW SIDE ══ -->
+  <div class="preview-side">
+    <div class="preview-card">
+      <div class="preview-toolbar">
+        <div class="pt-title-label">📋 Live Preview</div>
+        <div class="pt-btns">
+          <button class="pt-b"><i class="ti ti-download" style="font-size:11px"></i>PDF</button>
+          <button class="pt-b"><i class="ti ti-share" style="font-size:11px"></i>Share</button>
         </div>
       </div>
 
-      <div className="prop-doc" id="propDoc">
+      <div class="prop-doc" id="propDoc">
 
-        {/*  COVER  */}
-        <div className="p-cover">
-          <div className="p-logo">YT</div>
-          <div className="p-label">Project Proposal</div>
-          <div className="p-title" id="pv-title">— Proposal Title —</div>
-          <div className="p-subtitle" id="pv-sub">Prepared by YENCODE Technologies</div>
-          <div className="p-meta">
-            <div className="p-meta-i"><i className="ti ti-calendar" style={{"fontSize":"11px"}}></i><span id="pv-date">01 Jun 2026</span></div>
-            <div className="p-meta-i"><i className="ti ti-tag" style={{"fontSize":"11px"}}></i><span id="pv-type">Web Development</span></div>
-            <div className="p-meta-i"><i className="ti ti-clock" style={{"fontSize":"11px"}}></i><span id="pv-expiry">Expires 01 Jul 2026</span></div>
+        <!-- COVER -->
+        <div class="p-cover">
+          <div class="p-logo">YT</div>
+          <div class="p-label">Project Proposal</div>
+          <div class="p-title" id="pv-title">— Proposal Title —</div>
+          <div class="p-subtitle" id="pv-sub">Prepared by YENCODE Technologies</div>
+          <div class="p-meta">
+            <div class="p-meta-i"><i class="ti ti-calendar" style="font-size:11px"></i><span id="pv-date">01 Jun 2026</span></div>
+            <div class="p-meta-i"><i class="ti ti-tag" style="font-size:11px"></i><span id="pv-type">Web Development</span></div>
+            <div class="p-meta-i"><i class="ti ti-clock" style="font-size:11px"></i><span id="pv-expiry">Expires 01 Jul 2026</span></div>
           </div>
-          <div className="p-badge" id="pv-status">DRAFT</div>
+          <div class="p-badge" id="pv-status">DRAFT</div>
         </div>
 
-        {/*  PARTIES  */}
-        <div className="ps">
-          <div className="ps-lbl"><i className="ti ti-building"></i>Parties</div>
-          <div className="party-grid">
-            <div className="party-b">
-              <div className="pb-lbl">Prepared By</div>
-              <div className="pb-name" id="pv-from">Prabhu R</div>
-              <div className="pb-detail" id="pv-from-d">YENCODE Technologies<br />yencodetechnologies@gmail.com</div>
+        <!-- PARTIES -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-building"></i>Parties</div>
+          <div class="party-grid">
+            <div class="party-b">
+              <div class="pb-lbl">Prepared By</div>
+              <div class="pb-name" id="pv-from">Prabhu R</div>
+              <div class="pb-detail" id="pv-from-d">YENCODE Technologies<br>yencodetechnologies@gmail.com</div>
             </div>
-            <div className="party-b">
-              <div className="pb-lbl">Prepared For</div>
-              <div className="pb-name" id="pv-to" style={{"color":"var(--text3)"}}>— Client —</div>
-              <div className="pb-detail" id="pv-to-d"><span style={{"color":"var(--text3)"}}>Fill in client details</span></div>
+            <div class="party-b">
+              <div class="pb-lbl">Prepared For</div>
+              <div class="pb-name" id="pv-to" style="color:var(--text3)">— Client —</div>
+              <div class="pb-detail" id="pv-to-d"><span style="color:var(--text3)">Fill in client details</span></div>
             </div>
           </div>
         </div>
 
-        {/*  EXEC SUMMARY  */}
-        <div className="ps">
-          <div className="ps-lbl"><i className="ti ti-align-left"></i>Executive Summary</div>
-          <div className="exec-block problem">
-            <div className="eb-lbl">Problem</div>
-            <div className="eb-text" id="pv-problem"><span style={{"color":"var(--text3)","fontStyle":"italic"}}>Describe the client's challenge…</span></div>
+        <!-- EXEC SUMMARY -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-align-left"></i>Executive Summary</div>
+          <div class="exec-block problem">
+            <div class="eb-lbl">Problem</div>
+            <div class="eb-text" id="pv-problem"><span style="color:var(--text3);font-style:italic">Describe the client's challenge…</span></div>
           </div>
-          <div className="exec-block solution" style={{"marginTop":"6px"}}>
-            <div className="eb-lbl">Solution</div>
-            <div className="eb-text" id="pv-solution"><span style={{"color":"var(--text3)","fontStyle":"italic"}}>Describe your proposed solution…</span></div>
+          <div class="exec-block solution" style="margin-top:6px">
+            <div class="eb-lbl">Solution</div>
+            <div class="eb-text" id="pv-solution"><span style="color:var(--text3);font-style:italic">Describe your proposed solution…</span></div>
           </div>
-          <div className="exec-block whyus" style={{"marginTop":"6px"}} id="pv-outcome-block">
-            <div className="eb-lbl">Expected Outcome</div>
-            <div className="eb-text" id="pv-outcome"><span style={{"color":"var(--text3)","fontStyle":"italic"}}>Describe expected results…</span></div>
-          </div>
-        </div>
-
-        {/*  DELIVERABLES  */}
-        <div className="ps">
-          <div className="ps-lbl"><i className="ti ti-checklist"></i>Scope & Deliverables</div>
-          <div className="del-list" id="pv-del">
-            <div className="del-item-p">Fully responsive website (8 pages)</div>
-            <div className="del-item-p">Custom UI/UX design + brand guide</div>
-            <div className="del-item-p">CMS for easy content management</div>
-            <div className="del-item-p">SEO optimisation + Google Analytics</div>
-            <div className="del-item-p">3-month post-launch support</div>
+          <div class="exec-block whyus" style="margin-top:6px" id="pv-outcome-block">
+            <div class="eb-lbl">Expected Outcome</div>
+            <div class="eb-text" id="pv-outcome"><span style="color:var(--text3);font-style:italic">Describe expected results…</span></div>
           </div>
         </div>
 
-        {/*  TIMELINE  */}
-        <div className="ps">
-          <div className="ps-lbl"><i className="ti ti-calendar-stats"></i>Project Timeline</div>
-          <div style={{"display":"flex","gap":"12px","marginBottom":"8px"}}>
-            <span style={{"fontSize":"10px","fontWeight":700,"color":"var(--text2)"}}>Start: <span id="pv-start" style={{"color":"var(--teal)"}}>01 Jul 2026</span></span>
-            <span style={{"fontSize":"10px","fontWeight":700,"color":"var(--text2)"}}>End: <span id="pv-end" style={{"color":"var(--teal)"}}>31 Oct 2026</span></span>
-            <span style={{"fontSize":"10px","fontWeight":700,"color":"var(--text2)"}}>Duration: <span id="pv-dur" style={{"color":"var(--teal)"}}>4 Months</span></span>
+        <!-- DELIVERABLES -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-checklist"></i>Scope & Deliverables</div>
+          <div class="del-list" id="pv-del">
+            <div class="del-item-p">Fully responsive website (8 pages)</div>
+            <div class="del-item-p">Custom UI/UX design + brand guide</div>
+            <div class="del-item-p">CMS for easy content management</div>
+            <div class="del-item-p">SEO optimisation + Google Analytics</div>
+            <div class="del-item-p">3-month post-launch support</div>
           </div>
-          <div className="tl-p" id="pv-timeline"></div>
         </div>
 
-        {/*  TEAM (optional)  */}
-        <div className="ps" id="pv-sec-team">
-          <div className="ps-lbl"><i className="ti ti-users"></i>Our Team</div>
-          <div className="team-p" id="pv-team"></div>
+        <!-- TIMELINE -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-calendar-stats"></i>Project Timeline</div>
+          <div style="display:flex;gap:12px;margin-bottom:8px">
+            <span style="font-size:10px;font-weight:700;color:var(--text2)">Start: <span id="pv-start" style="color:var(--teal)">01 Jul 2026</span></span>
+            <span style="font-size:10px;font-weight:700;color:var(--text2)">End: <span id="pv-end" style="color:var(--teal)">31 Oct 2026</span></span>
+            <span style="font-size:10px;font-weight:700;color:var(--text2)">Duration: <span id="pv-dur" style="color:var(--teal)">4 Months</span></span>
+          </div>
+          <div class="tl-p" id="pv-timeline"></div>
         </div>
 
-        {/*  VALUE (optional)  */}
-        <div className="ps" id="pv-sec-value">
-          <div className="ps-lbl"><i className="ti ti-trending-up"></i>Value Proposition & ROI</div>
-          <div className="val-p" id="pv-value"></div>
+        <!-- TEAM (optional) -->
+        <div class="ps" id="pv-sec-team">
+          <div class="ps-lbl"><i class="ti ti-users"></i>Our Team</div>
+          <div class="team-p" id="pv-team"></div>
         </div>
 
-        {/*  CASE STUDIES (optional)  */}
-        <div className="ps" id="pv-sec-cs" style={{"display":"none"}}>
-          <div className="ps-lbl"><i className="ti ti-trophy"></i>Past Work & Case Studies</div>
+        <!-- VALUE (optional) -->
+        <div class="ps" id="pv-sec-value">
+          <div class="ps-lbl"><i class="ti ti-trending-up"></i>Value Proposition & ROI</div>
+          <div class="val-p" id="pv-value"></div>
+        </div>
+
+        <!-- CASE STUDIES (optional) -->
+        <div class="ps" id="pv-sec-cs" style="display:none">
+          <div class="ps-lbl"><i class="ti ti-trophy"></i>Past Work & Case Studies</div>
           <div id="pv-cs"></div>
         </div>
 
-        {/*  TESTIMONIALS (optional)  */}
-        <div className="ps" id="pv-sec-tm" style={{"display":"none"}}>
-          <div className="ps-lbl"><i className="ti ti-quote"></i>Client Testimonials</div>
+        <!-- TESTIMONIALS (optional) -->
+        <div class="ps" id="pv-sec-tm" style="display:none">
+          <div class="ps-lbl"><i class="ti ti-quote"></i>Client Testimonials</div>
           <div id="pv-tm"></div>
         </div>
 
-        {/*  RISKS (optional)  */}
-        <div className="ps" id="pv-sec-risks">
-          <div className="ps-lbl"><i className="ti ti-shield-exclamation"></i>Risks & Mitigation</div>
-          <div className="risk-p" id="pv-risks"></div>
+        <!-- RISKS (optional) -->
+        <div class="ps" id="pv-sec-risks">
+          <div class="ps-lbl"><i class="ti ti-shield-exclamation"></i>Risks & Mitigation</div>
+          <div class="risk-p" id="pv-risks"></div>
         </div>
 
-        {/*  PRICING  */}
-        <div className="ps">
-          <div className="ps-lbl"><i className="ti ti-currency-rupee"></i>Investment</div>
-          <table className="pricing-tbl">
+        <!-- PRICING -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-currency-rupee"></i>Investment</div>
+          <table class="pricing-tbl">
             <thead><tr><th>Service</th><th>Amount</th></tr></thead>
             <tbody id="pv-pricing"></tbody>
           </table>
-          <div className="pricing-grand" style={{"marginTop":"7px"}}><span>Total Investment</span><span id="pv-grand">₹1,12,100</span></div>
-          <div style={{"marginTop":"6px","fontSize":"10px","color":"var(--text2)","fontWeight":600}} id="pv-pay">Payment: 50% advance, 50% on delivery</div>
+          <div class="pricing-grand" style="margin-top:7px"><span>Total Investment</span><span id="pv-grand">₹1,12,100</span></div>
+          <div style="margin-top:6px;font-size:10px;color:var(--text2);font-weight:600" id="pv-pay">Payment: 50% advance, 50% on delivery</div>
         </div>
 
-        {/*  CLOSING  */}
-        <div className="ps">
-          <div className="ps-lbl"><i className="ti ti-writing"></i>Closing</div>
-          <div id="pv-closing" style={{"fontSize":"10px","color":"var(--text2)","lineHeight":1.7}}>We are excited about the opportunity to work with you…</div>
+        <!-- CLOSING -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-writing"></i>Closing</div>
+          <div id="pv-closing" style="font-size:10px;color:var(--text2);line-height:1.7">We are excited about the opportunity to work with you…</div>
         </div>
 
-        {/*  SIGN OFF  */}
-        <div className="ps">
-          <div className="ps-lbl"><i className="ti ti-signature"></i>Sign-off</div>
-          <div className="sop">
-            <div className="sob">
-              <div className="sob-line"></div>
-              <div className="sob-name" id="pv-sig1">Prabhu R</div>
-              <div className="sob-role">YENCODE Technologies</div>
+        <!-- SIGN OFF -->
+        <div class="ps">
+          <div class="ps-lbl"><i class="ti ti-signature"></i>Sign-off</div>
+          <div class="sop">
+            <div class="sob">
+              <div class="sob-line"></div>
+              <div class="sob-name" id="pv-sig1">Prabhu R</div>
+              <div class="sob-role">YENCODE Technologies</div>
             </div>
-            <div className="sob">
-              <div className="sob-line" style={{"background":"var(--amber)"}}></div>
-              <div className="sob-name" id="pv-sig2" style={{"color":"var(--text3)"}}>— Client —</div>
-              <div className="sob-role" id="pv-sig2-role">Awaiting</div>
+            <div class="sob">
+              <div class="sob-line" style="background:var(--amber)"></div>
+              <div class="sob-name" id="pv-sig2" style="color:var(--text3)">— Client —</div>
+              <div class="sob-role" id="pv-sig2-role">Awaiting</div>
             </div>
           </div>
         </div>
 
       </div>
     </div>
-  </div>{/*  /preview  */}
+  </div><!-- /preview -->
 
-  </div>{/*  /content  */}
-</div>{/*  /main  */}
+  </div><!-- /content -->
+</div><!-- /main -->
 
-
+` }} />
     </div>
   );
 }

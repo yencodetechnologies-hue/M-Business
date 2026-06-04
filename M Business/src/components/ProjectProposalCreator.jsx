@@ -821,6 +821,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const [isViewMode, setIsViewMode] = useState(new URLSearchParams(window.location.search).get("view") !== null);  // true when ?view= is in URL (client view)
   const [propTab, setPropTab] = useState("all");
   const [propSearch, setPropSearch] = useState("");
+  const [showNewModal, setShowNewModal] = useState(false);
+  const [newForm, setNewForm] = useState({ title: "", client: "", value: "" });
 
   // Role-based security: Force View Mode for clients
   useEffect(() => {
@@ -976,13 +978,14 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   // ← empty deps — uses functional setters, no stale closure
 
   const openDoc = (d) => { setDoc({ ...d }); setPage(0); setView("editor"); };
-  const createNew = () => {
-    const nd = makeInitialProposal(THEMES[0].name, companyName || "");
+  const createNew = (initialData = {}) => {
+    const nd = { ...makeInitialProposal(THEMES[0].name, companyName || ""), ...initialData, value: initialData.value ? Number(initialData.value) : 0 };
     setProposals(prev => [nd, ...prev]);
     setDoc(nd);
     setPage(0);
     setView("editor");
   };
+  const openNewModal = () => { setNewForm({ title: "", client: "", value: "" }); setShowNewModal(true); };
 
   const saveDoc = (d = doc) => { const nd = { ...d, updated: new Date().toISOString() }; persist(nd); setDoc(nd); flash("💾 Saved!"); };
   const shareProposal = async (p = doc) => {
@@ -1393,6 +1396,41 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
 
     return (
       <div style={{ fontFamily: "var(--font,'Nunito',sans-serif)", minHeight: "100%", background: "var(--bg,#F5FAFA)", padding: "24px 28px 40px" }}>
+        {/* NEW PROPOSAL MODAL */}
+        {showNewModal && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(26,46,53,0.55)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ background: "var(--surface,#fff)", borderRadius: 20, padding: 32, width: 440, boxShadow: "0 24px 80px rgba(0,0,0,0.2)", border: "1.5px solid var(--border,#E0EEF0)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text,#1A2E35)" }}>Create New Proposal</div>
+                  <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Fill in basic details to get started</div>
+                </div>
+                <button onClick={() => setShowNewModal(false)} style={{ background: "var(--bg,#F5FAFA)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 9, width: 32, height: 32, cursor: "pointer", fontSize: 16, color: "var(--text2,#607D86)", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2,#607D86)", textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 7 }}>Proposal Title *</label>
+                  <input value={newForm.title} onChange={e => setNewForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. Website Redesign Proposal" style={{ width: "100%", padding: "12px 14px", background: "var(--bg,#F5FAFA)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 12, fontSize: 13, color: "var(--text,#1A2E35)", fontFamily: "inherit", outline: "none", boxSizing: "border-box", transition: "border-color .15s" }} onFocus={e => e.target.style.borderColor = "var(--teal,#00BCD4)"} onBlur={e => e.target.style.borderColor = "var(--border,#E0EEF0)"} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2,#607D86)", textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 7 }}>Client</label>
+                  <select value={newForm.client} onChange={e => setNewForm(f => ({ ...f, client: e.target.value }))} style={{ width: "100%", padding: "12px 14px", background: "var(--bg,#F5FAFA)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 12, fontSize: 13, color: newForm.client ? "var(--text,#1A2E35)" : "var(--text3,#A0B8BE)", fontFamily: "inherit", outline: "none", boxSizing: "border-box", appearance: "none" }}>
+                    <option value="">-- Select Client --</option>
+                    {clientsData.map((c, i) => <option key={i} value={c.name || c.clientName || c}>{c.name || c.clientName || c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2,#607D86)", textTransform: "uppercase", letterSpacing: 0.5, display: "block", marginBottom: 7 }}>Estimated Value (₹)</label>
+                  <input type="number" value={newForm.value} onChange={e => setNewForm(f => ({ ...f, value: e.target.value }))} placeholder="e.g. 150000" style={{ width: "100%", padding: "12px 14px", background: "var(--bg,#F5FAFA)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 12, fontSize: 13, color: "var(--text,#1A2E35)", fontFamily: "inherit", outline: "none", boxSizing: "border-box", transition: "border-color .15s" }} onFocus={e => e.target.style.borderColor = "var(--teal,#00BCD4)"} onBlur={e => e.target.style.borderColor = "var(--border,#E0EEF0)"} />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
+                <button onClick={() => setShowNewModal(false)} style={{ flex: 1, padding: "12px", background: "var(--bg,#F5FAFA)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: "pointer", color: "var(--text2,#607D86)", fontFamily: "inherit" }}>Cancel</button>
+                <button onClick={() => { setShowNewModal(false); createNew({ title: newForm.title || "New Proposal", client: newForm.client, value: newForm.value }); }} style={{ flex: 2, padding: "12px", background: "var(--teal,#00BCD4)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 800, cursor: "pointer", color: "#fff", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(0,188,212,.3)" }}>Open Canvas Editor →</button>
+              </div>
+            </div>
+          </div>
+        )}
         <style>{`
           .prop-list-wrap .stat-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;}
           .prop-list-wrap .stat-card:hover{border-color:var(--teal,#00BCD4);box-shadow:0 4px 16px rgba(0,188,212,.1);}
@@ -1442,7 +1480,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <button className="filter-btn"><i className="ti ti-calendar" style={{ fontSize: 13 }}></i> {new Date().toLocaleString("en-IN", { month: "long", year: "numeric" })}</button>
-              <button className="new-prop-btn" onClick={createNew}><i className="ti ti-plus" style={{ fontSize: 15 }}></i> New Proposal</button>
+              <button className="new-prop-btn" onClick={openNewModal}><i className="ti ti-plus" style={{ fontSize: 15 }}></i> New Proposal</button>
             </div>
           </div>
 
@@ -1508,7 +1546,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               {loading ? (
                 <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}>Loading proposals…</div>
               ) : filtered.length === 0 ? (
-                <div className="add-card" onClick={createNew}>
+                <div className="add-card" onClick={openNewModal}>
                   <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>{propTab === "all" && !propSearch ? "Create Your First Proposal" : "No proposals found"}</div>
@@ -1604,7 +1642,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                   })}
 
                   {/* Add new card */}
-                  <div className="add-card" onClick={createNew}>
+                  <div className="add-card" onClick={openNewModal}>
                     <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>Create New Proposal</div>
@@ -1683,7 +1721,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                   { icon: "ti-chart-bar", label: "Digital Marketing", meta: "SEO, ads & content", bg: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)" },
                   { icon: "ti-cpu", label: "Custom Software", meta: "Enterprise solution", bg: "var(--blue-bg,#EFF4FF)", color: "var(--blue,#2563EB)" },
                 ].map((tmpl, i) => (
-                  <div key={i} className="tmpl-item" onClick={createNew}>
+                  <div key={i} className="tmpl-item" onClick={openNewModal}>
                     <div style={{ width: 32, height: 32, borderRadius: 8, background: tmpl.bg, color: tmpl.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}><i className={`ti ${tmpl.icon}`}></i></div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text,#1A2E35)" }}>{tmpl.label}</div>

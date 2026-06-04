@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
-export default function AuthPage({ setUser, initialTab = "register" }) {
+export default function AuthPage({ setUser, initialTab = "login" }) {
   const [tab, setTab] = useState(initialTab === "login" ? "login" : "register");
   const [animating, setAnimating] = useState(false);
   const [panelAnim, setPanelAnim] = useState("idle"); // "idle" | "flip-out" | "flip-in"

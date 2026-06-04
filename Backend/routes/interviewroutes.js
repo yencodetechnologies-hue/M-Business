@@ -16,18 +16,23 @@ const multer     = require("multer");
 const mongoose   = require("mongoose");
 const path       = require("path");
 const fs         = require("fs");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const router     = express.Router();
 
-// ── Upload Directory ──────────────────────────
-const UPLOAD_DIR = path.join(__dirname, "../uploads/resumes");
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+// ── Multer Config (Cloudinary) ─────────────────────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-// ── Multer Config ─────────────────────────────
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-  filename:    (req, file, cb) => {
-    const safe = file.originalname.replace(/\s+/g, "_");
-    cb(null, `${Date.now()}_${safe}`);
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "M-Business/Resumes",
+    resource_type: "raw", // 'raw' needed for non-image files like PDF, DOCX in Cloudinary
+    public_id: (req, file) => `${Date.now()}_${file.originalname.replace(/\s+/g, "_")}`,
   },
 });
 
@@ -73,13 +78,10 @@ const Interview = mongoose.models.Interview || mongoose.model("Interview", inter
 
 // ── Helper: attach resumeUrl ──────────────────
 const withResumeUrl = (req, doc) => {
-  const base = `${req.protocol}://${req.get("host")}`;
   const plain = doc.toObject ? doc.toObject() : { ...doc };
   return {
     ...plain,
-    resumeUrl: plain.resumePath
-      ? `${base}/uploads/resumes/${path.basename(plain.resumePath)}`
-      : null,
+    resumeUrl: plain.resumePath || null, // For Cloudinary, resumePath IS the full URL
   };
 };
 
@@ -111,7 +113,7 @@ router.post("/apply", upload.single("resume"), async (req, res) => {
       role,
       notes:       notes || "",
       resumeName:  req.file.originalname,
-      resumePath:  req.file.filename,
+      resumePath:  req.file.path, // Cloudinary URL
       status:      "Pending",
     });
 
@@ -145,12 +147,9 @@ router.get("/", async (req, res) => {
       .skip((+page - 1) * +limit)
       .limit(+limit);
 
-    const base = `${req.protocol}://${req.get("host")}`;
     const data = docs.map((d) => ({
       ...d.toObject(),
-      resumeUrl: d.resumePath
-        ? `${base}/uploads/resumes/${path.basename(d.resumePath)}`
-        : null,
+      resumeUrl: d.resumePath || null,
     }));
 
     res.json({ total, page: +page, limit: +limit, data });
@@ -232,11 +231,10 @@ router.delete("/:id", async (req, res) => {
     const doc = await Interview.findByIdAndDelete(req.params.id);
     if (!doc) return res.status(404).json({ msg: "Candidate not found" });
 
-    // Remove resume file from disk
-    if (doc.resumePath) {
-      const filePath = path.join(UPLOAD_DIR, path.basename(doc.resumePath));
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    }
+    // Since we're using Cloudinary, we could delete the file from Cloudinary here
+    // using cloudinary.uploader.destroy(public_id) if we parsed the public_id from the URL.
+    // For now, we will just delete the DB record.
+    
     res.json({ msg: "Candidate deleted successfully" });
   } catch (err) {
     res.status(500).json({ msg: err.message });

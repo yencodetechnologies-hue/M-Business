@@ -1717,7 +1717,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           </div>)}
 
           {/* Items */}
-          <div style={{ padding: isFirstPage ? "22px 32px" : "40px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
+          <div style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
                 <tr className="avoid-break" style={{ background: "var(--app-accent)" }}>
@@ -2078,14 +2078,14 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     return (
                       <tr key={item.id}>
                         <td>
-                          <input type="text" className="inv-creator-item-input desc" placeholder="Item description" value={item.description || ""} onChange={(e) => updItem(item.id, "description", e.target.value)} />
+                          <input type="text" id={`item_${item.id}_description`} className="inv-creator-item-input desc" placeholder="Item description" value={item.description || ""} onChange={(e) => updItem(item.id, "description", e.target.value)} />
                           {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                         </td>
                         <td>
                           <input type="number" className="inv-creator-item-input num" value={item.quantity === 0 ? "" : item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} />
                         </td>
                         <td>
-                          <input type="number" className="inv-creator-item-input num" value={item.rate === 0 ? "" : item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} style={{width:"90px"}} />
+                          <input type="number" id={`item_${item.id}_rate`} className="inv-creator-item-input num" value={item.rate === 0 ? "" : item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} style={{width:"90px"}} />
                           {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                         </td>
                         <td>

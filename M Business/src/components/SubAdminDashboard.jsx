@@ -4011,7 +4011,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div className="topbar no-print">
             <div className="search-wrap">
               <i className="ti ti-search"></i>
-              <input type="text" placeholder="Search..." />
+              <input type="text" placeholder="Search..." value={dashSearch} onChange={(e) => setDashSearch(e.target.value)} />
             </div>
             <div className="topbar-right">
               <div className="topbar-icon"><i className="ti ti-bell"></i><span className="notif-dot"></span></div>
@@ -4389,8 +4389,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       <div className="section-more" onClick={() => setActive("employees")}><i className="ti ti-dots"></i></div>
                     </div>
                     <div className="coowners-row">
-                      {employees.slice(0,4).map(e => (
-                        <div key={e.id} className="coowner">
+                      {employees.filter(e => (e.name||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,4).map(e => (
+                        <div key={e.id || e._id} className="coowner">
                           <div className="coowner-avatar">{e.name?.[0]?.toUpperCase() || "E"}</div>
                           <div>
                             <div className="coowner-name">{e.name}</div>
@@ -4409,8 +4409,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       <div className="section-more" onClick={() => setActive("projects")}><i className="ti ti-dots"></i></div>
                     </div>
                     <div className="folders-grid">
-                      {projects.slice(0,3).map(p => (
-                        <div key={p.id} className="folder-card" onClick={() => setActive("projects")}>
+                      {projects.filter(p => (p.title||p.name||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,3).map(p => (
+                        <div key={p.id || p._id} className="folder-card" onClick={() => setActive("projects")}>
                           <div className="folder-top">
                             <div className="folder-avatars">
                                <div className="fa">{p.title?.[0]?.toUpperCase() || "P"}</div>
@@ -4446,8 +4446,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                           </tr>
                         </thead>
                         <tbody>
-                          {invoices.slice(0,4).map(inv => (
-                            <tr key={inv.id} onClick={() => setActive("invoices")} style={{ cursor: "pointer" }}>
+                          {invoices.filter(i => (i.invoiceNo||"").toLowerCase().includes(dashSearch.toLowerCase()) || (i.clientName||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,4).map(inv => (
+                            <tr key={inv.id || inv._id} onClick={() => setActive("invoices")} style={{ cursor: "pointer" }}>
                               <td><input type="checkbox" className="cb" /></td>
                               <td><div className="file-type-icon doc"><i className="ti ti-file-text"></i></div></td>
                               <td className="fname">{inv.invoiceNo || "Invoice"} — {inv.clientName}</td>

@@ -305,7 +305,7 @@ export default function InvoiceViewer() {
         </div>
 
         {/* Notes + QR + Signature */}
-        <div style={{ padding: "0 32px 24px", display: "grid", gridTemplateColumns: "1fr auto auto", gap: 16, alignItems: "flex-start", flexShrink: 0 }}>
+        <div className="invoice-bottom-grid" style={{ padding: "0 32px 24px", alignItems: "flex-start", flexShrink: 0 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {inv.notes && (
               <div style={{ background: "#f8fafc", borderRadius: 11, padding: "14px 16px", border: "1px solid #e2e8f0" }}>
@@ -339,8 +339,8 @@ export default function InvoiceViewer() {
           </div>
           <div className="no-print" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#f8fafc", borderRadius: 12, padding: "14px 16px", border: currentT.borderStyle || "1px solid #e2e8f0", minWidth: 140 }}>
             <div style={{ fontSize: 9, color: currentT.primaryColor, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8, textAlign: "center" }}>SCAN INVOICE</div>
-            <div style={{ background: "#fff", padding: 8, borderRadius: 8, border: currentT.borderStyle || "1px solid #e2e8f0" }}>
-              <QRCodeSVG value={qrData} size={110} bgColor="#ffffff" fgColor={currentT.primaryColor} />
+            <div style={{ background: "#fff", padding: 12, borderRadius: 8, border: currentT.borderStyle || "1px solid #e2e8f0" }}>
+              <QRCodeSVG value={qrData} size={160} bgColor="#ffffff" fgColor={currentT.primaryColor} />
             </div>
             <div style={{ fontSize: 8, color: "#9ca3af", marginTop: 7, textAlign: "center", fontWeight: 600 }}>{inv.invoiceNo}</div>
           </div>

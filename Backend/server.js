@@ -18,7 +18,8 @@ const allowedOrigins = [
   "https://m-business-tau.vercel.app",
   "https://mbusiness.octosofttechnologies.in",
   "http://localhost:5173",
-  "http://localhost:3000"
+  "http://localhost:3000",
+  "https://www.mbusiness.cloud/"
 ];
 
 app.use(cors({

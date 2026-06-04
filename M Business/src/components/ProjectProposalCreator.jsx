@@ -819,6 +819,8 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   const [search, setSearch] = useState("");
   const [showResizeMenu, setShowResizeMenu] = useState(false);
   const [isViewMode, setIsViewMode] = useState(new URLSearchParams(window.location.search).get("view") !== null);  // true when ?view= is in URL (client view)
+  const [propTab, setPropTab] = useState("all");
+  const [propSearch, setPropSearch] = useState("");
 
   // Role-based security: Force View Mode for clients
   useEffect(() => {
@@ -1344,155 +1346,362 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   }
 
   // ══ LIST VIEW ══════════════════════════════════════════════════════════════
-  if (view === "list") return (
-    <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)", padding: "24px" }}>
-      <div className="main-grid">
-        <div className="left-col">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+
+
+  if (view === "list") {
+    const total = proposals.length;
+    const totalVal = proposals.reduce((s, p) => s + (p.value || 0), 0);
+    const wonCount = proposals.filter(p => p.status === "approved" || p.status === "won").length;
+    const wonVal = proposals.filter(p => p.status === "approved" || p.status === "won").reduce((s, p) => s + (p.value || 0), 0);
+    const activeCount = proposals.filter(p => p.status === "pending" || p.status === "negotiation" || p.status === "sent").length;
+    const decided = proposals.filter(p => p.status === "approved" || p.status === "won" || p.status === "rejected" || p.status === "lost").length;
+    const successRate = decided > 0 ? Math.round((wonCount / decided) * 100) : 0;
+
+    const filtered = proposals.filter(p => {
+      const matchTab = propTab === "all" ? true :
+        propTab === "draft" ? (!p.status || p.status === "draft") :
+        propTab === "sent" ? (p.status === "sent") :
+        propTab === "negotiation" ? (p.status === "pending" || p.status === "negotiation") :
+        propTab === "won" ? (p.status === "approved" || p.status === "won") :
+        propTab === "lost" ? (p.status === "rejected" || p.status === "lost") : true;
+      const matchSearch = !propSearch || (p.title || "").toLowerCase().includes(propSearch.toLowerCase()) || (p.client || "").toLowerCase().includes(propSearch.toLowerCase());
+      return matchTab && matchSearch;
+    });
+
+    const statusBadge = (s) => {
+      if (!s || s === "draft") return { cls: "draft", label: "Draft" };
+      if (s === "approved" || s === "won") return { cls: "won", label: "Won" };
+      if (s === "rejected" || s === "lost") return { cls: "lost", label: "Lost" };
+      if (s === "pending" || s === "negotiation") return { cls: "negotiation", label: "Negotiation" };
+      if (s === "sent") return { cls: "sent", label: "Sent" };
+      if (s === "review") return { cls: "review", label: "In Review" };
+      return { cls: "draft", label: s };
+    };
+
+    const fmtDate = (d) => { try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); } catch { return "—"; } };
+
+    const pipelineStages = [
+      { label: "Won", color: "var(--green)", count: wonCount, val: wonVal },
+      { label: "Active", color: "var(--purple)", count: activeCount, val: proposals.filter(p => p.status === "pending" || p.status === "negotiation" || p.status === "sent").reduce((s, p) => s + (p.value || 0), 0) },
+      { label: "Draft", color: "var(--text3)", count: proposals.filter(p => !p.status || p.status === "draft").length, val: proposals.filter(p => !p.status || p.status === "draft").reduce((s, p) => s + (p.value || 0), 0) },
+    ];
+
+    const themeGrad = (p) => {
+      const t2 = THEMES.find(x => x.name === p.theme) || THEMES[0];
+      return t2.g;
+    };
+
+    return (
+      <div style={{ fontFamily: "var(--font,'Nunito',sans-serif)", minHeight: "100%", background: "var(--bg,#F5FAFA)", padding: "24px 28px 40px" }}>
+        <style>{`
+          .prop-list-wrap .stat-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;}
+          .prop-list-wrap .stat-card:hover{border-color:var(--teal,#00BCD4);box-shadow:0 4px 16px rgba(0,188,212,.1);}
+          .prop-list-wrap .proposal-card{background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .2s;margin-bottom:14px;}
+          .prop-list-wrap .proposal-card:hover{border-color:var(--teal,#00BCD4);box-shadow:0 6px 24px rgba(0,188,212,.1);}
+          .prop-list-wrap .prop-tab{padding:7px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2,#607D86);transition:all .15s;border:none;background:none;font-family:inherit;}
+          .prop-list-wrap .prop-tab.active{background:var(--teal,#00BCD4);color:#fff;box-shadow:0 2px 10px rgba(0,188,212,.3);}
+          .prop-list-wrap .prop-tab:not(.active):hover{background:var(--teal-light,#E0F7FA);color:var(--teal,#00BCD4);}
+          .prop-list-wrap .pf-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:1.5px solid var(--border,#E0EEF0);background:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text2,#607D86);transition:all .15s;}
+          .prop-list-wrap .pf-btn:hover{border-color:var(--teal,#00BCD4);color:var(--teal,#00BCD4);background:var(--teal-light,#E0F7FA);}
+          .prop-list-wrap .pf-btn.primary{background:var(--teal,#00BCD4);color:#fff;border-color:var(--teal,#00BCD4);}
+          .prop-list-wrap .pf-btn.primary:hover{background:var(--teal2,#00ACC1);}
+          .prop-list-wrap .pf-btn.danger{color:var(--red,#F05C5C);border-color:var(--red-bg,#FEF2F2);}
+          .prop-list-wrap .badge-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+          .prop-list-wrap .badge-pill::before{content:'';width:5px;height:5px;border-radius:50%;}
+          .prop-list-wrap .badge-won{background:var(--green-bg,#E8FAF3);color:var(--green,#26C281);} .prop-list-wrap .badge-won::before{background:var(--green,#26C281);}
+          .prop-list-wrap .badge-sent{background:var(--blue-bg,#EFF4FF);color:var(--blue,#2563EB);} .prop-list-wrap .badge-sent::before{background:var(--blue,#2563EB);}
+          .prop-list-wrap .badge-review{background:var(--amber-bg,#FEF5E6);color:var(--amber,#F5A623);} .prop-list-wrap .badge-review::before{background:var(--amber,#F5A623);}
+          .prop-list-wrap .badge-draft{background:var(--surface2,#F8FAFB);color:var(--text3,#A0B8BE);border:1px solid var(--border,#E0EEF0);} .prop-list-wrap .badge-draft::before{background:var(--text3,#A0B8BE);}
+          .prop-list-wrap .badge-lost{background:var(--red-bg,#FEF2F2);color:var(--red,#F05C5C);} .prop-list-wrap .badge-lost::before{background:var(--red,#F05C5C);}
+          .prop-list-wrap .badge-negotiation{background:var(--purple-bg,#EEE9FF);color:var(--purple,#7C5CFC);} .prop-list-wrap .badge-negotiation::before{background:var(--purple,#7C5CFC);}
+          .prop-list-wrap .scope-tag{padding:4px 10px;background:var(--bg,#F5FAFA);border:1.5px solid var(--border,#E0EEF0);border-radius:20px;font-size:10px;font-weight:700;color:var(--text2,#607D86);}
+          .prop-list-wrap .add-card{background:var(--teal-lighter,#F0FDFE);border:2px dashed var(--teal,#00BCD4);border-radius:16px;padding:28px;cursor:pointer;display:flex;align-items:center;gap:18px;transition:all .2s;}
+          .prop-list-wrap .add-card:hover{background:var(--teal-light,#E0F7FA);}
+          .prop-list-wrap .tmpl-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg,#F5FAFA);border-radius:9px;border:1.5px solid var(--border,#E0EEF0);margin-bottom:8px;cursor:pointer;transition:all .15s;}
+          .prop-list-wrap .tmpl-item:last-child{margin-bottom:0;}
+          .prop-list-wrap .tmpl-item:hover{border-color:var(--teal,#00BCD4);background:var(--teal-lighter,#F0FDFE);}
+          .prop-list-wrap .stage-item-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg,#F5FAFA);border-radius:10px;border:1.5px solid var(--border,#E0EEF0);margin-bottom:8px;}
+          .prop-list-wrap .filter-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:10px;font-size:12px;font-weight:700;color:var(--text2,#607D86);cursor:pointer;font-family:inherit;transition:all .15s;}
+          .prop-list-wrap .filter-btn:hover{border-color:var(--teal,#00BCD4);color:var(--teal,#00BCD4);}
+          .prop-list-wrap .new-prop-btn{display:flex;align-items:center;gap:7px;padding:11px 20px;background:var(--teal,#00BCD4);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .15s;box-shadow:0 4px 14px rgba(0,188,212,.25);}
+          .prop-list-wrap .new-prop-btn:hover{background:var(--teal2,#00ACC1);}
+          .prop-list-wrap .prog-bar{height:5px;background:var(--border,#E0EEF0);border-radius:3px;overflow:hidden;margin-top:8px;}
+          .prop-list-wrap .prog-fill{height:100%;border-radius:3px;}
+          .prop-list-wrap .search-wrap{position:relative;flex:1;max-width:320px;}
+          .prop-list-wrap .search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3,#A0B8BE);font-size:15px;}
+          .prop-list-wrap .search-wrap input{width:100%;padding:10px 14px 10px 36px;background:var(--surface,#fff);border:1.5px solid var(--border,#E0EEF0);border-radius:12px;font-size:13px;color:var(--text,#1A2E35);font-family:inherit;outline:none;transition:all .15s;}
+          .prop-list-wrap .search-wrap input:focus{border-color:var(--teal,#00BCD4);box-shadow:0 0 0 3px rgba(0,188,212,.08);}
+        `}</style>
+
+        <div className="prop-list-wrap">
+          {/* PAGE HEADER */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
             <div>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--text)" }}>Proposals</h1>
-              <p style={{ fontSize: 13, color: "var(--text2)", marginTop: 4 }}>Manage and track all project proposals</p>
+              <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", margin: 0 }}>Project Proposals</h1>
+              <p style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Manage and track your client project proposals</p>
             </div>
-            <button className="add-proposal-card" onClick={createNew} style={{ padding: "12px 20px" }}>
-              <div className="add-icon" style={{ width: 32, height: 32, fontSize: 18 }}>+</div>
-              <div>
-                <div className="add-text">New Proposal</div>
-              </div>
-            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <button className="filter-btn"><i className="ti ti-calendar" style={{ fontSize: 13 }}></i> {new Date().toLocaleString("en-IN", { month: "long", year: "numeric" })}</button>
+              <button className="new-prop-btn" onClick={createNew}><i className="ti ti-plus" style={{ fontSize: 15 }}></i> New Proposal</button>
+            </div>
           </div>
 
-          {loading ? (
-            <div style={{ textAlign: "center", padding: "100px 20px" }}>Loading...</div>
-          ) : proposals.length === 0 ? (
-            <div className="add-proposal-card" onClick={createNew}>
-              <div className="add-icon">+</div>
+          {/* STATS ROW */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
+            <div className="stat-card">
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--teal-light,#E0F7FA)", color: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-presentation"></i></div>
               <div>
-                <div className="add-text">Create Your First Proposal</div>
-                <div className="add-sub">Use templates or start from scratch</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{total}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Total Proposals</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--teal,#00BCD4)" }}>₹{totalVal.toLocaleString("en-IN")} pipeline</div>
               </div>
             </div>
-          ) : (
-            <div className="proposals-list">
-              {proposals.map(p => {
-                const cover = p.slides?.find(s => s.type === "cover");
-                const t2 = THEMES.find(x => x.name === p.theme) || THEMES[0];
-                return (
-                  <div key={p.id} className="proposal-card" onClick={() => openDoc(p)}>
-                    <div className="pc-header">
-                      <div className="pc-cover" style={{ background: t2.g }}>{(p.title || p.id).substring(0, 2).toUpperCase()}</div>
-                      <div className="pc-info">
-                        <div className="pc-id">{p.id}</div>
-                        <div className="pc-title">{p.title}</div>
-                        <div className="pc-client-row">
-                          <div className="pc-av" style={{ background: "var(--teal)" }}>
-                            {p.client ? p.client.charAt(0).toUpperCase() : "?"}
+            <div className="stat-card">
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--green-bg,#E8FAF3)", color: "var(--green,#26C281)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-trophy"></i></div>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{wonCount}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Won</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--green,#26C281)" }}>₹{wonVal.toLocaleString("en-IN")} closed</div>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--purple-bg,#EEE9FF)", color: "var(--purple,#7C5CFC)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-arrows-exchange"></i></div>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{activeCount}</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>In Progress</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--purple,#7C5CFC)" }}>Active pipeline</div>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><i className="ti ti-percentage"></i></div>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text,#1A2E35)", lineHeight: 1 }}>{successRate}%</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 3 }}>Success Rate</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: "var(--amber,#F5A623)" }}>{wonCount} of {decided} decided</div>
+              </div>
+            </div>
+          </div>
+
+          {/* TABS + SEARCH */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+            <div style={{ display: "flex", gap: 4, background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 12, padding: 4 }}>
+              {["all","draft","sent","negotiation","won","lost"].map(t => (
+                <button key={t} className={`prop-tab${propTab === t ? " active" : ""}`} onClick={() => setPropTab(t)}>
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div className="search-wrap">
+                <i className="ti ti-search"></i>
+                <input placeholder="Search proposals…" value={propSearch} onChange={e => setPropSearch(e.target.value)} />
+              </div>
+              <div style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", fontWeight: 600, whiteSpace: "nowrap" }}>{filtered.length} proposals · ₹{totalVal.toLocaleString("en-IN")}</div>
+            </div>
+          </div>
+
+          {/* MAIN GRID */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20, alignItems: "start" }}>
+
+            {/* LEFT – PROPOSALS */}
+            <div>
+              {loading ? (
+                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text3,#A0B8BE)", fontSize: 14 }}>Loading proposals…</div>
+              ) : filtered.length === 0 ? (
+                <div className="add-card" onClick={createNew}>
+                  <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>{propTab === "all" && !propSearch ? "Create Your First Proposal" : "No proposals found"}</div>
+                    <div style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Build a professional proposal with scope, timeline and pricing</div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {filtered.map(p => {
+                    const badge = statusBadge(p.status);
+                    const initials = (p.title || p.id || "P").substring(0, 2).toUpperCase();
+                    const clientInitial = (p.client || "?").charAt(0).toUpperCase();
+                    const grad = themeGrad(p);
+                    const created = p.updated || p.createdAt || p.created;
+                    const value = p.value || 0;
+                    const slides = p.slides?.length || 0;
+                    return (
+                      <div key={p.id || p._id} className="proposal-card" onClick={() => openDoc(p)}>
+                        {/* Header */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 20px", borderBottom: "1px solid var(--border,#E0EEF0)" }}>
+                          <div style={{ width: 48, height: 48, borderRadius: 13, background: grad, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{initials}</div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 10, fontWeight: 800, color: "var(--teal,#00BCD4)", letterSpacing: 0.5, marginBottom: 2 }}>{p.id}</div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text,#1A2E35)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title || "Untitled Proposal"}</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
+                              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{clientInitial}</div>
+                              <span style={{ fontSize: 11, color: "var(--text2,#607D86)", fontWeight: 600 }}>{p.client || "No client assigned"}</span>
+                            </div>
                           </div>
-                          <div className="pc-client-name">{p.client || "No client"}</div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+                            <span className={`badge-pill badge-${badge.cls}`}>{badge.label}</span>
+                            <button onClick={e => { e.stopPropagation(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3,#A0B8BE)", fontSize: 17, padding: 4 }}><i className="ti ti-dots-vertical"></i></button>
+                          </div>
+                        </div>
+
+                        {/* Body */}
+                        <div style={{ padding: "16px 20px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, borderBottom: "1px solid var(--border,#E0EEF0)" }}>
+                          <div>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Proposal Value</div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>₹{value.toLocaleString("en-IN")}</div>
+                            <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Estimated</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Pages</div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text,#1A2E35)" }}>{slides}</div>
+                            <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Slides included</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Last Updated</div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)" }}>{fmtDate(created)}</div>
+                            <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Modified</div>
+                          </div>
+                        </div>
+
+                        {/* Scope tags from slide types */}
+                        {p.slides && p.slides.length > 0 && (
+                          <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border,#E0EEF0)" }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3,#A0B8BE)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 8 }}>Slide Types</div>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                              {[...new Set(p.slides.map(s => s.type))].slice(0, 5).map((t, i) => (
+                                <span key={i} className="scope-tag">{SLIDE_TYPES.find(x => x.id === t)?.label || t}</span>
+                              ))}
+                              {p.slides.length > 5 && <span className="scope-tag">+{p.slides.length - 5} more</span>}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Progress bar */}
+                        <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border,#E0EEF0)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text2,#607D86)" }}>Proposal Stage</span>
+                            <span style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", fontWeight: 600 }}>{badge.label}</span>
+                          </div>
+                          <div className="prog-bar">
+                            <div className="prog-fill" style={{ width: badge.cls === "draft" ? "10%" : badge.cls === "sent" ? "30%" : badge.cls === "review" ? "50%" : badge.cls === "negotiation" ? "75%" : badge.cls === "won" ? "100%" : "5%", background: badge.cls === "won" ? "linear-gradient(90deg,var(--green,#26C281),#6EE7B7)" : badge.cls === "negotiation" ? "linear-gradient(90deg,var(--purple,#7C5CFC),#B39DFF)" : badge.cls === "sent" ? "linear-gradient(90deg,var(--blue,#2563EB),#7EC8FD)" : "linear-gradient(90deg,var(--teal,#00BCD4),#26D0CE)" }}></div>
+                          </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div style={{ padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", display: "flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
+                            <i className="ti ti-calendar" style={{ fontSize: 11 }}></i> Valid until {fmtDate(new Date(Date.now() + 30 * 86400000))}
+                          </div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>₹{value.toLocaleString("en-IN")}</div>
+                          <div style={{ display: "flex", gap: 6 }} onClick={e => e.stopPropagation()}>
+                            <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposal(p); }}><i className="ti ti-share" style={{ fontSize: 12 }}></i> Share</button>
+                            <button className="pf-btn" onClick={e => { e.stopPropagation(); printProposal(p); }}><i className="ti ti-download" style={{ fontSize: 12 }}></i> PDF</button>
+                            <button className="pf-btn danger" onClick={e => deleteProposal(p.id, p._id, e)}><i className="ti ti-trash" style={{ fontSize: 12 }}></i></button>
+                          </div>
                         </div>
                       </div>
-                      <div className="pc-meta">
-                        <span className={"badge " + (p.status === "approved" ? "won" : p.status === "pending" ? "review" : "draft")}>
-                          {p.status || "draft"}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="pc-body">
-                      <div className="pb-item">
-                        <div className="pb-label">Value</div>
-                        <div className="pb-val">₹{p.value?.toLocaleString() || "0"}</div>
-                        <div className="pb-sub">Estimated</div>
-                      </div>
-                      <div className="pb-item">
-                        <div className="pb-label">Date</div>
-                        <div className="pb-val">
-                          {(() => {
-                            const d = p.updated || p.createdAt || p.created || new Date().toISOString();
-                            const dateObj = new Date(d);
-                            return isNaN(dateObj.getTime()) ? "Unavailable" : dateObj.toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' });
-                          })()}
-                        </div>
-                        <div className="pb-sub">Last updated</div>
-                      </div>
-                      <div className="pb-item">
-                        <div className="pb-label">Slides</div>
-                        <div className="pb-val">{p.slides?.length || 0}</div>
-                        <div className="pb-sub">Pages included</div>
-                      </div>
-                    </div>
-                    
-                    <div className="pc-footer">
-                      <div className="pf-date">
-                        <span><i className="ti ti-clock"></i></span> valid until {new Date(new Date().setDate(new Date().getDate() + 30)).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </div>
-                      <div className="pf-actions">
-                        <button className="pf-btn" onClick={e => { e.stopPropagation(); shareProposal(p); }}><i className="ti ti-share"></i> Share</button>
-                        <button className="pf-btn" onClick={e => { e.stopPropagation(); printProposal(p); }}><i className="ti ti-file-download"></i> PDF</button>
-                        <button className="pf-btn" onClick={e => deleteProposal(p.id, p._id, e)} style={{ color:"var(--red)", borderColor:"var(--red-bg)" }}><i className="ti ti-trash"></i></button>
-                      </div>
+                    );
+                  })}
+
+                  {/* Add new card */}
+                  <div className="add-card" onClick={createNew}>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--teal,#00BCD4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", boxShadow: "0 4px 12px rgba(0,188,212,.3)", flexShrink: 0 }}><i className="ti ti-plus"></i></div>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--teal,#00BCD4)" }}>Create New Proposal</div>
+                      <div style={{ fontSize: 12, color: "var(--text3,#A0B8BE)", marginTop: 3 }}>Build a professional proposal with scope, timeline and pricing</div>
                     </div>
                   </div>
-                );
-              })}
+                </>
+              )}
             </div>
-          )}
-        </div>
 
-        <div className="right-col">
-          <div className="pipeline-panel">
-            <div className="pp-title">Pipeline Summary</div>
-            <div className="pp-sub">Overview of all active proposals</div>
-            <div className="pipeline-value">
-              <div className="pv-label">Total Value</div>
-              <div className="pv-val">₹{(proposals.reduce((sum, p) => sum + (p.value || 0), 0)).toLocaleString("en-IN")}</div>
-              <div className="pv-sub">Across {proposals.length} proposals</div>
-            </div>
-            <div className="stage-list">
-              <div className="stage-item">
-                <div className="stage-dot" style={{ background:"var(--teal)" }}></div>
-                <div className="stage-name">Approved</div>
-                <div className="stage-count">{proposals.filter(p=>p.status==="approved").length}</div>
+            {/* RIGHT COL */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+              {/* PIPELINE SUMMARY */}
+              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, padding: 20 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)", marginBottom: 4 }}>Pipeline Summary</div>
+                <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", marginBottom: 16 }}>Total value across all stages</div>
+                <div style={{ textAlign: "center", padding: 14, background: "var(--teal-lighter,#F0FDFE)", borderRadius: 12, border: "1.5px solid var(--teal-light,#E0F7FA)", marginBottom: 14 }}>
+                  <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Total Pipeline Value</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "var(--teal,#00BCD4)", marginTop: 3, letterSpacing: -0.5 }}>₹{totalVal.toLocaleString("en-IN")}</div>
+                  <div style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", marginTop: 2 }}>Across {total} proposals</div>
+                </div>
+                <div>
+                  {pipelineStages.map((st, i) => (
+                    <div key={i} className="stage-item-row">
+                      <div style={{ width: 10, height: 10, borderRadius: "50%", background: st.color, flexShrink: 0 }}></div>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text,#1A2E35)", flex: 1 }}>{st.label}</span>
+                      <span style={{ fontSize: 11, color: "var(--text3,#A0B8BE)", fontWeight: 600 }}>{st.count} {st.count === 1 ? "proposal" : "proposals"}</span>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: st.color }}>₹{(st.val / 1000).toFixed(0)}K</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="stage-item">
-                <div className="stage-dot" style={{ background:"var(--amber)" }}></div>
-                <div className="stage-name">Pending</div>
-                <div className="stage-count">{proposals.filter(p=>p.status==="pending").length}</div>
+
+              {/* WIN RATE DONUT */}
+              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)", marginBottom: 14 }}>Win Rate</div>
+                <div style={{ position: "relative", width: 100, height: 100, margin: "0 auto 14px" }}>
+                  <svg viewBox="0 0 100 100" width="100" height="100">
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#E0EEF0" strokeWidth="12"/>
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="url(#wg2)" strokeWidth="12"
+                      strokeDasharray={`${successRate * 2.39} ${239 - successRate * 2.39}`} strokeDashoffset="28" strokeLinecap="round"/>
+                    <defs>
+                      <linearGradient id="wg2" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#00BCD4"/>
+                        <stop offset="100%" stopColor="#26C281"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", textAlign: "center" }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text,#1A2E35)" }}>{successRate}%</div>
+                    <div style={{ fontSize: 9, color: "var(--text3,#A0B8BE)", fontWeight: 600 }}>WIN RATE</div>
+                  </div>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  {[
+                    { val: wonCount, label: "Won", color: "var(--green,#26C281)" },
+                    { val: proposals.filter(p => p.status === "rejected" || p.status === "lost").length, label: "Lost", color: "var(--red,#F05C5C)" },
+                    { val: activeCount, label: "Active", color: "var(--amber,#F5A623)" },
+                    { val: proposals.filter(p => !p.status || p.status === "draft").length, label: "Draft", color: "var(--text3,#A0B8BE)" },
+                  ].map((s, i) => (
+                    <div key={i} style={{ padding: 10, background: "var(--bg,#F5FAFA)", borderRadius: 9, border: "1px solid var(--border,#E0EEF0)", textAlign: "center" }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: s.color }}>{s.val}</div>
+                      <div style={{ fontSize: 9, color: "var(--text3,#A0B8BE)", fontWeight: 600, marginTop: 2 }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="stage-item">
-                <div className="stage-dot" style={{ background:"var(--text3)" }}></div>
-                <div className="stage-name">Drafts</div>
-                <div className="stage-count">{proposals.filter(p=>p.status==="draft" || !p.status).length}</div>
+
+              {/* PROPOSAL TEMPLATES */}
+              <div style={{ background: "var(--surface,#fff)", border: "1.5px solid var(--border,#E0EEF0)", borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text,#1A2E35)", marginBottom: 12 }}>Quick Start Templates</div>
+                {[
+                  { icon: "ti-world", label: "Web Development", meta: "Full-stack project template", bg: "var(--teal-light,#E0F7FA)", color: "var(--teal,#00BCD4)" },
+                  { icon: "ti-device-mobile", label: "Mobile App", meta: "iOS / Android template", bg: "var(--purple-bg,#EEE9FF)", color: "var(--purple,#7C5CFC)" },
+                  { icon: "ti-chart-bar", label: "Digital Marketing", meta: "SEO, ads & content", bg: "var(--amber-bg,#FEF5E6)", color: "var(--amber,#F5A623)" },
+                  { icon: "ti-cpu", label: "Custom Software", meta: "Enterprise solution", bg: "var(--blue-bg,#EFF4FF)", color: "var(--blue,#2563EB)" },
+                ].map((tmpl, i) => (
+                  <div key={i} className="tmpl-item" onClick={createNew}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: tmpl.bg, color: tmpl.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}><i className={`ti ${tmpl.icon}`}></i></div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text,#1A2E35)" }}>{tmpl.label}</div>
+                      <div style={{ fontSize: 10, color: "var(--text3,#A0B8BE)" }}>{tmpl.meta}</div>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--teal,#00BCD4)" }}>Use →</span>
+                  </div>
+                ))}
               </div>
-            </div>
-          </div>
-          
-          <div className="winrate-panel" style={{ marginTop: 16 }}>
-            <div className="wr-title">Win Rate</div>
-            <div className="wr-donut">
-              <svg viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--border)" strokeWidth="3.5" />
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--green)" strokeWidth="3.5" strokeDasharray="65, 100" />
-              </svg>
-              <div className="wr-center">
-                <div className="wr-pct">65%</div>
-                <div className="wr-label">WIN RATE</div>
-              </div>
-            </div>
-            <div className="wr-stats">
-              <div className="wr-stat">
-                <div className="wr-stat-val" style={{ color:"var(--green)" }}>{proposals.filter(p=>p.status==="approved").length}</div>
-                <div className="wr-stat-label">WON</div>
-              </div>
-              <div className="wr-stat">
-                <div className="wr-stat-val" style={{ color:"var(--red)" }}>{proposals.filter(p=>p.status==="rejected").length}</div>
-                <div className="wr-stat-label">LOST</div>
-              </div>
+
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+
 
   // ══ EDITOR - full Canva layout ═════════════════════════════════════════════
   return (

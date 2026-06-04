@@ -1618,9 +1618,33 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
-        <div className="invoice-paper print-container">
+                {/* Pagination Logic */}
+        {(() => {
+          const ITEMS_PER_PAGE_FIRST = 10;
+          const ITEMS_PER_PAGE_REST = 16;
+          const pages = [];
+          if (items.length <= ITEMS_PER_PAGE_FIRST) {
+            pages.push(items);
+          } else {
+            pages.push(items.slice(0, ITEMS_PER_PAGE_FIRST));
+            let remaining = items.slice(ITEMS_PER_PAGE_FIRST);
+            while (remaining.length > 0) {
+              pages.push(remaining.slice(0, ITEMS_PER_PAGE_REST));
+              remaining = remaining.slice(ITEMS_PER_PAGE_REST);
+            }
+          }
+
+          return (
+            <div className="print-wrapper" style={{ display: "flex", flexDirection: "column", gap: "40px", alignItems: "center", width: "100%" }}>
+              {pages.map((pageItems, pageIndex) => {
+                const isFirstPage = pageIndex === 0;
+                const isLastPage = pageIndex === pages.length - 1;
+                const globalItemOffset = isFirstPage ? 0 : ITEMS_PER_PAGE_FIRST + ((pageIndex - 1) * ITEMS_PER_PAGE_REST);
+
+                return (
+                  <div key={pageIndex} className="invoice-paper print-container" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", display: "flex", flexDirection: "column", minHeight: 1122, width: "100%" }}>
           {/* Header */}
-          <div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
+          {isFirstPage && (<div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
             <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, ${currentT.primaryColor}0d, transparent)`, top: -80, right: -40, pointerEvents: "none" }} />
             <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
               <div>
@@ -1673,10 +1697,10 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 )}
               </div>
             </div>
-          </div>
+          </div>)}
 
           {/* Bill To */}
-          <div className="inv-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
+          {isFirstPage && (<div className="inv-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
             <div style={{ padding: "20px 32px" }}>
               <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
               <div style={{ fontSize: 17, fontWeight: 800, color: "var(--app-text)" }}>{inv.client || "—"}</div>
@@ -1685,7 +1709,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
               {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: currentT.primaryColor || "var(--app-accent)", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
             </div>
-          </div>
+          </div>)}
 
           {/* Items */}
           <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
@@ -1698,12 +1722,12 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                 </tr>
               </thead>
               <tbody>
-                {items.map((item, idx) => {
+                {pageItems.map((item, idx) => {
                   const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
                   const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
                   return (
                     <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-border)" }}>
-                      <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12 }}>{String(idx + 1).padStart(2, "0")}</td>
+                      <td style={{ padding: "12px 11px", color: "var(--app-muted)", fontWeight: 700, fontSize: 12 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
                       <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "var(--app-text)" }}>{item.description || "—"}</td>
                       <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
                       <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
@@ -1716,6 +1740,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
             </table>
           </div>
 
+          {isLastPage && (<>
           {/* Totals with QR Scanner */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", padding: "0 32px 16px" }}>
             {/* QR Scanner */}
@@ -1796,13 +1821,18 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
 
           <div className="flex-spacer" style={{ flex: 1 }} />
 
+          </>)}
           {/* Footer message */}
           <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, pageBreakBefore: "auto", breakBefore: "auto" }}>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
             <div style={{ fontSize: 13, fontWeight: 700, color: currentT.primaryColor || "#7c3aed" }}>{inv.footerMessage}</div>
             <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{inv.invoiceNo}</div>
           </div>
-        </div>
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>
     );
   }

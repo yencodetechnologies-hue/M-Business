@@ -901,31 +901,27 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
         }
       });
 
-      // Always fit image onto exactly one A4 page
       const A4_W = 210;
       const A4_H = 297;
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
 
-      // Calculate dimensions that fit within A4 maintaining aspect ratio
       const imgAspect = canvas.width / canvas.height;
-      let finalW = A4_W;
-      let finalH = A4_W / imgAspect;
-
-      // If still taller than A4, scale down by height
-      if (finalH > A4_H) {
-        finalH = A4_H;
-        finalW = A4_H * imgAspect;
-      }
-
-      // Center on the page
-      const xOff = (A4_W - finalW) / 2;
-      const yOff = (A4_H - finalH) / 2;
+      const finalW = A4_W;
+      const finalH = A4_W / imgAspect;
 
       const imgData = canvas.toDataURL('image/jpeg', 0.98);
-      pdf.addImage(imgData, 'JPEG', xOff, yOff, finalW, finalH);
-      // Verify single page (safety net)
-      while (pdf.internal.getNumberOfPages() > 1) {
-        pdf.deletePage(pdf.internal.getNumberOfPages());
+
+      let heightLeft = finalH;
+      let position = 0;
+
+      pdf.addImage(imgData, 'JPEG', 0, position, finalW, finalH);
+      heightLeft -= A4_H;
+
+      while (heightLeft > 0) {
+        position = heightLeft - finalH;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, finalW, finalH);
+        heightLeft -= A4_H;
       }
 
       const blob = pdf.output('blob');
@@ -1654,13 +1650,34 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
                   </div>
                 </div>
+                <div style={{ marginTop: 12, textAlign: "right" }}>
+                  <span style={{
+                    display: "inline-block",
+                    padding: "4px 14px",
+                    border: `1.5px solid ${balanceDue <= 0 ? "#10b981" : "#f59e0b"}`,
+                    borderRadius: 20,
+                    color: balanceDue <= 0 ? "#059669" : "#b45309",
+                    fontSize: 11,
+                    fontWeight: 800,
+                    background: balanceDue <= 0 ? "#d1fae5" : "#fef3c7",
+                    letterSpacing: 1
+                  }}>
+                    {balanceDue <= 0 ? "PAID" : "UNPAID"}
+                  </span>
+                </div>
+                {inv.project && (
+                  <div style={{ marginTop: 24, textAlign: "right" }}>
+                    <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>PROJECT</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--app-text)", lineHeight: 1.4 }}>{inv.project}</div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           {/* Bill To */}
-          <div className="inv-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: inv.project ? "1fr 1fr" : "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
-            <div style={{ padding: "20px 32px", borderRight: inv.project ? "1px solid var(--app-border)" : "none" }}>
+          <div className="inv-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
+            <div style={{ padding: "20px 32px" }}>
               <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
               <div style={{ fontSize: 17, fontWeight: 800, color: "var(--app-text)" }}>{inv.client || "—"}</div>
               {selectedClient?.companyName && <div style={{ fontSize: 13, color: currentT.primaryColor || "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
@@ -1668,12 +1685,6 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
               {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: currentT.primaryColor || "var(--app-accent)", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
             </div>
-            {inv.project && (
-              <div style={{ padding: "20px 32px" }}>
-                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>PROJECT</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "var(--app-text)" }}>{inv.project}</div>
-              </div>
-            )}
           </div>
 
           {/* Items */}

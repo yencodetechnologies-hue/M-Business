@@ -279,7 +279,8 @@ export default function AccountsPage({
   fetchIncome: propFetchIncome,
   expenses: propExpenses,
   setExpenses: propSetExpenses,
-  fetchExpenses: propFetchExpenses
+  fetchExpenses: propFetchExpenses,
+  onBack
 }) {
   const THEME = propTheme || GLOBAL_T;
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -342,6 +343,14 @@ export default function AccountsPage({
 
   return (
     <div style={{ paddingBottom: 60 }}>
+      {onBack && (
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+          <button onClick={onBack} style={{ padding: "8px", background: "#E0F2FE", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 20, color: "var(--teal)", display: "flex", alignItems: "center", transition: "all 0.2s" }} title="Back to Dashboard" onMouseEnter={e => e.currentTarget.style.background = "#BAE6FD"} onMouseLeave={e => e.currentTarget.style.background = "#E0F2FE"}>
+            <i className="ti ti-arrow-left"></i>
+          </button>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "#0F172A" }}>Revenue & Accounts</div>
+        </div>
+      )}
       <div className="tabs" style={{ marginBottom: 32 }}>
   <button onClick={() => setActiveTab("overview")} className={`tab ${activeTab === "overview" ? "active" : ""}`}>Overview</button>
   <button onClick={() => setActiveTab("income")} className={`tab ${activeTab === "income" ? "active" : ""}`}>Income</button>

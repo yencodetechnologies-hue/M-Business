@@ -112,14 +112,21 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         .ed-task-due { font-size: 10px; font-weight: 700; color: #64748B; }
         .ed-task-tag { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
 
-        .ed-docs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .ed-doc-card { background: #F8FAFC; border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; border: none; }
-        .ed-doc-card:hover { background: #F1F5F9; }
-        .ed-doc-icon { width: 32px; height: 32px; border-radius: 6px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .ed-docs-list { display: flex; flex-direction: column; gap: 0; }
+        .ed-doc-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #F1F5F9; }
+        .ed-doc-row:last-child { border-bottom: none; }
+        .ed-doc-icon { width: 36px; height: 36px; border-radius: 8px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
         .ed-doc-info { flex: 1; }
-        .ed-doc-name { font-size: 12px; font-weight: 800; color: #0F172A; }
+        .ed-doc-name { font-size: 13px; font-weight: 800; color: #0F172A; }
         .ed-doc-meta { font-size: 10px; font-weight: 600; color: #64748B; }
-        .ed-doc-add { border: 1px dashed var(--teal); background: #F0FDFE; color: var(--teal); justify-content: center; flex-direction: column; gap: 4px; padding: 16px; }
+        .ed-doc-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .ed-doc-btn { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; border: none; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
+        .ed-doc-btn.view { background: #E0F2FE; color: #0284C7; }
+        .ed-doc-btn.view:hover { background: #BAE6FD; }
+        .ed-doc-btn.download { background: var(--teal); color: #fff; }
+        .ed-doc-btn.download:hover { background: #0097A7; }
+        .ed-docs-sub { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .ed-docs-sub span { background: var(--teal); color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; }
       `}</style>
 
       {/* HEADER */}
@@ -333,74 +340,88 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-folder"></i> Documents</div>
-            <button className="ed-btn" style={{padding: "6px 12px", fontSize: "11px", borderRadius: "8px"}}><i className="ti ti-upload"></i> Upload</button>
-          <div className="ed-docs-grid">
-            <div className="ed-doc-card">
-              <div className="ed-doc-icon" style={{color: "#6366F1"}}><i className="ti ti-file-text"></i></div>
+            <button className="ed-btn" style={{padding: "6px 14px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#fff", border: "none"}}>
+              <i className="ti ti-download"></i> Request Document
+            </button>
+          </div>
+          <div className="ed-docs-sub">Uploaded Documents <span>5</span></div>
+          <div className="ed-docs-list">
+            <div className="ed-doc-row">
+              <div className="ed-doc-icon" style={{background: "#EEF2FF", color: "#6366F1"}}><i className="ti ti-file-text"></i></div>
               <div className="ed-doc-info">
                 <div className="ed-doc-name">Offer Letter</div>
                 <div className="ed-doc-meta">Jan 2024 · PDF</div>
               </div>
-              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
+              <div className="ed-doc-actions">
+                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
+                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
+              </div>
             </div>
-            <div className="ed-doc-card">
-              <div className="ed-doc-icon" style={{color: "#0ea5e9"}}><i className="ti ti-id"></i></div>
+            <div className="ed-doc-row">
+              <div className="ed-doc-icon" style={{background: "#E0F2FE", color: "#0ea5e9"}}><i className="ti ti-id"></i></div>
               <div className="ed-doc-info">
                 <div className="ed-doc-name">Aadhaar Card</div>
                 <div className="ed-doc-meta">ID Proof · PDF</div>
               </div>
-              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
+              <div className="ed-doc-actions">
+                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
+                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
+              </div>
             </div>
-            <div className="ed-doc-card">
-              <div className="ed-doc-icon" style={{color: "#f59e0b"}}><i className="ti ti-file-certificate"></i></div>
+            <div className="ed-doc-row">
+              <div className="ed-doc-icon" style={{background: "#FFFBEB", color: "#f59e0b"}}><i className="ti ti-file-certificate"></i></div>
               <div className="ed-doc-info">
                 <div className="ed-doc-name">Contract</div>
                 <div className="ed-doc-meta">Signed · PDF</div>
               </div>
-              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
+              <div className="ed-doc-actions">
+                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
+                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
+              </div>
             </div>
-            <div className="ed-doc-card">
-              <div className="ed-doc-icon" style={{color: "#8b5cf6"}}><i className="ti ti-certificate"></i></div>
+            <div className="ed-doc-row">
+              <div className="ed-doc-icon" style={{background: "#F5F3FF", color: "#8b5cf6"}}><i className="ti ti-certificate"></i></div>
               <div className="ed-doc-info">
                 <div className="ed-doc-name">Degree Cert</div>
                 <div className="ed-doc-meta">Education · PDF</div>
               </div>
-              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
+              <div className="ed-doc-actions">
+                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
+                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
+              </div>
             </div>
-            <div className="ed-doc-card">
-              <div className="ed-doc-icon" style={{color: "#ef4444"}}><i className="ti ti-file-description"></i></div>
+            <div className="ed-doc-row">
+              <div className="ed-doc-icon" style={{background: "#FEF2F2", color: "#ef4444"}}><i className="ti ti-file-description"></i></div>
               <div className="ed-doc-info">
                 <div className="ed-doc-name">Resume</div>
                 <div className="ed-doc-meta">Latest · PDF</div>
               </div>
-              <i className="ti ti-download" style={{color: "var(--text-muted)", fontSize: 16}}></i>
-            </div>
-            <div className="ed-doc-card ed-doc-add">
-              <i className="ti ti-plus" style={{fontSize: 24}}></i>
-              <div style={{fontSize: 12, fontWeight: 800}}>Add Document</div>
-              <div style={{fontSize: 10, fontWeight: 700, color: "var(--teal)", opacity: 0.8}}>Upload new</div>
+              <div className="ed-doc-actions">
+                <button className="ed-doc-btn view"><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
+                <button className="ed-doc-btn download"><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* DANGER ZONE */}
-        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: "12px", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "24px" }}>
-          <div>
-            <div style={{ color: "#DC2626", fontWeight: "900", fontSize: "15px", display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-              <i className="ti ti-alert-triangle"></i> Danger Zone
-            </div>
-            <div style={{ color: "#9CA3AF", fontSize: "13px", fontWeight: "600" }}>
-              Deactivating revokes all access. Deletion is permanent and cannot be undone.
-            </div>
+      </div>{/* END BOTTOM GRID */}
+
+      {/* DANGER ZONE */}
+      <div style={{ background: "#FFF5F5", border: "1px solid #FFE4E4", borderRadius: "10px", padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "24px" }}>
+        <div>
+          <div style={{ color: "#DC2626", fontWeight: "800", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+            <i className="ti ti-alert-triangle" style={{fontSize: "14px"}}></i> Danger Zone
           </div>
-          <div style={{ display: "flex", gap: "12px" }}>
-            <button className="ed-btn" style={{ background: "#FEF3C7", color: "#D97706", border: "none" }}><i className="ti ti-user-x"></i> Deactivate</button>
-            <button className="ed-btn" style={{ background: "#FEE2E2", color: "#DC2626", border: "none" }} onClick={onDelete}><i className="ti ti-trash"></i> Delete Employee</button>
+          <div style={{ color: "#9CA3AF", fontSize: "12px", fontWeight: "500" }}>
+            Deactivating revokes all access. Deletion is permanent and cannot be undone.
           </div>
         </div>
-
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button className="ed-btn" style={{ background: "#FEF9EC", color: "#D97706", border: "1px solid #FDE68A", fontSize: "12px", padding: "6px 14px" }}><i className="ti ti-user-x"></i> Deactivate</button>
+          <button className="ed-btn" style={{ background: "#FFF1F1", color: "#DC2626", border: "1px solid #FECACA", fontSize: "12px", padding: "6px 14px" }} onClick={onDelete}><i className="ti ti-trash"></i> Delete Employee</button>
+        </div>
       </div>
-    </div>
+
     </div>
   );
 }

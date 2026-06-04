@@ -156,11 +156,13 @@ function DocCard({ doc, empName, onUploaded, notify }) {
 // NEW PROP: onDocStatusChange(statusMap) — called whenever any doc is uploaded/deleted
 // ═══════════════════════════════════════════════════════════════════════════════
 export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange, forceOpen, onClose: onCloseExternal, THEME }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!!forceOpen);
 
   // Support forceOpen from parent (e.g. Dashboard "Upload" button)
   useEffect(() => {
-    if (forceOpen) setOpen(true);
+    if (forceOpen) {
+      setOpen(true);
+    }
   }, [forceOpen]);
 
   // Panel close ஆகும்போது parent-க்கு notify பண்ணணும்
@@ -195,14 +197,14 @@ export function EmployeeProfilePanel({ empName, user, notify, onDocStatusChange,
 
   return (
     <>
-      {open && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.4)", zIndex: 997, backdropFilter: "blur(2px)" }} />}
+      {open && <div onClick={handleClose} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.4)", zIndex: 997, backdropFilter: "blur(2px)" }} />}
 
       <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 340, background: "#fff", zIndex: 998, boxShadow: "-8px 0 40px rgba(99,102,241,0.18)", transform: open ? "translateX(0)" : "translateX(100%)", transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)", display: "flex", flexDirection: "column", overflowY: "auto" }}>
         {/* Header */}
         <div style={{ background: THEME?.sidebar || "linear-gradient(135deg,#0f172a,#1e1b4b)", padding: "20px 18px 16px", flexShrink: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>My Profile</div>
-            <button onClick={() => setOpen(false)} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: 8, width: 28, height: 28, cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <button onClick={handleClose} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: 8, width: 28, height: 28, cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 52, height: 52, borderRadius: 14, background: THEME?.accent ? `linear-gradient(135deg,${THEME.accent},var(--app-muted))` : "linear-gradient(135deg,var(--app-accent),var(--app-muted))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, color: "#fff", flexShrink: 0, border: "2px solid rgba(255,255,255,0.2)" }}>{initials}</div>

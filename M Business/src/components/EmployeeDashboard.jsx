@@ -549,6 +549,200 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
   );
 }
 
+// ── MY PROFILE FULL PAGE (Teal themed) ───────────────────────
+function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
+  const name = user?.name || "Employee";
+  const role = user?.role || "Employee";
+  const dept = user?.department || user?.dept || "";
+  const email = user?.email || "";
+  const phone = user?.phone || "";
+  const empId = user?.employeeId || user?.emp_id || "EMP-001";
+  const joinDate = user?.dateJoined || user?.joinDate || "";
+  const employment = user?.employmentType || user?.employment || "Full-Time";
+  const presentDays = attendance.filter(a => a.status === "present").length;
+  const absentDays  = attendance.filter(a => a.status === "absent").length;
+  const leaveDays   = attendance.filter(a => a.status === "leave").length;
+  const wfhDays     = attendance.filter(a => a.status === "wfh").length;
+  const totalMarked = presentDays + absentDays + leaveDays;
+  const attRate     = totalMarked > 0 ? Math.round((presentDays / totalMarked) * 100) : 0;
+  const leaveUsed   = leaveDays;
+  const leaveTotal  = 18;
+  const pendingTasks = tasks.filter(t => !["done","completed"].includes((t.status||"").toLowerCase())).length;
+  const activeProj   = projects.filter(p => !["done","completed"].includes((p.status||"").toLowerCase())).length;
+  const leaveHistory = attendance.filter(a => a.status === "leave" || a.status === "absent").slice(0,3);
+  const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
+
+  const TC = { teal: "#00BCD4", bg: "#f0f4f8", card: "#fff", border: "#e5eaf0", text: "#0f1c2e", textMid: "#4a5568", textSoft: "#94a3b8", green: "#16a34a", amber: "#d97706", red: "#dc2626", blue: "#2563eb" };
+
+  const docItems = [
+    { name:"Offer Letter",  meta:"Jan 2024 · PDF", icon:"📄", color:"#6366F1" },
+    { name:"Aadhaar Card",  meta:"ID Proof · PDF",  icon:"🪪", color:"#0ea5e9" },
+    { name:"Contract",      meta:"Signed · PDF",     icon:"📋",color:"#f59e0b" },
+    { name:"Degree Cert",   meta:"Education · PDF",  icon:"🎓", color:"#8b5cf6" },
+    { name:"Resume",        meta:"Latest · PDF",     icon:"📝", color:"#ef4444" },
+  ];
+
+  const cardStyle = { background: TC.card, borderRadius: 16, border: `1px solid ${TC.border}`, overflow: "hidden" };
+  const headStyle = { padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `1px solid ${TC.border}` };
+  const titleStyle = { fontSize: 13, fontWeight: 900, color: TC.text, display: "flex", alignItems: "center", gap: 8 };
+  const bodyStyle = { padding: "18px" };
+  const lblStyle = { fontSize: 10, fontWeight: 700, color: TC.teal, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 3 };
+  const valStyle = { fontSize: 13, fontWeight: 700, color: TC.text };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+      {/* Back */}
+      <button onClick={onBack} style={{ display:"flex", alignItems:"center", gap:8, background:TC.card, border:`1.5px solid ${TC.border}`, borderRadius:10, padding:"8px 16px", fontSize:13, fontWeight:700, color:TC.textMid, cursor:"pointer", fontFamily:"inherit", width:"fit-content" }}>
+        ← Back to Dashboard
+      </button>
+
+      {/* Hero */}
+      <div style={{ background:"linear-gradient(135deg,#0f9baa,#00BCD4,#26c6da)", borderRadius:18, padding:"24px 28px", display:"flex", alignItems:"center", gap:18, color:"#fff", position:"relative", overflow:"hidden" }}>
+        <div style={{ width:56, height:56, borderRadius:16, background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:900, border:"2px solid rgba(255,255,255,0.3)", flexShrink:0 }}>{initials}</div>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:12, opacity:0.7, fontWeight:600 }}>My Profile</div>
+          <div style={{ fontSize:22, fontWeight:900, marginTop:2 }}>{name} 👋</div>
+          <div style={{ fontSize:12, opacity:0.7, marginTop:4 }}>{role}{dept ? ` · ${dept} Department` : ""}</div>
+        </div>
+        <div style={{ textAlign:"right" }}>
+          <div style={{ fontSize:14, fontWeight:800 }}>{empId}</div>
+          <div style={{ fontSize:10, opacity:0.6 }}>Employee ID</div>
+          <div style={{ marginTop:8, background:"rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 14px", fontSize:11, fontWeight:700, display:"inline-flex", alignItems:"center", gap:5 }}>
+            <span style={{ width:6, height:6, borderRadius:"50%", background:"#fff" }} /> Active Employee
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Stats */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+        {[
+          { icon:"📅", val:presentDays, lbl:"Days Present", bg:"#e0f7fa", ic:TC.teal },
+          { icon:"💼", val:activeProj, lbl:"Active Projects", bg:"#dcfce7", ic:TC.green },
+          { icon:"☑️", val:pendingTasks, lbl:"Tasks Pending", bg:"#fef3c7", ic:TC.amber },
+          { icon:"🏖️", val:leaveTotal-leaveUsed, lbl:"Leave Days Left", bg:"#dbeafe", ic:TC.blue },
+        ].map((s,i) => (
+          <div key={i} style={{ ...cardStyle, padding:"16px 18px", display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ width:40, height:40, borderRadius:10, background:s.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>{s.icon}</div>
+            <div><div style={{ fontSize:20, fontWeight:900, color:TC.text }}>{s.val}</div><div style={{ fontSize:11, color:TC.textSoft, fontWeight:600 }}>{s.lbl}</div></div>
+          </div>
+        ))}
+      </div>
+
+      {/* Profile + Attendance */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+        <div style={cardStyle}>
+          <div style={headStyle}><div style={titleStyle}>👤 My Profile</div></div>
+          <div style={bodyStyle}>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+              {[["Full Name",name],["Employee ID",empId,true],["Role",role],["Department",dept||"—"],["Email",email||"—"],["Phone",phone||"—"],["Date Joined",joinDate||"—"],["Employment",employment]].map(([l,v,teal],i)=>(
+                <div key={i}><div style={lblStyle}>{l}</div><div style={{ ...valStyle, ...(teal?{color:TC.teal}:{}) }}>{v}</div></div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div style={cardStyle}>
+          <div style={headStyle}><div style={titleStyle}>📊 Attendance & Leave</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>This Month</span></div>
+          <div style={bodyStyle}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, marginBottom:16 }}>
+              {[[presentDays,"Present",TC.green],[absentDays,"Absent",TC.red],[leaveDays,"On Leave",TC.amber],[wfhDays,"WFH",TC.blue]].map(([v,l,c],i)=>(
+                <div key={i} style={{ textAlign:"center", padding:"10px 0", borderRadius:10, border:`1px solid ${TC.border}` }}>
+                  <div style={{ fontSize:18, fontWeight:900, color:c }}>{v}</div>
+                  <div style={{ fontSize:10, color:TC.textSoft, fontWeight:600, marginTop:2 }}>{l}</div>
+                </div>
+              ))}
+            </div>
+            {[["Attendance Rate",attRate+"%",attRate,TC.green],["Leave Used",`${leaveUsed} / ${leaveTotal} days`,Math.round((leaveUsed/leaveTotal)*100),TC.amber]].map(([l,r,pct,c],i)=>(
+              <div key={i} style={{ marginBottom:10 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, fontWeight:700, color:TC.textMid, marginBottom:4 }}><span>{l}</span><span>{r}</span></div>
+                <div style={{ height:5, borderRadius:99, background:"#e5eaf0" }}><div style={{ height:"100%", borderRadius:99, background:c, width:`${pct}%`, transition:"width 0.5s" }} /></div>
+              </div>
+            ))}
+            <div style={{ marginTop:14 }}>
+              <div style={{ fontSize:11, fontWeight:900, color:TC.text, marginBottom:8 }}>📋 My Leave History</div>
+              <table style={{ width:"100%", fontSize:11, borderCollapse:"collapse" }}>
+                <thead><tr style={{ borderBottom:`1px solid ${TC.border}` }}>{["TYPE","DATES","STATUS"].map(h=><th key={h} style={{ padding:"6px 0", textAlign:"left", color:TC.textSoft, fontWeight:700, fontSize:10 }}>{h}</th>)}</tr></thead>
+                <tbody>
+                  {leaveHistory.length===0
+                    ? <tr><td colSpan={3} style={{ textAlign:"center", color:TC.textSoft, padding:12 }}>No leave history</td></tr>
+                    : leaveHistory.map((a,i)=><tr key={i} style={{ borderBottom:`1px solid ${TC.border}` }}><td style={{ padding:"6px 0" }}>{a.leaveType||"Leave"}</td><td>{a.date}</td><td><span style={{ background:TC.amber+"20", color:TC.amber, padding:"2px 8px", borderRadius:12, fontSize:10, fontWeight:700 }}>{a.leaveStatus||"Pending"}</span></td></tr>)}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Projects + Tasks + Documents */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16 }}>
+        {/* Projects */}
+        <div style={cardStyle}>
+          <div style={headStyle}><div style={titleStyle}>💼 My Projects</div><span style={{ fontSize:12, fontWeight:800, color:TC.teal }}>{activeProj} active</span></div>
+          <div style={{ padding:"8px 18px" }}>
+            {projects.slice(0,4).map((p,i)=>{
+              const pTasks=tasks.filter(t=>t.project===p.name||t.projectId===p._id);
+              const s=(p.status||"").toLowerCase();
+              const pct=s==="done"||s==="completed"?100:pTasks.length>0?Math.round((pTasks.filter(t=>["done","completed"].includes((t.status||"").toLowerCase())).length/pTasks.length)*100):s==="in progress"?50:(p.progress||0);
+              return(
+                <div key={p._id||i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 0", borderBottom:i<Math.min(projects.length,4)-1?`1px solid ${TC.border}`:"none" }}>
+                  <div style={{ width:32, height:32, borderRadius:8, background:TC.teal+"15", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:TC.teal }}>🌐</div>
+                  <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:700, color:TC.text }}>{p.name}</div><div style={{ fontSize:10, color:TC.textSoft }}>{role}</div></div>
+                  <div style={{ textAlign:"right" }}>
+                    <div style={{ fontSize:12, fontWeight:800, color:TC.teal }}>{pct}%</div>
+                    <div style={{ fontSize:10, color:TC.textSoft }}>{p.status||"Pending"}</div>
+                    <div style={{ width:50, height:3, borderRadius:99, background:"#e5eaf0", marginTop:3 }}><div style={{ height:"100%", borderRadius:99, background:TC.teal, width:`${pct}%` }}/></div>
+                  </div>
+                </div>
+              );
+            })}
+            {projects.length===0&&<div style={{ padding:"20px 0", textAlign:"center", color:TC.textSoft, fontSize:12 }}>No projects assigned</div>}
+          </div>
+        </div>
+
+        {/* Tasks */}
+        <div style={cardStyle}>
+          <div style={headStyle}><div style={titleStyle}>☑️ My Tasks</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>{pendingTasks} pending</span></div>
+          <div style={{ borderBottom:`1px solid ${TC.border}`, display:"flex" }}>
+            {["All","Pending","Done"].map((tab,i)=><button key={tab} style={{ flex:1, padding:"8px 0", background:"none", border:"none", borderBottom:i===0?`2px solid ${TC.teal}`:"2px solid transparent", fontSize:11, fontWeight:i===0?800:600, color:i===0?TC.teal:TC.textSoft, cursor:"pointer", fontFamily:"inherit" }}>{tab}</button>)}
+          </div>
+          <div style={{ padding:"8px 18px" }}>
+            {tasks.slice(0,5).map((t,i,arr)=>{
+              const isDone=["done","completed"].includes((t.status||"").toLowerCase());
+              const pri=(t.priority||"low").toLowerCase();
+              const priColor=pri==="high"?"#dc2626":pri==="medium"||pri==="mid"?"#d97706":"#16a34a";
+              return(
+                <div key={t._id||i} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 0", borderBottom:i<arr.length-1?`1px solid ${TC.border}`:"none" }}>
+                  <div style={{ width:16, height:16, borderRadius:4, border:`1.5px solid ${isDone?TC.green:TC.border}`, background:isDone?TC.green:"transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{isDone&&<span style={{ color:"#fff", fontSize:9 }}>✓</span>}</div>
+                  <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:600, color:isDone?TC.textSoft:TC.text, textDecoration:isDone?"line-through":"none" }}>{t.title}</div><div style={{ fontSize:10, color:TC.textSoft }}>{t.date||t.dueDate?`Due: ${t.date||t.dueDate}`:""}</div></div>
+                  <span style={{ background:priColor+"15", color:priColor, padding:"2px 8px", borderRadius:10, fontSize:10, fontWeight:700 }}>{pri.charAt(0).toUpperCase()+pri.slice(1)}</span>
+                </div>
+              );
+            })}
+            {tasks.length===0&&<div style={{ padding:"20px 0", textAlign:"center", color:TC.textSoft, fontSize:12 }}>No tasks assigned</div>}
+          </div>
+        </div>
+
+        {/* Documents */}
+        <div style={cardStyle}>
+          <div style={headStyle}><div style={titleStyle}>📂 My Documents</div><span style={{ fontSize:11, color:TC.textSoft, fontWeight:700 }}>5 files</span></div>
+          <div style={bodyStyle}>
+            {docItems.map((d,i)=>(
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 0", borderBottom:i<docItems.length-1?`1px solid ${TC.border}`:"none" }}>
+                <span style={{ fontSize:16 }}>{d.icon}</span>
+                <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:700, color:TC.text }}>{d.name}</div><div style={{ fontSize:10, color:TC.textSoft }}>{d.meta}</div></div>
+                <div style={{ display:"flex", gap:4 }}>
+                  <button style={{ background:"#f0f4f8", border:`1px solid ${TC.border}`, borderRadius:6, padding:"4px 8px", cursor:"pointer", fontSize:10, fontWeight:700, color:TC.textMid, fontFamily:"inherit" }}>👁 View</button>
+                  <button style={{ background:TC.teal, border:"none", borderRadius:6, padding:"4px 8px", cursor:"pointer", color:"#fff", fontSize:10, fontFamily:"inherit" }}>⬇</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── PROJECTS PAGE ────────────────────────────────────────────
 
 function ProjectsPage({ projects, tasks }) {
@@ -1714,7 +1908,7 @@ export default function EmployeeDashboard({ user, setUser }) {
                 </div>
               </div>
               {[
-                { icon: "👤", label: "Profile", action: () => { setProfileDropdownOpen(false); setProfileOpen(true); } },
+                { icon: "👤", label: "Profile", action: () => { setProfileDropdownOpen(false); setPage("myprofile"); } },
                 ...(subscription?.businessLimit === "Multiple business manage" ? [{ icon: "➕", label: "Add account", action: () => { setProfileDropdownOpen(false); setAccountAuthOpen(true); } }] : []),
                 { icon: "🚪", label: "Logout", action: () => { setProfileDropdownOpen(false); handleLogout(); }, danger: true },
               ].map((item, idx) => (
@@ -1732,6 +1926,7 @@ export default function EmployeeDashboard({ user, setUser }) {
           <div className="main-pad" style={{ flex: 1, padding: "22px 28px", overflowY: "auto" }}>
             <EmployeeSubscriptionWarning user={resolvedUser} />
             {page === "dashboard" && <DashboardPage user={resolvedUser} projects={projects} tasks={tasks} proposals={proposals} attendance={attendance} salary={salary} setPage={setPage} docStatus={docStatus} onOpenProfile={() => setProfileOpen(true)} />}
+            {page === "myprofile" && <MyProfilePage user={resolvedUser} projects={projects} tasks={tasks} attendance={attendance} onBack={() => setPage("dashboard")} />}
             {page === "projects" && <ProjectsPage projects={projects} tasks={tasks} />}
             {page === "proposals" && <ProposalsPage proposals={proposals} />}
             {page === "tasks" && <TasksPage tasks={tasks} onToggle={handleToggleTask} />}

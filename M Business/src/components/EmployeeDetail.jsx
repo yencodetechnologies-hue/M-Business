@@ -382,6 +382,23 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
             </div>
           </div>
         </div>
+
+        {/* DANGER ZONE */}
+        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: "12px", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "24px" }}>
+          <div>
+            <div style={{ color: "#DC2626", fontWeight: "900", fontSize: "15px", display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+              <i className="ti ti-alert-triangle"></i> Danger Zone
+            </div>
+            <div style={{ color: "#9CA3AF", fontSize: "13px", fontWeight: "600" }}>
+              Deactivating revokes all access. Deletion is permanent and cannot be undone.
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button className="ed-btn" style={{ background: "#FEF3C7", color: "#D97706", border: "none" }}><i className="ti ti-user-x"></i> Deactivate</button>
+            <button className="ed-btn" style={{ background: "#FEE2E2", color: "#DC2626", border: "none" }} onClick={onDelete}><i className="ti ti-trash"></i> Delete Employee</button>
+          </div>
+        </div>
+
       </div>
     </div>
     </div>

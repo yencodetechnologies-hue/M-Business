@@ -20,6 +20,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { QRCodeSVG } from "qrcode.react";
 import { SubAdminDocumentsPage } from "./EmployeeProfilePanel";
 import { DOC_TYPES } from "./EmployeeProfilePanel";
+import EmployeeDetail from "./EmployeeDetail";
 import AuthPage from "./AuthPage";
 import MySubscriptions from "./MySubscriptions";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
@@ -947,6 +948,10 @@ function EmployeesPage({ employees, setEmployees }) {
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
+  if (viewEmp) {
+    return <EmployeeDetail emp={viewEmp} onBack={() => setViewEmp(null)} onEdit={() => { setViewEmp(null); openEdit(viewEmp); }} onDelete={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} empDocs={empDocs} empDocsLoading={empDocsLoading} />;
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
@@ -1062,95 +1067,7 @@ function EmployeesPage({ employees, setEmployees }) {
         <Pagination totalItems={filtered.length} itemsPerPage={itemsPerPage} currentPage={currentPage} onPageChange={setCurrentPage} onItemsPerPageChange={setItemsPerPage} />
       </SC>
 
-      {viewEmp && (
-        <Mdl title="Employee Profile" onClose={() => setViewEmp(null)} maxWidth={500}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{(viewEmp.name || "?")[0].toUpperCase()}</div>
-            <div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: T.text }}>{viewEmp.name}</div>
-              <div style={{ fontSize: 13, color: "var(--app-accent)", marginTop: 2 }}>{viewEmp.role || "Employee"}</div>
-            </div>
-            <div style={{ marginLeft: "auto" }}><Badge label={viewEmp.status || "Active"} /></div>
-          </div>
-          <InfoRow icon="📧" label="Email" value={viewEmp.email} />
-          <InfoRow icon="📱" label="Phone" value={viewEmp.phone} />
-          <InfoRow icon="🏢" label="Department" value={viewEmp.department} />
-          <InfoRow icon="💰" label="Salary" value={viewEmp.salary} />
-          <InfoRow icon="📅" label="Date of Birth" value={viewEmp.dateOfBirth} />
-          <InfoRow icon="📅" label="Joining Date" value={viewEmp.joiningDate} />
-          <InfoRow icon="💍" label="Marital Status" value={viewEmp.maritalStatus} />
-          <InfoRow icon="📍" label="Address" value={viewEmp.address} />
-          <InfoRow icon="🕒" label="Joined" value={viewEmp.createdAt ? new Date(viewEmp.createdAt).toLocaleDateString() : "—"} />
 
-          <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-              🏦 Bank Details
-            </div>
-            <div style={{ background: "#f8fafc", borderRadius: 12, padding: "12px 14px", border: "1px solid var(--app-border)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <div>
-                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase" }}>Bank Name</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.text }}>{viewEmp.bankDetails?.bankName || "—"}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase" }}>IFSC Code</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.text }}>{viewEmp.bankDetails?.ifscCode || "—"}</div>
-              </div>
-              <div style={{ gridColumn: "1 / -1" }}>
-                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 700, textTransform: "uppercase" }}>Account Number</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.text }}>{viewEmp.bankDetails?.accountNumber || "—"}</div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-              📂 Documents
-              {empDocsLoading && <span style={{ fontSize: 10, color: "var(--app-muted)" }}>Loading...</span>}
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {DOC_TYPES.map(dt => {
-                const doc = empDocs[dt.key];
-                const hasDoc = !!doc?.url;
-                const isImg = (url = "") => /\.(jpg|jpeg|png|gif|webp)$/i.test(url) || url.startsWith("data:image");
-                return (
-                  <div key={dt.key} style={{ border: `1.5px solid ${hasDoc ? dt.color + "35" : "#f1f5f9"}`, borderRadius: 12, overflow: "hidden", background: hasDoc ? `${dt.color}04` : "#f8fafc" }}>
-                    <div style={{ padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 16 }}>{dt.icon}</span>
-                      <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: "var(--app-sidebar)" }}>{dt.label}</div>
-                      {hasDoc
-                        ? <span style={{ background: `${dt.color}15`, border: `1px solid ${dt.color}30`, borderRadius: 20, padding: "2px 10px", fontSize: 10, fontWeight: 700, color: dt.color }}>✓ Uploaded</span>
-                        : <span style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 20, padding: "2px 10px", fontSize: 10, fontWeight: 700, color: "#ef4444" }}>✗ Missing</span>}
-                    </div>
-                    {hasDoc && (
-                      <div style={{ padding: "0 12px 10px" }}>
-                        {isImg(doc.url)
-                          ? <img src={doc.url} alt={dt.label} style={{ width: "100%", maxHeight: 120, objectFit: "contain", borderRadius: 8, border: "1px solid #f1f5f9", background: "#fff" }} />
-                          : <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#fff", borderRadius: 8, border: "1px solid #f1f5f9" }}>
-                            <span style={{ fontSize: 20 }}>📄</span>
-                            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--app-sidebar)" }}>{doc.fileName || `${dt.label}.pdf`}</div>
-                          </div>}
-                        <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
-                          <button onClick={() => window.open(doc.url, "_blank")}
-                            style={{ flex: 1, padding: "6px 10px", background: `${dt.color}10`, border: `1px solid ${dt.color}30`, borderRadius: 7, fontSize: 11, fontWeight: 700, color: dt.color, cursor: "pointer", fontFamily: "inherit" }}>
-                            View
-                          </button>
-                          <a href={doc.url} download style={{ flex: 1, padding: "6px 10px", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 11, fontWeight: 700, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            ⬇ Download
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => { setViewEmp(null); openEdit(viewEmp); }} style={{ flex: 1, padding: "10px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
-            <button onClick={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
-          </div>
-        </Mdl>
-      )}
 
       {editEmp && (
         <Mdl title="Edit Employee" onClose={() => setEditEmp(null)}>

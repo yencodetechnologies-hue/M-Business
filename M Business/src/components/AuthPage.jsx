@@ -207,7 +207,7 @@ export default function AuthPage({ setUser, initialTab = "register" }) {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
         input::placeholder { color: rgba(255,255,255,0.25); }
-        input:focus { border-bottom-color: #a855f7 !important; }
+        input:focus { border-bottom-color: #00BCD4 !important; }
         input:-webkit-autofill {
           -webkit-box-shadow: 0 0 0 40px #100820 inset !important;
           -webkit-text-fill-color: #fff !important;
@@ -220,7 +220,7 @@ export default function AuthPage({ setUser, initialTab = "register" }) {
           max-width: 900px;
           min-height: 500px;
           border-radius: 22px;
-          border: 2px solid #7429cc;
+          border: 2px solid #00BCD4;
           box-shadow:
             0 0 0 1px rgba(116,41,204,0.12),
             0 0 60px rgba(116,41,204,0.28),
@@ -254,7 +254,7 @@ export default function AuthPage({ setUser, initialTab = "register" }) {
           position: absolute;
           top: 0; bottom: 0;
           width: 42%;
-          background: linear-gradient(155deg, #6d28d9 0%, #8b5cf6 60%, #5b21b6 100%);
+          background: linear-gradient(155deg, #00BCD4, #00BCD4 60%, #00BCD4 100%);
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -295,12 +295,12 @@ export default function AuthPage({ setUser, initialTab = "register" }) {
 
         .purple-btn {
           width: 100%; padding: 13px 0;
-          background: linear-gradient(90deg, #7c3aed, #a855f7);
+          background: linear-gradient(90deg, #00BCD4, #00BCD4);
           border: none; border-radius: 50px;
           color: #fff; font-size: 15px; font-weight: 700;
           cursor: pointer; font-family: inherit;
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          box-shadow: 0 4px 22px rgba(168,85,247,0.4);
+          box-shadow: 0 4px 22px #00BCD4;
           margin-top: 8px; transition: opacity .2s;
         }
         .purple-btn:disabled { opacity: 0.55; cursor: not-allowed; }
@@ -317,7 +317,7 @@ export default function AuthPage({ setUser, initialTab = "register" }) {
 
         .link-btn {
           background: none; border: none;
-          color: #a855f7; font-weight: 700;
+          color: #00BCD4; font-weight: 700;
           cursor: pointer; font-family: inherit; font-size: 13px;
         }
 
@@ -481,7 +481,7 @@ export default function AuthPage({ setUser, initialTab = "register" }) {
 
               <div style={{ textAlign: "right", marginBottom: 22, marginTop: -4 }}>
                 <button onClick={() => { setTab("forgot"); setError(""); setSuccess(""); }}
-                  style={{ background: "none", border: "none", color: "rgba(192,132,252,0.85)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                  style={{ background: "none", border: "none", color: "#00BCD4", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
                   Forgot Password?
                 </button>
               </div>

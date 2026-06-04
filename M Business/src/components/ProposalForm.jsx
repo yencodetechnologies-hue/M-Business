@@ -9,7 +9,8 @@ export default function ProposalForm({ onBack, onSave }) {
     const c = containerRef.current;
     if (!c) return;
 
-    // We no longer inject scripts! We use the imported logic module!
+    // Expose logic to window so inline HTML string events don't throw ReferenceError
+    Object.assign(window, logic);
 
     const handleClick = (e) => {
       const btn = e.target.closest('[onclick]');

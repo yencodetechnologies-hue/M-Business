@@ -1805,7 +1805,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
               <div className="inv-bank-detail" style={{ fontSize: "9px", color: "var(--text)", lineHeight: "1.5" }}>
                 {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
-                {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
+          {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
                 {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
                 {inv.upiId && <div style={{marginTop: "2px"}}>UPI: {inv.upiId}</div>}
               </div>

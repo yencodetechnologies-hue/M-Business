@@ -146,6 +146,15 @@ export default function InvoiceViewer() {
   const isPaid = balanceDue <= 0;
   const qrData = window.location.href;
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("print") === "true") {
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }
+  }, []);
+
   const getTemplateStyles = (templateName) => {
     switch (templateName) {
       case "Minimal":

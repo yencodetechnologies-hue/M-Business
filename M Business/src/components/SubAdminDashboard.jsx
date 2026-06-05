@@ -1752,7 +1752,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack }) {
+function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack, onCreateProject }) {
   const [search, setSearch] = useState("");
 
   const projectsWithProgress = (projects || []).map(p => {
@@ -1882,6 +1882,23 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
+
+      {/* ── Page header ── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+        <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2332" }}>Projects</div>
+        <div style={{ display: "flex", gap: 10 }}>
+          {onBack && (
+            <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 18px", background: "transparent", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#4A5568", cursor: "pointer", fontFamily: "inherit" }}>
+              <i className="ti ti-arrow-left" /> Dashboard
+            </button>
+          )}
+          {onCreateProject && (
+            <button onClick={onCreateProject} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 18px", background: "#00BCD4", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}>
+              <i className="ti ti-plus" /> New Project
+            </button>
+          )}
+        </div>
+      </div>
 
       <ModernProjectsView
         projects={projectsWithProgress}
@@ -4850,7 +4867,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-                {validActive === "projects" && <ProjectsPage onBack={() => setActive("dashboard")} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
+                {validActive === "projects" && <ProjectsPage onBack={() => setActive("dashboard")} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() => setModal("project")} onAddEmployee={() => {
                   const limit = getSubscriptionLimit("employee");
                   if (subscription && employees.length >= limit) {
                     setLimitModal({ type: "employee", limit });

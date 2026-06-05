@@ -4650,7 +4650,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               </thead>
                               <tbody>
                                 {invoices.filter(i => (i.invoiceNo || "").toLowerCase().includes(dashSearch.toLowerCase()) || (i.clientName || "").toLowerCase().includes(dashSearch.toLowerCase())).slice(0, 4).map(inv => (
-                                  <tr key={inv.id || inv._id} onClick={() => { setJumpInvoice(inv); setSidebarOverride("dashboard"); setActive("invoices"); }} style={{ cursor: "pointer" }}>
+                                  <tr key={inv.id || inv._id} onClick={() => { 
+  setJumpInvoice(null); // clear first to force re-trigger
+  setTimeout(() => {
+    setJumpInvoice(inv); 
+    setActive("invoices"); 
+  }, 0);
+}} style={{ cursor: "pointer" }}>
                                     <td><input type="checkbox" className="cb" /></td>
                                     <td><div className="file-type-icon doc"><i className="ti ti-file-text"></i></div></td>
                                     <td className="fname">{inv.invoiceNo || "Invoice"} — {inv.clientName}</td>
@@ -4699,7 +4705,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                     <div className="ft-bar" style={{ background: "#0061FF", width: "70%" }}></div>
                                   </div>
                                 </div>
-                                <div className="ft-item" onClick={() => setActive("projects")} style={{ cursor: "pointer" }}>
+                                <div className="ft-item" onClick={() => { setSidebarOverride(null); setActive("projects"); }}style={{ cursor: "pointer" }}>
                                   <div className="ft-icon" style={{ background: "#E8FAF3", color: "#26C281" }}><i className="ti ti-device-mobile"></i></div>
                                   <div style={{ flex: 1 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Mobile Apps</span><span className="ft-size">{mobileAppsCount}</span></div>

@@ -659,9 +659,7 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
       {/* Back */}
-      <button onClick={onBack} style={{ display:"flex", alignItems:"center", gap:8, background:TC.card, border:`1.5px solid ${TC.border}`, borderRadius:10, padding:"8px 16px", fontSize:13, fontWeight:700, color:TC.textMid, cursor:"pointer", fontFamily:"inherit", width:"fit-content" }}>
-        ← Back to Dashboard
-      </button>
+     
 
       {/* Hero */}
       <div style={{ background:"linear-gradient(135deg,#0f9baa,#00BCD4,#26c6da)", borderRadius:18, padding:"24px 28px", display:"flex", alignItems:"center", gap:18, color:"#fff", position:"relative", overflow:"hidden" }}>

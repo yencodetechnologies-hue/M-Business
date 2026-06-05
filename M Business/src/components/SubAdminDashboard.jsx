@@ -1872,17 +1872,16 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       {/* ── Page header ── */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-        <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2332" }}>Projects</div>
-        <div style={{ display: "flex", gap: 10 }}>
-          {onBack && (
-            <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 18px", background: "transparent", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#4A5568", cursor: "pointer", fontFamily: "inherit" }}>
-              <i className="ti ti-arrow-left" /> Dashboard
-            </button>
-          )}
-    
-        </div>
-      </div>
+   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+    {onBack && (
+      <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "#E0F7FA", border: "none", borderRadius: 10, cursor: "pointer", color: "#00BCD4", flexShrink: 0 }}>
+        <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
+      </button>
+    )}
+    <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2332" }}>Projects</div>
+  </div>
+</div>
 
       <ModernProjectsView
         projects={projectsWithProgress}
@@ -4490,12 +4489,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 {dashTasksProj ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%", marginTop: "10px" }}>
                     <div>
-                      <button
-                        onClick={() => setDashTasksProj(null)}
-                        style={{ padding: "8px 16px", background: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", color: "#374151" }}
-                      >
-                        ← Back to Dashboard
-                      </button>
+                    
                     </div>
                     <div style={{ flex: 1 }}>
                       <ModernEmployeeProjectDetails
@@ -4809,7 +4803,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-                {validActive === "projects" && <ProjectsPage onBack={() => setActive("dashboard")} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() => setActive("create-project")} onAddEmployee={() => {
+{validActive === "projects" && <ProjectsPage 
+  onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() => setActive("create-project")} onAddEmployee={() => {
                   const limit = getSubscriptionLimit("employee");
                   if (subscription && employees.length >= limit) {
                     setLimitModal({ type: "employee", limit });

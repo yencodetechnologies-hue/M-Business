@@ -1254,11 +1254,18 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
         )}
 
         {/* PAGE HEADER */}
-        <div className="page-header">
-          <div>
-            <div className="page-title">Invoices</div>
-            <div className="page-sub">Track, manage and send invoices to your clients</div>
-          </div>
+     <div className="page-header">
+  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+    {onBack && (
+      <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "#E0F7FA", border: "none", borderRadius: 10, cursor: "pointer", color: "#00BCD4", flexShrink: 0 }}>
+        <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
+      </button>
+    )}
+    <div>
+      <div className="page-title">Invoices</div>
+      <div className="page-sub">Track, manage and send invoices to your clients</div>
+    </div>
+  </div>
           <div className="header-actions">
             <button className="filter-btn"><i className="ti ti-filter" style={{fontSize:14}}></i> Filter</button>
             <button className="filter-btn"><i className="ti ti-calendar" style={{fontSize:14}}></i> May 2026</button>

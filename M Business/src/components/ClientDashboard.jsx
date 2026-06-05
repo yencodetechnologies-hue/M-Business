@@ -634,9 +634,7 @@ export default function ClientDashboard({ user, setUser }) {
         <style>{CSS}</style>
         {renderTopNav()}
         <div style={{ maxWidth: 900, margin: "24px auto", padding: "0 24px" }}>
-          <button onClick={() => setActive("dashboard")} style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid " + C.border, background: C.surface, padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, color: C.text2, marginBottom: 20 }}>
-            <i className="ti ti-arrow-left"></i> Back to Dashboard
-          </button>
+        
           <SettingsPage
             user={user}
             THEME={{

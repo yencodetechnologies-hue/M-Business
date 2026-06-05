@@ -23,12 +23,12 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
     tenure = years > 0 ? `${years} yr ${months} mo` : `${months} mo`;
   }
 
-  // Projects helpers
-  const staticProjects = [
+  // Projects state
+  const [staticProjects, setStaticProjects] = useState([
     { _id: "p1", name: "M Business", role: "UI/UX Design", progress: 65, status: "In Progress" },
     { _id: "p2", name: "M Access", role: "Frontend Dev", progress: 15, status: "Pending" },
     { _id: "p3", name: "YDMart App", role: "Backend API", progress: 100, status: "Completed" }
-  ];
+  ]);
 
   const activeProjects = staticProjects.filter(p => (p.status || '').toLowerCase() !== 'completed');
   const totalWorkload = staticProjects.length > 0
@@ -45,16 +45,84 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
     { bg: '#FFF1F2', color: '#EF4444' },
   ];
 
-  // Tasks helpers
-  const staticTasks = [
+  // Tasks state
+  const [staticTasks, setStaticTasks] = useState([
     { _id: "t1", title: "Design Landing Page Layout", priority: "Medium", status: "Pending", dueDate: "2026-06-10" },
     { _id: "t2", title: "Implement OAuth Login Flow", priority: "High", status: "Pending", dueDate: "2026-06-12" },
     { _id: "t3", title: "Database Schema Migration", priority: "Low", status: "Completed", dueDate: "2026-06-05" }
-  ];
+  ]);
 
   const pendingTasks = staticTasks.filter(t => (t.status || '').toLowerCase() === 'pending' || (!t.completed && !t.done && t.status !== 'completed'));
   const completedTasks = staticTasks.filter(t => t.completed || t.done || (t.status || '').toLowerCase() === 'completed');
   const filteredTasks = taskTab === 'all' ? staticTasks : taskTab === 'pending' ? pendingTasks : completedTasks;
+
+  // Documents state
+  const [requestedDocs, setRequestedDocs] = useState([]);
+
+  // Modals state
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [showRequestDocModal, setShowRequestDocModal] = useState(false);
+
+  // Form states
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskPriority, setNewTaskPriority] = useState("Medium");
+  const [newTaskDueDate, setNewTaskDueDate] = useState("");
+
+  const [newDocName, setNewDocName] = useState("");
+  const [newDocType, setNewDocType] = useState("Offer Letter");
+
+  // Interactions
+  const handleToggleTask = (taskId) => {
+    setStaticTasks(prev => prev.map(t => {
+      if (t._id === taskId) {
+        const done = t.completed || t.done || (t.status || '').toLowerCase() === 'completed';
+        return {
+          ...t,
+          status: done ? "Pending" : "Completed",
+          completed: !done,
+          done: !done
+        };
+      }
+      return t;
+    }));
+  };
+
+  const handleDeleteTask = (taskId) => {
+    setStaticTasks(prev => prev.filter(t => t._id !== taskId));
+  };
+
+  const handleAddTaskSubmit = (e) => {
+    e.preventDefault();
+    if (!newTaskTitle.trim()) return;
+    const newTask = {
+      _id: "t_" + Date.now(),
+      title: newTaskTitle,
+      priority: newTaskPriority,
+      status: "Pending",
+      dueDate: newTaskDueDate || new Date(Date.now() + 86400000 * 2).toISOString().substring(0, 10)
+    };
+    setStaticTasks(prev => [...prev, newTask]);
+    setShowAddTaskModal(false);
+    setNewTaskTitle("");
+    setNewTaskPriority("Medium");
+    setNewTaskDueDate("");
+  };
+
+  const handleRequestDocSubmit = (e) => {
+    e.preventDefault();
+    if (!newDocName.trim()) return;
+    const newDoc = {
+      _id: "doc_" + Date.now(),
+      name: newDocName,
+      type: newDocType,
+      uploadedAt: new Date().toISOString(),
+      url: "#"
+    };
+    setRequestedDocs(prev => [...prev, newDoc]);
+    setShowRequestDocModal(false);
+    setNewDocName("");
+    setNewDocType("Offer Letter");
+  };
 
   const getPriorityStyle = (priority = '') => {
     const p = priority.toLowerCase();
@@ -91,7 +159,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
     return docIcons.default;
   };
 
-  const docsToShow = Array.isArray(empDocs) ? empDocs : (empDocs ? Object.values(empDocs) : []);
+  const apiDocs = Array.isArray(empDocs) ? empDocs : (empDocs ? Object.values(empDocs) : []);
+  const docsToShow = [...apiDocs, ...requestedDocs];
 
   return (
     <div style={{
@@ -276,6 +345,11 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
             <div className="ed-info-item"><div className="lbl">Employment Type</div><div className="val">{emp.employmentType || emp.type || "Full-Time"}</div></div>
             {emp.salary && <div className="ed-info-item"><div className="lbl">Salary</div><div className="val">₹{Number(emp.salary).toLocaleString()}</div></div>}
             {emp.address && <div className="ed-info-item"><div className="lbl">Address</div><div className="val">{emp.address}</div></div>}
+            {emp.dateOfBirth && <div className="ed-info-item"><div className="lbl">Date of Birth</div><div className="val">{new Date(emp.dateOfBirth).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div></div>}
+            {emp.maritalStatus && <div className="ed-info-item"><div className="lbl">Marital Status</div><div className="val">{emp.maritalStatus}</div></div>}
+            {(emp.bankName || emp.bankDetails?.bankName) && <div className="ed-info-item"><div className="lbl">Bank Name</div><div className="val">{emp.bankName || emp.bankDetails?.bankName}</div></div>}
+            {(emp.accountNumber || emp.bankDetails?.accountNumber) && <div className="ed-info-item"><div className="lbl">Account Number</div><div className="val">{emp.accountNumber || emp.bankDetails?.accountNumber}</div></div>}
+            {(emp.ifscCode || emp.bankDetails?.ifscCode) && <div className="ed-info-item"><div className="lbl">IFSC Code</div><div className="val">{emp.ifscCode || emp.bankDetails?.ifscCode}</div></div>}
           </div>
         </div>
 
@@ -332,11 +406,11 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
             <div className="ed-card-title"><i className="ti ti-briefcase"></i> Assigned Projects</div>
             <span style={{fontSize: "12px", fontWeight: "800", color: "var(--teal)"}}>{activeProjects.length} active</span>
           </div>
-          {projects.length === 0 ? (
+          {staticProjects.length === 0 ? (
             <div className="ed-empty"><i className="ti ti-briefcase-off" style={{fontSize: 24, display: 'block', marginBottom: 8}}></i>No projects assigned</div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column" }}>
-              {projects.map((proj, i) => {
+              {staticProjects.map((proj, i) => {
                 const pc = projColors[i % projColors.length];
                 const ic = projIcons[i % projIcons.length];
                 const perc = proj.progress || proj.percentage || proj.completion || 0;
@@ -359,7 +433,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
               })}
             </div>
           )}
-          {projects.length > 0 && (
+          {staticProjects.length > 0 && (
             <div className="ed-progress-group" style={{marginTop: "16px", marginBottom: 0}}>
               <div className="ed-progress-header"><span>Overall Workload</span><span>{totalWorkload}%</span></div>
               <div className="ed-progress-bar"><div className="ed-progress-fill" style={{width: `${totalWorkload}%`, background: "var(--teal)"}}></div></div>
@@ -373,7 +447,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
             <div className="ed-card-title"><i className="ti ti-checkbox"></i> Tasks</div>
             <span style={{fontSize: "11px", fontWeight: "700", color: "var(--text-muted)"}}>
               {pendingTasks.length} pending &nbsp;
-              <button className="ed-btn" style={{padding: "6px 12px", background: "var(--teal)", color: "#fff", border: "none", fontSize: "11px", borderRadius: "8px"}}>
+              <button className="ed-btn" onClick={() => setShowAddTaskModal(true)} style={{padding: "6px 12px", background: "var(--teal)", color: "#fff", border: "none", fontSize: "11px", borderRadius: "8px"}}>
                 <i className="ti ti-plus"></i> Assign Task
               </button>
             </span>
@@ -394,10 +468,10 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
                 const tagStyle = getPriorityStyle(priority);
                 return (
                   <div key={task._id || i} className="ed-task-item">
-                    <div className={`ed-task-cb ${done ? 'done' : ''}`}>
+                    <div className={`ed-task-cb ${done ? 'done' : ''}`} onClick={() => handleToggleTask(task._id)} style={{ cursor: "pointer" }}>
                       {done && <i className="ti ti-check" style={{fontSize: 12}}></i>}
                     </div>
-                    <div className="ed-task-content">
+                    <div className="ed-task-content" onClick={() => handleToggleTask(task._id)} style={{ cursor: "pointer" }}>
                       <div className={`ed-task-title ${done ? 'done' : ''}`}>{task.title || task.taskName || "Task"}</div>
                       <div className="ed-task-due" style={{color: overdue ? 'var(--danger)' : '#64748B'}}>
                         {overdue ? 'Overdue - ' : 'Due: '}
@@ -405,7 +479,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
                       </div>
                     </div>
                     <div className="ed-task-tag" style={tagStyle}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</div>
-                    <i className="ti ti-x" style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
+                    <i className="ti ti-x" onClick={() => handleDeleteTask(task._id)} style={{color: "var(--text-muted)", cursor: "pointer"}}></i>
                   </div>
                 );
               })}
@@ -417,7 +491,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         <div className="ed-card">
           <div className="ed-card-header">
             <div className="ed-card-title"><i className="ti ti-folder"></i> Documents</div>
-            <button className="ed-btn" style={{padding: "6px 14px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#fff", border: "none"}}>
+            <button className="ed-btn" onClick={() => setShowRequestDocModal(true)} style={{padding: "6px 14px", fontSize: "11px", borderRadius: "8px", background: "var(--teal)", color: "#fff", border: "none"}}>
               <i className="ti ti-download"></i> Request Document
             </button>
           </div>
@@ -471,6 +545,103 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
           <button className="ed-btn" style={{ background: "#FFF1F1", color: "#DC2626", border: "1px solid #FECACA", fontSize: "12px", padding: "6px 14px" }} onClick={onDelete}><i className="ti ti-trash"></i> Delete Employee</button>
         </div>
       </div>
+
+
+      {/* ADD TASK MODAL */}
+      {showAddTaskModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
+            <div style={{ display: "flex", justifySpaceBetween: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text)" }}>Assign New Task</div>
+              <button onClick={() => setShowAddTaskModal(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "var(--text-muted)" }}><i className="ti ti-x"></i></button>
+            </div>
+            <form onSubmit={handleAddTaskSubmit}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Task Title</label>
+                <input 
+                  type="text" 
+                  value={newTaskTitle} 
+                  onChange={e => setNewTaskTitle(e.target.value)} 
+                  required 
+                  placeholder="e.g. Design Landing Page Layout" 
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
+                />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Priority</label>
+                  <select 
+                    value={newTaskPriority} 
+                    onChange={e => setNewTaskPriority(e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Due Date</label>
+                  <input 
+                    type="date" 
+                    value={newTaskDueDate} 
+                    onChange={e => setNewTaskDueDate(e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+                <button type="button" onClick={() => setShowAddTaskModal(false)} style={{ background: "#f1f5f9", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                <button type="submit" style={{ background: "var(--teal)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Assign Task</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* REQUEST DOCUMENT MODAL */}
+      {showRequestDocModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 450, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)", fontFamily: "'Nunito', sans-serif" }}>
+            <div style={{ display: "flex", justifySpaceBetween: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text)" }}>Request Document</div>
+              <button onClick={() => setShowRequestDocModal(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "var(--text-muted)" }}><i className="ti ti-x"></i></button>
+            </div>
+            <form onSubmit={handleRequestDocSubmit}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Name</label>
+                <input 
+                  type="text" 
+                  value={newDocName} 
+                  onChange={e => setNewDocName(e.target.value)} 
+                  required 
+                  placeholder="e.g. Aadhar Card" 
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700 }}
+                />
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>Document Type</label>
+                <select 
+                  value={newDocType} 
+                  onChange={e => setNewDocType(e.target.value)}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", outline: "none", fontSize: 13, fontWeight: 700, background: "#fff" }}
+                >
+                  <option value="Offer Letter">Offer Letter</option>
+                  <option value="ID Proof">ID Proof</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Degree Certificate">Degree Certificate</option>
+                  <option value="Resume/CV">Resume/CV</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+                <button type="button" onClick={() => setShowRequestDocModal(false)} style={{ background: "#f1f5f9", color: "var(--text-muted)", border: "none", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                <button type="submit" style={{ background: "var(--teal)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Request Document</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

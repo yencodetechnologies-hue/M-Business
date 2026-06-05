@@ -20,6 +20,7 @@ const employeeSchema = new mongoose.Schema({
   otpExpires: { type: Date },
   dateOfBirth:    { type: String, default: "" },
   joiningDate:    { type: String, default: "" },
-  maritalStatus:  { type: String, enum: ["Unmarried", "Married"], default: "Unmarried" }
+  maritalStatus:  { type: String, enum: ["Unmarried", "Married"], default: "Unmarried" },
+  address:        { type: String, default: "" }
 }, { timestamps: true });
 module.exports = mongoose.model("Employee", employeeSchema);

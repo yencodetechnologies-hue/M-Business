@@ -988,7 +988,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
   const getInitials = (n) => n ? n.split(' ').map(x => x[0]).join('').toUpperCase().slice(0, 2) : "?";
 
   const openEdit = (e) => {
-    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "Employee", department: e.department || "", salary: e.salary || "", dateOfBirth: e.dateOfBirth ? e.dateOfBirth.substring(0, 10) : "", joiningDate: e.joiningDate ? e.joiningDate.substring(0, 10) : "", maritalStatus: e.maritalStatus || "Unmarried", status: e.status || "Pending", address: e.address || "", bankName: e.bankName || "", ifscCode: e.ifscCode || "", accountNumber: e.accountNumber || "" });
+    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "Employee", department: e.department || "", salary: e.salary || "", dateOfBirth: e.dateOfBirth ? e.dateOfBirth.substring(0, 10) : "", joiningDate: e.joiningDate ? e.joiningDate.substring(0, 10) : "", maritalStatus: e.maritalStatus || "Unmarried", status: e.status || "Pending", address: e.address || "", bankName: e.bankName || e.bankDetails?.bankName || "", ifscCode: e.ifscCode || e.bankDetails?.ifscCode || "", accountNumber: e.accountNumber || e.bankDetails?.accountNumber || "" });
     setEditErr({}); setEditEmp(e);
   };
   const saveEdit = async () => {
@@ -999,10 +999,18 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
     try {
       setSaving(true);
       const res = await axios.put(`${BASE_URL}/api/employees/${editEmp._id}`, editForm);
-      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...(res.data || editForm) } : e));
+      const updated = { ...editEmp, ...(res.data || editForm) };
+      setEmployees(prev => prev.map(e => e._id === editEmp._id ? updated : e));
+      if (viewEmp && viewEmp._id === editEmp._id) {
+        setViewEmp(updated);
+      }
       setEditEmp(null); showToast("✅ Employee updated successfully!");
     } catch {
-      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...editForm } : e));
+      const updated = { ...editEmp, ...editForm };
+      setEmployees(prev => prev.map(e => e._id === editEmp._id ? updated : e));
+      if (viewEmp && viewEmp._id === editEmp._id) {
+        setViewEmp(updated);
+      }
       setEditEmp(null); showToast("✅ Updated locally!");
     } finally { setSaving(false); }
   };
@@ -1010,10 +1018,18 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
     try {
       await axios.delete(`${BASE_URL}/api/employees/${deleteTarget._id}`);
       setEmployees(p => p.filter(e => e._id !== deleteTarget._id));
-      setDeleteTarget(null); showToast("🗑️ Employee deleted!");
+      setDeleteTarget(null);
+      if (viewEmp && viewEmp._id === deleteTarget._id) {
+        setViewEmp(null);
+      }
+      showToast("🗑️ Employee deleted!");
     } catch {
       setEmployees(p => p.filter(e => e._id !== deleteTarget._id));
-      setDeleteTarget(null); showToast("🗑️ Deleted locally!");
+      setDeleteTarget(null);
+      if (viewEmp && viewEmp._id === deleteTarget._id) {
+        setViewEmp(null);
+      }
+      showToast("🗑️ Deleted locally!");
     }
   };
 
@@ -1024,7 +1040,64 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
   const copyLink = () => { navigator.clipboard.writeText(onboardingLink); setLinkCopied(true); setTimeout(() => setLinkCopied(false), 2000); };
 
   if (viewEmp) {
-    return <EmployeeDetail emp={viewEmp} onBack={() => setViewEmp(null)} onEdit={() => { setViewEmp(null); openEdit(viewEmp); }} onDelete={() => { setViewEmp(null); setDeleteTarget(viewEmp); }} empDocs={empDocs} empDocsLoading={empDocsLoading} projects={projects} tasks={tasks} onViewProject={(p) => { setViewEmp(null); setJumpProject(p); setActive("projects"); }} />;
+    return (
+      <>
+        <EmployeeDetail 
+          emp={viewEmp} 
+          onBack={() => setViewEmp(null)} 
+          onEdit={() => openEdit(viewEmp)} 
+          onDelete={() => setDeleteTarget(viewEmp)} 
+          empDocs={empDocs} 
+          empDocsLoading={empDocsLoading} 
+          projects={projects} 
+          tasks={tasks} 
+          onViewProject={(p) => { setViewEmp(null); setJumpProject(p); setActive("projects"); }} 
+        />
+        {editEmp && (
+          <Mdl title="Edit Employee" onClose={() => setEditEmp(null)}>
+            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              <Fld label="Full Name *" value={editForm.name} onChange={v => setEditForm(p => ({ ...p, name: v }))} error={editErr.name} />
+              <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
+              <Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
+              <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={["Manager", "Developer", "Tech", "Others"]} />
+              <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
+              <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
+              <Fld label="Date of Birth" value={editForm.dateOfBirth} onChange={v => setEditForm(p => ({ ...p, dateOfBirth: v }))} type="date" />
+              <Fld label="Joining Date" value={editForm.joiningDate} onChange={v => setEditForm(p => ({ ...p, joiningDate: v }))} type="date" />
+              <Fld label="Marital Status" value={editForm.maritalStatus} onChange={v => setEditForm(p => ({ ...p, maritalStatus: v }))} options={["Unmarried", "Married"]} />
+              <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
+            </div>
+            <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
+
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+                <Fld label="Bank Name" value={editForm.bankName} onChange={v => setEditForm(p => ({ ...p, bankName: v }))} />
+                <Fld label="IFSC Code" value={editForm.ifscCode} onChange={v => setEditForm(p => ({ ...p, ifscCode: v }))} />
+                <Fld label="Account Number" value={editForm.accountNumber} onChange={v => setEditForm(p => ({ ...p, accountNumber: v }))} />
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
+              <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes →"}</button>
+            </div>
+          </Mdl>
+        )}
+        {deleteTarget && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
+            <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 400, boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text)", marginBottom: 12 }}>Delete Employee</div>
+              <div style={{ fontSize: 13, color: "var(--text-mid)" }}>Are you sure you want to delete {deleteTarget.name}? This action cannot be undone.</div>
+              <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
+                <button onClick={() => setDeleteTarget(null)} style={{ background: "#f1f5f9", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                <button onClick={doDelete} style={{ background: "#dc2626", color: "#fff", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Delete</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    );
   }
 
   const activeCount = employees.filter(e => e.status === "Active" || e.status === "Approved").length;

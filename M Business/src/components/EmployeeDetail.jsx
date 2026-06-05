@@ -24,9 +24,15 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
   }
 
   // Projects helpers
-  const activeProjects = projects.filter(p => (p.status || '').toLowerCase() !== 'completed');
-  const totalWorkload = projects.length > 0
-    ? Math.round(projects.reduce((sum, p) => sum + (p.progress || p.percentage || 0), 0) / projects.length)
+  const staticProjects = [
+    { _id: "p1", name: "M Business", role: "UI/UX Design", progress: 65, status: "In Progress" },
+    { _id: "p2", name: "M Access", role: "Frontend Dev", progress: 15, status: "Pending" },
+    { _id: "p3", name: "YDMart App", role: "Backend API", progress: 100, status: "Completed" }
+  ];
+
+  const activeProjects = staticProjects.filter(p => (p.status || '').toLowerCase() !== 'completed');
+  const totalWorkload = staticProjects.length > 0
+    ? Math.round(staticProjects.reduce((sum, p) => sum + (p.progress || p.percentage || 0), 0) / staticProjects.length)
     : 0;
 
   const projIcons = ['ti-world', 'ti-device-mobile', 'ti-chart-bar', 'ti-code', 'ti-building', 'ti-rocket'];
@@ -40,9 +46,15 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
   ];
 
   // Tasks helpers
-  const pendingTasks = tasks.filter(t => !t.completed && !t.done && t.status !== 'completed');
-  const completedTasks = tasks.filter(t => t.completed || t.done || t.status === 'completed');
-  const filteredTasks = taskTab === 'all' ? tasks : taskTab === 'pending' ? pendingTasks : completedTasks;
+  const staticTasks = [
+    { _id: "t1", title: "Design Landing Page Layout", priority: "Medium", status: "Pending", dueDate: "2026-06-10" },
+    { _id: "t2", title: "Implement OAuth Login Flow", priority: "High", status: "Pending", dueDate: "2026-06-12" },
+    { _id: "t3", title: "Database Schema Migration", priority: "Low", status: "Completed", dueDate: "2026-06-05" }
+  ];
+
+  const pendingTasks = staticTasks.filter(t => (t.status || '').toLowerCase() === 'pending' || (!t.completed && !t.done && t.status !== 'completed'));
+  const completedTasks = staticTasks.filter(t => t.completed || t.done || (t.status || '').toLowerCase() === 'completed');
+  const filteredTasks = taskTab === 'all' ? staticTasks : taskTab === 'pending' ? pendingTasks : completedTasks;
 
   const getPriorityStyle = (priority = '') => {
     const p = priority.toLowerCase();

@@ -1644,23 +1644,10 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
   const [viewTasksProj, setViewTasksProj] = useState(null);
 
   const projectsWithProgress = (projects || []).map(p => {
-    const projId = String(p._id || p.id || "");
-    const projName = String(p.name || p.title || "").toLowerCase();
-    
-    const projTasks = (tasks || []).filter(t => {
-      const tProjId = String(t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id || "");
-      return tProjId === projId || tProjId.toLowerCase() === projName;
-    });
-    
-    let pct = 0;
+    let pct = p.progress || 0;
     const s = (p.status || "").toLowerCase();
     if (s === "completed" || s === "done") {
       pct = 100;
-    } else if (projTasks.length > 0) {
-      const doneTasks = projTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length;
-      pct = Math.round((doneTasks / projTasks.length) * 100);
-    } else {
-      pct = p.progress || 0;
     }
     return { ...p, progress: pct };
   });

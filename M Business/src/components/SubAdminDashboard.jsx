@@ -1164,33 +1164,35 @@ ${onboardingLink}`;
       </div>
 
       {editEmp && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(15,28,46,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, backdropFilter: "blur(4px)" }}>
-          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: 490, maxWidth: "95vw", boxShadow: "0 24px 80px rgba(0,0,0,0.18)", border: "1px solid var(--border)" }}>
-            <div style={{ fontSize: 17, fontWeight: 900, color: "var(--text)", marginBottom: 20 }}>Edit Employee</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <label style={{ fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1, textTransform: "uppercase" }}>Full Name</label>
-                <input type="text" value={editForm.name} onChange={e => { setEditForm(p => ({ ...p, name: e.target.value })); setEditErr(p => ({ ...p, name: "" })); }} style={{ background: "#f8fafc", border: `1.5px solid ${editErr.name ? "#dc2626" : "var(--border)"}`, borderRadius: 8, padding: "9px 12px", fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none" }} />
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <label style={{ fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1, textTransform: "uppercase" }}>Email</label>
-                <input type="text" value={editForm.email} onChange={e => { setEditForm(p => ({ ...p, email: e.target.value })); setEditErr(p => ({ ...p, email: "" })); }} style={{ background: "#f8fafc", border: `1.5px solid ${editErr.email ? "#dc2626" : "var(--border)"}`, borderRadius: 8, padding: "9px 12px", fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none" }} />
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <label style={{ fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1, textTransform: "uppercase" }}>Role</label>
-                <input type="text" value={editForm.role} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))} style={{ background: "#f8fafc", border: "1.5px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none" }} />
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <label style={{ fontSize: 10, fontWeight: 900, color: "var(--text-soft)", letterSpacing: 1, textTransform: "uppercase" }}>Department</label>
-                <input type="text" value={editForm.department} onChange={e => setEditForm(p => ({ ...p, department: e.target.value }))} style={{ background: "#f8fafc", border: "1.5px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontFamily: "'Nunito',sans-serif", fontSize: 13, color: "var(--text)", outline: "none" }} />
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
-              <button onClick={() => setEditEmp(null)} style={{ background: "#f1f5f9", color: "var(--text-mid)", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-              <button onClick={saveEdit} style={{ background: "#00BCD4", color: "#fff", border: "none", padding: "9px 18px", borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>{saving ? "Saving..." : "Save Changes"}</button>
+        <Mdl title="Edit Employee" onClose={() => setEditEmp(null)}>
+          <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+            <Fld label="Full Name *" value={editForm.name} onChange={v => setEditForm(p => ({ ...p, name: v }))} error={editErr.name} />
+            <Fld label="Email *" value={editForm.email} onChange={v => { setEditForm(p => ({ ...p, email: v })); setEditErr(p => ({ ...p, email: "" })); }} type="email" error={editErr.email} />
+            <Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
+            <Fld label="Role / Position" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={["Manager", "Developer", "Tech", "Others"]} />
+            <Fld label="Department" value={editForm.department} onChange={v => setEditForm(p => ({ ...p, department: v }))} />
+            <Fld label="Salary" value={editForm.salary} onChange={v => setEditForm(p => ({ ...p, salary: v }))} />
+            <Fld label="Date of Birth" value={editForm.dateOfBirth} onChange={v => setEditForm(p => ({ ...p, dateOfBirth: v }))} type="date" />
+            <Fld label="Joining Date" value={editForm.joiningDate} onChange={v => setEditForm(p => ({ ...p, joiningDate: v }))} type="date" />
+            <Fld label="Marital Status" value={editForm.maritalStatus} onChange={v => setEditForm(p => ({ ...p, maritalStatus: v }))} options={["Unmarried", "Married"]} />
+            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Pending", "Approved", "Rejected"]} />
+          </div>
+          <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
+
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              <Fld label="Bank Name" value={editForm.bankName} onChange={v => setEditForm(p => ({ ...p, bankName: v }))} />
+              <Fld label="IFSC Code" value={editForm.ifscCode} onChange={v => setEditForm(p => ({ ...p, ifscCode: v }))} />
+              <Fld label="Account Number" value={editForm.accountNumber} onChange={v => setEditForm(p => ({ ...p, accountNumber: v }))} />
             </div>
           </div>
-        </div>
+
+          <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
+            <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes →"}</button>
+          </div>
+        </Mdl>
       )}
 
       {deleteTarget && (
@@ -1652,23 +1654,10 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   const [search, setSearch] = useState("");
 
   const projectsWithProgress = (projects || []).map(p => {
-    const projId = String(p._id || p.id || "");
-    const projName = String(p.name || p.title || "").toLowerCase();
-    
-    const projTasks = (tasks || []).filter(t => {
-      const tProjId = String(t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id || "");
-      return tProjId === projId || tProjId.toLowerCase() === projName;
-    });
-    
-    let pct = 0;
+    let pct = p.progress || 0;
     const s = (p.status || "").toLowerCase();
     if (s === "completed" || s === "done") {
       pct = 100;
-    } else if (projTasks.length > 0) {
-      const doneTasks = projTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length;
-      pct = Math.round((doneTasks / projTasks.length) * 100);
-    } else {
-      pct = p.progress || 0;
     }
     return { ...p, progress: pct };
   });
@@ -1701,20 +1690,10 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (p) => {
-    const projId = String(p._id || p.id || "");
-    const projName = String(p.name || p.title || "").toLowerCase();
-    const projTasks = (tasks || []).filter(t => {
-      const tProjId = String(t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id || "");
-      return tProjId === projId || tProjId.toLowerCase() === projName;
-    });
-
     let currentProgress = p.progress || 0;
     const s = (p.status || "").toLowerCase();
     if (s === "completed" || s === "done") {
       currentProgress = 100;
-    } else if (projTasks.length > 0) {
-      const doneTasks = projTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length;
-      currentProgress = Math.round((doneTasks / projTasks.length) * 100);
     }
 
     setEditForm({ 
@@ -1922,10 +1901,6 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
               label="Progress (%)" 
               value={editForm.progress || 0} 
               type="number"
-              disabled={(tasks || []).filter(t => {
-                const tProjId = String(t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id || "");
-                return tProjId === String(editProj._id || editProj.id || "") || tProjId.toLowerCase() === String(editProj.name || "").toLowerCase();
-              }).length > 0}
               placeholder="0"
               onChange={v => {
                 let val = Number(v);
@@ -3221,6 +3196,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [empSaveLoading, setEmpSaveLoading] = useState(false);
 
   const [projects, setProjects] = useState([]);
+  const projectsWithProgress = (projects || []).map(p => {
+    let pct = p.progress || 0;
+    const s = (p.status || "").toLowerCase();
+    if (s === "completed" || s === "done") {
+      pct = 100;
+    }
+    return { ...p, progress: pct };
+  });
   const [projLoading, setProjLoading] = useState(false);
   const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", progress: 0, assignedTo: [] });
   const [npError, setNpError] = useState({});
@@ -4763,7 +4746,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   setNcError({}); setShowClientPass(false); setModal("client");
                 }} triggerCrop={triggerCrop} />}
 
-                {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projects} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
+                {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
                 {validActive === "projects" && <ProjectsPage onBack={() => setActive("dashboard")} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
                   const limit = getSubscriptionLimit("employee");

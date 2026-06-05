@@ -11,6 +11,8 @@ import CalendarPage from "./CalendarPage";
 import MessagingPage from "./MessagingPage";
 import SettingsPage from "./SettingsPage";
 import ImageCropModal from "./ImageCropModal";
+import ModernEmployeeProjects from "./ModernEmployeeProjects";
+import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
 
 const BASE = "/api/employee-dashboard";
 
@@ -1617,7 +1619,8 @@ function ProposalsPage({ proposals }) {
 
 export default function EmployeeDashboard({ user, setUser }) {
   const [page, setPage] = useState(() => localStorage.getItem("activeTab_employee") || "dashboard");
-  useEffect(() => { localStorage.setItem("activeTab_employee", page); }, [page]);
+  const [selectedEmpProject, setSelectedEmpProject] = useState(null);
+  useEffect(() => { localStorage.setItem("activeTab_employee", page); if (page !== "projects") setSelectedEmpProject(null); }, [page]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -2061,7 +2064,8 @@ export default function EmployeeDashboard({ user, setUser }) {
             <EmployeeSubscriptionWarning user={resolvedUser} />
             {page === "dashboard" && <DashboardPage user={resolvedUser} projects={projects} tasks={tasks} proposals={proposals} attendance={attendance} salary={salary} setPage={setPage} docStatus={docStatus} onOpenProfile={() => setProfileOpen(true)} />}
             {page === "myprofile" && <MyProfilePage user={resolvedUser} projects={projects} tasks={tasks} attendance={attendance} onBack={() => setPage("dashboard")} />}
-            {page === "projects" && <ProjectsPage projects={projects} tasks={tasks} />}
+            {page === "projects" && !selectedEmpProject && <ModernEmployeeProjects projects={projects} tasks={tasks} user={resolvedUser} onViewProject={(p) => setSelectedEmpProject(p)} />}
+            {page === "projects" && selectedEmpProject && <ModernEmployeeProjectDetails project={selectedEmpProject} tasks={tasks} user={resolvedUser} onBack={() => setSelectedEmpProject(null)} />}
             {page === "proposals" && <ProposalsPage proposals={proposals} />}
             {page === "tasks" && <TasksPage tasks={tasks} onToggle={handleToggleTask} />}
             {page === "attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify} />}

@@ -25,7 +25,10 @@ import AuthPage from "./AuthPage";
 import MySubscriptions from "./MySubscriptions";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
 import ImageCropModal from "./ImageCropModal";
+import PaymentDashboard from "./PaymentDashboard";
 import ModernProjectsView from "./ModernProjectsView";
+import ModernProjectCreator from "./ModernProjectCreator";
+import ModernProjectDetails from "./ModernProjectDetails";
 
 
 
@@ -1907,6 +1910,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         onEdit={openEdit}
         onDelete={setDeleteTarget}
         onAssign={(p) => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }}
+        onCreate={onCreateProject}
       />
 
       {viewProj && (
@@ -4114,7 +4118,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // Always land on mysubscriptions when enforced — never show dashboard
   const validActive = enforceMySubscriptions
     ? "mysubscriptions"
-    : ((findNavItem(active) || active === "tasks") ? active : navItems[0]?.key || "dashboard");
+    : ((findNavItem(active) || active === "tasks" || active === "create-project" || active === "project-details") ? active : navItems[0]?.key || "dashboard");
 
   const page = findNavItem(validActive) || navItems[0];
 
@@ -4306,7 +4310,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 </div>
               )}
               {validActive === "projects" && (
-                <button className="create-btn" onClick={() => { setNpError({}); setModal("project"); }}><i className="ti ti-plus"></i> New Project</button>
+                <button className="create-btn" onClick={() => { setNpError({}); setActive("create-project"); }}><i className="ti ti-plus"></i> New Project</button>
               )}
               {validActive === "managers" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -4599,9 +4603,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         <i className="ti ti-search"></i>
                         <input type="text" placeholder="Search projects, invoices, clients..." value={dashSearch} onChange={(e) => setDashSearch(e.target.value)} />
                       </div>
-                      <button className="create-btn" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ margin: 0 }}>
-                        <i className="ti ti-plus" style={{ fontSize: 15 }}></i> Create New
-                      </button>
+                    
                     </div>
 
                     <div className="modern-dash-content">
@@ -4856,7 +4858,26 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             )}
 
                 {/* ── Pages using new components ── */}
-                {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => {
+                {validActive === "create-project" && (
+                  <ModernProjectCreator
+                    clients={clients}
+                    employees={employees}
+                    onBack={() => setActive("projects")}
+                    onSuccess={(newProj) => {
+                      fetchProjects();
+                      setJumpProject(newProj?.project || newProj); // Ensure we get the project object from the response
+                      setActive("project-details");
+                    }}
+                  />
+                )}
+                {validActive === "project-details" && (
+                  <ModernProjectDetails 
+                    project={jumpProject} 
+                    tasks={tasks} 
+                    onBack={() => setActive("projects")} 
+                  />
+                )}
+                {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
                   const limit = getSubscriptionLimit("client");
                   if (subscription && clients.length >= limit) {
                     setLimitModal({ type: "client", limit });
@@ -4867,7 +4888,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
                 {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-                {validActive === "projects" && <ProjectsPage onBack={() => setActive("dashboard")} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() => setModal("project")} onAddEmployee={() => {
+                {validActive === "projects" && <ProjectsPage onBack={() => setActive("dashboard")} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() => setActive("create-project")} onAddEmployee={() => {
                   const limit = getSubscriptionLimit("employee");
                   if (subscription && employees.length >= limit) {
                     setLimitModal({ type: "employee", limit });

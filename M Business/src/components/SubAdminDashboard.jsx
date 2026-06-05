@@ -1051,6 +1051,31 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
           onBack={() => setViewEmp(null)} 
           onEdit={() => openEdit(viewEmp)} 
           onDelete={() => setDeleteTarget(viewEmp)} 
+          onDeactivate={async () => {
+            if (!window.confirm(`Are you sure you want to deactivate ${viewEmp.name}?`)) return;
+            try {
+              await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Inactive" });
+              setViewEmp(prev => ({ ...prev, status: "Inactive" }));
+              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Inactive" } : e));
+              showToast("👤 Employee deactivated!");
+            } catch (err) {
+              console.error("Failed to deactivate employee:", err);
+              showToast("❌ Failed to deactivate employee");
+            }
+          }}
+          onChangeRole={async () => {
+            const newRole = prompt(`Enter new role/position for ${viewEmp.name}:`, viewEmp.role || "");
+            if (newRole === null) return;
+            try {
+              await axios.put(`${BASE_URL}/api/employees/${viewEmp._id}`, { role: newRole });
+              setViewEmp(prev => ({ ...prev, role: newRole }));
+              setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, role: newRole } : e));
+              showToast("💼 Role updated successfully!");
+            } catch (err) {
+              console.error("Failed to update role:", err);
+              showToast("❌ Failed to update role");
+            }
+          }}
           empDocs={empDocs} 
           empDocsLoading={empDocsLoading} 
           projects={projects} 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from "../config";
 
-export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs, empDocsLoading, projects = [], tasks = [], onViewProject }) {
+export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, onDeactivate, onChangeRole, empDocs, empDocsLoading, projects = [], tasks = [], onViewProject }) {
   if (!emp) return null;
 
   const [taskTab, setTaskTab] = useState('all');
@@ -89,6 +89,21 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
 
   // Documents state
   const [requestedDocs, setRequestedDocs] = useState([]);
+  const [dbNotifications, setDbNotifications] = useState([]);
+
+  useEffect(() => {
+    const fetchEmpNotifications = async () => {
+      const empId = emp?._id || emp?.employeeId;
+      if (!empId) return;
+      try {
+        const res = await axios.get(`${BASE_URL}/api/notifications/${empId}`);
+        setDbNotifications(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch employee notifications:", err);
+      }
+    };
+    fetchEmpNotifications();
+  }, [emp]);
 
   // Modals state
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -258,7 +273,37 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
   };
 
   const apiDocs = Array.isArray(empDocs) ? empDocs : (empDocs ? Object.values(empDocs) : []);
-  const docsToShow = [...apiDocs, ...requestedDocs];
+
+  // Filter pending document request notifications (unread warnings or texts with upload/document)
+  const dbRequested = dbNotifications
+    .filter(n => !n.isRead && (n.type === "warning" || n.text?.toLowerCase().includes("upload") || n.icon === "📁"))
+    .map(n => {
+      let name = "";
+      const match = n.text.match(/Please upload your (.+?) \((.+?)\)/);
+      if (match) {
+        name = match[1];
+      } else {
+        name = n.text.replace("Please upload your ", "");
+      }
+      return {
+        _id: n._id,
+        name: name,
+        type: "Requested",
+        uploadedAt: n.createdAt,
+        url: "#"
+      };
+    });
+
+  // Filter out any dbRequested docs that have already been uploaded in apiDocs
+  const pendingDbRequested = dbRequested.filter(d => 
+    !apiDocs.some(ad => (ad.docType || ad.documentType || "").toLowerCase() === d.name.toLowerCase() || (ad.name || "").toLowerCase() === d.name.toLowerCase())
+  );
+
+  const docsToShow = [
+    ...apiDocs,
+    ...pendingDbRequested,
+    ...requestedDocs.filter(rd => !apiDocs.some(ad => (ad.name || "").toLowerCase() === rd.name.toLowerCase()))
+  ];
 
   return (
     <div style={{
@@ -379,8 +424,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
         </div>
         <div className="ed-actions">
           <button className="ed-btn" onClick={onEdit}><i className="ti ti-edit"></i> Edit Details</button>
-          <button className="ed-btn warning"><i className="ti ti-shield"></i> Change Role</button>
-          <button className="ed-btn danger" onClick={onDelete}><i className="ti ti-user-x"></i> Deactivate</button>
+          <button className="ed-btn warning" onClick={onChangeRole}><i className="ti ti-shield"></i> Change Role</button>
+          <button className="ed-btn danger" onClick={onDeactivate}><i className="ti ti-user-x"></i> Deactivate</button>
         </div>
       </div>
 
@@ -616,8 +661,14 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
                       <div className="ed-doc-meta">{metaStr}</div>
                     </div>
                     <div className="ed-doc-actions">
-                      {doc.url && <button className="ed-doc-btn view" onClick={() => window.open(doc.url, '_blank')}><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>}
-                      {doc.url && <button className="ed-doc-btn download" onClick={() => { const a = document.createElement('a'); a.href = doc.url; a.download = docName; a.click(); }}><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>}
+                      {doc.url && doc.url !== "#" ? (
+                        <>
+                          <button className="ed-doc-btn view" onClick={() => window.open(doc.url, '_blank')}><i className="ti ti-eye" style={{fontSize:12}}></i> View</button>
+                          <button className="ed-doc-btn download" onClick={() => { const a = document.createElement('a'); a.href = doc.url; a.download = docName; a.click(); }}><i className="ti ti-download" style={{fontSize:12}}></i> Download</button>
+                        </>
+                      ) : (
+                        <span style={{ fontSize: 11, color: "var(--text-muted)", background: "#F1F5F9", padding: "4px 10px", borderRadius: 20, fontWeight: 700 }}>Sent</span>
+                      )}
                     </div>
                   </div>
                 );
@@ -639,7 +690,7 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
           </div>
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <button className="ed-btn" style={{ background: "#FEF9EC", color: "#D97706", border: "1px solid #FDE68A", fontSize: "12px", padding: "6px 14px" }}><i className="ti ti-user-x"></i> Deactivate</button>
+          <button className="ed-btn" style={{ background: "#FEF9EC", color: "#D97706", border: "1px solid #FDE68A", fontSize: "12px", padding: "6px 14px" }} onClick={onDeactivate}><i className="ti ti-user-x"></i> Deactivate</button>
           <button className="ed-btn" style={{ background: "#FFF1F1", color: "#DC2626", border: "1px solid #FECACA", fontSize: "12px", padding: "6px 14px" }} onClick={onDelete}><i className="ti ti-trash"></i> Delete Employee</button>
         </div>
       </div>

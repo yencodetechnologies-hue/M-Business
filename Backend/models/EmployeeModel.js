@@ -8,7 +8,7 @@ const employeeSchema = new mongoose.Schema({
   department: { type: String, default: "" },
   salary:     { type: String, default: "" },
   password: { type: String, default: "" } , 
-  status:     { type: String, enum: ["Pending", "Approved", "Rejected"], default: "Pending" },
+  status:     { type: String, enum: ["Pending", "Approved", "Rejected", "Inactive"], default: "Pending" },
   companyId: { type: String, default: "" },
   profilePhoto: { type: String, default: "" },
   bankDetails: {

@@ -1,0 +1,71 @@
+﻿<USER_REQUEST>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>STA Corporation â€“ Client Portal Â· Powered by YENCODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --teal:#00BCD4;--teal2:#00ACC1;--teal3:#006E7F;
+  --teal-light:#E0F7FA;--teal-lighter:#F0FDFE;--teal-mid:rgba(0,188,212,.12);
+  --bg:#F3F8F9;--surface:#FFFFFF;--surface2:#F8FAFB;--border:#DFF0F2;--border2:#C5DDE0;
+  --text:#0D2027;--text2:#4E6B75;--text3:#96B0B8;
+  --green:#1DB87A;--green-bg:#E3FAF0;
+  --amber:#F59E0B;--amber-bg:#FEF3C7;
+  --red:#EF4444;--red-bg:#FEF2F2;
+  --purple:#7C3AED;--purple-bg:#EDE9FE;
+  --blue:#2563EB;--blue-bg:#EFF4FF;
+  --font:'Nunito',sans-serif;--font2:'Nunito Sans',sans-serif;
+  --radius:16px;--radius-sm:10px;
+}
+html,body{min-height:100%;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text);overflow-x:hidden}
+
+/* â”€â”€ TOP NAV â”€â”€ */
+.topnav{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 12px rgba(0,0,0,.05)}
+.topnav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:62px;display:flex;align-items:center;gap:16px}
+.tn-brand{display:flex;align-items:center;gap:10px}
+.tn-logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--teal3),var(--teal));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;letter-spacing:-.5px}
+.tn-company{font-size:15px;font-weig
+<truncated 45215 bytes>
+ class="cal-day">15</div><div class="cal-day">16</div><div class="cal-day">17</div>
+            <div class="cal-day">18</div><div class="cal-day selected">19</div><div class="cal-day">20</div><div class="cal-day">21</div>
+            <!-- Week 5 -->
+            <div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day">24</div>
+            <div class="cal-day has-event">25</div><div class="cal-day">26</div><div class="cal-day">27</div><div class="cal-day">28</div>
+            <!-- Week 6 -->
+            <div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day other-month">1</div>
+            <div class="cal-day other-month">2</div><div class="cal-day other-month">3</div><div class="cal-day other-month">4</div><div class="cal-day other-month">5</div>
+          </div>
+        </div>
+        <div style="padding:0 14px 8px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px">Upcoming Meetings</div>
+        <div class="meetings-list">
+          <div class="meeting-item">
+            <div class="mi-time-col">
+              <div class="mi-time">11:00</div>
+              <div class="mi-dur">1h</div>
+            </div>
+            <div class="mi-divider"></div>
+            <div style="flex:1">
+              <div class="mi-title">Final Review Call</div>
+              <div class="mi-meta">2 Jun Â· Google Meet Â· Prabhu + STA Admin</div>
+            </div>
+            <div class="mi-join"><i class="ti ti-video" style="font-size:12px"></i> Join</div>
+          </div>
+          <div class="meeting-item">
+            <div class="mi-time-col">
+              <div class="mi-time">3:00</div>
+              <div class="mi-dur">45m</div>
+            </div>
+            <div class="mi-divider"></div>
+            <div style="flex:1">
+              <div class="mi-title"
+<truncated 10689 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.

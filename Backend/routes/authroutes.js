@@ -91,6 +91,9 @@ router.post("/login", async (req, res) => {
       console.log("Employee password hash:", employee?.password);
 
       if (employee) {
+        if (employee.status === "Inactive") {
+          return res.status(403).json({ msg: "Your account is deactivated. Please contact support." });
+        }
         // Check if password exists and is hashed
         if (!employee.password || employee.password.length < 10) {
           console.log("Employee password not set or not hashed");

@@ -3,78 +3,39 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 import SettingsPage from "./SettingsPage";
 
-// ── Color System (from image: dark navy + pink-purple gradient) ──
+// ── Teal Theme Colors ──────────────────────────────────────────
 const C = {
-  bg:       "#0d0d1a",
-  surface:  "#12122b",
-  card:     "#1a1a35",
-  cardHov:  "#1f1f40",
-  border:   "#2a2a5020",
-  borderHov:"#e91e9940",
-
-  grad:     "linear-gradient(135deg,#e91e99,#7b2ff7)",
-  gradSoft: "linear-gradient(135deg,#e91e9918,#7b2ff718)",
-  gradText: "linear-gradient(135deg,#f472b6,#a78bfa)",
-
-  pink:     "#e91e99",
-  purple:   "#7b2ff7",
-  violet:   "#a855f7",
-
-  glowPink: "#e91e9930",
-  glowPurp: "#7b2ff730",
-
-  text:     "#ffffff",
-  muted:    "#a89cc8",
-  dim:      "#6655aa",
-
-  green:    "#00e5a0",
-  amber:    "#ffb547",
-  red:      "#ff4d6d",
-  blue:     "#4db8ff",
+  bg:       "#F3F8F9",
+  surface:  "#FFFFFF",
+  surface2: "#F8FAFB",
+  border:   "#DFF0F2",
+  border2:  "#C5DDE0",
+  text:     "#0D2027",
+  text2:    "#4E6B75",
+  text3:    "#96B0B8",
+  teal:     "#00BCD4",
+  teal2:    "#00ACC1",
+  teal3:    "#006E7F",
+  tealLight:"#E0F7FA",
+  tealLighter:"#F0FDFE",
+  tealMid:  "rgba(0,188,212,.12)",
+  green:    "#1DB87A",
+  greenBg:  "#E3FAF0",
+  amber:    "#F59E0B",
+  amberBg:  "#FEF3C7",
+  red:      "#EF4444",
+  redBg:    "#FEF2F2",
+  purple:   "#7C3AED",
+  purpleBg: "#EDE9FE",
+  blue:     "#2563EB",
+  blueBg:   "#EFF4FF",
 };
 
-const NAV = [
-  { key:"dashboard", icon:"ti-layout-dashboard", label:"Overview"  },
-  { key:"projects",  icon:"ti-layout-kanban",    label:"Projects"  },
-  { key:"tasks",     icon:"ti-checklist",        label:"Tasks"     },
-  { key:"payments",  icon:"ti-receipt",          label:"Payments"  },
-  { key:"calendar",  icon:"ti-calendar",         label:"Calendar"  },
-  { key:"messages",  icon:"ti-message-circle",   label:"Messages"  },
-  { key:"reports",   icon:"ti-chart-bar",        label:"Reports"   },
-  { key:"settings",  icon:"ti-settings",         label:"Settings"  },
-];
-
-const STATUS = {
-  "In Progress":{ bg:"#7b2ff720", text:"#c084fc", dot:"#a855f7" },
-  "Active":     { bg:"#e91e9920", text:"#f472b6", dot:"#e91e99" },
-  "Completed":  { bg:"#00e5a020", text:"#00e5a0", dot:"#00e5a0" },
-  "Done":       { bg:"#00e5a020", text:"#00e5a0", dot:"#00e5a0" },
-  "On Hold":    { bg:"#ffb54720", text:"#ffb547", dot:"#ffb547" },
-  "Pending":    { bg:"#ffb54720", text:"#ffb547", dot:"#ffb547" },
-  "Paid":       { bg:"#00e5a020", text:"#00e5a0", dot:"#00e5a0" },
-  "part_paid":  { bg:"#00e5a020", text:"#00e5a0", dot:"#00e5a0" },
-  "paid":       { bg:"#00e5a020", text:"#00e5a0", dot:"#00e5a0" },
-  "unpaid":     { bg:"#ffb54720", text:"#ffb547", dot:"#ffb547" },
-  "overdue":    { bg:"#ff4d6d20", text:"#ff4d6d", dot:"#ff4d6d" },
-  "draft":      { bg:"#7b2ff720", text:"#c084fc", dot:"#a855f7" },
-  "Overdue":    { bg:"#ff4d6d20", text:"#ff4d6d", dot:"#ff4d6d" },
-  "High":       { bg:"#ff4d6d20", text:"#ff4d6d", dot:"#ff4d6d" },
-  "Medium":     { bg:"#7b2ff720", text:"#c084fc", dot:"#a855f7" },
-  "Low":        { bg:"#00e5a020", text:"#00e5a0", dot:"#00e5a0" },
-};
-const sc = (s) => STATUS[s] || { bg:"#ffffff08", text:"#c8c8e8", dot:"#8888bb" };
-
-const fmt = (n) => {
-  if (!n) return "₹0";
-  const num = Number(n);
-  return num >= 100000 ? `₹${(num/100000).toFixed(1)}L` : `₹${num.toLocaleString("en-IN")}`;
-};
-
-// ── Font + Icon Loader ────────────────────────────────────────
+// Load Nunito Font + Tabler Icons
 function useAssets() {
   useEffect(() => {
-    ["https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap",
-     "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+    ["https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap",
+     "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
     ].forEach(href => {
       if (!document.querySelector(`link[href="${href}"]`)) {
         const l = document.createElement("link");
@@ -85,681 +46,66 @@ function useAssets() {
   }, []);
 }
 
-// ── Glow Orb ─────────────────────────────────────────────────
-function GlowOrb({ color, size, top, left, right, bottom, opacity=0.18 }) {
-  return (
-    <div style={{
-      position:"absolute", width:size, height:size, borderRadius:"50%",
-      background:`radial-gradient(circle, ${color} 0%, transparent 70%)`,
-      opacity, top, left, right, bottom, pointerEvents:"none", zIndex:0
-    }}/>
-  );
-}
-
-// ── Status Badge ──────────────────────────────────────────────
-function Badge({ label }) {
-  const c = sc(label);
-  const displayLabel = typeof label === 'string' ? (label.charAt(0).toUpperCase() + label.slice(1).replace('_', ' ')) : label;
-  return (
-    <span style={{ background:c.bg, color:c.text, fontSize:10, fontWeight:600,
-      padding:"3px 10px", borderRadius:20, display:"inline-flex", alignItems:"center",
-      gap:5, letterSpacing:0.3, whiteSpace:"nowrap", border:`1px solid ${c.dot}25` }}>
-      <span style={{ width:5, height:5, borderRadius:"50%", background:c.dot }}/>
-      {displayLabel}
-    </span>
-  );
-}
-
-// ── Progress Ring ─────────────────────────────────────────────
-function Ring({ pct, size=54, color=C.pink }) {
-  const r = (size-8)/2;
-  const circ = 2*Math.PI*r;
-  const dash = (pct/100)*circ;
-  return (
-    <svg width={size} height={size} style={{ transform:"rotate(-90deg)", flexShrink:0 }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#2a2a4a" strokeWidth={5}/>
-      <circle cx={size/2} cy={size/2} r={r} fill="none"
-        stroke={color} strokeWidth={5}
-        strokeDasharray={`${dash} ${circ-dash}`} strokeLinecap="round"
-        style={{ filter:`drop-shadow(0 0 4px ${color})`, transition:"stroke-dasharray 1.2s ease" }}/>
-    </svg>
-  );
-}
-
-// ── Stat Card ─────────────────────────────────────────────────
-function StatCard({ icon, label, value, sub, accent, onClick }) {
-  const [h, setH] = useState(false);
-  return (
-    <div onClick={onClick} onMouseEnter={()=>setH(true)} onMouseLeave={()=>setH(false)}
-      style={{ background: h ? C.cardHov : C.card, border:`1px solid ${h ? accent+"50" : C.border}`,
-        borderRadius:18, padding:"22px 20px", cursor:onClick?"pointer":"default",
-        transition:"all 0.3s", position:"relative", overflow:"hidden" }}>
-      <div style={{ position:"absolute", top:-30, right:-30, width:100, height:100, borderRadius:"50%",
-        background:`radial-gradient(circle,${accent}25,transparent 70%)`, pointerEvents:"none" }}/>
-      <div style={{ width:40, height:40, borderRadius:12, background:`${accent}18`,
-        border:`1px solid ${accent}35`, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:14 }}>
-        <i className={`ti ${icon}`} style={{ fontSize:18, color:accent }}/>
-      </div>
-      <div style={{ fontSize:10, color:"#dcdcff", fontWeight:600, textTransform:"uppercase",
-        letterSpacing:1.2, marginBottom:5 }}>{label}</div>
-      <div style={{ fontSize:24, fontWeight:700, color:C.text, letterSpacing:"-0.5px",
-        fontFamily:"'Space Grotesk',sans-serif" }}>{value}</div>
-      {sub && <div style={{ fontSize:11, color:"#a0a0c8", marginTop:5 }}>{sub}</div>}
-    </div>
-  );
-}
-
-// ── GradButton ────────────────────────────────────────────────
-function GradBtn({ children, onClick, style: s }) {
-  const [h, setH] = useState(false);
-  return (
-    <button onClick={onClick} onMouseEnter={()=>setH(true)} onMouseLeave={()=>setH(false)}
-      style={{ background: h ? "linear-gradient(135deg,#f472b6,#a78bfa)" : C.grad,
-        border:"none", borderRadius:10, padding:"8px 18px", color:"#fff",
-        fontWeight:700, fontSize:12, cursor:"pointer", letterSpacing:0.3,
-        boxShadow: h ? `0 0 20px ${C.glowPink}` : `0 0 10px ${C.glowPink}`,
-        transition:"all 0.25s", fontFamily:"inherit", ...s }}>
-      {children}
-    </button>
-  );
-}
-
-// ── Sidebar ───────────────────────────────────────────────────
-function Sidebar({ active, setActive, user, setUser }) {
-  const displayName = user?.clientName || user?.name || "Client";
-  const initials = displayName.substring(0, 2).toUpperCase();
-
-  const handleLogout = () => {
-    if(setUser) setUser(null);
-    else {
-      localStorage.removeItem("user");
-      window.location.href = "/";
-    }
-  };
-
-  return (
-    <div style={{ width:230, background:C.surface, borderRight:`1px solid ${C.border}`,
-      display:"flex", flexDirection:"column", height:"100vh", position:"sticky", top:0, flexShrink:0,
-      overflow:"hidden" }}>
-      <GlowOrb color={C.pink} size={200} top={-80} left={-80} opacity={0.12}/>
-      <GlowOrb color={C.purple} size={160} bottom={-60} right={-60} opacity={0.1}/>
-
-
-      <div style={{ margin:"14px 14px 6px", background:C.card, borderRadius:14,
-        padding:"14px", border:`1px solid ${C.border}`, position:"relative", zIndex:1 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <div style={{ width:38, height:38, borderRadius:10, background:C.grad,
-            display:"flex", alignItems:"center", justifyContent:"center",
-            fontSize:13, fontWeight:700, color:"#fff", fontFamily:"'Space Grotesk'",
-            boxShadow:`0 0 12px ${C.glowPurp}` }}>{initials}</div>
-          <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:13, fontWeight:600, color:C.text,
-              whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{displayName}</div>
-            <div style={{ fontSize:9, color:C.violet, fontWeight:600, letterSpacing:0.8 }}>CLIENT</div>
-          </div>
-        </div>
-      </div>
-
-      <nav style={{ flex:1, padding:"8px 10px", overflowY:"auto", position:"relative", zIndex:1 }}>
-        <div style={{ fontSize:8, color:"#9999cc", fontWeight:700, letterSpacing:2,
-          padding:"6px 10px 4px" }}>MAIN MENU</div>
-        {NAV.map(n => {
-          const on = active === n.key;
-          return (
-            <button key={n.key} onClick={()=>setActive(n.key)}
-              style={{ width:"100%", display:"flex", alignItems:"center", gap:10,
-                padding:"11px 14px", background: on ? C.gradSoft : "transparent",
-                border:"none", borderRadius:12, color: on ? C.pink : "#d0d0f0",
-                fontWeight: on ? 700 : 400, fontSize:13, cursor:"pointer",
-                marginBottom:2, textAlign:"left", fontFamily:"inherit",
-                boxShadow: on ? `inset 0 0 0 1px ${C.pink}30` : "none",
-                transition:"all 0.2s" }}
-              onMouseEnter={e=>{ if(!on){ e.currentTarget.style.background=C.border; e.currentTarget.style.color="#ffffff"; }}}
-              onMouseLeave={e=>{ if(!on){ e.currentTarget.style.background="transparent"; e.currentTarget.style.color="#d0d0f0"; }}}>
-              <i className={`ti ${n.icon}`} style={{ fontSize:17, flexShrink:0,
-                filter: on ? `drop-shadow(0 0 6px ${C.pink})` : "none" }}/>
-              {n.label}
-              {on && <div style={{ marginLeft:"auto", width:4, height:4, borderRadius:"50%",
-                background:C.pink, boxShadow:`0 0 8px ${C.pink}` }}/>}
-            </button>
-          );
-        })}
-      </nav>
-
-      <div style={{ padding:"14px 10px 20px", borderTop:`1px solid ${C.border}`, position:"relative", zIndex:1 }}>
-        <button onClick={handleLogout} style={{ width:"100%", display:"flex", alignItems:"center", gap:10,
-          padding:"11px 14px", background:"transparent", border:"none", borderRadius:12,
-          color:"#ff4d6d80", fontSize:13, cursor:"pointer", fontFamily:"inherit",
-          transition:"all 0.2s" }}
-          onMouseEnter={e=>{e.currentTarget.style.background="#ff4d6d12";e.currentTarget.style.color=C.red;}}
-          onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="#ff4d6d80";}}>
-          <i className="ti ti-logout" style={{ fontSize:17 }}/>
-          Sign Out
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ── Topbar ─────────────────────────────────────────────────────
-function Topbar({ active, notifs, user }) {
-  const unread = notifs.filter(n=>!n.isRead).length;
-  const label = NAV.find(n=>n.key===active)?.label || "Overview";
-  const day = new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"});
-  const displayName = user?.clientName || user?.name || "Client";
-  const initials = displayName.substring(0, 2).toUpperCase();
-
-  return (
-    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
-      padding:"18px 28px", borderBottom:`1px solid ${C.border}`, background:C.bg,
-      position:"sticky", top:0, zIndex:50, backdropFilter:"blur(12px)" }}>
-      <div>
-        <div style={{ fontSize:20, fontWeight:700, color:C.text,
-          fontFamily:"'Space Grotesk',sans-serif" }}>{label}</div>
-        <div style={{ fontSize:11, color:"#b8b8dd", marginTop:1 }}>{day}</div>
-      </div>
-      <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-      
-        <div style={{ position:"relative" }}>
-          <button style={{ width:40, height:40, borderRadius:10, background:C.card,
-            border:`1px solid ${C.border}`, cursor:"pointer",
-            display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <i className="ti ti-bell" style={{ fontSize:18, color:"#dcdcff" }}/>
-          </button>
-          {unread>0 && <span style={{ position:"absolute", top:-4, right:-4,
-            width:18, height:18, borderRadius:"50%", background:C.grad,
-            fontSize:10, fontWeight:700, color:"#fff", display:"flex",
-            alignItems:"center", justifyContent:"center", border:`2px solid ${C.bg}`,
-            boxShadow:`0 0 8px ${C.glowPink}` }}>{unread}</span>}
-        </div>
-        <div style={{ width:40, height:40, borderRadius:10, background:C.grad,
-          display:"flex", alignItems:"center", justifyContent:"center",
-          fontSize:13, fontWeight:700, color:"#fff", fontFamily:"'Space Grotesk'",
-          boxShadow:`0 0 14px ${C.glowPurp}` }}>{initials}</div>
-      </div>
-    </div>
-  );
-}
-
-// ── Dashboard Page ────────────────────────────────────────────
-function DashboardPage({ user, projects, invoices, tasks, notifs, setActive }) {
-  const totalInvoiced = invoices.reduce((s,p)=>s+p.total,0);
-  const totalPaid     = invoices.filter(p=>p.status==="paid").reduce((s,p)=>s+p.total,0);
-  const totalOverdue  = invoices.filter(p=>p.status==="overdue").reduce((s,p)=>s+p.total,0);
-  const activeProj    = projects.filter(p=>p.status!=="Completed").length;
-
-  const getRelativeTime = (dateStr) => {
-    if(!dateStr) return "";
-    const d = new Date(dateStr);
-    const diff = Math.floor((new Date() - d) / 1000);
-    if(diff < 60) return `${diff}s ago`;
-    if(diff < 3600) return `${Math.floor(diff/60)}m ago`;
-    if(diff < 86400) return `${Math.floor(diff/3600)}h ago`;
-    return `${Math.floor(diff/86400)}d ago`;
-  };
-
-  return (
-    <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
-      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:22,
-        padding:"28px 30px", position:"relative", overflow:"hidden" }}>
-        <GlowOrb color={C.pink}   size={300} top={-100} right={-50}  opacity={0.2}/>
-        <GlowOrb color={C.purple} size={200} bottom={-80} left={-40} opacity={0.15}/>
-        <div style={{ position:"relative", zIndex:1 }}>
-          <div style={{ fontSize:10, color:C.pink, fontWeight:700, letterSpacing:2, marginBottom:8 }}>WELCOME BACK</div>
-          <div style={{ fontSize:26, fontWeight:700, color:C.text,
-            fontFamily:"'Space Grotesk',sans-serif", marginBottom:6 }}>{user?.clientName || user?.name || "Client"} 👋</div>
-          <div style={{ fontSize:13, color:"#dcdcff", maxWidth:480, lineHeight:1.6 }}>
-            You have{" "}
-            <span style={{ color:C.red, fontWeight:600 }}>{invoices.filter(i => i.status === 'overdue').length} overdue invoices</span> and{" "}
-            <span style={{ background:C.gradText, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", fontWeight:600 }}>
-              {tasks.filter(t=>t.status!=="Done").length} active tasks
-            </span>{" "}awaiting attention.
-          </div>
-          <div style={{ display:"flex", gap:10, marginTop:18, flexWrap:"wrap" }}>
-            <span style={{ fontSize:11, background:C.gradSoft, color:C.pink,
-              border:`1px solid ${C.pink}30`, padding:"5px 14px", borderRadius:20, fontWeight:600 }}>
-              Client Portal</span>
-            <span style={{ fontSize:11, background:"#00e5a015", color:C.green,
-              border:`1px solid ${C.green}30`, padding:"5px 14px", borderRadius:20, fontWeight:600 }}>
-              {activeProj} Active Projects</span>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
-        <StatCard icon="ti-cash"            label="Total Invoiced" value={fmt(totalInvoiced)} sub="All time"         accent={C.pink} onClick={() => setActive("payments")}  />
-        <StatCard icon="ti-circle-check"    label="Total Paid"     value={fmt(totalPaid)}     sub={`${invoices.filter(p=>p.status==="paid").length} invoices`} accent={C.green} onClick={() => setActive("payments")} />
-        <StatCard icon="ti-alert-triangle"  label="Overdue"        value={fmt(totalOverdue)}  sub="Needs attention"  accent={C.red} onClick={() => setActive("payments")}   />
-        <StatCard icon="ti-layout-kanban"   label="Active Projects" value={String(activeProj)} sub={`of ${projects.length} total`} accent={C.violet} onClick={() => setActive("projects")} />
-      </div>
-
-      <div style={{ display:"grid", gridTemplateColumns:"1.5fr 1fr", gap:18 }}>
-        <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, padding:24, position:"relative", overflow:"hidden" }}>
-          <GlowOrb color={C.purple} size={200} bottom={-60} right={-60} opacity={0.1}/>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20, position:"relative", zIndex:1 }}>
-            <div style={{ fontSize:14, fontWeight:700, color:C.text, fontFamily:"'Space Grotesk'" }}>Project Progress</div>
-            <button onClick={() => setActive("projects")} style={{ fontSize:11, color:C.pink, background:"none", border:"none",
-              cursor:"pointer", fontFamily:"inherit", fontWeight:600 }}>View All →</button>
-          </div>
-          <div style={{ display:"flex", flexDirection:"column", gap:16, position:"relative", zIndex:1 }}>
-            {projects.slice(0, 4).map(p => {
-              const progress = p.progress || 0;
-              const col = p.status==="Completed"?C.green : p.status==="On Hold"?C.amber : progress>60?C.pink:C.violet;
-              return (
-                <div key={p._id} style={{ display:"flex", alignItems:"center", gap:14 }}>
-                  <div style={{ position:"relative", flexShrink:0 }}>
-                    <Ring pct={progress} size={50} color={col}/>
-                    <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center",
-                      justifyContent:"center", fontSize:10, fontWeight:700, color:col,
-                      fontFamily:"'Space Grotesk'" }}>{progress}%</div>
-                  </div>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
-                      <span style={{ fontSize:13, fontWeight:600, color:C.text,
-                        whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:140 }}>{p.name}</span>
-                      <Badge label={p.status}/>
-                    </div>
-                    <div style={{ height:4, background:"#2a2a4a", borderRadius:99, overflow:"hidden" }}>
-                      <div style={{ width:`${progress}%`, height:"100%", borderRadius:99,
-                        background:`linear-gradient(90deg,${col},${col}bb)`,
-                        boxShadow:`0 0 8px ${col}60`, transition:"width 1s ease" }}/>
-                    </div>
-                    <div style={{ fontSize:10, color:"#dcdcff", marginTop:4 }}>Tasks {p.completedTasks || 0}/{p.tasks || 0} · Deadline {p.deadline || "N/A"}</div>
-                  </div>
-                </div>
-              );
-            })}
-            {projects.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", marginTop: 20 }}>No projects found.</div>}
-          </div>
-        </div>
-
-        <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, padding:24, position:"relative", overflow:"hidden" }}>
-          <GlowOrb color={C.pink} size={160} top={-50} right={-50} opacity={0.1}/>
-          <div style={{ fontSize:14, fontWeight:700, color:C.text,
-            fontFamily:"'Space Grotesk'", marginBottom:18, position:"relative", zIndex:1 }}>Recent Alerts</div>
-          <div style={{ display:"flex", flexDirection:"column", gap:10, position:"relative", zIndex:1 }}>
-            {notifs.slice(0, 5).map(n => {
-              const tc = { danger:C.red, success:C.green, info:C.blue, warning:C.amber };
-              const col = tc[n.type]||C.muted;
-              return (
-                <div key={n._id} style={{ display:"flex", gap:10, padding:"12px 14px",
-                  background: n.isRead ? "transparent" : `${col}0d`,
-                  borderRadius:12, border:`1px solid ${n.isRead ? C.border : col+"30"}`,
-                  alignItems:"flex-start" }}>
-                  <div style={{ width:32, height:32, borderRadius:10, background:`${col}18`,
-                    display:"flex", alignItems:"center", justifyContent:"center",
-                    fontSize:15, flexShrink:0 }}>{n.icon || "🔔"}</div>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:12, fontWeight: n.isRead?400:600,
-                      color: n.isRead?C.muted:C.text, lineHeight:1.4 }}>{n.text}</div>
-                    <div style={{ fontSize:10, color:"#a0a0c8", marginTop:3 }}>{getRelativeTime(n.createdAt)}</div>
-                  </div>
-                  {!n.isRead && <div style={{ width:6, height:6, borderRadius:"50%", background:col,
-                    boxShadow:`0 0 6px ${col}`, flexShrink:0, marginTop:4 }}/>}
-                </div>
-              );
-            })}
-            {notifs.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", marginTop: 20 }}>No new alerts.</div>}
-          </div>
-        </div>
-      </div>
-
-      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, padding:24, position:"relative", overflow:"hidden" }}>
-        <GlowOrb color={C.purple} size={250} bottom={-80} right={-80} opacity={0.08}/>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20, position:"relative", zIndex:1 }}>
-          <div style={{ fontSize:14, fontWeight:700, color:C.text, fontFamily:"'Space Grotesk'" }}>Recent Transactions</div>
-          <GradBtn onClick={() => setActive("payments")}>View All</GradBtn>
-        </div>
-        <div style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 100px",
-          padding:"8px 12px", fontSize:9, fontWeight:700, color:"#ffffff", letterSpacing:1.3,
-          textTransform:"uppercase", borderBottom:`1px solid ${C.border}`, marginBottom:4, position:"relative", zIndex:1 }}>
-          <span>Project</span><span>Invoice</span><span>Date</span><span>Amount</span><span>Status</span>
-        </div>
-        {invoices.slice(0, 5).map((p,i)=>(
-          <div key={p._id || p.id} style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 100px",
-            padding:"14px 12px", borderBottom: i<Math.min(invoices.length, 5)-1?`1px solid ${C.border}`:"none",
-            alignItems:"center", borderRadius:10, transition:"background 0.15s", cursor:"pointer",
-            position:"relative", zIndex:1 }}
-            onMouseEnter={e=>e.currentTarget.style.background=C.surface}
-            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <div style={{ width:32, height:32, borderRadius:8, background:C.gradSoft,
-                border:`1px solid ${C.pink}30`, display:"flex", alignItems:"center",
-                justifyContent:"center", fontSize:11, fontWeight:700, color:C.pink,
-                fontFamily:"'Space Grotesk'" }}>{(p.project || "PR").slice(0,2).toUpperCase()}</div>
-              <span style={{ fontSize:13, fontWeight:500, color:C.text }}>{p.project || "N/A"}</span>
-            </div>
-            <span style={{ fontSize:11, color:"#dcdcff" }}>{p.invoiceNo}</span>
-            <span style={{ fontSize:11, color:"#dcdcff" }}>{p.date}</span>
-            <span style={{ fontSize:13, fontWeight:700, color:C.text, fontFamily:"'Space Grotesk'" }}>{fmt(p.total)}</span>
-            <Badge label={p.status}/>
-          </div>
-        ))}
-        {invoices.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", marginTop: 20 }}>No transactions found.</div>}
-      </div>
-    </div>
-  );
-}
-
-// ── Projects Page ─────────────────────────────────────────────
-function ProjectsPage({ projects }) {
-  const [filter, setFilter] = useState("All");
-  const shown = filter==="All" ? projects : projects.filter(p=>p.status===filter);
-
-  return (
-    <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <div style={{ fontSize:13, color:"#e0e0ff" }}>{projects.length} projects total</div>
-        <div style={{ display:"flex", gap:8 }}>
-          {["All","Active","Completed","On Hold"].map((f,i)=>(
-            <button key={f} onClick={() => setFilter(f)} style={{ padding:"6px 14px", background:filter===f?C.gradSoft:"transparent",
-              border:`1px solid ${filter===f?C.pink+"50":C.border}`, borderRadius:8,
-              color:filter===f?C.pink:C.muted, fontSize:11, cursor:"pointer", fontFamily:"inherit",
-              fontWeight:filter===f?600:400 }}>{f}</button>
-          ))}
-        </div>
-      </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-        {shown.map(p=>{
-          const budget = parseFloat(String(p.budget).replace(/[^0-9.-]+/g,"")) || 0;
-          const spent = p.spent || (budget * (p.progress || 0) / 100);
-          const bpct = budget > 0 ? Math.round((spent/budget)*100) : 0;
-          const isOver = spent>budget;
-          const progress = p.progress || 0;
-          const col = p.status==="Completed"?C.green:p.status==="On Hold"?C.amber:progress>60?C.pink:C.violet;
-          return (
-            <div key={p._id} style={{ background:C.card, border:`1px solid ${C.border}`,
-              borderRadius:20, padding:24, position:"relative", overflow:"hidden",
-              transition:"border-color 0.2s, transform 0.2s" }}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor=col+"50";e.currentTarget.style.transform="translateY(-3px)";}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border;e.currentTarget.style.transform="";}}>
-              <div style={{ position:"absolute", top:0, left:0, right:0, height:2,
-                background:`linear-gradient(90deg,transparent,${col},transparent)`,
-                boxShadow:`0 0 12px ${col}` }}/>
-              <GlowOrb color={col} size={160} top={-60} right={-60} opacity={0.08}/>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start",
-                marginBottom:18, position:"relative", zIndex:1 }}>
-                <div>
-                  <div style={{ fontSize:16, fontWeight:700, color:C.text,
-                    fontFamily:"'Space Grotesk'", marginBottom:4 }}>{p.name}</div>
-                  <div style={{ fontSize:11, color:"#dcdcff", display:"flex", alignItems:"center", gap:4 }}>
-                    <i className="ti ti-calendar" style={{ fontSize:12 }}/>{p.deadline || "No deadline"}
-                  </div>
-                </div>
-                <Badge label={p.status}/>
-              </div>
-
-              <div style={{ marginBottom:18, position:"relative", zIndex:1 }}>
-                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-                  <span style={{ fontSize:11, color:"#dcdcff" }}>Completion</span>
-                  <span style={{ fontSize:13, fontWeight:700, color:col,
-                    fontFamily:"'Space Grotesk'", textShadow:`0 0 8px ${col}` }}>{progress}%</span>
-                </div>
-                <div style={{ height:6, background:"#2a2a4a", borderRadius:99, overflow:"hidden" }}>
-                  <div style={{ width:`${progress}%`, height:"100%", borderRadius:99,
-                    background:`linear-gradient(90deg,${C.pink},${C.purple})`,
-                    boxShadow:`0 0 10px ${C.glowPink}` }}/>
-                </div>
-              </div>
-
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8,
-                marginBottom:14, position:"relative", zIndex:1 }}>
-                {[
-                  { l:"Budget", v:fmt(budget), c:C.pink   },
-                  { l:"Spent (Est)",  v:fmt(spent),  c:isOver?C.red:C.text },
-                  { l:"Tasks",  v:`${p.completedTasks || 0}/${p.tasks || 0}`, c:(p.completedTasks === p.tasks && p.tasks > 0)?C.green:C.text },
-                ].map(m=>(
-                  <div key={m.l} style={{ background:C.surface, borderRadius:10,
-                    padding:"10px 12px", border:`1px solid ${C.border}` }}>
-                    <div style={{ fontSize:8, color:"#d8d8ff", fontWeight:800, letterSpacing:1.2,
-                      marginBottom:4, textTransform:"uppercase" }}>{m.l}</div>
-                    <div style={{ fontSize:13, fontWeight:700, color:m.c,
-                      fontFamily:"'Space Grotesk'" }}>{m.v}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ position:"relative", zIndex:1 }}>
-                <div style={{ display:"flex", justifyContent:"space-between",
-                  fontSize:9, color:"#c8c8ee", marginBottom:4, letterSpacing:0.5 }}>
-                  <span>Budget Utilization</span>
-                  <span style={{ color:isOver?C.red:C.muted }}>{bpct}%</span>
-                </div>
-                <div style={{ height:3, background:"#2a2a4a", borderRadius:99, overflow:"hidden" }}>
-                  <div style={{ width:`${Math.min(bpct,100)}%`, height:"100%",
-                    background:isOver?C.red:bpct>80?C.amber:C.green, borderRadius:99 }}/>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {shown.length === 0 && <div style={{ fontSize: 14, color: C.muted, textAlign: "center", marginTop: 40 }}>No projects found.</div>}
-    </div>
-  );
-}
-
-// ── Tasks Page ────────────────────────────────────────────────
-function TasksPage({ tasks }) {
-  const [filter, setFilter] = useState("All");
-  const shown = filter==="All" ? tasks : tasks.filter(t=>t.status===filter || (filter === "Done" && t.status === "Completed") || (filter === "Pending" && t.status === "Not Started"));
-  
-  return (
-    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-      <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-        {["All","In Progress","Pending","Done"].map(f=>(
-          <button key={f} onClick={()=>setFilter(f)}
-            style={{ padding:"7px 16px", background:filter===f?C.gradSoft:"transparent",
-              border:`1px solid ${filter===f?C.pink+"50":C.border}`, borderRadius:10,
-              color:filter===f?C.pink:C.muted, fontSize:12, fontWeight:filter===f?700:400,
-              cursor:"pointer", fontFamily:"inherit" }}>
-            {f} <span style={{ opacity:0.5 }}>({f==="All"?tasks.length:tasks.filter(t=>t.status===f || (f === "Done" && t.status === "Completed") || (f === "Pending" && t.status === "Not Started")).length})</span>
-          </button>
-        ))}
-      </div>
-      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, overflow:"hidden" }}>
-        <GlowOrb color={C.purple} size={200} bottom={-60} right={-60} opacity={0.07}/>
-        <div style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 110px",
-          padding:"12px 20px", fontSize:9, fontWeight:700, color:"#ffffff", letterSpacing:1.3,
-          textTransform:"uppercase", borderBottom:`1px solid ${C.border}`, position:"relative", zIndex:1 }}>
-          <span>Task</span><span>Project</span><span>Priority</span><span>Due</span><span>Status</span>
-        </div>
-        {shown.map((t,i)=>(
-          <div key={t._id} style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr 110px",
-            padding:"16px 20px", borderBottom:i<shown.length-1?`1px solid ${C.border}`:"none",
-            alignItems:"center", transition:"background 0.15s", cursor:"pointer", position:"relative", zIndex:1 }}
-            onMouseEnter={e=>e.currentTarget.style.background=C.surface}
-            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <div style={{ width:20, height:20, borderRadius:6,
-                border:`1.5px solid ${t.status==="Done" || t.status==="Completed"?C.green:C.dim}`,
-                background:t.status==="Done" || t.status==="Completed"?`${C.green}20`:"transparent",
-                display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                {(t.status==="Done" || t.status==="Completed") && <i className="ti ti-check" style={{ fontSize:11, color:C.green }}/>}
-              </div>
-              <span style={{ fontSize:13, fontWeight:500, color:(t.status==="Done" || t.status==="Completed")?C.muted:C.text,
-                textDecoration:(t.status==="Done" || t.status==="Completed")?"line-through":"none" }}>{t.title}</span>
-            </div>
-            <span style={{ fontSize:12, color:"#dcdcff" }}>{t.project || "General"}</span>
-            <Badge label={t.priority || "Medium"}/>
-            <span style={{ fontSize:12, color:"#dcdcff" }}>{t.date || t.dueDate || "N/A"}</span>
-            <Badge label={t.status || "Pending"}/>
-          </div>
-        ))}
-        {shown.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", padding: 20 }}>No tasks found.</div>}
-      </div>
-    </div>
-  );
-}
-
-// ── Payments Page ─────────────────────────────────────────────
-function PaymentsPage({ invoices }) {
-  const totalInvoiced = invoices.reduce((s,p)=>s+p.total,0);
-  const totalPaid     = invoices.filter(p=>p.status==="paid").reduce((s,p)=>s+p.total,0);
-  const totalOverdue  = invoices.filter(p=>p.status==="overdue").reduce((s,p)=>s+p.total,0);
-  const totalPending  = invoices.filter(p=>p.status==="unpaid" || p.status==="draft" || p.status==="sent").reduce((s,p)=>s+p.total,0);
-  
-  return (
-    <div style={{ display:"flex", flexDirection:"column", gap:22 }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
-        <StatCard icon="ti-report-money"      label="Total Invoiced" value={fmt(totalInvoiced)} accent={C.pink}   />
-        <StatCard icon="ti-circle-check"      label="Paid"           value={fmt(totalPaid)}     accent={C.green}  />
-        <StatCard icon="ti-clock-exclamation" label="Overdue"        value={fmt(totalOverdue)}  accent={C.red}    />
-        <StatCard icon="ti-hourglass"         label="Pending"        value={fmt(totalPending)}  accent={C.violet} />
-      </div>
-      <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:20, padding:24, position:"relative", overflow:"hidden" }}>
-        <GlowOrb color={C.pink} size={250} top={-80} right={-80} opacity={0.08}/>
-        <div style={{ fontSize:14, fontWeight:700, color:C.text,
-          fontFamily:"'Space Grotesk'", marginBottom:20, position:"relative", zIndex:1 }}>Payment History</div>
-        <div style={{ display:"flex", flexDirection:"column", gap:10, position:"relative", zIndex:1 }}>
-          {invoices.map(inv=>{
-            const c = sc(inv.status);
-            const isOvd = inv.status==="overdue";
-            return (
-              <div key={inv._id || inv.id} style={{ display:"flex", alignItems:"center", gap:16,
-                padding:"18px 20px", background:C.surface, borderRadius:14,
-                border:`1px solid ${isOvd?C.red+"30":C.border}`, transition:"all 0.2s" }}
-                onMouseEnter={e=>{e.currentTarget.style.borderColor=C.pink+"40";e.currentTarget.style.background=C.card;}}
-                onMouseLeave={e=>{e.currentTarget.style.borderColor=isOvd?C.red+"30":C.border;e.currentTarget.style.background=C.surface;}}>
-                <div style={{ width:46, height:46, borderRadius:12, background:c.bg,
-                  display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <i className={inv.status==="paid"?"ti ti-receipt":isOvd?"ti ti-alert-triangle":"ti ti-clock"}
-                    style={{ fontSize:18, color:c.text, filter:`drop-shadow(0 0 5px ${c.dot})` }}/>
-                </div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontSize:14, fontWeight:600, color:C.text }}>{inv.invoiceNo}</div>
-                  <div style={{ fontSize:11, color:"#dcdcff" }}>{inv.project || "N/A"} · Due {inv.dueDate || "N/A"}</div>
-                </div>
-                <div style={{ textAlign:"right", marginRight:14 }}>
-                  <div style={{ fontSize:16, fontWeight:700, color:C.text,
-                    fontFamily:"'Space Grotesk'" }}>{fmt(inv.total)}</div>
-                  <div style={{ fontSize:10, color:"#a0a0c8" }}>{inv.date}</div>
-                </div>
-                <Badge label={inv.status}/>
-                <button style={{ width:34, height:34, background:C.surface,
-                  border:`1px solid ${C.border}`, borderRadius:8, cursor:"pointer",
-                  display:"flex", alignItems:"center", justifyContent:"center" }}
-                  onMouseEnter={e=>{e.currentTarget.style.background=C.gradSoft;e.currentTarget.style.borderColor=C.pink+"50";}}
-                  onMouseLeave={e=>{e.currentTarget.style.background=C.surface;e.currentTarget.style.borderColor=C.border;}}>
-                  <i className="ti ti-download" style={{ fontSize:15, color:"#dcdcff" }}/>
-                </button>
-              </div>
-            );
-          })}
-          {invoices.length === 0 && <div style={{ fontSize: 13, color: C.muted, textAlign: "center", padding: 20 }}>No invoices found.</div>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Messages / Documents Page ──────────────────────────────────
-function MessagesPage({ user }) {
-  const [docs, setDocs] = useState([]);
-  const [selectedDoc, setSelectedDoc] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchDocs = async () => {
-      try {
-        const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
-        const displayName = user?.clientName || user?.name || "Client";
-        const res = await axios.get(`${BASE_URL}/api/documents?companyId=${companyId}&client=${encodeURIComponent(displayName)}&sendTo=client`);
-        setDocs(res.data);
-      } catch (err) {
-        console.error("Failed to fetch documents:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDocs();
-  }, [user]);
-
-  if (selectedDoc) {
-    return (
-      <div style={{ display:"flex", flexDirection:"column", height:"100%" }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
-          <button onClick={() => setSelectedDoc(null)} style={{ background:C.surface, border:`1px solid ${C.border}`, color:C.text, padding:"8px 16px", borderRadius:8, cursor:"pointer", display:"flex", alignItems:"center", gap:8 }}>
-            <i className="ti ti-arrow-left"></i> Back to Messages
-          </button>
-          <div style={{ fontSize:16, fontWeight:700, color:C.text }}>{selectedDoc.docType.toUpperCase()} Document</div>
-        </div>
-        <div className="document-preview-content" style={{ flex:1, background:"#fff", borderRadius:12, padding:"30px", overflowY:"auto", color:"#000" }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent }} />
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-      <div style={{ fontSize:18, fontWeight:700, color:C.text, fontFamily:"'Space Grotesk'" }}>Received Documents</div>
-      <div style={{ display:"grid", gap:12 }}>
-        {loading ? (
-          <div style={{ color:C.text3, padding: 20 }}>Loading documents...</div>
-        ) : docs.length === 0 ? (
-          <div style={{ background:C.surface, border:`1px solid ${C.border}`, padding:40, borderRadius:16, textAlign:"center" }}>
-            <div style={{ fontSize:40, marginBottom:16 }}>📭</div>
-            <div style={{ fontSize:16, fontWeight:700, color:C.text, marginBottom:8 }}>No Documents</div>
-            <div style={{ color:C.text3, fontSize:14 }}>You haven't received any documents or messages yet.</div>
-          </div>
-        ) : (
-          docs.map(doc => (
-          <div key={doc._id || doc.id} onClick={() => setSelectedDoc(doc)} style={{ background:C.card, border:`1px solid ${C.border}`, padding:20, borderRadius:12, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center", transition:"all 0.2s" }} onMouseEnter={e => e.currentTarget.style.borderColor = C.pink} onMouseLeave={e => e.currentTarget.style.borderColor = C.border}>
-            <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-              <div style={{ width:40, height:40, borderRadius:10, background:C.gradSoft, display:"flex", alignItems:"center", justifyContent:"center", color:C.pink }}>
-                <i className="ti ti-file-text" style={{ fontSize:20 }}></i>
-              </div>
-              <div>
-                <div style={{ fontSize:15, fontWeight:600, color:C.text, textTransform:"capitalize" }}>{doc.docType} received</div>
-                <div style={{ fontSize:12, color:C.muted }}>Sent on {new Date(doc.dateSent).toLocaleString()}</div>
-              </div>
-            </div>
-            <i className="ti ti-chevron-right" style={{ color:C.muted }}></i>
-          </div>
-        )))}
-      </div>
-    </div>
-  );
-}
-
-// ── Placeholder ───────────────────────────────────────────────
-function PlaceholderPage({ icon, title, sub }) {
-  return (
-    <div style={{ display:"flex", flexDirection:"column", alignItems:"center",
-      justifyContent:"center", padding:"80px 20px", textAlign:"center" }}>
-      <div style={{ width:70, height:70, borderRadius:20, background:C.gradSoft,
-        border:`1px solid ${C.pink}30`, display:"flex", alignItems:"center",
-        justifyContent:"center", marginBottom:20,
-        boxShadow:`0 0 30px ${C.glowPink}` }}>
-        <i className={`ti ${icon}`} style={{ fontSize:30, color:C.pink,
-          filter:`drop-shadow(0 0 8px ${C.pink})` }}/>
-      </div>
-      <div style={{ fontSize:20, fontWeight:700, color:C.text,
-        fontFamily:"'Space Grotesk'", marginBottom:8 }}>{title}</div>
-      <div style={{ fontSize:13, color:"#dcdcff", maxWidth:360, lineHeight:1.6 }}>{sub}</div>
-    </div>
-  );
-}
-
-// ── Main ──────────────────────────────────────────────────────
 export default function ClientDashboard({ user, setUser }) {
   useAssets();
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_client") || "dashboard");
   useEffect(() => { localStorage.setItem("activeTab_client", active); }, [active]);
+
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [notifs, setNotifs] = useState([]);
+  const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Profile Dropdown
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  // File filter
+  const [fileFilter, setFileFilter] = useState("All");
+
+  // Local Chat Mockups
+  const [chatMessages, setChatMessages] = useState([
+    { sender: "Prabhu · YENCODE", msg: "Hi! The final review designs have been uploaded. Please check and let us know your feedback.", time: "9:05 AM", mine: false },
+    { sender: "You", msg: "Looks great! I'll review and get back by EOD. Can we schedule a call too?", time: "9:22 AM", mine: true },
+    { sender: "Prabhu · YENCODE", msg: "Absolutely! I've added a meeting slot for tomorrow 11 AM. Check the schedule section below.", time: "9:30 AM", mine: false },
+    { sender: "You", msg: "Perfect. Also please send the updated invoice when ready.", time: "9:45 AM", mine: true }
+  ]);
+  const [chatText, setChatText] = useState("");
+
+  // Feedback Mock
+  const [feedbackRating, setFeedbackRating] = useState(4);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+  // Approvals Mock
+  const [approvals, setApprovals] = useState([
+    { id: 1, title: "Homepage Design v3", desc: "Phase 1 design revisions approved, awaiting visual layout approval.", icon: "ti-photo" },
+    { id: 2, title: "SEO Keywords Plan", desc: "Approval request for targeting primary and secondary service keywords.", icon: "ti-seo" }
+  ]);
+
+  // Calendar states
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 5, 19)); // Default mid June 2026
+  const [selectedDay, setSelectedDay] = useState(19);
+
+  // Document preview states
+  const [selectedDoc, setSelectedDoc] = useState(null);
+
+  // Payment Checkout Modal
+  const [payModalOpen, setPayModalOpen] = useState(false);
+  const [paymentInvoice, setPaymentInvoice] = useState(null);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+  const clientName = user?.clientName || user?.name || "Client";
 
   useEffect(() => {
     if (!user) {
       setLoading(false);
       return;
     }
-    const clientName = user.clientName || user.name;
     const fetchAll = async () => {
       try {
-        const [projRes, taskRes, invRes, notifRes] = await Promise.all([
+        const [projRes, taskRes, invRes, notifRes, docRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
@@ -769,55 +115,1361 @@ export default function ClientDashboard({ user, setUser }) {
           axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
-          axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`)
+          axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
+          axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] }))
         ]);
+
         setProjects(projRes.data || []);
         setTasks(taskRes.data || []);
         setInvoices(invRes.data || []);
         setNotifs(notifRes.data || []);
+        setDocs(docRes.data || []);
       } catch (err) {
-        console.error("Failed to fetch dashboard data", err);
+        console.error("Failed to fetch client dashboard data", err);
       } finally {
         setLoading(false);
       }
     };
     fetchAll();
-  }, [user]);
+  }, [user, clientName]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    window.location.href = "/";
+  };
+
+  const handleSendMessage = () => {
+    if (!chatText.trim()) return;
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    setChatMessages([...chatMessages, { sender: "You", msg: chatText, time: timeStr, mine: true }]);
+    setChatText("");
+    // Simulate auto-reply
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, {
+        sender: "Prabhu · YENCODE",
+        msg: "Received! Let me check this with the development team and get back to you shortly.",
+        time: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+        mine: false
+      }]);
+    }, 1500);
+  };
+
+  const submitFeedback = (e) => {
+    e.preventDefault();
+    setFeedbackSubmitted(true);
+    setTimeout(() => {
+      setFeedbackText("");
+      setFeedbackSubmitted(false);
+      alert("Thank you for your feedback! We appreciate your support.");
+    }, 1000);
+  };
+
+  const handleApproval = (id, type) => {
+    setApprovals(approvals.filter(a => a.id !== id));
+    alert(type === "approve" ? "Approved successfully!" : "Rejected/Request Changes sent.");
+  };
+
+  // Payment execution
+  const startPayment = (invoice) => {
+    setPaymentInvoice(invoice);
+    setPayModalOpen(true);
+  };
+
+  const executePayment = async () => {
+    if (!paymentInvoice) return;
+    setPaymentProcessing(true);
+    try {
+      const remainingAmount = paymentInvoice.total - (paymentInvoice.amountPaid || 0);
+      const res = await axios.patch(`${BASE_URL}/api/invoices/${paymentInvoice.id || paymentInvoice._id}/status`, {
+        status: "paid",
+        amountPaid: remainingAmount,
+        paymentMode: "GPay",
+        paymentDate: new Date().toISOString().split("T")[0],
+        transactionId: "TXN" + Math.floor(Math.random() * 1000000000)
+      });
+      if (res.data?.success || res.status === 200) {
+        // Update local invoices state
+        setInvoices(invoices.map(inv => {
+          if (inv.id === paymentInvoice.id || inv._id === paymentInvoice._id) {
+            return { ...inv, status: "paid", amountPaid: inv.total };
+          }
+          return inv;
+        }));
+        alert("Payment of ₹" + remainingAmount.toLocaleString("en-IN") + " completed successfully!");
+      }
+    } catch (err) {
+      console.error("Payment failed:", err);
+      alert("Payment failed: " + (err.response?.data?.msg || err.message));
+    } finally {
+      setPaymentProcessing(false);
+      setPayModalOpen(false);
+      setPaymentInvoice(null);
+    }
+  };
+
+  // Mock Calendar Calculations for June 2026
+  const getCalendarDays = () => {
+    const days = [];
+    // Previous month padding (May 2026 ends on Sunday 31) -> none or fill 5 days from previous week if start is weekday
+    // June 2026 starts on Monday (1)
+    // May days: 25, 26, 27, 28, 29, 30, 31 (7 days)
+    for (let i = 25; i <= 31; i++) {
+      days.push({ day: i, isOtherMonth: true });
+    }
+    // June days: 1 to 30
+    for (let i = 1; i <= 30; i++) {
+      days.push({ day: i, isOtherMonth: false });
+    }
+    // Next month padding (July 2026 starts on Wednesday)
+    // July days: 1 to 5
+    for (let i = 1; i <= 5; i++) {
+      days.push({ day: i, isOtherMonth: true });
+    }
+    return days;
+  };
+
+  const getEventClass = (day, other) => {
+    if (other) return "";
+    const eventDays = [2, 6, 10, 25];
+    return eventDays.includes(day) ? "has-event" : "";
+  };
+
+  // File grid logic
+  const defaultMockFiles = [
+    { name: "Homepage_Final_v3.fig", meta: "Figma Design · 8.4 MB", date: "28 May 2026", type: "Designs", icon: "ti-photo", bg: C.blueBg, col: C.blue, badge: "New" },
+    { name: "Brand_Guidelines_v2.pdf", meta: "PDF · 2.4 MB", date: "22 May 2026", type: "Documents", icon: "ti-file-type-pdf", bg: C.redBg, col: C.red },
+    { name: "SEO_Audit_Report.xlsx", meta: "Excel · 890 KB", date: "20 May 2026", type: "Reports", icon: "ti-file-spreadsheet", bg: C.greenBg, col: C.green },
+    { name: "STA_Phase2_Proposal.docx", meta: "Word · 340 KB", date: "15 May 2026", type: "Documents", icon: "ti-file-text", bg: C.purpleBg, col: C.purple },
+    { name: "AboutPage_Design.png", meta: "PNG · 1.2 MB", date: "12 May 2026", type: "Designs", icon: "ti-photo", bg: C.amberBg, col: C.amber },
+    { name: "Project_Contract.pdf", meta: "PDF · 560 KB", date: "01 Apr 2026", type: "Documents", icon: "ti-file-type-pdf", bg: C.redBg, col: C.red },
+    { name: "ContactPage_v2.png", meta: "PNG · 980 KB", date: "29 May 2026", type: "Designs", icon: "ti-photo", bg: C.blueBg, col: C.blue, badge: "New" },
+    { name: "Content_Brief.docx", meta: "Word · 210 KB", date: "08 Apr 2026", type: "Documents", icon: "ti-file-text", bg: C.greenBg, col: C.green }
+  ];
+
+  // Convert uploaded docs to matching file card format
+  const docCards = docs.map(d => ({
+    name: d.docType ? `${d.docType.charAt(0).toUpperCase() + d.docType.slice(1)}_Document.pdf` : "Document.pdf",
+    meta: `PDF · ${(d.htmlContent?.length ? (d.htmlContent.length / 1024).toFixed(1) : "120")} KB`,
+    date: new Date(d.dateSent || Date.now()).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+    type: "Documents",
+    icon: "ti-file-type-pdf",
+    bg: C.redBg,
+    col: C.red,
+    raw: d
+  }));
+
+  const allFiles = [...docCards, ...defaultMockFiles];
+  const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
+
+  // Invoices variables
+  const dbInvoices = invoices.map(inv => ({
+    id: inv.id || inv._id,
+    invoiceNo: inv.invoiceNo,
+    desc: inv.project || "Project Delivery Milestone",
+    dueDate: inv.dueDate || "30 Jun 2026",
+    date: inv.date || "01 May 2026",
+    total: inv.total || 0,
+    amountPaid: inv.amountPaid || 0,
+    status: (inv.status || "draft").toLowerCase()
+  }));
+
+  // Mock fallback if DB has no invoices
+  const defaultMockInvoices = [
+    { id: "mock1", invoiceNo: "#INV-2026-1230", desc: "STA Website · Advance Payment", date: "01 May 2026", dueDate: "01 May 2026", total: 40000, amountPaid: 40000, status: "paid" },
+    { id: "mock2", invoiceNo: "#INV-2026-1218", desc: "STA Website · Design Milestone", date: "25 Apr 2026", dueDate: "25 Apr 2026", total: 40000, amountPaid: 40000, status: "paid" },
+    { id: "mock3", invoiceNo: "#INV-2026-1240", desc: "STA Website · Final Delivery", date: "29 May 2026", dueDate: "30 Jun 2026", total: 40000, amountPaid: 0, status: "pending" }
+  ];
+
+  const finalInvoicesList = dbInvoices.length > 0 ? dbInvoices : defaultMockInvoices;
+
+  const totalPaid = finalInvoicesList.filter(i => i.status === "paid").reduce((sum, i) => sum + i.total, 0);
+  const totalPending = finalInvoicesList.filter(i => i.status === "pending" || i.status === "unpaid" || i.status === "sent").reduce((sum, i) => sum + (i.total - i.amountPaid), 0);
+  const totalOverdue = finalInvoicesList.filter(i => i.status === "overdue").reduce((sum, i) => sum + (i.total - i.amountPaid), 0);
+  const totalInvoiced = totalPaid + totalPending + totalOverdue;
+
+  // Active project calculation
+  const activeProjName = projects[0]?.name || "STA Corporate Website";
+  const activeProjProgress = projects[0]?.progress || 90;
+  const activeProjDesc = projects[0]?.description || "Your project is progressing well and is currently in the final review stage. All major milestones have been delivered on schedule.";
+  const activeProjDeadline = projects[0]?.deadline || "30 Jun 2026";
+
+  // Styles Injection
   const CSS = `
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:${C.bg};}
-    ::-webkit-scrollbar{width:4px;}
-    ::-webkit-scrollbar-track{background:${C.bg};}
-    ::-webkit-scrollbar-thumb{background:${C.dim};border-radius:10px;}
-    input::placeholder{color:#6060a0;}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-    .pg{animation:fadeUp 0.35s ease forwards;}
+    .cp-root {
+      --teal: #00BCD4;
+      --teal2: #00ACC1;
+      --teal3: #006E7F;
+      --teal-light: #E0F7FA;
+      --teal-lighter: #F0FDFE;
+      --bg: #F3F8F9;
+      --surface: #FFFFFF;
+      --surface2: #F8FAFB;
+      --border: #DFF0F2;
+      --border2: #C5DDE0;
+      --text: #0D2027;
+      --text2: #4E6B75;
+      --text3: #96B0B8;
+      --green: #1DB87A;
+      --green-bg: #E3FAF0;
+      --amber: #F59E0B;
+      --amber-bg: #FEF3C7;
+      --red: #EF4444;
+      --red-bg: #FEF2F2;
+      --purple: #7C3AED;
+      --purple-bg: #EDE9FE;
+      --blue: #2563EB;
+      --blue-bg: #EFF4FF;
+      --radius: 16px;
+      --font: 'Nunito', sans-serif;
+      --font2: 'Nunito Sans', sans-serif;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cp-root * { box-sizing: border-box; margin: 0; padding: 0; }
+    .cp-root button, .cp-root input, .cp-root textarea { font-family: var(--font); }
+
+    /* ── TOP NAV ── */
+    .cp-root .topnav { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 12px rgba(0,0,0,.05); }
+    .cp-root .topnav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 62px; display: flex; align-items: center; gap: 16px; }
+    .cp-root .tn-brand { display: flex; align-items: center; gap: 10px; }
+    .cp-root .tn-logo { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--teal3), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; color: #fff; letter-spacing: -.5px; }
+    .cp-root .tn-company { font-size: 15px; font-weight: 800; color: var(--text); }
+    .cp-root .tn-powered { font-size: 10px; color: var(--text3); font-weight: 600; }
+    .cp-root .tn-nav { display: flex; gap: 2px; margin-left: 24px; }
+    .cp-root .tn-item { padding: 8px 14px; border-radius: 9px; font-size: 13px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all .15s; border: none; background: none; }
+    .cp-root .tn-item:hover { background: var(--bg); color: var(--text); }
+    .cp-root .tn-item.active { background: var(--teal-light); color: var(--teal); }
+    .cp-root .tn-right { margin-left: auto; display: flex; align-items: center; gap: 10px; position: relative; }
+    .cp-root .tn-notif { width: 36px; height: 36px; border-radius: 9px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; color: var(--text2); position: relative; transition: all 0.2s; }
+    .cp-root .tn-notif:hover { border-color: var(--teal); color: var(--teal); }
+    .cp-root .tn-notif-dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--red); border: 1.5px solid #fff; }
+    .cp-root .tn-client-chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; cursor: pointer; position: relative; }
+    .cp-root .tn-client-chip:hover { border-color: var(--teal); }
+    .cp-root .tn-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--amber), #D97706); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
+    .cp-root .tn-client-name { font-size: 12px; font-weight: 700; color: var(--text); }
+    .cp-root .mobile-menu-btn { display: none; width: 36px; height: 36px; border-radius: 9px; background: var(--bg); border: 1px solid var(--border); align-items: center; justify-content: center; cursor: pointer; font-size: 18px; color: var(--text2); }
+
+    /* Profile Dropdown */
+    .cp-root .profile-dropdown { position: absolute; top: 48px; right: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; box-shadow: 0 4px 18px rgba(0,0,0,0.08); width: 150px; z-index: 150; padding: 6px 0; }
+    .cp-root .profile-drop-item { width: 100%; padding: 8px 14px; text-align: left; background: none; border: none; font-size: 13px; color: var(--text2); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s; }
+    .cp-root .profile-drop-item:hover { background: var(--teal-lighter); color: var(--teal); }
+    .cp-root .profile-drop-item.signout:hover { background: var(--red-bg); color: var(--red); }
+
+    /* ── HERO BANNER ── */
+    .cp-root .hero { background: linear-gradient(135deg, #004D5E 0%, var(--teal3) 40%, var(--teal) 100%); position: relative; overflow: hidden; border-radius: 0 0 20px 20px; }
+    .cp-root .hero::after { content: ''; position: absolute; right: -80px; top: -80px; width: 320px; height: 320px; border-radius: 50%; background: rgba(255,255,255,.05); pointer-events: none; }
+    .cp-root .hero::before { content: ''; position: absolute; right: 120px; bottom: -100px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,.04); pointer-events: none; }
+    .cp-root .hero-inner { max-width: 1200px; margin: 0 auto; padding: 36px 24px; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; position: relative; z-index: 1; }
+    .cp-root .hero-label { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.15); color: rgba(255,255,255,.9); font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; margin-bottom: 10px; letter-spacing: .6px; text-transform: uppercase; }
+    .cp-root .hero-title { font-size: 24px; font-weight: 900; color: #fff; letter-spacing: -.5px; margin-bottom: 6px; }
+    .cp-root .hero-sub { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.6; max-width: 480px; font-family: var(--font2); }
+    .cp-root .hero-stats { display: flex; gap: 28px; margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.15); }
+    .cp-root .hs-item { text-align: left; }
+    .cp-root .hs-val { font-size: 22px; font-weight: 800; color: #fff; }
+    .cp-root .hs-label { font-size: 10px; color: rgba(255,255,255,.6); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+    .cp-root .hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+    .cp-root .hero-pct-ring { position: relative; width: 110px; height: 110px; }
+    .cp-root .hero-pct-ring svg { width: 100%; height: 100%; }
+    .cp-root .hero-pct-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+    .cp-root .hero-pct-val { font-size: 22px; font-weight: 900; color: #fff; }
+    .cp-root .hero-pct-label { font-size: 9px; color: rgba(255,255,255,.6); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .cp-root .hero-status-badge { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.15); color: #fff; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; }
+    .cp-root .hero-status-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+    /* ── PAGE BODY ── */
+    .cp-root .page-body { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; display: flex; flex-direction: column; gap: 28px; }
+
+    /* ── SECTION HEADERS ── */
+    .cp-root .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .cp-root .sec-title { font-size: 15px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .cp-root .sec-title-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .cp-root .sec-action { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--teal); cursor: pointer; padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--teal-light); background: var(--teal-lighter); transition: all .15s; }
+    .cp-root .sec-action:hover { background: var(--teal-light); }
+
+    /* ── PROJECT TIMELINE & GANTT ── */
+    .cp-root .timeline-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .cp-root .tc-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .cp-root .tc-title { font-size: 13px; font-weight: 800; color: var(--text); }
+    .cp-root .tc-legend { display: flex; gap: 14px; }
+    .cp-root .tc-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--text3); }
+    .cp-root .tc-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .cp-root .timeline-scroll { overflow-x: auto; padding: 20px 22px 16px; }
+    .cp-root .timeline-wrap { min-width: 700px; }
+    .cp-root .tl-months { display: grid; grid-template-columns: 140px repeat(6, 1fr); gap: 0; margin-bottom: 6px; }
+    .cp-root .tl-month { font-size: 10px; font-weight: 700; color: var(--text3); text-align: center; text-transform: uppercase; letter-spacing: .5px; }
+    .cp-root .tl-month:first-child { text-align: left; }
+    .cp-root .tl-row { display: grid; grid-template-columns: 140px repeat(6, 1fr); gap: 0; align-items: center; margin-bottom: 8px; }
+    .cp-root .tl-task-name { font-size: 12px; font-weight: 700; color: var(--text); padding-right: 12px; white-space: nowrap; }
+    .cp-root .tl-task-sub { font-size: 10px; color: var(--text3); margin-top: 1px; }
+    .cp-root .tl-grid-cell { height: 28px; border-left: 1px dashed var(--border); position: relative; }
+    .cp-root .tl-grid-cell:last-child { border-right: 1px dashed var(--border); }
+    .cp-root .tl-bar-wrap { position: relative; height: 22px; margin: 3px 0; }
+    .cp-root .tl-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; position: absolute; }
+    .cp-root .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--red); z-index: 5; pointer-events: none; }
+    .cp-root .today-label { position: absolute; top: -18px; transform: translateX(-50%); font-size: 9px; font-weight: 800; color: var(--red); background: var(--red-bg); padding: 1px 6px; border-radius: 20px; white-space: nowrap; }
+
+    /* ── PROGRESS STEPS ── */
+    .cp-root .steps-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; position: relative; }
+    .cp-root .steps-grid::before { content: ''; position: absolute; top: 18px; left: 10%; right: 10%; height: 2px; background: var(--border); z-index: 0; }
+    .cp-root .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; z-index: 1; }
+    .cp-root .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; border: 2px solid transparent; transition: all .2s; cursor: pointer; }
+    .cp-root .step-circle.done { background: var(--teal); color: #fff; border-color: var(--teal); box-shadow: 0 3px 10px rgba(0,188,212,.3); }
+    .cp-root .step-circle.active { background: var(--surface); color: var(--teal); border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-light); }
+    .cp-root .step-circle.pending { background: var(--surface2); color: var(--text3); border-color: var(--border); }
+    .cp-root .step-name { font-size: 10px; font-weight: 700; color: var(--text2); text-align: center; max-width: 80px; }
+    .cp-root .step-date { font-size: 9px; color: var(--text3); font-weight: 600; text-align: center; }
+
+    /* ── LAYOUTS ── */
+    .cp-root .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .cp-root .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+    /* ── FILES PANEL ── */
+    .cp-root .files-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .cp-root .files-toolbar { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+    .cp-root .ft-filter { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); color: var(--text2); transition: all .15s; }
+    .cp-root .ft-filter.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .cp-root .ft-filter:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
+    .cp-root .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding: 16px 18px; }
+    .cp-root .file-card { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
+    .cp-root .file-card:hover { border-color: var(--teal); box-shadow: 0 4px 14px rgba(0,188,212,.1); transform: translateY(-1px); }
+    .cp-root .fc-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 10px; }
+    .cp-root .fc-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cp-root .fc-meta { font-size: 10px; color: var(--text3); font-weight: 600; }
+    .cp-root .fc-date { font-size: 10px; color: var(--text3); margin-top: 6px; }
+    .cp-root .fc-download { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 7px; background: var(--teal-light); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--teal); opacity: 0; transition: opacity .15s; }
+    .cp-root .file-card:hover .fc-download { opacity: 1; }
+    .cp-root .fc-new-badge { position: absolute; top: 10px; left: 10px; background: var(--red); color: #fff; font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 20px; }
+
+    /* ── INVOICES ── */
+    .cp-root .invoice-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--border); cursor: pointer; transition: all .15s; }
+    .cp-root .invoice-item:last-child { border-bottom: none; }
+    .cp-root .invoice-item:hover { background: var(--teal-lighter); }
+    .cp-root .inv-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+    .cp-root .inv-id { font-size: 12px; font-weight: 800; color: var(--text); }
+    .cp-root .inv-desc { font-size: 11px; color: var(--text3); margin-top: 1px; }
+    .cp-root .inv-date { font-size: 11px; color: var(--text2); font-weight: 600; }
+    .cp-root .inv-amount { font-size: 14px; font-weight: 800; text-align: right; }
+    .cp-root .inv-dl { width: 30px; height: 30px; border-radius: 8px; background: var(--teal-light); border: 1px solid var(--teal-light); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; color: var(--teal); flex-shrink: 0; transition: all .15s; }
+    .cp-root .inv-dl:hover { background: var(--teal); color: #fff; }
+    .cp-root .badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: capitalize; }
+    .cp-root .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
+    .cp-root .badge.paid { background: var(--green-bg); color: var(--green); }
+    .cp-root .badge.paid::before { background: var(--green); }
+    .cp-root .badge.pending, .cp-root .badge.unpaid, .cp-root .badge.sent, .cp-root .badge.part_paid { background: var(--amber-bg); color: var(--amber); }
+    .cp-root .badge.pending::before, .cp-root .badge.unpaid::before, .cp-root .badge.sent::before, .cp-root .badge.part_paid::before { background: var(--amber); }
+    .cp-root .badge.overdue { background: var(--red-bg); color: var(--red); }
+    .cp-root .badge.overdue::before { background: var(--red); }
+
+    /* ── MESSAGES / CHAT ── */
+    .cp-root .messages-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; height: 420px; }
+    .cp-root .msg-list { flex: 1; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+    .cp-root .msg-row { display: flex; gap: 8px; align-items: flex-end; }
+    .cp-root .msg-row.mine { flex-direction: row-reverse; }
+    .cp-root .msg-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff; flex-shrink: 0; }
+    .cp-root .msg-body { display: flex; flex-direction: column; gap: 2px; max-width: 70%; }
+    .cp-root .msg-row.mine .msg-body { align-items: flex-end; }
+    .cp-root .msg-name { font-size: 10px; font-weight: 700; color: var(--text3); margin-bottom: 1px; }
+    .cp-root .msg-bubble { padding: 9px 13px; border-radius: 12px; font-size: 12px; line-height: 1.5; color: var(--text); }
+    .cp-root .msg-bubble.them { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px 12px 12px 12px; }
+    .cp-root .msg-bubble.mine { background: var(--teal); color: #fff; border-radius: 12px 4px 12px 12px; }
+    .cp-root .msg-time { font-size: 10px; color: var(--text3); font-weight: 600; margin-top: 1px; }
+    .cp-root .msg-row.mine .msg-time { color: var(--text3); }
+    .cp-root .msg-input-row { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); background: var(--surface); }
+    .cp-root .msg-inp { flex: 1; padding: 9px 13px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; font-size: 12px; color: var(--text); outline: none; transition: all .15s; }
+    .cp-root .msg-inp:focus { border-color: var(--teal); background: #fff; }
+    .cp-root .msg-inp::placeholder { color: var(--text3); }
+    .cp-root .msg-send { width: 36px; height: 36px; border-radius: 9px; background: var(--teal); border: none; display: flex; align-items: center; justify-content: center; font-size: 17px; color: #fff; cursor: pointer; flex-shrink: 0; transition: all .15s; }
+    .cp-root .msg-send:hover { background: var(--teal2); }
+    .cp-root .msg-attach { width: 36px; height: 36px; border-radius: 9px; background: var(--bg); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text2); cursor: pointer; flex-shrink: 0; transition: all .15s; }
+    .cp-root .msg-attach:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* ── CALENDAR ── */
+    .cp-root .calendar-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .cp-root .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+    .cp-root .cal-month { font-size: 13px; font-weight: 800; color: var(--text); }
+    .cp-root .cal-nav { display: flex; gap: 4px; }
+    .cp-root .cal-nav-btn { width: 28px; height: 28px; border-radius: 7px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: var(--text2); transition: all .15s; }
+    .cp-root .cal-nav-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .cp-root .cal-grid { padding: 12px 14px 16px; }
+    .cp-root .cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 4px; }
+    .cp-root .cal-day-label { font-size: 10px; font-weight: 700; color: var(--text3); padding: 4px 0; text-transform: uppercase; }
+    .cp-root .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .cp-root .cal-day { height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all .15s; position: relative; }
+    .cp-root .cal-day:hover { background: var(--teal-light); color: var(--teal); }
+    .cp-root .cal-day.today { background: var(--teal); color: #fff; font-weight: 800; box-shadow: 0 2px 8px rgba(0,188,212,.3); }
+    .cp-root .cal-day.has-event::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+    .cp-root .cal-day.has-event.today::after { background: #fff; }
+    .cp-root .cal-day.other-month { color: var(--text3); opacity: .4; }
+    .cp-root .cal-day.selected { background: var(--teal-light); color: var(--teal); font-weight: 700; border: 1px solid var(--teal); }
+    .cp-root .meetings-list { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .cp-root .meeting-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: var(--bg); border-radius: 10px; border: 1.5px solid var(--border); cursor: pointer; transition: all .15s; }
+    .cp-root .meeting-item:hover { border-color: var(--teal); }
+    .cp-root .mi-time-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 38px; }
+    .cp-root .mi-time { font-size: 11px; font-weight: 800; color: var(--teal); }
+    .cp-root .mi-dur { font-size: 9px; color: var(--text3); font-weight: 600; }
+    .cp-root .mi-divider { width: 2px; height: 32px; background: var(--teal-light); border-radius: 1px; align-self: center; }
+    .cp-root .mi-title { font-size: 12px; font-weight: 700; color: var(--text); }
+    .cp-root .mi-meta { font-size: 10px; color: var(--text3); margin-top: 2px; }
+    .cp-root .mi-join { margin-left: auto; display: flex; align-items: center; gap: 4px; padding: 5px 10px; background: var(--teal); color: #fff; border-radius: 7px; font-size: 10px; font-weight: 700; flex-shrink: 0; transition: all 0.15s; }
+    .cp-root .mi-join:hover { background: var(--teal2); }
+
+    /* ── APPROVALS ── */
+    .cp-root .approval-item { display: flex; align-items: center; gap: 12px; padding: 13px 18px; border-bottom: 1px solid var(--border); transition: all .15s; }
+    .cp-root .approval-item:last-child { border-bottom: none; }
+    .cp-root .approval-item:hover { background: var(--teal-lighter); }
+    .cp-root .ai-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; background: var(--teal-light); color: var(--teal); }
+    .cp-root .ai-title { font-size: 12px; font-weight: 700; color: var(--text); }
+    .cp-root .ai-desc { font-size: 11px; color: var(--text3); margin-top: 1px; }
+    .cp-root .ai-actions { margin-left: auto; display: flex; gap: 6px; }
+    .cp-root .ai-btn { padding: 6px 12px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: none; color: var(--text2); transition: all .15s; }
+    .cp-root .ai-btn.approve { background: var(--green); color: #fff; border-color: var(--green); }
+    .cp-root .ai-btn.reject { background: none; color: var(--red); border-color: rgba(239,68,68,.3); }
+    .cp-root .ai-btn.approve:hover { opacity: .85; }
+    .cp-root .ai-btn.reject:hover { background: var(--red-bg); }
+
+    /* ── ACTIVITY FEED ── */
+    .cp-root .activity-feed { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 0; }
+    .cp-root .af-item { display: flex; gap: 12px; padding-bottom: 14px; }
+    .cp-root .af-item:last-child { padding-bottom: 0; }
+    .cp-root .af-dot-col { display: flex; flex-direction: column; align-items: center; }
+    .cp-root .af-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; background: var(--teal-light); color: var(--teal); }
+    .cp-root .af-line { width: 2px; background: var(--border); flex: 1; margin: 4px 0; min-height: 14px; }
+    .cp-root .af-item:last-child .af-line { display: none; }
+    .cp-root .af-title { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.4; }
+    .cp-root .af-time { font-size: 10px; color: var(--text3); margin-top: 2px; display: flex; align-items: center; gap: 3px; }
+
+    /* ── FEEDBACK ── */
+    .cp-root .feedback-panel { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .cp-root .rating-row { display: flex; gap: 8px; margin: 10px 0 14px; }
+    .cp-root .star { font-size: 24px; cursor: pointer; color: var(--border2); transition: color .15s; }
+    .cp-root .star.active { color: var(--amber); }
+    .cp-root .star:hover { color: var(--amber); }
+    .cp-root .feedback-input { width: 100%; padding: 10px 13px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; font-size: 12px; color: var(--text); outline: none; resize: none; min-height: 72px; transition: all .15s; }
+    .cp-root .feedback-input:focus { border-color: var(--teal); background: #fff; }
+    .cp-root .feedback-input::placeholder { color: var(--text3); }
+    .cp-root .feedback-submit { width: 100%; margin-top: 10px; padding: 11px; background: var(--teal); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; box-shadow: 0 3px 10px rgba(0,188,212,.25); }
+    .cp-root .feedback-submit:hover { background: var(--teal2); }
+
+    /* ── CONTACT CARD ── */
+    .cp-root .contact-card { background: linear-gradient(135deg, #004D5E, var(--teal)); border-radius: var(--radius); padding: 22px; color: #fff; }
+    .cp-root .cc-label { font-size: 10px; font-weight: 700; opacity: .65; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+    .cp-root .cc-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+    .cp-root .cc-role { font-size: 12px; opacity: .7; margin-bottom: 16px; }
+    .cp-root .cc-contacts { display: flex; flex-direction: column; gap: 8px; }
+    .cp-root .cc-contact-row { display: flex; align-items: center; gap: 8px; font-size: 12px; opacity: .85; }
+    .cp-root .cc-contact-row i { font-size: 15px; opacity: .7; }
+    .cp-root .cc-actions { display: flex; gap: 8px; margin-top: 16px; }
+    .cp-root .cc-btn { flex: 1; padding: 9px; background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.25); border-radius: 9px; font-size: 11px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all .15s; }
+    .cp-root .cc-btn:hover { background: rgba(255,255,255,.25); }
+
+    /* ── MOBILE BOTTOM NAV ── */
+    .cp-root .mobile-bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 62px; background: var(--surface); border-top: 1px solid var(--border); z-index: 100; box-shadow: 0 -2px 12px rgba(0,0,0,.06); }
+    .cp-root .mbn-inner { display: flex; align-items: center; justify-content: space-around; height: 100%; padding: 0 8px; }
+    .cp-root .mbn-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; border-radius: 9px; cursor: pointer; flex: 1; text-decoration: none; border: none; background: none; }
+    .cp-root .mbn-item.active { background: var(--teal-light); }
+    .cp-root .mbn-item i { font-size: 20px; color: var(--text3); }
+    .cp-root .mbn-item.active i { color: var(--teal); }
+    .cp-root .mbn-label { font-size: 9px; font-weight: 700; color: var(--text3); }
+    .cp-root .mbn-item.active .mbn-label { color: var(--teal); }
+
+    /* ── POPUP MODAL OVERLAY ── */
+    .cp-root .modal-overlay { position: fixed; inset: 0; background: rgba(13, 32, 39, 0.4); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .cp-root .modal-card { background: var(--surface); border-radius: var(--radius); border: 1.5px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); width: 100%; max-width: 420px; overflow: hidden; animation: popUp 0.3s ease; }
+    .cp-root .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .cp-root .modal-title { font-size: 15px; font-weight: 800; color: var(--text); }
+    .cp-root .modal-close { background: none; border: none; font-size: 20px; color: var(--text3); cursor: pointer; }
+    .cp-root .modal-close:hover { color: var(--text); }
+    .cp-root .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+    @keyframes popUp {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px){
+      .cp-root .two-col, .cp-root .three-col { grid-template-columns: 1fr; }
+      .cp-root .hero-stats { gap: 16px; }
+      .cp-root .hero-right { display: none; }
+      .cp-root .steps-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .cp-root .steps-grid::before { display: none; }
+      .cp-root .tn-nav { display: none; }
+      .cp-root .mobile-menu-btn { display: flex; }
+      .cp-root .mobile-bottom-nav { display: block; }
+      .cp-root .page-body { padding-bottom: 80px; }
+      .cp-root .tl-months, .cp-root .tl-row { grid-template-columns: 120px repeat(6, 1fr); }
+      .cp-root .files-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media(max-width:480px){
+      .cp-root .hero-inner { grid-template-columns: 1fr; padding: 24px 16px; }
+      .cp-root .page-body { padding: 16px 16px 80px; }
+      .cp-root .hero-stats { flex-wrap: wrap; gap: 14px; }
+      .cp-root .hs-val { font-size: 18px; }
+      .cp-root .files-grid { grid-template-columns: 1fr; }
+    }
   `;
 
   if (loading) {
-    return <div style={{ display: 'flex', height: '100vh', background: C.bg, alignItems: 'center', justifyContent: 'center', color: C.text }}>Loading dashboard...</div>;
+    return (
+      <div style={{ display: 'flex', height: '100vh', background: C.bg, alignItems: 'center', justifyContent: 'center', color: C.text, fontFamily: 'sans-serif' }}>
+        Loading Client Portal...
+      </div>
+    );
+  }
+
+  // Settings Component Render Wrapper
+  if (active === "settings") {
+    return (
+      <div className="cp-root">
+        <style>{CSS}</style>
+        {renderTopNav()}
+        <div style={{ maxWidth: 900, margin: "24px auto", padding: "0 24px" }}>
+          <button onClick={() => setActive("dashboard")} style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid " + C.border, background: C.surface, padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, color: C.text2, marginBottom: 20 }}>
+            <i className="ti ti-arrow-left"></i> Back to Dashboard
+          </button>
+          <SettingsPage
+            user={user}
+            THEME={{
+              bg: C.bg, surface: C.surface, card: C.surface, cardHov: C.surface2, border: C.border, borderHov: C.border2,
+              grad: "linear-gradient(135deg, " + C.teal3 + ", " + C.teal + ")", gradSoft: "rgba(0, 188, 212, 0.08)",
+              gradText: "linear-gradient(135deg, " + C.teal3 + ", " + C.teal + ")", pink: C.teal, purple: C.teal3,
+              violet: C.teal2, text: C.text, muted: C.text2, dim: C.text3, green: C.green, amber: C.amber, red: C.red, blue: C.blue
+            }}
+            onProfileUpdate={(updates) => {
+              const updated = { ...user, ...updates };
+              if (setUser) setUser(updated);
+              localStorage.setItem("user", JSON.stringify(updated));
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Render Topnav Helper
+  function renderTopNav() {
+    const totalUnreadNotifs = notifs.filter(n => !n.isRead).length;
+    const initials = clientName.substring(0, 2).toUpperCase();
+
+    return (
+      <nav className="topnav">
+        <div className="topnav-inner">
+          <div className="tn-brand">
+            <div className="tn-logo">YT</div>
+            <div>
+              <div className="tn-company">YENCODE Technologies</div>
+              <div className="tn-powered">Client Portal</div>
+            </div>
+          </div>
+          <div className="tn-nav">
+            <button className={`tn-item ${active === "dashboard" ? "active" : ""}`} onClick={() => setActive("dashboard")}>Overview</button>
+            <button className={`tn-item ${active === "timeline" ? "active" : ""}`} onClick={() => setActive("timeline")}>Timeline</button>
+            <button className={`tn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>Files</button>
+            <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>Invoices</button>
+            <button className={`tn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>Messages</button>
+            <button className={`tn-item ${active === "calendar" ? "active" : ""}`} onClick={() => setActive("calendar")}>Schedule</button>
+          </div>
+          <div className="tn-right">
+            <div className="tn-notif" onClick={() => setActive("dashboard")}>
+              <i className="ti ti-bell"></i>
+              {totalUnreadNotifs > 0 && <span className="tn-notif-dot"></span>}
+            </div>
+            <div className="tn-client-chip" onClick={() => setProfileOpen(!profileOpen)}>
+              <div className="tn-avatar">{initials}</div>
+              <span className="tn-client-name">{clientName}</span>
+              <i className="ti ti-chevron-down" style={{ fontSize: 12, color: C.text3 }}></i>
+
+              {profileOpen && (
+                <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
+                  <button className="profile-drop-item" onClick={() => { setActive("settings"); setProfileOpen(false); }}>
+                    <i className="ti ti-settings" style={{ fontSize: 14 }}></i> Settings
+                  </button>
+                  <button className="profile-drop-item signout" onClick={handleLogout}>
+                    <i className="ti ti-logout" style={{ fontSize: 14 }}></i> Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="mobile-menu-btn" onClick={() => setProfileOpen(!profileOpen)}>
+              <i className="ti ti-menu-2"></i>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  // Render Hero Helper
+  function renderHero() {
+    const pendingAmountFormatted = totalPending >= 1000 ? `₹${(totalPending / 1000).toFixed(0)}K` : `₹${totalPending.toLocaleString("en-IN")}`;
+    const dashoffset = 289 - (activeProjProgress / 100) * 289; // Circle stroke dash offsets
+
+    return (
+      <div className="hero">
+        <div className="hero-inner">
+          <div>
+            <div className="hero-label"><i className="ti ti-briefcase" style={{ fontSize: 11 }}></i> Active Project</div>
+            <div className="hero-title">{activeProjName}</div>
+            <div className="hero-sub">{activeProjDesc}</div>
+            <div className="hero-stats">
+              <div className="hs-item">
+                <div className="hs-val">{activeProjProgress}%</div>
+                <div className="hs-label">Complete</div>
+              </div>
+              <div className="hs-item">
+                <div className="hs-val">30</div>
+                <div className="hs-label">Days Left</div>
+              </div>
+              <div className="hs-item">
+                <div className="hs-val">{pendingAmountFormatted}</div>
+                <div className="hs-label">Pending</div>
+              </div>
+              <div className="hs-item">
+                <div className="hs-val">{allFiles.length}</div>
+                <div className="hs-label">Files Shared</div>
+              </div>
+            </div>
+          </div>
+          <div className="hero-right">
+            <div className="hero-pct-ring">
+              <svg viewBox="0 0 110 110">
+                <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="10" />
+                <circle cx="55" cy="55" r="46" fill="none" stroke="#fff" strokeWidth="10"
+                  strokeDasharray="289" strokeDashoffset={dashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
+              </svg>
+              <div className="hero-pct-center">
+                <div className="hero-pct-val">{activeProjProgress}%</div>
+                <div className="hero-pct-label">Done</div>
+              </div>
+            </div>
+            <div className="hero-status-badge">{activeProjProgress === 100 ? "Completed" : "In Review"}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Gantt Timeline helper
+  function renderTimelineComponent() {
+    return (
+      <div>
+        {/* Milestone Steps */}
+        <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: C.text2, marginBottom: 18 }}>Milestone Progress</div>
+          <div className="steps-grid">
+            <div className="step-item">
+              <div className={`step-circle ${activeProjProgress > 15 ? "done" : "active"}`}>
+                {activeProjProgress > 15 ? <i className="ti ti-check" style={{ fontSize: 16 }}></i> : "1"}
+              </div>
+              <div className="step-name">Discovery</div>
+              <div className="step-date" style={{ color: activeProjProgress > 15 ? C.green : C.teal }}>
+                {activeProjProgress > 15 ? "Done · 10 Apr" : "Active"}
+              </div>
+            </div>
+            <div className="step-item">
+              <div className={`step-circle ${activeProjProgress > 40 ? "done" : activeProjProgress > 15 ? "active" : "pending"}`}>
+                {activeProjProgress > 40 ? <i className="ti ti-check" style={{ fontSize: 16 }}></i> : "2"}
+              </div>
+              <div className="step-name">UI/UX Design</div>
+              <div className="step-date" style={{ color: activeProjProgress > 40 ? C.green : activeProjProgress > 15 ? C.teal : C.text3 }}>
+                {activeProjProgress > 40 ? "Done · 25 Apr" : activeProjProgress > 15 ? "Active" : "Pending"}
+              </div>
+            </div>
+            <div className="step-item">
+              <div className={`step-circle ${activeProjProgress > 70 ? "done" : activeProjProgress > 40 ? "active" : "pending"}`}>
+                {activeProjProgress > 70 ? <i className="ti ti-check" style={{ fontSize: 16 }}></i> : "3"}
+              </div>
+              <div className="step-name">Development</div>
+              <div className="step-date" style={{ color: activeProjProgress > 70 ? C.green : activeProjProgress > 40 ? C.teal : C.text3 }}>
+                {activeProjProgress > 70 ? "Done · 20 May" : activeProjProgress > 40 ? "Active" : "Pending"}
+              </div>
+            </div>
+            <div className="step-item">
+              <div className={`step-circle ${activeProjProgress > 85 ? "done" : activeProjProgress > 70 ? "active" : "pending"}`}>
+                {activeProjProgress > 85 ? <i className="ti ti-check" style={{ fontSize: 16 }}></i> : "4"}
+              </div>
+              <div className="step-name">CMS & SEO</div>
+              <div className="step-date" style={{ color: activeProjProgress > 85 ? C.green : activeProjProgress > 70 ? C.teal : C.text3 }}>
+                {activeProjProgress > 85 ? "Done · 27 May" : activeProjProgress > 70 ? "Active" : "Pending"}
+              </div>
+            </div>
+            <div className="step-item">
+              <div className={`step-circle ${activeProjProgress >= 100 ? "done" : activeProjProgress >= 85 ? "active" : "pending"}`}>
+                {activeProjProgress >= 100 ? <i className="ti ti-check" style={{ fontSize: 15 }}></i> : <i className="ti ti-eye" style={{ fontSize: 15 }}></i>}
+              </div>
+              <div className="step-name">Final Review</div>
+              <div className="step-date" style={{ color: activeProjProgress >= 100 ? C.green : activeProjProgress >= 85 ? C.teal : C.text3 }}>
+                {activeProjProgress >= 100 ? "Done · 2 Jun" : activeProjProgress >= 85 ? "Active now" : "Pending"}
+              </div>
+            </div>
+            <div className="step-item">
+              <div className={`step-circle ${activeProjProgress >= 100 ? "active" : "pending"}`}>
+                {activeProjProgress >= 100 ? <i className="ti ti-rocket" style={{ fontSize: 15 }}></i> : "6"}
+              </div>
+              <div className="step-name">Launch 🚀</div>
+              <div className="step-date" style={{ color: activeProjProgress >= 100 ? C.teal : C.text3 }}>
+                {activeProjProgress >= 100 ? "Launch Now!" : activeProjDeadline}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Gantt Chart */}
+        <div className="timeline-card">
+          <div className="tc-header">
+            <div className="tc-title">Gantt Chart · Apr – Jun 2026</div>
+            <div className="tc-legend">
+              <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.teal }}></div>Completed</div>
+              <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.amber }}></div>Active</div>
+              <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.border2 }}></div>Pending</div>
+              <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.red }}></div>Today</div>
+            </div>
+          </div>
+          <div className="timeline-scroll">
+            <div className="timeline-wrap">
+              <div className="tl-months">
+                <div className="tl-month"></div>
+                <div className="tl-month">Apr</div>
+                <div className="tl-month">May</div>
+                <div className="tl-month" style={{ color: C.teal, fontWeight: 800 }}>Jun ←</div>
+                <div className="tl-month">Jul</div>
+                <div className="tl-month">Aug</div>
+                <div className="tl-month">Sep</div>
+              </div>
+
+              {/* Rows */}
+              <div className="tl-row">
+                <div><div class="tl-task-name">Discovery</div><div class="tl-task-sub">Planning</div></div>
+                <div className="tl-grid-cell">
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: "90%", left: "0%", background: C.teal }}>✓</div>
+                  </div>
+                </div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+              </div>
+
+              <div className="tl-row">
+                <div><div class="tl-task-name">UI/UX Design</div><div class="tl-task-sub">Design</div></div>
+                <div className="tl-grid-cell">
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: "100%", left: "0%", background: C.teal }}>Design ✓</div>
+                  </div>
+                </div>
+                <div className="tl-grid-cell">
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: "40%", left: "0%", background: C.teal }}></div>
+                  </div>
+                </div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+              </div>
+
+              <div className="tl-row">
+                <div><div class="tl-task-name">Development</div><div class="tl-task-sub">Frontend + Backend</div></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell">
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: "100%", left: "0%", background: C.teal }}>Dev ✓</div>
+                  </div>
+                </div>
+                <div className="tl-grid-cell">
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: "20%", left: "0%", background: activeProjProgress >= 70 ? C.teal : C.amber }}></div>
+                  </div>
+                </div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+              </div>
+
+              <div className="tl-row">
+                <div><div class="tl-task-name">CMS & SEO Setup</div><div class="tl-task-sub">Content + SEO</div></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell">
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: "60%", left: "40%", background: C.teal }}>CMS ✓</div>
+                  </div>
+                </div>
+                <div className="tl-grid-cell">
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: "20%", left: "0%", background: activeProjProgress >= 85 ? C.teal : C.amber }}></div>
+                  </div>
+                </div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+              </div>
+
+              <div className="tl-row">
+                <div><div class="tl-task-name">Final Review</div><div class="tl-task-sub">Client Review</div></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell" style={{ position: "relative" }}>
+                  <div className="today-label">TODAY</div>
+                  <div className="today-line"></div>
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: "50%", left: "0%", background: activeProjProgress >= 100 ? C.teal : C.amber }}>In Review</div>
+                  </div>
+                </div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+              </div>
+
+              <div className="tl-row">
+                <div><div class="tl-task-name">Launch 🚀</div><div class="tl-task-sub">Go Live</div></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell">
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: "100%", left: "0%", background: activeProjProgress >= 100 ? C.amber : "#CBD5E1", color: C.text2 }}>
+                      {activeProjProgress >= 100 ? "Ready to Launch!" : "Planned"}
+                    </div>
+                  </div>
+                </div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+                <div className="tl-grid-cell"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Files panel
+  function renderFilesComponent() {
+    return (
+      <div className="files-panel">
+        <div className="files-toolbar">
+          {["All", "Designs", "Documents", "Reports", "Invoices"].map(filter => (
+            <button key={filter} className={`ft-filter ${fileFilter === filter ? "active" : ""}`} onClick={() => setFileFilter(filter)}>
+              {filter} ({filter === "All" ? allFiles.length : allFiles.filter(f => f.type === filter).length})
+            </button>
+          ))}
+        </div>
+        <div className="files-grid">
+          {filteredFiles.map((file, idx) => (
+            <div key={idx} className="file-card" onClick={() => file.raw && setSelectedDoc(file.raw)}>
+              {file.badge && <span className="fc-new-badge">{file.badge}</span>}
+              <div className="fc-download"><i className="ti ti-download"></i></div>
+              <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
+              <div className="fc-name">{file.name}</div>
+              <div className="fc-meta">{file.meta}</div>
+              <div className="fc-date">{file.date}</div>
+            </div>
+          ))}
+          {filteredFiles.length === 0 && (
+            <div style={{ gridColumn: "1 / -1", padding: 40, textAlign: "center", color: C.text3 }}>No files found.</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Render Invoices helper
+  function renderInvoicesComponent() {
+    const unpaidInvoices = finalInvoicesList.filter(inv => inv.status !== "paid");
+    const firstUnpaid = unpaidInvoices[0];
+
+    return (
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
+        {/* Summary Bar */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", padding: "14px 18px", background: C.surface2, borderBottom: "1px solid " + C.border, gap: 0 }}>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: "16px", fontWeight: "800", color: C.green }}>₹{totalPaid.toLocaleString("en-IN")}</div>
+            <div style={{ fontSize: "10px", color: C.text3, fontWeight: "600", marginTop: "1px" }}>Paid</div>
+          </div>
+          <div style={{ textAlign: "center", borderLeft: "1px solid " + C.border, borderRight: "1px solid " + C.border }}>
+            <div style={{ fontSize: "16px", fontWeight: "800", color: C.amber }}>₹{totalPending.toLocaleString("en-IN")}</div>
+            <div style={{ fontSize: "10px", color: C.text3, fontWeight: "600", marginTop: "1px" }}>Pending</div>
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: "16px", fontWeight: "800", color: C.text }}>₹{totalInvoiced.toLocaleString("en-IN")}</div>
+            <div style={{ fontSize: "10px", color: C.text3, fontWeight: "600", marginTop: "1px" }}>Total</div>
+          </div>
+        </div>
+
+        {/* Invoices List */}
+        <div>
+          {finalInvoicesList.map((inv) => (
+            <div key={inv.id} className="invoice-item" onClick={() => {
+              if (inv.status !== "paid") {
+                startPayment(inv);
+              } else {
+                alert("This invoice is already paid!");
+              }
+            }}>
+              <div className="inv-icon" style={{ background: inv.status === "paid" ? C.greenBg : C.amberBg, color: inv.status === "paid" ? C.green : C.amber }}>
+                <i className={inv.status === "paid" ? "ti ti-circle-check" : "ti ti-clock"}></i>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="inv-id">{inv.invoiceNo}</div>
+                <div className="inv-desc">{inv.desc}</div>
+              </div>
+              <div style={{ textAlign: "right", marginRight: "10px" }}>
+                <div className="inv-amount" style={{ color: inv.status === "paid" ? C.green : C.amber }}>
+                  ₹{inv.total.toLocaleString("en-IN")}
+                </div>
+                <div className="inv-date">{inv.status === "paid" ? inv.date : `Due ${inv.dueDate}`}</div>
+              </div>
+              <span className={`badge ${inv.status}`}>{inv.status}</span>
+              <div className="inv-dl" style={{ marginLeft: "8px" }} onClick={(e) => { e.stopPropagation(); alert("Downloading invoice PDF..."); }}>
+                <i className="ti ti-download"></i>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Pay Now Button */}
+        {firstUnpaid && (
+          <div style={{ padding: "14px 18px", borderTop: "1px solid " + C.border, background: C.surface2 }}>
+            <button onClick={() => startPayment(firstUnpaid)} style={{ width: "100%", padding: "11px", background: C.teal, color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", boxShadow: "0 3px 10px rgba(0,188,212,.25)" }}>
+              <i className="ti ti-credit-card" style={{ fontSize: "15px" }}></i> Pay ₹{(firstUnpaid.total - firstUnpaid.amountPaid).toLocaleString("en-IN")} Now
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Render Messages / Chat helper
+  function renderMessagesComponent() {
+    const initials = clientName ? clientName.substring(0, 2).toUpperCase() : "CL";
+    // If a document was clicked in Messages view, show document preview
+    if (selectedDoc) {
+      return (
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <button onClick={() => setSelectedDoc(null)} style={{ background: C.bg, border: "1px solid " + C.border, color: C.text2, padding: "8px 16px", borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 700 }}>
+              <i className="ti ti-arrow-left"></i> Back to Messages
+            </button>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>{selectedDoc.docType ? selectedDoc.docType.toUpperCase() : "Document"} Preview</div>
+          </div>
+          <div style={{ flex: 1, background: "#fff", borderRadius: 12, padding: "20px", overflowY: "auto", border: "1px solid " + C.border, minHeight: 350, color: "#333", fontSize: 13, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: selectedDoc.htmlContent || `<p>No HTML preview available. Standard attachment file: <b>${selectedDoc.fileName || "document.pdf"}</b></p>` }} />
+        </div>
+      );
+    }
+
+    return (
+      <div className="messages-panel">
+        <div className="msg-list">
+          {chatMessages.map((msg, idx) => (
+            <div key={idx} className={`msg-row ${msg.mine ? "mine" : ""}`}>
+              <div className="msg-av" style={{ background: msg.mine ? "linear-gradient(135deg, " + C.amber + ", #D97706)" : "linear-gradient(135deg, " + C.teal + ", " + C.teal3 + ")" }}>
+                {msg.mine ? initials : "P"}
+              </div>
+              <div className="msg-body">
+                {!msg.mine && <div className="msg-name">{msg.sender}</div>}
+                <div className={`msg-bubble ${msg.mine ? "mine" : "them"}`}>{msg.msg}</div>
+                <div className="msg-time">{msg.time}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="msg-input-row">
+          <div className="msg-attach" onClick={() => alert("Attachment handler opened.")}><i className="ti ti-paperclip"></i></div>
+          <input className="msg-inp" type="text" placeholder="Type a message…" value={chatText} onChange={(e) => setChatText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSendMessage()} />
+          <button className="msg-send" onClick={handleSendMessage}><i className="ti ti-send"></i></button>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Calendar helper
+  function renderCalendarComponent() {
+    const calendarDays = getCalendarDays();
+    const meetings = [
+      { id: 1, title: "Final Review Call", time: "11:00", dur: "1h", meta: "2 Jun · Google Meet · Prabhu + STA Admin" },
+      { id: 2, title: "Launch Coordination Sync", time: "3:00", dur: "45m", meta: "6 Jun · Google Meet · Prabhu + Dev team" }
+    ];
+
+    return (
+      <div className="calendar-panel">
+        <div className="cal-header">
+          <div className="cal-month">June 2026</div>
+          <div className="cal-nav">
+            <div className="cal-nav-btn" onClick={() => alert("Previous month (May 2026)")}><i className="ti ti-chevron-left"></i></div>
+            <div className="cal-nav-btn" onClick={() => alert("Next month (July 2026)")}><i className="ti ti-chevron-right"></i></div>
+          </div>
+        </div>
+        <div className="cal-grid">
+          <div className="cal-days-header">
+            <div className="cal-day-label">Su</div><div className="cal-day-label">Mo</div><div className="cal-day-label">Tu</div>
+            <div className="cal-day-label">We</div><div className="cal-day-label">Th</div><div className="cal-day-label">Fr</div><div className="cal-day-label">Sa</div>
+          </div>
+          <div className="cal-days">
+            {calendarDays.map((dayObj, idx) => {
+              const eventClass = getEventClass(dayObj.day, dayObj.isOtherMonth);
+              const isSelected = selectedDay === dayObj.day && !dayObj.isOtherMonth;
+              const isToday = dayObj.day === 1 && !dayObj.isOtherMonth; // Mock June 1st today
+
+              return (
+                <div key={idx} className={`cal-day ${dayObj.isOtherMonth ? "other-month" : ""} ${isToday ? "today" : ""} ${eventClass} ${isSelected ? "selected" : ""}`}
+                  onClick={() => !dayObj.isOtherMonth && setSelectedDay(dayObj.day)}>
+                  {dayObj.day}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ padding: "0 14px 8px", fontSize: 10, fontWeight: 700, color: C.text3, textTransform: "uppercase", letterSpacing: .6 }}>Upcoming Meetings</div>
+        <div className="meetings-list">
+          {meetings.map((meet) => (
+            <div key={meet.id} className="meeting-item" onClick={() => alert(`Redirecting to Google Meet link for ${meet.title}...`)}>
+              <div className="mi-time-col">
+                <div className="mi-time">{meet.time}</div>
+                <div className="mi-dur">{meet.dur}</div>
+              </div>
+              <div className="mi-divider"></div>
+              <div style={{ flex: 1 }}>
+                <div className="mi-title">{meet.title}</div>
+                <div className="mi-meta">{meet.meta}</div>
+              </div>
+              <div className="mi-join"><i className="ti ti-video" style={{ fontSize: 12 }}></i> Join</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Render Approvals helper
+  function renderApprovalsComponent() {
+    return (
+      <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", overflow: "hidden" }}>
+        <div style={{ padding: "14px 18px", borderBottom: "1px solid " + C.border, fontSize: 12, fontWeight: 800, color: C.text2, background: C.surface2 }}>Pending Approvals</div>
+        <div>
+          {approvals.map((app) => (
+            <div key={app.id} className="approval-item">
+              <div className="ai-icon"><i className={`ti ${app.icon}`}></i></div>
+              <div style={{ flex: 1 }}>
+                <div className="ai-title">{app.title}</div>
+                <div className="ai-desc">{app.desc}</div>
+              </div>
+              <div className="ai-actions">
+                <button className="ai-btn reject" onClick={() => handleApproval(app.id, "reject")}>Reject</button>
+                <button className="ai-btn approve" onClick={() => handleApproval(app.id, "approve")}>Approve</button>
+              </div>
+            </div>
+          ))}
+          {approvals.length === 0 && (
+            <div style={{ padding: 24, textAlign: "center", color: C.text3, fontSize: 12 }}>No pending approvals. All caught up!</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Render Activity Feed helper
+  function renderActivityFeed() {
+    const feedItems = [
+      { id: 1, title: "Prabhu uploaded Homepage_Final_v3.fig", time: "2 hours ago", icon: "ti-file-upload" },
+      { id: 2, title: "Payment #INV-2026-1218 approved by gateway", time: "1 day ago", icon: "ti-receipt" },
+      { id: 3, title: "Meeting Final Review Call scheduled by Prabhu", time: "2 days ago", icon: "ti-video" }
+    ];
+
+    return (
+      <div className="activity-feed">
+        <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginBottom: 14 }}>Recent Activity</div>
+        {feedItems.map((item) => (
+          <div key={item.id} className="af-item">
+            <div className="af-dot-col">
+              <div className="af-dot"><i className={`ti ${item.icon}`}></i></div>
+              <div className="af-line"></div>
+            </div>
+            <div>
+              <div className="af-title">{item.title}</div>
+              <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 12 }}></i> {item.time}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Render Feedback helper
+  function renderFeedbackPanel() {
+    return (
+      <div className="feedback-panel">
+        <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginBottom: 4 }}>Rate Our Services</div>
+        <form onSubmit={submitFeedback}>
+          <div className="rating-row">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span key={star} className={`star ${feedbackRating >= star ? "active" : ""}`} onClick={() => setFeedbackRating(star)}>
+                ★
+              </span>
+            ))}
+          </div>
+          <textarea className="feedback-input" placeholder="Tell us how we can improve…" value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} required></textarea>
+          <button className="feedback-submit" type="submit">Submit Feedback</button>
+        </form>
+      </div>
+    );
+  }
+
+  // Render Contact Card helper
+  function renderContactCard() {
+    return (
+      <div className="contact-card">
+        <div className="cc-label">Your Account Manager</div>
+        <div className="cc-name">Prabhu</div>
+        <div className="cc-role">Senior Project Lead, YENCODE</div>
+        <div className="cc-contacts">
+          <div className="cc-contact-row"><i className="ti ti-mail"></i> prabhu@yencode.com</div>
+          <div className="cc-contact-row"><i className="ti ti-phone"></i> +91 98765 43210</div>
+        </div>
+        <div className="cc-actions">
+          <button className="cc-btn" onClick={() => setActive("messages")}><i className="ti ti-message-2"></i> Chat</button>
+          <button className="cc-btn" onClick={() => alert("Initiating call to account manager...")}><i className="ti ti-phone-call"></i> Call</button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div style={{ display:"flex", height:"100vh", overflow:"hidden",
-      background:C.bg, fontFamily:"'Plus Jakarta Sans',sans-serif", color:C.text }}>
+    <div className="cp-root">
       <style>{CSS}</style>
-      <Sidebar active={active} setActive={setActive} user={user} setUser={setUser}/>
-      <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0, overflow:"hidden" }}>
-        <Topbar active={active} notifs={notifs} user={user} />
-        <div key={active} className="pg"
-          style={{ flex:1, overflowY:"auto", padding:"26px 30px" }}>
-          {active==="dashboard" && <DashboardPage user={user} projects={projects} invoices={invoices} tasks={tasks} notifs={notifs} setActive={setActive} />}
-          {active==="projects"  && <ProjectsPage projects={projects} />}
-          {active==="tasks"     && <TasksPage tasks={tasks} />}
-          {active==="payments"  && <PaymentsPage invoices={invoices} />}
-          {active==="calendar"  && <PlaceholderPage icon="ti-calendar"       title="Business Calendar" sub="Deadlines, meetings, and milestones — all in one view."/>}
-          {active==="messages"  && <MessagesPage user={user} />}
-          {active==="reports"   && <PlaceholderPage icon="ti-chart-bar"      title="Reports"           sub="Detailed financial and project performance analytics."/>}
-          {active==="settings"  && <SettingsPage user={user} THEME={C} onProfileUpdate={(updates) => { const updated = { ...user, ...updates }; if (setUser) setUser(updated); localStorage.setItem("user", JSON.stringify(updated)); }} />}
+      {renderTopNav()}
+      {renderHero()}
+
+      {/* Main Container */}
+      <div className="page-body">
+
+        {active === "dashboard" && (
+          <>
+            {/* Timeline */}
+            <div>
+              <div className="sec-header">
+                <div className="sec-title">
+                  <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
+                  Project Timeline
+                </div>
+              </div>
+              <div className="two-col">
+                {renderTimelineComponent()}
+                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                  {renderApprovalsComponent()}
+                  {renderCalendarComponent()}
+                </div>
+              </div>
+            </div>
+
+            {/* Files & Documents */}
+            <div>
+              <div className="sec-header">
+                <div className="sec-title">
+                  <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
+                  Files & Documents
+                </div>
+                <div className="sec-action" onClick={() => alert("Downloading all files shared...")}>
+                  <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
+                </div>
+              </div>
+              {renderFilesComponent()}
+            </div>
+
+            {/* Invoices and Messages */}
+            <div className="two-col">
+              {/* Invoices */}
+              <div>
+                <div className="sec-header">
+                  <div className="sec-title">
+                    <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
+                    Invoices & Payments
+                  </div>
+                </div>
+                {renderInvoicesComponent()}
+              </div>
+
+              {/* Messages */}
+              <div>
+                <div className="sec-header">
+                  <div className="sec-title">
+                    <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
+                    Messages & Chat
+                  </div>
+                  <div className="sec-action" onClick={() => setActive("messages")}><i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i> Open Chat</div>
+                </div>
+                {renderMessagesComponent()}
+              </div>
+            </div>
+
+            {/* Activity, Feedback and Contact */}
+            <div className="three-col">
+              {renderActivityFeed()}
+              {renderFeedbackPanel()}
+              {renderContactCard()}
+            </div>
+          </>
+        )}
+
+        {active === "timeline" && (
+          <div>
+            <div className="sec-header">
+              <div className="sec-title">
+                <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-calendar-stats"></i></div>
+                Project Timeline & Gantt Detail
+              </div>
+            </div>
+            {renderTimelineComponent()}
+          </div>
+        )}
+
+        {active === "files" && (
+          <div>
+            <div className="sec-header">
+              <div className="sec-title">
+                <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
+                Files & Documents Checklist
+              </div>
+              <div className="sec-action" onClick={() => alert("Downloading all files shared...")}>
+                <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
+              </div>
+            </div>
+            {renderFilesComponent()}
+          </div>
+        )}
+
+        {active === "payments" && (
+          <div>
+            <div className="sec-header">
+              <div className="sec-title">
+                <div className="sec-title-icon" style={{ background: C.greenBg, color: C.green }}><i className="ti ti-receipt-2"></i></div>
+                Invoices & Payments History
+              </div>
+            </div>
+            <div style={{ maxWidth: 800, margin: "0 auto" }}>
+              {renderInvoicesComponent()}
+            </div>
+          </div>
+        )}
+
+        {active === "messages" && (
+          <div>
+            <div className="sec-header">
+              <div className="sec-title">
+                <div className="sec-title-icon" style={{ background: C.purpleBg, color: C.purple }}><i className="ti ti-message-2"></i></div>
+                Messages & Received Documents
+              </div>
+            </div>
+            <div className="two-col">
+              {renderMessagesComponent()}
+              {renderFilesComponent()}
+            </div>
+          </div>
+        )}
+
+        {active === "calendar" && (
+          <div>
+            <div className="sec-header">
+              <div className="sec-title">
+                <div className="sec-title-icon" style={{ background: C.amberBg, color: C.amber }}><i className="ti ti-calendar-event"></i></div>
+                Meeting Schedule & Business Calendar
+              </div>
+              <button className="sec-action" onClick={() => alert("Request meeting slot modal opened.")}>
+                <i className="ti ti-plus" style={{ fontSize: 13 }}></i> Request Meeting
+              </button>
+            </div>
+            <div style={{ maxWidth: 700, margin: "0 auto" }}>
+              {renderCalendarComponent()}
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* MOBILE BOTTOM NAV */}
+      <div className="mobile-bottom-nav">
+        <div className="mbn-inner">
+          <button className={`mbn-item ${active === "dashboard" ? "active" : ""}`} onClick={() => setActive("dashboard")}>
+            <i className="ti ti-layout-dashboard"></i>
+            <div className="mbn-label">Overview</div>
+          </button>
+          <button className={`mbn-item ${active === "timeline" ? "active" : ""}`} onClick={() => setActive("timeline")}>
+            <i className="ti ti-calendar-stats"></i>
+            <div className="mbn-label">Timeline</div>
+          </button>
+          <button className={`mbn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>
+            <i className="ti ti-files"></i>
+            <div className="mbn-label">Files</div>
+          </button>
+          <button className={`mbn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>
+            <i className="ti ti-receipt-2"></i>
+            <div className="mbn-label">Invoices</div>
+          </button>
+          <button className={`mbn-item ${active === "messages" ? "active" : ""}`} onClick={() => setActive("messages")}>
+            <i className="ti ti-message-2"></i>
+            <div className="mbn-label">Messages</div>
+          </button>
         </div>
       </div>
+
+      {/* PAYMENT MODAL (CHECKOUT DIALOG OVERLAY) */}
+      {payModalOpen && paymentInvoice && (
+        <div className="modal-overlay" onClick={() => setPayModalOpen(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <span className="modal-title">Complete Payment</span>
+              <button className="modal-close" onClick={() => setPayModalOpen(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div style={{ background: C.surface2, border: "1px solid " + C.border, borderRadius: 10, padding: 14, textAlign: "center" }}>
+                <div style={{ fontSize: 11, color: C.text3, textTransform: "uppercase", fontWeight: 700, letterSpacing: 0.5 }}>Amount Due</div>
+                <div style={{ fontSize: 28, fontWeight: 900, color: C.text, margin: "6px 0", fontFamily: "Nunito Sans" }}>
+                  ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}
+                </div>
+                <div style={{ fontSize: 11, color: C.text2 }}>Invoice {paymentInvoice.invoiceNo}</div>
+              </div>
+
+              <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginTop: 4 }}>Select Payment Method</div>
+              
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.teal, borderRadius: 10, cursor: "pointer", background: C.tealLighter }}>
+                  <i className="ti ti-brand-google-play" style={{ fontSize: 20, color: C.teal }}></i>
+                  <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: C.text }}>Google Pay / UPI</div>
+                  <div style={{ width: 14, height: 14, borderRadius: "50%", background: C.teal, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }}></div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.border, borderRadius: 10, cursor: "pointer", opacity: 0.6 }} onClick={() => alert("Credit Card payment option is simulated. Please use Google Pay/UPI.")}>
+                  <i className="ti ti-credit-card" style={{ fontSize: 20, color: C.text2 }}></i>
+                  <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: C.text }}>Credit / Debit Card</div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", border: "1.5px solid " + C.border, borderRadius: 10, cursor: "pointer", opacity: 0.6 }} onClick={() => alert("Net Banking payment option is simulated. Please use Google Pay/UPI.")}>
+                  <i className="ti ti-building-bank" style={{ fontSize: 20, color: C.text2 }}></i>
+                  <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: C.text }}>Net Banking</div>
+                </div>
+              </div>
+
+              <button onClick={executePayment} disabled={paymentProcessing} style={{ width: "100%", padding: "12px", background: C.teal, color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: "700", cursor: "pointer", marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                {paymentProcessing ? (
+                  <>Processing...</>
+                ) : (
+                  <>Confirm & Pay ₹{(paymentInvoice.total - (paymentInvoice.amountPaid || 0)).toLocaleString("en-IN")}</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

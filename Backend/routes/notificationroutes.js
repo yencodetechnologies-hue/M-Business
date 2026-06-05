@@ -35,8 +35,8 @@ router.patch('/read-all/:userId', async (req, res) => {
 // Create notification
 router.post('/', async (req, res) => {
     try {
-        const { userId, type, icon, text, link } = req.body;
-        const newNotif = new Notification({ userId, type, icon, text, link });
+        const { userId, type, icon, text, link, companyId } = req.body;
+        const newNotif = new Notification({ userId, type, icon, text, link, companyId: companyId || req.companyId || "" });
         await newNotif.save();
         res.json(newNotif);
     } catch (err) {

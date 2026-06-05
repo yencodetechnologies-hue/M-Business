@@ -319,7 +319,7 @@ function DocumentsCard({ docStatus, onOpenProfile }) {
 // ── DASHBOARD PAGE ───────────────────────────────────────────
 
 // ── Employee Documents Page ──────────────────────────────────
-function EmployeeDocumentsPage({ user }) {
+function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
   const [docs, setDocs] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -376,9 +376,74 @@ function EmployeeDocumentsPage({ user }) {
     );
   }
 
+  // Filter pending document request notifications (unread warnings or texts with upload/document)
+  const pendingRequests = (notifications || []).filter(
+    n => !n.isRead && (n.type === "warning" || n.msg?.toLowerCase().includes("upload") || n.title?.toLowerCase().includes("document"))
+  );
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16, padding:24 }}>
       <div style={{ fontSize:22, fontWeight:800, color:T.text }}>My Documents</div>
+
+      {pendingRequests.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {pendingRequests.map(req => (
+            <div key={req.id} style={{
+              background: T.warningBg,
+              border: `1.5px solid ${T.warningBorder}`,
+              borderRadius: T.radius,
+              padding: "16px 20px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 14,
+              boxShadow: "0 4px 12px rgba(180, 83, 9, 0.05)"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 10,
+                  background: "#FEF3C7",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 20,
+                  color: "#D97706"
+                }}>
+                  📁
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#92400E" }}>Pending Document Request</div>
+                  <div style={{ fontSize: 12.5, color: "#B45309", marginTop: 2, fontWeight: 500 }}>{req.msg}</div>
+                </div>
+              </div>
+              <button
+                onClick={() => onAcknowledge && onAcknowledge(req.id)}
+                style={{
+                  background: "#D97706",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: T.radiusSm,
+                  padding: "8px 16px",
+                  fontSize: 12,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  boxShadow: "0 2px 6px rgba(217, 119, 6, 0.2)",
+                  transition: "all 0.15s"
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "#B45309"}
+                onMouseLeave={e => e.currentTarget.style.background = "#D97706"}
+              >
+                Acknowledge
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div style={{ display:"grid", gap:12 }}>
         {loading ? (
           <div style={{ color:T.textMuted, padding: 20 }}>Loading documents...</div>
@@ -1645,27 +1710,49 @@ export default function EmployeeDashboard({ user, setUser }) {
     setNotifications(prev => {
       if (prev.find(x => x.id === n.id)) return prev;
       const updated = [{ ...n, isRead: false }, ...prev].slice(0, 50);
-      if (empName) localStorage.setItem(`notifications_${empName}`, JSON.stringify(updated));
+      if (empName) localStorage.setItem(`notifications_${empName}`, JSON.stringify(updated.filter(x => !x.isDb)));
       return updated;
     });
   }, [empName]);
 
-  const clearAllNotifications = useCallback(() => { setNotifications([]); if (empName) localStorage.setItem(`notifications_${empName}`, JSON.stringify([])); }, [empName]);
-  const removeNotification = useCallback((id) => { setNotifications(prev => { const u = prev.filter(n => n.id !== id); if (empName) localStorage.setItem(`notifications_${empName}`, JSON.stringify(u)); return u; }); }, [empName]);
+  const clearAllNotifications = useCallback(() => {
+    setNotifications([]);
+    if (empName) localStorage.setItem(`notifications_${empName}`, JSON.stringify([]));
+    const userId = resolvedUser?._id || resolvedUser?.id;
+    if (userId) {
+      axios.patch(`${BASE_URL}/api/notifications/read-all/${userId}`, {}, {
+        headers: { "x-company-id": resolvedUser?.companyId || "" }
+      }).catch(err => console.error("Failed to clear all notifications in DB:", err));
+    }
+  }, [empName, resolvedUser]);
+
+  const removeNotification = useCallback((id, isDb) => {
+    setNotifications(prev => {
+      const u = prev.filter(n => n.id !== id);
+      if (empName) localStorage.setItem(`notifications_${empName}`, JSON.stringify(u.filter(x => !x.isDb)));
+      return u;
+    });
+    if (isDb) {
+      axios.patch(`${BASE_URL}/api/notifications/${id}/read`).catch(err => console.error("Failed to mark notification as read in DB:", err));
+    }
+  }, [empName]);
 
   const loadData = useCallback(async (name) => {
     const n = name || empName; if (!n) { setLoading(false); return; }
     const enc = encodeURIComponent(n); const companyId = resolvedUser?.companyId || "";
+    const userId = resolvedUser?._id || resolvedUser?.id;
     setLoading(true);
     try {
       const config = { headers: { "x-company-id": companyId } };
-      const [projRes, taskRes, propRes, attRes, salRes, eventRes] = await Promise.allSettled([
+      const notifUrl = userId ? `${BASE_URL}/api/notifications/${userId}` : null;
+      const [projRes, taskRes, propRes, attRes, salRes, eventRes, notifRes] = await Promise.allSettled([
         axios.get(`${BASE}/projects/${enc}`, config),
         axios.get(`${BASE}/tasks/${enc}`, config),
         axios.get(`${BASE_URL}/api/proposals/employee/${enc}`, config),
         axios.get(`${BASE}/attendance/${enc}`, config),
         axios.get(`${BASE}/salary/${enc}`, config),
-        axios.get(`${BASE_URL}/api/events?companyId=${companyId}&employeeName=${enc}`, config)
+        axios.get(`${BASE_URL}/api/events?companyId=${companyId}&employeeName=${enc}`, config),
+        notifUrl ? axios.get(notifUrl, config) : Promise.reject(new Error("No user ID"))
       ]);
 
       if (projRes.status === "fulfilled") {
@@ -1701,19 +1788,46 @@ export default function EmployeeDashboard({ user, setUser }) {
         sessionStorage.setItem(`events_${n}`, JSON.stringify(data));
       } else setEvents([]);
 
+      if (notifRes.status === "fulfilled") {
+        const dbNotifs = notifRes.value.data || [];
+        const mappedDbNotifs = dbNotifs.map(dn => ({
+          id: dn._id,
+          type: dn.type || "warning",
+          title: dn.type === "warning" ? "Document Request" : "Notification",
+          msg: dn.text,
+          icon: dn.icon || "📁",
+          color: dn.type === "warning" ? T.warning : T.accent,
+          time: dn.createdAt || new Date().toISOString(),
+          isRead: dn.isRead,
+          isDb: true
+        }));
+        setNotifications(prev => {
+          const localOnly = prev.filter(ln => !ln.isDb);
+          const combined = [...mappedDbNotifs, ...localOnly];
+          combined.sort((a, b) => new Date(b.time) - new Date(a.time));
+          return combined;
+        });
+      }
+
       if (propRes.status === "fulfilled") setProposals(propRes.value.data || []); else setProposals([]);
       if (attRes.status === "fulfilled") setAttendance(attRes.value.data || []); else setAttendance([]);
       if (salRes.status === "fulfilled") setSalary(salRes.value.data || []); else setSalary([]);
     } catch (err) { console.error("LoadData Error:", err); } finally { setLoading(false); }
-  }, [empName, addNotification, resolvedUser?.companyId]);
+  }, [empName, addNotification, resolvedUser]);
 
   useEffect(() => { if (!empName) return; setDocStatus({}); setProfileOpen(false); loadData(empName); }, [empName]);
 
   useEffect(() => {
     if (notifDropdownOpen && notifications.some(n => !n.isRead)) {
-      setNotifications(prev => { const u = prev.map(n => ({ ...n, isRead: true })); localStorage.setItem(`notifications_${empName}`, JSON.stringify(u)); return u; });
+      setNotifications(prev => { const u = prev.map(n => ({ ...n, isRead: true })); localStorage.setItem(`notifications_${empName}`, JSON.stringify(u.filter(x => !x.isDb))); return u; });
+      const userId = resolvedUser?._id || resolvedUser?.id;
+      if (userId) {
+        axios.patch(`${BASE_URL}/api/notifications/read-all/${userId}`, {}, {
+          headers: { "x-company-id": resolvedUser?.companyId || "" }
+        }).catch(err => console.error("Failed to mark all notifications as read in DB:", err));
+      }
     }
-  }, [notifDropdownOpen, notifications, empName]);
+  }, [notifDropdownOpen, notifications, empName, resolvedUser]);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -1788,16 +1902,36 @@ export default function EmployeeDashboard({ user, setUser }) {
             <div style={{ fontSize: 12 }}>No new notifications</div>
           </div>
         ) : notifications.map((n, i) => (
-          <div key={n.id || i} style={{ padding: "13px 16px", borderBottom: i < notifications.length - 1 ? `1px solid ${T.border}` : "none", display: "flex", gap: 12, alignItems: "flex-start", background: i === 0 ? T.accentLight : T.surface, transition: "background 0.15s" }}
+          <div key={n.id || i}
+            onClick={() => {
+              if (n.type === "warning" || n.title?.toLowerCase().includes("document") || n.msg?.toLowerCase().includes("document")) {
+                setPage("documents");
+              } else if (n.title?.toLowerCase().includes("task") || n.msg?.toLowerCase().includes("task")) {
+                setPage("tasks");
+              } else if (n.title?.toLowerCase().includes("project") || n.msg?.toLowerCase().includes("project")) {
+                setPage("projects");
+              }
+              setNotifDropdownOpen(false);
+            }}
+            style={{
+              padding: "13px 16px",
+              borderBottom: i < notifications.length - 1 ? `1px solid ${T.border}` : "none",
+              display: "flex",
+              gap: 12,
+              alignItems: "flex-start",
+              background: !n.isRead ? T.accentLight : T.surface,
+              transition: "background 0.15s",
+              cursor: "pointer"
+            }}
             onMouseEnter={e => e.currentTarget.style.background = T.bg}
-            onMouseLeave={e => e.currentTarget.style.background = i === 0 ? T.accentLight : T.surface}>
+            onMouseLeave={e => e.currentTarget.style.background = !n.isRead ? T.accentLight : T.surface}>
             <div style={{ width: 34, height: 34, borderRadius: 9, background: T.accentLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, border: `1px solid ${T.border}` }}>{n.icon}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>{n.title}</div>
               <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2, lineHeight: 1.5 }}>{n.msg}</div>
               <div style={{ fontSize: 10, color: T.textFaint, marginTop: 5 }}>{new Date(n.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
             </div>
-            <button onClick={() => removeNotification(n.id)} style={{ background: "none", border: "none", color: T.textFaint, cursor: "pointer", fontSize: 13, padding: 3 }} onMouseEnter={e => e.currentTarget.style.color = T.danger}>✕</button>
+            <button onClick={(e) => { e.stopPropagation(); removeNotification(n.id, n.isDb); }} style={{ background: "none", border: "none", color: T.textFaint, cursor: "pointer", fontSize: 13, padding: 3 }} onMouseEnter={el => el.currentTarget.style.color = T.danger}>✕</button>
           </div>
         ))}
       </div>
@@ -1945,7 +2079,22 @@ export default function EmployeeDashboard({ user, setUser }) {
               />
             )}
             {page === "messaging" && <MessagingPage user={resolvedUser} />}
-            {page === "documents" && <EmployeeDocumentsPage user={resolvedUser} />}
+            {page === "documents" && (
+              <EmployeeDocumentsPage
+                user={resolvedUser}
+                notifications={notifications}
+                onAcknowledge={async (notifId) => {
+                  try {
+                    await axios.patch(`${BASE_URL}/api/notifications/${notifId}/read`);
+                    setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, isRead: true } : n));
+                    notify("Request acknowledged successfully!");
+                  } catch (err) {
+                    console.error("Acknowledge notification error:", err);
+                    notify("Failed to acknowledge request", "error");
+                  }
+                }}
+              />
+            )}
             {page === "settings" && (
               <SettingsPage
                 user={resolvedUser}

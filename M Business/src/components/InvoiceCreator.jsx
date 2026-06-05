@@ -864,9 +864,6 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
       }, 0);
       return;
     }
-    const element = document.querySelector(".invoice-paper");
-    if (!element) return;
-    
     showToast("⏳ Generating PDF...");
 
     // Helper: resolve CSS variables so html2canvas captures correct colours on all OS/browsers
@@ -886,55 +883,61 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
     };
 
     try {
-      // Capture full element including footer
-      const elemH = element.scrollHeight;
-      const elemW = element.scrollWidth;
-
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        letterRendering: true,
-        width: elemW,
-        height: elemH,
-        windowWidth: elemW,
-        windowHeight: elemH,
-        scrollX: 0,
-        scrollY: -window.scrollY,
-        onclone: (doc) => {
-          const el = doc.querySelector('.invoice-paper');
-          if (el) {
-            resolveCssVars(el);
-            el.style.width = elemW + 'px';
-            el.style.maxWidth = 'none';
-            el.style.overflow = 'visible';
-            el.style.borderRadius = '0';
-            el.style.boxShadow = 'none';
-          }
-        }
-      });
+      // Capture ALL invoice pages (multi-page support)
+      const elements = document.querySelectorAll(".invoice-paper");
+      if (!elements || elements.length === 0) return;
 
       const A4_W = 210;
       const A4_H = 297;
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
 
-      const imgAspect = canvas.width / canvas.height;
-      const finalW = A4_W;
-      const finalH = A4_W / imgAspect;
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        const elemH = element.scrollHeight;
+        const elemW = element.scrollWidth;
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          letterRendering: true,
+          width: elemW,
+          height: elemH,
+          windowWidth: elemW,
+          windowHeight: elemH,
+          scrollX: 0,
+          scrollY: -window.scrollY,
+          onclone: (doc) => {
+            const el = doc.querySelectorAll('.invoice-paper')[i];
+            if (el) {
+              resolveCssVars(el);
+              el.style.width = elemW + 'px';
+              el.style.maxWidth = 'none';
+              el.style.overflow = 'visible';
+              el.style.borderRadius = '0';
+              el.style.boxShadow = 'none';
+            }
+          }
+        });
 
-      let heightLeft = finalH;
-      let position = 0;
+        const imgAspect = canvas.width / canvas.height;
+        const finalW = A4_W;
+        const finalH = A4_W / imgAspect;
+        const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
-      pdf.addImage(imgData, 'JPEG', 0, position, finalW, finalH);
-      heightLeft -= A4_H;
+        if (i > 0) pdf.addPage();
 
-      while (heightLeft > 0) {
-        position = heightLeft - finalH;
-        pdf.addPage();
+        let heightLeft = finalH;
+        let position = 0;
         pdf.addImage(imgData, 'JPEG', 0, position, finalW, finalH);
         heightLeft -= A4_H;
+
+        while (heightLeft > 0) {
+          position = heightLeft - finalH;
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, position, finalW, finalH);
+          heightLeft -= A4_H;
+        }
       }
 
       const blob = pdf.output('blob');

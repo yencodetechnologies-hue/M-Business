@@ -2346,9 +2346,9 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
     if (!id || String(id).startsWith("tmp_")) return;
     setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).map(t => (t._id || t.id) === id ? { ...t, [field]: value } : t) })));
     if (selected && (selected._id || selected.id) === id) setSelected(p => ({ ...p, [field]: value }));
-    onUpdate?.();
     try {
       await axios.put(`${API}/tasks/${id}`, { [field]: value });
+      onUpdate?.();
       
       // Notify if assigned
       if (field === "assignTo" && value && value !== "Unassigned") {
@@ -2376,13 +2376,13 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
     window.open(url, "_blank");
   };
 
-  const delTask = async (id) => { const snap = groups; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).filter(t => (t._id || t.id) !== id) }))); if (selected && (selected._id || selected.id) === id) setSelected(null); onUpdate?.(); try { await axios.delete(`${API}/tasks/${id}`); } catch { setGroups(snap); showToast("Failed to delete", "error"); } };
+  const delTask = async (id) => { const snap = groups; setGroups(p => p.map(g => ({ ...g, tasks: (g.tasks || []).filter(t => (t._id || t.id) !== id) }))); if (selected && (selected._id || selected.id) === id) setSelected(null); try { await axios.delete(`${API}/tasks/${id}`); onUpdate?.(); } catch { setGroups(snap); showToast("Failed to delete", "error"); } };
 
   const addGroup = async (label) => { const color = GRP_COLORS[groups.length % GRP_COLORS.length]; try { const r = await axios.post(`${API}/groups`, { label, color }); setGroups(p => [...p, { ...r.data, tasks: [], open: true }]); onUpdate?.(); } catch { showToast("Failed to create group", "error"); } };
 
   const importTasks = async (tasks) => { const first = groups[0]; if (!first) { showToast("Add a group first", "error"); return; } const gid = first._id || first.id; for (const t of tasks) await addTask(gid, t.title || "Imported task"); showToast(`${tasks.length} tasks imported!`); };
 
-  const delGroup = async (id) => { const snap = groups; setGroups(p => p.filter(g => (g._id || g.id) !== id)); onUpdate?.(); try { await axios.delete(`${API}/groups/${id}`); showToast("Task deleted"); } catch { setGroups(snap); showToast("Failed", "error"); } };
+  const delGroup = async (id) => { const snap = groups; setGroups(p => p.filter(g => (g._id || g.id) !== id)); try { await axios.delete(`${API}/groups/${id}`); showToast("Task deleted"); onUpdate?.(); } catch { setGroups(snap); showToast("Failed", "error"); } };
 
   const handleAutoAssign = async (task) => {
     try {

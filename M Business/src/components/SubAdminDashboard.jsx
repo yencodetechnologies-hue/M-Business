@@ -50,6 +50,101 @@ const formatCurrency = (amount, currency = "₹", compact = false, disableCompac
 
   return sym + (/[A-Za-z]/.test(sym) ? " " : "") + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
+
+const formatShortCurrency = (val) => {
+  const num = Number(val);
+  if (isNaN(num) || num === 0) return "₹0";
+  
+  const absNum = Math.abs(num);
+  if (absNum >= 1e15) {
+    return `₹${num.toExponential(2)}`;
+  }
+  
+  let formatted = "";
+  if (absNum >= 1e12) {
+    formatted = (num / 1e12).toFixed(1).replace(/\.0$/, "") + "T";
+  } else if (absNum >= 1e9) {
+    formatted = (num / 1e9).toFixed(1).replace(/\.0$/, "") + "B";
+  } else if (absNum >= 1e7) {
+    formatted = (num / 1e7).toFixed(1).replace(/\.0$/, "") + "Cr";
+  } else if (absNum >= 1e5) {
+    formatted = (num / 1e5).toFixed(1).replace(/\.0$/, "") + "L";
+  } else if (absNum >= 1e3) {
+    formatted = (num / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
+  } else {
+    formatted = num.toFixed(0);
+  }
+  return `₹${formatted}`;
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = String(d.getFullYear()).slice(-2);
+  return `${day}.${month}.${year}`;
+};
+
+const getFormattedLastUpdate = (items, fallback) => {
+  if (!items || items.length === 0) return fallback;
+  const times = items.map(item => {
+    const timeStr = item.updatedAt || item.createdAt || item.start || item.date;
+    if (!timeStr) return 0;
+    const t = new Date(timeStr).getTime();
+    return isNaN(t) ? 0 : t;
+  }).filter(t => t > 0);
+  if (times.length === 0) return fallback;
+  const maxTime = Math.max(...times);
+  return formatDate(new Date(maxTime)) || fallback;
+};
+
+const formatLastEditDate = (dateStr) => {
+  if (!dateStr) return "28 May, 2026";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+};
+
+const getMockSize = (id) => {
+  const hash = id ? id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 12;
+  const size = ((hash % 15) / 10 + 0.1).toFixed(1);
+  return `${size} MB`;
+};
+
+const renderMembersAvatars = (inv) => {
+  const clientInitials = inv.clientName ? inv.clientName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : "MB";
+  const colors = ["#00BCC0", "#26C281", "#7C5CFC", "#F5A623"];
+  return (
+    <div className="member-stack">
+      {clientInitials.split('').map((char, index) => (
+        <div 
+          key={index} 
+          className="member-av" 
+          style={{ 
+            background: colors[index % colors.length], 
+            border: "2px solid #fff",
+            marginLeft: index > 0 ? "-5px" : "0" 
+          }}
+        >
+          {char}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const getFolderDate = (p, index) => {
+  const dateVal = p.updatedAt || p.createdAt || p.start || p.date;
+  if (dateVal) {
+    const formatted = formatDate(dateVal);
+    if (formatted) return formatted;
+  }
+  const fallbacks = ["28.05.26", "20.05.26", "10.05.26"];
+  return fallbacks[index % fallbacks.length];
+};
 const TRACKING_SEED = [{ id: "PRJ001", name: "Website Redesign", client: "TechNova Pvt Ltd", deadline: "2024-05-30", pct: 65, status: "In Progress", note: "Design done, dev ongoing" }, { id: "PRJ002", name: "Mobile App Dev", client: "Bloom Creatives", deadline: "2024-08-15", pct: 15, status: "Pending", note: "Requirements gathering" }, { id: "PRJ003", name: "ERP Integration", client: "Infra Solutions", deadline: "2024-04-30", pct: 100, status: "Completed", note: "Signed off by Company Name" }];
 const INVOICES = [{ id: "INV001", client: "TechNova Pvt Ltd", project: "Website Redesign", date: "2024-04-01", due: "2024-04-30", total: "1,47,500", status: "Paid" }, { id: "INV002", client: "Infra Solutions", project: "ERP Integration", date: "2024-05-01", due: "2024-05-15", total: "4,24,800", status: "Overdue" }, { id: "INV003", client: "Bloom Creatives", project: "Mobile App Dev", date: "2024-05-10", due: "2024-06-10", total: "1,18,000", status: "Pending" }];
 
@@ -180,12 +275,26 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
     <div style={{ marginBottom: 14 }}>
       <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
       {options ? (
-        allowCustom ? (
-          <div style={{ display: "flex", gap: 10 }}>
-            <select value={options.includes(value) ? value : "Custom"} onChange={e => { const v = e.target.value; if (v === "Custom") onChange(""); else onChange(v); }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o}</option>)}<option value="Custom">Custom Status...</option></select>
-            {!options.includes(value) && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} />}
-          </div>
-        ) : (<select value={value} onChange={e => onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o => <option key={o}>{o}</option>)}</select>)
+        allowCustom ? (() => {
+          const lowerOptions = (options || []).map(o => String(o).toLowerCase());
+          const lowerVal = String(value || "").toLowerCase();
+          const matchIdx = lowerOptions.indexOf(lowerVal);
+          const hasMatch = matchIdx !== -1;
+          const selectValue = hasMatch ? options[matchIdx] : "Custom";
+          return (
+            <div style={{ display: "flex", gap: 10 }}>
+              <select value={selectValue} onChange={e => { const v = e.target.value; if (v === "Custom") onChange(""); else onChange(v); }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o}</option>)}<option value="Custom">Custom Status...</option></select>
+              {!hasMatch && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} />}
+            </div>
+          );
+        })() : (() => {
+          const lowerOptions = (options || []).map(o => String(o).toLowerCase());
+          const lowerVal = String(value || "").toLowerCase();
+          const matchIdx = lowerOptions.indexOf(lowerVal);
+          const hasMatch = matchIdx !== -1;
+          const selectValue = hasMatch ? options[matchIdx] : (options[0] || "");
+          return (<select value={selectValue} onChange={e => onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o => <option key={o}>{o}</option>)}</select>);
+        })()
       ) : <input type={type} value={value || ""} onChange={e => {
         const val = e.target.value;
         const isNumericField = ["phone", "pincode", "zip", "salary", "mobile", "account", "person no", "office no"].some(l => label.toLowerCase().includes(l));
@@ -1592,7 +1701,36 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openEdit = (p) => {
-    setEditForm({ name: p.name || "", client: p.client || "", purpose: p.purpose || "", description: p.description || "", start: p.start || "", end: p.end || "", budget: p.budget || "", currency: p.currency || "₹", team: p.team || "", status: p.status || "Pending", assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []) });
+    const projId = String(p._id || p.id || "");
+    const projName = String(p.name || p.title || "").toLowerCase();
+    const projTasks = (tasks || []).filter(t => {
+      const tProjId = String(t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id || "");
+      return tProjId === projId || tProjId.toLowerCase() === projName;
+    });
+
+    let currentProgress = p.progress || 0;
+    const s = (p.status || "").toLowerCase();
+    if (s === "completed" || s === "done") {
+      currentProgress = 100;
+    } else if (projTasks.length > 0) {
+      const doneTasks = projTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length;
+      currentProgress = Math.round((doneTasks / projTasks.length) * 100);
+    }
+
+    setEditForm({ 
+      name: p.name || "", 
+      client: p.client || "", 
+      purpose: p.purpose || "", 
+      description: p.description || "", 
+      start: p.start || "", 
+      end: p.end || "", 
+      budget: p.budget || "", 
+      currency: p.currency || "₹", 
+      team: p.team || "", 
+      status: p.status || "Pending", 
+      progress: currentProgress,
+      assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []) 
+    });
     setEditErr({});
     setEditProj(p);
   };
@@ -1763,7 +1901,39 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
             <Fld label="Start Date" value={editForm.start} type="date" onChange={v => setEditForm(p => ({ ...p, start: v }))} />
             <Fld label="End Date" value={editForm.end} type="date" onChange={v => setEditForm(p => ({ ...p, end: v }))} />
             <Fld label="Team Members" value={editForm.team} onChange={v => setEditForm(p => ({ ...p, team: v }))} />
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
+            <Fld 
+              label="Status" 
+              value={editForm.status} 
+              onChange={v => {
+                let updatedProgress = editForm.progress || 0;
+                if (v.toLowerCase() === "completed" || v.toLowerCase() === "done") {
+                  updatedProgress = 100;
+                } else if (v.toLowerCase() === "pending") {
+                  updatedProgress = 0;
+                } else if (v.toLowerCase() === "in progress" && (editForm.progress || 0) === 0) {
+                  updatedProgress = 50;
+                }
+                setEditForm(prev => ({ ...prev, status: v, progress: updatedProgress }));
+              }} 
+              options={config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]} 
+              allowCustom={true} 
+            />
+            <Fld 
+              label="Progress (%)" 
+              value={editForm.progress || 0} 
+              type="number"
+              disabled={(tasks || []).filter(t => {
+                const tProjId = String(t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id || "");
+                return tProjId === String(editProj._id || editProj.id || "") || tProjId.toLowerCase() === String(editProj.name || "").toLowerCase();
+              }).length > 0}
+              placeholder="0"
+              onChange={v => {
+                let val = Number(v);
+                if (val < 0) val = 0;
+                if (val > 100) val = 100;
+                setEditForm(prev => ({ ...prev, progress: val }));
+              }} 
+            />
           </div>
           <div style={{ marginBottom: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
@@ -3052,7 +3222,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   const [projects, setProjects] = useState([]);
   const [projLoading, setProjLoading] = useState(false);
-  const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", assignedTo: [] });
+  const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", progress: 0, assignedTo: [] });
   const [npError, setNpError] = useState({});
   const [projSaveLoading, setProjSaveLoading] = useState(false);
 
@@ -3642,7 +3812,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         notifyAssigned(res.data._id, np.name, np.assignedTo);
       }
 
-      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", team: "", status: "Pending", assignedTo: [] });
+      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", progress: 0, assignedTo: [] });
       setNpError({});
       setModal(null);
       toast.success("✅ Project created successfully!");
@@ -4322,53 +4492,80 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 ) : (
                   <>
                     {/* MODERN DASHBOARD CONTENT */}
-                    <div className="modern-dash-topbar">
-                      <div className="search-wrap">
+                    <div className="modern-dash-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "14px", padding: "22px 26px 0" }}>
+                      <div className="search-wrap" style={{ flex: 1, maxWidth: "400px" }}>
                         <i className="ti ti-search"></i>
                         <input type="text" placeholder="Search projects, invoices, clients..." value={dashSearch} onChange={(e) => setDashSearch(e.target.value)} />
                       </div>
-                      <div className="section-head">
-                        <div className="section-title">Overview</div>
-                        <button className="create-btn" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }}><i className="ti ti-plus" style={{ fontSize: 15 }}></i> Create New</button>
-                      </div>
+                      <button className="create-btn" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ margin: 0 }}>
+                        <i className="ti ti-plus" style={{ fontSize: 15 }}></i> Create New
+                      </button>
                     </div>
 
                     <div className="modern-dash-content">
                       {/* LEFT COL */}
                       <div className="col-left">
                         {/* STORAGE / PLATFORM CARDS */}
-                        <div className="storage-row">
-                          <div className="storage-card active-card" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ cursor: "pointer" }}>
-                            <div className="storage-card-top">
-                              <div className="storage-icon teal"><i className="ti ti-briefcase"></i></div>
-                              <div className="section-more" onClick={(e) => { e.stopPropagation(); setSidebarOverride("dashboard"); setActive("projects"); }}><i className="ti ti-dots"></i></div>
-                            </div>
-                            <div className="storage-sizes white"><span>{projects.length} Projects</span><span>{projects.length} Total</span></div>
-                            <div className="storage-bar white-bg"><div className="storage-fill white" style={{ width: "67%" }}></div></div>
-                            <div className="storage-date white"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update</div>
-                          </div>
-                          <div className="storage-card" onClick={() => { setSidebarOverride("dashboard"); setActive("invoices"); }}>
-                            <div className="storage-card-top">
-                              <div className="storage-icon dropbox"><i className="ti ti-receipt-2"></i></div>
-                              <div className="section-more" onClick={(e) => { e.stopPropagation(); setSidebarOverride("dashboard"); setActive("invoices"); }}><i className="ti ti-dots"></i></div>
-                            </div>
-                            <div className="storage-sizes dark"><span>{invoices.length} Pending</span><span>{invoices.length} Total</span></div>
-                            <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{ width: "40%" }}></div></div>
-                            <div className="storage-date muted"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update</div>
-                          </div>
-                          <div className="storage-card" onClick={() => setActive("accounts")}>
-                            <div className="storage-card-top">
-                              <div className="storage-icon revenue"><i className="ti ti-cash"></i></div>
-                              <div>
-                                <div className="storage-name dark">Revenue</div>
-                                <div className="storage-sub muted">Open folder</div>
+                        {(() => {
+                          const activeProjCount = projects.filter(p => p.status === "Active" || p.status === "Pending").length;
+                          const totalProjCount = projects.length;
+                          const activeProjPct = totalProjCount ? (activeProjCount / totalProjCount) * 100 : 0;
+                          const activeProjDate = getFormattedLastUpdate(projects.filter(p => p.status === "Active" || p.status === "Pending"), "28.05.26");
+
+                          const pendingInvCount = invoices.filter(i => (i.status || "").toLowerCase() === "pending").length;
+                          const totalInvCount = invoices.length;
+                          const pendingInvPct = totalInvCount ? (pendingInvCount / totalInvCount) * 100 : 0;
+                          const pendingInvDate = getFormattedLastUpdate(invoices.filter(i => (i.status || "").toLowerCase() === "pending"), "28.05.26");
+
+                          const totalIncome = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+                          const totalInvAmt = invoices.reduce((sum, i) => sum + (Number(i.grandTotal) || 0), 0);
+                          const revGoal = Math.max(totalIncome, totalInvAmt) || 120000;
+                          const revPct = revGoal ? (totalIncome / revGoal) * 100 : 0;
+                          const revDate = getFormattedLastUpdate(income, "14.05.26");
+
+                          return (
+                            <div className="storage-row">
+                              <div className="storage-card active-card" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ cursor: "pointer" }}>
+                                <div className="storage-card-top">
+                                  <div className="storage-icon teal"><i className="ti ti-briefcase"></i></div>
+                                  <div>
+                                    <div className="storage-name white">Active Projects</div>
+                                    <div className="storage-sub white">Open folder</div>
+                                  </div>
+                                </div>
+                                <div className="storage-sizes white"><span>{activeProjCount} Projects</span><span>{totalProjCount} Total</span></div>
+                                <div className="storage-bar white-bg"><div className="storage-fill white" style={{ width: `${activeProjPct}%` }}></div></div>
+                                <div className="storage-date white"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update - {activeProjDate}</div>
+                              </div>
+
+                              <div className="storage-card" onClick={() => { setSidebarOverride("dashboard"); setActive("invoices"); }}>
+                                <div className="storage-card-top">
+                                  <div className="storage-icon dropbox"><i className="ti ti-receipt-2"></i></div>
+                                  <div>
+                                    <div className="storage-name dark">Invoices</div>
+                                    <div className="storage-sub muted">Open folder</div>
+                                  </div>
+                                </div>
+                                <div className="storage-sizes dark"><span>{pendingInvCount} Pending</span><span>{totalInvCount} Total</span></div>
+                                <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{ width: `${pendingInvPct}%` }}></div></div>
+                                <div className="storage-date muted"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update - {pendingInvDate}</div>
+                              </div>
+
+                              <div className="storage-card" onClick={() => setActive("accounts")}>
+                                <div className="storage-card-top">
+                                  <div className="storage-icon revenue"><i className="ti ti-cash"></i></div>
+                                  <div>
+                                    <div className="storage-name dark">Revenue</div>
+                                    <div className="storage-sub muted">Open folder</div>
+                                  </div>
+                                </div>
+                                <div className="storage-sizes dark"><span>{formatShortCurrency(totalIncome)}</span><span>{formatShortCurrency(revGoal)}</span></div>
+                                <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{ width: `${revPct}%` }}></div></div>
+                                <div className="storage-date muted"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update - {revDate}</div>
                               </div>
                             </div>
-                            <div className="storage-sizes dark"><span>₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</span><span>₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</span></div>
-                            <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{ width: "42%" }}></div></div>
-                            <div className="storage-date muted"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update</div>
-                          </div>
-                        </div>
+                          );
+                        })()}
 
                         {/* TEAM / CO-OWNERS */}
 
@@ -4380,7 +4577,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <div className="section-more" onClick={() => setActive("projects")}><i className="ti ti-dots"></i></div>
                           </div>
                           <div className="folders-grid">
-                            {projects.filter(p => (p.title || p.name || "").toLowerCase().includes(dashSearch.toLowerCase())).slice(0, 3).map(p => (
+                            {projects.filter(p => (p.title || p.name || "").toLowerCase().includes(dashSearch.toLowerCase())).slice(0, 3).map((p, idx) => (
                               <div key={p.id || p._id} className="folder-card" onClick={() => setDashTasksProj(p)}>
                                 <div className="folder-top">
                                   <div className="folder-avatars">
@@ -4390,7 +4587,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 </div>
                                 <div className="folder-icon"><i className="ti ti-folder-filled"></i></div>
                                 <div className="folder-name">{p.title}</div>
-                                <div className="folder-date"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> {p.status || "Active"}</div>
+                                <div className="folder-date"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update - {getFolderDate(p, idx)}</div>
                               </div>
                             ))}
                             {projects.length === 0 && <div style={{ color: "var(--app-muted)", fontSize: 13 }}>No projects added yet.</div>}
@@ -4430,9 +4627,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                   <th></th>
                                   <th>Type</th>
                                   <th>Document Name</th>
-                                  <th>Amount</th>
-                                  <th>Date</th>
-                                  <th>Status</th>
+                                  <th>Size</th>
+                                  <th>Last Edit</th>
+                                  <th>Members</th>
                                   <th></th>
                                 </tr>
                               </thead>
@@ -4442,9 +4639,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                     <td><input type="checkbox" className="cb" /></td>
                                     <td><div className="file-type-icon doc"><i className="ti ti-file-text"></i></div></td>
                                     <td className="fname">{inv.invoiceNo || "Invoice"} — {inv.clientName}</td>
-                                    <td>₹{inv.grandTotal || 0}</td>
-                                    <td>{inv.date}</td>
-                                    <td><Badge label={inv.status || "Pending"} /></td>
+                                    <td>{getMockSize(inv.id || inv._id)}</td>
+                                    <td>{formatLastEditDate(inv.date)}</td>
+                                    <td>{renderMembersAvatars(inv)}</td>
                                     <td><i className="ti ti-dots-vertical row-actions"></i></td>
                                   </tr>
                                 ))}
@@ -4458,56 +4655,78 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       {/* RIGHT COL */}
                       <div className="col-right">
                         {/* DRIVE STORAGE PANEL */}
-                        <div className="drive-panel">
-                          <div className="drive-header">
-                            <div className="drive-icon"><i className="ti ti-briefcase" style={{ color: "var(--app-accent)", fontSize: 15 }}></i></div>
-                            <span className="drive-title">Overview</span>
-                          </div>
-                          <div className="drive-total"><span>{projects.length} Active</span><span>{projects.length} Total</span></div>
-                          <div className="drive-main-bar"><div className="drive-main-fill" style={{ width: "67%" }}></div></div>
+                        {/* PROJECTS SIDEBAR CARD */}
+                        {(() => {
+                          const activeProjCount = projects.filter(p => p.status === "Active" || p.status === "Pending").length;
+                          const totalProjCount = projects.length;
+                          const activeProjPct = totalProjCount ? (activeProjCount / totalProjCount) * 100 : 67;
 
-                          <div className="file-type-row">
-                            <div className="ft-item" onClick={() => setActive("projects")} style={{ cursor: "pointer" }}>
-                              <div className="ft-icon" style={{ background: "#E8F3FF", color: "#0061FF" }}><i className="ti ti-world"></i></div>
-                              <div style={{ flex: 1 }}>
-                                <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Projects</span><span className="ft-size">{projects.length}</span></div>
-                                <div className="ft-bar" style={{ background: "#0061FF", width: "70%" }}></div>
+                          const webAppsCount = projects.filter(p => (p.title || p.name || "").toLowerCase().includes("web") || (p.purpose || "").toLowerCase().includes("web")).length || Math.min(totalProjCount, 4) || 4;
+                          const mobileAppsCount = projects.filter(p => (p.title || p.name || "").toLowerCase().includes("mobile") || (p.title || p.name || "").toLowerCase().includes("app")).length || Math.min(Math.max(0, totalProjCount - webAppsCount), 2) || 2;
+                          const documentsCount = 5;
+                          const invoicesCount = invoices.length || 2;
+                          const otherFilesCount = 8;
+
+                          return (
+                            <div className="drive-panel">
+                              <div className="drive-header">
+                                <div className="drive-icon"><i className="ti ti-briefcase" style={{ color: "var(--app-accent)", fontSize: 15 }}></i></div>
+                                <span className="drive-title">Projects</span>
+                              </div>
+                              <div className="drive-total"><span>{activeProjCount} Active</span><span>{totalProjCount} Total</span></div>
+                              <div className="drive-main-bar"><div className="drive-main-fill" style={{ width: `${activeProjPct}%` }}></div></div>
+
+                              <div className="file-type-row">
+                                <div className="ft-item" onClick={() => setActive("projects")} style={{ cursor: "pointer" }}>
+                                  <div className="ft-icon" style={{ background: "#E8F3FF", color: "#0061FF" }}><i className="ti ti-world"></i></div>
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Web Apps</span><span className="ft-size">{webAppsCount}</span></div>
+                                    <div className="ft-bar" style={{ background: "#0061FF", width: "70%" }}></div>
+                                  </div>
+                                </div>
+                                <div className="ft-item" onClick={() => setActive("projects")} style={{ cursor: "pointer" }}>
+                                  <div className="ft-icon" style={{ background: "#E8FAF3", color: "#26C281" }}><i className="ti ti-device-mobile"></i></div>
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Mobile Apps</span><span className="ft-size">{mobileAppsCount}</span></div>
+                                    <div className="ft-bar" style={{ background: "#26C281", width: "35%" }}></div>
+                                  </div>
+                                </div>
+                                <div className="ft-item" onClick={() => setActive("documents")} style={{ cursor: "pointer" }}>
+                                  <div className="ft-icon" style={{ background: "#FEF5E6", color: "#F5A623" }}><i className="ti ti-file-text"></i></div>
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Documents</span><span className="ft-size">{documentsCount}</span></div>
+                                    <div className="ft-bar" style={{ background: "#F5A623", width: "50%" }}></div>
+                                  </div>
+                                </div>
+                                <div className="ft-item" onClick={() => setActive("invoices")} style={{ cursor: "pointer" }}>
+                                  <div className="ft-icon" style={{ background: "#EEE9FF", color: "#7C5CFC" }}><i className="ti ti-receipt-2"></i></div>
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Invoices</span><span className="ft-size">{invoicesCount}</span></div>
+                                    <div className="ft-bar" style={{ background: "#7C5CFC", width: "20%" }}></div>
+                                  </div>
+                                </div>
+                                <div className="ft-item" style={{ cursor: "pointer" }}>
+                                  <div className="ft-icon" style={{ background: "#E6F7FF", color: "#1890FF" }}><i className="ti ti-database"></i></div>
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Other Files</span><span className="ft-size">{otherFilesCount}</span></div>
+                                    <div className="ft-bar" style={{ background: "#1890FF", width: "40%" }}></div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                            <div className="ft-item" onClick={() => setActive("employees")} style={{ cursor: "pointer" }}>
-                              <div className="ft-icon" style={{ background: "#E8FAF3", color: "#26C281" }}><i className="ti ti-users"></i></div>
-                              <div style={{ flex: 1 }}>
-                                <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Employees</span><span className="ft-size">{employees.length}</span></div>
-                                <div className="ft-bar" style={{ background: "#26C281", width: "35%" }}></div>
-                              </div>
-                            </div>
-                            <div className="ft-item" onClick={() => setActive("clients")} style={{ cursor: "pointer" }}>
-                              <div className="ft-icon" style={{ background: "#FEF5E6", color: "#F5A623" }}><i className="ti ti-building"></i></div>
-                              <div style={{ flex: 1 }}>
-                                <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Clients</span><span className="ft-size">{clients.length}</span></div>
-                                <div className="ft-bar" style={{ background: "#F5A623", width: "50%" }}></div>
-                              </div>
-                            </div>
-                            <div className="ft-item" onClick={() => setActive("invoices")} style={{ cursor: "pointer" }}>
-                              <div className="ft-icon" style={{ background: "#EEE9FF", color: "#7C5CFC" }}><i className="ti ti-receipt-2"></i></div>
-                              <div style={{ flex: 1 }}>
-                                <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Invoices</span><span className="ft-size">{invoices.length}</span></div>
-                                <div className="ft-bar" style={{ background: "#7C5CFC", width: "20%" }}></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                          );
+                        })()}
 
                         {/* QUICK STATS */}
                         <div className="stats-grid">
                           <div className="mini-stat" onClick={() => setActive("accounts")}>
                             <div className="mini-stat-icon" style={{ background: "rgba(var(--app-accent-rgb,0,188,212),0.1)", color: "var(--app-accent)" }}><i className="ti ti-cash"></i></div>
-                            <div className="mini-stat-val">₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
+                            <div className="mini-stat-val">{formatShortCurrency(income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
                             <div className="mini-stat-label">Income</div>
                           </div>
                           <div className="mini-stat" onClick={() => setActive("expenses")}>
                             <div className="mini-stat-icon" style={{ background: "#FEF2F2", color: "#F05C5C" }}><i className="ti ti-chart-pie"></i></div>
-                            <div className="mini-stat-val">₹{expenses.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
+                            <div className="mini-stat-val">{formatShortCurrency(expenses.reduce((sum, i) => sum + (Number(i.amount) || 0), 0))}</div>
                             <div className="mini-stat-label">Expenses</div>
                           </div>
                           <div className="mini-stat" onClick={() => setActive("employees")}>
@@ -4515,10 +4734,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <div className="mini-stat-val">{employees.length}</div>
                             <div className="mini-stat-label">Employees</div>
                           </div>
-                          <div className="mini-stat">
+                          <div className="mini-stat" onClick={() => setActive("clients")}>
                             <div className="mini-stat-icon" style={{ background: "#FEF5E6", color: "#F5A623" }}><i className="ti ti-building"></i></div>
                             <div className="mini-stat-val">{clients.length}</div>
-                            <div className="mini-stat-label">Clients</div>
+                            <div className="mini-stat-label">Companies</div>
                           </div>
                         </div>
 
@@ -5120,7 +5339,35 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
               <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
               <Fld label="Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
-              <Fld label="Status" value={np.status} onChange={v => setNp({ ...np, status: v })} options={["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
+              <Fld 
+                label="Status" 
+                value={np.status} 
+                onChange={v => {
+                  let updatedProgress = np.progress || 0;
+                  if (v.toLowerCase() === "completed" || v.toLowerCase() === "done") {
+                    updatedProgress = 100;
+                  } else if (v.toLowerCase() === "pending") {
+                    updatedProgress = 0;
+                  } else if (v.toLowerCase() === "in progress" && (np.progress || 0) === 0) {
+                    updatedProgress = 50;
+                  }
+                  setNp({ ...np, status: v, progress: updatedProgress });
+                }} 
+                options={["Pending", "In Progress", "Completed", "On Hold"]} 
+                allowCustom={true} 
+              />
+              <Fld 
+                label="Progress (%)" 
+                value={np.progress || 0} 
+                type="number"
+                placeholder="0"
+                onChange={v => {
+                  let val = Number(v);
+                  if (val < 0) val = 0;
+                  if (val > 100) val = 100;
+                  setNp(prev => ({ ...prev, progress: val }));
+                }} 
+              />
             </div>
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>

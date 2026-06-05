@@ -110,12 +110,26 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
     <div style={{ marginBottom: 14 }}>
       <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
       {options ? (
-        allowCustom ? (
-          <div style={{ display: "flex", gap: 10 }}>
-            <select value={options.includes(value) ? value : "Custom"} onChange={e => { const v = e.target.value; if (v === "Custom") onChange(""); else onChange(v); }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o}</option>)}<option value="Custom">Custom Status...</option></select>
-            {!options.includes(value) && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} />}
-          </div>
-        ) : (<select value={value} onChange={e => onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o => <option key={o}>{o}</option>)}</select>)
+        allowCustom ? (() => {
+          const lowerOptions = (options || []).map(o => String(o).toLowerCase());
+          const lowerVal = String(value || "").toLowerCase();
+          const matchIdx = lowerOptions.indexOf(lowerVal);
+          const hasMatch = matchIdx !== -1;
+          const selectValue = hasMatch ? options[matchIdx] : "Custom";
+          return (
+            <div style={{ display: "flex", gap: 10 }}>
+              <select value={selectValue} onChange={e => { const v = e.target.value; if (v === "Custom") onChange(""); else onChange(v); }} style={{ ...s, flex: 1 }} disabled={disabled}>{options.map(o => <option key={o} value={o}>{o}</option>)}<option value="Custom">Custom Status...</option></select>
+              {!hasMatch && <input type="text" placeholder={`Type custom ${label.toLowerCase()}...`} value={value || ""} onChange={e => onChange(e.target.value)} style={sCustom} disabled={disabled} />}
+            </div>
+          );
+        })() : (() => {
+          const lowerOptions = (options || []).map(o => String(o).toLowerCase());
+          const lowerVal = String(value || "").toLowerCase();
+          const matchIdx = lowerOptions.indexOf(lowerVal);
+          const hasMatch = matchIdx !== -1;
+          const selectValue = hasMatch ? options[matchIdx] : (options[0] || "");
+          return (<select value={selectValue} onChange={e => onChange(e.target.value)} style={s} disabled={disabled}>{options.map(o => <option key={o}>{o}</option>)}</select>);
+        })()
       ) : <input type={type} value={value || ""} onChange={e => {
         const val = e.target.value;
         const isNumericField = ["phone", "pincode", "zip", "salary", "mobile", "account", "person no", "office no"].some(l => label.toLowerCase().includes(l));

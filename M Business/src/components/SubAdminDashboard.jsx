@@ -967,9 +967,13 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
     setEmpDocsLoading(true);
     try {
       const r = await axios.get(`${BASE_URL}/api/employee-dashboard/documents/${encodeURIComponent(emp.name)}/all`);
-      if (r.data?.success) {
+      const docs = r.data?.documents || r.data || [];
+      if (Array.isArray(docs)) {
         const dmap = {};
-        r.data.documents.forEach(d => { dmap[d.documentType] = d; });
+        docs.forEach(d => {
+          const key = d.docType || d.documentType || "default";
+          dmap[key] = d;
+        });
         setEmpDocs(dmap);
       }
     } catch (e) { console.error(e); }

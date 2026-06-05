@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { BASE_URL } from "../config";
 
 export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs, empDocsLoading, projects = [], tasks = [], onViewProject }) {
   if (!emp) return null;
@@ -46,11 +48,40 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
   ];
 
   // Tasks state
-  const [staticTasks, setStaticTasks] = useState([
-    { _id: "t1", title: "Design Landing Page Layout", priority: "Medium", status: "Pending", dueDate: "2026-06-10" },
-    { _id: "t2", title: "Implement OAuth Login Flow", priority: "High", status: "Pending", dueDate: "2026-06-12" },
-    { _id: "t3", title: "Database Schema Migration", priority: "Low", status: "Completed", dueDate: "2026-06-05" }
-  ]);
+  const [staticTasks, setStaticTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(false);
+
+  const loadTasks = async () => {
+    if (!emp?.name) return;
+    setTasksLoading(true);
+    try {
+      const companyId = emp.companyId || "";
+      const headers = {};
+      if (companyId) headers['x-company-id'] = companyId;
+      const res = await axios.get(`${BASE_URL}/api/employee-dashboard/tasks/${encodeURIComponent(emp.name)}`, { headers });
+      const mapped = (res.data || []).map(t => {
+        const isDone = t.checked || t.completed || t.done || (t.status || '').toLowerCase() === 'completed';
+        return {
+          ...t,
+          title: t.title || t.taskName || "",
+          priority: t.priority || "Medium",
+          status: isDone ? "Completed" : "Pending",
+          completed: isDone,
+          done: isDone,
+          dueDate: t.date || t.dueDate || ""
+        };
+      });
+      setStaticTasks(mapped);
+    } catch (err) {
+      console.error("Failed to load employee tasks:", err);
+    } finally {
+      setTasksLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTasks();
+  }, [emp?.name]);
 
   const pendingTasks = staticTasks.filter(t => (t.status || '').toLowerCase() === 'pending' || (!t.completed && !t.done && t.status !== 'completed'));
   const completedTasks = staticTasks.filter(t => t.completed || t.done || (t.status || '').toLowerCase() === 'completed');
@@ -72,7 +103,8 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
   const [newDocType, setNewDocType] = useState("Offer Letter");
 
   // Interactions
-  const handleToggleTask = (taskId) => {
+  const handleToggleTask = async (taskId) => {
+    // Optimistic UI update
     setStaticTasks(prev => prev.map(t => {
       if (t._id === taskId) {
         const done = t.completed || t.done || (t.status || '').toLowerCase() === 'completed';
@@ -85,43 +117,109 @@ export default function EmployeeDetail({ emp, onBack, onEdit, onDelete, empDocs,
       }
       return t;
     }));
+
+    try {
+      await axios.patch(`${BASE_URL}/api/tasks/${taskId}/toggle`);
+    } catch (err) {
+      console.error("Failed to toggle task status:", err);
+      loadTasks();
+    }
   };
 
-  const handleDeleteTask = (taskId) => {
+  const handleDeleteTask = async (taskId) => {
+    // Optimistic UI update
     setStaticTasks(prev => prev.filter(t => t._id !== taskId));
+    try {
+      await axios.delete(`${BASE_URL}/api/tasks/${taskId}`);
+    } catch (err) {
+      console.error("Failed to delete task:", err);
+      loadTasks();
+    }
   };
 
-  const handleAddTaskSubmit = (e) => {
+  const handleAddTaskSubmit = async (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
-    const newTask = {
-      _id: "t_" + Date.now(),
-      title: newTaskTitle,
-      priority: newTaskPriority,
-      status: "Pending",
-      dueDate: newTaskDueDate || new Date(Date.now() + 86400000 * 2).toISOString().substring(0, 10)
-    };
-    setStaticTasks(prev => [...prev, newTask]);
-    setShowAddTaskModal(false);
-    setNewTaskTitle("");
-    setNewTaskPriority("Medium");
-    setNewTaskDueDate("");
+    try {
+      // 1. Fetch board columns/groups to find a valid groupId
+      const boardRes = await axios.get(`${BASE_URL}/api/tasks/board${emp?.name ? `?employeeName=${encodeURIComponent(emp.name)}` : ""}`);
+      let groupId = "";
+      if (boardRes.data && boardRes.data.length > 0) {
+        groupId = boardRes.data[0]._id || boardRes.data[0].id;
+      } else {
+        // Create a default Tasks group
+        const groupRes = await axios.post(`${BASE_URL}/api/groups`, {
+          label: "Tasks",
+          color: "#6366F1",
+          companyId: emp?.companyId || ""
+        });
+        groupId = groupRes.data._id || groupRes.data.id;
+      }
+
+      if (!groupId) {
+        alert("Failed to find or create a task group. Please make sure task groups exist.");
+        return;
+      }
+
+      // 2. Post new task
+      const payload = {
+        title: newTaskTitle,
+        priority: newTaskPriority,
+        status: "Pending",
+        date: newTaskDueDate || new Date(Date.now() + 86400000 * 2).toISOString().substring(0, 10),
+        assignTo: emp.name,
+        groupId
+      };
+      
+      const res = await axios.post(`${BASE_URL}/api/tasks`, payload);
+      if (res.data) {
+        const newTask = {
+          ...res.data,
+          title: res.data.title,
+          priority: res.data.priority,
+          status: res.data.status,
+          dueDate: res.data.date || res.data.dueDate || ""
+        };
+        setStaticTasks(prev => [newTask, ...prev]);
+      }
+      setShowAddTaskModal(false);
+      setNewTaskTitle("");
+      setNewTaskPriority("Medium");
+      setNewTaskDueDate("");
+    } catch (err) {
+      console.error("Failed to assign task:", err);
+      alert("Failed to assign task: " + (err.response?.data?.message || err.message));
+    }
   };
 
-  const handleRequestDocSubmit = (e) => {
+  const handleRequestDocSubmit = async (e) => {
     e.preventDefault();
     if (!newDocName.trim()) return;
-    const newDoc = {
-      _id: "doc_" + Date.now(),
-      name: newDocName,
-      type: newDocType,
-      uploadedAt: new Date().toISOString(),
-      url: "#"
-    };
-    setRequestedDocs(prev => [...prev, newDoc]);
-    setShowRequestDocModal(false);
-    setNewDocName("");
-    setNewDocType("Offer Letter");
+    try {
+      // Create a database notification for the employee requesting the document
+      await axios.post(`${BASE_URL}/api/notifications`, {
+        userId: emp._id || emp.employeeId,
+        text: `Please upload your ${newDocName} (${newDocType})`,
+        type: "warning",
+        icon: "📁",
+        companyId: emp.companyId || ""
+      });
+
+      const newDoc = {
+        _id: "doc_" + Date.now(),
+        name: newDocName,
+        type: newDocType,
+        uploadedAt: new Date().toISOString(),
+        url: "#"
+      };
+      setRequestedDocs(prev => [...prev, newDoc]);
+      setShowRequestDocModal(false);
+      setNewDocName("");
+      setNewDocType("Offer Letter");
+    } catch (err) {
+      console.error("Failed to request document:", err);
+      alert("Failed to request document: " + (err.response?.data?.message || err.message));
+    }
   };
 
   const getPriorityStyle = (priority = '') => {

@@ -4095,7 +4095,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // Always land on mysubscriptions when enforced — never show dashboard
   const validActive = enforceMySubscriptions
     ? "mysubscriptions"
-    : ((findNavItem(active) || active === "tasks" || active === "create-project" || active === "project-details") ? active : navItems[0]?.key || "dashboard");
+    : ((findNavItem(active) || active === "tasks" || active === "create-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
 
   const page = findNavItem(validActive) || navItems[0];
 
@@ -4167,7 +4167,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div className="no-print" style={{ display: "contents" }}>
           <Sidebar
             user={user}
-            active={sidebarOverride || validActive}
+  active={validActive === "projects" && sidebarOverride === null ? "dashboard" : (sidebarOverride || validActive)}
             setActive={(val) => { setSidebarOverride(null); setActive(val); }}
             onLogout={handleLogout}
             open={sidebarOpen}
@@ -4692,41 +4692,45 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                             <div className="drive-panel">
                               <div className="drive-header">
                                 <div className="drive-icon"><i className="ti ti-briefcase" style={{ color: "var(--app-accent)", fontSize: 15 }}></i></div>
-                                <span className="drive-title">Projects</span>
+                                <span className="drive-title" onClick={() => { setSidebarOverride(null); setActive("projects"); }} style={{ cursor: "pointer" }}>Projects</span>
                               </div>
                               <div className="drive-total"><span>{activeProjCount} Active</span><span>{totalProjCount} Total</span></div>
                               <div className="drive-main-bar"><div className="drive-main-fill" style={{ width: `${activeProjPct}%` }}></div></div>
 
                               <div className="file-type-row">
-                                <div className="ft-item" onClick={() => setActive("projects")} style={{ cursor: "pointer" }}>
+                             <div className="ft-item" onClick={() => { setSidebarOverride(null); setActive("projects"); }} style={{ cursor: "pointer" }}>
+
                                   <div className="ft-icon" style={{ background: "#E8F3FF", color: "#0061FF" }}><i className="ti ti-world"></i></div>
                                   <div style={{ flex: 1 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Web Apps</span><span className="ft-size">{webAppsCount}</span></div>
                                     <div className="ft-bar" style={{ background: "#0061FF", width: "70%" }}></div>
                                   </div>
                                 </div>
-                                <div className="ft-item" onClick={() => { setSidebarOverride(null); setActive("projects"); }}style={{ cursor: "pointer" }}>
-                                  <div className="ft-icon" style={{ background: "#E8FAF3", color: "#26C281" }}><i className="ti ti-device-mobile"></i></div>
+                                <div className="ft-item" onClick={() => { setSidebarOverride(null); setActive("projects"); }} style={{ cursor: "pointer" }}>
+                          <div className="ft-icon" style={{ background: "#E8FAF3", color: "#26C281" }}><i className="ti ti-device-mobile"></i></div>
                                   <div style={{ flex: 1 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Mobile Apps</span><span className="ft-size">{mobileAppsCount}</span></div>
                                     <div className="ft-bar" style={{ background: "#26C281", width: "35%" }}></div>
                                   </div>
                                 </div>
-                                <div className="ft-item" onClick={() => setActive("documents")} style={{ cursor: "pointer" }}>
+                              <div className="ft-item" onClick={() => { setSidebarOverride(null); setActive("projects"); }} style={{ cursor: "pointer" }}>
+
                                   <div className="ft-icon" style={{ background: "#FEF5E6", color: "#F5A623" }}><i className="ti ti-file-text"></i></div>
                                   <div style={{ flex: 1 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Documents</span><span className="ft-size">{documentsCount}</span></div>
                                     <div className="ft-bar" style={{ background: "#F5A623", width: "50%" }}></div>
                                   </div>
                                 </div>
-                                <div className="ft-item" onClick={() => setActive("invoices")} style={{ cursor: "pointer" }}>
+                           <div className="ft-item" onClick={() => { setSidebarOverride(null); setActive("projects"); }} style={{ cursor: "pointer" }}>
+
                                   <div className="ft-icon" style={{ background: "#EEE9FF", color: "#7C5CFC" }}><i className="ti ti-receipt-2"></i></div>
                                   <div style={{ flex: 1 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Invoices</span><span className="ft-size">{invoicesCount}</span></div>
                                     <div className="ft-bar" style={{ background: "#7C5CFC", width: "20%" }}></div>
                                   </div>
                                 </div>
-                                <div className="ft-item" style={{ cursor: "pointer" }}>
+                            <div className="ft-item" onClick={() => { setSidebarOverride(null); setActive("projects"); }} style={{ cursor: "pointer" }}>
+
                                   <div className="ft-icon" style={{ background: "#E6F7FF", color: "#1890FF" }}><i className="ti ti-database"></i></div>
                                   <div style={{ flex: 1 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Other Files</span><span className="ft-size">{otherFilesCount}</span></div>

@@ -1895,11 +1895,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
               <i className="ti ti-arrow-left" /> Dashboard
             </button>
           )}
-          {onCreateProject && (
-            <button onClick={onCreateProject} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 18px", background: "#00BCD4", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(0,188,212,0.3)" }}>
-              <i className="ti ti-plus" /> New Project
-            </button>
-          )}
+    
         </div>
       </div>
 

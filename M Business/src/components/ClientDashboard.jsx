@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import SettingsPage from "./SettingsPage";
+import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
 
 // ── Teal Theme Colors ──────────────────────────────────────────
 const C = {
@@ -49,7 +50,8 @@ function useAssets() {
 export default function ClientDashboard({ user, setUser }) {
   useAssets();
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_client") || "dashboard");
-  useEffect(() => { localStorage.setItem("activeTab_client", active); }, [active]);
+  const [selectedClientProject, setSelectedClientProject] = useState(null);
+  useEffect(() => { localStorage.setItem("activeTab_client", active); if (active !== "projects") setSelectedClientProject(null); }, [active]);
 
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -671,6 +673,7 @@ export default function ClientDashboard({ user, setUser }) {
           </div>
           <div className="tn-nav">
             <button className={`tn-item ${active === "dashboard" ? "active" : ""}`} onClick={() => setActive("dashboard")}>Overview</button>
+            <button className={`tn-item ${active === "projects" ? "active" : ""}`} onClick={() => setActive("projects")}><i className="ti ti-layout-kanban" style={{marginRight:4}}></i>My Projects</button>
             <button className={`tn-item ${active === "timeline" ? "active" : ""}`} onClick={() => setActive("timeline")}>Timeline</button>
             <button className={`tn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>Files</button>
             <button className={`tn-item ${active === "payments" ? "active" : ""}`} onClick={() => setActive("payments")}>Invoices</button>
@@ -1392,6 +1395,89 @@ export default function ClientDashboard({ user, setUser }) {
           </div>
         )}
 
+        {active === "projects" && !selectedClientProject && (
+          <div>
+            <div className="sec-header">
+              <div className="sec-title">
+                <div className="sec-title-icon" style={{ background: C.tealLight, color: C.teal }}><i className="ti ti-layout-kanban"></i></div>
+                My Projects
+              </div>
+              <div style={{ fontSize: 12, color: C.text3, fontWeight: 600 }}>{projects.length} project{projects.length !== 1 ? 's' : ''} assigned to you</div>
+            </div>
+            {projects.length === 0 ? (
+              <div style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '48px 24px', textAlign: 'center' }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>📂</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 6 }}>No Projects Yet</div>
+                <div style={{ fontSize: 13, color: C.text3 }}>Projects assigned to your account will appear here.</div>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18 }}>
+                {projects.map((proj, idx) => {
+                  const s = (proj.status || '').toLowerCase();
+                  const isDone = s === 'done' || s === 'completed';
+                  const isHold = s.includes('hold');
+                  const pct = proj.progress || (isDone ? 100 : s === 'in progress' ? 55 : 20);
+                  const statusColor = isDone ? C.green : isHold ? C.amber : C.teal;
+                  const statusBg = isDone ? C.greenBg : isHold ? C.amberBg : C.tealLight;
+                  const endD = proj.end ? new Date(proj.end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : proj.deadline || '—';
+                  return (
+                    <div key={proj._id || idx}
+                      onClick={() => setSelectedClientProject(proj)}
+                      style={{ background: C.surface, border: '1.5px solid ' + C.border, borderRadius: 16, padding: '20px 22px', cursor: 'pointer', transition: 'all .2s', boxShadow: '0 2px 12px rgba(0,188,212,.06)' }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = C.teal; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,188,212,.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,188,212,.06)'; e.currentTarget.style.transform = 'none'; }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{proj.name || 'Unnamed Project'}</div>
+                          <div style={{ fontSize: 12, color: C.text3, display: 'flex', alignItems: 'center', gap: 5 }}>
+                            <i className="ti ti-tag" style={{ fontSize: 11 }}></i>
+                            {proj.purpose || proj.category || 'Project'}
+                          </div>
+                        </div>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: statusBg, color: statusColor, flexShrink: 0, marginLeft: 10 }}>
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor, display: 'inline-block' }}></span>
+                          {proj.status || 'Active'}
+                        </span>
+                      </div>
+                      {proj.description && (
+                        <div style={{ fontSize: 12, color: C.text2, marginBottom: 12, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{proj.description}</div>
+                      )}
+                      <div style={{ marginBottom: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                          <span style={{ fontSize: 11, color: C.text3, fontWeight: 600 }}>Progress</span>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: C.teal }}>{pct}%</span>
+                        </div>
+                        <div style={{ background: C.border, borderRadius: 20, height: 7, overflow: 'hidden' }}>
+                          <div style={{ width: pct + '%', height: '100%', borderRadius: 20, background: 'linear-gradient(90deg, ' + C.teal + ', ' + C.teal2 + ')', transition: 'width .4s ease' }}></div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: C.text3, fontWeight: 600 }}>
+                          <i className="ti ti-calendar" style={{ fontSize: 12 }}></i>
+                          {endD}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700, color: C.teal }}>
+                          View Details <i className="ti ti-arrow-right" style={{ fontSize: 13 }}></i>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {active === "projects" && selectedClientProject && (
+          <ModernEmployeeProjectDetails
+            project={selectedClientProject}
+            tasks={tasks}
+            user={user}
+            onBack={() => setSelectedClientProject(null)}
+          />
+        )}
+
       </div>
 
       {/* MOBILE BOTTOM NAV */}
@@ -1401,9 +1487,9 @@ export default function ClientDashboard({ user, setUser }) {
             <i className="ti ti-layout-dashboard"></i>
             <div className="mbn-label">Overview</div>
           </button>
-          <button className={`mbn-item ${active === "timeline" ? "active" : ""}`} onClick={() => setActive("timeline")}>
-            <i className="ti ti-calendar-stats"></i>
-            <div className="mbn-label">Timeline</div>
+          <button className={`mbn-item ${active === "projects" ? "active" : ""}`} onClick={() => setActive("projects")}>
+            <i className="ti ti-layout-kanban"></i>
+            <div className="mbn-label">Projects</div>
           </button>
           <button className={`mbn-item ${active === "files" ? "active" : ""}`} onClick={() => setActive("files")}>
             <i className="ti ti-files"></i>

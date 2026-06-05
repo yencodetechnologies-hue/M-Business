@@ -208,11 +208,12 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
     <div className="epd-root">
       <style>{css}</style>
 
-      {/* BREADCRUMB */}
-      <div className="epd-breadcrumb">
-        <a onClick={onBack}>My Projects</a>
-        <i className="ti ti-chevron-right" style={{ fontSize: 14 }}></i>
-        <span style={{ color: textDark }}>{projName}</span>
+      {/* BACK ARROW HEADER */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+        <button onClick={onBack} style={{ padding: "8px", background: "#E0F2FE", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 20, color: "var(--teal, #0d9488)", display: "flex", alignItems: "center", transition: "all 0.2s" }} title="Back" onMouseEnter={e => e.currentTarget.style.background = "#BAE6FD"} onMouseLeave={e => e.currentTarget.style.background = "#E0F2FE"}>
+          <i className="ti ti-arrow-left"></i>
+        </button>
+        <div style={{ fontSize: 20, fontWeight: 800, color: "#0F172A" }}>{projName}</div>
       </div>
 
       {/* HERO */}
@@ -243,78 +244,6 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
       <div className="epd-grid">
         {/* LEFT */}
         <div>
-          {/* UNREAD BANNER */}
-          {unreadCount > 0 && (
-            <div className="epd-unread-banner">
-              <i className="ti ti-speakerphone" style={{ color: primary, fontSize: 20 }}></i>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: primaryDark }}>{unreadCount} new update{unreadCount > 1 ? 's' : ''} from admin</div>
-                <div style={{ fontSize: 12, color: textMid }}>Tap each update to mark as read</div>
-              </div>
-              <button className="epd-btn epd-btn-outline" style={{ fontSize: 12 }} onClick={markAllRead}>Mark all read</button>
-            </div>
-          )}
-
-          {/* UPDATES FEED */}
-          {/* Static sample updates — in production wire to backend /api/project-updates?projectId=... */}
-          <div style={{ marginBottom: 4, fontSize: 11, fontWeight: 800, color: textLight, textTransform: 'uppercase', letterSpacing: '.7px' }}>Project Updates</div>
-
-          {[
-            {
-              id: 'upd1', type: 'progress', cls: '', label: 'Progress', icon: 'ti-chart-line',
-              title: 'Project update from admin',
-              body: project.description || 'Latest progress update for this project.',
-              internal: false,
-            },
-            {
-              id: 'upd2', type: 'milestone', cls: 'ms', label: 'Milestone', icon: 'ti-flag',
-              title: 'Milestone check — review your task assignments',
-              body: 'Please review your open tasks and update estimates accordingly.',
-              internal: false,
-            },
-            {
-              id: 'upd3', type: 'blocker', cls: 'bl', label: 'Blocker', icon: 'ti-alert-triangle',
-              title: 'Action required — check your tasks',
-              body: 'There may be blockers or dependencies pending your attention.',
-              internal: true,
-            }
-          ].map(upd => {
-            const isUnread = unreadIds.has(upd.id);
-            const badgeClass = 'epd-upd-' + upd.type;
-            return (
-              <div key={upd.id} className={'epd-uf-card ' + upd.cls + (isUnread ? ' unread' : '')} onClick={() => markRead(upd.id)}>
-                <div className="epd-uf-inner">
-                  <div className="epd-uf-top">
-                    <span className={'epd-uf-badge ' + badgeClass}><i className={'ti ' + upd.icon} style={{ fontSize: 11 }}></i> {upd.label}</span>
-                    {upd.internal && <span className="epd-internal">Internal Only</span>}
-                    {isUnread && <span className="epd-uf-new" style={{ marginLeft: 'auto' }}>New</span>}
-                  </div>
-                  <div className="epd-uf-title">{upd.title}</div>
-                  <div className="epd-uf-body">{upd.body}</div>
-                  {upd.type === 'progress' && (
-                    <div className="epd-uf-prog">
-                      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
-                        <span style={{ fontSize:12, fontWeight:700, color:textMid }}>Project completion</span>
-                        <span style={{ fontSize:13, fontWeight:900, color:primary }}>{pct}%</span>
-                      </div>
-                      <div className="epd-progress-bg"><div className="epd-progress-fill" style={{ width: pct + '%' }}></div></div>
-                    </div>
-                  )}
-                  {upd.type === 'blocker' && (
-                    <div className="epd-uf-blocker"><i className="ti ti-alert-circle"></i>Check your assigned tasks for blockers</div>
-                  )}
-                  <div className="epd-uf-footer">
-                    <div className="epd-uf-from">
-                      <div className="epd-av epd-av-sm" style={{ background: primary }}>AD</div>
-                      Admin
-                    </div>
-                    <div className="epd-uf-date">Recent</div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
           {/* MY TASKS */}
           <div className="epd-card">
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>

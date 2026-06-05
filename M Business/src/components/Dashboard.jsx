@@ -1048,7 +1048,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, config, onVie
             <Fld label="Start Date" value={editForm.start} type="date" onChange={v => setEditForm(p => ({ ...p, start: v }))} />
             <Fld label="End Date" value={editForm.end} type="date" onChange={v => setEditForm(p => ({ ...p, end: v }))} />
             <Fld label="Team Members" value={editForm.team} onChange={v => setEditForm(p => ({ ...p, team: v }))} />
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
+            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "On Hold", "Completed", "Overdue"]} allowCustom={true} />
           </div>
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES</label>
@@ -1761,7 +1761,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setProjSaveLoading(true);
       const res = await axios.post(BASE_URL + "/api/projects/add", np);
       await fetchProjects();
-      setNp({ name: "", client: "", purpose: "", description: "", start: "", end: "", budget: "", team: "", status: "Pending", assignedTo: [] });
+      setNp({ name: "", client: "", purpose: "", description: "", start: "", end: "", budget: "", team: "", status: "Active", assignedTo: [] });
       setNpError({});
       setModal(null);
       toast.success("✅ Project created successfully!");
@@ -2125,7 +2125,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
           <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
           <Fld label="Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
-          <Fld label="Status" value={np.status} onChange={v => setNp({ ...np, status: v })} options={["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
+          <Fld label="Status" value={np.status} onChange={v => setNp({ ...np, status: v })} options={["Active", "On Hold", "Completed", "Overdue"]} allowCustom={true} />
         </div>
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400 }}></span></label>

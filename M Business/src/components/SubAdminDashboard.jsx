@@ -24,6 +24,7 @@ import EmployeeDetail from "./EmployeeDetail";
 import AuthPage from "./AuthPage";
 import MySubscriptions from "./MySubscriptions";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
+import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
 import ImageCropModal from "./ImageCropModal";
 import PaymentDashboard from "./PaymentDashboard";
 import ModernProjectsView from "./ModernProjectsView";
@@ -168,7 +169,6 @@ const NAV = [
     items: [
       { key: "projects", icon: "ti-briefcase", label: "Projects" },
       { key: "tasks", icon: "ti-checkbox", label: "Tasks" },
-      { key: "tracking", icon: "ti-chart-pie", label: "Project Status" },
       { key: "calendar", icon: "ti-calendar-event", label: "Calendar" },
     ]
   },
@@ -1856,28 +1856,13 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
   if (viewTasksProj) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%" }}>
-        <div>
-          <button
-            onClick={() => setViewTasksProj(null)}
-            style={{ padding: "8px 16px", background: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
-          >
-            ← Back to Projects
-          </button>
-        </div>
-        <div style={{ flex: 1 }}>
-          <TaskPage
-            projects={projects}
-            employees={employees}
-            onUpdate={() => fetchTasks && fetchTasks()}
-            config={config}
-            user={user}
-            selectedProjectId={viewTasksProj._id || viewTasksProj.id || null}
-            selectedProjectName={viewTasksProj.name || null}
-            onClearProjectFilter={() => setViewTasksProj(null)}
-            onSelectProject={(p) => setViewTasksProj(p)}
-          />
-        </div>
+      <div style={{ flex: 1, height: "100%" }}>
+        <ModernEmployeeProjectDetails
+          project={viewTasksProj}
+          tasks={tasks.filter(t => (t.project || t.projectId) === (viewTasksProj._id || viewTasksProj.id))}
+          user={user}
+          onBack={() => setViewTasksProj(null)}
+        />
       </div>
     );
   }
@@ -2013,7 +1998,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
                 }
                 setEditForm(prev => ({ ...prev, status: v, progress: updatedProgress }));
               }} 
-              options={config?.projectStatuses || ["Pending", "In Progress", "Completed", "On Hold"]} 
+              options={["Active", "On Hold", "Completed", "Overdue"]} 
               allowCustom={true} 
             />
             <Fld 
@@ -2294,7 +2279,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
           <SearchDropdown label="Employee" items={employeeNames} displayKey="name" value={tsForm.employee} onChange={v => setTsForm({ ...tsForm, employee: v })} placeholder="-- Select Employee --" />
           <Fld label="Deadline *" value={tsForm.deadline} type="date" onChange={v => { setTsForm({ ...tsForm, deadline: v }); setTsErr(p => ({ ...p, deadline: "" })); }} error={tsErr.deadline} />
-          <Fld label="Status" value={tsForm.status} onChange={v => setTsForm({ ...tsForm, status: v })} options={config?.projectStatuses || ["In Progress", "Pending", "Completed", "On Hold"]} allowCustom={true} />
+          <Fld label="Status" value={tsForm.status} onChange={v => setTsForm({ ...tsForm, status: v })} options={["Active", "On Hold", "Completed", "Overdue"]} allowCustom={true} />
           <Fld label="Progress (0–100)" value={String(tsForm.progress)} type="number" onChange={v => { setTsForm({ ...tsForm, progress: v }); setTsErr(p => ({ ...p, progress: "" })); }} error={tsErr.progress} placeholder="e.g. 65" />
         </div>
         <Fld label="Notes" value={tsForm.notes} onChange={v => setTsForm({ ...tsForm, notes: v })} placeholder="Brief update…" />
@@ -3544,7 +3529,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   };
 
   const getSubStatus = () => {
-    if (!subscription) return { blocked: true, alert: false, status: "none" };
+    // While subscription data is still loading, never block
+    if (!subscription) return { blocked: false, alert: false, status: "loading" };
 
     const end = new Date(subscription.endDate);
     const now = new Date();
@@ -3914,7 +3900,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         notifyAssigned(res.data._id, np.name, np.assignedTo);
       }
 
-      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", progress: 0, assignedTo: [] });
+      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Active", progress: 0, assignedTo: [] });
       setNpError({});
       setModal(null);
       toast.success("✅ Project created successfully!");
@@ -4087,12 +4073,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // (a) subadmin and still loading subscription data (prevent flash)
   // (b) subadmin and no active subscription (blocked)
   let enforceMySubscriptions = false;
-  if (!isAdmin && isSubAdmin) {
-    if (!subLoading && subStatus.blocked) {
-      enforceMySubscriptions = true;
-    }
-  }
-
+  // Subadmin subscription blocking logic removed as requested
   const rawNavItems = getNavForRole(user?.role);
   // When restricted, ONLY show My Subscriptions (no dashboard — must subscribe first)
   const navItems = enforceMySubscriptions
@@ -4463,71 +4444,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     🎨
                   </button>
                 </div>
-                {/* Subscription Status Alert (Blocking) */}
-                {subStatus.blocked && (
-                  <div style={{
-                    background: "linear-gradient(135deg,#fee2e2,#fecaca)",
-                    border: "2px solid #ef4444",
-                    borderRadius: 16,
-                    padding: "24px",
-                    marginBottom: 24,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    textAlign: "center",
-                    gap: 16,
-                    boxShadow: "0 10px 30px rgba(239,68,68,0.15)"
-                  }}>
-                    <div style={{ fontSize: 48 }}>🚫</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 20, fontWeight: 800, color: "#991b1b", marginBottom: 8 }}>
-                        Subscription Expired
-                      </div>
-                      <div style={{ fontSize: 14, color: "#7f1d1d", maxWidth: 500, margin: "0 auto", lineHeight: 1.6 }}>
-                        Your access to premium features has been restricted because your subscription is no longer active.
-                        Please renew your plan to unlock all management tools and continue your business operations.
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", gap: 12 }}>
-                      <button
-                        onClick={() => setActive("mysubscriptions")}
-                        style={{
-                          background: "linear-gradient(135deg,#ef4444,#dc2626)",
-                          border: "none",
-                          borderRadius: 10,
-                          padding: "12px 24px",
-                          fontSize: 14,
-                          fontWeight: 700,
-                          color: "#fff",
-                          cursor: "pointer",
-                          fontFamily: "inherit",
-                          boxShadow: "0 4px 12px rgba(239,68,68,0.3)"
-                        }}
-                      >
-                        🚀 Renew Subscription
-                      </button>
-                      <button
-                        onClick={() => window.open(`mailto:${user?.email || "support@workspace.com"}`)}
-                        style={{
-                          background: "#fff",
-                          border: "1.5px solid #ef4444",
-                          borderRadius: 10,
-                          padding: "12px 24px",
-                          fontSize: 14,
-                          fontWeight: 700,
-                          color: "#ef4444",
-                          cursor: "pointer",
-                          fontFamily: "inherit"
-                        }}
-                      >
-                        📞 Contact Support
-                      </button>
-                    </div>
-                  </div>
-                )}
+                {/* Subscription Status Alert (Blocking) Removed as requested */}
 
                 {/* Subscription Status Alert (Warning only) */}
-                {subStatus.alert && !subStatus.blocked && (
+                {!subLoading && subStatus.alert && !subStatus.blocked && (
                   <div style={{
                     background: "linear-gradient(135deg,#fef3c7,#fde68a)",
                     border: "2px solid #f59e0b",
@@ -4578,16 +4498,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </button>
                     </div>
                     <div style={{ flex: 1 }}>
-                      <TaskPage
-                        projects={projects}
-                        employees={employees}
-                        onUpdate={() => fetchTasks && fetchTasks()}
-                        config={config}
+                      <ModernEmployeeProjectDetails
+                        project={dashTasksProj}
+                        tasks={tasks.filter(t => (t.project || t.projectId) === (dashTasksProj._id || dashTasksProj.id))}
                         user={user}
-                        selectedProjectId={dashTasksProj._id || dashTasksProj.id || null}
-                        selectedProjectName={dashTasksProj.title || dashTasksProj.name || null}
-                        onClearProjectFilter={() => setDashTasksProj(null)}
-                        onSelectProject={(p) => setDashTasksProj(p)}
+                        onBack={() => setDashTasksProj(null)}
                       />
                     </div>
                   </div>
@@ -4681,12 +4596,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                               <div key={p.id || p._id} className="folder-card" onClick={() => setDashTasksProj(p)}>
                                 <div className="folder-top">
                                   <div className="folder-avatars">
-                                    <div className="fa">{p.title?.[0]?.toUpperCase() || "P"}</div>
+                                    <div className="fa">{(p.name || p.title)?.[0]?.toUpperCase() || "P"}</div>
                                   </div>
                                   <i className="ti ti-dots folder-more"></i>
                                 </div>
                                 <div className="folder-icon"><i className="ti ti-folder-filled"></i></div>
-                                <div className="folder-name">{p.title}</div>
+                                <div className="folder-name">{p.name || p.title}</div>
                                 <div className="folder-date"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update - {getFolderDate(p, idx)}</div>
                               </div>
                             ))}
@@ -5472,7 +5387,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   }
                   setNp({ ...np, status: v, progress: updatedProgress });
                 }} 
-                options={["Pending", "In Progress", "Completed", "On Hold"]} 
+                options={["Active", "On Hold", "Completed", "Overdue"]} 
                 allowCustom={true} 
               />
               <Fld 

@@ -240,6 +240,9 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
 
   useEffect(() => { fetchList(); }, []);
   useEffect(() => { if (step === "list") fetchList(); }, [step]);
+  useEffect(() => {
+    if (step === "preview") window.scrollTo(0, 0);
+  }, [step]);
 
   const addItem = () => setItems((p) => [...p, { id: Date.now(), description: "", quantity: 1, rate: "" }]);
   const removeItem = (id) => { if (items.length > 1) setItems((p) => p.filter((i) => i.id !== id)); };
@@ -599,7 +602,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               const init = (entry.client || "U").substring(0,2).toUpperCase();
               
               return (
-                <div key={entry.id || entry.quoteNo} className={`quote-card ${getStatusTheme(entry.status)}`} onClick={() => setViewEntry(entry)}>
+                <div key={entry.id || entry.quoteNo} className={`quote-card ${getStatusTheme(entry.status)}`} onClick={() => { loadEntry(entry); setStep("preview"); }}>
                   <div className="qc-top">
                     <span className="qc-id">#{entry.quoteNo || "QT-XXXX"}</span>
                     <select 
@@ -755,7 +758,12 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
               width: 100% !important; max-width: 100% !important; margin: 0 !important; 
               border-radius: 0 !important; box-shadow: none !important; 
               overflow: visible !important; min-height: 0 !important; height: auto !important;
+              page-break-after: always; break-after: page;
             }
+            .qt-paper:last-child {
+              page-break-after: auto; break-after: auto;
+            }
+            .qt-table-wrap { overflow-x: visible !important; overflow: visible !important; }
             .flex-spacer { display: none !important; }
             body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
           }
@@ -826,7 +834,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
           </div>
 
           {/* Items */}
-          <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
+          <div className="qt-table-wrap" style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
                 <tr className="avoid-break" style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>

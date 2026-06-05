@@ -129,7 +129,9 @@ export default function QuotationViewer() {
           @page { size: A4 portrait; margin: 0; }
           html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; background: white !important; }
           .no-print, .no-print * { display: none !important; }
-          .qt-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; }
+          .qt-paper { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; max-width: 210mm !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; display: block !important; page-break-after: always; break-after: page; }
+          .qt-paper:last-child { page-break-after: auto; break-after: auto; }
+          .qt-table-wrap { overflow-x: visible !important; overflow: visible !important; }
           body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
         }
         @media (max-width:600px) { .qt-hgrid { flex-direction:column!important; } .qt-btgrid { grid-template-columns:1fr!important; } }
@@ -192,7 +194,7 @@ export default function QuotationViewer() {
         </div>
 
         {/* Items */}
-        <div style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
+        <div className="qt-table-wrap" style={{ padding: "22px 32px", overflowX: "auto", flexShrink: 0 }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
             <thead>
               <tr style={{ background: "linear-gradient(90deg,#f0fdf4,#f7fffe)" }}>

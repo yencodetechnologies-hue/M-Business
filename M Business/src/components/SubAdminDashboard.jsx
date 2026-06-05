@@ -54,54 +54,54 @@ const TRACKING_SEED = [{ id: "PRJ001", name: "Website Redesign", client: "TechNo
 const INVOICES = [{ id: "INV001", client: "TechNova Pvt Ltd", project: "Website Redesign", date: "2024-04-01", due: "2024-04-30", total: "1,47,500", status: "Paid" }, { id: "INV002", client: "Infra Solutions", project: "ERP Integration", date: "2024-05-01", due: "2024-05-15", total: "4,24,800", status: "Overdue" }, { id: "INV003", client: "Bloom Creatives", project: "Mobile App Dev", date: "2024-05-10", due: "2024-06-10", total: "1,18,000", status: "Pending" }];
 
 const NAV = [
-    { key: "dashboard", icon: "ti-layout-dashboard", label: "Dashboard" },
-    {
-      label: "Internal Management",
-      type: "group",
-      items: [
-        { key: "clients", icon: "ti-building", label: "Clients" },
-        { key: "employees", icon: "ti-users", label: "Employees" },
-        { key: "vendors", icon: "ti-truck-delivery", label: "Vendors" },
-      ]
-    },
-    {
-      label: "Projects",
-      type: "group",
-      items: [
-        { key: "projects", icon: "ti-briefcase", label: "Projects" },
-        { key: "tasks", icon: "ti-checkbox", label: "Tasks" },
-        { key: "tracking", icon: "ti-chart-pie", label: "Project Status" },
-        { key: "calendar", icon: "ti-calendar-event", label: "Calendar" },
-      ]
-    },
-    {
-      label: "Finance",
-      type: "group",
-      items: [
-        { key: "quotations", icon: "ti-file-invoice", label: "Quotations" },
-        { key: "proposals", icon: "ti-presentation-analytics", label: "Project Proposals" },
-        { key: "invoices", icon: "ti-receipt", label: "Invoices" },
-        { key: "accounts", icon: "ti-wallet", label: "Accounts" },
-        { key: "payments", icon: "ti-arrows-right-left", label: "Payments" },
-        { key: "expenses", icon: "ti-cash", label: "Expenses" },
-        { key: "templates", icon: "ti-template", label: "Templates" },
-        { key: "letterhead", icon: "ti-letter-a", label: "Letterhead" },
-      ]
-    },
-    {
-      label: "Resources",
-      type: "group",
-      items: [
-        { key: "interviews", icon: "ti-microphone", label: "Interviews" },
-        { key: "reports", icon: "ti-chart-bar", label: "Reports" },
-        { key: "messaging", icon: "ti-messages", label: "Messages" },
-        { key: "settings", icon: "ti-settings", label: "Settings" },
-        { key: "packages", icon: "ti-package", label: "Packages" },
-        { key: "rolePermissions", icon: "ti-shield-lock", label: "Role Permissions" },
-      ]
-    },
-    { key: "mysubscriptions", icon: "ti-rocket", label: "My Subscriptions" }
-  ];
+  { key: "dashboard", icon: "ti-layout-dashboard", label: "Dashboard" },
+  {
+    label: "Internal Management",
+    type: "group",
+    items: [
+      { key: "clients", icon: "ti-building", label: "Clients" },
+      { key: "employees", icon: "ti-users", label: "Employees" },
+      { key: "vendors", icon: "ti-truck-delivery", label: "Vendors" },
+    ]
+  },
+  {
+    label: "Projects",
+    type: "group",
+    items: [
+      { key: "projects", icon: "ti-briefcase", label: "Projects" },
+      { key: "tasks", icon: "ti-checkbox", label: "Tasks" },
+      { key: "tracking", icon: "ti-chart-pie", label: "Project Status" },
+      { key: "calendar", icon: "ti-calendar-event", label: "Calendar" },
+    ]
+  },
+  {
+    label: "Finance",
+    type: "group",
+    items: [
+      { key: "quotations", icon: "ti-file-invoice", label: "Quotations" },
+      { key: "proposals", icon: "ti-presentation-analytics", label: "Project Proposals" },
+      { key: "invoices", icon: "ti-receipt", label: "Invoices" },
+      { key: "accounts", icon: "ti-wallet", label: "Accounts" },
+      { key: "payments", icon: "ti-arrows-right-left", label: "Payments" },
+      { key: "expenses", icon: "ti-cash", label: "Expenses" },
+      { key: "templates", icon: "ti-template", label: "Templates" },
+      { key: "letterhead", icon: "ti-letter-a", label: "Letterhead" },
+    ]
+  },
+  {
+    label: "Resources",
+    type: "group",
+    items: [
+      { key: "interviews", icon: "ti-microphone", label: "Interviews" },
+      { key: "reports", icon: "ti-chart-bar", label: "Reports" },
+      { key: "messaging", icon: "ti-messages", label: "Messages" },
+      { key: "settings", icon: "ti-settings", label: "Settings" },
+      { key: "packages", icon: "ti-package", label: "Packages" },
+      { key: "rolePermissions", icon: "ti-shield-lock", label: "Role Permissions" },
+    ]
+  },
+  { key: "mysubscriptions", icon: "ti-rocket", label: "My Subscriptions" }
+];
 
 function getNavForRole(role) {
   const r = (role || "").toLowerCase().trim();
@@ -262,7 +262,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onCancel} style={{ flex: 1, padding: "10px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, fontSize: 13, fontWeight: 600, color: T.text, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
           <button onClick={onConfirm} style={{ flex: 1, padding: "10px", background: danger ? "linear-gradient(135deg,#EF4444,#dc2626)" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>{confirmLabel}</button>
-          </div>
+        </div>
       </div>
     </div>
   );
@@ -863,23 +863,23 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
         r.data.documents.forEach(d => { dmap[d.documentType] = d; });
         setEmpDocs(dmap);
       }
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
     setEmpDocsLoading(false);
   };
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
   const filtered = employees.filter(e => {
-    const mSearch = (e.name||"").toLowerCase().includes(search.toLowerCase()) || (e.email||"").toLowerCase().includes(search.toLowerCase()) || (e.role||"").toLowerCase().includes(search.toLowerCase());
+    const mSearch = (e.name || "").toLowerCase().includes(search.toLowerCase()) || (e.email || "").toLowerCase().includes(search.toLowerCase()) || (e.role || "").toLowerCase().includes(search.toLowerCase());
     const mDept = deptFilter === "All Departments" || e.department === deptFilter;
     const mStatus = statusFilter === "All Status" || e.status === statusFilter;
     return mSearch && mDept && mStatus;
   });
 
-  const getInitials = (n) => n ? n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2) : "?";
+  const getInitials = (n) => n ? n.split(' ').map(x => x[0]).join('').toUpperCase().slice(0, 2) : "?";
 
   const openEdit = (e) => {
-    setEditForm({ name: e.name||"", email: e.email||"", phone: e.phone||"", role: e.role||"Employee", department: e.department||"", salary: e.salary||"", dateOfBirth: e.dateOfBirth?e.dateOfBirth.substring(0,10):"", joiningDate: e.joiningDate?e.joiningDate.substring(0,10):"", maritalStatus: e.maritalStatus||"Unmarried", status: e.status||"Pending", address: e.address||"", bankName: e.bankName||"", ifscCode: e.ifscCode||"", accountNumber: e.accountNumber||"" });
+    setEditForm({ name: e.name || "", email: e.email || "", phone: e.phone || "", role: e.role || "Employee", department: e.department || "", salary: e.salary || "", dateOfBirth: e.dateOfBirth ? e.dateOfBirth.substring(0, 10) : "", joiningDate: e.joiningDate ? e.joiningDate.substring(0, 10) : "", maritalStatus: e.maritalStatus || "Unmarried", status: e.status || "Pending", address: e.address || "", bankName: e.bankName || "", ifscCode: e.ifscCode || "", accountNumber: e.accountNumber || "" });
     setEditErr({}); setEditEmp(e);
   };
   const saveEdit = async () => {
@@ -890,7 +890,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
     try {
       setSaving(true);
       const res = await axios.put(`${BASE_URL}/api/employees/${editEmp._id}`, editForm);
-      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...(res.data||editForm) } : e));
+      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...(res.data || editForm) } : e));
       setEditEmp(null); showToast("✅ Employee updated successfully!");
     } catch {
       setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...editForm } : e));
@@ -1004,21 +1004,21 @@ ${onboardingLink}`;
             </tr></thead>
             <tbody>
               {filtered.map((e, i) => {
-                const eid = e.employeeId || e._id?.substring(0,6).toUpperCase() || `EMP-${String(i+1).padStart(3,"0")}`;
+                const eid = e.employeeId || e._id?.substring(0, 6).toUpperCase() || `EMP-${String(i + 1).padStart(3, "0")}`;
                 const jDate = e.joiningDate ? new Date(e.joiningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "—";
                 let st = e.status || "Pending";
-                if(st === "Approved") st = "Active";
-                if(st === "Rejected") st = "Inactive";
+                if (st === "Approved") st = "Active";
+                if (st === "Rejected") st = "Inactive";
                 let badgeClass = "badge";
                 let badgeStyle = { display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 11px", borderRadius: 20, fontSize: 11, fontWeight: 800 };
-                if(st === "Active") { badgeStyle.background = "#dcfce7"; badgeStyle.color = "#16a34a"; }
-                else if(st === "On Leave" || st === "Pending") { badgeStyle.background = "#fef3c7"; badgeStyle.color = "#d97706"; }
+                if (st === "Active") { badgeStyle.background = "#dcfce7"; badgeStyle.color = "#16a34a"; }
+                else if (st === "On Leave" || st === "Pending") { badgeStyle.background = "#fef3c7"; badgeStyle.color = "#d97706"; }
                 else { badgeStyle.background = "#fee2e2"; badgeStyle.color = "#dc2626"; }
                 const dotStyle = { width: 5, height: 5, borderRadius: "50%", background: "currentColor" };
-                
+
                 const avColors = ["linear-gradient(135deg,#00BCD4,#0097a7)", "linear-gradient(135deg,#7c3aed,#5b21b6)", "linear-gradient(135deg,#d97706,#b45309)", "linear-gradient(135deg,#16a34a,#15803d)", "linear-gradient(135deg,#dc2626,#991b1b)", "linear-gradient(135deg,#ec4899,#be185d)"];
                 const avBg = avColors[i % avColors.length];
-                
+
                 return (
                   <tr key={e._id || i} style={{ cursor: "pointer", borderBottom: "1px solid var(--border)", transition: "background 0.12s" }} onMouseEnter={ev => ev.currentTarget.style.background = "#f8fbff"} onMouseLeave={ev => ev.currentTarget.style.background = "transparent"} onClick={(ev) => { ev.stopPropagation(); setViewEmp(e); loadEmpDocs(e); }}>
                     <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
@@ -1539,8 +1539,32 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack }) {
+function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack }) {
   const [search, setSearch] = useState("");
+
+  const projectsWithProgress = (projects || []).map(p => {
+    const projId = String(p._id || p.id || "");
+    const projName = String(p.name || p.title || "").toLowerCase();
+    
+    const projTasks = (tasks || []).filter(t => {
+      const tProjId = String(t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id || "");
+      return tProjId === projId || tProjId.toLowerCase() === projName;
+    });
+    
+    let pct = 0;
+    const s = (p.status || "").toLowerCase();
+    if (s === "completed" || s === "done") {
+      pct = 100;
+    } else if (projTasks.length > 0) {
+      const doneTasks = projTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length;
+      pct = Math.round((doneTasks / projTasks.length) * 100);
+    } else {
+      pct = p.progress || 0;
+    }
+    return { ...p, progress: pct };
+  });
+
+  const [viewTasksProj, setViewTasksProj] = useState(null);
   const [viewProj, setViewProj] = useState(null);
   const [editProj, setEditProj] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -1562,7 +1586,7 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
-  const filtered = projects.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()) || (p.client || "").toLowerCase().includes(search.toLowerCase()));
+  const filtered = projectsWithProgress.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase()) || (p.client || "").toLowerCase().includes(search.toLowerCase()));
 
   useEffect(() => { setCurrentPage(1); }, [search, projects.length]);
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -1608,14 +1632,42 @@ function ProjectsPage({ projects, setProjects, clients, employees, jumpProject, 
     } catch (err) { alert(err.response?.data?.msg || "Failed to assign"); }
   };
 
+  if (viewTasksProj) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%" }}>
+        <div>
+          <button
+            onClick={() => setViewTasksProj(null)}
+            style={{ padding: "8px 16px", background: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+          >
+            ← Back to Projects
+          </button>
+        </div>
+        <div style={{ flex: 1 }}>
+          <TaskPage
+            projects={projects}
+            employees={employees}
+            onUpdate={() => fetchTasks && fetchTasks()}
+            config={config}
+            user={user}
+            selectedProjectId={viewTasksProj._id || viewTasksProj.id || null}
+            selectedProjectName={viewTasksProj.name || null}
+            onClearProjectFilter={() => setViewTasksProj(null)}
+            onSelectProject={(p) => setViewTasksProj(p)}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      <ModernProjectsView 
-        projects={projects}
+      <ModernProjectsView
+        projects={projectsWithProgress}
         searchQuery={search}
-        onViewTasks={onViewTasks}
+        onViewTasks={(p) => setViewTasksProj(p)}
         onEdit={openEdit}
         onDelete={setDeleteTarget}
         onAssign={(p) => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }}
@@ -2438,7 +2490,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
           <span className="logo-badge" style={{ position: "absolute", bottom: 2, right: 10, width: 20, height: 20, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }} onClick={onLogoUploadClick}>+</span>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">✕</button>
         </div>
-        
+
         <div className="profile-area">
           <div className="profile-avatar">{initials || "P"}</div>
           <div>
@@ -2457,8 +2509,8 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
                   {n.items.map(sub => {
                     const on = active === sub.key;
                     return (
-                      <div 
-                        key={sub.key} 
+                      <div
+                        key={sub.key}
                         className={`nav-item ${on ? 'active' : ''}`}
                         onClick={() => {
                           if (sub.key === "tasks") setSelectedProjectForTasks(null);
@@ -2475,8 +2527,8 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
             }
             const on = active === n.key;
             return (
-              <div 
-                key={n.key} 
+              <div
+                key={n.key}
                 className={`nav-item ${on ? 'active' : ''}`}
                 onClick={() => {
                   if (n.key === "tasks") setSelectedProjectForTasks(null);
@@ -2489,7 +2541,7 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
             );
           })}
         </nav>
-        
+
         <div className="sidebar-bottom" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '20px' }}>
 
           <button onClick={onLogout} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '14px', fontSize: '14px', fontWeight: '800', color: '#fff', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}>
@@ -2802,6 +2854,7 @@ function VendorsPage({ vendors, setVendors }) {
 export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "M Business";
   const [dashSearch, setDashSearch] = useState("");
+  const [dashTasksProj, setDashTasksProj] = useState(null);
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_subadmin") || "dashboard");
   useEffect(() => { localStorage.setItem("activeTab_subadmin", active); }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
@@ -2886,7 +2939,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
   // Apply theme whenever appTheme or customColor changes
   useEffect(() => {
-    
+
     const t = appTheme === "custom" ? generateThemeFromColor(customColor) : (THEMES[appTheme] || THEMES.purple);
     if (!t) return;
     document.documentElement.style.setProperty("--app-sidebar", t.sidebar);
@@ -2896,7 +2949,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     document.documentElement.style.setProperty("--app-bg", t.bg);
     document.documentElement.style.setProperty("--app-muted", t.muted);
     document.documentElement.style.setProperty("--app-border", t.border);
-    
+
     // Override template hardcoded colors to match theme
     document.documentElement.style.setProperty("--teal", t.accent);
     document.documentElement.style.setProperty("--teal2", t.dot);
@@ -2909,7 +2962,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       if (f.contentWindow) {
         try {
           f.contentWindow.postMessage({ type: 'SET_THEME', color: t.accent }, '*');
-        } catch(e) {}
+        } catch (e) { }
       }
     });
 
@@ -3078,9 +3131,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       if (e.data && e.data.type === "SEND_DOCUMENT") {
         const payload = e.data.payload;
         if (!payload) return;
-        
+
         const companyId = resolveSubadminId();
-        
+
         try {
           await axios.post(`${BASE_URL}/api/documents`, {
             docType: payload.docType || "lh",
@@ -3100,7 +3153,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       if (e.data && e.data.type === "SAVE_QUOTATION") {
         const { qt, items } = e.data.payload;
         if (!qt || !qt.quoteNo) return;
-        
+
         // 1. Save to backend API
         try {
           await axios.post(`${BASE_URL}/api/quotations`, { qt, items, status: "draft" });
@@ -3117,10 +3170,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
           const total = subtotal * (1 + (qt.gstRate || 0) / 100);
           const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "—", total, savedAt: Date.now(), qt, items, status: "draft" };
-          
-          if (idx >= 0) all[idx] = entry; 
+
+          if (idx >= 0) all[idx] = entry;
           else all.unshift(entry);
-          
+
           localStorage.setItem(LOCAL_KEY, JSON.stringify(all.slice(0, 30)));
           toast.success("Quotation saved successfully!");
           fetchQuotations(); // Refresh list to update the Template Designer dropdown
@@ -3387,23 +3440,23 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }
   };
 
-  const fetchQuotations = async () => { 
-    try { 
-      const res = await axios.get(BASE_URL + "/api/quotations"); 
+  const fetchQuotations = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/api/quotations");
       let apiDocs = res.data?.quotations || res.data || [];
       if (!Array.isArray(apiDocs)) apiDocs = [];
       let localDocs = [];
-      try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) {}
+      try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) { }
       // Combine avoiding duplicates by quoteNo
       const combined = [...apiDocs];
       localDocs.forEach(ld => {
         if (!combined.some(c => (c.quoteNo || c.qt?.quoteNo) === (ld.quoteNo || ld.qt?.quoteNo))) combined.push(ld);
       });
-      setQuotations(combined); 
-    } catch (e) { 
-      console.log(e); 
-      try { const d = localStorage.getItem("quotation_drafts"); setQuotations(d ? JSON.parse(d) : []); } catch (e) {}
-    } 
+      setQuotations(combined);
+    } catch (e) {
+      console.log(e);
+      try { const d = localStorage.getItem("quotation_drafts"); setQuotations(d ? JSON.parse(d) : []); } catch (e) { }
+    }
   };
   const fetchVendors = async () => {
     try {
@@ -3840,7 +3893,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const roleDisplay = user?.role || "Admin";
 
   return (
-<div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "linear-gradient(135deg,var(--app-bg) 0%,var(--app-bg) 50%,var(--app-border) 100%)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box}
@@ -3928,7 +3981,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
             <div className="topbar-right">
               <div className="topbar-icon"><i className="ti ti-bell"></i><span className="notif-dot"></span></div>
               <div className="topbar-icon" onClick={() => setActive("settings")}><i className="ti ti-settings"></i></div>
-              
+
               {/* Dynamic Action Buttons based on validActive */}
               {validActive === "clients" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -4000,7 +4053,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         return;
                       }
                       setNmError({}); setShowMgrPass(false); setModal("manager");
-                    }} 
+                    }}
                     style={{ opacity: isUsageAtLimit("manager", managers.length) ? 0.5 : 1 }}
                   >
                     <i className="ti ti-plus"></i> Add Manager
@@ -4027,680 +4080,671 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           <div className="content">
             <EmployeeSubscriptionWarning user={user} onRenew={() => setActive("mysubscriptions")} />
 
-          {/* ── Dashboard ── */}
-          {validActive === "dashboard" && (
-            <>
-              {/* Theme Picker - Dashboard Page */}
-              <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 5000 }}>
-                {showThemePicker && (
-                  <div style={{
-                    position: "absolute", bottom: 56, right: 0,
-                    background: "#fff", borderRadius: 18, padding: 20,
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
-                    width: 300, maxHeight: "70vh", overflowY: "auto"
-                  }}>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
-                      🎨 Choose Theme
-                    </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
-                      {Object.entries(THEMES).map(([key, t]) => (
-                        <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
-                          style={{
-                            border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
-                            borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
-                            cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-                            fontFamily: "inherit", transition: "all 0.15s"
-                          }}>
-                          <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
-                          <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748b" }}>
-                            {t.label}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Custom Color Picker Section */}
-                    <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                        🎯 Custom Color
+            {/* ── Dashboard ── */}
+            {validActive === "dashboard" && (
+              <>
+                {/* Theme Picker - Dashboard Page */}
+                <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 5000 }}>
+                  {showThemePicker && (
+                    <div style={{
+                      position: "absolute", bottom: 56, right: 0,
+                      background: "#fff", borderRadius: 18, padding: 20,
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.18)", border: "1.5px solid var(--app-border)",
+                      width: 300, maxHeight: "70vh", overflowY: "auto"
+                    }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
+                        🎨 Choose Theme
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ position: "relative", flexShrink: 0 }}>
-                          <div style={{
-                            width: 42, height: 42, borderRadius: 12,
-                            background: customColor,
-                            border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
-                            boxShadow: `0 4px 12px ${customColor}40`,
-                            cursor: "pointer", transition: "all 0.2s",
-                            display: "flex", alignItems: "center", justifyContent: "center"
-                          }}
-                            onClick={() => document.getElementById("customColorInput")?.click()}
-                          >
-                            <span style={{ fontSize: 16 }}>🎨</span>
-                          </div>
-                          <input
-                            id="customColorInput"
-                            type="color"
-                            value={customColor}
-                            onChange={(e) => {
-                              setCustomColor(e.target.value);
-                              setAppTheme("custom");
-                            }}
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+                        {Object.entries(THEMES).map(([key, t]) => (
+                          <button key={key} onClick={() => { setAppTheme(key); setShowThemePicker(false); }}
                             style={{
-                              position: "absolute", top: 0, left: 0, width: 42, height: 42,
-                              opacity: 0, cursor: "pointer", border: "none"
-                            }}
-                          />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
-                            {appTheme === "custom" ? "Custom Active" : "Pick any color"}
-                          </div>
-                          <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
-                            {customColor.toUpperCase()}
-                          </div>
-                        </div>
-                        {appTheme === "custom" && (
-                          <div style={{
-                            width: 8, height: 8, borderRadius: "50%",
-                            background: "#22c55e", boxShadow: "0 0 6px #22c55e80"
-                          }} />
-                        )}
-                      </div>
-
-                      {/* Quick custom color presets */}
-                      <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-                        {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
-                          <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
-                            style={{
-                              width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
-                              border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
-                              boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
-                              transition: "all 0.15s"
-                            }}
-                          />
+                              border: appTheme === key ? `2.5px solid ${t.dot}` : "2px solid var(--app-border)",
+                              borderRadius: 12, padding: "10px 6px", background: appTheme === key ? `${t.dot}15` : "#fafafa",
+                              cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                              fontFamily: "inherit", transition: "all 0.15s"
+                            }}>
+                            <div style={{ width: 28, height: 28, borderRadius: "50%", background: t.dot, boxShadow: `0 3px 8px ${t.dot}50` }} />
+                            <span style={{ fontSize: 10, fontWeight: 700, color: appTheme === key ? t.dot : "#64748b" }}>
+                              {t.label}
+                            </span>
+                          </button>
                         ))}
                       </div>
+
+                      {/* Custom Color Picker Section */}
+                      <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                          🎯 Custom Color
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div style={{ position: "relative", flexShrink: 0 }}>
+                            <div style={{
+                              width: 42, height: 42, borderRadius: 12,
+                              background: customColor,
+                              border: appTheme === "custom" ? `2.5px solid ${customColor}` : "2px solid var(--app-border)",
+                              boxShadow: `0 4px 12px ${customColor}40`,
+                              cursor: "pointer", transition: "all 0.2s",
+                              display: "flex", alignItems: "center", justifyContent: "center"
+                            }}
+                              onClick={() => document.getElementById("customColorInput")?.click()}
+                            >
+                              <span style={{ fontSize: 16 }}>🎨</span>
+                            </div>
+                            <input
+                              id="customColorInput"
+                              type="color"
+                              value={customColor}
+                              onChange={(e) => {
+                                setCustomColor(e.target.value);
+                                setAppTheme("custom");
+                              }}
+                              style={{
+                                position: "absolute", top: 0, left: 0, width: 42, height: 42,
+                                opacity: 0, cursor: "pointer", border: "none"
+                              }}
+                            />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: appTheme === "custom" ? customColor : "#64748b" }}>
+                              {appTheme === "custom" ? "Custom Active" : "Pick any color"}
+                            </div>
+                            <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                              {customColor.toUpperCase()}
+                            </div>
+                          </div>
+                          {appTheme === "custom" && (
+                            <div style={{
+                              width: 8, height: 8, borderRadius: "50%",
+                              background: "#22c55e", boxShadow: "0 0 6px #22c55e80"
+                            }} />
+                          )}
+                        </div>
+
+                        {/* Quick custom color presets */}
+                        <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+                          {["#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c2d12", "#4f46e5", "#0f766e", "#b91c1c"].map(c => (
+                            <div key={c} onClick={() => { setCustomColor(c); setAppTheme("custom"); setShowThemePicker(false); }}
+                              style={{
+                                width: 22, height: 22, borderRadius: 6, background: c, cursor: "pointer",
+                                border: customColor === c && appTheme === "custom" ? "2px solid #fff" : "2px solid transparent",
+                                boxShadow: customColor === c && appTheme === "custom" ? `0 0 0 2px ${c}, 0 2px 8px ${c}50` : `0 1px 4px ${c}30`,
+                                transition: "all 0.15s"
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <button onClick={() => setShowThemePicker(v => !v)}
+                    style={{
+                      width: 48, height: 48, borderRadius: "50%",
+                      background: appTheme === "custom"
+                        ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
+                        : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
+                      border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
+                      boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      transition: "all 0.2s"
+                    }}>
+                    🎨
+                  </button>
+                </div>
+                {/* Subscription Status Alert (Blocking) */}
+                {subStatus.blocked && (
+                  <div style={{
+                    background: "linear-gradient(135deg,#fee2e2,#fecaca)",
+                    border: "2px solid #ef4444",
+                    borderRadius: 16,
+                    padding: "24px",
+                    marginBottom: 24,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    gap: 16,
+                    boxShadow: "0 10px 30px rgba(239,68,68,0.15)"
+                  }}>
+                    <div style={{ fontSize: 48 }}>🚫</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 20, fontWeight: 800, color: "#991b1b", marginBottom: 8 }}>
+                        Subscription Expired
+                      </div>
+                      <div style={{ fontSize: 14, color: "#7f1d1d", maxWidth: 500, margin: "0 auto", lineHeight: 1.6 }}>
+                        Your access to premium features has been restricted because your subscription is no longer active.
+                        Please renew your plan to unlock all management tools and continue your business operations.
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: 12 }}>
+                      <button
+                        onClick={() => setActive("mysubscriptions")}
+                        style={{
+                          background: "linear-gradient(135deg,#ef4444,#dc2626)",
+                          border: "none",
+                          borderRadius: 10,
+                          padding: "12px 24px",
+                          fontSize: 14,
+                          fontWeight: 700,
+                          color: "#fff",
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          boxShadow: "0 4px 12px rgba(239,68,68,0.3)"
+                        }}
+                      >
+                        🚀 Renew Subscription
+                      </button>
+                      <button
+                        onClick={() => window.open(`mailto:${user?.email || "support@workspace.com"}`)}
+                        style={{
+                          background: "#fff",
+                          border: "1.5px solid #ef4444",
+                          borderRadius: 10,
+                          padding: "12px 24px",
+                          fontSize: 14,
+                          fontWeight: 700,
+                          color: "#ef4444",
+                          cursor: "pointer",
+                          fontFamily: "inherit"
+                        }}
+                      >
+                        📞 Contact Support
+                      </button>
                     </div>
                   </div>
                 )}
-                <button onClick={() => setShowThemePicker(v => !v)}
-                  style={{
-                    width: 48, height: 48, borderRadius: "50%",
-                    background: appTheme === "custom"
-                      ? `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
-                      : `linear-gradient(135deg, ${THEMES[appTheme]?.accent}, ${THEMES[appTheme]?.dot})`,
-                    border: "none", color: "#fff", fontSize: 20, cursor: "pointer",
-                    boxShadow: `0 6px 20px ${appTheme === "custom" ? customColor : (THEMES[appTheme]?.dot || "var(--app-accent)")}60`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    transition: "all 0.2s"
+
+                {/* Subscription Status Alert (Warning only) */}
+                {subStatus.alert && !subStatus.blocked && (
+                  <div style={{
+                    background: "linear-gradient(135deg,#fef3c7,#fde68a)",
+                    border: "2px solid #f59e0b",
+                    borderRadius: 12,
+                    padding: "16px 20px",
+                    marginBottom: 18,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12
                   }}>
-                  🎨
-                </button>
-              </div>
-              {/* Subscription Status Alert (Blocking) */}
-              {subStatus.blocked && (
-                <div style={{
-                  background: "linear-gradient(135deg,#fee2e2,#fecaca)",
-                  border: "2px solid #ef4444",
-                  borderRadius: 16,
-                  padding: "24px",
-                  marginBottom: 24,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
-                  gap: 16,
-                  boxShadow: "0 10px 30px rgba(239,68,68,0.15)"
-                }}>
-                  <div style={{ fontSize: 48 }}>🚫</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 20, fontWeight: 800, color: "#991b1b", marginBottom: 8 }}>
-                      Subscription Expired
+                    <div style={{ fontSize: 24 }}>⚠️</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#92400e", marginBottom: 4 }}>
+                        Subscription Renewal Required
+                      </div>
+                      <div style={{ fontSize: 13, color: "#78350f" }}>
+                        Your {subscription?.planName} subscription expires in {subStatus.days} days. Please renew soon.
+                      </div>
                     </div>
-                    <div style={{ fontSize: 14, color: "#7f1d1d", maxWidth: 500, margin: "0 auto", lineHeight: 1.6 }}>
-                      Your access to premium features has been restricted because your subscription is no longer active.
-                      Please renew your plan to unlock all management tools and continue your business operations.
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", gap: 12 }}>
                     <button
                       onClick={() => setActive("mysubscriptions")}
                       style={{
-                        background: "linear-gradient(135deg,#ef4444,#dc2626)",
+                        background: "linear-gradient(135deg,#f59e0b,#d97706)",
                         border: "none",
-                        borderRadius: 10,
-                        padding: "12px 24px",
-                        fontSize: 14,
+                        borderRadius: 8,
+                        padding: "8px 16px",
+                        fontSize: 12,
                         fontWeight: 700,
                         color: "#fff",
-                        cursor: "pointer",
-                        fontFamily: "inherit",
-                        boxShadow: "0 4px 12px rgba(239,68,68,0.3)"
-                      }}
-                    >
-                      🚀 Renew Subscription
-                    </button>
-                    <button
-                      onClick={() => window.open(`mailto:${user?.email || "support@workspace.com"}`)}
-                      style={{
-                        background: "#fff",
-                        border: "1.5px solid #ef4444",
-                        borderRadius: 10,
-                        padding: "12px 24px",
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: "#ef4444",
                         cursor: "pointer",
                         fontFamily: "inherit"
                       }}
                     >
-                      📞 Contact Support
+                      Renew Now
                     </button>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Subscription Status Alert (Warning only) */}
-              {subStatus.alert && !subStatus.blocked && (
-                <div style={{
-                  background: "linear-gradient(135deg,#fef3c7,#fde68a)",
-                  border: "2px solid #f59e0b",
-                  borderRadius: 12,
-                  padding: "16px 20px",
-                  marginBottom: 18,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12
-                }}>
-                  <div style={{ fontSize: 24 }}>⚠️</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#92400e", marginBottom: 4 }}>
-                      Subscription Renewal Required
+
+                {dashTasksProj ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%", marginTop: "10px" }}>
+                    <div>
+                      <button
+                        onClick={() => setDashTasksProj(null)}
+                        style={{ padding: "8px 16px", background: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", color: "#374151" }}
+                      >
+                        ← Back to Dashboard
+                      </button>
                     </div>
-                    <div style={{ fontSize: 13, color: "#78350f" }}>
-                      Your {subscription?.planName} subscription expires in {subStatus.days} days. Please renew soon.
+                    <div style={{ flex: 1 }}>
+                      <TaskPage
+                        projects={projects}
+                        employees={employees}
+                        onUpdate={() => fetchTasks && fetchTasks()}
+                        config={config}
+                        user={user}
+                        selectedProjectId={dashTasksProj._id || dashTasksProj.id || null}
+                        selectedProjectName={dashTasksProj.title || dashTasksProj.name || null}
+                        onClearProjectFilter={() => setDashTasksProj(null)}
+                        onSelectProject={(p) => setDashTasksProj(p)}
+                      />
                     </div>
                   </div>
-                  <button
-                    onClick={() => setActive("mysubscriptions")}
-                    style={{
-                      background: "linear-gradient(135deg,#f59e0b,#d97706)",
-                      border: "none",
-                      borderRadius: 8,
-                      padding: "8px 16px",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: "#fff",
-                      cursor: "pointer",
-                      fontFamily: "inherit"
-                    }}
-                  >
-                    Renew Now
-                  </button>
-                </div>
-              )}
-
-              
-              {/* MODERN DASHBOARD CONTENT */}
-              <div className="modern-dash-topbar">
-                <div className="search-wrap">
-                  <i className="ti ti-search"></i>
-                  <input type="text" placeholder="Search projects, invoices, clients..." value={dashSearch} onChange={(e) => setDashSearch(e.target.value)} />
-                </div>
-                <div className="section-head">
-                  <div className="section-title">Overview</div>
-                  <button className="create-btn" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }}><i className="ti ti-plus" style={{fontSize:15}}></i> Create New</button>
-                </div>
-              </div>
-
-              <div className="modern-dash-content">
-                {/* LEFT COL */}
-                <div className="col-left">
-                  {/* STORAGE / PLATFORM CARDS */}
-                  <div className="storage-row">
-                    <div className="storage-card active-card" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{cursor:"pointer"}}>
-                      <div className="storage-card-top">
-                        <div className="storage-icon teal"><i className="ti ti-briefcase"></i></div>
-                        <div className="section-more" onClick={(e) => { e.stopPropagation(); setSidebarOverride("dashboard"); setActive("projects"); }}><i className="ti ti-dots"></i></div>
+                ) : (
+                  <>
+                    {/* MODERN DASHBOARD CONTENT */}
+                    <div className="modern-dash-topbar">
+                      <div className="search-wrap">
+                        <i className="ti ti-search"></i>
+                        <input type="text" placeholder="Search projects, invoices, clients..." value={dashSearch} onChange={(e) => setDashSearch(e.target.value)} />
                       </div>
-                      <div className="storage-sizes white"><span>{projects.length} Projects</span><span>{projects.length} Total</span></div>
-                      <div className="storage-bar white-bg"><div className="storage-fill white" style={{width: "67%"}}></div></div>
-                      <div className="storage-date white"><i className="ti ti-clock" style={{fontSize: 11}}></i> Last update</div>
-                    </div>
-                    <div className="storage-card" onClick={() => { setSidebarOverride("dashboard"); setActive("invoices"); }}>
-                      <div className="storage-card-top">
-                        <div className="storage-icon dropbox"><i className="ti ti-receipt-2"></i></div>
-                        <div className="section-more" onClick={(e) => { e.stopPropagation(); setSidebarOverride("dashboard"); setActive("invoices"); }}><i className="ti ti-dots"></i></div>
+                      <div className="section-head">
+                        <div className="section-title">Overview</div>
+                        <button className="create-btn" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }}><i className="ti ti-plus" style={{ fontSize: 15 }}></i> Create New</button>
                       </div>
-                      <div className="storage-sizes dark"><span>{invoices.length} Pending</span><span>{invoices.length} Total</span></div>
-                      <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{width: "40%"}}></div></div>
-                      <div className="storage-date muted"><i className="ti ti-clock" style={{fontSize: 11}}></i> Last update</div>
                     </div>
-                    <div className="storage-card" onClick={() => setActive("accounts")}>
-                      <div className="storage-card-top">
-                        <div className="storage-icon revenue"><i className="ti ti-cash"></i></div>
-                        <div>
-                          <div className="storage-name dark">Revenue</div>
-                          <div className="storage-sub muted">Open folder</div>
-                        </div>
-                      </div>
-                      <div className="storage-sizes dark"><span>₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</span><span>₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</span></div>
-                      <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{width: "42%"}}></div></div>
-                      <div className="storage-date muted"><i className="ti ti-clock" style={{fontSize: 11}}></i> Last update</div>
-                    </div>
-                  </div>
 
-                  {/* TEAM / CO-OWNERS */}
-                
-
-                  {/* FOLDERS */}
-                  <div>
-                    <div className="section-header">
-                      <span className="section-title">Projects</span>
-                      <div className="section-more" onClick={() => setActive("projects")}><i className="ti ti-dots"></i></div>
-                    </div>
-                    <div className="folders-grid">
-                      {projects.filter(p => (p.title||p.name||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,3).map(p => (
-                        <div key={p.id || p._id} className="folder-card" onClick={() => { setSelectedProjectForTasks(p); setActive("tasks"); }}>
-                          <div className="folder-top">
-                            <div className="folder-avatars">
-                               <div className="fa">{p.title?.[0]?.toUpperCase() || "P"}</div>
+                    <div className="modern-dash-content">
+                      {/* LEFT COL */}
+                      <div className="col-left">
+                        {/* STORAGE / PLATFORM CARDS */}
+                        <div className="storage-row">
+                          <div className="storage-card active-card" onClick={() => { setSidebarOverride("dashboard"); setActive("projects"); }} style={{ cursor: "pointer" }}>
+                            <div className="storage-card-top">
+                              <div className="storage-icon teal"><i className="ti ti-briefcase"></i></div>
+                              <div className="section-more" onClick={(e) => { e.stopPropagation(); setSidebarOverride("dashboard"); setActive("projects"); }}><i className="ti ti-dots"></i></div>
                             </div>
-                            <i className="ti ti-dots folder-more"></i>
+                            <div className="storage-sizes white"><span>{projects.length} Projects</span><span>{projects.length} Total</span></div>
+                            <div className="storage-bar white-bg"><div className="storage-fill white" style={{ width: "67%" }}></div></div>
+                            <div className="storage-date white"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update</div>
                           </div>
-                          <div className="folder-icon"><i className="ti ti-folder-filled"></i></div>
-                          <div className="folder-name">{p.title}</div>
-                          <div className="folder-date"><i className="ti ti-clock" style={{fontSize: 11}}></i> {p.status || "Active"}</div>
-                        </div>
-                      ))}
-                      {projects.length === 0 && <div style={{color:"var(--app-muted)", fontSize: 13}}>No projects added yet.</div>}
-                    </div>
-                  </div>
-                    {/* TEAM / CO-OWNERS */}
-  <div>
-
-                    <div className="section-header">
-                      <span className="section-title">Team Members</span>
-                      <div className="section-more" onClick={() => setActive("employees")}><i className="ti ti-dots"></i></div>
-                    </div>
-                    <div className="coowners-row">
-                      {employees.filter(e => (e.name||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,4).map(e => (
-                        <div key={e.id || e._id} className="coowner">
-                          <div className="coowner-avatar">{e.name?.[0]?.toUpperCase() || "E"}</div>
-                          <div>
-                            <div className="coowner-name">{e.name}</div>
-                            <div className="coowner-role">{e.role}</div>
+                          <div className="storage-card" onClick={() => { setSidebarOverride("dashboard"); setActive("invoices"); }}>
+                            <div className="storage-card-top">
+                              <div className="storage-icon dropbox"><i className="ti ti-receipt-2"></i></div>
+                              <div className="section-more" onClick={(e) => { e.stopPropagation(); setSidebarOverride("dashboard"); setActive("invoices"); }}><i className="ti ti-dots"></i></div>
+                            </div>
+                            <div className="storage-sizes dark"><span>{invoices.length} Pending</span><span>{invoices.length} Total</span></div>
+                            <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{ width: "40%" }}></div></div>
+                            <div className="storage-date muted"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update</div>
+                          </div>
+                          <div className="storage-card" onClick={() => setActive("accounts")}>
+                            <div className="storage-card-top">
+                              <div className="storage-icon revenue"><i className="ti ti-cash"></i></div>
+                              <div>
+                                <div className="storage-name dark">Revenue</div>
+                                <div className="storage-sub muted">Open folder</div>
+                              </div>
+                            </div>
+                            <div className="storage-sizes dark"><span>₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</span><span>₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</span></div>
+                            <div className="storage-bar gray-bg"><div className="storage-fill teal" style={{ width: "42%" }}></div></div>
+                            <div className="storage-date muted"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> Last update</div>
                           </div>
                         </div>
-                      ))}
-                      {employees.length === 0 && <div style={{color:"var(--app-muted)", fontSize: 13}}>No employees added yet.</div>}
-                    </div>
-                  </div>
 
-                  {/* FILE TABLE */}
-                  <div>
-                    <div className="section-header">
-                      <span className="section-title">Recent Files</span>
-                      <div className="section-more" onClick={() => setActive("invoices")}><i className="ti ti-dots"></i></div>
-                    </div>
-                    <div className="table-panel">
-                      <table className="dash-table">
-                        <thead>
-                          <tr>
-                            <th></th>
-                            <th>Type</th>
-                            <th>Document Name</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {invoices.filter(i => (i.invoiceNo||"").toLowerCase().includes(dashSearch.toLowerCase()) || (i.clientName||"").toLowerCase().includes(dashSearch.toLowerCase())).slice(0,4).map(inv => (
-                            <tr key={inv.id || inv._id} onClick={() => { setJumpInvoice(inv); setSidebarOverride("dashboard"); setActive("invoices"); }} style={{ cursor: "pointer" }}>
-                              <td><input type="checkbox" className="cb" /></td>
-                              <td><div className="file-type-icon doc"><i className="ti ti-file-text"></i></div></td>
-                              <td className="fname">{inv.invoiceNo || "Invoice"} — {inv.clientName}</td>
-                              <td>₹{inv.grandTotal || 0}</td>
-                              <td>{inv.date}</td>
-                              <td><Badge label={inv.status || "Pending"} /></td>
-                              <td><i className="ti ti-dots-vertical row-actions"></i></td>
-                            </tr>
-                          ))}
-                          {invoices.length === 0 && <tr><td colSpan="7" style={{textAlign:"center", padding:20}}>No recent invoices.</td></tr>}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
+                        {/* TEAM / CO-OWNERS */}
 
-                {/* RIGHT COL */}
-                <div className="col-right">
-                  {/* DRIVE STORAGE PANEL */}
-                  <div className="drive-panel">
-                    <div className="drive-header">
-                      <div className="drive-icon"><i className="ti ti-briefcase" style={{color: "var(--app-accent)", fontSize: 15}}></i></div>
-                      <span className="drive-title">Overview</span>
-                    </div>
-                    <div className="drive-total"><span>{projects.length} Active</span><span>{projects.length} Total</span></div>
-                    <div className="drive-main-bar"><div className="drive-main-fill" style={{width: "67%"}}></div></div>
 
-                    <div className="file-type-row">
-                      <div className="ft-item" onClick={() => setActive("projects")} style={{cursor:"pointer"}}>
-                        <div className="ft-icon" style={{background: "#E8F3FF", color: "#0061FF"}}><i className="ti ti-world"></i></div>
-                        <div style={{flex: 1}}>
-                          <div style={{display: "flex", justifyContent: "space-between"}}><span className="ft-name">Projects</span><span className="ft-size">{projects.length}</span></div>
-                          <div className="ft-bar" style={{background: "#0061FF", width: "70%"}}></div>
+                        {/* FOLDERS */}
+                        <div>
+                          <div className="section-header">
+                            <span className="section-title">Projects</span>
+                            <div className="section-more" onClick={() => setActive("projects")}><i className="ti ti-dots"></i></div>
+                          </div>
+                          <div className="folders-grid">
+                            {projects.filter(p => (p.title || p.name || "").toLowerCase().includes(dashSearch.toLowerCase())).slice(0, 3).map(p => (
+                              <div key={p.id || p._id} className="folder-card" onClick={() => setDashTasksProj(p)}>
+                                <div className="folder-top">
+                                  <div className="folder-avatars">
+                                    <div className="fa">{p.title?.[0]?.toUpperCase() || "P"}</div>
+                                  </div>
+                                  <i className="ti ti-dots folder-more"></i>
+                                </div>
+                                <div className="folder-icon"><i className="ti ti-folder-filled"></i></div>
+                                <div className="folder-name">{p.title}</div>
+                                <div className="folder-date"><i className="ti ti-clock" style={{ fontSize: 11 }}></i> {p.status || "Active"}</div>
+                              </div>
+                            ))}
+                            {projects.length === 0 && <div style={{ color: "var(--app-muted)", fontSize: 13 }}>No projects added yet.</div>}
+                          </div>
+                        </div>
+                        {/* TEAM / CO-OWNERS */}
+                        <div>
+
+                          <div className="section-header">
+                            <span className="section-title">Team Members</span>
+                            <div className="section-more" onClick={() => setActive("employees")}><i className="ti ti-dots"></i></div>
+                          </div>
+                          <div className="coowners-row">
+                            {employees.filter(e => (e.name || "").toLowerCase().includes(dashSearch.toLowerCase())).slice(0, 4).map(e => (
+                              <div key={e.id || e._id} className="coowner">
+                                <div className="coowner-avatar">{e.name?.[0]?.toUpperCase() || "E"}</div>
+                                <div>
+                                  <div className="coowner-name">{e.name}</div>
+                                  <div className="coowner-role">{e.role}</div>
+                                </div>
+                              </div>
+                            ))}
+                            {employees.length === 0 && <div style={{ color: "var(--app-muted)", fontSize: 13 }}>No employees added yet.</div>}
+                          </div>
+                        </div>
+
+                        {/* FILE TABLE */}
+                        <div>
+                          <div className="section-header">
+                            <span className="section-title">Recent Files</span>
+                            <div className="section-more" onClick={() => setActive("invoices")}><i className="ti ti-dots"></i></div>
+                          </div>
+                          <div className="table-panel">
+                            <table className="dash-table">
+                              <thead>
+                                <tr>
+                                  <th></th>
+                                  <th>Type</th>
+                                  <th>Document Name</th>
+                                  <th>Amount</th>
+                                  <th>Date</th>
+                                  <th>Status</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {invoices.filter(i => (i.invoiceNo || "").toLowerCase().includes(dashSearch.toLowerCase()) || (i.clientName || "").toLowerCase().includes(dashSearch.toLowerCase())).slice(0, 4).map(inv => (
+                                  <tr key={inv.id || inv._id} onClick={() => { setJumpInvoice(inv); setSidebarOverride("dashboard"); setActive("invoices"); }} style={{ cursor: "pointer" }}>
+                                    <td><input type="checkbox" className="cb" /></td>
+                                    <td><div className="file-type-icon doc"><i className="ti ti-file-text"></i></div></td>
+                                    <td className="fname">{inv.invoiceNo || "Invoice"} — {inv.clientName}</td>
+                                    <td>₹{inv.grandTotal || 0}</td>
+                                    <td>{inv.date}</td>
+                                    <td><Badge label={inv.status || "Pending"} /></td>
+                                    <td><i className="ti ti-dots-vertical row-actions"></i></td>
+                                  </tr>
+                                ))}
+                                {invoices.length === 0 && <tr><td colSpan="7" style={{ textAlign: "center", padding: 20 }}>No recent invoices.</td></tr>}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </div>
-                      <div className="ft-item" onClick={() => setActive("employees")} style={{cursor:"pointer"}}>
-                        <div className="ft-icon" style={{background: "#E8FAF3", color: "#26C281"}}><i className="ti ti-users"></i></div>
-                        <div style={{flex: 1}}>
-                          <div style={{display: "flex", justifyContent: "space-between"}}><span className="ft-name">Employees</span><span className="ft-size">{employees.length}</span></div>
-                          <div className="ft-bar" style={{background: "#26C281", width: "35%"}}></div>
+
+                      {/* RIGHT COL */}
+                      <div className="col-right">
+                        {/* DRIVE STORAGE PANEL */}
+                        <div className="drive-panel">
+                          <div className="drive-header">
+                            <div className="drive-icon"><i className="ti ti-briefcase" style={{ color: "var(--app-accent)", fontSize: 15 }}></i></div>
+                            <span className="drive-title">Overview</span>
+                          </div>
+                          <div className="drive-total"><span>{projects.length} Active</span><span>{projects.length} Total</span></div>
+                          <div className="drive-main-bar"><div className="drive-main-fill" style={{ width: "67%" }}></div></div>
+
+                          <div className="file-type-row">
+                            <div className="ft-item" onClick={() => setActive("projects")} style={{ cursor: "pointer" }}>
+                              <div className="ft-icon" style={{ background: "#E8F3FF", color: "#0061FF" }}><i className="ti ti-world"></i></div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Projects</span><span className="ft-size">{projects.length}</span></div>
+                                <div className="ft-bar" style={{ background: "#0061FF", width: "70%" }}></div>
+                              </div>
+                            </div>
+                            <div className="ft-item" onClick={() => setActive("employees")} style={{ cursor: "pointer" }}>
+                              <div className="ft-icon" style={{ background: "#E8FAF3", color: "#26C281" }}><i className="ti ti-users"></i></div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Employees</span><span className="ft-size">{employees.length}</span></div>
+                                <div className="ft-bar" style={{ background: "#26C281", width: "35%" }}></div>
+                              </div>
+                            </div>
+                            <div className="ft-item" onClick={() => setActive("clients")} style={{ cursor: "pointer" }}>
+                              <div className="ft-icon" style={{ background: "#FEF5E6", color: "#F5A623" }}><i className="ti ti-building"></i></div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Clients</span><span className="ft-size">{clients.length}</span></div>
+                                <div className="ft-bar" style={{ background: "#F5A623", width: "50%" }}></div>
+                              </div>
+                            </div>
+                            <div className="ft-item" onClick={() => setActive("invoices")} style={{ cursor: "pointer" }}>
+                              <div className="ft-icon" style={{ background: "#EEE9FF", color: "#7C5CFC" }}><i className="ti ti-receipt-2"></i></div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between" }}><span className="ft-name">Invoices</span><span className="ft-size">{invoices.length}</span></div>
+                                <div className="ft-bar" style={{ background: "#7C5CFC", width: "20%" }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* QUICK STATS */}
+                        <div className="stats-grid">
+                          <div className="mini-stat" onClick={() => setActive("accounts")}>
+                            <div className="mini-stat-icon" style={{ background: "rgba(var(--app-accent-rgb,0,188,212),0.1)", color: "var(--app-accent)" }}><i className="ti ti-cash"></i></div>
+                            <div className="mini-stat-val">₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
+                            <div className="mini-stat-label">Income</div>
+                          </div>
+                          <div className="mini-stat" onClick={() => setActive("expenses")}>
+                            <div className="mini-stat-icon" style={{ background: "#FEF2F2", color: "#F05C5C" }}><i className="ti ti-chart-pie"></i></div>
+                            <div className="mini-stat-val">₹{expenses.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
+                            <div className="mini-stat-label">Expenses</div>
+                          </div>
+                          <div className="mini-stat" onClick={() => setActive("employees")}>
+                            <div className="mini-stat-icon" style={{ background: "#E8FAF3", color: "#26C281" }}><i className="ti ti-users"></i></div>
+                            <div className="mini-stat-val">{employees.length}</div>
+                            <div className="mini-stat-label">Employees</div>
+                          </div>
+                          <div className="mini-stat">
+                            <div className="mini-stat-icon" style={{ background: "#FEF5E6", color: "#F5A623" }}><i className="ti ti-building"></i></div>
+                            <div className="mini-stat-val">{clients.length}</div>
+                            <div className="mini-stat-label">Clients</div>
+                          </div>
+                        </div>
+
+                        {/* CLEAR MEMORY */}
+                        <div className="clear-panel">
+                          <div className="clear-icon"><i className="ti ti-refresh"></i></div>
+                          <div className="clear-text">Clear <strong>₹0.00</strong> in pending expense entries from temporary records</div>
+                          <button className="clear-btn"><i className="ti ti-trash" style={{ fontSize: 13 }}></i> CLEAR RECORDS</button>
                         </div>
                       </div>
-                      <div className="ft-item" onClick={() => setActive("clients")} style={{cursor:"pointer"}}>
-                        <div className="ft-icon" style={{background: "#FEF5E6", color: "#F5A623"}}><i className="ti ti-building"></i></div>
-                        <div style={{flex: 1}}>
-                          <div style={{display: "flex", justifyContent: "space-between"}}><span className="ft-name">Clients</span><span className="ft-size">{clients.length}</span></div>
-                          <div className="ft-bar" style={{background: "#F5A623", width: "50%"}}></div>
-                        </div>
-                      </div>
-                      <div className="ft-item" onClick={() => setActive("invoices")} style={{cursor:"pointer"}}>
-                        <div className="ft-icon" style={{background: "#EEE9FF", color: "#7C5CFC"}}><i className="ti ti-receipt-2"></i></div>
-                        <div style={{flex: 1}}>
-                          <div style={{display: "flex", justifyContent: "space-between"}}><span className="ft-name">Invoices</span><span className="ft-size">{invoices.length}</span></div>
-                          <div className="ft-bar" style={{background: "#7C5CFC", width: "20%"}}></div>
-                        </div>
-                      </div>
                     </div>
-                  </div>
+                  </>)}
+              </>
+            )}
 
-                  {/* QUICK STATS */}
-                  <div className="stats-grid">
-                    <div className="mini-stat" onClick={() => setActive("accounts")}>
-                      <div className="mini-stat-icon" style={{background: "rgba(var(--app-accent-rgb,0,188,212),0.1)", color: "var(--app-accent)"}}><i className="ti ti-cash"></i></div>
-                      <div className="mini-stat-val">₹{income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
-                      <div className="mini-stat-label">Income</div>
-                    </div>
-                    <div className="mini-stat" onClick={() => setActive("expenses")}>
-                      <div className="mini-stat-icon" style={{background: "#FEF2F2", color: "#F05C5C"}}><i className="ti ti-chart-pie"></i></div>
-                      <div className="mini-stat-val">₹{expenses.reduce((sum, i) => sum + (Number(i.amount) || 0), 0).toLocaleString()}</div>
-                      <div className="mini-stat-label">Expenses</div>
-                    </div>
-                    <div className="mini-stat" onClick={() => setActive("employees")}>
-                      <div className="mini-stat-icon" style={{background: "#E8FAF3", color: "#26C281"}}><i className="ti ti-users"></i></div>
-                      <div className="mini-stat-val">{employees.length}</div>
-                      <div className="mini-stat-label">Employees</div>
-                    </div>
-                    <div className="mini-stat">
-                      <div className="mini-stat-icon" style={{background: "#FEF5E6", color: "#F5A623"}}><i className="ti ti-building"></i></div>
-                      <div className="mini-stat-val">{clients.length}</div>
-                      <div className="mini-stat-label">Clients</div>
-                    </div>
-                  </div>
+                {/* ── Pages using new components ── */}
+                {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => {
+                  const limit = getSubscriptionLimit("client");
+                  if (subscription && clients.length >= limit) {
+                    setLimitModal({ type: "client", limit });
+                    return;
+                  }
+                  setNcError({}); setShowClientPass(false); setModal("client");
+                }} triggerCrop={triggerCrop} />}
 
-                  {/* CLEAR MEMORY */}
-                  <div className="clear-panel">
-                    <div className="clear-icon"><i className="ti ti-refresh"></i></div>
-                    <div className="clear-text">Clear <strong>₹0.00</strong> in pending expense entries from temporary records</div>
-                    <button className="clear-btn"><i className="ti ti-trash" style={{fontSize: 13}}></i> CLEAR RECORDS</button>
-                  </div>
-                </div>
-              </div>
-</>)}
+                {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projects} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
+                {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
+                {validActive === "projects" && <ProjectsPage onBack={() => setActive("dashboard")} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
+                  const limit = getSubscriptionLimit("employee");
+                  if (subscription && employees.length >= limit) {
+                    setLimitModal({ type: "employee", limit });
+                    return;
+                  }
+                  setReturnToModal(null); setModal("employee");
+                }} />}
+                {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-          {/* ── Pages using new components ── */}
-          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => {
-            const limit = getSubscriptionLimit("client");
-            if (subscription && clients.length >= limit) {
-              setLimitModal({ type: "client", limit });
-              return;
-            }
-            setNcError({}); setShowClientPass(false); setModal("client");
-          }} triggerCrop={triggerCrop} />}
-
-          {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projects} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
-          {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-          {validActive === "projects" && <ProjectsPage onBack={() => setActive("dashboard")} projects={projects} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setSelectedProjectForTasks(proj); setActive("tasks"); }} user={user} fetchTasks={fetchTasks} onAddEmployee={() => {
-            const limit = getSubscriptionLimit("employee");
-            if (subscription && employees.length >= limit) {
-              setLimitModal({ type: "employee", limit });
-              return;
-            }
-            setReturnToModal(null); setModal("employee");
-          }} />}
-          {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
-
-          {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive("dashboard")} jumpInvoice={jumpInvoice} onAddClient={() => {
-            const limit = getSubscriptionLimit("client");
-            if (subscription && clients.length >= limit) {
-              setLimitModal({ type: "client", limit });
-              return;
-            }
-            setReturnToModal(modal); setModal("client");
-          }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
-          {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
-            const limit = getSubscriptionLimit("client");
-            if (subscription && clients.length >= limit) {
-              setLimitModal({ type: "client", limit });
-              return;
-            }
-            setReturnToModal(modal); setModal("client");
-          }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
-          {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
-          {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
-          {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
-          {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
-          {validActive === "messaging" && <MessagingPage user={user} />}
-          {validActive === "settings" && (
-            <SettingsPage
-              user={user}
-              THEME={T}
-              appTheme={appTheme}
-              setAppTheme={setAppTheme}
-              themes={THEMES}
-              customColor={customColor}
-              setCustomColor={setCustomColor}
-              onLogoChange={onLogoChange}
-              triggerCrop={triggerCrop}
-              onProfileUpdate={(updates) => {
-                const updated = { ...user, ...updates };
-                setUser(updated);
-                try { localStorage.setItem("user", JSON.stringify(updated)); } catch { }
-              }}
-            />
-          )}
-
-          {validActive === "accounts" && <AccountsPage onBack={() => setActive("dashboard")} THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
-          {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
-          {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
-          {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
-          {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
-          {validActive === "templates" && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
-              <iframe
-                id="template-designer-frame"
-                src={`/template-designer.html?v=2`}
-                style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
-                title="Template Designer"
-                onLoad={(e) => {
-                  const frame = e.target.contentWindow;
-                  frame.postMessage({
-                    type: 'SET_DATA',
-                    clients: clients.map(c => c.clientName || c.name),
-                    employees: employees.map(emp => emp.name),
-                    quotations: quotations,
-                    company: {
-                      name: user?.companyName || "",
-                      logoUrl: user?.logoUrl || "",
-                      email: user?.email || "",
-                      phone: user?.phone || "",
-                    }
-                  }, '*');
-                  frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
-                }}
-              />
-            </div>
-          )}
-          
-          {validActive === "letterhead" && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
-              <iframe
-                key="letterhead-frame"
-                id="letterhead-frame"
-                src={`/template-designer.html?v=1#lh`}
-                style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
-                title="Letterhead Designer"
-                onLoad={(e) => {
-                  const frame = e.target.contentWindow;
-                  // Small delay to ensure iframe is fully ready
-                  setTimeout(() => {
-                    frame.postMessage({
-                      type: 'SET_DATA',
-                      clients: clients.map(c => c.clientName || c.name),
-                      employees: employees.map(emp => emp.name),
-                      company: {
-                        name: user?.companyName || "",
-                        logoUrl: user?.logoUrl || "",
-                        email: user?.email || "",
-                        phone: user?.phone || "",
-                      }
-                    }, '*');
-                    frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
-                  }, 300);
-                }}
-              />
-            </div>
-          )}
-          
-          {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} />}
-          {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
-          {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
-          {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
-          {validActive === "rolePermissions" && <RolePermissionDashboard />}
-        </div>
-      </div>
-
-      {profileDropdownOpen && (
-        <div
-          data-profile-menu="true"
-          style={{
-            position: "fixed",
-            top: "72px",
-            right: "16px",
-            zIndex: 10050,
-            background: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: 12,
-            boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
-            overflow: "hidden",
-            minWidth: 220,
-            maxWidth: 280,
-          }}
-        >
-          {/* Current Account Header */}
-          <div style={{ padding: "12px 14px", borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              {companyLogo ? (
-                <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, background: "#fff", display: "block", borderRadius: 10, border: "1px solid #f1f5f9" }} />
-              ) : (
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14 }}>{initials}</div>
-              )}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
-                <div style={{ fontSize: 11, color: "var(--app-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
-              </div>
-              <span style={{ fontSize: 12 }}>✓</span>
-            </div>
-          </div>
-
-          {/* Other Saved Accounts */}
-          {accounts.length > 1 && (
-            <div style={{ maxHeight: 180, overflowY: "auto" }}>
-              {accounts.filter(a => a.email !== user?.email).map((account, idx) => {
-                const accName = account?.name || account?.email?.split("@")[0] || "User";
-                const accInitials = accName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-                return (
-                  <button
-                    key={account.email || idx}
-                    onClick={() => switchAccount(account)}
-                    style={{
-                      width: "100%",
-                      background: "none",
-                      border: "none",
-                      padding: "10px 14px",
-                      cursor: "pointer",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      fontFamily: "inherit",
-                      color: T.text,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                      borderBottom: "1px solid #f8fafc",
-                      textAlign: "left",
+                {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive("dashboard")} jumpInvoice={jumpInvoice} onAddClient={() => {
+                  const limit = getSubscriptionLimit("client");
+                  if (subscription && clients.length >= limit) {
+                    setLimitModal({ type: "client", limit });
+                    return;
+                  }
+                  setReturnToModal(modal); setModal("client");
+                }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+                {validActive === "quotations" && <QuotationCreatorModern user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onAddClient={() => {
+                  const limit = getSubscriptionLimit("client");
+                  if (subscription && clients.length >= limit) {
+                    setLimitModal({ type: "client", limit });
+                    return;
+                  }
+                  setReturnToModal(modal); setModal("client");
+                }} onAddProject={() => { setReturnToModal(modal); setModal("project"); }} />}
+                {validActive === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={companyLogo} companyName={companyNameStr} />}
+                {validActive === "tracking" && <ProjectStatusPage clients={clients} employees={employees} managers={managers} config={config} />}
+                {validActive === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} config={config} user={user} selectedProjectId={selectedProjectForTasks?._id || null} selectedProjectName={selectedProjectForTasks?.name || null} onClearProjectFilter={() => setSelectedProjectForTasks(null)} onSelectProject={(p) => setSelectedProjectForTasks(p)} autoOpenAddModal={autoOpenTaskModal} onAddModalOpened={(val) => setAutoOpenTaskModal(!!val)} />}
+                {validActive === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} companyId={companyId} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} config={config} />}
+                {validActive === "messaging" && <MessagingPage user={user} />}
+                {validActive === "settings" && (
+                  <SettingsPage
+                    user={user}
+                    THEME={T}
+                    appTheme={appTheme}
+                    setAppTheme={setAppTheme}
+                    themes={THEMES}
+                    customColor={customColor}
+                    setCustomColor={setCustomColor}
+                    onLogoChange={onLogoChange}
+                    triggerCrop={triggerCrop}
+                    onProfileUpdate={(updates) => {
+                      const updated = { ...user, ...updates };
+                      setUser(updated);
+                      try { localStorage.setItem("user", JSON.stringify(updated)); } catch { }
                     }}
-                    onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                  >
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
-                      {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{accInitials}</span>}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accName}</div>
-                      <div style={{ fontSize: 10, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}</div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+                  />
+                )}
 
-          {/* Menu Options */}
-          <div style={{ borderTop: "1px solid #f1f5f9" }}>
-            <button
-              onClick={() => {
-                setProfileDropdownOpen(false);
-                setShowProfile(true);
-              }}
+                {validActive === "accounts" && <AccountsPage onBack={() => setActive("dashboard")} THEME={currentTheme} initialTab="overview" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+                {validActive === "payments" && <AccountsPage THEME={currentTheme} initialTab="income" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+                {validActive === "expenses" && <AccountsPage THEME={currentTheme} initialTab="expenses" income={income} setIncome={setIncome} fetchIncome={fetchIncome} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+                {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
+                {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
+                {validActive === "templates" && (
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+                    <iframe
+                      id="template-designer-frame"
+                      src={`/template-designer.html?v=2`}
+                      style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
+                      title="Template Designer"
+                      onLoad={(e) => {
+                        const frame = e.target.contentWindow;
+                        frame.postMessage({
+                          type: 'SET_DATA',
+                          clients: clients.map(c => c.clientName || c.name),
+                          employees: employees.map(emp => emp.name),
+                          quotations: quotations,
+                          company: {
+                            name: user?.companyName || "",
+                            logoUrl: user?.logoUrl || "",
+                            email: user?.email || "",
+                            phone: user?.phone || "",
+                          }
+                        }, '*');
+                        frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
+                      }}
+                    />
+                  </div>
+                )}
+
+                {validActive === "letterhead" && (
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", background: "#F5FAFA" }}>
+                    <iframe
+                      key="letterhead-frame"
+                      id="letterhead-frame"
+                      src={`/template-designer.html?v=1#lh`}
+                      style={{ width: "100%", height: "100%", border: "none", flex: 1, display: "block" }}
+                      title="Letterhead Designer"
+                      onLoad={(e) => {
+                        const frame = e.target.contentWindow;
+                        // Small delay to ensure iframe is fully ready
+                        setTimeout(() => {
+                          frame.postMessage({
+                            type: 'SET_DATA',
+                            clients: clients.map(c => c.clientName || c.name),
+                            employees: employees.map(emp => emp.name),
+                            company: {
+                              name: user?.companyName || "",
+                              logoUrl: user?.logoUrl || "",
+                              email: user?.email || "",
+                              phone: user?.phone || "",
+                            }
+                          }, '*');
+                          frame.postMessage({ type: 'SET_THEME', color: currentTheme.accent }, '*');
+                        }, 300);
+                      }}
+                    />
+                  </div>
+                )}
+
+                {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} />}
+                {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
+                {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
+                {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
+                {validActive === "rolePermissions" && <RolePermissionDashboard />}
+          {profileDropdownOpen && (
+           <div
+              data-profile-menu="true"
               style={{
-                width: "100%",
-                background: "none",
-                border: "none",
-                padding: "10px 14px",
-                cursor: "pointer",
-                fontSize: 13,
-                fontWeight: 700,
-                fontFamily: "inherit",
-                color: T.text,
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
+                position: "fixed",
+                top: "72px",
+                right: "16px",
+                zIndex: 10050,
+                background: "#fff",
+                border: "1px solid #e2e8f0",
+                borderRadius: 12,
+                boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+                overflow: "hidden",
+                minWidth: 220,
+                maxWidth: 280,
               }}
-              onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
-              <span style={{ fontSize: 14 }}>👤</span> Profile
-            </button>
-            {(isAdmin ||
-              user?.businessLimit?.toLowerCase().includes("multiple") ||
-              user?.businessLimit?.toLowerCase().includes("unlimited") ||
-              subscription?.businessLimit?.toLowerCase().includes("multiple") ||
-              subscription?.businessLimit?.toLowerCase().includes("unlimited") ||
-              subscription?.features?.some(f => f.toLowerCase().includes("multiple")) ||
-              packages.some(p => p.assignedSubadmins?.includes(user?.id || user?._id) &&
-                (p.businessLimit?.toLowerCase().includes("multiple") ||
-                  p.features?.some(f => f.toLowerCase().includes("multiple"))))
-            ) && (
+              {/* Current Account Header */}
+              <div style={{ padding: "12px 14px", borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  {companyLogo ? (
+                    <img src={companyLogo} alt="logo" style={{ height: 38, width: "auto", maxWidth: "100px", objectFit: "contain", flexShrink: 0, background: "#fff", display: "block", borderRadius: 10, border: "1px solid #f1f5f9" }} />
+                  ) : (
+                    <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 14 }}>{initials}</div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
+                    <div style={{ fontSize: 11, color: "var(--app-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
+                  </div>
+                  <span style={{ fontSize: 12 }}>✓</span>
+                </div>
+              </div>
+
+              {/* Other Saved Accounts */}
+              {accounts.length > 1 && (
+                <div style={{ maxHeight: 180, overflowY: "auto" }}>
+                  {accounts.filter(a => a.email !== user?.email).map((account, idx) => {
+                    const accName = account?.name || account?.email?.split("@")[0] || "User";
+                    const accInitials = accName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+                    return (
+                      <button
+                        key={account.email || idx}
+                        onClick={() => switchAccount(account)}
+                        style={{
+                          width: "100%",
+                          background: "none",
+                          border: "none",
+                          padding: "10px 14px",
+                          cursor: "pointer",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          fontFamily: "inherit",
+                          color: T.text,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          borderBottom: "1px solid #f8fafc",
+                          textAlign: "left",
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
+                          {account?.logoUrl ? <img src={account.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 2, background: "#fff" }} /> : <span>{accInitials}</span>}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accName}</div>
+                          <div style={{ fontSize: 10, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{account?.email}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+              
+                </div>
+              )}
+
+              {/* Menu Options */}
+              <div style={{ borderTop: "1px solid #f1f5f9" }}>
                 <button
                   onClick={() => {
                     setProfileDropdownOpen(false);
-                    setAccountAuthTab("login");
-                    setAccountAuthOpen(true);
+                    setShowProfile(true);
                   }}
                   style={{
                     width: "100%",
@@ -4715,815 +4759,850 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     display: "flex",
                     alignItems: "center",
                     gap: 10,
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
+                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                >
+                  <span style={{ fontSize: 14 }}>👤</span> Profile
+                </button>
+                {(isAdmin ||
+                  user?.businessLimit?.toLowerCase().includes("multiple") ||
+                  user?.businessLimit?.toLowerCase().includes("unlimited") ||
+                  subscription?.businessLimit?.toLowerCase().includes("multiple") ||
+                  subscription?.businessLimit?.toLowerCase().includes("unlimited") ||
+                  subscription?.features?.some(f => f.toLowerCase().includes("multiple")) ||
+                  packages.some(p => p.assignedSubadmins?.includes(user?.id || user?._id) &&
+                    (p.businessLimit?.toLowerCase().includes("multiple") ||
+                      p.features?.some(f => f.toLowerCase().includes("multiple"))))
+                ) && (
+                    <button
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        setAccountAuthTab("login");
+                        setAccountAuthOpen(true);
+                      }}
+                      style={{
+                        width: "100%",
+                        background: "none",
+                        border: "none",
+                        padding: "10px 14px",
+                        cursor: "pointer",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        fontFamily: "inherit",
+                        color: T.text,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        borderTop: "1px solid #f8fafc",
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                    >
+                      <span style={{ fontSize: 14 }}>➕</span> Add account
+                    </button>
+                  )}
+                <button
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    handleLogout();
+                  }}
+                  style={{
+                    width: "100%",
+                    background: "none",
+                    border: "none",
+                    padding: "10px 14px",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    fontFamily: "inherit",
+                    color: "#ef4444",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
                     borderTop: "1px solid #f8fafc",
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
+                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
-                  <span style={{ fontSize: 14 }}>➕</span> Add account
-                </button>
-              )}
-            <button
-              onClick={() => {
-                setProfileDropdownOpen(false);
-                handleLogout();
-              }}
-              style={{
-                width: "100%",
-                background: "none",
-                border: "none",
-                padding: "10px 14px",
-                cursor: "pointer",
-                fontSize: 13,
-                fontWeight: 700,
-                fontFamily: "inherit",
-                color: "#ef4444",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                borderTop: "1px solid #f8fafc",
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-            >
-              <span style={{ fontSize: 14 }}>🚪</span> Logout            </button>
-          </div>
-        </div>
-      )}
-
-      {accountAuthOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 10060 }}>
-          <button
-            onClick={() => setAccountAuthOpen(false)}
-            style={{
-              position: "absolute",
-              top: 16,
-              right: 16,
-              zIndex: 10061,
-              background: "rgba(255,255,255,0.22)",
-              border: "1.5px solid rgba(255,255,255,0.35)",
-              color: "#fff",
-              borderRadius: 10,
-              width: 36,
-              height: 36,
-              cursor: "pointer",
-              fontWeight: 900,
-              fontSize: 14,
-            }}
-          >
-            ✕
-          </button>
-          <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
-        </div>
-      )}
-
-      {showProfile && <ProfileModal
-        user={user}
-        setUser={setUser}
-        onClose={() => setShowProfile(false)}
-        onLogout={handleLogout}
-        companyLogo={companyLogo}
-        onLogoChange={onLogoChange}
-        paymentHistory={paymentHistory}
-        projects={projects}
-        invoices={invoices}
-        onLogoUpload={handleHeaderLogoUpload}
-      />}
-
-
-      {/* ── Add Client Modal ── */}
-      {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setActive("mysubscriptions"); }} />}
-      {modal === "client" && <Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
-        {clientSuccessData ? (
-          <div style={{ textAlign: "center", padding: "5px 0" }}>
-            <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
-            <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
-              The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created.
-              Share these credentials securely.
-            </p>
-
-            <div style={{ background: "linear-gradient(135deg,#f8fafc,#f1f5f9)", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.02)" }}>
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>LOGIN EMAIL</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: T.text, background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>{clientSuccessData.email}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password || "Not set (optional)"}</div>
+                  <span style={{ fontSize: 14 }}>🚪</span> Logout            </button>
               </div>
             </div>
+          )}
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {accountAuthOpen && (
+            <div style={{ position: "fixed", inset: 0, zIndex: 10060 }}>
               <button
-                onClick={() => {
-                  const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
-                  navigator.clipboard.writeText(text);
-                  toast.success("📋 Credentials copied!");
-                }}
-                style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
-              >
-                📋 Copy Login Details
-              </button>
-
-              <button
-                onClick={() => {
-                  const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}`;
-                  const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                  window.open(wpUrl, "_blank");
-                }}
-                style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(37,211,102,0.2)" }}
-              >
-                <span style={{ fontSize: 16 }}>💬</span> Share via WhatsApp
-              </button>
-
-              <button
-                onClick={() => { setModal(null); setClientSuccessData(null); }}
-                style={{ width: "100%", background: "transparent", border: "1.2px solid var(--app-border)", color: "#64748b", borderRadius: 10, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 12, marginTop: 6 }}
-              >
-                Done & Close
-              </button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-              <div
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*';
-                  input.onchange = (e) => triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
-                  input.click();
-                }}
+                onClick={() => setAccountAuthOpen(false)}
                 style={{
-                  position: "relative",
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  zIndex: 10061,
+                  background: "rgba(255,255,255,0.22)",
+                  border: "1.5px solid rgba(255,255,255,0.35)",
+                  color: "#fff",
+                  borderRadius: 10,
+                  width: 36,
+                  height: 36,
                   cursor: "pointer",
-                  width: "auto",
-                  height: "auto",
-                  maxWidth: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center"
+                  fontWeight: 900,
+                  fontSize: 14,
                 }}
               >
-                <div style={{
-                  padding: nc.logoUrl ? 4 : 24,
-                  borderRadius: 20,
-                  background: "#fff",
-                  border: "2.5px dashed var(--app-border)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minWidth: 100,
-                  minHeight: 100,
-                  overflow: "hidden",
-                  boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
-                  transition: "all 0.3s ease"
-                }}>
-                  {nc.logoUrl ? (
-                    <img
-                      src={nc.logoUrl}
-                      alt="Logo"
-                      style={{
-                        width: "auto",
-                        height: "auto",
-                        maxWidth: "240px",
-                        maxHeight: "120px",
-                        objectFit: "contain",
-                        display: "block",
-                        borderRadius: 12
-                      }}
-                    />
-                  ) : (
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div>
-                      <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
-                    </div>
-                  )}
+                ✕
+              </button>
+              <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
+            </div>
+          )}
+
+          {showProfile && <ProfileModal
+            user={user}
+            setUser={setUser}
+            onClose={() => setShowProfile(false)}
+            onLogout={handleLogout}
+            companyLogo={companyLogo}
+            onLogoChange={onLogoChange}
+            paymentHistory={paymentHistory}
+            projects={projects}
+            invoices={invoices}
+            onLogoUpload={handleHeaderLogoUpload}
+          />}
+
+
+          {/* ── Add Client Modal ── */}
+          {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setActive("mysubscriptions"); }} />}
+          {modal === "client" && <Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
+            {clientSuccessData ? (
+              <div style={{ textAlign: "center", padding: "5px 0" }}>
+                <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
+                <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
+                  The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created.
+                  Share these credentials securely.
+                </p>
+
+                <div style={{ background: "linear-gradient(135deg,#f8fafc,#f1f5f9)", border: "1.5px solid #e2e8f0", borderRadius: 12, padding: "16px", marginBottom: 20, textAlign: "left", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.02)" }}>
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>LOGIN EMAIL</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: T.text, background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>{clientSuccessData.email}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 9, color: "#64748b", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: 0.8 }}>TEMPORARY PASSWORD</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-muted)", background: "#fff", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "monospace" }}>{clientSuccessData.password || "Not set (optional)"}</div>
+                  </div>
                 </div>
-                <div style={{
-                  position: "absolute", bottom: -10, right: -10,
-                  width: 36, height: 36, borderRadius: "50%",
-                  background: "var(--app-accent)", color: "#fff",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
-                  border: "3px solid #fff"
-                }}>📷</div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <button
+                    onClick={() => {
+                      const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
+                      navigator.clipboard.writeText(text);
+                      toast.success("📋 Credentials copied!");
+                    }}
+                    style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
+                  >
+                    📋 Copy Login Details
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}`;
+                      const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                      window.open(wpUrl, "_blank");
+                    }}
+                    style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(37,211,102,0.2)" }}
+                  >
+                    <span style={{ fontSize: 16 }}>💬</span> Share via WhatsApp
+                  </button>
+
+                  <button
+                    onClick={() => { setModal(null); setClientSuccessData(null); }}
+                    style={{ width: "100%", background: "transparent", border: "1.2px solid var(--app-border)", color: "#64748b", borderRadius: 10, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 12, marginTop: 6 }}
+                  >
+                    Done & Close
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+                  <div
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = (e) => triggerCrop(e, (croppedImage) => setNc(p => ({ ...p, logoUrl: croppedImage })), 1);
+                      input.click();
+                    }}
+                    style={{
+                      position: "relative",
+                      cursor: "pointer",
+                      width: "auto",
+                      height: "auto",
+                      maxWidth: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center"
+                    }}
+                  >
+                    <div style={{
+                      padding: nc.logoUrl ? 4 : 24,
+                      borderRadius: 20,
+                      background: "#fff",
+                      border: "2.5px dashed var(--app-border)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: 100,
+                      minHeight: 100,
+                      overflow: "hidden",
+                      boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+                      transition: "all 0.3s ease"
+                    }}>
+                      {nc.logoUrl ? (
+                        <img
+                          src={nc.logoUrl}
+                          alt="Logo"
+                          style={{
+                            width: "auto",
+                            height: "auto",
+                            maxWidth: "240px",
+                            maxHeight: "120px",
+                            objectFit: "contain",
+                            display: "block",
+                            borderRadius: 12
+                          }}
+                        />
+                      ) : (
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
+                        </div>
+                      )}
+                    </div>
+                    <div style={{
+                      position: "absolute", bottom: -10, right: -10,
+                      width: 36, height: 36, borderRadius: "50%",
+                      background: "var(--app-accent)", color: "#fff",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
+                      border: "3px solid #fff"
+                    }}>📷</div>
+                  </div>
+                </div>
+                <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+                  <Fld label="Company Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: "" })); }} error={ncError.name} />
+                  <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: "" })); }} type="email" error={ncError.email} />
+                  <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
+                  <Fld label="Contact Person No" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
+                  <Fld label="Office No" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
+                  <Fld label="Company Tax/GST" value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
+                  <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={["Active", "Inactive"]} />
+                </div>
+                <Fld label="Company Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} />
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD (OPTIONAL)</label>
+                  <div style={{ position: "relative" }}>
+                    <input type={showClientPass ? "text" : "password"} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })} style={{ width: "100%", border: `1.5px solid ${ncError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set client password (optional)" />
+                    <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showClientPass ? "HIDE" : "SHOW"}</button>
+                  </div>
+                  <div style={{ fontSize: 10, color: "var(--app-muted)", marginTop: 4 }}></div>
+                  {ncError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {ncError.password}</div>}
+                </div>
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+                  <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+                  <button onClick={addClient} disabled={saveLoading} style={{ ...B("var(--app-accent)"), opacity: saveLoading ? 0.7 : 1 }}>{saveLoading ? "Saving..." : "Add Client"}</button>
+                </div>
+              </>
+            )}
+          </Mdl>}
+
+          {/* ── Add Employee Modal ── */}
+          {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-              <Fld label="Company Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: "" })); }} error={ncError.name} />
-              <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: "" })); }} type="email" error={ncError.email} />
-              <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
-              <Fld label="Contact Person No" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
-              <Fld label="Office No" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
-              <Fld label="Company Tax/GST" value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
-              <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={["Active", "Inactive"]} />
+              <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
+              <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} />
+              <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
+              <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={["Manager", "Developer", "Tech", "Others"]} />
+              <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
+              <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
+              <Fld label="Date of Birth" value={ne.dateOfBirth} onChange={v => setNe({ ...ne, dateOfBirth: v })} type="date" />
+              <Fld label="Joining Date" value={ne.joiningDate} onChange={v => setNe({ ...ne, joiningDate: v })} type="date" />
+              <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
+              <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Pending", "Approved", "Rejected"]} />
             </div>
-            <Fld label="Company Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} />
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD (OPTIONAL)</label>
-              <div style={{ position: "relative" }}>
-                <input type={showClientPass ? "text" : "password"} value={nc.password} onChange={e => setNc({ ...nc, password: e.target.value })} style={{ width: "100%", border: `1.5px solid ${ncError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set client password (optional)" />
-                <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showClientPass ? "HIDE" : "SHOW"}</button>
+            <Fld label="Address" value={ne.address} onChange={v => setNe({ ...ne, address: v })} />
+
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+              <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+                <Fld label="Bank Name" value={ne.bankName} onChange={v => setNe({ ...ne, bankName: v })} />
+                <Fld label="IFSC Code" value={ne.ifscCode} onChange={v => setNe({ ...ne, ifscCode: v })} />
+                <Fld label="Account Number" value={ne.accountNumber} onChange={v => setNe({ ...ne, accountNumber: v })} />
               </div>
-              <div style={{ fontSize: 10, color: "var(--app-muted)", marginTop: 4 }}></div>
-              {ncError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {ncError.password}</div>}
+            </div>
+            <div style={{ marginBottom: 14, marginTop: 4 }}>
+              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+              <div style={{ position: "relative" }}>
+                <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
+                <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
+              </div>
+              {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {neError.password}</div>}
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
+              <button onClick={() => {
+                const link = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(user?.companyName || "Our Company")}`;
+                const text = `Hi,\n\nPlease fill in your onboarding details at the following link to join our team at ${user?.companyName || "Our Company"}:\n\n${link}`;
+                const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                window.open(wpUrl, "_blank");
+              }} style={{ background: "#dcfce7", border: "1.5px solid #bbf7d0", color: "#16a34a", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 700, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
+                <span>💬</span> Share Link
+              </button>
+              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+              <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Add Employee"}</button>
+            </div>
+          </Mdl>}
+
+          {/* ── Add Project Modal ── */}
+          {modal === "project" && <Mdl title="Create New Project" onClose={() => setModal(null)}>
+            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
+                <ClientDropdown
+                  clients={clients}
+                  value={np.client}
+                  onChange={v => {
+                    const sel = clients.find(c => (c.clientName || c.name) === v);
+                    setNp({
+                      ...np,
+                      client: v,
+                      contactPersonName: sel?.contactPersonName || "",
+                      contactPersonNo: sel?.contactPersonNo || ""
+                    });
+                    setNpError(p => ({ ...p, client: "" }));
+                  }}
+                  error={npError.client}
+                  onAddClient={() => {
+                    const limit = getSubscriptionLimit("client");
+                    if (subscription && clients.length >= limit) {
+                      setLimitModal({ type: "client", limit });
+                      return;
+                    }
+                    setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false);
+                  }}
+                />
+                {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}
+              </div>
+              <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
+              <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
+              <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <select
+                    value={np.currency}
+                    onChange={e => setNp({ ...np, currency: e.target.value })}
+                    style={{ width: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
+                  >
+                    {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <input
+                    type="text"
+                    value={np.budget}
+                    onChange={e => { const val = e.target.value; if (val && !/^[\d.]*$/.test(val)) return; setNp({ ...np, budget: val }); }}
+                    style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+              <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
+              <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
+              <Fld label="Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
+              <Fld label="Status" value={np.status} onChange={v => setNp({ ...np, status: v })} options={["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 0 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400 }}></span></label>
+                <button
+                  onClick={async () => {
+                    await fetchSubscription();
+                    const limit = getSubscriptionLimit("employee");
+                    if (subscription && employees.length >= limit) {
+                      setLimitModal({ type: "employee", limit });
+                      return;
+                    }
+                    setReturnToModal(modal);
+                    setModal("employee");
+                  }}
+                  style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
+                >
+                  <span style={{ fontSize: 14 }}>+</span> Add Employee
+                </button>
+              </div>
+              <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "12px", background: "var(--app-bg)", maxHeight: 200, overflowY: "auto" }}>
+                {employees.length === 0 ? <div style={{ color: "var(--app-muted)", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
+                  : employees.map(e => (
+                    <div key={e._id || e.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--app-bg)" }}>
+                      <input type="checkbox"
+                        id={`emp-${e._id || e.email}`}
+                        checked={np.assignedTo.includes(e.name)}
+                        onChange={evt => {
+                          if (evt.target.checked) {
+                            setNp(prev => ({ ...prev, assignedTo: [...prev.assignedTo, e.name] }));
+                          } else {
+                            setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== e.name) }));
+                          }
+                        }}
+                        style={{ width: 16, height: 16, cursor: "pointer" }}
+                      />
+                      <label htmlFor={`emp-${e._id || e.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
+                        <span>{e.name}</span>
+                        {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "var(--app-border)", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
+                      </label>
+                    </div>
+                  ))}
+              </div>
+              {np.assignedTo.length > 0 && (
+                <div style={{ marginTop: 12 }}>
+                  <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({np.assignedTo.length})</label>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {np.assignedTo.map(name => (
+                      <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                        <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-muted)" }}>{name}</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== name) })); }}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <Fld label="Description" value={np.description} onChange={v => setNp({ ...np, description: v })} />
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+              <button onClick={addProject} disabled={projSaveLoading} style={{ ...B("var(--app-accent)"), opacity: projSaveLoading ? 0.7 : 1 }}>{projSaveLoading ? "Saving..." : "Add Project"}</button>
+            </div>
+          </Mdl>}
+
+          {/* ── Add Manager Modal ── */}
+          {modal === "manager" && <Mdl title="Add New Manager" onClose={() => setModal(null)}>
+            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              <Fld label="Manager Name *" value={nm.managerName} onChange={v => { setNm({ ...nm, managerName: v }); setNmError(p => ({ ...p, managerName: "" })); }} error={nmError.managerName} />
+              <Fld label="Email *" value={nm.email} onChange={v => { setNm({ ...nm, email: v }); setNmError(p => ({ ...p, email: "" })); }} type="email" error={nmError.email} />
+              <Fld label="Phone Number" value={nm.phone} onChange={v => setNm({ ...nm, phone: v })} />
+              <Fld label="Role" value={nm.role} onChange={v => setNm({ ...nm, role: v })} />
+              <Fld label="Department" value={nm.department} onChange={v => setNm({ ...nm, department: v })} />
+              <Fld label="Status" value={nm.status} onChange={v => setNm({ ...nm, status: v })} options={["Active", "Inactive"]} />
+            </div>
+            <Fld label="Address" value={nm.address} onChange={v => setNm({ ...nm, address: v })} />
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+              <div style={{ position: "relative" }}>
+                <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
+                <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
+              </div>
+              {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nmError.password}</div>}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={addClient} disabled={saveLoading} style={{ ...B("var(--app-accent)"), opacity: saveLoading ? 0.7 : 1 }}>{saveLoading ? "Saving..." : "Add Client"}</button>
+              <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager →"}</button>
             </div>
-          </>
-        )}
-      </Mdl>}
+          </Mdl>}
 
-      {/* ── Add Employee Modal ── */}
-      {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
-        <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-          <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
-          <Fld label="Email *" value={ne.email} onChange={v => { setNe({ ...ne, email: v }); setNeError(p => ({ ...p, email: "" })); }} type="email" error={neError.email} />
-          <Fld label="Phone Number" value={ne.phone} onChange={v => setNe({ ...ne, phone: v })} />
-          <Fld label="Role / Position" value={ne.role} onChange={v => setNe({ ...ne, role: v })} options={["Manager", "Developer", "Tech", "Others"]} />
-          <Fld label="Department" value={ne.department} onChange={v => setNe({ ...ne, department: v })} />
-          <Fld label="Salary" value={ne.salary} onChange={v => setNe({ ...ne, salary: v })} />
-          <Fld label="Date of Birth" value={ne.dateOfBirth} onChange={v => setNe({ ...ne, dateOfBirth: v })} type="date" />
-          <Fld label="Joining Date" value={ne.joiningDate} onChange={v => setNe({ ...ne, joiningDate: v })} type="date" />
-          <Fld label="Marital Status" value={ne.maritalStatus} onChange={v => setNe({ ...ne, maritalStatus: v })} options={["Unmarried", "Married"]} />
-          <Fld label="Status" value={ne.status} onChange={v => setNe({ ...ne, status: v })} options={["Pending", "Approved", "Rejected"]} />
-        </div>
-        <Fld label="Address" value={ne.address} onChange={v => setNe({ ...ne, address: v })} />
-
-        <div style={{ marginTop: 14 }}>
-          <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
-          <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-            <Fld label="Bank Name" value={ne.bankName} onChange={v => setNe({ ...ne, bankName: v })} />
-            <Fld label="IFSC Code" value={ne.ifscCode} onChange={v => setNe({ ...ne, ifscCode: v })} />
-            <Fld label="Account Number" value={ne.accountNumber} onChange={v => setNe({ ...ne, accountNumber: v })} />
-          </div>
-        </div>
-        <div style={{ marginBottom: 14, marginTop: 4 }}>
-          <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-          <div style={{ position: "relative" }}>
-            <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
-            <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
-          </div>
-          {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {neError.password}</div>}
-        </div>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
-          <button onClick={() => {
-            const link = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(user?.companyName || "Our Company")}`;
-            const text = `Hi,\n\nPlease fill in your onboarding details at the following link to join our team at ${user?.companyName || "Our Company"}:\n\n${link}`;
-            const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            window.open(wpUrl, "_blank");
-          }} style={{ background: "#dcfce7", border: "1.5px solid #bbf7d0", color: "#16a34a", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 700, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
-            <span>💬</span> Share Link
-          </button>
-          <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Add Employee"}</button>
-        </div>
-      </Mdl>}
-
-      {/* ── Add Project Modal ── */}
-      {modal === "project" && <Mdl title="Create New Project" onClose={() => setModal(null)}>
-        <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-          <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
-            <ClientDropdown
-              clients={clients}
-              value={np.client}
-              onChange={v => {
-                const sel = clients.find(c => (c.clientName || c.name) === v);
-                setNp({
-                  ...np,
-                  client: v,
-                  contactPersonName: sel?.contactPersonName || "",
-                  contactPersonNo: sel?.contactPersonNo || ""
-                });
-                setNpError(p => ({ ...p, client: "" }));
-              }}
-              error={npError.client}
-              onAddClient={() => {
-                const limit = getSubscriptionLimit("client");
-                if (subscription && clients.length >= limit) {
-                  setLimitModal({ type: "client", limit });
-                  return;
-                }
-                setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false);
-              }}
-            />
-            {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}
-          </div>
-          <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
-          <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
-          <Fld label="Purpose" value={np.purpose} onChange={v => setNp({ ...np, purpose: v })} />
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
-            <div style={{ display: "flex", gap: 8 }}>
-              <select
-                value={np.currency}
-                onChange={e => setNp({ ...np, currency: e.target.value })}
-                style={{ width: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
-              >
-                {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-              <input
-                type="text"
-                value={np.budget}
-                onChange={e => { const val = e.target.value; if (val && !/^[\d.]*$/.test(val)) return; setNp({ ...np, budget: val }); }}
-                style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
-                placeholder="0.00"
-              />
+          {/* ── Add Subadmin Modal ── */}
+          {modal === "subadmin" && <Mdl title="Add New Subadmin" onClose={() => setModal(null)}>
+            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              <Fld label="Full Name *" value={ns.name} onChange={v => { setNs({ ...ns, name: v }); setNsError(p => ({ ...p, name: "" })); }} error={nsError.name} />
+              <Fld label="Email *" value={ns.email} onChange={v => { setNs({ ...ns, email: v }); setNsError(p => ({ ...p, email: "" })); }} type="email" error={nsError.email} />
+              <Fld label="Phone" value={ns.phone} onChange={v => setNs({ ...ns, phone: v })} />
+              <Fld label="Status" value={ns.status} onChange={v => setNs({ ...ns, status: v })} options={["Active", "Inactive"]} />
+              <Fld label="Company Name" value={ns.companyName} onChange={v => setNs({ ...ns, companyName: v })} placeholder="Company name" />
+              <Fld label="Company Type" value={ns.companyType} onChange={v => setNs({ ...ns, companyType: v })} options={["IT", "Software", "Services", "Consulting", "Other"]} />
+              <Fld label="No. of Employees" value={ns.employeeCount} onChange={v => setNs({ ...ns, employeeCount: v })} options={["0-10", "11-50", "51-100", "100+"]} />
+              <Fld label="Client Limit *" type="number" value={ns.clientLimit} onChange={v => setNs({ ...ns, clientLimit: v })} />
+              <Fld label="Employee Limit *" type="number" value={ns.employeeLimit} onChange={v => setNs({ ...ns, employeeLimit: v })} />
             </div>
-          </div>
-          <Fld label="Start Date" value={np.start} onChange={v => setNp({ ...np, start: v })} type="date" />
-          <Fld label="End Date" value={np.end} onChange={v => setNp({ ...np, end: v })} type="date" />
-          <Fld label="Team Members" value={np.team} onChange={v => setNp({ ...np, team: v })} />
-          <Fld label="Status" value={np.status} onChange={v => setNp({ ...np, status: v })} options={["Pending", "In Progress", "Completed", "On Hold"]} allowCustom={true} />
-        </div>
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 0 }}>ASSIGN EMPLOYEES <span style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 400 }}></span></label>
-            <button
-              onClick={async () => {
-                await fetchSubscription();
-                const limit = getSubscriptionLimit("employee");
-                if (subscription && employees.length >= limit) {
-                  setLimitModal({ type: "employee", limit });
-                  return;
-                }
-                setReturnToModal(modal);
-                setModal("employee");
-              }}
-              style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
-            >
-              <span style={{ fontSize: 14 }}>+</span> Add Employee
-            </button>
-          </div>
-          <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "12px", background: "var(--app-bg)", maxHeight: 200, overflowY: "auto" }}>
-            {employees.length === 0 ? <div style={{ color: "var(--app-muted)", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
-              : employees.map(e => (
-                <div key={e._id || e.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--app-bg)" }}>
-                  <input type="checkbox"
-                    id={`emp-${e._id || e.email}`}
-                    checked={np.assignedTo.includes(e.name)}
-                    onChange={evt => {
-                      if (evt.target.checked) {
-                        setNp(prev => ({ ...prev, assignedTo: [...prev.assignedTo, e.name] }));
-                      } else {
-                        setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== e.name) }));
-                      }
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
+              <div style={{ position: "relative" }}>
+                <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
+                <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
+              </div>
+              {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nsError.password}</div>}
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+              <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin →"}</button>
+            </div>
+          </Mdl>}
+
+          {/* ── Add Package Modal ── */}
+          {modal === "package_add" && <Mdl title="Add New Package" onClose={() => setModal(null)} maxWidth={700}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+              <Fld label="Package Title *" value={npkg.title} onChange={v => { setNpkg({ ...npkg, title: v }); setPkgError(p => ({ ...p, title: "" })); }} error={pkgError.title} />
+              <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
+
+              <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
+            </div>
+
+            <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
+              <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+                <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. ₹999" />
+                <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. ₹2,499" />
+                <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. ₹4,499" />
+                <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. ₹7,999" />
+              </div>
+            </div>
+
+            <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "#fce7f3", margin: "14px 0" }}>
+              <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+              <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+                {["Single business manage", "Multiple business manage"].map(mode => (
+                  <button
+                    key={mode}
+                    onClick={() => setNpkg({ ...npkg, businessLimit: mode })}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      borderRadius: 12,
+                      border: npkg.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+                      background: npkg.businessLimit === mode ? "#f5f3ff" : "#fff",
+                      color: npkg.businessLimit === mode ? "#7c3aed" : "#64748b",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      transition: "all 0.2s"
                     }}
-                    style={{ width: 16, height: 16, cursor: "pointer" }}
-                  />
-                  <label htmlFor={`emp-${e._id || e.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
-                    <span>{e.name}</span>
-                    {e.department && <span style={{ fontSize: 11, color: "#a78bba", background: "var(--app-border)", padding: "2px 6px", borderRadius: 4 }}>{e.department}</span>}
-                  </label>
-                </div>
-              ))}
-          </div>
-          {np.assignedTo.length > 0 && (
-            <div style={{ marginTop: 12 }}>
-              <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({np.assignedTo.length})</label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {np.assignedTo.map(name => (
-                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
-                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-muted)" }}>{name}</span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== name) })); }}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
-                    >
-                      ×
-                    </button>
-                  </div>
+                  >
+                    {npkg.businessLimit === mode ? "✓ " : ""}{mode}
+                  </button>
                 ))}
               </div>
-            </div>
-          )}
-        </div>
-        <Fld label="Description" value={np.description} onChange={v => setNp({ ...np, description: v })} />
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-          <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addProject} disabled={projSaveLoading} style={{ ...B("var(--app-accent)"), opacity: projSaveLoading ? 0.7 : 1 }}>{projSaveLoading ? "Saving..." : "Add Project"}</button>
-        </div>
-      </Mdl>}
 
-      {/* ── Add Manager Modal ── */}
-      {modal === "manager" && <Mdl title="Add New Manager" onClose={() => setModal(null)}>
-        <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-          <Fld label="Manager Name *" value={nm.managerName} onChange={v => { setNm({ ...nm, managerName: v }); setNmError(p => ({ ...p, managerName: "" })); }} error={nmError.managerName} />
-          <Fld label="Email *" value={nm.email} onChange={v => { setNm({ ...nm, email: v }); setNmError(p => ({ ...p, email: "" })); }} type="email" error={nmError.email} />
-          <Fld label="Phone Number" value={nm.phone} onChange={v => setNm({ ...nm, phone: v })} />
-          <Fld label="Role" value={nm.role} onChange={v => setNm({ ...nm, role: v })} />
-          <Fld label="Department" value={nm.department} onChange={v => setNm({ ...nm, department: v })} />
-          <Fld label="Status" value={nm.status} onChange={v => setNm({ ...nm, status: v })} options={["Active", "Inactive"]} />
-        </div>
-        <Fld label="Address" value={nm.address} onChange={v => setNm({ ...nm, address: v })} />
-        <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-          <div style={{ position: "relative" }}>
-            <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
-            <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
-          </div>
-          {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nmError.password}</div>}
-        </div>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-          <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager →"}</button>
-        </div>
-      </Mdl>}
-
-      {/* ── Add Subadmin Modal ── */}
-      {modal === "subadmin" && <Mdl title="Add New Subadmin" onClose={() => setModal(null)}>
-        <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-          <Fld label="Full Name *" value={ns.name} onChange={v => { setNs({ ...ns, name: v }); setNsError(p => ({ ...p, name: "" })); }} error={nsError.name} />
-          <Fld label="Email *" value={ns.email} onChange={v => { setNs({ ...ns, email: v }); setNsError(p => ({ ...p, email: "" })); }} type="email" error={nsError.email} />
-          <Fld label="Phone" value={ns.phone} onChange={v => setNs({ ...ns, phone: v })} />
-          <Fld label="Status" value={ns.status} onChange={v => setNs({ ...ns, status: v })} options={["Active", "Inactive"]} />
-          <Fld label="Company Name" value={ns.companyName} onChange={v => setNs({ ...ns, companyName: v })} placeholder="Company name" />
-          <Fld label="Company Type" value={ns.companyType} onChange={v => setNs({ ...ns, companyType: v })} options={["IT", "Software", "Services", "Consulting", "Other"]} />
-          <Fld label="No. of Employees" value={ns.employeeCount} onChange={v => setNs({ ...ns, employeeCount: v })} options={["0-10", "11-50", "51-100", "100+"]} />
-          <Fld label="Client Limit *" type="number" value={ns.clientLimit} onChange={v => setNs({ ...ns, clientLimit: v })} />
-          <Fld label="Employee Limit *" type="number" value={ns.employeeLimit} onChange={v => setNs({ ...ns, employeeLimit: v })} />
-        </div>
-        <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD *</label>
-          <div style={{ position: "relative" }}>
-            <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
-            <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
-          </div>
-          {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nsError.password}</div>}
-        </div>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-          <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin →"}</button>
-        </div>
-      </Mdl>}
-
-      {/* ── Add Package Modal ── */}
-      {modal === "package_add" && <Mdl title="Add New Package" onClose={() => setModal(null)} maxWidth={700}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-          <Fld label="Package Title *" value={npkg.title} onChange={v => { setNpkg({ ...npkg, title: v }); setPkgError(p => ({ ...p, title: "" })); }} error={pkgError.title} />
-          <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
-
-          <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
-        </div>
-
-        <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
-          <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-            <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. ₹999" />
-            <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. ₹2,499" />
-            <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. ₹4,499" />
-            <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. ₹7,999" />
-          </div>
-        </div>
-
-        <div style={{ background: "#fdf2f8", padding: 18, borderRadius: 16, border: "#fce7f3", margin: "14px 0" }}>
-          <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
-          <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-            {["Single business manage", "Multiple business manage"].map(mode => (
-              <button
-                key={mode}
-                onClick={() => setNpkg({ ...npkg, businessLimit: mode })}
-                style={{
-                  flex: 1,
-                  padding: "12px",
-                  borderRadius: 12,
-                  border: npkg.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
-                  background: npkg.businessLimit === mode ? "#f5f3ff" : "#fff",
-                  color: npkg.businessLimit === mode ? "#7c3aed" : "#64748b",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  transition: "all 0.2s"
-                }}
-              >
-                {npkg.businessLimit === mode ? "✓ " : ""}{mode}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>RESOURCE LIMITS</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
-            <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={npkg.managerLimit} onChange={v => setNpkg({ ...npkg, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
-            <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={npkg.clientLimit} onChange={v => setNpkg({ ...npkg, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
-            <Fld label="EMPLOYEE LIMIT" value={npkg.employeeLimit} onChange={v => setNpkg({ ...npkg, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
-          </div>
-        </div>
-
-        <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
-          <textarea
-            value={npkg.features}
-            onChange={e => setNpkg({ ...npkg, features: e.target.value })}
-            style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
-            placeholder="e.g. Unlimited Company Names, Premium Support, Custom Branding"
-          />
-        </div>
-
-        {user?.role === "admin" && (
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
-              {subadmins.map(s => (
-                <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: npkg.assignedSubadmins.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
-                  <input
-                    type="checkbox"
-                    checked={npkg.assignedSubadmins.includes(s._id)}
-                    onChange={() => {
-                      const current = npkg.assignedSubadmins || [];
-                      const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
-                      setNpkg({ ...npkg, assignedSubadmins: next });
-                    }}
-                  />
-                  {s.name}
-                </label>
-              ))}
-              {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
-            </div>
-          </div>
-        )}
-
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-          <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package →"}</button>
-        </div>
-      </Mdl>}
-
-      {modal === "vendor_add" && <Mdl title="Add New Vendor" onClose={() => setModal(null)}>
-        <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-          <Fld label="Vendor Name *" value={nv.vendorName} onChange={v => { setNv({ ...nv, vendorName: v }); setNvError(p => ({ ...p, vendorName: "" })); }} error={nvError.vendorName} />
-          <Fld label="Product Name *" value={nv.vendorProduct} onChange={v => { setNv({ ...nv, vendorProduct: v }); setNvError(p => ({ ...p, vendorProduct: "" })); }} error={nvError.vendorProduct} />
-          <Fld label="Required Amount *" value={nv.amountTaxGst} type="number" onChange={v => { setNv({ ...nv, amountTaxGst: v }); setNvError(p => ({ ...p, amountTaxGst: "" })); }} error={nvError.amountTaxGst} />
-          <Fld label="Paid Amount *" value={nv.paidAmount} type="number" onChange={v => { setNv({ ...nv, paidAmount: v }); setNvError(p => ({ ...p, paidAmount: "" })); }} error={nvError.paidAmount} />
-          <Fld label="Date of Purchase" value={nv.dateOfPurchase} type="date" onChange={v => setNv({ ...nv, dateOfPurchase: v })} />
-          <Fld label="Mode of Payment" value={nv.modeOfPayment} onChange={v => setNv({ ...nv, modeOfPayment: v })} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
-        </div>
-        <Fld label="Product Description" value={nv.productDescription} onChange={v => setNv({ ...nv, productDescription: v })} />
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
-          <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor →"}</button>
-        </div>
-      </Mdl>}
-
-      {/* ── View Package Modal ── */}
-      {viewPackage && (
-        <Mdl title={`Package Details: ${viewPackage.title}`} onClose={() => setViewPackage(null)} maxWidth={500}>
-          <div style={{ padding: "10px 0" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
-                {viewPackage.icon || "📦"}
-              </div>
-              <div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: T.text }}>{viewPackage.title}</div>
-                <div style={{ fontSize: 13, color: "var(--app-muted)" }}>{viewPackage.type === "free" ? "Free Package" : "Paid Package"}</div>
+              <div style={{ fontSize: 11, color: "#be185d", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>RESOURCE LIMITS</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
+                <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={npkg.managerLimit} onChange={v => setNpkg({ ...npkg, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
+                <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={npkg.clientLimit} onChange={v => setNpkg({ ...npkg, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
+                <Fld label="EMPLOYEE LIMIT" value={npkg.employeeLimit} onChange={v => setNpkg({ ...npkg, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
               </div>
             </div>
 
-            <InfoRow icon="📄" label="Description" value={viewPackage.description} />
-            <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
-            <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `₹${viewPackage.price || 0}`} />
-            <InfoRow icon="🗓️" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
-            <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
-            <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
-            <InfoRow icon="👥" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
-            <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
-            <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>FEATURES (Comma separated)</label>
+              <textarea
+                value={npkg.features}
+                onChange={e => setNpkg({ ...npkg, features: e.target.value })}
+                style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
+                placeholder="e.g. Unlimited Company Names, Premium Support, Custom Branding"
+              />
+            </div>
 
-            {viewPackage.features && viewPackage.features.length > 0 && (
-              <div style={{ marginTop: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", marginBottom: 10 }}>FEATURES</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {(Array.isArray(viewPackage.features) ? viewPackage.features : viewPackage.features.split('\\n')).map((f, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
-                      <span style={{ color: "#22c55e" }}>✓</span> {f}
-                    </div>
+            {user?.role === "admin" && (
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
+                  {subadmins.map(s => (
+                    <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: npkg.assignedSubadmins.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+                      <input
+                        type="checkbox"
+                        checked={npkg.assignedSubadmins.includes(s._id)}
+                        onChange={() => {
+                          const current = npkg.assignedSubadmins || [];
+                          const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
+                          setNpkg({ ...npkg, assignedSubadmins: next });
+                        }}
+                      />
+                      {s.name}
+                    </label>
                   ))}
+                  {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
                 </div>
               </div>
             )}
-          </div>
-          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
-            <button onClick={() => setViewPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Close</button>
-          </div>
-        </Mdl>
-      )}
 
-      {/* ── Edit Package Modal ── */}
-      {editPackage && (
-        <Mdl title={`Edit Package: ${editPackage.title}`} onClose={() => setEditPackage(null)} maxWidth={700}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-            <Fld label="Package Title *" value={editPkgForm.title} onChange={v => setEditPkgForm({ ...editPkgForm, title: v })} />
-            <Fld label="Icon (Emoji)" value={editPkgForm.icon} onChange={v => setEditPkgForm({ ...editPkgForm, icon: v })} />
-            <Fld label="Type" value={editPkgForm.type} onChange={v => setEditPkgForm({ ...editPkgForm, type: v })} options={["free", "paid"]} />
-            <Fld label="Price" value={editPkgForm.price} onChange={v => setEditPkgForm({ ...editPkgForm, price: v })} disabled={editPkgForm.type === "free"} />
-            <Fld label="Number of Days *" value={editPkgForm.noOfDays} onChange={v => setEditPkgForm({ ...editPkgForm, noOfDays: v })} />
-            <Fld label="Status" value={editPkgForm.status} onChange={v => setEditPkgForm({ ...editPkgForm, status: v })} options={["Active", "Inactive"]} />
-          </div>
-
-          <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
-            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
-            <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-              {["Single business manage", "Multiple business manage"].map(mode => (
-                <button
-                  key={mode}
-                  onClick={() => setEditPkgForm({ ...editPkgForm, businessLimit: mode })}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    borderRadius: 12,
-                    border: editPkgForm.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
-                    background: editPkgForm.businessLimit === mode ? "#f5f3ff" : "#fff",
-                    color: editPkgForm.businessLimit === mode ? "#7c3aed" : "#64748b",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    transition: "all 0.2s"
-                  }}
-                >
-                  {editPkgForm.businessLimit === mode ? "✓ " : ""}{mode}
-                </button>
-              ))}
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+              <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package →"}</button>
             </div>
+          </Mdl>}
 
-            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>PACKAGE LIMITS</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
-              <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
-              <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
-              <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
-              <Fld label="EMPLOYEE LIMIT" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
+          {modal === "vendor_add" && <Mdl title="Add New Vendor" onClose={() => setModal(null)}>
+            <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+              <Fld label="Vendor Name *" value={nv.vendorName} onChange={v => { setNv({ ...nv, vendorName: v }); setNvError(p => ({ ...p, vendorName: "" })); }} error={nvError.vendorName} />
+              <Fld label="Product Name *" value={nv.vendorProduct} onChange={v => { setNv({ ...nv, vendorProduct: v }); setNvError(p => ({ ...p, vendorProduct: "" })); }} error={nvError.vendorProduct} />
+              <Fld label="Required Amount *" value={nv.amountTaxGst} type="number" onChange={v => { setNv({ ...nv, amountTaxGst: v }); setNvError(p => ({ ...p, amountTaxGst: "" })); }} error={nvError.amountTaxGst} />
+              <Fld label="Paid Amount *" value={nv.paidAmount} type="number" onChange={v => { setNv({ ...nv, paidAmount: v }); setNvError(p => ({ ...p, paidAmount: "" })); }} error={nvError.paidAmount} />
+              <Fld label="Date of Purchase" value={nv.dateOfPurchase} type="date" onChange={v => setNv({ ...nv, dateOfPurchase: v })} />
+              <Fld label="Mode of Payment" value={nv.modeOfPayment} onChange={v => setNv({ ...nv, modeOfPayment: v })} options={["Cash", "Bank Transfer", "UPI", "Cheque"]} />
             </div>
-          </div>
+            <Fld label="Product Description" value={nv.productDescription} onChange={v => setNv({ ...nv, productDescription: v })} />
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
+              <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+              <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor →"}</button>
+            </div>
+          </Mdl>}
 
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>DESCRIPTION</label>
-            <textarea
-              value={editPkgForm.description}
-              onChange={e => setEditPkgForm({ ...editPkgForm, description: e.target.value })}
-              style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
-              placeholder="Package description..."
-            />
-          </div>
+          {/* ── View Package Modal ── */}
+          {viewPackage && (
+            <Mdl title={`Package Details: ${viewPackage.title}`} onClose={() => setViewPackage(null)} maxWidth={500}>
+              <div style={{ padding: "10px 0" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+                  <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
+                    {viewPackage.icon || "📦"}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: T.text }}>{viewPackage.title}</div>
+                    <div style={{ fontSize: 13, color: "var(--app-muted)" }}>{viewPackage.type === "free" ? "Free Package" : "Paid Package"}</div>
+                  </div>
+                </div>
 
-          {user?.role === "admin" && (
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
-                {subadmins.map(s => (
-                  <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: editPkgForm.assignedSubadmins?.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
-                    <input
-                      type="checkbox"
-                      checked={editPkgForm.assignedSubadmins?.includes(s._id)}
-                      onChange={() => {
-                        const current = editPkgForm.assignedSubadmins || [];
-                        const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
-                        setEditPkgForm({ ...editPkgForm, assignedSubadmins: next });
-                      }}
-                    />
-                    {s.name}
-                  </label>
-                ))}
-                {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
+                <InfoRow icon="📄" label="Description" value={viewPackage.description} />
+                <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
+                <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `₹${viewPackage.price || 0}`} />
+                <InfoRow icon="🗓️" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
+                <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
+                <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
+                <InfoRow icon="👥" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
+                <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
+                <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
+
+                {viewPackage.features && viewPackage.features.length > 0 && (
+                  <div style={{ marginTop: 20 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--app-muted)", marginBottom: 10 }}>FEATURES</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {(Array.isArray(viewPackage.features) ? viewPackage.features : viewPackage.features.split('\\n')).map((f, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
+                          <span style={{ color: "#22c55e" }}>✓</span> {f}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+                <button onClick={() => setViewPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 20px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Close</button>
+              </div>
+            </Mdl>
           )}
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-            <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-            <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
-          </div>
-        </Mdl>
-      )}
+          {/* ── Edit Package Modal ── */}
+          {editPackage && (
+            <Mdl title={`Edit Package: ${editPackage.title}`} onClose={() => setEditPackage(null)} maxWidth={700}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+                <Fld label="Package Title *" value={editPkgForm.title} onChange={v => setEditPkgForm({ ...editPkgForm, title: v })} />
+                <Fld label="Icon (Emoji)" value={editPkgForm.icon} onChange={v => setEditPkgForm({ ...editPkgForm, icon: v })} />
+                <Fld label="Type" value={editPkgForm.type} onChange={v => setEditPkgForm({ ...editPkgForm, type: v })} options={["free", "paid"]} />
+                <Fld label="Price" value={editPkgForm.price} onChange={v => setEditPkgForm({ ...editPkgForm, price: v })} disabled={editPkgForm.type === "free"} />
+                <Fld label="Number of Days *" value={editPkgForm.noOfDays} onChange={v => setEditPkgForm({ ...editPkgForm, noOfDays: v })} />
+                <Fld label="Status" value={editPkgForm.status} onChange={v => setEditPkgForm({ ...editPkgForm, status: v })} options={["Active", "Inactive"]} />
+              </div>
 
-      {viewProject && (
-        <Mdl title="Project Details" onClose={() => setViewProject(null)} maxWidth={550}>
-          <div style={{ background: "#fff", borderRadius: 16 }}>
-            {/* Header Info */}
-            <div style={{ background: "var(--app-bg)", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid var(--app-border)" }}>
-              <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProject.name}</h2>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <Badge label={viewProject.status || "Pending"} />
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
-                  <span>👥</span> {viewProject.client}
+              <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
+                <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>BUSINESS MANAGEMENT</div>
+                <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+                  {["Single business manage", "Multiple business manage"].map(mode => (
+                    <button
+                      key={mode}
+                      onClick={() => setEditPkgForm({ ...editPkgForm, businessLimit: mode })}
+                      style={{
+                        flex: 1,
+                        padding: "12px",
+                        borderRadius: 12,
+                        border: editPkgForm.businessLimit === mode ? "1.5px solid #7c3aed" : "1.5px solid #e2e8f0",
+                        background: editPkgForm.businessLimit === mode ? "#f5f3ff" : "#fff",
+                        color: editPkgForm.businessLimit === mode ? "#7c3aed" : "#64748b",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      {editPkgForm.businessLimit === mode ? "✓ " : ""}{mode}
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12, marginTop: 12 }}>PACKAGE LIMITS</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
+                  <Fld label="Plan Duration" value={editPkgForm.planDuration} onChange={v => setEditPkgForm({ ...editPkgForm, planDuration: v })} options={["Monthly", "90 Days", "Yearly"]} />
+                  <Fld label="MANAGER LIMIT (TYPE NUMBER)" value={editPkgForm.managerLimit} onChange={v => setEditPkgForm({ ...editPkgForm, managerLimit: v })} placeholder="e.g. 5 Manager or Unlimited Manager" />
+                  <Fld label="COMPANY NAME LIMIT (CLIENTS)" value={editPkgForm.clientLimit} onChange={v => setEditPkgForm({ ...editPkgForm, clientLimit: v })} placeholder="e.g. 10 Company manage or Unlimited" />
+                  <Fld label="EMPLOYEE LIMIT" value={editPkgForm.employeeLimit} onChange={v => setEditPkgForm({ ...editPkgForm, employeeLimit: v })} placeholder="e.g. 50 Employee manage or Unlimited" />
                 </div>
               </div>
-            </div>
 
-            {/* Budget Row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
-              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
-              <div>
-                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)" }}>{formatCurrency(viewProject.budget, viewProject.currency)}</div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>DESCRIPTION</label>
+                <textarea
+                  value={editPkgForm.description}
+                  onChange={e => setEditPkgForm({ ...editPkgForm, description: e.target.value })}
+                  style={{ width: "100%", height: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", resize: "none" }}
+                  placeholder="Package description..."
+                />
               </div>
-            </div>
 
-            {/* Assigned Employees */}
-            <div style={{ marginBottom: 18 }}>
-              <h3 style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>ASSIGNED EMPLOYEES</h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {(() => {
-                  const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
-                  return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
+              {user?.role === "admin" && (
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>ASSIGN TO SUBADMINS (ONLY ASSIGNED WILL SEE THIS)</label>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 12, border: "1.5px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
+                    {subadmins.map(s => (
+                      <label key={s._id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: T.text, cursor: "pointer", background: editPkgForm.assignedSubadmins?.includes(s._id) ? "rgba(124, 58, 237, 0.1)" : "transparent", padding: "4px 8px", borderRadius: 6 }}>
+                        <input
+                          type="checkbox"
+                          checked={editPkgForm.assignedSubadmins?.includes(s._id)}
+                          onChange={() => {
+                            const current = editPkgForm.assignedSubadmins || [];
+                            const next = current.includes(s._id) ? current.filter(id => id !== s._id) : [...current, s._id];
+                            setEditPkgForm({ ...editPkgForm, assignedSubadmins: next });
+                          }}
+                        />
+                        {s.name}
+                      </label>
+                    ))}
+                    {subadmins.length === 0 && <div style={{ fontSize: 12, color: "var(--app-muted)" }}>No subadmins found</div>}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+                <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
+              </div>
+            </Mdl>
+          )}
+
+          {viewProject && (
+            <Mdl title="Project Details" onClose={() => setViewProject(null)} maxWidth={550}>
+              <div style={{ background: "#fff", borderRadius: 16 }}>
+                {/* Header Info */}
+                <div style={{ background: "var(--app-bg)", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid var(--app-border)" }}>
+                  <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProject.name}</h2>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <Badge label={viewProject.status || "Pending"} />
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
+                      <span>👥</span> {viewProject.client}
                     </div>
-                  )) : <div style={{ color: "var(--app-muted)", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
-                })()}
-              </div>
-            </div>
+                  </div>
+                </div>
 
-            {/* Purpose Row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
-              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
-              <div>
-                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "—"}</div>
-              </div>
-            </div>
+                {/* Budget Row */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
+                  <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
+                  <div>
+                    <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)" }}>{formatCurrency(viewProject.budget, viewProject.currency)}</div>
+                  </div>
+                </div>
 
-            <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
-            </div>
-          </div>
-        </Mdl>
-      )}
+                {/* Assigned Employees */}
+                <div style={{ marginBottom: 18 }}>
+                  <h3 style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>ASSIGNED EMPLOYEES</h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {(() => {
+                      const assignedEmployees = Array.isArray(viewProject.assignedTo) ? viewProject.assignedTo : (viewProject.assignedTo ? [viewProject.assignedTo] : []);
+                      return assignedEmployees.length > 0 ? assignedEmployees.map((emp, idx) => (
+                        <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "var(--app-bg)", borderRadius: 12, border: "1px solid var(--app-border)" }}>
+                          <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{emp[0].toUpperCase()}</div>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>{emp}</span>
+                        </div>
+                      )) : <div style={{ color: "var(--app-muted)", fontSize: 12, fontStyle: "italic" }}>No employees assigned</div>;
+                    })()}
+                  </div>
+                </div>
 
-      {/* Upload File Modal */}
-      {uploadFileTarget && (
-        <Mdl title="Upload Document" onClose={() => { setUploadFileTarget(null); setUploadTargetUser(""); }}>
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 8 }}>Selected File</div>
-            <div style={{ padding: "12px 16px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, display: "flex", alignItems: "center", gap: 10 }}>
-              <i className="ti ti-file" style={{ fontSize: 20, color: "var(--app-accent)" }}></i>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{uploadFileTarget.name}</div>
-                <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{(uploadFileTarget.size / 1024 / 1024).toFixed(2)} MB</div>
+                {/* Purpose Row */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
+                  <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
+                  <div>
+                    <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "—"}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button onClick={() => setViewProject(null)} style={{ flex: 1, padding: "11px", background: "var(--app-accent-gradient)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+                </div>
               </div>
-            </div>
-          </div>
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SEND TO TYPE *</label>
-            <select value={uploadTargetRole} onChange={(e) => { setUploadTargetRole(e.target.value); setUploadTargetUser(""); }} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
-              <option value="client">Client</option>
-              <option value="employee">Employee</option>
-            </select>
-          </div>
-          <div style={{ marginBottom: 24 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SELECT {uploadTargetRole.toUpperCase()} *</label>
-            <select value={uploadTargetUser} onChange={(e) => setUploadTargetUser(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
-              <option value="">-- Select --</option>
-              {uploadTargetRole === "client" 
-                ? clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)
-                : employees.map(e => <option key={e._id || e.id} value={e.name}>{e.name}</option>)
-              }
-            </select>
-          </div>
-          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-            <button onClick={() => { setUploadFileTarget(null); setUploadTargetUser(""); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: "var(--app-text)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button disabled={!uploadTargetUser || uploadIsSending} onClick={async () => {
-              setUploadIsSending(true);
-              try {
-                const reader = new FileReader();
-                reader.readAsDataURL(uploadFileTarget);
-                reader.onload = async () => {
-                  const base64Data = reader.result;
-                  const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
-                  
-                  await axios.post(`${BASE_URL}/api/documents`, {
-                    docType: "upload",
-                    sendTo: uploadTargetRole,
-                    client: uploadTargetUser,
-                    recipientEmail: "",
-                    htmlContent: base64Data,
-                    senderCompany: companyNameStr,
-                    companyId
-                  });
-                  toast.success("File uploaded successfully!");
-                  setUploadFileTarget(null);
-                  setUploadTargetUser("");
-                };
-              } catch (err) {
-                console.error(err);
-                toast.error("Upload failed.");
-              } finally {
-                setUploadIsSending(false);
-              }
-            }} style={{ flex: 1, padding: "11px", background: (!uploadTargetUser || uploadIsSending) ? "var(--app-border)" : "var(--app-accent)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: (!uploadTargetUser || uploadIsSending) ? "var(--app-muted)" : "#fff", cursor: (!uploadTargetUser || uploadIsSending) ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
-              {uploadIsSending ? "Uploading..." : "Upload File"}
-            </button>
-          </div>
-        </Mdl>
-      )}
-            </div>
-  </div>
+            </Mdl>
+          )}
+
+          {/* Upload File Modal */}
+          {uploadFileTarget && (
+            <Mdl title="Upload Document" onClose={() => { setUploadFileTarget(null); setUploadTargetUser(""); }}>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 8 }}>Selected File</div>
+                <div style={{ padding: "12px 16px", background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 10, display: "flex", alignItems: "center", gap: 10 }}>
+                  <i className="ti ti-file" style={{ fontSize: 20, color: "var(--app-accent)" }}></i>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{uploadFileTarget.name}</div>
+                    <div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{(uploadFileTarget.size / 1024 / 1024).toFixed(2)} MB</div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SEND TO TYPE *</label>
+                <select value={uploadTargetRole} onChange={(e) => { setUploadTargetRole(e.target.value); setUploadTargetUser(""); }} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
+                  <option value="client">Client</option>
+                  <option value="employee">Employee</option>
+                </select>
+              </div>
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>SELECT {uploadTargetRole.toUpperCase()} *</label>
+                <select value={uploadTargetUser} onChange={(e) => setUploadTargetUser(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--app-border)", background: "var(--app-bg)", color: "var(--app-text)", fontSize: 13, outline: "none", fontFamily: "inherit" }}>
+                  <option value="">-- Select --</option>
+                  {uploadTargetRole === "client"
+                    ? clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)
+                    : employees.map(e => <option key={e._id || e.id} value={e.name}>{e.name}</option>)
+                  }
+                </select>
+              </div>
+              <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+                <button onClick={() => { setUploadFileTarget(null); setUploadTargetUser(""); }} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: "var(--app-text)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
+                <button disabled={!uploadTargetUser || uploadIsSending} onClick={async () => {
+                  setUploadIsSending(true);
+                  try {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(uploadFileTarget);
+                    reader.onload = async () => {
+                      const base64Data = reader.result;
+                      const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
+
+                      await axios.post(`${BASE_URL}/api/documents`, {
+                        docType: "upload",
+                        sendTo: uploadTargetRole,
+                        client: uploadTargetUser,
+                        recipientEmail: "",
+                        htmlContent: base64Data,
+                        senderCompany: companyNameStr,
+                        companyId
+                      });
+                      toast.success("File uploaded successfully!");
+                      setUploadFileTarget(null);
+                      setUploadTargetUser("");
+                    };
+                  } catch (err) {
+                    console.error(err);
+                    toast.error("Upload failed.");
+                  } finally {
+                    setUploadIsSending(false);
+                  }
+                }} style={{ flex: 1, padding: "11px", background: (!uploadTargetUser || uploadIsSending) ? "var(--app-border)" : "var(--app-accent)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: (!uploadTargetUser || uploadIsSending) ? "var(--app-muted)" : "#fff", cursor: (!uploadTargetUser || uploadIsSending) ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
+                  {uploadIsSending ? "Uploading..." : "Upload File"}
+                </button>
+              </div>
+          </Mdl>
+          )}
+        </div>
+      </div>
+    </div>
+    </div>
   );
 }
-
-

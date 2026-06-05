@@ -774,6 +774,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);
     setSaving(false);
     setStep("preview");
+    window.scrollTo(0, 0);
   };
 
   // ── Delete invoice ──────────────────────────────────────────
@@ -1411,7 +1412,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                   const isPending = !isPaid && !isPartPaid && !isDraft;
 
                   return (
-                    <tr key={entry.id || idx} onClick={() => setViewEntry(entry)}>
+                    <tr key={entry.id || idx} onClick={() => { loadEntry(entry); setStep("preview"); }}>
                       <td onClick={e => e.stopPropagation()}><input type="checkbox" className="cb" /></td>
                       <td className="inv-id" style={{color: "var(--teal)", fontWeight: 800}}>{entry.invoiceNo || "—"}</td>
                       <td>
@@ -1453,7 +1454,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                       </td>
                       <td onClick={e => e.stopPropagation()}>
                         <div className="row-actions">
-                          <button className="row-btn" onClick={() => { loadEntry(entry); setStep("preview"); }}><i className="ti ti-eye"></i></button>
+                          <button className="row-btn" onClick={() => { loadEntry(entry); setStep("preview"); window.scrollTo(0, 0); }}><i className="ti ti-eye"></i></button>
                           {(isPaid || isPartPaid) ? (
                             <button className="row-btn" onClick={() => {
                               setReceiptEntry({ ...entry, paymentData: { amountPaid: entry.amountPaid || entry.total, paymentMode: entry.paymentMode || "Other", paymentDate: entry.paymentDate || new Date().toISOString(), transactionId: entry.transactionId } });
@@ -1611,7 +1612,12 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               width: 100% !important; max-width: 100% !important; margin: 0 !important; 
               border-radius: 0 !important; box-shadow: none !important; 
               overflow: visible !important; min-height: 0 !important; height: auto !important;
+              page-break-after: always; break-after: page;
             }
+            .invoice-paper:last-child {
+              page-break-after: auto; break-after: auto;
+            }
+            .inv-table-wrap { overflow-x: visible !important; overflow: visible !important; }
             .flex-spacer { display: none !important; }
             body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
           }
@@ -1729,12 +1735,12 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
           </div>)}
 
           {/* Items */}
-          <div style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
+          <div className="inv-table-wrap" style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
               <thead>
-                <tr className="avoid-break" style={{ background: "#0f1c2e" }}>
+                <tr className="avoid-break" style={{ background: "#f8fafc" }}>
                   {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
-                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 700, color: "#fff", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
                   ))}
                 </tr>
               </thead>
@@ -2446,13 +2452,13 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               {/* ITEMS TABLE */}
                <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
                 <thead>
-                  <tr style={{ background: "#0f1c2e" }}>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "left" }}>#</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "left" }}>Description</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "right" }}>Qty</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "right" }}>Unit Price</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "right" }}>Tax %</th>
-                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "700", color: "#fff", textAlign: "right" }}>Total</th>
+                  <tr style={{ background: "#f8fafc" }}>
+                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>#</th>
+                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>Description</th>
+                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Qty</th>
+                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Unit Price</th>
+                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Tax %</th>
+                    <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "right" }}>Total</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -514,11 +514,11 @@ const T = darkMode ? {
           {active === "subadmins" && <SubadminsList THEME={THEME} subadmins={subadmins} refresh={fetchSubadmins} packages={packages} subscriptions={subscriptions} fetchSubscriptions={fetchSubscriptions} />}
           {active === "employees" && <EmployeesPage THEME={THEME} employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage THEME={THEME} managers={managers} setManagers={setManagers} />}
-          {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} setProjects={setProjects} clients={clients} employees={employees} />}
+          {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} fetchTasks={fetchTasks} />}
           {active === "quotations" && <QuotationCreatorModern THEME={THEME} clients={clients} projects={projects} />}
           {active === "proposals" && <ProjectProposalCreator clients={clients} companyLogo={user?.logoUrl} companyName={user?.companyName || "M Business"} />}
           {active === "invoices" && <InvoiceCreator THEME={THEME} clients={clients} projects={projects} />}
-          {active === "tasks" && <TaskPage projects={projects} employees={employees} />}
+          {active === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} />}
           {active === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} />}
           {active === "reports" && <ReportsPage THEME={THEME} clients={clients} projects={projects} employees={employees} managers={managers} />}
           {active === "subscriptions" && <SubscriptionsPage THEME={THEME} subscriptions={subscriptions} />}
@@ -1639,12 +1639,62 @@ function ManagersPage({ THEME, managers, setManagers }) {
 }
 
 // ── Projects Page ──
-function ProjectsPage({ THEME, projects, setProjects, clients, employees }) {
+function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees, fetchTasks }) {
   const [search, setSearch] = useState("");
-  const filtered = (projects || []).filter(p =>
+  const [viewTasksProj, setViewTasksProj] = useState(null);
+
+  const projectsWithProgress = (projects || []).map(p => {
+    const projId = String(p._id || p.id || "");
+    const projName = String(p.name || p.title || "").toLowerCase();
+    
+    const projTasks = (tasks || []).filter(t => {
+      const tProjId = String(t.projectId?._id || t.projectId || t.project || t.projectName || t.project_id || "");
+      return tProjId === projId || tProjId.toLowerCase() === projName;
+    });
+    
+    let pct = 0;
+    const s = (p.status || "").toLowerCase();
+    if (s === "completed" || s === "done") {
+      pct = 100;
+    } else if (projTasks.length > 0) {
+      const doneTasks = projTasks.filter(t => ["done", "completed"].includes((t.status || "").toLowerCase())).length;
+      pct = Math.round((doneTasks / projTasks.length) * 100);
+    } else {
+      pct = p.progress || 0;
+    }
+    return { ...p, progress: pct };
+  });
+
+  const filtered = projectsWithProgress.filter(p =>
     (p.name || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.client || "").toLowerCase().includes(search.toLowerCase())
   );
+
+  if (viewTasksProj) {
+    return (
+      <div style={{ background: THEME.card, borderRadius: 24, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
+        <div style={{ marginBottom: "20px" }}>
+          <button 
+            onClick={() => setViewTasksProj(null)} 
+            style={{ padding: "8px 16px", background: THEME.surface, color: THEME.text, border: `1px solid ${THEME.border}`, borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+          >
+            ← Back to Projects
+          </button>
+        </div>
+        <div style={{ flex: 1 }}>
+          <TaskPage 
+            projects={projects} 
+            employees={employees} 
+            onUpdate={() => fetchTasks && fetchTasks()}
+            selectedProjectId={viewTasksProj._id || viewTasksProj.id || null} 
+            selectedProjectName={viewTasksProj.name || null} 
+            onClearProjectFilter={() => setViewTasksProj(null)}
+            onSelectProject={(p) => setViewTasksProj(p)}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ background: THEME.card, borderRadius: 24, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
@@ -1657,7 +1707,7 @@ function ProjectsPage({ THEME, projects, setProjects, clients, employees }) {
           style={{ padding: "8px 16px", borderRadius: 10, fontSize: 13, minWidth: 240, background: THEME.surface, color: THEME.text, border: `1px solid ${THEME.border}` }}
         />
       </div>
-      <ModernProjectsView projects={projects} searchQuery={search} />
+      <ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => setViewTasksProj(p)} />
     </div>
   );
 }

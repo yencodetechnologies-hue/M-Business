@@ -222,6 +222,7 @@ export default function InvoiceViewer() {
           .print-wrapper { background: white !important; padding: 0 !important; min-height: 0 !important; }
           .inv-paper { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; width: 100% !important; min-height: 270mm !important; margin: 0 auto !important; position: relative !important; page-break-after: always; }
           .inv-paper:last-child { page-break-after: auto; }
+          .inv-table-wrap { overflow-x: visible !important; overflow: visible !important; }
           body > div { height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
         }
         @media (max-width:600px) { .inv-hgrid { flex-direction:column!important; } .inv-btgrid { grid-template-columns:1fr!important; } }
@@ -318,7 +319,7 @@ export default function InvoiceViewer() {
               )}
 
               {/* Items */}
-              <div style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
+              <div className="inv-table-wrap" style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
                   <thead>
                     <tr style={{ background: currentT.primaryColor || "#1A2E35" }}>

@@ -162,7 +162,7 @@ router.put("/:id", async (req, res) => {
       updateData.assignedTo = [updateData.assignedTo];
     }
 
-    const companyId = req.companyId || "NONE";
+    const companyId = req.companyId || "";
     const project = await Project.findOneAndUpdate(
       { _id: req.params.id, companyId },
       { $set: updateData },
@@ -201,7 +201,7 @@ router.put("/:id", async (req, res) => {
 // DELETE project
 router.delete("/:id", async (req, res) => {
   try {
-    const companyId = req.companyId || "NONE";
+    const companyId = req.companyId || "";
     const project = await Project.findOneAndDelete({ _id: req.params.id, companyId });
     if (!project) return res.status(404).json({ msg: "Project not found or unauthorized" });
 

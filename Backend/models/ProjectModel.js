@@ -18,6 +18,7 @@ const projectSchema = new mongoose.Schema({
   assignedTo: { type: [String], default: [] },  // ✅ Fixed
   manager: { type: String, default: "" },
   companyId: { type: String, default: "" },
+  loggedHours: { type: Number, default: 0 },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Project", projectSchema);

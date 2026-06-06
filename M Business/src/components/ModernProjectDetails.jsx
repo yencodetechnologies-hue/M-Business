@@ -162,7 +162,7 @@ function getAvatarColor(name) {
 }
 
 export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
-  const [activeTab, setActiveTab] = useState('tasks');
+  const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
 
@@ -351,29 +351,42 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
             <div className="mpd-tabs">
               <button className={`mpd-tab-btn ${activeTab==='milestones'?'mpd-active':''}`} onClick={()=>setActiveTab('milestones')}>Milestones</button>
               <button className={`mpd-tab-btn ${activeTab==='activity'?'mpd-active':''}`} onClick={()=>setActiveTab('activity')}>Activity</button>
+              <button className={`mpd-tab-btn ${activeTab==='updates'?'mpd-active':''}`} onClick={()=>setActiveTab('updates')}>Updates</button>
             </div>
             
             <div className={`mpd-tab-pane ${activeTab==='milestones'?'mpd-active':''}`}>
               {(!project.milestones || project.milestones.length === 0) ? (
                 <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No milestones defined.</div>
               ) : (
-                project.milestones.map((m, idx) => (
-                   <div key={idx} style={{display:'flex', gap:12, marginBottom:16}}>
+                project.milestones.map((m, idx) => {
+                  const isDone = m.done === true;
+                  const isInProgress = !isDone && idx === project.milestones.findIndex(x => !x.done);
+                  const dotColor = isDone ? P.green : isInProgress ? P.primary : P.border;
+                  const dotBorder = isDone || isInProgress ? 'none' : `2px solid ${P.border}`;
+                  const statusLabel = isDone ? '✓ Completed' : isInProgress ? 'In Progress' : 'Pending';
+                  const statusColor = isDone ? P.green : isInProgress ? P.primary : P.textLight;
+                  return (
+                    <div key={idx} style={{display:'flex', gap:12, marginBottom:20}}>
                       <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-                        <div style={{width:13, height:13, borderRadius:'50%', background:P.green, marginTop:3}}></div>
-                        {idx !== project.milestones.length-1 && <div style={{width:2, flex:1, background:P.border, minHeight:20, marginTop:4}}></div>}
+                        <div style={{width:13, height:13, borderRadius:'50%', background:dotColor, border:dotBorder, marginTop:3, flexShrink:0}}></div>
+                        {idx !== project.milestones.length-1 && <div style={{width:2, flex:1, background:P.border, minHeight:24, marginTop:4}}></div>}
                       </div>
                       <div>
-                        <div style={{fontSize:13, fontWeight:700, color:P.textDark}}>{m.name || m}</div>
-                        <div style={{fontSize:11, color:P.textLight, marginTop:2}}>{m.date ? new Date(m.date).toLocaleDateString() : '—'}</div>
+                        <div style={{fontSize:13, fontWeight:800, color:P.textDark}}>{m.name || m}</div>
+                        <div style={{fontSize:11, color:P.textLight, marginTop:2}}>{m.date ? new Date(m.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
+                        <div style={{fontSize:11, fontWeight:700, color:statusColor, marginTop:2}}>{statusLabel}</div>
                       </div>
-                   </div>
-                ))
+                    </div>
+                  );
+                })
               )}
             </div>
 
             <div className={`mpd-tab-pane ${activeTab==='activity'?'mpd-active':''}`}>
                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>Activity logs will appear here.</div>
+            </div>
+            <div className={`mpd-tab-pane ${activeTab==='updates'?'mpd-active':''}`}>
+               <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No updates posted yet.</div>
             </div>
           </div>
         </div>
@@ -395,9 +408,23 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
             ))}
           </div>
 
+          {/* BUDGET */}
+          <div className="mpd-card">
+            <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div></div>
+            <div className="mpd-brow"><span className="mpd-lbl">Total Budget</span><span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span></div>
+            <div className="mpd-brow"><span className="mpd-lbl">Billed</span><span className="mpd-val">{currency}{Math.round(spent * 0.51).toLocaleString()}</span></div>
+            <div className="mpd-brow"><span className="mpd-lbl">Received</span><span className="mpd-val mpd-g">{currency}{Math.round(spent * 0.495).toLocaleString()}</span></div>
+            <div className="mpd-brow"><span className="mpd-lbl">Pending</span><span className="mpd-val mpd-r">{currency}{Math.round(spent * 0.25).toLocaleString()}</span></div>
+            <div className="mpd-brow"><span className="mpd-lbl">Remaining</span><span className="mpd-val mpd-p">{currency}{remaining.toLocaleString()}</span></div>
+            <div style={{marginTop:10}}>
+              <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{width:`${budgetAmt?(spent/budgetAmt)*100:0}%`}}></div></div>
+              <div style={{fontSize:11,color:P.textLight,marginTop:4}}>{budgetAmt?Math.round((spent/budgetAmt)*100):0}% used</div>
+            </div>
+          </div>
+
           {/* FILES */}
           <div className="mpd-card">
-            <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div></div>
+            <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div><button className="mpd-btn mpd-btn-outline" style={{padding:'5px 10px',fontSize:11}}><i className="ti ti-upload"></i> Upload</button></div>
             <div style={{fontSize:12, color:P.textLight, textAlign:'center', padding:'10px 0'}}>No files attached.</div>
           </div>
 

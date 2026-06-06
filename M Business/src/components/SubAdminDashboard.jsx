@@ -259,8 +259,8 @@ function Search({ value, onChange, placeholder }) {
 
 function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-      <div style={{ background: "var(--app-card)", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: "1px solid var(--app-border)" }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+      <div style={{ background: "var(--app-card)", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }}>
         <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
@@ -364,9 +364,9 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, onIte
 
 function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Delete", danger = true }) {
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ background: "var(--app-card)", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", border: "1px solid var(--app-border)" }}>
-        <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "#fee2e2" : "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div style={{ background: "var(--app-card)", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }}>
+        <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "rgba(var(--red-rgb),0.1)" : "rgba(var(--app-accent-rgb),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
           {danger ? "  Delete️" : "✅"}
         </div>
         <h3 style={{ textAlign: "center", margin: "0 0 8px", fontSize: 16, fontWeight: 800, color: T.text }}>{title}</h3>
@@ -476,11 +476,12 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
   const [activeTab, setActiveTab] = useState("overview");
   const [editClient, setEditClient] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [editForm, setEditForm] = useState({ clientName: "", companyName: "", email: "", phone: "", address: "", status: "Active", gstNumber: "", logoUrl: "", contactPersonName: "", contactPersonNo: "", password: "" });
+  const [editForm, setEditForm] = useState({ companyName: "", email: "", phone: "", address: "", status: "Active", gstNumber: "", logoUrl: "", contactPersonName: "", contactPersonNo: "", password: "" });
   const [editErr, setEditErr] = useState({});
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
   const [statusDropOpen, setStatusDropOpen] = useState(false);
+  const [showClientPass, setShowClientPass] = useState(false);
   const statusDropRef = useRef(null);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
@@ -508,14 +509,14 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
   }, []);
 
   const openEdit = (c) => {
-    setEditForm({ clientName: c.clientName || c.name || "", companyName: c.companyName || c.company || "", email: c.email || "", phone: c.phone || "", address: c.address || "", status: c.status || "Active", gstNumber: c.gstNumber || "", logoUrl: c.logoUrl || "", contactPersonName: c.contactPersonName || "", contactPersonNo: c.contactPersonNo || "", password: "" });
+    setEditForm({ companyName: c.companyName || c.company || c.clientName || c.name || "", email: c.email || "", phone: c.phone || "", address: c.address || "", status: c.status || "Active", gstNumber: c.gstNumber || "", logoUrl: c.logoUrl || "", contactPersonName: c.contactPersonName || "", contactPersonNo: c.contactPersonNo || "", password: "" });
     setEditErr({});
     setEditClient(c);
   };
 
   const saveEdit = async () => {
     const errs = {};
-    if (!editForm.clientName.trim()) errs.clientName = "Name required";
+    if (!editForm.companyName.trim()) errs.companyName = "Company name required";
     if (!editForm.email.trim()) errs.email = "Email required";
     if (Object.keys(errs).length) { setEditErr(errs); return; }
     try {
@@ -914,35 +915,31 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
       {editClient && (
         <Mdl title="Edit Client" onClose={() => setEditClient(null)}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-            <div onClick={() => { const input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.onchange = (e) => triggerCrop(e, (img) => setEditForm(p => ({ ...p, logoUrl: img })), 1); input.click(); }} style={{ cursor: "pointer", padding: editForm.logoUrl ? 4 : 24, borderRadius: 20, background: "#fff", border: "2.5px dashed #E0EEF0", display: "flex", alignItems: "center", justifyContent: "center", minWidth: 100, minHeight: 100, overflow: "hidden" }}>
-              {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{ width: "auto", height: "auto", maxWidth: 240, maxHeight: 120, objectFit: "contain", display: "block", borderRadius: 12 }} /> : <div style={{ textAlign: "center" }}><div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div><div style={{ fontSize: 10, fontWeight: 800, color: "#A0B8BE", textTransform: "uppercase", letterSpacing: 1 }}>Change Logo</div></div>}
+            <div onClick={() => { const input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.onchange = (e) => triggerCrop(e, (img) => setEditForm(p => ({ ...p, logoUrl: img })), 1); input.click(); }} style={{ cursor: "pointer", padding: editForm.logoUrl ? 4 : 24, borderRadius: 20, background: "#fff", border: "2.5px dashed var(--app-border)", display: "flex", alignItems: "center", justifyContent: "center", minWidth: 100, minHeight: 100, overflow: "hidden" }}>
+              {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{ width: "auto", height: "auto", maxWidth: 240, maxHeight: 120, objectFit: "contain", display: "block", borderRadius: 12 }} /> : <div style={{ textAlign: "center" }}><div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div><div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Change Logo</div></div>}
             </div>
           </div>
-          {[
-            { key: "clientName", label: "Client Name*", placeholder: "Full name" },
-            { key: "companyName", label: "Company", placeholder: "Company name" },
-            { key: "email", label: "Email*", placeholder: "email@example.com" },
-            { key: "phone", label: "Phone", placeholder: "+91 XXXXX XXXXX" },
-            { key: "address", label: "Address", placeholder: "City, State" },
-            { key: "gstNumber", label: "GST Number", placeholder: "GST number" },
-            { key: "contactPersonName", label: "Contact Person", placeholder: "Contact name" },
-            { key: "contactPersonNo", label: "Contact Phone", placeholder: "Contact number" },
-          ].map(f => (
-            <div key={f.key} style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 11, fontWeight: 700, color: "#607D86", textTransform: "uppercase", letterSpacing: .5, marginBottom: 5, display: "block" }}>{f.label}</label>
-              <input value={editForm[f.key] || ""} onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder} style={{ width: "100%", padding: "9px 12px", background: "#F5FAFA", border: `1.5px solid ${editErr[f.key] ? "#F05C5C" : "#E0EEF0"}`, borderRadius: 9, fontSize: 13, color: "#1A2E35", fontFamily: "inherit", outline: "none" }} />
-              {editErr[f.key] && <div style={{ color: "#F05C5C", fontSize: 11, marginTop: 3 }}>{editErr[f.key]}</div>}
+          <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+            <Fld label="Company Name *" value={editForm.companyName} onChange={v => setEditForm(p => ({ ...p, companyName: v }))} error={editErr.companyName} />
+            <Fld label="Email *" value={editForm.email} onChange={v => setEditForm(p => ({ ...p, email: v }))} type="email" error={editErr.email} />
+            <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
+            <Fld label="Contact Person No" value={editForm.contactPersonNo} onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
+            <Fld label="Office No" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
+            <Fld label="Company Tax/GST" value={editForm.gstNumber} onChange={v => setEditForm(p => ({ ...p, gstNumber: v }))} />
+            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
+          </div>
+          <Fld label="Company Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD (OPTIONAL)</label>
+            <div style={{ position: "relative" }}>
+              <input type={showClientPass ? "text" : "password"} value={editForm.password} onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Update client password (optional)" />
+              <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showClientPass ? "HIDE" : "SHOW"}</button>
             </div>
-          ))}
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ fontSize: 11, fontWeight: 700, color: "#607D86", textTransform: "uppercase", letterSpacing: .5, marginBottom: 5, display: "block" }}>Status</label>
-            <select value={editForm.status} onChange={e => setEditForm(p => ({ ...p, status: e.target.value }))} style={{ width: "100%", padding: "9px 12px", background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 13, color: "#1A2E35", fontFamily: "inherit", outline: "none" }}>
-              <option>Active</option><option>Pending</option><option>Inactive</option>
-            </select>
+            {editErr.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {editErr.password}</div>}
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => setEditClient(null)} style={{ flex: 1, padding: 10, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ flex: 1, padding: 10, background: "#00BCD4", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>{saving ? "Saving..." : "Save Changes"}</button>
+            <button onClick={() => setEditClient(null)} style={{ flex: 1, padding: 10, background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{ flex: 1, padding: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving..." : "Save Changes"}</button>
           </div>
         </Mdl>
       )}
@@ -3125,12 +3122,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [accounts, setAccounts] = useState([]);
 
   // ← இது மட்டும் இருக்கணும் (KEEP THIS)
-  const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "purple");
+  const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "teal");
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "var(--app-accent)");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [returnToModal, setReturnToModal] = useState(null);
   const [limitModal, setLimitModal] = useState(null); // { type, limit }
+  const [forceUpgradeTab, setForceUpgradeTab] = useState(false);
 
   // Helper: hex to HSL
   const hexToHsl = (hex) => {
@@ -4330,7 +4328,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </div>
 
           <div className="content">
-            <EmployeeSubscriptionWarning user={user} onRenew={() => setActive("mysubscriptions")} />
+            <EmployeeSubscriptionWarning user={user} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); }} />
 
             {/* ── Dashboard ── */}
             {validActive === "dashboard" && (
@@ -4467,7 +4465,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       </div>
                     </div>
                     <button
-                      onClick={() => setActive("mysubscriptions")}
+                      onClick={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); }}
                       style={{
                         background: "linear-gradient(135deg,#f59e0b,#d97706)",
                         border: "none",
@@ -4916,7 +4914,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   </div>
                 )}
 
-                {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} />}
+                {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} />}
                 {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
                 {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
                 {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}
@@ -5129,7 +5127,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 
           {/* ── Add Client Modal ── */}
-          {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setActive("mysubscriptions"); }} />}
+          {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
           {modal === "client" && <Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
             {clientSuccessData ? (
               <div style={{ textAlign: "center", padding: "5px 0" }}>

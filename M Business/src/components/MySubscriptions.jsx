@@ -83,7 +83,7 @@ const getDaysLeft = (endDate) => {
 const getStatusColor = (s) => ({ active: T.success, completed: T.success, paid: T.success, cancelled: T.danger, expired: T.danger, failed: T.danger, pending: T.warning, refunded: T.warning }[s?.toLowerCase()] || T.muted);
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview", preloadedSubscription = null }) {
+export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview", preloadedSubscription = null, onTabChange }) {
   const [subscription, setSubscription] = useState(preloadedSubscription);
   const [payments, setPayments] = useState([]);
   const [invoices, setInvoices] = useState([]);
@@ -97,26 +97,60 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   useEffect(() => {
     setActiveTab(initialTab);
   }, [initialTab]);
+
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    if (onTabChange) onTabChange();
+  };
   const [toast, setToast] = useState("");
   const [mockGatewayOpen, setMockGatewayOpen] = useState(null);
   const [paymentSuccessData, setPaymentSuccessData] = useState(null);
   const [assignedPackages, setAssignedPackages] = useState([]);
+  
+  // For testing: manually trigger success popup
+  const testSuccessPopup = () => {
+    console.log("Manually triggering success popup");
+    setPaymentSuccessData({ name: "Professional" });
+  };
 
   // Check URL for PayU success/failure redirect
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const paymentStatus = params.get("payment");
-    if (paymentStatus === "success") {
-      showToast("🎉 Payment Successful! Your plan is active.");
-      const planName = params.get("plan");
-      setPaymentSuccessData({ name: planName || "Subscription" });
+    const checkPaymentStatus = () => {
+      const params = new URLSearchParams(window.location.search);
+      const paymentStatus = params.get("payment");
+      console.log("Checking payment status:", paymentStatus);
+      console.log("Full URL:", window.location.href);
       
-      // Clean up URL without reloading
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (paymentStatus === "failed") {
-      showToast("❌ Payment failed. Please try again.");
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
+      if (paymentStatus === "success") {
+        showToast("🎉 Payment Successful! Your plan is active.");
+        const planName = params.get("plan");
+        console.log("Setting payment success data for plan:", planName);
+        setPaymentSuccessData({ name: planName || "Subscription" });
+        
+        // Refresh subscription data after successful payment with delay to ensure backend updates
+        setTimeout(() => fetchData(), 1000);
+        
+        // Clean up URL without reloading
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (paymentStatus === "failed") {
+        showToast("❌ Payment failed. Please try again.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    };
+    
+    checkPaymentStatus();
+    
+    // Also check on URL changes (for PayU redirect)
+    const handlePopState = () => checkPaymentStatus();
+    window.addEventListener('popstate', handlePopState);
+    
+    // Also check periodically for PayU redirect
+    const interval = setInterval(checkPaymentStatus, 1000);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      clearInterval(interval);
+    };
   }, []);
 
   const userId = user?._id || user?.id;
@@ -136,7 +170,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         setSubscription(sub);
         const days = getDaysLeft(sub.endDate);
         if (sub.status === "hidden" || sub.status === "expired" || (days !== null && days <= 10)) {
-          setActiveTab("upgrade");
+          handleTabChange("upgrade");
         }
       } else {
         setSubscription(null);
@@ -364,19 +398,71 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
 
   // ── Success UI ───────────────────────────────────────────────────────────────
   if (paymentSuccessData) {
+    console.log("Showing payment success popup for:", paymentSuccessData);
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, textAlign: "center", animation: "fadeIn 0.5s ease" }}>
-        <style>{`@keyframes scaleIn { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
-        <div style={{ width: 90, height: 90, borderRadius: "50%", background: "linear-gradient(135deg, #10b981, #059669)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 40, marginBottom: 24, boxShadow: "0 10px 30px rgba(16,185,129,0.3)", animation: "scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)" }}>
-          ✓
-        </div>
-        <h2 style={{ fontSize: 28, fontWeight: 800, color: "#1e293b", margin: "0 0 12px" }}>Payment Successful! 🎉</h2>
-        <p style={{ fontSize: 16, color: "#64748b", margin: 0, maxWidth: 400, lineHeight: 1.5 }}>
-          Your <strong>{paymentSuccessData.name}</strong> plan is now active. Your dashboard is ready!
-        </p>
-        <div style={{ marginTop: 32, display: "flex", alignItems: "center", gap: 10, color: "#94a3b8", fontSize: 13, fontWeight: 700, background: "#f8fafc", padding: "10px 20px", borderRadius: 20 }}>
-          <div style={{ width: 14, height: 14, border: "2px solid #cbd5e1", borderTopColor: "var(--app-accent)", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-          Waiting {onSubscriptionSuccess ? "for Dashboard..." : "for Home..."}
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(10px)", zIndex: 999999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <style>{`@keyframes scaleIn { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } } @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+        <div style={{ background: "#fff", borderRadius: 24, padding: 48, maxWidth: 480, width: "100%", textAlign: "center", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", animation: "fadeIn 0.5s ease", position: "relative" }}>
+          <div style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, #10b981, #059669)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 48, marginBottom: 28, boxShadow: "0 10px 30px rgba(16,185,129,0.3)", animation: "scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)", margin: "0 auto 28px" }}>
+            ✓
+          </div>
+          <h2 style={{ fontSize: 32, fontWeight: 800, color: "#1e293b", margin: "0 0 16px" }}>Payment Successful! 🎉</h2>
+          <p style={{ fontSize: 16, color: "#64748b", margin: "0 0 32px", lineHeight: 1.6, maxWidth: 380, margin: "0 auto 32px" }}>
+            Your <strong>{paymentSuccessData.name}</strong> plan is now active. Your dashboard is ready!
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, color: "#10b981", fontSize: 14, fontWeight: 700, background: "#ecfdf5", padding: "12px 24px", borderRadius: 12 }}>
+              <div style={{ width: 16, height: 16, border: "2px solid #10b981", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+              Activating your subscription...
+            </div>
+            <button 
+              onClick={() => {
+                console.log("Go to Dashboard clicked");
+                setPaymentSuccessData(null);
+                if (onSubscriptionSuccess) onSubscriptionSuccess();
+                else window.location.href = "/";
+              }}
+              style={{ 
+                width: "100%", 
+                padding: "14px 28px", 
+                borderRadius: 12, 
+                fontSize: 15, 
+                fontWeight: 800, 
+                cursor: "pointer", 
+                background: "linear-gradient(135deg, #10b981, #059669)", 
+                color: "#fff", 
+                border: "none", 
+                fontFamily: "inherit",
+                boxShadow: "0 4px 12px rgba(16,185,129,0.3)",
+                transition: "all 0.2s"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+              onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
+            >
+              Go to Dashboard
+            </button>
+            {/* Test button - remove in production */}
+            {process.env.NODE_ENV === 'development' && (
+              <button 
+                onClick={testSuccessPopup}
+                style={{ 
+                  width: "100%", 
+                  padding: "8px 16px", 
+                  borderRadius: 8, 
+                  fontSize: 12, 
+                  fontWeight: 600, 
+                  cursor: "pointer", 
+                  background: "#f1f5f9", 
+                  color: "#64748b", 
+                  border: "1px solid #e2e8f0", 
+                  fontFamily: "inherit",
+                  marginTop: 8
+                }}
+              >
+                Test Popup Again
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -516,7 +602,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
             Your subscription expired {daysSinceExpiry} days ago. Access has been restricted. Please renew your plan to restore access.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-            <button onClick={() => setActiveTab("upgrade")} style={{ display: "inline-block", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={() => handleTabChange("upgrade")} style={{ display: "inline-block", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer", fontFamily: "inherit" }}>
               🚀 Renew Subscription
             </button>
             <a href="tel:+919876543210" style={{ display: "inline-block", background: "#f1f5f9", color: "var(--app-sidebar)", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, fontSize: 14, border: "1.5px solid #e2e8f0" }}>
@@ -601,7 +687,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   <div style={{ zIndex: 1, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "center" }}>
     <div style={{ fontSize: 42, fontWeight: 900, marginBottom: 4, letterSpacing: "-1px" }}>₹{subscription.planPrice?.toLocaleString("en-IN") || "0"}</div>
     <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 600, marginBottom: 24 }}>per {subscription.billingCycle || "month"}</div>
-    <button onClick={() => setActiveTab("upgrade")} style={{ background: "#fff", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
+    <button onClick={() => handleTabChange("upgrade")} style={{ background: "#fff", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
       <i className="ti ti-arrow-up"></i> Upgrade Now
     </button>
     {daysLeft !== null && (
@@ -701,7 +787,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">Billing History</div>
-                <button className="panel-action" onClick={() => setActiveTab(activeTab === "payments" ? "overview" : "payments")}>
+                <button className="panel-action" onClick={() => handleTabChange(activeTab === "payments" ? "overview" : "payments")}>
                   {activeTab === "payments" ? "Hide all" : "View all"} <span>→</span>
                 </button>
               </div>

@@ -137,6 +137,9 @@ class PaymentController {
             isFullyPaid: true,
             invoiceRefs: [`INV-SUB-${ts}`],
             quotationRefs: [`QUO-SUB-${ts}`],
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+            nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             updatedAt: new Date()
           }, { new: true });
           

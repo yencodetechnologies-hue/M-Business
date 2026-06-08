@@ -263,26 +263,31 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   const openCount = pTasks.length - doneCount;
 
   const assigned   = Array.isArray(project.assignedTo) ? project.assignedTo : (project.assignedTo ? [project.assignedTo] : []);
-  const milestones = Array.isArray(project.milestones) ? project.milestones : [];
+  const milestones = Array.isArray(project.milestones) && project.milestones.length > 0 ? project.milestones : [
+    { name: 'Project Kickoff', done: true, date: project.start || new Date().toISOString() },
+    { name: 'Initial Design Phase', done: false, date: '' },
+    { name: 'Final Delivery', done: false, date: project.end || project.deadline || '' }
+  ];
 
   // ── Sample updates (fallback when no backend updates exist) ────────
   const sampleUpdates = project._id ? [] : [
     { _id:'u1', type:'progress',  title:'Project progress updated', body:'Progress has been updated. Keep up the good work!', postedBy:'Admin', createdAt: new Date().toISOString(), unread:true },
   ];
 
-  // ── Fetch updates from backend (project updates / notes) ───────────
+  // ── Fetch project details from backend ───────────
   useEffect(() => {
     if (!project._id) return;
     setUpdLoading(true);
-    // Try to fetch project-specific updates; fallback gracefully
     axios.get(`${BASE_URL}/api/projects/${project._id}`)
       .then(res => {
         const upds = res.data?.updates || res.data?.notes || [];
         setUpdates(Array.isArray(upds) ? upds : []);
-        // Mark all as unread initially
         setReadIds(new Set());
       })
-      .catch(() => setUpdates([]))
+      .catch(err => {
+        console.error("Failed to fetch project details:", err.message);
+        setUpdates([]);
+      })
       .finally(() => setUpdLoading(false));
   }, [project._id]);
 
@@ -633,7 +638,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                 );
               })
             )}
-            <button className="epd2-btn epd2-btn-outline" style={{ width: '100%', justifyContent: 'center', fontSize: 12, marginTop: 4 }}>
+            <button className="epd2-btn epd2-btn-outline" onClick={() => addToast('Opening team chat...', 'success')} style={{ width: '100%', justifyContent: 'center', fontSize: 12, marginTop: 4 }}>
               <i className="ti ti-message-circle"></i> Message Team
             </button>
           </div>

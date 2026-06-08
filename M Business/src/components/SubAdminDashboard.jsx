@@ -514,24 +514,27 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
     setEditClient(c);
   };
 
-  const saveEdit = async () => {
-    const errs = {};
-    if (!editForm.companyName.trim()) errs.companyName = "Company name required";
-    if (!editForm.email.trim()) errs.email = "Email required";
-    if (Object.keys(errs).length) { setEditErr(errs); return; }
-    try {
-      setSaving(true);
-      const res = await axios.put(`${BASE_URL}/api/clients/${editClient._id}`, editForm);
-      setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...(res.data.client || editForm) } : c));
-      setEditClient(null);
-      showToast("✅ Client updated!");
-    } catch {
-      setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm } : c));
-      setEditClient(null);
-      showToast("✅ Updated locally!");
-    } finally { setSaving(false); }
-  };
-
+const saveEdit = async () => {
+  const errs = {};
+  if (!editForm.name.trim()) errs.name = "Name required";
+  if (!editForm.client.trim()) errs.client = "Company name required";
+  if (Object.keys(errs).length) { setEditErr(errs); return; }
+  try {
+    setSaving(true);
+    const payload = {
+      ...editForm,
+      deadline: editForm.end || editForm.start || "",
+    };
+    const res = await axios.put(`${BASE_URL}/api/projects/${editProj._id}`, payload);
+    setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...(res.data.project || payload) } : p));
+    setEditProj(null);
+    showToast("✅ Project updated!");
+  } catch {
+    setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...editForm } : p));
+    setEditProj(null);
+    showToast("✅ Updated locally!");
+  } finally { setSaving(false); }
+};
   const doDelete = async () => {
     try { await axios.delete(`${BASE_URL}/api/clients/${deleteTarget._id}`); } catch { }
     setClients(prev => prev.filter(c => c._id !== deleteTarget._id));
@@ -924,6 +927,8 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             <Fld label="Email *" value={editForm.email} onChange={v => setEditForm(p => ({ ...p, email: v }))} type="email" error={editErr.email} />
             <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
             <Fld label="Contact Person No" value={editForm.contactPersonNo} onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
+            <Fld label="Category" value={editForm.category || "Web Development"} onChange={v => setEditForm(p => ({ ...p, category: v }))} options={["Web Development", "Mobile App", "UI/UX Design", "Marketing", "Consulting", "Other"]} />
+            <Fld label="Priority" value={editForm.priority || "medium"} onChange={v => setEditForm(p => ({ ...p, priority: v }))} options={["low", "medium", "high"]} />
             <Fld label="Office No" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
             <Fld label="Company Tax/GST" value={editForm.gstNumber} onChange={v => setEditForm(p => ({ ...p, gstNumber: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
@@ -1752,7 +1757,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack, onCreateProject }) {
+function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject }) {
   const [search, setSearch] = useState("");
 
   const projectsWithProgress = (projects || []).map(p => {
@@ -1775,12 +1780,7 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
 
-  useEffect(() => {
-    if (jumpProject) {
-      setViewProj(jumpProject);
-      setJumpProject(null);
-    }
-  }, [jumpProject]);
+  // UseEffect removed to prevent unnecessary popup
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -1791,48 +1791,69 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   useEffect(() => { setCurrentPage(1); }, [search, projects.length]);
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  const openEdit = (p) => {
+const openEdit = (p) => {
+  setJumpProject(p);
+  if (onEditProject) {
+    onEditProject(p);
+  } else {
     let currentProgress = p.progress || 0;
     const s = (p.status || "").toLowerCase();
-    if (s === "completed" || s === "done") {
-      currentProgress = 100;
-    }
+    if (s === "completed" || s === "done") currentProgress = 100;
 
-    setEditForm({ 
-      name: p.name || "", 
-      client: p.client || "", 
-      purpose: p.purpose || "", 
-      description: p.description || "", 
-      start: p.start || "", 
-      end: p.end || "", 
-      budget: p.budget || "", 
-      currency: p.currency || "₹", 
-      team: p.team || "", 
-      status: p.status || "Pending", 
+    setEditForm({
+      name: p.name || "",
+      client: p.client || "",
+      contactPersonName: p.contactPersonName || "",
+      contactPersonNo: p.contactPersonNo || "",
+      category: p.category || "Web Development",
+      priority: p.priority || "medium",
+      purpose: p.purpose || "",
+      description: p.description || "",
+      start: p.start ? new Date(p.start).toISOString().split('T')[0] : "",
+      end: p.end ? new Date(p.end).toISOString().split('T')[0] : (p.deadline ? new Date(p.deadline).toISOString().split('T')[0] : ""),
+      budget: p.budget || "",
+      currency: p.currency || "₹",
+      team: p.team || "",
+      status: p.status || "Pending",
       progress: currentProgress,
-      assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []) 
+      assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []),
+      manager: p.manager || "",
+      loggedHours: p.loggedHours || 0,
+      milestones: Array.isArray(p.milestones) ? p.milestones : [],
+      portalOpts: p.portalOpts || {
+        enablePortal: false,
+        showProgress: false,
+        showMilestones: false,
+        showTeam: false,
+        allowMessages: false
+      },
     });
     setEditErr({});
     setEditProj(p);
-  };
+  }
+};
 
-  const saveEdit = async () => {
-    const errs = {};
-    if (!editForm.name.trim()) errs.name = "Name required";
-    if (!editForm.client.trim()) errs.client = "Company name required";
-    if (Object.keys(errs).length) { setEditErr(errs); return; }
-    try {
-      setSaving(true);
-      const res = await axios.put(`${BASE_URL}/api/projects/${editProj._id}`, editForm);
-      setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...(res.data.project || editForm) } : p));
-      setEditProj(null);
-      showToast("✅ Project updated!");
-    } catch {
-      setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...editForm } : p));
-      setEditProj(null);
-      showToast("✅ Updated locally!");
-    } finally { setSaving(false); }
-  };
+const saveEdit = async () => {
+  const errs = {};
+  if (!editForm.name.trim()) errs.name = "Name required";
+  if (!editForm.client.trim()) errs.client = "Company name required";
+  if (Object.keys(errs).length) { setEditErr(errs); return; }
+  try {
+    setSaving(true);
+    const payload = {
+      ...editForm,
+      deadline: editForm.end || editForm.start || "",
+    };
+    const res = await axios.put(`${BASE_URL}/api/projects/${editProj._id}`, payload);
+    setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...(res.data.project || payload) } : p));
+    setEditProj(null);
+    showToast("✅ Project updated!");
+  } catch {
+    setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...editForm } : p));
+    setEditProj(null);
+    showToast("✅ Updated locally!");
+  } finally { setSaving(false); }
+};
 
   const doDelete = async () => {
     try { await axios.delete(`${BASE_URL}/api/projects/${deleteTarget._id}`); } catch { }
@@ -1947,127 +1968,252 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
           </div>
         </Mdl>
       )}
+{editProj && (
+  <Mdl title="Edit Project" onClose={() => setEditProj(null)}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
+      
+      {/* Project Name */}
+      <Fld label="Project Name *" value={editForm.name}
+        onChange={v => { setEditForm(p => ({ ...p, name: v })); setEditErr(p => ({ ...p, name: "" })); }}
+        error={editErr.name} />
 
-      {editProj && (
-        <Mdl title="Edit Project" onClose={() => setEditProj(null)}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-            <Fld label="Project Name *" value={editForm.name} onChange={v => { setEditForm(p => ({ ...p, name: v })); setEditErr(p => ({ ...p, name: "" })); }} error={editErr.name} />
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
-              <ClientDropdown clients={clients} value={editForm.client} onChange={v => { setEditForm(p => ({ ...p, client: v })); setEditErr(p => ({ ...p, client: "" })); }} error={editErr.client} />
-              {editErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {editErr.client}</div>}
-            </div>
-            <Fld label="Purpose" value={editForm.purpose} onChange={v => setEditForm(p => ({ ...p, purpose: v }))} />
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
-              <div style={{ display: "flex", gap: 8 }}>
-                <select
-                  value={editForm.currency}
-                  onChange={e => setEditForm({ ...editForm, currency: e.target.value })}
-                  style={{ width: 70, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
-                >
-                  {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-                <input
-                  type="text"
-                  value={editForm.budget}
-                  onChange={e => setEditForm({ ...editForm, budget: e.target.value })}
-                  style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
-                  placeholder="0.00"
-                />
-              </div>
-            </div>
-            <Fld label="Start Date" value={editForm.start} type="date" onChange={v => setEditForm(p => ({ ...p, start: v }))} />
-            <Fld label="End Date" value={editForm.end} type="date" onChange={v => setEditForm(p => ({ ...p, end: v }))} />
-            <Fld label="Team Members" value={editForm.team} onChange={v => setEditForm(p => ({ ...p, team: v }))} />
-            <Fld 
-              label="Status" 
-              value={editForm.status} 
-              onChange={v => {
-                let updatedProgress = editForm.progress || 0;
-                if (v.toLowerCase() === "completed" || v.toLowerCase() === "done") {
-                  updatedProgress = 100;
-                } else if (v.toLowerCase() === "pending") {
-                  updatedProgress = 0;
-                } else if (v.toLowerCase() === "in progress" && (editForm.progress || 0) === 0) {
-                  updatedProgress = 50;
-                }
-                setEditForm(prev => ({ ...prev, status: v, progress: updatedProgress }));
-              }} 
-              options={["Active", "On Hold", "Completed", "Overdue"]} 
-              allowCustom={true} 
-            />
-            <Fld 
-              label="Progress (%)" 
-              value={editForm.progress || 0} 
-              type="number"
-              placeholder="0"
-              onChange={v => {
-                let val = Number(v);
-                if (val < 0) val = 0;
-                if (val > 100) val = 100;
-                setEditForm(prev => ({ ...prev, progress: val }));
-              }} 
-            />
-          </div>
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-              <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 0 }}>ASSIGN EMPLOYEES</label>
-              <button onClick={() => onAddEmployee && onAddEmployee()} style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ fontSize: 14 }}>+</span> Add Employee
-              </button>
-            </div>
-            <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "12px", background: "var(--app-bg)", maxHeight: 200, overflowY: "auto" }}>
-              {employees.length === 0 ? <div style={{ color: "var(--app-muted)", fontSize: 13, textAlign: "center", padding: "20px" }}>No employees available</div>
-                : employees.map(emp => (
-                  <div key={emp._id || emp.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--app-bg)" }}>
-                    <input type="checkbox"
-                      id={`edit-emp-${emp._id || emp.email}`}
-                      checked={Array.isArray(editForm.assignedTo) ? editForm.assignedTo.includes(emp.name) : (editForm.assignedTo === emp.name)}
-                      onChange={e => {
-                        const currentAssigned = Array.isArray(editForm.assignedTo) ? editForm.assignedTo : (editForm.assignedTo ? [editForm.assignedTo] : []);
-                        if (e.target.checked) {
-                          setEditForm({ ...editForm, assignedTo: [...currentAssigned, emp.name] });
-                        } else {
-                          setEditForm({ ...editForm, assignedTo: currentAssigned.filter(name => name !== emp.name) });
-                        }
-                      }}
-                      style={{ width: 16, height: 16, cursor: "pointer" }}
-                    />
-                    <label htmlFor={`edit-emp-${emp._id || emp.email}`} style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
-                      <span>{emp.name}</span>
-                      {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "var(--app-border)", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
-                    </label>
-                  </div>
-                ))}
-            </div>
-            {editForm.assignedTo && editForm.assignedTo.length > 0 && (
-              <div style={{ marginTop: 12 }}>
-                <label style={{ display: "block", fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 6 }}>SELECTED EMPLOYEES ({editForm.assignedTo.length})</label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {editForm.assignedTo.map(name => (
-                    <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
-                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name ? name[0].toUpperCase() : "?"}</div>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-muted)" }}>{name}</span>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setEditForm({ ...editForm, assignedTo: editForm.assignedTo.filter(n => n !== name) }); }}
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-          <Fld label="Description" value={editForm.description} onChange={v => setEditForm(p => ({ ...p, description: v }))} />
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
-            <button onClick={() => setEditProj(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
-          </div>
-        </Mdl>
+      {/* Client */}
+      <div style={{ marginBottom: 14 }}>
+        <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
+        <ClientDropdown clients={clients} value={editForm.client}
+          onChange={v => { setEditForm(p => ({ ...p, client: v })); setEditErr(p => ({ ...p, client: "" })); }}
+          error={editErr.client} />
+        {editErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {editErr.client}</div>}
+      </div>
+
+      {/* Contact */}
+      <Fld label="Contact Person Name" value={editForm.contactPersonName}
+        onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
+      <Fld label="Contact Person No" value={editForm.contactPersonNo}
+        onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
+
+      {/* Category */}
+      <Fld label="Category" value={editForm.category}
+        onChange={v => setEditForm(p => ({ ...p, category: v }))}
+        options={["Web Development", "Mobile App", "UI/UX Design", "Marketing", "Consulting", "Other"]} />
+
+      {/* Priority */}
+      <Fld label="Priority" value={editForm.priority}
+        onChange={v => setEditForm(p => ({ ...p, priority: v }))}
+        options={["low", "medium", "high"]} />
+
+      {/* Purpose */}
+      <Fld label="Purpose" value={editForm.purpose}
+        onChange={v => setEditForm(p => ({ ...p, purpose: v }))} />
+
+      {/* Manager */}
+      <Fld label="Manager" value={editForm.manager}
+        onChange={v => setEditForm(p => ({ ...p, manager: v }))}
+        placeholder="Manager name" />
+
+      {/* Budget */}
+      <div style={{ marginBottom: 14 }}>
+        <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
+        <div style={{ display: "flex", gap: 8 }}>
+          <select value={editForm.currency}
+            onChange={e => setEditForm(p => ({ ...p, currency: e.target.value }))}
+            style={{ width: 70, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}>
+            {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <input type="text" value={editForm.budget}
+            onChange={e => setEditForm(p => ({ ...p, budget: e.target.value }))}
+            style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
+            placeholder="0.00" />
+        </div>
+      </div>
+
+      {/* Logged Hours */}
+      <Fld label="Logged Hours" value={editForm.loggedHours}
+        type="number" placeholder="0"
+        onChange={v => setEditForm(p => ({ ...p, loggedHours: Number(v) || 0 }))} />
+
+      {/* Dates */}
+      <Fld label="Start Date" value={editForm.start} type="date"
+        onChange={v => setEditForm(p => ({ ...p, start: v }))} />
+      <Fld label="End / Deadline Date" value={editForm.end} type="date"
+        onChange={v => setEditForm(p => ({ ...p, end: v }))} />
+
+      {/* Team */}
+      <Fld label="Team Members" value={editForm.team}
+        onChange={v => setEditForm(p => ({ ...p, team: v }))} />
+
+      {/* Status */}
+      <Fld label="Status" value={editForm.status}
+        onChange={v => {
+          let updatedProgress = editForm.progress || 0;
+          if (v.toLowerCase() === "completed" || v.toLowerCase() === "done") updatedProgress = 100;
+          else if (v.toLowerCase() === "pending") updatedProgress = 0;
+          else if (v.toLowerCase() === "in progress" && (editForm.progress || 0) === 0) updatedProgress = 50;
+          setEditForm(prev => ({ ...prev, status: v, progress: updatedProgress }));
+        }}
+        options={["Active", "On Hold", "Completed", "Overdue"]} allowCustom={true} />
+
+      {/* Progress */}
+      <Fld label="Progress (%)" value={editForm.progress || 0} type="number" placeholder="0"
+        onChange={v => {
+          let val = Number(v);
+          if (val < 0) val = 0;
+          if (val > 100) val = 100;
+          setEditForm(prev => ({ ...prev, progress: val }));
+        }} />
+    </div>
+
+    {/* Description - full width */}
+    <Fld label="Description" value={editForm.description}
+      onChange={v => setEditForm(p => ({ ...p, description: v }))} />
+
+    {/* ── Milestones ── */}
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <label style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>MILESTONES</label>
+        <button onClick={() => setEditForm(p => ({ ...p, milestones: [...(p.milestones || []), { name: "", date: "", done: false }] }))}
+          style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+          + Add Milestone
+        </button>
+      </div>
+      {(editForm.milestones || []).length === 0 && (
+        <div style={{ fontSize: 12, color: "var(--app-muted)", fontStyle: "italic", padding: "8px 0" }}>No milestones added</div>
       )}
+      {(editForm.milestones || []).map((ms, idx) => (
+        <div key={idx} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+          <input type="checkbox" checked={ms.done}
+            onChange={e => setEditForm(p => {
+              const m = [...p.milestones];
+              m[idx] = { ...m[idx], done: e.target.checked };
+              return { ...p, milestones: m };
+            })}
+            style={{ width: 16, height: 16, cursor: "pointer", flexShrink: 0 }} />
+          <input type="text" value={ms.name} placeholder="Milestone name"
+            onChange={e => setEditForm(p => {
+              const m = [...p.milestones];
+              m[idx] = { ...m[idx], name: e.target.value };
+              return { ...p, milestones: m };
+            })}
+            style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 8, padding: "7px 10px", fontSize: 12, background: "var(--app-bg)", outline: "none", textDecoration: ms.done ? "line-through" : "none", color: ms.done ? "var(--app-muted)" : T.text }} />
+          <input type="date" value={ms.date}
+            onChange={e => setEditForm(p => {
+              const m = [...p.milestones];
+              m[idx] = { ...m[idx], date: e.target.value };
+              return { ...p, milestones: m };
+            })}
+            style={{ border: "1.5px solid var(--app-border)", borderRadius: 8, padding: "7px 10px", fontSize: 12, background: "var(--app-bg)", outline: "none" }} />
+          <button onClick={() => setEditForm(p => ({ ...p, milestones: p.milestones.filter((_, i) => i !== idx) }))}
+            style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 9px", color: "#ef4444", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>×</button>
+        </div>
+      ))}
+    </div>
+
+    {/* ── Client Portal Settings ── */}
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <label style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>CLIENT PORTAL SETTINGS</label>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>
+          <input type="checkbox" checked={editForm.portalOpts?.enablePortal || false}
+            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, enablePortal: e.target.checked } }))}
+            style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--app-accent)" }} />
+          Enable client portal for this project
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", opacity: editForm.portalOpts?.enablePortal ? 1 : 0.5 }}>
+          <input type="checkbox" checked={editForm.portalOpts?.showProgress || false}
+            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, showProgress: e.target.checked } }))}
+            disabled={!editForm.portalOpts?.enablePortal}
+            style={{ width: 16, height: 16, cursor: editForm.portalOpts?.enablePortal ? "pointer" : "not-allowed", accentColor: "var(--app-accent)" }} />
+          Show project progress to client
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", opacity: editForm.portalOpts?.enablePortal ? 1 : 0.5 }}>
+          <input type="checkbox" checked={editForm.portalOpts?.showMilestones || false}
+            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, showMilestones: e.target.checked } }))}
+            disabled={!editForm.portalOpts?.enablePortal}
+            style={{ width: 16, height: 16, cursor: editForm.portalOpts?.enablePortal ? "pointer" : "not-allowed", accentColor: "var(--app-accent)" }} />
+          Show milestones to client
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", opacity: editForm.portalOpts?.enablePortal ? 1 : 0.5 }}>
+          <input type="checkbox" checked={editForm.portalOpts?.showTeam || false}
+            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, showTeam: e.target.checked } }))}
+            disabled={!editForm.portalOpts?.enablePortal}
+            style={{ width: 16, height: 16, cursor: editForm.portalOpts?.enablePortal ? "pointer" : "not-allowed", accentColor: "var(--app-accent)" }} />
+          Show team members to client
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", opacity: editForm.portalOpts?.enablePortal ? 1 : 0.5 }}>
+          <input type="checkbox" checked={editForm.portalOpts?.allowMessages || false}
+            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, allowMessages: e.target.checked } }))}
+            disabled={!editForm.portalOpts?.enablePortal}
+            style={{ width: 16, height: 16, cursor: editForm.portalOpts?.enablePortal ? "pointer" : "not-allowed", accentColor: "var(--app-accent)" }} />
+          Allow client to send messages
+        </label>
+      </div>
+    </div>
+
+    {/* ── Assign Employees ── */}
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+        <label style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>ASSIGN EMPLOYEES</label>
+        <button onClick={() => onAddEmployee && onAddEmployee()}
+          style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+          + Add Employee
+        </button>
+      </div>
+      <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "12px", background: "var(--app-bg)", maxHeight: 200, overflowY: "auto" }}>
+        {employees.length === 0
+          ? <div style={{ color: "var(--app-muted)", fontSize: 13, textAlign: "center", padding: 20 }}>No employees available</div>
+          : employees.map(emp => (
+            <div key={emp._id || emp.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--app-bg)" }}>
+              <input type="checkbox" id={`edit-emp-${emp._id || emp.email}`}
+                checked={Array.isArray(editForm.assignedTo) ? editForm.assignedTo.includes(emp.name) : editForm.assignedTo === emp.name}
+                onChange={e => {
+                  const cur = Array.isArray(editForm.assignedTo) ? editForm.assignedTo : (editForm.assignedTo ? [editForm.assignedTo] : []);
+                  setEditForm(p => ({ ...p, assignedTo: e.target.checked ? [...cur, emp.name] : cur.filter(n => n !== emp.name) }));
+                }}
+                style={{ width: 16, height: 16, cursor: "pointer" }} />
+              <label htmlFor={`edit-emp-${emp._id || emp.email}`}
+                style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
+                <span>{emp.name}</span>
+                {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "var(--app-border)", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
+              </label>
+            </div>
+          ))}
+      </div>
+
+      {/* Selected tags */}
+      {editForm.assignedTo && editForm.assignedTo.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, marginBottom: 6 }}>
+            SELECTED ({editForm.assignedTo.length})
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {editForm.assignedTo.map(name => (
+              <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
+                <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name[0]?.toUpperCase()}</div>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-muted)" }}>{name}</span>
+                <button onClick={() => setEditForm(p => ({ ...p, assignedTo: p.assignedTo.filter(n => n !== name) }))}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}>×</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+
+    {/* Actions */}
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
+      <button onClick={() => setEditProj(null)}
+        style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>
+        Cancel
+      </button>
+      <button onClick={saveEdit} disabled={saving}
+        style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>
+        {saving ? "Saving…" : "Save Changes →"}
+      </button>
+    </div>
+  </Mdl>
+)}
 
       {assignModal && (
         <Mdl title="Assign Employees" onClose={() => setAssignModal(null)} maxWidth={450}>
@@ -4092,7 +4238,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   // Always land on mysubscriptions when enforced — never show dashboard
   const validActive = enforceMySubscriptions
     ? "mysubscriptions"
-    : ((findNavItem(active) || active === "tasks" || active === "create-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
+    : ((findNavItem(active) || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
 
   const page = findNavItem(validActive) || navItems[0];
 
@@ -4164,7 +4310,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div className="no-print" style={{ display: "contents" }}>
           <Sidebar
             user={user}
-  active={validActive === "projects" && sidebarOverride === null ? "dashboard" : (sidebarOverride || validActive)}
+  active={["projects","create-project","edit-project","project-details"].includes(validActive) ? "projects" : (sidebarOverride || validActive)}
             setActive={(val) => { setSidebarOverride(null); setActive(val); }}
             onLogout={handleLogout}
             open={sidebarOpen}
@@ -4783,11 +4929,28 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     }}
                   />
                 )}
+
+{validActive === "edit-project" && (
+  <ModernProjectCreator
+    key={jumpProject?._id || "edit"}
+    editProject={jumpProject}        // ← இது important
+    clients={clients}
+    employees={employees}
+    onBack={() => setActive("projects")}
+    onSuccess={(updatedProj) => {
+      fetchProjects();
+      setActive("projects");
+    }}
+  />
+)}
                 {validActive === "project-details" && (
                   <ModernProjectDetails 
                     project={jumpProject} 
                     tasks={tasks} 
                     onBack={() => setActive("projects")} 
+                    onEdit={() => setActive("edit-project")}
+                    onUpdate={fetchTasks}
+                    fetchProjects={fetchProjects}
                   />
                 )}
                 {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
@@ -4802,7 +4965,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
 {validActive === "projects" && <ProjectsPage 
-  onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() => setActive("create-project")} onAddEmployee={() => {
+  onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() => setActive("create-project")} // ProjectsPage-ல் இது இருக்கணும்
+onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} onAddEmployee={() => {
                   const limit = getSubscriptionLimit("employee");
                   if (subscription && employees.length >= limit) {
                     setLimitModal({ type: "employee", limit });

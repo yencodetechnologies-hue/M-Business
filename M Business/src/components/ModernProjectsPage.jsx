@@ -310,6 +310,9 @@ export default function ModernProjectsPage({ user }) {
               project={toDetailShape(selectedProject)}
               onBack={() => setSelectedProject(null)}
               tasks={tasksForProject(selectedProject)}
+              onUpdate={fetchAll}
+              fetchProjects={fetchAll}
+              onEdit={() => openEdit(selectedProject)}
             />
           </div>
         </div>

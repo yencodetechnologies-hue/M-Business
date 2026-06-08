@@ -3075,7 +3075,10 @@ function updateMilestonesPreview() {
     html += `<div class="tl-pi"><div class="tl-left"><div class="tl-dot">${i+1}</div>${!isLast?'<div class="tl-line-p"></div>':''}</div>
       <div><div class="tl-pi-title">${ti?ti.value:'Milestone'}</div>${di&&di.value?`<div class="tl-pi-date">${fmtDate(di.value)}</div>`:''}${de&&de.value?`<div class="tl-pi-desc">${de.value}</div>`:''}</div></div>`;
   });
-  document.getElementById('pv-timeline').innerHTML = html;
+  const pvTimeline = document.getElementById('pv-timeline');
+  if (pvTimeline) {
+    pvTimeline.innerHTML = html;
+  }
 }
 
 function updateTeamPreview() {
@@ -3089,13 +3092,19 @@ function updateTeamPreview() {
     const init = n.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     html += `<div class="tp-card" style="display:flex;align-items:center;gap:7px"><div class="tp-av-p" style="background:${bg}">${init}</div><div><div class="tp-name-p">${n}</div><div class="tp-role-p">${r}</div></div></div>`;
   });
-  document.getElementById('pv-team').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
+  const pvTeam = document.getElementById('pv-team');
+  if (pvTeam) {
+    pvTeam.innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
+  }
 }
 
 function updateValuePreview() {
   let html = '';
   document.querySelectorAll('#td-valueList .dv-input').forEach(v => { if (v.value.trim()) html += `<div class="val-pi">${v.value}</div>`; });
-  document.getElementById('pv-value').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No value points</span>';
+  const pvValue = document.getElementById('pv-value');
+  if (pvValue) {
+    pvValue.innerHTML = html || '<span style="color:var(--text3);font-size:10px">No value points</span>';
+  }
 }
 
 function updateRisksPreview() {
@@ -3109,7 +3118,10 @@ function updateRisksPreview() {
     const cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
     html += `<div class="risk-pi"><span class="risk-badge-p ${cls}">${lik}</span><div><div class="risk-pi-text">${inputs[0].value}</div>${inputs[1]?`<div class="risk-pi-mit">↳ ${inputs[1].value}</div>`:''}</div></div>`;
   });
-  document.getElementById('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
+  const pvRisks = document.getElementById('pv-risks');
+  if (pvRisks) {
+    pvRisks.innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
+  }
 }
 
 function updateCasePreview() {

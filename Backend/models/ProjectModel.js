@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 const projectSchema = new mongoose.Schema({
   name: { type: String, required: true },
   client: { type: String, default: "" },
+  contactPersonName: { type: String, default: "" },
+  contactPersonNo: { type: String, default: "" },
+  category: { type: String, default: "Web Development" },
+  priority: { type: String, default: "medium" },
   purpose: { type: String, default: "" },
   description: { type: String, default: "" },
   start: { type: String, default: "" },
@@ -19,6 +23,32 @@ const projectSchema = new mongoose.Schema({
   manager: { type: String, default: "" },
   companyId: { type: String, default: "" },
   loggedHours: { type: Number, default: 0 },
+  milestones: {
+    type: [{
+      name: { type: String, required: true },
+      date: { type: String, default: "" },
+      done: { type: Boolean, default: false }
+    }],
+    default: []
+  },
+  updates: {
+    type: [{
+      text: { type: String, required: true },
+      date: { type: Date, default: Date.now },
+      author: { type: String, default: "System" }
+    }],
+    default: []
+  },
+  files: {
+    type: [{
+      name: { type: String, required: true },
+      url: { type: String, required: true },
+      size: { type: Number, default: 0 },
+      type: { type: String, default: "" },
+      uploadedAt: { type: Date, default: Date.now }
+    }],
+    default: []
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Project", projectSchema);

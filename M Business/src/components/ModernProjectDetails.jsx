@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import ModernEmployeeProjectDetails from './ModernEmployeeProjectDetails';
 
 // ── Shared Colors ──
 const P = {
@@ -161,27 +162,86 @@ function getAvatarColor(name) {
   return colors[name.charCodeAt(0) % colors.length];
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], onEdit, onUpdate, fetchProjects, fetchTasks }) {
   const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
 
-  if (!project) return null;
+  // Live state synchronized with backend
+  const [currProject, setCurrProject] = useState(project);
+  const [currTasks, setCurrTasks] = useState(tasks);
+  const [loadingProject, setLoadingProject] = useState(false);
+
+  // Modal / Input states
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskPriority, setNewTaskPriority] = useState('medium');
+  const [newTaskAssignTo, setNewTaskAssignTo] = useState('Unassigned');
+  const [newTaskDue, setNewTaskDue] = useState('');
+  const [newTaskDesc, setNewTaskDesc] = useState('');
+  const [addingTask, setAddingTask] = useState(false);
+
+  const [updateText, setUpdateText] = useState('');
+  const [updateType, setUpdateType] = useState('general');
+  const [postingUpdate, setPostingUpdate] = useState(false);
+
+  const [newMilestoneName, setNewMilestoneName] = useState('');
+  const [newMilestoneDate, setNewMilestoneDate] = useState('');
+  const [showAddMilestone, setShowAddMilestone] = useState(false);
+
+  const fileInputRef = useRef(null);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [showPortalPreview, setShowPortalPreview] = useState(false);
+
+  const loadLatest = useCallback(async () => {
+    if (!project?._id) return;
+    setLoadingProject(true);
+    try {
+      const [pRes, tRes] = await Promise.all([
+        axios.get(`${BASE_URL}/api/projects/${project._id}`),
+        axios.get(`${BASE_URL}/api/tasks`)
+      ]);
+      if (pRes.data) {
+        setCurrProject(pRes.data);
+      }
+      if (Array.isArray(tRes.data)) {
+        setCurrTasks(tRes.data);
+      }
+    } catch (e) {
+      console.error("Error loading project details:", e);
+    } finally {
+      setLoadingProject(false);
+    }
+  }, [project?._id]);
+
+  useEffect(() => {
+    setCurrProject(project);
+  }, [project]);
+
+  useEffect(() => {
+    setCurrTasks(tasks);
+  }, [tasks]);
+
+  useEffect(() => {
+    loadLatest();
+  }, [loadLatest]);
+
+  if (!currProject) return null;
 
   // Derived Project Data
-  const projName = project.name || "Unnamed Project";
-  const clientName = project.client || project.clientName || "Unknown Client";
-  const category = project.purpose || project.category || "General";
-  const priority = project.priority || "medium";
-  const status = (project.status || "Active").toLowerCase();
+  const projName = currProject.name || "Unnamed Project";
+  const clientName = currProject.client || currProject.clientName || "Unknown Client";
+  const category = currProject.purpose || currProject.category || "General";
+  const priority = currProject.priority || "medium";
+  const status = (currProject.status || "Active").toLowerCase();
   
-  const startD = project.start ? new Date(project.start).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) : '—';
-  const endD = project.end ? new Date(project.end).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) : '—';
+  const startD = currProject.start ? new Date(currProject.start).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) : '—';
+  const endD = currProject.end || currProject.deadline ? new Date(currProject.end || currProject.deadline).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) : '—';
   
-  const budgetAmt = project.budget ? Number(project.budget) : 0;
-  const currency = project.currency || "₹";
+  const budgetAmt = currProject.budget ? Number(currProject.budget) : 0;
+  const currency = currProject.currency || "₹";
 
-  const assigned = Array.isArray(project.assignedTo) ? project.assignedTo : (project.assignedTo ? [project.assignedTo] : []);
+  const assigned = Array.isArray(currProject.assignedTo) ? currProject.assignedTo : (currProject.assignedTo ? [currProject.assignedTo] : []);
   
   // Status Logic
   let badgeClass = 'mpd-badge-active';
@@ -194,14 +254,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
   if (priority.includes('low')) prioClass = 'mpd-prio-low';
 
   // Tasks Logic
-  const projTasks = tasks.filter(t => t.projectId === project._id || t.project === projName);
+  const projTasks = currTasks.filter(t => t.projectId === currProject._id || t.project === projName || (t.projectId && t.projectId._id === currProject._id));
   const totalTasks = projTasks.length || 0;
   const doneTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length || 0;
   const inprogTasks = projTasks.filter(t => t.status === 'in_progress').length || 0;
   const openTasks = totalTasks - doneTasks - inprogTasks;
-  const progressPct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : (project.progress || 0);
+  const progressPct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : (currProject.progress || 0);
 
-  // Fake some budget spent data if not available
+  // Budget spent data
   const spent = Math.round(budgetAmt * (progressPct / 100));
   const remaining = budgetAmt - spent;
 
@@ -212,6 +272,221 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
     if (taskFilter === 'open') return t.status !== 'done' && t.status !== 'completed' && t.status !== 'in_progress';
     return true;
   });
+
+  // Task/Milestone/File Actions
+  const handleToggleTask = async (task) => {
+    try {
+      const isCurrentlyDone = task.status === 'done' || task.status === 'completed';
+      const newStatus = isCurrentlyDone ? 'in_progress' : 'completed';
+      await axios.put(`${BASE_URL}/api/tasks/${task._id}`, { status: newStatus });
+      loadLatest();
+      if (onUpdate) onUpdate();
+      if (fetchTasks) fetchTasks();
+    } catch (err) {
+      console.error("Failed to toggle task:", err);
+    }
+  };
+
+  const getOrCreateGroupId = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/groups`);
+      if (res.data && res.data.length > 0) {
+        return res.data[0]._id;
+      }
+      const newGroup = await axios.post(`${BASE_URL}/api/groups`, {
+        label: "Tasks",
+        color: "#00BCD4"
+      });
+      return newGroup.data._id;
+    } catch (e) {
+      console.error("Failed to get/create group:", e);
+      return null;
+    }
+  };
+
+  const handleCreateTask = async (e) => {
+    e.preventDefault();
+    if (!newTaskTitle.trim()) return;
+    setAddingTask(true);
+    try {
+      const gId = await getOrCreateGroupId();
+      if (!gId) {
+        alert("Could not find or create a task group.");
+        return;
+      }
+
+      await axios.post(`${BASE_URL}/api/tasks`, {
+        title: newTaskTitle.trim(),
+        description: newTaskDesc.trim(),
+        priority: newTaskPriority,
+        assignTo: newTaskAssignTo,
+        date: newTaskDue,
+        groupId: gId,
+        projectId: currProject._id,
+        status: 'Not Started'
+      });
+
+      setNewTaskTitle('');
+      setNewTaskDesc('');
+      setNewTaskPriority('medium');
+      setNewTaskAssignTo('Unassigned');
+      setNewTaskDue('');
+      setShowAddTaskModal(false);
+
+      loadLatest();
+      if (onUpdate) onUpdate();
+      if (fetchTasks) fetchTasks();
+    } catch (err) {
+      console.error("Failed to add task:", err);
+      alert("Failed to add task.");
+    } finally {
+      setAddingTask(false);
+    }
+  };
+
+  const handlePostUpdate = async (e) => {
+    e.preventDefault();
+    if (!updateText.trim()) return;
+    setPostingUpdate(true);
+    try {
+      const newUpdate = {
+        text: updateText.trim(),
+        date: new Date().toISOString(),
+        author: 'Admin',
+        type: updateType
+      };
+
+      const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
+
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        updates: updatedUpdates
+      });
+
+      setUpdateText('');
+      setUpdateType('general');
+      setComposerOpen(false);
+      loadLatest();
+      if (onUpdate) onUpdate();
+      if (fetchProjects) fetchProjects();
+    } catch (err) {
+      console.error("Failed to post update:", err);
+      alert("Failed to post update.");
+    } finally {
+      setPostingUpdate(false);
+    }
+  };
+
+  const handleToggleMilestone = async (index) => {
+    try {
+      const updatedMilestones = (currProject.milestones || []).map((m, idx) => {
+        if (idx === index) {
+          return { ...m, done: !m.done };
+        }
+        return m;
+      });
+
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        milestones: updatedMilestones
+      });
+      loadLatest();
+      if (onUpdate) onUpdate();
+      if (fetchProjects) fetchProjects();
+    } catch (err) {
+      console.error("Failed to toggle milestone:", err);
+    }
+  };
+
+  const handleAddMilestone = async (e) => {
+    e.preventDefault();
+    if (!newMilestoneName.trim()) return;
+    try {
+      const newMilestone = {
+        name: newMilestoneName.trim(),
+        date: newMilestoneDate || '',
+        done: false
+      };
+      const updatedMilestones = [...(currProject.milestones || []), newMilestone];
+
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        milestones: updatedMilestones
+      });
+
+      setNewMilestoneName('');
+      setNewMilestoneDate('');
+      setShowAddMilestone(false);
+      loadLatest();
+      if (onUpdate) onUpdate();
+      if (fetchProjects) fetchProjects();
+    } catch (err) {
+      console.error("Failed to add milestone:", err);
+      alert("Failed to add milestone.");
+    }
+  };
+
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setUploadingFile(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      const uploadedUrl = res.data.url;
+      const newFileObj = {
+        name: file.name,
+        url: uploadedUrl,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date().toISOString()
+      };
+
+      const updatedFiles = [...(currProject.files || []), newFileObj];
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        files: updatedFiles
+      });
+
+      loadLatest();
+      if (onUpdate) onUpdate();
+      if (fetchProjects) fetchProjects();
+    } catch (err) {
+      console.error("Failed to upload file:", err);
+      alert("Failed to upload file. Make sure it's an image (JPG/PNG).");
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const handleDeleteFile = async (fileId) => {
+    if (!confirm("Are you sure you want to delete this file?")) return;
+    try {
+      const updatedFiles = (currProject.files || []).filter(f => f._id !== fileId);
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        files: updatedFiles
+      });
+      loadLatest();
+      if (onUpdate) onUpdate();
+      if (fetchProjects) fetchProjects();
+    } catch (err) {
+      console.error("Failed to delete file:", err);
+    }
+  };
+
+  const handleShare = () => {
+    const text = `📂 Project Alert: ${projName}\nStatus: ${currProject.status}\nProgress: ${progressPct}%\nBudget: ${currency}${budgetAmt.toLocaleString()}`;
+    const url = `whatsapp://send?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+  };
 
   return (
     <div className="mpd-root">
@@ -225,8 +500,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
           <span style={{color:P.textDark}}>{projName}</span>
         </div>
         <div className="mpd-topbar-actions">
-          <button className="mpd-btn mpd-btn-outline"><i className="ti ti-share"></i> Share</button>
-          <button className="mpd-btn mpd-btn-primary" onClick={() => {}}><i className="ti ti-edit"></i> Edit</button>
+          <button className="mpd-btn mpd-btn-outline" onClick={handleShare}><i className="ti ti-share"></i> Share</button>
+          <button className="mpd-btn mpd-btn-primary" onClick={onEdit || (() => {})}><i className="ti ti-edit"></i> Edit</button>
         </div>
       </div>
 
@@ -235,10 +510,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
         <div className="mpd-ph-left">
           <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
             <div className="mpd-proj-name">{projName}</div>
-            <span className={`mpd-status-badge ${badgeClass}`}>{project.status || 'Active'}</span>
+            <span className={`mpd-status-badge ${badgeClass}`}>{currProject.status || 'Active'}</span>
             <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
           </div>
-          <div className="mpd-proj-desc">{project.description || "No description provided for this project."}</div>
+          <div className="mpd-proj-desc">{currProject.description || "No description provided for this project."}</div>
           <div className="mpd-ph-meta">
             <div className="mpd-pm-item"><i className="ti ti-building"></i> Client: <strong>{clientName}</strong></div>
             <div className="mpd-pm-item"><i className="ti ti-calendar"></i> Start: <strong>{startD}</strong></div>
@@ -266,7 +541,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
         </div>
         <div className="mpd-kpi">
           <div className="mpd-kpi-icon" style={{background:P.greenLight}}><i className="ti ti-clock" style={{color:P.green}}></i></div>
-          <div><div className="mpd-kpi-val">{project.loggedHours || 0}h</div><div className="mpd-kpi-lbl">Hours Logged</div><div className="mpd-kpi-trend mpd-up">Active</div></div>
+          <div><div className="mpd-kpi-val">{currProject.loggedHours || 0}h</div><div className="mpd-kpi-lbl">Hours Logged</div><div className="mpd-kpi-trend mpd-up">Active</div></div>
         </div>
         <div className="mpd-kpi">
           <div className="mpd-kpi-icon" style={{background:P.orangeLight}}><i className="ti ti-alert-triangle" style={{color:P.orange}}></i></div>
@@ -302,9 +577,29 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
           <button className="mpd-uc-toggle">{composerOpen ? 'Collapse ↑' : 'Expand ↓'}</button>
         </div>
         <div className={`mpd-uc-body ${composerOpen ? 'mpd-open' : ''}`}>
-           <div style={{fontSize:13, color:P.textMid, padding: 20, textAlign:'center'}}>
-              <i>Backend integration for updates feature goes here...</i>
-           </div>
+           <form onSubmit={handlePostUpdate} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+               <select value={updateType} onChange={e => setUpdateType(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', fontFamily: 'inherit' }}>
+                 <option value="general">📢 General Update</option>
+                 <option value="progress">📈 Progress Update</option>
+                 <option value="milestone">🚩 Milestone Update</option>
+                 <option value="blocker">⚠️ Blocker / Alert</option>
+                 <option value="delivery">📦 Delivery Update</option>
+               </select>
+               <span style={{ fontSize: 12, color: P.textLight }}>Select an update type to alert your client and team</span>
+             </div>
+             <textarea 
+               value={updateText} 
+               onChange={e => setUpdateText(e.target.value)} 
+               placeholder="Type the project update details here..." 
+               required 
+               style={{ width: '100%', padding: 12, borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', minHeight: 80, outline: 'none' }}
+             />
+             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+               <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setComposerOpen(false)}>Cancel</button>
+               <button type="submit" className="mpd-btn mpd-btn-primary" disabled={postingUpdate}>{postingUpdate ? 'Posting...' : 'Post Update'}</button>
+             </div>
+           </form>
         </div>
       </div>
 
@@ -316,7 +611,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
           <div className="mpd-card" style={{padding:0, overflow:'hidden', marginBottom: 20}}>
             <div className="mpd-card-header" style={{padding:'20px 24px 10px', marginBottom:0}}>
               <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
-              <button className="mpd-btn mpd-btn-outline" style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
+              <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(true)} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
             </div>
             <div style={{padding:'0 24px 14px'}}>
               <div className="mpd-task-filters">
@@ -333,12 +628,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
                 filteredTasks.map(t => {
                   const isDone = t.status === 'done' || t.status === 'completed';
                   return (
-                    <div key={t._id} className="mpd-task-row">
+                    <div key={t._id} className="mpd-task-row" onClick={() => handleToggleTask(t)}>
                       <div className={`mpd-task-chk ${isDone ? 'mpd-done' : ''}`}></div>
                       <div className={`mpd-task-prio ${t.priority==='high'?'mpd-h':(t.priority==='medium'?'mpd-m':'mpd-l')}`}></div>
-                      <div className={`mpd-task-name ${isDone ? 'mpd-done' : ''}`}>{t.name}</div>
-                      <div className="mpd-task-assign">{t.assignedTo || 'Unassigned'}</div>
-                      <div className="mpd-task-due">{t.due ? new Date(t.due).toLocaleDateString() : ''}</div>
+                      <div className={`mpd-task-name ${isDone ? 'mpd-done' : ''}`}>{t.title || t.name}</div>
+                      <div className="mpd-task-assign">{t.assignTo || t.assignedTo || 'Unassigned'}</div>
+                      <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN', {day:'numeric',month:'short'}) : ''}</div>
                     </div>
                   );
                 })
@@ -355,24 +650,24 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
             </div>
             
             <div className={`mpd-tab-pane ${activeTab==='milestones'?'mpd-active':''}`}>
-              {(!project.milestones || project.milestones.length === 0) ? (
+              {(!currProject.milestones || currProject.milestones.length === 0) ? (
                 <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No milestones defined.</div>
               ) : (
-                project.milestones.map((m, idx) => {
+                currProject.milestones.map((m, idx) => {
                   const isDone = m.done === true;
-                  const isInProgress = !isDone && idx === project.milestones.findIndex(x => !x.done);
+                  const isInProgress = !isDone && idx === currProject.milestones.findIndex(x => !x.done);
                   const dotColor = isDone ? P.green : isInProgress ? P.primary : P.border;
                   const dotBorder = isDone || isInProgress ? 'none' : `2px solid ${P.border}`;
                   const statusLabel = isDone ? '✓ Completed' : isInProgress ? 'In Progress' : 'Pending';
                   const statusColor = isDone ? P.green : isInProgress ? P.primary : P.textLight;
                   return (
-                    <div key={idx} style={{display:'flex', gap:12, marginBottom:20}}>
+                    <div key={idx} onClick={() => handleToggleMilestone(idx)} style={{display:'flex', gap:12, marginBottom:20, cursor: 'pointer'}}>
                       <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
                         <div style={{width:13, height:13, borderRadius:'50%', background:dotColor, border:dotBorder, marginTop:3, flexShrink:0}}></div>
-                        {idx !== project.milestones.length-1 && <div style={{width:2, flex:1, background:P.border, minHeight:24, marginTop:4}}></div>}
+                        {idx !== currProject.milestones.length-1 && <div style={{width:2, flex:1, background:P.border, minHeight:24, marginTop:4}}></div>}
                       </div>
                       <div>
-                        <div style={{fontSize:13, fontWeight:800, color:P.textDark}}>{m.name || m}</div>
+                        <div style={{fontSize:13, fontWeight:800, color:P.textDark}}>{m.name}</div>
                         <div style={{fontSize:11, color:P.textLight, marginTop:2}}>{m.date ? new Date(m.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
                         <div style={{fontSize:11, fontWeight:700, color:statusColor, marginTop:2}}>{statusLabel}</div>
                       </div>
@@ -380,13 +675,63 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
                   );
                 })
               )}
+
+              {showAddMilestone ? (
+                <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <input type="text" value={newMilestoneName} onChange={e => setNewMilestoneName(e.target.value)} placeholder="Milestone name..." required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input type="date" value={newMilestoneDate} onChange={e => setNewMilestoneDate(e.target.value)} style={{ padding: '6px 8px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1 }} />
+                    <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
+                    <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
+                  </div>
+                </form>
+              ) : (
+                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(true)} style={{ width: '100%', justifyContent: 'center', marginTop: 12, padding: '8px', fontSize: 12 }}>
+                  + Add Milestone
+                </button>
+              )}
             </div>
 
             <div className={`mpd-tab-pane ${activeTab==='activity'?'mpd-active':''}`}>
-               <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>Activity logs will appear here.</div>
+               <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>
+                 {(currProject.updates && currProject.updates.length > 0) ? (
+                   <div style={{ textAlign: 'left' }}>
+                     {currProject.updates.map((upd, idx) => (
+                       <div key={idx} style={{ padding: '8px 0', borderBottom: `1px solid ${P.bg}`, fontSize: 12.5, color: P.textMid }}>
+                         📢 Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
+                       </div>
+                     ))}
+                   </div>
+                 ) : "Activity logs will appear here."}
+               </div>
             </div>
+
             <div className={`mpd-tab-pane ${activeTab==='updates'?'mpd-active':''}`}>
-               <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No updates posted yet.</div>
+              {(!currProject.updates || currProject.updates.length === 0) ? (
+                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No updates posted yet.</div>
+              ) : (
+                currProject.updates.map((upd, idx) => (
+                  <div key={idx} style={{ padding: '12px 14px', borderBottom: `1px solid ${P.bg}`, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <div style={{ background: P.primaryLight, color: P.primary, borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 13 }}>
+                      {getInitials(upd.author)}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                        <strong style={{ fontSize: 13, color: P.textDark }}>{upd.author}</strong>
+                        <span style={{ fontSize: 11, color: P.textLight }}>{new Date(upd.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                      <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.5 }}>
+                        <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: P.primaryLight, color: P.primary, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', marginRight: 6 }}>
+                          {upd.type || 'general'}
+                        </span>
+                        {upd.text}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -424,18 +769,105 @@ export default function ModernProjectDetails({ project, onBack, tasks = [] }) {
 
           {/* FILES */}
           <div className="mpd-card">
-            <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div><button className="mpd-btn mpd-btn-outline" style={{padding:'5px 10px',fontSize:11}}><i className="ti ti-upload"></i> Upload</button></div>
-            <div style={{fontSize:12, color:P.textLight, textAlign:'center', padding:'10px 0'}}>No files attached.</div>
+            <div className="mpd-card-header">
+              <div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div>
+              <button className="mpd-btn mpd-btn-outline" onClick={triggerFileUpload} disabled={uploadingFile} style={{padding:'5px 10px',fontSize:11}}>
+                <i className="ti ti-upload"></i> {uploadingFile ? 'Uploading...' : 'Upload'}
+              </button>
+            </div>
+            
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileUpload} 
+              style={{display: 'none'}} 
+              accept="image/*"
+            />
+            
+            {(!currProject.files || currProject.files.length === 0) ? (
+              <div style={{fontSize:12, color:P.textLight, textAlign:'center', padding:'10px 0'}}>No files attached.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {currProject.files.map((file) => (
+                  <div key={file._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', border: `1.5px solid ${P.border}`, borderRadius: 8 }}>
+                    <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 700, color: P.primary, textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>
+                      <i className="ti ti-file" style={{ marginRight: 6 }}></i>
+                      {file.name}
+                    </a>
+                    <button onClick={() => handleDeleteFile(file._id)} style={{ background: 'transparent', border: 'none', color: P.red, cursor: 'pointer', fontSize: 14 }}>
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* PORTAL LINK */}
           <div className="mpd-card" style={{background:`linear-gradient(135deg, ${P.primaryLight}, #fff)`, border:`1.5px solid ${P.primaryMid}`}}>
             <div className="mpd-card-title" style={{marginBottom:12}}><i className="ti ti-building"></i> Client Portal</div>
             <div style={{fontSize:12, color:P.textMid, marginBottom:16}}>The client has access to their project portal with live progress, files, invoices and updates.</div>
-            <button className="mpd-btn mpd-btn-primary" style={{width:'100%', justifyContent:'center'}}><i className="ti ti-external-link"></i> View Portal</button>
+            <button className="mpd-btn mpd-btn-primary" onClick={() => setShowPortalPreview(true)} style={{width:'100%', justifyContent:'center'}}><i className="ti ti-external-link"></i> View Portal</button>
           </div>
         </div>
       </div>
+
+      {/* Add Task Modal */}
+      {showAddTaskModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: P.radius, width: 440, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box' }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: 18, color: P.textDark }}>Add New Task</h3>
+            <form onSubmit={handleCreateTask}>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Task Name</label>
+                <input type="text" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="Enter task title" required style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Description</label>
+                <textarea value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder="Enter details..." style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', resize: 'vertical', minHeight: 60, boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Priority</label>
+                  <select value={newTaskPriority} onChange={e => setNewTaskPriority(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Due Date</label>
+                  <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} style={{ width: '100%', padding: '9px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
+                <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : 'Add Task'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Portal Live Preview Overlay */}
+      {showPortalPreview && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: '#fff', overflowY: 'auto', padding: 20 }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: `1px solid ${P.border}`, paddingBottom: 12 }}>
+              <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
+              <button className="mpd-btn mpd-btn-danger" onClick={() => setShowPortalPreview(false)}>
+                <i className="ti ti-arrow-left"></i> Exit Preview
+              </button>
+            </div>
+            <ModernEmployeeProjectDetails
+              project={currProject}
+              tasks={currTasks}
+              user={{ role: 'client', name: currProject.client }}
+              onBack={() => setShowPortalPreview(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -21,7 +21,7 @@ router.get("/client/:clientName", async (req, res) => {
     const companyId = req.companyId || "";
     const name = decodeURIComponent(req.params.clientName).trim();
     const companyName = req.query.company ? decodeURIComponent(req.query.company).trim() : "";
-    
+
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeName = escapeRegExp(name);
     const safeCompany = escapeRegExp(companyName);
@@ -29,13 +29,26 @@ router.get("/client/:clientName", async (req, res) => {
     const conditions = [];
     if (safeName) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
     if (safeCompany) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
-    
+
     const filter = conditions.length > 0 ? { $or: conditions } : {};
-    
+
     const projects = await Project.find(filter).sort({ createdAt: -1 });
     res.json(projects);
   } catch (err) {
     console.error("GET by-client error:", err.message);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
+// GET single project by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const companyId = req.companyId || "";
+    const project = await Project.findOne({ _id: req.params.id, companyId });
+    if (!project) return res.status(404).json({ msg: "Project not found" });
+    res.json(project);
+  } catch (err) {
+    console.error("GET project by ID error:", err.message);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 });
@@ -56,7 +69,8 @@ router.post("/add", async (req, res) => {
     console.log("Body received:", JSON.stringify(req.body));
 
     const {
-      name, client, purpose, description,
+      name, client, contactPersonName, contactPersonNo,
+      category, priority, purpose, description,
       start, end, deadline, budget, team,
       status, progress, tasks, completedTasks,
       assignedTo, manager,
@@ -69,6 +83,10 @@ router.post("/add", async (req, res) => {
     const project = new Project({
       name,
       client,
+      contactPersonName: contactPersonName || "",
+      contactPersonNo: contactPersonNo || "",
+      category: category || "Web Development",
+      priority: priority || "medium",
       purpose: purpose || "",
       description: description || "",
       start: start || "",
@@ -87,7 +105,7 @@ router.post("/add", async (req, res) => {
 
     console.log("Attempting to save project...");
     const saved = await project.save();
-    
+
     // Auto-create Project Status tracking entry
     try {
       const ProjectStatus = mongoose.models.ProjectStatus;
@@ -176,14 +194,14 @@ router.put("/:id", async (req, res) => {
       if (ProjectStatus) {
         await ProjectStatus.findOneAndUpdate(
           { name: project.name, companyId: project.companyId },
-          { $set: { 
+          { $set: {
               client: project.client,
               manager: project.manager || "",
               employee: (project.assignedTo && project.assignedTo.length) ? project.assignedTo.join(", ") : "",
               deadline: project.deadline || project.end || new Date().toISOString().split("T")[0],
               status: project.status || "Pending",
               progress: project.progress || 0,
-            } 
+            }
           }
         );
       }

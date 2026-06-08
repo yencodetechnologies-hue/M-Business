@@ -103,41 +103,69 @@ function getAvatarColor(name) {
   return colors[name.charCodeAt(0) % colors.length];
 }
 
-export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess }) {
+export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject }) {
   const [loading, setLoading] = useState(false);
 
   // Form State
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [client, setClient] = useState('');
-  const [category, setCategory] = useState('Web Development');
-  const [priority, setPriority] = useState('medium');
-  const [status, setStatus] = useState('Active');
+  const [name, setName] = useState(editProject?.name || '');
+  const [description, setDescription] = useState(editProject?.description || '');
+  const [client, setClient] = useState(editProject?.client || '');
+  const [category, setCategory] = useState(editProject?.category || 'Web Development');
+  const [priority, setPriority] = useState(editProject?.priority || 'medium');
+  const [status, setStatus] = useState(editProject?.status || 'Active');
   
-  const [start, setStart] = useState(new Date().toISOString().split('T')[0]);
-  const [end, setEnd] = useState('');
+  const [start, setStart] = useState(editProject?.start ? new Date(editProject.start).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+  const [end, setEnd] = useState(editProject?.end || editProject?.deadline || '');
   
-  const [assigned, setAssigned] = useState([]); // array of employee names
+  const [assigned, setAssigned] = useState(Array.isArray(editProject?.assignedTo) ? editProject.assignedTo : (editProject?.assignedTo ? [editProject.assignedTo] : [])); // array of employee names
   
-  const [budget, setBudget] = useState('');
-  const [currency, setCurrency] = useState('₹');
+  const [budget, setBudget] = useState(editProject?.budget || '');
+  const [currency, setCurrency] = useState(editProject?.currency || '₹');
   const [advPct, setAdvPct] = useState('30');
   const [msPct, setMsPct] = useState('40');
   const [delPct, setDelPct] = useState('30');
 
-  const [milestones, setMilestones] = useState([
+  const [milestones, setMilestones] = useState(editProject?.milestones?.length ? editProject.milestones : [
     { name: 'Kickoff & Requirements', date: '' },
     { name: 'Design Approval', date: '' },
     { name: 'Development Complete', date: '' }
   ]);
 
-  const [portalOpts, setPortalOpts] = useState({
+  const [portalOpts, setPortalOpts] = useState(editProject?.portalSettings || {
     enablePortal: true,
     showProgress: true,
     showMilestones: true,
     showTeam: false,
     allowMessages: true
   });
+
+  useEffect(() => {
+    if (editProject) {
+      setName(editProject.name || '');
+      setDescription(editProject.description || '');
+      setClient(editProject.client || '');
+      setCategory(editProject.category || 'Web Development');
+      setPriority(editProject.priority || 'medium');
+      setStatus(editProject.status || 'Active');
+      setStart(editProject.start ? new Date(editProject.start).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+      setEnd(editProject.end || editProject.deadline || '');
+      setAssigned(Array.isArray(editProject.assignedTo) ? editProject.assignedTo : (editProject.assignedTo ? [editProject.assignedTo] : []));
+      setBudget(editProject.budget || '');
+      setCurrency(editProject.currency || '₹');
+      setMilestones(editProject.milestones?.length ? editProject.milestones : [
+        { name: 'Kickoff & Requirements', date: '' },
+        { name: 'Design Approval', date: '' },
+        { name: 'Development Complete', date: '' }
+      ]);
+      setPortalOpts(editProject.portalSettings || {
+        enablePortal: true,
+        showProgress: true,
+        showMilestones: true,
+        showTeam: false,
+        allowMessages: true
+      });
+    }
+  }, [editProject]);
 
   // Calculate Progress Steps dynamically
   const stepInfo = 1;
@@ -178,20 +206,27 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         name,
         description,
         client,
-        purpose: category,
+        category,
+        purpose: description,
         priority,
         status,
         start,
         end,
+        deadline: end || start || '',
         budget,
         currency,
         assignedTo: assigned,
-        progress: 0,
+        progress: editProject?.progress || 0,
         milestones: milestones.filter(m => m.name.trim()),
         portalSettings: portalOpts
       };
 
-      const res = await axios.post(`${BASE_URL}/api/projects/add`, payload);
+      let res;
+      if (editProject) {
+        res = await axios.put(`${BASE_URL}/api/projects/${editProject._id || editProject.id}`, payload);
+      } else {
+        res = await axios.post(`${BASE_URL}/api/projects/add`, payload);
+      }
       
       // Notify assigned employees
       if (assigned.length > 0) {
@@ -212,7 +247,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
       if (onSuccess) onSuccess(res.data);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.msg || "Failed to create project");
+      alert(err.response?.data?.msg || `Failed to ${editProject ? 'update' : 'create'} project`);
     } finally {
       setLoading(false);
     }
@@ -224,7 +259,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <div style={{ fontSize: 22, fontWeight: 900, color: P.textDark }}>Create New Project</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: P.textDark }}>{editProject ? 'Edit Project' : 'Create New Project'}</div>
         {onBack && (
           <button onClick={onBack} className="mpc-btn mpc-btn-outline">
             <i className="ti ti-arrow-left" /> Back
@@ -436,7 +471,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
           {onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
           <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
             {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
-            {loading ? 'Launching...' : 'Create & Launch Project'}
+            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Update Project' : 'Create & Launch Project')}
           </button>
         </div>
       </div>

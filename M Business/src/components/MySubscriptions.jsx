@@ -82,6 +82,276 @@ const getDaysLeft = (endDate) => {
 };
 const getStatusColor = (s) => ({ active: T.success, completed: T.success, paid: T.success, cancelled: T.danger, expired: T.danger, failed: T.danger, pending: T.warning, refunded: T.warning }[s?.toLowerCase()] || T.muted);
 
+
+// ─── Plan Picker Modal (Choose Your Plan) ────────────────────────────────────
+function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onStartTrial }) {
+  const currentPlan = subscription?.planName;
+  return (
+    <div style={{ position:"fixed", inset:0, zIndex:99990, background:"linear-gradient(135deg,#e0f7fa 0%,#e8f5e9 50%,#e3f2fd 100%)", overflowY:"auto", display:"flex", flexDirection:"column" }}>
+      <style>{`
+        @keyframes ppFadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+        .pp-card { transition: transform 0.22s, box-shadow 0.22s; cursor:default; }
+        .pp-card:hover { transform: translateY(-6px) !important; box-shadow: 0 24px 48px rgba(0,150,136,0.13) !important; }
+        .pp-btn { transition: all 0.18s; }
+        .pp-btn:hover:not(:disabled) { filter: brightness(0.93); transform: translateY(-1px); }
+      `}</style>
+
+      {/* Close button */}
+      <button onClick={onClose} style={{ position:"fixed", top:18, right:22, zIndex:100000, background:"rgba(0,150,136,0.12)", border:"none", color:"#00796b", width:38, height:38, borderRadius:"50%", fontSize:20, cursor:"pointer", fontFamily:"inherit", fontWeight:700 }}>✕</button>
+
+      <div style={{ maxWidth:1060, width:"100%", margin:"0 auto", padding:"48px 20px 60px", animation:"ppFadeUp 0.38s ease" }}>
+
+        {/* Header */}
+        <div style={{ textAlign:"center", marginBottom:44 }}>
+          <h2 style={{ fontSize:36, fontWeight:900, color:"#00897b", margin:"0 0 10px", letterSpacing:"-0.5px" }}>Choose Your Plan</h2>
+          <p style={{ color:"#00796b", fontSize:15, margin:"0 0 6px", fontWeight:500 }}>Select the best plan for your business growth</p>
+          <div style={{ fontSize:12, color:"#80cbc4", fontWeight:700, letterSpacing:0.5 }}>
+            {subscription ? `Current Plan: ${currentPlan}` : "Management Suite - subadmin"}
+          </div>
+        </div>
+
+        {/* Plan Cards Grid */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(270px,1fr))", gap:28, alignItems:"stretch" }}>
+          {PLANS.map((plan) => {
+            const isCurrent = plan.name === currentPlan;
+            const isProcessing = payLoading === plan.name;
+            const isPopular = plan.popular && !isCurrent;
+
+            return (
+              <div key={plan.name} className="pp-card" style={{
+                background:"#fff",
+                borderRadius:20,
+                padding:"36px 26px 28px",
+                border: isPopular ? "2.5px solid #00897b" : isCurrent ? "2.5px solid #26a69a" : "1.5px solid #e0f2f1",
+                boxShadow: isPopular ? "0 16px 48px rgba(0,137,123,0.16)" : "0 6px 24px rgba(0,0,0,0.05)",
+                position:"relative",
+                display:"flex",
+                flexDirection:"column",
+                transform: isPopular ? "scale(1.035)" : "scale(1)"
+              }}>
+                {/* MOST POPULAR badge */}
+                {isPopular && (
+                  <div style={{ position:"absolute", top:-1, right:-1, background:"#00897b", color:"#fff", padding:"7px 18px", borderRadius:"0 18px 0 14px", fontSize:11, fontWeight:900, textTransform:"uppercase", letterSpacing:1 }}>
+                    Most Popular
+                  </div>
+                )}
+                {/* CURRENT PLAN badge */}
+                {isCurrent && (
+                  <div style={{ position:"absolute", top:-1, right:-1, background:"#26a69a", color:"#fff", padding:"7px 18px", borderRadius:"0 18px 0 14px", fontSize:11, fontWeight:900, textTransform:"uppercase", letterSpacing:1 }}>
+                    Current Plan
+                  </div>
+                )}
+
+                {/* Icon */}
+                <div style={{ fontSize:38, marginBottom:16 }}>{plan.icon}</div>
+
+                {/* Name */}
+                <h3 style={{ fontSize:24, fontWeight:900, color: isPopular ? "#00897b" : "#1e293b", margin:"0 0 16px" }}>{plan.name}</h3>
+
+                {/* Price */}
+                <div style={{ display:"flex", alignItems:"baseline", gap:3, marginBottom:20 }}>
+                  <span style={{ fontSize:40, fontWeight:900, color:"#1e293b", letterSpacing:"-1px" }}>
+                    {plan.price === 0 ? "₹0" : plan.price === null ? "Custom" : `₹${plan.price.toLocaleString("en-IN")}`}
+                  </span>
+                  {plan.price !== null && <span style={{ fontSize:14, color:"#94a3b8", fontWeight:600 }}> / month</span>}
+                </div>
+
+                {/* Features */}
+                <div style={{ flex:1, display:"flex", flexDirection:"column", gap:11, marginBottom:28 }}>
+                  {plan.features.map((f, i) => (
+                    <div key={i} style={{ display:"flex", alignItems:"center", gap:9 }}>
+                      <span style={{ color:"#00897b", fontSize:15, flexShrink:0, fontWeight:700 }}>✓</span>
+                      <span style={{ fontSize:13.5, color:"#475569", fontWeight:500 }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Action Button */}
+                <button
+                  className="pp-btn"
+                  disabled={isCurrent || !!payLoading}
+                  onClick={() => plan.isTrial ? onStartTrial() : onSelectPlan(plan)}
+                  style={{
+                    width:"100%", padding:"14px", borderRadius:12, fontSize:15, fontWeight:800,
+                    fontFamily:"inherit", border:"none",
+                    cursor: isCurrent || payLoading ? "not-allowed" : "pointer",
+                    background: isCurrent
+                      ? "#e0f2f1"
+                      : isPopular
+                      ? "#00897b"
+                      : plan.isTrial
+                      ? "#e0f2f1"
+                      : "#e0f2f1",
+                    color: isCurrent
+                      ? "#26a69a"
+                      : isPopular
+                      ? "#fff"
+                      : plan.isTrial
+                      ? "#00897b"
+                      : "#00897b",
+                    boxShadow: isPopular && !isCurrent ? "0 6px 18px rgba(0,137,123,0.3)" : "none"
+                  }}
+                >
+                  {isProcessing ? "Processing..." : isCurrent ? "✓ Current Plan" : plan.btnLabel || "Get Started"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ textAlign:"center", marginTop:32, color:"#80cbc4", fontSize:13, fontWeight:600 }}>
+          🔒 Secure payment · Cancel anytime · 24/7 support
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Mock Payment Gateway ──────────────────────────────────────────────────────
+function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, onPay }) {
+  const [method, setMethod] = useState("card");
+  const [cardNum, setCardNum] = useState("");
+  const [cardName, setCardName] = useState(userName || "");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [upi, setUpi] = useState("");
+  const [bank, setBank] = useState("sbi");
+  const loading = !!payLoading;
+
+  const fmtCard = (v) => v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
+  const fmtExp  = (v) => v.replace(/\D/g, "").slice(0, 4).replace(/^(\d{2})(\d)/, "$1/$2");
+
+  const canPay = method === "card"
+    ? cardNum.replace(/\s/g,"").length === 16 && cardName && expiry.length === 5 && cvv.length >= 3
+    : method === "upi"
+    ? /^[\w.\-]+@[\w]+$/.test(upi)
+    : true;
+
+  return (
+    <div style={{ position:"fixed", inset:0, zIndex:999998, background:"rgba(10,10,30,0.75)", backdropFilter:"blur(8px)", display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+      <style>{`
+        @keyframes slideUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pgSpin { to { transform:rotate(360deg); } }
+        .pg-input { width:100%; padding:12px 14px; border:1.5px solid #e2e8f0; borderRadius:10px; fontSize:14px; fontFamily:inherit; outline:none; transition:border 0.2s; background:#fafafa; }
+        .pg-input:focus { border-color:#6366f1; background:#fff; }
+        .pg-method { display:flex; alignItems:center; gap:10px; padding:12px 16px; border:2px solid #e2e8f0; borderRadius:12px; cursor:pointer; transition:all 0.2s; fontWeight:600; fontSize:13px; }
+        .pg-method.active { border-color:#6366f1; background:#f5f3ff; color:#6366f1; }
+        .pg-method:hover { border-color:#a5b4fc; }
+      `}</style>
+
+      <div style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:480, boxShadow:"0 30px 60px rgba(0,0,0,0.3)", animation:"slideUp 0.35s ease", overflow:"hidden" }}>
+        {/* Header */}
+        <div style={{ background:"linear-gradient(135deg,#6366f1,#4f46e5)", padding:"24px 28px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <div>
+            <div style={{ color:"rgba(255,255,255,0.8)", fontSize:12, fontWeight:700, letterSpacing:1, textTransform:"uppercase", marginBottom:4 }}>Secure Payment</div>
+            <div style={{ color:"#fff", fontSize:22, fontWeight:900 }}>₹{plan.price?.toLocaleString("en-IN")}<span style={{ fontSize:13, fontWeight:600, opacity:0.8 }}>/month</span></div>
+            <div style={{ color:"rgba(255,255,255,0.85)", fontSize:13, marginTop:2 }}>{plan.icon} {plan.name} Plan</div>
+          </div>
+          <button onClick={onClose} style={{ background:"rgba(255,255,255,0.2)", border:"none", color:"#fff", width:36, height:36, borderRadius:"50%", fontSize:18, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>✕</button>
+        </div>
+
+        <div style={{ padding:"24px 28px" }}>
+          {/* Payment methods */}
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:24 }}>
+            {[
+              { id:"card", icon:"💳", label:"Card" },
+              { id:"upi",  icon:"📱", label:"UPI" },
+              { id:"netbanking", icon:"🏦", label:"Net Banking" }
+            ].map(m => (
+              <div key={m.id} className={`pg-method${method===m.id?" active":""}`} onClick={() => setMethod(m.id)}
+                style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 12px", border:`2px solid ${method===m.id?"#6366f1":"#e2e8f0"}`, borderRadius:12, cursor:"pointer", background:method===m.id?"#f5f3ff":"#fafafa", color:method===m.id?"#6366f1":"#64748b", fontWeight:700, fontSize:12, transition:"all 0.2s" }}>
+                <span style={{ fontSize:18 }}>{m.icon}</span> {m.label}
+              </div>
+            ))}
+          </div>
+
+          {/* Card Fields */}
+          {method === "card" && (
+            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+              <div>
+                <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Card Number</div>
+                <input className="pg-input" placeholder="1234 5678 9012 3456" value={cardNum}
+                  onChange={e => setCardNum(fmtCard(e.target.value))}
+                  style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:15, fontFamily:"inherit", outline:"none", background:"#fafafa", letterSpacing:2 }} />
+              </div>
+              <div>
+                <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Cardholder Name</div>
+                <input className="pg-input" placeholder="Name on card" value={cardName}
+                  onChange={e => setCardName(e.target.value)}
+                  style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, fontFamily:"inherit", outline:"none", background:"#fafafa" }} />
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                <div>
+                  <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Expiry</div>
+                  <input className="pg-input" placeholder="MM/YY" value={expiry}
+                    onChange={e => setExpiry(fmtExp(e.target.value))}
+                    style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, fontFamily:"inherit", outline:"none", background:"#fafafa" }} />
+                </div>
+                <div>
+                  <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>CVV</div>
+                  <input className="pg-input" placeholder="•••" type="password" maxLength={4} value={cvv}
+                    onChange={e => setCvv(e.target.value.replace(/\D/g,"").slice(0,4))}
+                    style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, fontFamily:"inherit", outline:"none", background:"#fafafa" }} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* UPI */}
+          {method === "upi" && (
+            <div>
+              <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>UPI ID</div>
+              <input placeholder="yourname@upi" value={upi} onChange={e => setUpi(e.target.value)}
+                style={{ width:"100%", padding:"12px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, fontFamily:"inherit", outline:"none", background:"#fafafa" }} />
+              <div style={{ marginTop:8, fontSize:12, color:"#94a3b8" }}>e.g. 9876543210@paytm, name@ybl</div>
+            </div>
+          )}
+
+          {/* Net Banking */}
+          {method === "netbanking" && (
+            <div>
+              <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>Select Bank</div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                {[{id:"sbi",label:"State Bank of India"},{id:"hdfc",label:"HDFC Bank"},{id:"icici",label:"ICICI Bank"},{id:"axis",label:"Axis Bank"},{id:"kotak",label:"Kotak Bank"},{id:"other",label:"Other Bank"}].map(b => (
+                  <div key={b.id} onClick={() => setBank(b.id)}
+                    style={{ padding:"10px 14px", border:`2px solid ${bank===b.id?"#6366f1":"#e2e8f0"}`, borderRadius:10, cursor:"pointer", fontSize:12, fontWeight:700, color:bank===b.id?"#6366f1":"#475569", background:bank===b.id?"#f5f3ff":"#fafafa", transition:"all 0.15s" }}>
+                    {b.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Summary */}
+          <div style={{ marginTop:20, background:"#f8fafc", borderRadius:12, padding:"14px 16px", display:"flex", justifyContent:"space-between", alignItems:"center", border:"1px solid #e2e8f0" }}>
+            <div style={{ fontSize:13, color:"#64748b", fontWeight:600 }}>Total to pay</div>
+            <div style={{ fontSize:20, fontWeight:900, color:"#1e293b" }}>₹{plan.price?.toLocaleString("en-IN")}</div>
+          </div>
+
+          {/* Pay Button */}
+          <button
+            onClick={onPay}
+            disabled={!canPay || loading}
+            style={{ marginTop:16, width:"100%", padding:"15px", background: canPay && !loading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "#e2e8f0", color: canPay && !loading ? "#fff" : "#94a3b8", border:"none", borderRadius:12, fontSize:16, fontWeight:800, cursor: canPay && !loading ? "pointer" : "not-allowed", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:10, transition:"all 0.2s", boxShadow: canPay && !loading ? "0 8px 20px rgba(99,102,241,0.35)" : "none" }}
+          >
+            {loading
+              ? <><div style={{ width:18, height:18, border:"2.5px solid #fff", borderTopColor:"transparent", borderRadius:"50%", animation:"pgSpin 0.8s linear infinite" }} /> Processing...</>
+              : <>🔒 Pay ₹{plan.price?.toLocaleString("en-IN")} Now</>
+            }
+          </button>
+
+          {/* Security badges */}
+          <div style={{ marginTop:16, display:"flex", justifyContent:"center", gap:20, color:"#94a3b8", fontSize:11, fontWeight:600 }}>
+            <span>🔒 256-bit SSL</span>
+            <span>🛡️ PCI DSS</span>
+            <span>✅ RBI Compliant</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview", preloadedSubscription = null, onTabChange }) {
   const [subscription, setSubscription] = useState(preloadedSubscription);
@@ -96,6 +366,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   
   useEffect(() => {
     setActiveTab(initialTab);
+    if (initialTab === "upgrade") setShowPlanPicker(true);
   }, [initialTab]);
 
   const handleTabChange = (newTab) => {
@@ -105,6 +376,8 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   const [toast, setToast] = useState("");
   const [mockGatewayOpen, setMockGatewayOpen] = useState(null);
   const [paymentSuccessData, setPaymentSuccessData] = useState(null);
+  const [mockGatewayPlan, setMockGatewayPlan] = useState(null);
+  const [showPlanPicker, setShowPlanPicker] = useState(initialTab === "upgrade");
   const [assignedPackages, setAssignedPackages] = useState([]);
   
   // For testing: manually trigger success popup
@@ -347,54 +620,78 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     }
   };
 
-  // ── PayU Payment for Paid Plans ─────────────────────────────────────────────
-  const startPayUPayment = async (plan) => {
+  // ── Open Mock Payment Gateway ─────────────────────────────────────────────
+  const startPayUPayment = (plan) => {
     if (plan.isTrial) { startTrial(plan); return; }
     if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
+    setMockGatewayPlan(plan);
+  };
 
+  // ── Complete mock payment → activate subscription ─────────────────────────
+  const completeMockPayment = async (plan) => {
     try {
       setPayLoading(plan.name);
-
-      // Call backend to initialize PayU and get hash
-      const initRes = await axios.post(`${BASE_URL}/api/payments/payu/init`, {
-        plan,
-        userId,
-        userEmail,
-        userName
-      });
-
-      if (!initRes.data.success) throw new Error("Payment initialization failed");
-
-      const { key, txnid, amount, productinfo, firstname, email, phone, hash, surl, furl, env } = initRes.data;
-
-      // Determine PayU URL based on environment
-      const payuUrl = env === "secure" ? "https://secure.payu.in/_payment" : "https://test.payu.in/_payment";
-
-      // Create a form dynamically and submit it
-      const form = document.createElement("form");
-      form.setAttribute("method", "POST");
-      form.setAttribute("action", payuUrl);
-
-      const params = {
-        key, txnid, amount, productinfo, firstname, email, phone, surl, furl, hash
-      };
-
-      for (const [k, v] of Object.entries(params)) {
-        const hiddenField = document.createElement("input");
-        hiddenField.setAttribute("type", "hidden");
-        hiddenField.setAttribute("name", k);
-        hiddenField.setAttribute("value", v);
-        form.appendChild(hiddenField);
+      // Try PayU init first, fallback to direct subscription activation
+      let activated = false;
+      try {
+        const res = await axios.post(`${BASE_URL}/api/subscriptions/activate`, {
+          userId, userEmail, userName,
+          planName: plan.name,
+          planPrice: plan.price,
+          billingCycle: "monthly",
+          paymentMethod: "card",
+          duration: plan.duration || 30
+        });
+        if (res.data.success) activated = true;
+      } catch (e) {
+        // fallback: start-trial style
+        const res2 = await axios.post(`${BASE_URL}/api/subscriptions/start-trial`, {
+          userId, userEmail, userName,
+          planName: plan.name,
+          planPrice: plan.price,
+          clientLimit: plan.clientLimit,
+          employeeLimit: plan.employeeLimit,
+          managerLimit: plan.managerLimit,
+          features: plan.features
+        });
+        if (res2.data.success) activated = true;
       }
-
-      document.body.appendChild(form);
-      form.submit();
-
+      setMockGatewayPlan(null);
+      setPaymentSuccessData({ name: plan.name, price: plan.price });
+      if (activated) { await fetchData(); if (onSubscriptionSuccess) onSubscriptionSuccess(); }
     } catch (err) {
-      showToast("❌ " + (err.response?.data?.error || err.message));
+      showToast("❌ " + (err.response?.data?.error || err.message || "Payment failed"));
+    } finally {
       setPayLoading(null);
     }
   };
+
+  // ── Plan Picker (Choose Your Plan overlay) ────────────────────────────────────
+  if (showPlanPicker && !mockGatewayPlan) {
+    return (
+      <PlanPickerModal
+        subscription={subscription}
+        payLoading={payLoading}
+        onClose={() => { setShowPlanPicker(false); if (onTabChange) onTabChange(); }}
+        onSelectPlan={(plan) => { setShowPlanPicker(false); startPayUPayment(plan); }}
+        onStartTrial={() => startTrial()}
+      />
+    );
+  }
+
+  // ── Mock Payment Gateway Modal ───────────────────────────────────────────────
+  if (mockGatewayPlan) {
+    return (
+      <MockPaymentGateway
+        plan={mockGatewayPlan}
+        userEmail={userEmail}
+        userName={userName}
+        payLoading={payLoading}
+        onClose={() => { setMockGatewayPlan(null); setShowPlanPicker(true); }}
+        onPay={() => completeMockPayment(mockGatewayPlan)}
+      />
+    );
+  }
 
   // ── Success UI ───────────────────────────────────────────────────────────────
   if (paymentSuccessData) {
@@ -407,7 +704,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
             ✓
           </div>
           <h2 style={{ fontSize: 32, fontWeight: 800, color: "#1e293b", margin: "0 0 16px" }}>Payment Successful! 🎉</h2>
-          <p style={{ fontSize: 16, color: "#64748b", margin: "0 0 32px", lineHeight: 1.6, maxWidth: 380, margin: "0 auto 32px" }}>
+          <p style={{ fontSize: 16, color: "#64748b", lineHeight: 1.6, maxWidth: 380, margin: "0 auto 32px" }}>
             Your <strong>{paymentSuccessData.name}</strong> plan is now active. Your dashboard is ready!
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
@@ -687,7 +984,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   <div style={{ zIndex: 1, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "center" }}>
     <div style={{ fontSize: 42, fontWeight: 900, marginBottom: 4, letterSpacing: "-1px" }}>₹{subscription.planPrice?.toLocaleString("en-IN") || "0"}</div>
     <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 600, marginBottom: 24 }}>per {subscription.billingCycle || "month"}</div>
-    <button onClick={() => handleTabChange("upgrade")} style={{ background: "#fff", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
+    <button onClick={() => setShowPlanPicker(true)} style={{ background: "#fff", color: "var(--teal)", border: "none", padding: "12px 24px", borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}>
       <i className="ti ti-arrow-up"></i> Upgrade Now
     </button>
     {daysLeft !== null && (

@@ -77,6 +77,8 @@ const incomeRoutes = require("./routes/incomeroutes");
 const notificationRoutes = require("./routes/notificationroutes");
 const configRoutes = require("./routes/configroutes");
 const documentRoutes = require("./routes/documentroutes");
+const bankRoutes = require("./routes/bankroutes");
+const auditRoutes = require("./routes/auditroutes");
 
 
 // Static files (local resume storage)
@@ -118,6 +120,8 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/config", configRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/banks", bankRoutes);
+app.use("/api/audit-notes", auditRoutes);
 
 app.use("/upload", express.static("uploads"));
 

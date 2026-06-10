@@ -182,7 +182,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
   const [addingTask, setAddingTask] = useState(false);
 
   const [updateText, setUpdateText] = useState('');
-  const [updateType, setUpdateType] = useState('general');
+  const [updateTitle, setUpdateTitle] = useState('');
+  const [updateType, setUpdateType] = useState('progress');
+  const [sendToTeam, setSendToTeam] = useState(true);
+  const [sendToClient, setSendToClient] = useState(true);
   const [postingUpdate, setPostingUpdate] = useState(false);
 
   const [newMilestoneName, setNewMilestoneName] = useState('');
@@ -231,7 +234,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
   // Derived Project Data
   const projName = currProject.name || "Unnamed Project";
   const clientName = currProject.client || currProject.clientName || "Unknown Client";
-  const category = currProject.purpose || currProject.category || "General";
+  const category = currProject.category || currProject.purpose || "General";
   const priority = currProject.priority || "medium";
   const status = (currProject.status || "Active").toLowerCase();
   
@@ -261,9 +264,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
   const openTasks = totalTasks - doneTasks - inprogTasks;
   const progressPct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : (currProject.progress || 0);
 
-  // Budget spent data
-  const spent = Math.round(budgetAmt * (progressPct / 100));
-  const remaining = budgetAmt - spent;
+  // Budget spent data (Real values from backend)
+  const billed = currProject.billed || 0;
+  const received = currProject.received || 0;
+  const pending = currProject.pending || 0;
+  const spent = currProject.spent || 0;
+  const remaining = budgetAmt > 0 ? (budgetAmt - spent) : 0;
+  const budgetUsedPct = budgetAmt > 0 ? Math.round((spent / budgetAmt) * 100) : 0;
 
   const filteredTasks = projTasks.filter(t => {
     if (taskFilter === 'all') return true;
@@ -500,8 +507,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
           <span style={{color:P.textDark}}>{projName}</span>
         </div>
         <div className="mpd-topbar-actions">
-          <button className="mpd-btn mpd-btn-outline" onClick={handleShare}><i className="ti ti-share"></i> Share</button>
-          <button className="mpd-btn mpd-btn-primary" onClick={onEdit || (() => {})}><i className="ti ti-edit"></i> Edit</button>
+          <button className="mpd-btn mpd-btn-outline" onClick={handleShare} style={{gap:6}}><i className="ti ti-share"></i> Share</button>
+          <button className="mpd-btn mpd-btn-outline" style={{gap:6}} onClick={() => {
+            const text = `Project: ${projName}\nClient: ${clientName}\nStatus: ${currProject.status}\nProgress: ${progressPct}%\nBudget: ${currency}${budgetAmt.toLocaleString()}`;
+            const blob = new Blob([text], {type:'text/plain'});
+            const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${projName}.txt`; a.click();
+          }}><i className="ti ti-download"></i> Export</button>
+          <button className="mpd-btn mpd-btn-primary" onClick={onEdit || (() => {})} style={{gap:6}}><i className="ti ti-edit"></i> Edit</button>
+          <button className="mpd-btn mpd-btn-danger" style={{gap:6}} onClick={() => { if(window.confirm('Delete this project?')) {} }}><i className="ti ti-trash"></i> Delete</button>
         </div>
       </div>
 
@@ -563,44 +576,115 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
         </div>
         <div className="mpd-prog-divider"></div>
         <div className="mpd-prog-item">
-          <div className="mpd-prog-num">{budgetAmt ? Math.round((spent/budgetAmt)*100) : 0}%</div>
+          <div className="mpd-prog-num">{budgetUsedPct}%</div>
           <div className="mpd-prog-lbl">Budget Used</div>
-          <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{width:`${budgetAmt ? (spent/budgetAmt)*100 : 0}%`}}></div></div>
+          <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{width:`${budgetUsedPct}%`}}></div></div>
           <div className="mpd-prog-sub">{currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}</div>
         </div>
       </div>
 
-      {/* UPDATE COMPOSER (Animated) */}
-      <div className="mpd-upd-composer" style={{ height: composerOpen ? 'auto' : 54, overflow: 'hidden' }}>
+      {/* UPDATE COMPOSER */}
+      <div className="mpd-upd-composer" style={{ overflow: 'hidden' }}>
         <div className="mpd-uc-header" onClick={() => setComposerOpen(!composerOpen)} style={{ cursor: 'pointer' }}>
           <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
-          <button className="mpd-uc-toggle">{composerOpen ? 'Collapse ↑' : 'Expand ↓'}</button>
+          <button className="mpd-uc-toggle" onClick={e => { e.stopPropagation(); setComposerOpen(!composerOpen); }}>{composerOpen ? 'Collapse ↑' : 'Expand ↓'}</button>
         </div>
-        <div className={`mpd-uc-body ${composerOpen ? 'mpd-open' : ''}`}>
-           <form onSubmit={handlePostUpdate} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-               <select value={updateType} onChange={e => setUpdateType(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', fontFamily: 'inherit' }}>
-                 <option value="general">📢 General Update</option>
-                 <option value="progress">📈 Progress Update</option>
-                 <option value="milestone">🚩 Milestone Update</option>
-                 <option value="blocker">⚠️ Blocker / Alert</option>
-                 <option value="delivery">📦 Delivery Update</option>
-               </select>
-               <span style={{ fontSize: 12, color: P.textLight }}>Select an update type to alert your client and team</span>
-             </div>
-             <textarea 
-               value={updateText} 
-               onChange={e => setUpdateText(e.target.value)} 
-               placeholder="Type the project update details here..." 
-               required 
-               style={{ width: '100%', padding: 12, borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', minHeight: 80, outline: 'none' }}
-             />
-             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-               <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setComposerOpen(false)}>Cancel</button>
-               <button type="submit" className="mpd-btn mpd-btn-primary" disabled={postingUpdate}>{postingUpdate ? 'Posting...' : 'Post Update'}</button>
-             </div>
-           </form>
+        {composerOpen && (
+        <div style={{ padding: '18px 22px' }}>
+          {/* SEND TO */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Send To</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <div onClick={() => setSendToTeam(!sendToTeam)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToTeam ? P.primary : P.border}`, background: sendToTeam ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToTeam ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
+                <i className="ti ti-users" style={{ fontSize: 16 }} />
+                Team ({assigned.length} members)
+              </div>
+              <div onClick={() => setSendToClient(!sendToClient)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToClient ? P.primary : P.border}`, background: sendToClient ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToClient ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
+                <i className="ti ti-building" style={{ fontSize: 16 }} />
+                Client Portal — {clientName}
+              </div>
+            </div>
+          </div>
+
+          {/* UPDATE TYPE CHIPS */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Type</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {[
+                { key: 'progress', label: 'Progress', icon: 'ti-chart-bar' },
+                { key: 'milestone', label: 'Milestone', icon: 'ti-flag' },
+                { key: 'blocker', label: 'Blocker', icon: 'ti-alert-triangle' },
+                { key: 'general', label: 'General', icon: 'ti-speakerphone' },
+                { key: 'delivery', label: 'Delivery', icon: 'ti-package' },
+              ].map(({ key, label, icon }) => (
+                <button key={key} onClick={() => setUpdateType(key)} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === key ? P.primary : P.border}`, background: updateType === key ? P.primary : '#fff', color: updateType === key ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
+                  <i className={`ti ${icon}`} style={{ fontSize: 13 }} />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* UPDATE TITLE */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Update Title *</div>
+            <input
+              value={updateTitle}
+              onChange={e => setUpdateTitle(e.target.value)}
+              placeholder="e.g. Checkout flow 80% complete"
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          {/* DETAILS */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Details</div>
+            <textarea
+              value={updateText}
+              onChange={e => setUpdateText(e.target.value)}
+              placeholder="What's done, what's next, any blockers or decisions needed..."
+              style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', minHeight: 90, outline: 'none', boxSizing: 'border-box', lineHeight: 1.6 }}
+            />
+          </div>
+
+          {/* ATTACHMENTS ROW + SEND BUTTON */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background='#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background='none'}>
+                <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
+              </button>
+              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background='#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background='none'}>
+                <i className="ti ti-file" style={{ fontSize: 15 }} /> File/Doc
+              </button>
+              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background='#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background='none'}>
+                <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> Attach
+              </button>
+              <span style={{ fontSize: 11, color: P.textLight, alignSelf: 'center' }}>Drag &amp; drop supported</span>
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setComposerOpen(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
+              <button
+                disabled={postingUpdate || !updateTitle.trim()}
+                onClick={async () => {
+                  if (!updateTitle.trim()) return;
+                  setPostingUpdate(true);
+                  try {
+                    const newUpdate = { text: `${updateTitle}: ${updateText}`.trim(), date: new Date().toISOString(), author: 'Admin', type: updateType };
+                    const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
+                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
+                    setUpdateText(''); setUpdateTitle(''); setUpdateType('progress'); setComposerOpen(false);
+                    loadLatest(); if (onUpdate) onUpdate(); if (fetchProjects) fetchProjects();
+                  } catch(err) { console.error(err); alert('Failed to post update'); }
+                  finally { setPostingUpdate(false); }
+                }}
+                style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: postingUpdate || !updateTitle.trim() ? 'not-allowed' : 'pointer', opacity: postingUpdate || !updateTitle.trim() ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
+                <i className="ti ti-send" style={{ fontSize: 15 }} />
+                {postingUpdate ? 'Sending...' : 'Send to Team & Client'}
+              </button>
+            </div>
+          </div>
         </div>
+        )}
       </div>
 
       {/* MAIN CONTENT GRID */}
@@ -757,13 +841,13 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
           <div className="mpd-card">
             <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div></div>
             <div className="mpd-brow"><span className="mpd-lbl">Total Budget</span><span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span></div>
-            <div className="mpd-brow"><span className="mpd-lbl">Billed</span><span className="mpd-val">{currency}{Math.round(spent * 0.51).toLocaleString()}</span></div>
-            <div className="mpd-brow"><span className="mpd-lbl">Received</span><span className="mpd-val mpd-g">{currency}{Math.round(spent * 0.495).toLocaleString()}</span></div>
-            <div className="mpd-brow"><span className="mpd-lbl">Pending</span><span className="mpd-val mpd-r">{currency}{Math.round(spent * 0.25).toLocaleString()}</span></div>
+            <div className="mpd-brow"><span className="mpd-lbl">Billed</span><span className="mpd-val">{currency}{billed.toLocaleString()}</span></div>
+            <div className="mpd-brow"><span className="mpd-lbl">Received</span><span className="mpd-val mpd-g">{currency}{received.toLocaleString()}</span></div>
+            <div className="mpd-brow"><span className="mpd-lbl">Pending</span><span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span></div>
             <div className="mpd-brow"><span className="mpd-lbl">Remaining</span><span className="mpd-val mpd-p">{currency}{remaining.toLocaleString()}</span></div>
             <div style={{marginTop:10}}>
-              <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{width:`${budgetAmt?(spent/budgetAmt)*100:0}%`}}></div></div>
-              <div style={{fontSize:11,color:P.textLight,marginTop:4}}>{budgetAmt?Math.round((spent/budgetAmt)*100):0}% used</div>
+              <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{width:`${budgetUsedPct}%`}}></div></div>
+              <div style={{fontSize:11,color:P.textLight,marginTop:4}}>{budgetUsedPct}% used</div>
             </div>
           </div>
 

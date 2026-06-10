@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
@@ -379,51 +379,47 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   const [mockGatewayPlan, setMockGatewayPlan] = useState(null);
   const [showPlanPicker, setShowPlanPicker] = useState(initialTab === "upgrade");
   const [assignedPackages, setAssignedPackages] = useState([]);
-  
-  // For testing: manually trigger success popup
-  const testSuccessPopup = () => {
-    console.log("Manually triggering success popup");
-    setPaymentSuccessData({ name: "Professional" });
-  };
+  const payuInFlight = useRef(false); // Guard against duplicate PayU API calls
 
-  // Check URL for PayU success/failure redirect
+  // Check URL for PayU success/failure redirect (called after PayU redirects browser back)
   useEffect(() => {
-    const checkPaymentStatus = () => {
+    const checkPaymentStatus = async () => {
       const params = new URLSearchParams(window.location.search);
       const paymentStatus = params.get("payment");
-      console.log("Checking payment status:", paymentStatus);
-      console.log("Full URL:", window.location.href);
-      
+      if (!paymentStatus) return;
+
+      // Clean up URL immediately to prevent re-triggering
+      window.history.replaceState({}, document.title, window.location.pathname);
+
       if (paymentStatus === "success") {
-        showToast("🎉 Payment Successful! Your plan is active.");
         const planName = params.get("plan");
-        console.log("Setting payment success data for plan:", planName);
+        const subId = params.get("subId");
+        const txnid = params.get("txnid");
+
+        // Activate the pending subscription in backend
+        try {
+          if (subId) {
+            await axios.post(`${BASE_URL}/api/subscriptions/activate-pending`, {
+              subscriptionId: subId,
+              txnid
+            });
+          }
+        } catch (e) {
+          console.log("Activation call:", e.message);
+        }
+
+        // Refresh data and show success popup
+        await fetchData();
+        if (onSubscriptionSuccess) onSubscriptionSuccess();
         setPaymentSuccessData({ name: planName || "Subscription" });
-        
-        // Refresh subscription data after successful payment with delay to ensure backend updates
-        setTimeout(() => fetchData(), 1000);
-        
-        // Clean up URL without reloading
-        window.history.replaceState({}, document.title, window.location.pathname);
+        showToast("🎉 Payment Successful! Your plan is active.");
+
       } else if (paymentStatus === "failed") {
         showToast("❌ Payment failed. Please try again.");
-        window.history.replaceState({}, document.title, window.location.pathname);
       }
     };
-    
+
     checkPaymentStatus();
-    
-    // Also check on URL changes (for PayU redirect)
-    const handlePopState = () => checkPaymentStatus();
-    window.addEventListener('popstate', handlePopState);
-    
-    // Also check periodically for PayU redirect
-    const interval = setInterval(checkPaymentStatus, 1000);
-    
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      clearInterval(interval);
-    };
   }, []);
 
   const userId = user?._id || user?.id;
@@ -620,11 +616,64 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
     }
   };
 
-  // ── Open Mock Payment Gateway ─────────────────────────────────────────────
-  const startPayUPayment = (plan) => {
+  // ── Initiate PayU Payment ─────────────────────────────────────────────
+  const startPayUPayment = async (plan) => {
     if (plan.isTrial) { startTrial(plan); return; }
     if (!plan.price) { window.open(`mailto:billing@${(user?.companyName || "business").toLowerCase().replace(/\s+/g, "")}.com`); return; }
-    setMockGatewayPlan(plan);
+    
+    // Prevent duplicate API calls from rapid clicking
+    if (payuInFlight.current || payLoading) return;
+    payuInFlight.current = true;
+    setPayLoading(plan.name);
+    try {
+      // Get PayU parameters from backend
+      const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, {
+        userId,
+        userEmail,
+        userName,
+        plan
+      });
+
+      if (res.data.success) {
+        // Create an invisible form and submit it to PayU
+        const payuData = res.data;
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = payuData.env === "prod" ? "https://secure.payu.in/_payment" : "https://test.payu.in/_payment";
+        form.style.display = "none";
+
+        const fields = {
+          key: payuData.key,
+          txnid: payuData.txnid,
+          amount: payuData.amount,
+          productinfo: payuData.productinfo,
+          firstname: payuData.firstname,
+          email: payuData.email,
+          phone: payuData.phone,
+          hash: payuData.hash,
+          surl: payuData.surl,
+          furl: payuData.furl
+        };
+
+        for (const [key, value] of Object.entries(fields)) {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = value;
+          form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+      } else {
+        throw new Error(res.data.error || "Failed to initialize PayU payment");
+      }
+    } catch (err) {
+      console.error("PayU init error:", err);
+      showToast("❌ Could not initialize payment. Please try again.");
+      setPayLoading(null);
+      payuInFlight.current = false; // Release the guard on error
+    }
   };
 
   // ── Complete mock payment → activate subscription ─────────────────────────
@@ -634,7 +683,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
       // Try PayU init first, fallback to direct subscription activation
       let activated = false;
       try {
-        const res = await axios.post(`${BASE_URL}/api/subscriptions/activate`, {
+        const res = await axios.post(`${BASE_URL}/api/subscriptions/create`, {
           userId, userEmail, userName,
           planName: plan.name,
           planPrice: plan.price,
@@ -667,7 +716,7 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   };
 
   // ── Plan Picker (Choose Your Plan overlay) ────────────────────────────────────
-  if (showPlanPicker && !mockGatewayPlan) {
+  if (showPlanPicker) {
     return (
       <PlanPickerModal
         subscription={subscription}
@@ -675,20 +724,6 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
         onClose={() => { setShowPlanPicker(false); if (onTabChange) onTabChange(); }}
         onSelectPlan={(plan) => { setShowPlanPicker(false); startPayUPayment(plan); }}
         onStartTrial={() => startTrial()}
-      />
-    );
-  }
-
-  // ── Mock Payment Gateway Modal ───────────────────────────────────────────────
-  if (mockGatewayPlan) {
-    return (
-      <MockPaymentGateway
-        plan={mockGatewayPlan}
-        userEmail={userEmail}
-        userName={userName}
-        payLoading={payLoading}
-        onClose={() => { setMockGatewayPlan(null); setShowPlanPicker(true); }}
-        onPay={() => completeMockPayment(mockGatewayPlan)}
       />
     );
   }
@@ -736,30 +771,9 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
               onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
               onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
             >
-              Go to Dashboard
+              Login to dashboard
             </button>
-            {/* Test button - remove in production */}
-            {process.env.NODE_ENV === 'development' && (
-              <button 
-                onClick={testSuccessPopup}
-                style={{ 
-                  width: "100%", 
-                  padding: "8px 16px", 
-                  borderRadius: 8, 
-                  fontSize: 12, 
-                  fontWeight: 600, 
-                  cursor: "pointer", 
-                  background: "#f1f5f9", 
-                  color: "#64748b", 
-                  border: "1px solid #e2e8f0", 
-                  fontFamily: "inherit",
-                  marginTop: 8
-                }}
-              >
-                Test Popup Again
-              </button>
-            )}
-          </div>
+            </div>
         </div>
       </div>
     );

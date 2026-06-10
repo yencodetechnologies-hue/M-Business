@@ -514,27 +514,27 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
     setEditClient(c);
   };
 
-const saveEdit = async () => {
-  const errs = {};
-  if (!editForm.name.trim()) errs.name = "Name required";
-  if (!editForm.client.trim()) errs.client = "Company name required";
-  if (Object.keys(errs).length) { setEditErr(errs); return; }
-  try {
-    setSaving(true);
-    const payload = {
-      ...editForm,
-      deadline: editForm.end || editForm.start || "",
-    };
-    const res = await axios.put(`${BASE_URL}/api/projects/${editProj._id}`, payload);
-    setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...(res.data.project || payload) } : p));
-    setEditProj(null);
-    showToast("✅ Project updated!");
-  } catch {
-    setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...editForm } : p));
-    setEditProj(null);
-    showToast("✅ Updated locally!");
-  } finally { setSaving(false); }
-};
+  const saveEdit = async () => {
+    const errs = {};
+    if (!editForm.companyName.trim()) errs.companyName = "Company name required";
+    if (!editForm.email.trim()) errs.email = "Email required";
+    if (Object.keys(errs).length) { setEditErr(errs); return; }
+    
+    try {
+      setSaving(true);
+      const res = await axios.put(`${BASE_URL}/api/clients/${editClient._id}`, editForm);
+      setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm, ...res.data.client } : c));
+      setEditClient(null);
+      showToast("✅ Client updated successfully!");
+    } catch (err) {
+      console.error(err);
+      setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm } : c));
+      setEditClient(null);
+      showToast("✅ Client updated locally!");
+    } finally { 
+      setSaving(false); 
+    }
+  };
   const doDelete = async () => {
     try { await axios.delete(`${BASE_URL}/api/clients/${deleteTarget._id}`); } catch { }
     setClients(prev => prev.filter(c => c._id !== deleteTarget._id));
@@ -3711,32 +3711,36 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     return 10;
   };
   const getSubscriptionLimit = (type, sub = subscription) => {
-    // Priority 1: Direct limit set by Admin on the user profile (Manual override)
+    // 1. Try to get limit from the active subscription directly
+    let val = null;
+    if (sub) {
+      val = type === "client" ? sub.clientLimit : type === "employee" ? sub.employeeLimit : sub.managerLimit;
+      
+      // If direct field is empty, search in features array
+      if ((!val || val === "") && sub.features && Array.isArray(sub.features)) {
+        const label = type === "client" ? "client" : type === "employee" ? "employee" : "manager";
+        const feat = sub.features.find(f => f.toLowerCase().includes(label));
+        if (feat) {
+          const match = feat.match(/\d+/);
+          if (match) val = match[0];
+          if (feat.toLowerCase().includes("unlimited")) val = "Infinity";
+        }
+      }
+    }
+
+    // 2. If subscription has a limit, parse and return it
+    if (val && String(val).trim() !== "" && String(val) !== "0") {
+      return parseLimit(val);
+    }
+
+    // 3. Fallback: Direct limit set by Admin on the user profile
     const uLimit = type === "client" ? user?.clientLimit : type === "employee" ? user?.employeeLimit : user?.managerLimit;
     if (uLimit && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
       return parseLimit(uLimit);
     }
-
-    if (!sub) return 10;
-
-    const map = {
-      client: sub.clientLimit,
-      employee: sub.employeeLimit,
-      manager: sub.managerLimit,
-    };
-    let val = map[type];
-
-    // Smart Fallback: If direct field is empty, search in features array
-    if ((!val || val === "") && sub.features && Array.isArray(sub.features)) {
-      const label = type === "client" ? "client" : type === "employee" ? "employee" : "manager";
-      const feat = sub.features.find(f => f.toLowerCase().includes(label));
-      if (feat) {
-        const match = feat.match(/\d+/);
-        if (match) val = match[0];
-      }
-    }
-
-    return parseLimit(val);
+    
+    // 4. Default fallback
+    return 10;
   };
 
   const isUsageAtLimit = (type, currentCount, sub = subscription) => {

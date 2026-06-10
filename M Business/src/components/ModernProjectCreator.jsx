@@ -121,9 +121,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   
   const [budget, setBudget] = useState(editProject?.budget || '');
   const [currency, setCurrency] = useState(editProject?.currency || '₹');
-  const [advPct, setAdvPct] = useState('30');
-  const [msPct, setMsPct] = useState('40');
-  const [delPct, setDelPct] = useState('30');
+  const [billed, setBilled] = useState(editProject?.billed || '');
+  const [received, setReceived] = useState(editProject?.received || '');
+  const [pending, setPending] = useState(editProject?.pending || '');
+  const [spent, setSpent] = useState(editProject?.spent || '');
 
   const [milestones, setMilestones] = useState(editProject?.milestones?.length ? editProject.milestones : [
     { name: 'Kickoff & Requirements', date: '' },
@@ -152,6 +153,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
       setAssigned(Array.isArray(editProject.assignedTo) ? editProject.assignedTo : (editProject.assignedTo ? [editProject.assignedTo] : []));
       setBudget(editProject.budget || '');
       setCurrency(editProject.currency || '₹');
+      setBilled(editProject.billed || '');
+      setReceived(editProject.received || '');
+      setPending(editProject.pending || '');
+      setSpent(editProject.spent || '');
       setMilestones(editProject.milestones?.length ? editProject.milestones : [
         { name: 'Kickoff & Requirements', date: '' },
         { name: 'Design Approval', date: '' },
@@ -215,6 +220,10 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         deadline: end || start || '',
         budget,
         currency,
+        billed: billed || 0,
+        received: received || 0,
+        pending: pending || 0,
+        spent: spent || 0,
         assignedTo: assigned,
         progress: editProject?.progress || 0,
         milestones: milestones.filter(m => m.name.trim()),
@@ -382,10 +391,23 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
               </div>
             </div>
             {budget && (
-              <div className="mpc-budget-split">
-                <div className="mpc-bs-item"><label>Advance %</label><input type="number" value={advPct} onChange={e => setAdvPct(e.target.value)} /></div>
-                <div className="mpc-bs-item"><label>On Milestone %</label><input type="number" value={msPct} onChange={e => setMsPct(e.target.value)} /></div>
-                <div className="mpc-bs-item"><label>On Delivery %</label><input type="number" value={delPct} onChange={e => setDelPct(e.target.value)} /></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+                <div className="mpc-form-group">
+                  <label>Billed Amount</label>
+                  <input type="number" value={billed} onChange={e => setBilled(e.target.value)} placeholder="0" />
+                </div>
+                <div className="mpc-form-group">
+                  <label>Received Amount</label>
+                  <input type="number" value={received} onChange={e => setReceived(e.target.value)} placeholder="0" />
+                </div>
+                <div className="mpc-form-group">
+                  <label>Pending Amount</label>
+                  <input type="number" value={pending} onChange={e => setPending(e.target.value)} placeholder="0" />
+                </div>
+                <div className="mpc-form-group">
+                  <label>Spent Amount</label>
+                  <input type="number" value={spent} onChange={e => setSpent(e.target.value)} placeholder="0" />
+                </div>
               </div>
             )}
           </div>

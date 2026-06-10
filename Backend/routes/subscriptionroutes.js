@@ -135,14 +135,21 @@ router.post("/start-trial", async (req, res) => {
       paymentDate: new Date(),
       planName: "Free Trial",
       planDuration: "trial",
-      providerCompany: "M Business"
+      businessLimit: req.body.businessLimit || "1 Business manage",
+      paymentMethod: "free_trial"
     });
     await trialPayment.save();
 
     // Update user mySubscriptions
-    await User.findByIdAndUpdate(userId, { mySubscriptions: true, numberOfSubscriptions: 1 }).catch(() => { });
+    await User.findByIdAndUpdate(userId, { 
+      mySubscriptions: true,
+      clientLimit: subscription.clientLimit,
+      employeeLimit: subscription.employeeLimit,
+      managerLimit: subscription.managerLimit,
+      businessLimit: subscription.businessLimit
+    }).catch(() => { });
 
-    // Send trial welcome email
+    // Send Trial Started Email
     try {
       await sendTrialWelcome(userEmail, userName || "User", endDate);
     } catch (mailErr) {
@@ -168,7 +175,14 @@ router.post("/create", async (req, res) => {
     const subscription = new Subscription(data);
     await subscription.save();
 
-    await User.findByIdAndUpdate(data.userId, { mySubscriptions: true }).catch(() => { });
+    // Update user limits to match the new subscription
+    await User.findByIdAndUpdate(data.userId, { 
+      mySubscriptions: true,
+      clientLimit: subscription.clientLimit,
+      employeeLimit: subscription.employeeLimit,
+      managerLimit: subscription.managerLimit,
+      businessLimit: subscription.businessLimit
+    }).catch(() => { });
 
     // Send subscription success email
     try {
@@ -178,6 +192,76 @@ router.post("/create", async (req, res) => {
     }
 
     res.status(201).json({ success: true, subscription });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Activate Pending Subscription (called after PayU redirects back) ─────────
+router.post("/activate-pending", async (req, res) => {
+  try {
+    const { subscriptionId, txnid } = req.body;
+    if (!subscriptionId) return res.status(400).json({ error: "subscriptionId required" });
+
+    // Activate the pending subscription
+    const activatedSub = await Subscription.findByIdAndUpdate(
+      subscriptionId,
+      {
+        status: "active",
+        isFullyPaid: true,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
+
+    if (!activatedSub) return res.status(404).json({ error: "Subscription not found" });
+
+    // Cancel any other active subscriptions for this user
+    await Subscription.updateMany(
+      { userId: activatedSub.userId, _id: { $ne: activatedSub._id }, status: "active" },
+      { status: "cancelled", updatedAt: new Date() }
+    );
+
+    // Update user limits to match the new subscription
+    await User.findByIdAndUpdate(activatedSub.userId, {
+      mySubscriptions: true,
+      clientLimit: activatedSub.clientLimit,
+      employeeLimit: activatedSub.employeeLimit,
+      managerLimit: activatedSub.managerLimit,
+      businessLimit: activatedSub.businessLimit
+    }).catch(() => { });
+
+    // Update payment history record if txnid provided
+    if (txnid) {
+      const ts = Date.now();
+      await PaymentHistory.findOneAndUpdate(
+        { paymentId: txnid },
+        {
+          status: "completed",
+          paymentDate: new Date(),
+          invoiceNo: `INV-SUB-${ts}`,
+          updatedAt: new Date()
+        }
+      );
+    }
+
+    // Send success email
+    try {
+      await sendSubscriptionSuccess(
+        activatedSub.userEmail,
+        activatedSub.userName || "User",
+        activatedSub.planName,
+        activatedSub.startDate,
+        activatedSub.endDate
+      );
+    } catch (mailErr) {
+      console.log("Subscription success email failed:", mailErr.message);
+    }
+
+    res.json({ success: true, subscription: activatedSub });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -463,7 +547,13 @@ router.post("/assign-to-subadmin", async (req, res) => {
       managerLimit: sub.managerLimit,
     });
 
-    await User.findByIdAndUpdate(subadminId, { mySubscriptions: true }).catch(() => {});
+    await User.findByIdAndUpdate(subadminId, { 
+      mySubscriptions: true,
+      clientLimit: sub.clientLimit,
+      employeeLimit: sub.employeeLimit,
+      managerLimit: sub.managerLimit,
+      businessLimit: sub.businessLimit
+    }).catch(() => {});
 
     res.status(201).json({ success: true, subscription: sub });
   } catch (err) {

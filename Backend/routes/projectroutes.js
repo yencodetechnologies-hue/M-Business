@@ -71,9 +71,11 @@ router.post("/add", async (req, res) => {
     const {
       name, client, contactPersonName, contactPersonNo,
       category, priority, purpose, description,
-      start, end, deadline, budget, team,
-      status, progress, tasks, completedTasks,
+      start, end, deadline, budget, currency,
+      billed, received, pending, spent,
+      team, status, progress, tasks, completedTasks,
       assignedTo, manager,
+      updates, milestones, files, portalSettings, portalOpts
     } = req.body;
 
     if (!name) return res.status(400).json({ msg: "Project name required" });
@@ -93,6 +95,10 @@ router.post("/add", async (req, res) => {
       end: end || "",
       deadline: deadline || end || "",
       budget: budget || "",
+      billed: Number(billed) || 0,
+      received: Number(received) || 0,
+      pending: Number(pending) || 0,
+      spent: Number(spent) || 0,
       team: team || "",
       status: status || "Pending",
       progress: Number(progress) || 0,

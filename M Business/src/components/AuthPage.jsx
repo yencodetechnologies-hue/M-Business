@@ -59,7 +59,8 @@ export default function AuthPage({ setUser, initialTab = "login" }) {
     if (Object.keys(errs).length) { setLoginErr(errs); return; }
     try {
       setLoading(true); setError("");
-      const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
+console.log("Sending:", loginData); // check what's actually being sent
+const res = await axios.post(`${BASE_URL}/api/auth/login`, loginData);
       const userData = res.data.user || res.data;
       const userWithLogo = { ...userData, logoUrl: userData.logoUrl || "" };
       localStorage.setItem("user", JSON.stringify(userWithLogo));

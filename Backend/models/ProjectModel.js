@@ -14,6 +14,10 @@ const projectSchema = new mongoose.Schema({
   deadline: { type: String, default: "" },
   budget: { type: String, default: "" },
   currency: { type: String, default: "₹" },
+  billed: { type: Number, default: 0 },
+  received: { type: Number, default: 0 },
+  pending: { type: Number, default: 0 },
+  spent: { type: Number, default: 0 },
   team: { type: String, default: "" },
   status: { type: String, default: "Pending" },
   progress: { type: Number, default: 0 },
@@ -48,6 +52,16 @@ const projectSchema = new mongoose.Schema({
       uploadedAt: { type: Date, default: Date.now }
     }],
     default: []
+  },
+  portalSettings: {
+    type: Object,
+    default: {
+      enablePortal: true,
+      showProgress: true,
+      showMilestones: true,
+      showTeam: false,
+      allowMessages: true
+    }
   }
 }, { timestamps: true });
 

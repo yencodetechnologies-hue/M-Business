@@ -132,21 +132,17 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
       status: { $in: ["active", "grace_period", "trial", "pending", "expired"] }
     }).sort({ createdAt: -1 });
 
-    // Priority 1: Subscription-based limit (most reliable — set when package assigned)
-    let limit = getSubscriptionLimit(resourceType, subscription);
-
-    // Priority 2: Direct limit on User profile (admin manual override)
-    // Only applied if stricter (lower) than the subscription limit
+    // Direct limit on User profile (latest manual or package limit)
     const subadmin = await User.findById(companyId);
     const uLimit = resourceType === "client" ? subadmin?.clientLimit
                  : resourceType === "employee" ? subadmin?.employeeLimit
                  : subadmin?.managerLimit;
 
-    if (uLimit && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
-      const parsedUserLimit = parseLimit(uLimit);
-      if (parsedUserLimit < limit) {
-        limit = parsedUserLimit;
-      }
+    let limit;
+    if (uLimit !== undefined && uLimit !== null && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
+      limit = parseLimit(uLimit);
+    } else {
+      limit = getSubscriptionLimit(resourceType, subscription);
     }
 
     let currentCount = 0;

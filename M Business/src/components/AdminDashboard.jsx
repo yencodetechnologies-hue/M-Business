@@ -69,6 +69,7 @@ function Badge({ label }) {
 
 const NAV = [
   { key: "dashboard", icon: "", label: "Dashboard" },
+  { key: "subadmins", icon: "", label: "Subadmins" },
   { key: "proposals", icon: "", label: "Project Proposals" },
   { key: "reports", icon: "", label: "Reports" },
   { key: "subscriptions", icon: "", label: "Subscriptions" },
@@ -454,7 +455,7 @@ const T = darkMode ? {
                   border: "none", borderRadius: 14, color: on ? (darkMode ? "#fff" : "#3b82f6") : (darkMode ? "rgba(255,255,255,0.5)" : "#64748b"),
                   fontWeight: on ? 800 : 600, fontSize: 14, cursor: "pointer", marginBottom: 6, transition: "0.2s"
                 }}>
-                <span style={{ fontSize: 18 }}>{n.key === 'dashboard' ? '📊' : n.key === 'proposals' ? '📄' : n.key === 'reports' ? '📈' : n.key === 'subscriptions' ? '💳' : n.key === 'packages' ? '📦' : '💸'}</span>
+                <span style={{ fontSize: 18 }}>{n.key === 'dashboard' ? '📊' : n.key === 'subadmins' ? '🛡️' : n.key === 'proposals' ? '📄' : n.key === 'reports' ? '📈' : n.key === 'subscriptions' ? '💳' : n.key === 'packages' ? '📦' : '💸'}</span>
                 <span style={{ flex: 1, textAlign: "left" }}>{n.label}</span>
                 {on && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981" }} />}
               </button>
@@ -510,8 +511,8 @@ const T = darkMode ? {
 
         <div style={{ flex: 1, padding: 32, overflowY: "auto" }}>
           {active === "dashboard" && <OverviewPage THEME={THEME} subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} invoices={invoices} />}
-          {active === "clients" && <ClientsPage THEME={THEME} clients={clients} setClients={setClients} />}
           {active === "subadmins" && <SubadminsList THEME={THEME} subadmins={subadmins} refresh={fetchSubadmins} packages={packages} subscriptions={subscriptions} fetchSubscriptions={fetchSubscriptions} />}
+          {active === "clients" && <ClientsPage THEME={THEME} clients={clients} setClients={setClients} />}
           {active === "employees" && <EmployeesPage THEME={THEME} employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage THEME={THEME} managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} fetchTasks={fetchTasks} />}
@@ -521,7 +522,7 @@ const T = darkMode ? {
           {active === "tasks" && <TaskPage projects={projects} employees={employees} onUpdate={() => fetchTasks()} />}
           {active === "calendar" && <CalendarPage projects={projects} tasks={tasks} clients={clients} user={user} onUpdateProject={() => fetchProjects()} onUpdateTask={() => fetchTasks()} />}
           {active === "reports" && <ReportsPage THEME={THEME} clients={clients} projects={projects} employees={employees} managers={managers} />}
-          {active === "subscriptions" && <SubscriptionsPage THEME={THEME} subscriptions={subscriptions} />}
+          {active === "subscriptions" && <SubscriptionsPage THEME={THEME} subscriptions={subscriptions} subadmins={subadmins} />}
           {active === "packages" && <PackagesPage THEME={THEME} packages={packages} onEdit={handleEditPackageClick} onDelete={deletePackage} darkMode={darkMode} />}
           {active === "payments" && <AccountsPage THEME={THEME} initialTab="income" />}
         </div>
@@ -556,7 +557,7 @@ const T = darkMode ? {
             }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>
-                  {editPkg ? "Edit Edit Package" : "📦 Add New Package"}
+                  {editPkg ? "✏️ Edit Package" : "📦 Add New Package"}
                 </h2>
                 <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
                   {editPkg ? "Update subscription plan details" : "Create a subscription plan for subadmins"}
@@ -995,6 +996,39 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
   const [durationDays, setDurationDays] = useState(30);
   const [assignLoading, setAssignLoading] = useState(false);
 
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editSubadmin, setEditSubadmin] = useState(null);
+  const [editForm, setEditForm] = useState({ name: "", email: "", phone: "", companyName: "", clientLimit: "", employeeLimit: "", status: "Active" });
+
+  const openEditModal = (subadmin) => {
+    setEditSubadmin(subadmin);
+    setEditForm({
+      name: subadmin.name || "",
+      email: subadmin.email || "",
+      phone: subadmin.phone || "",
+      companyName: subadmin.companyName || "",
+      clientLimit: subadmin.clientLimit !== undefined ? String(subadmin.clientLimit).replace(/[^0-9]/g, "") : "",
+      employeeLimit: subadmin.employeeLimit !== undefined ? String(subadmin.employeeLimit).replace(/[^0-9]/g, "") : "",
+      status: subadmin.status || "Active"
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubadmin = async () => {
+    if (!editSubadmin) return;
+    setLoading(true);
+    try {
+      await axios.put(`${BASE_URL}/api/subadmins/${editSubadmin._id}`, editForm);
+      alert("Subadmin updated successfully!");
+      setEditModalOpen(false);
+      refresh();
+    } catch (e) {
+      alert("Failed to update subadmin: " + (e.response?.data?.msg || e.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const openAssignModal = (subadmin) => {
     setSelectedSubadmin(subadmin);
     setSelectedPackage("");
@@ -1057,29 +1091,49 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr>
-              {["Name", "Email", "Company", "Current Plan", "Status", "Actions"].map(h => (
-                <th key={h} style={{ padding: "16px", textAlign: "left", fontWeight: 800, color: THEME.muted, borderBottom: `2px solid ${THEME.border}` }}>{h}</th>
+              {["Name", "Email", "Company", "Client Limit", "Emp. Limit", "Current Plan", "Status", "Actions"].map(h => (
+                <th key={h} style={{ padding: "14px 16px", textAlign: "left", fontWeight: 800, color: THEME.muted, borderBottom: `2px solid ${THEME.border}`, whiteSpace: "nowrap" }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
+            {subadmins.length === 0 && (
+              <tr><td colSpan={8} style={{ padding: 28, textAlign: "center", color: THEME.muted }}>No subadmins found. Click "+ Add Subadmin" to create one.</td></tr>
+            )}
             {subadmins.map((s, i) => {
               const sub = subscriptions.find(sub => (sub.userId === s._id || sub.companyId === s._id) && sub.status === "active");
+              const cl = s.clientLimit ? String(s.clientLimit) : "—";
+              const el = s.employeeLimit ? String(s.employeeLimit) : "—";
               return (
                 <tr key={s._id || i} style={{ borderBottom: `1px solid ${THEME.border}` }}>
-                  <td style={{ padding: "16px", fontWeight: 700, color: THEME.text }}>{s.name}</td>
-                  <td style={{ padding: "16px", color: THEME.muted }}>{s.email}</td>
-                  <td style={{ padding: "16px" }}>
+                  <td style={{ padding: "14px 16px", fontWeight: 700, color: THEME.text }}>{s.name}</td>
+                  <td style={{ padding: "14px 16px", color: THEME.muted, fontSize: 12 }}>{s.email}</td>
+                  <td style={{ padding: "14px 16px" }}>
                     <span onClick={() => handleViewCompany(s.companyName || s.company)} style={{ color: THEME.accent, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>
                       {s.companyName || s.company || "—"}
                     </span>
                   </td>
-                  <td style={{ padding: "16px", fontWeight: 800, color: sub ? THEME.accentSecondary : THEME.muted }}>{sub?.planName || "No Plan"}</td>
-                  <td style={{ padding: "16px" }}><Badge label={s.status || "Active"} /></td>
-                  <td style={{ padding: "16px" }}>
+                  <td style={{ padding: "14px 16px" }}>
+                    <span style={{
+                      background: cl.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(59,130,246,0.1)",
+                      color: cl.toLowerCase().includes("unlimited") ? "#10b981" : "#3b82f6",
+                      padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
+                    }}>{cl}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px" }}>
+                    <span style={{
+                      background: el.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(124,58,237,0.1)",
+                      color: el.toLowerCase().includes("unlimited") ? "#10b981" : "#7c3aed",
+                      padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
+                    }}>{el}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px", fontWeight: 800, color: sub ? THEME.accentSecondary : THEME.muted }}>{sub?.planName || "No Plan"}</td>
+                  <td style={{ padding: "14px 16px" }}><Badge label={s.status || "Active"} /></td>
+                  <td style={{ padding: "14px 16px" }}>
                     <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={() => openEditModal(s)} style={{ background: `${THEME.accent}15`, color: THEME.accent, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>✏️ Edit</button>
                       <button onClick={() => openAssignModal(s)} style={{ background: `${THEME.accentSecondary}15`, color: THEME.accentSecondary, border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>📦 Assign</button>
-                      <button onClick={async () => { if (window.confirm("Delete?")) { await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`); refresh(); } }} style={{ background: "#ef444415", color: "#ef4444", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Delete Delete</button>
+                      <button onClick={async () => { if (window.confirm("Delete?")) { await axios.delete(`${BASE_URL}/api/subadmins/${s._id}`); refresh(); } }} style={{ background: "#ef444415", color: "#ef4444", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>Delete</button>
                     </div>
                   </td>
                 </tr>
@@ -1133,25 +1187,108 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
         </div>
       )}
 
-      {assignModalOpen && (
+      {editModalOpen && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
           <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 440, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
-            <h3 style={{ margin: "0 0 8px", fontWeight: 900, color: THEME.text }}>Assign Package</h3>
-            <p style={{ margin: "0 0 24px", color: THEME.muted, fontSize: 13 }}>to {selectedSubadmin.name}</p>
+            <h3 style={{ margin: "0 0 24px", fontWeight: 900, color: THEME.text }}>✏️ Edit Subadmin & Limits</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <select value={selectedPackage} onChange={e => setSelectedPackage(e.target.value)} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }}>
-                <option value="">-- Choose Plan --</option>
-                {packages.map(p => <option key={p._id} value={p._id}>{p.title} (₹{p.price})</option>)}
-              </select>
-              <input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} style={{ padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6 }}>NAME</label>
+                <input placeholder="Full Name" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6 }}>EMAIL</label>
+                <input placeholder="Email" value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6 }}>PHONE</label>
+                <input placeholder="Phone" value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6 }}>COMPANY NAME</label>
+                <input placeholder="Company Name" value={editForm.companyName} onChange={e => setEditForm({ ...editForm, companyName: e.target.value })} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6 }}>CLIENT LIMIT</label>
+                  <input type="number" placeholder="e.g. 5" value={editForm.clientLimit} onChange={e => setEditForm({ ...editForm, clientLimit: e.target.value })} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6 }}>EMPLOYEE LIMIT</label>
+                  <input type="number" placeholder="e.g. 20" value={editForm.employeeLimit} onChange={e => setEditForm({ ...editForm, employeeLimit: e.target.value })} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }} />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6 }}>STATUS</label>
+                <select value={editForm.status} onChange={e => setEditForm({ ...editForm, status: e.target.value })} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text }}>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
               <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-                <button onClick={() => setAssignModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", fontWeight: 700, background: THEME.surface, color: THEME.text }}>Cancel</button>
-                <button onClick={handleAssignPackage} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#fff", fontWeight: 700 }}>Assign</button>
+                <button onClick={() => setEditModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", fontWeight: 700, background: THEME.surface, color: THEME.text, cursor: "pointer" }}>Cancel</button>
+                <button onClick={handleEditSubadmin} disabled={loading} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: THEME.accent, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+                  {loading ? "Saving..." : "Save Changes"}
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {assignModalOpen && (() => {
+        const selPkg = packages.find(p => p._id === selectedPackage);
+        return (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+          <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 480, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow, maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+              <h3 style={{ margin: 0, fontWeight: 900, color: THEME.text }}>📦 Assign Package</h3>
+              <button onClick={() => setAssignModalOpen(false)} style={{ background: "transparent", border: "none", fontSize: 18, cursor: "pointer", color: THEME.muted }}>✕</button>
+            </div>
+            <p style={{ margin: "0 0 20px", color: THEME.muted, fontSize: 13 }}>Assigning to: <strong style={{ color: THEME.text }}>{selectedSubadmin.name}</strong> ({selectedSubadmin.email})</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6, textTransform: "uppercase" }}>Select Package *</label>
+                <select value={selectedPackage} onChange={e => setSelectedPackage(e.target.value)} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text, fontSize: 13 }}>
+                  <option value="">-- Choose Plan --</option>
+                  {packages.map(p => <option key={p._id} value={p._id}>{p.title} — ₹{p.price} / {p.no_of_days || 30} days</option>)}
+                </select>
+              </div>
+              {selPkg && (
+                <div style={{ background: THEME.surface, borderRadius: 12, padding: 16, border: `1px solid ${THEME.border}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>Package Limits Preview</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                    {[
+                      { label: "👥 Clients", val: selPkg.clientLimit || "—" },
+                      { label: "🧑‍💼 Employees", val: selPkg.employeeLimit || "—" },
+                      { label: "🔑 Managers", val: selPkg.managerLimit || "—" }
+                    ].map(({ label, val }) => (
+                      <div key={label} style={{ background: THEME.card, borderRadius: 8, padding: "10px 12px", border: `1px solid ${THEME.border}` }}>
+                        <div style={{ fontSize: 10, color: THEME.muted, marginBottom: 4 }}>{label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: THEME.accent }}>{val}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6, textTransform: "uppercase" }}>Duration (Days)</label>
+                <input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} placeholder="30" style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text, fontSize: 13, boxSizing: "border-box" }} />
+              </div>
+              <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#b45309" }}>
+                ⚠️ This will cancel any existing active subscription for this subadmin and replace it with the selected package.
+              </div>
+              <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
+                <button onClick={() => setAssignModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, fontWeight: 700, background: THEME.surface, color: THEME.text, cursor: "pointer" }}>Cancel</button>
+                <button onClick={handleAssignPackage} disabled={assignLoading} style={{ flex: 2, padding: 12, borderRadius: 12, border: "none", background: assignLoading ? "#a78bfa" : THEME.accent, color: "#fff", fontWeight: 700, cursor: assignLoading ? "not-allowed" : "pointer" }}>
+                  {assignLoading ? "Assigning..." : "✓ Assign Package"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        );
+      })()}
     </div>
   );
 }
@@ -1162,18 +1299,30 @@ function formatDate(d) {
   return isNaN(dt.getTime()) ? "—" : dt.toLocaleDateString();
 }
 
-function SubscriptionsPage({ THEME, subscriptions }) {
+function SubscriptionsPage({ THEME, subscriptions, subadmins }) {
   const [filter, setFilter] = useState("all");
   const filtered = subscriptions.filter(s => filter === "all" || s.status?.toLowerCase() === filter.toLowerCase());
-  const statusColors = { active: "#10b981", pending: "#f59e0b", expired: "#ef4444", cancelled: "#64748b" };
+  const statusColors = { active: "#10b981", pending: "#f59e0b", expired: "#ef4444", cancelled: "#64748b", trial: "#a78bfa" };
+
+  const getSubadminLimits = (sub) => {
+    const sa = subadmins?.find(s => s._id === sub.userId || s._id === sub.companyId);
+    return {
+      clientLimit: sa?.clientLimit || sub.clientLimit || "—",
+      employeeLimit: sa?.employeeLimit || sub.employeeLimit || "—"
+    };
+  };
 
   return (
     <div style={{ background: THEME.card, borderRadius: 24, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: THEME.text }}>Subscription Management</h3>
+        <div>
+          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: THEME.text }}>Subscription Management</h3>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: THEME.muted }}>Manage all subadmin plans and resource limits</p>
+        </div>
         <select value={filter} onChange={e => setFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: 10, fontSize: 13, fontWeight: 600, background: THEME.surface, color: THEME.text, border: `1px solid ${THEME.border}` }}>
           <option value="all">All Status</option>
           <option value="active">Active</option>
+          <option value="trial">Trial</option>
           <option value="pending">Pending</option>
           <option value="expired">Expired</option>
           <option value="cancelled">Cancelled</option>
@@ -1184,29 +1333,52 @@ function SubscriptionsPage({ THEME, subscriptions }) {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr>
-              {["User Name", "Email", "Plan", "Price", "Billing", "Status", "End Date"].map(h => (
-                <th key={h} style={{ padding: "16px", textAlign: "left", fontWeight: 800, color: THEME.muted, borderBottom: `2px solid ${THEME.border}` }}>{h}</th>
+              {["User", "Plan", "Price", "Client Limit", "Emp. Limit", "Status", "End Date"].map(h => (
+                <th key={h} style={{ padding: "14px 16px", textAlign: "left", fontWeight: 800, color: THEME.muted, borderBottom: `2px solid ${THEME.border}`, whiteSpace: "nowrap" }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {filtered.map((sub, i) => (
-              <tr key={sub._id || i} style={{ borderBottom: `1px solid ${THEME.border}` }}>
-                <td style={{ padding: "16px", fontWeight: 700, color: THEME.text }}>{sub.userName || "—"}</td>
-                <td style={{ padding: "16px", color: THEME.muted }}>{sub.userEmail || "—"}</td>
-                <td style={{ padding: "16px", color: THEME.accent, fontWeight: 800 }}>{sub.planName || "—"}</td>
-                <td style={{ padding: "16px", fontWeight: 900, color: THEME.text }}>₹{sub.planPrice || 0}</td>
-                <td style={{ padding: "16px", color: THEME.muted }}>{sub.billingCycle || "—"}</td>
-                <td style={{ padding: "16px" }}>
-                  <span style={{
-                    background: `${statusColors[sub.status?.toLowerCase()] || "#64748B"}15`,
-                    color: statusColors[sub.status?.toLowerCase()] || "#64748B",
-                    padding: "4px 12px", borderRadius: 10, fontSize: 11, fontWeight: 800, textTransform: "uppercase"
-                  }}>{sub.status || "—"}</span>
-                </td>
-                <td style={{ padding: "16px", color: THEME.muted }}>{formatDate(sub.endDate)}</td>
-              </tr>
-            ))}
+            {filtered.length === 0 && (
+              <tr><td colSpan={7} style={{ padding: 28, textAlign: "center", color: THEME.muted }}>No subscriptions found</td></tr>
+            )}
+            {filtered.map((sub, i) => {
+              const limits = getSubadminLimits(sub);
+              const cl = String(limits.clientLimit);
+              const el = String(limits.employeeLimit);
+              return (
+                <tr key={sub._id || i} style={{ borderBottom: `1px solid ${THEME.border}` }}>
+                  <td style={{ padding: "14px 16px" }}>
+                    <div style={{ fontWeight: 700, color: THEME.text }}>{sub.userName || "—"}</div>
+                    <div style={{ fontSize: 11, color: THEME.muted }}>{sub.userEmail || ""}</div>
+                  </td>
+                  <td style={{ padding: "14px 16px", color: THEME.accent, fontWeight: 800 }}>{sub.planName || "—"}</td>
+                  <td style={{ padding: "14px 16px", fontWeight: 900, color: THEME.text }}>₹{sub.planPrice || 0}</td>
+                  <td style={{ padding: "14px 16px" }}>
+                    <span style={{
+                      background: cl.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(59,130,246,0.1)",
+                      color: cl.toLowerCase().includes("unlimited") ? "#10b981" : "#3b82f6",
+                      padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
+                    }}>{cl}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px" }}>
+                    <span style={{
+                      background: el.toLowerCase().includes("unlimited") ? "rgba(16,185,129,0.1)" : "rgba(124,58,237,0.1)",
+                      color: el.toLowerCase().includes("unlimited") ? "#10b981" : "#7c3aed",
+                      padding: "3px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700
+                    }}>{el}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px" }}>
+                    <span style={{
+                      background: `${statusColors[sub.status?.toLowerCase()] || "#64748B"}18`,
+                      color: statusColors[sub.status?.toLowerCase()] || "#64748B",
+                      padding: "4px 12px", borderRadius: 10, fontSize: 11, fontWeight: 800, textTransform: "uppercase"
+                    }}>{sub.status || "—"}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px", color: THEME.muted, fontSize: 12 }}>{formatDate(sub.endDate)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

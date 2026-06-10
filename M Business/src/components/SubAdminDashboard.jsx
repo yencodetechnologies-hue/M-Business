@@ -928,7 +928,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
             <Fld label="Contact Person No" value={editForm.contactPersonNo} onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
             <Fld label="Category" value={editForm.category || "Web Development"} onChange={v => setEditForm(p => ({ ...p, category: v }))} options={["Web Development", "Mobile App", "UI/UX Design", "Marketing", "Consulting", "Other"]} />
-            <Fld label="Priority" value={editForm.priority || "medium"} onChange={v => setEditForm(p => ({ ...p, priority: v }))} options={["low", "medium", "high"]} />
+
             <Fld label="Office No" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
             <Fld label="Company Tax/GST" value={editForm.gstNumber} onChange={v => setEditForm(p => ({ ...p, gstNumber: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
@@ -1806,7 +1806,7 @@ const openEdit = (p) => {
       contactPersonName: p.contactPersonName || "",
       contactPersonNo: p.contactPersonNo || "",
       category: p.category || "Web Development",
-      priority: p.priority || "medium",
+
       purpose: p.purpose || "",
       description: p.description || "",
       start: p.start ? new Date(p.start).toISOString().split('T')[0] : "",
@@ -1919,7 +1919,7 @@ const saveEdit = async () => {
               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProj.name}</h2>
               <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                 <Badge label={viewProj.status || "Pending"} />
-                {viewProj.priority && <Badge label={viewProj.priority} />}
+
                 {viewProj.category && <Badge label={viewProj.category} />}
               </div>
             </div>
@@ -2013,10 +2013,7 @@ const saveEdit = async () => {
         onChange={v => setEditForm(p => ({ ...p, category: v }))}
         options={["Web Development", "Mobile App", "UI/UX Design", "Marketing", "Consulting", "Other"]} />
 
-      {/* Priority */}
-      <Fld label="Priority" value={editForm.priority}
-        onChange={v => setEditForm(p => ({ ...p, priority: v }))}
-        options={["low", "medium", "high"]} />
+
 
       {/* Purpose */}
       <Fld label="Purpose" value={editForm.purpose}

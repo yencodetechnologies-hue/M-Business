@@ -39,6 +39,9 @@ router.post("/", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
+    const finalClientLimit = (clientLimit !== undefined && clientLimit !== null && clientLimit !== "") ? clientLimit : "5";
+    const finalEmployeeLimit = (employeeLimit !== undefined && employeeLimit !== null && employeeLimit !== "") ? employeeLimit : "20";
+
     const newSubadmin = new User({
       name,
       email,
@@ -46,6 +49,9 @@ router.post("/", async (req, res) => {
       phone: phone || "",
       role: "subadmin",
       companyName: companyName || "",
+      clientLimit: finalClientLimit,
+      employeeLimit: finalEmployeeLimit,
+      managerLimit: "5",
     });
 
     await newSubadmin.save();
@@ -53,9 +59,6 @@ router.post("/", async (req, res) => {
     // Create 30 days free trial subscription
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 30);
-    
-    const finalClientLimit = (clientLimit !== undefined && clientLimit !== null && clientLimit !== "") ? clientLimit : "5";
-    const finalEmployeeLimit = (employeeLimit !== undefined && employeeLimit !== null && employeeLimit !== "") ? employeeLimit : "20";
 
     const newSubscription = new Subscription({
       userId: newSubadmin._id.toString(),
@@ -262,9 +265,21 @@ router.post("/assign-resources", async (req, res) => {
         : Promise.resolve(0)
     ]);
 
-    const employeeLimit = parseLimit(activeSubscription.employeeLimit);
-    const clientLimit = parseLimit(activeSubscription.clientLimit);
-    const managerLimit = parseLimit(activeSubscription.managerLimit);
+    const subadmin = await User.findById(subadminId);
+    
+    const getLimit = (type, sub, userObj) => {
+      const uLimit = type === "client" ? userObj?.clientLimit
+                   : type === "employee" ? userObj?.employeeLimit
+                   : userObj?.managerLimit;
+      if (uLimit !== undefined && uLimit !== null && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
+        return parseLimit(uLimit);
+      }
+      return sub ? parseLimit(type === "client" ? sub.clientLimit : type === "employee" ? sub.employeeLimit : sub.managerLimit) : 10;
+    };
+
+    const employeeLimit = getLimit("employee", activeSubscription, subadmin);
+    const clientLimit = getLimit("client", activeSubscription, subadmin);
+    const managerLimit = getLimit("manager", activeSubscription, subadmin);
 
     if (Number.isFinite(employeeLimit) && (currentEmployeeCount + newEmployeesToAssign) > employeeLimit) {
       return res.status(403).json({

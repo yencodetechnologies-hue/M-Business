@@ -282,21 +282,39 @@ export default function InvoiceViewer() {
                           <div style={{ fontSize: 12, color: "#1e1b4b", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
                         </div>
                       </div>
-                      <div style={{ marginTop: 12, textAlign: "right" }}>
-                        <span style={{
-                          display: "inline-block",
-                          padding: "4px 14px",
-                          border: `1.5px solid ${isPaid ? "#10b981" : "#f59e0b"}`,
-                          borderRadius: 20,
-                          color: isPaid ? "#059669" : "#b45309",
-                          fontSize: 11,
-                          fontWeight: 800,
-                          background: isPaid ? "#d1fae5" : "#fef3c7",
-                          letterSpacing: 1
-                        }}>
-                          {isPaid ? "PAID" : "UNPAID"}
-                        </span>
-                      </div>
+                      {(!isPaid && finalPaid > 0) ? (
+                        <div style={{ marginTop: 12, textAlign: "right" }}>
+                          <span style={{
+                            display: "inline-block",
+                            padding: "4px 14px",
+                            border: "1.5px solid #f59e0b",
+                            borderRadius: 20,
+                            color: "#b45309",
+                            fontSize: 11,
+                            fontWeight: 800,
+                            background: "#fef3c7",
+                            letterSpacing: 1
+                          }}>
+                            PART PAID
+                          </span>
+                        </div>
+                      ) : isPaid ? (
+                        <div style={{ marginTop: 12, textAlign: "right" }}>
+                          <span style={{
+                            display: "inline-block",
+                            padding: "4px 14px",
+                            border: "1.5px solid #10b981",
+                            borderRadius: 20,
+                            color: "#059669",
+                            fontSize: 11,
+                            fontWeight: 800,
+                            background: "#d1fae5",
+                            letterSpacing: 1
+                          }}>
+                            PAID
+                          </span>
+                        </div>
+                      ) : null}
                       {inv.project && (
                         <div style={{ marginTop: 24, textAlign: "right" }}>
                           <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>PROJECT</div>

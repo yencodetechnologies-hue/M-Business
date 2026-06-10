@@ -1707,21 +1707,39 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
                   </div>
                 </div>
-                <div style={{ marginTop: 12, textAlign: "right" }}>
-                  <span style={{
-                    display: "inline-block",
-                    padding: "4px 14px",
-                    border: `1.5px solid ${balanceDue <= 0 ? "#10b981" : "#f59e0b"}`,
-                    borderRadius: 20,
-                    color: balanceDue <= 0 ? "#059669" : "#b45309",
-                    fontSize: 11,
-                    fontWeight: 800,
-                    background: balanceDue <= 0 ? "#d1fae5" : "#fef3c7",
-                    letterSpacing: 1
-                  }}>
-                    {balanceDue <= 0 ? "PAID" : "UNPAID"}
-                  </span>
-                </div>
+                {(balanceDue > 0 && amountPaid > 0) ? (
+                  <div style={{ marginTop: 12, textAlign: "right" }}>
+                    <span style={{
+                      display: "inline-block",
+                      padding: "4px 14px",
+                      border: "1.5px solid #f59e0b",
+                      borderRadius: 20,
+                      color: "#b45309",
+                      fontSize: 11,
+                      fontWeight: 800,
+                      background: "#fef3c7",
+                      letterSpacing: 1
+                    }}>
+                      PART PAID
+                    </span>
+                  </div>
+                ) : balanceDue <= 0 ? (
+                  <div style={{ marginTop: 12, textAlign: "right" }}>
+                    <span style={{
+                      display: "inline-block",
+                      padding: "4px 14px",
+                      border: "1.5px solid #10b981",
+                      borderRadius: 20,
+                      color: "#059669",
+                      fontSize: 11,
+                      fontWeight: 800,
+                      background: "#d1fae5",
+                      letterSpacing: 1
+                    }}>
+                      PAID
+                    </span>
+                  </div>
+                ) : null}
                 {inv.project && (
                   <div style={{ marginTop: 24, textAlign: "right" }}>
                     <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>PROJECT</div>
@@ -2426,9 +2444,17 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     <span>Issue: {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : "—"}</span><br/>
                     <span>Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : "—"}</span>
                   </div>
-                  <div className={`inv-status ${statusUpdating ? "draft" : "paid"}`} style={{ display: "inline-flex", alignItems: "center", padding: "3px 10px", borderRadius: "20px", fontSize: "9px", fontWeight: "700", marginTop: "6px", background: inv.amountPaid >= total ? "var(--green-bg)" : "var(--amber-bg)", color: inv.amountPaid >= total ? "var(--green)" : "var(--amber)" }}>
-                    {inv.amountPaid >= total ? "PAID" : inv.amountPaid > 0 ? "PART PAID" : "UNPAID"}
-                  </div>
+                  {inv.amountPaid < total ? (
+                    inv.amountPaid > 0 ? (
+                      <div className={`inv-status ${statusUpdating ? "draft" : "paid"}`} style={{ display: "inline-flex", alignItems: "center", padding: "3px 10px", borderRadius: "20px", fontSize: "9px", fontWeight: "700", marginTop: "6px", background: "var(--amber-bg)", color: "var(--amber)" }}>
+                        PART PAID
+                      </div>
+                    ) : null
+                  ) : (
+                    <div className={`inv-status ${statusUpdating ? "draft" : "paid"}`} style={{ display: "inline-flex", alignItems: "center", padding: "3px 10px", borderRadius: "20px", fontSize: "9px", fontWeight: "700", marginTop: "6px", background: "var(--green-bg)", color: "var(--green)" }}>
+                      PAID
+                    </div>
+                  )}
                 </div>
               </div>
 

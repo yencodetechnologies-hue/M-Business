@@ -8,6 +8,23 @@ import { jsPDF } from "jspdf";
 const GST_RATES = [0, 5, 12, 18, 28];
 const DEFAULT_LOGO_URL = "";
 
+function numberToWords(num) {
+  const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+    'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  const n = Math.round(Number(num) || 0);
+  if (n === 0) return 'Zero';
+  const toWords = (n) => {
+    if (n < 20) return ones[n];
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? ' ' + ones[n % 10] : '');
+    if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' ' + toWords(n % 100) : '');
+    if (n < 100000) return toWords(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 ? ' ' + toWords(n % 1000) : '');
+    if (n < 10000000) return toWords(Math.floor(n / 100000)) + ' Lakh' + (n % 100000 ? ' ' + toWords(n % 100000) : '');
+    return toWords(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 ? ' ' + toWords(n % 10000000) : '');
+  };
+  return toWords(n) + ' Only';
+}
+
 function generateInvoiceNo() {
   return `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 }
@@ -88,22 +105,22 @@ function Toast({ msg }) {
         .inv-creator-form-side { display: flex; flex-direction: column; gap: 16px; }
         .inv-creator-card { background: #FFFFFF; border: 1.5px solid #E0EEF0; border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
         .inv-creator-card-header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #E0EEF0; }
-        .inv-creator-card-title { font-size: 13px; font-weight: 800; color: #1A2E35; }
-        .inv-creator-card-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .inv-creator-card-title { font-size: 15px; font-weight: 800; color: #1A2E35; }
+        .inv-creator-card-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
         .inv-creator-card-body { padding: 18px; }
 
         .inv-creator-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
         .inv-creator-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
         .inv-creator-form-group { margin-bottom: 14px; }
         .inv-creator-form-group:last-child { margin-bottom: 0; }
-        .inv-creator-form-label { font-size: 11px; font-weight: 700; color: #607D86; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; display: block; }
-        .inv-creator-form-input { width: 100%; padding: 10px 13px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 13px; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
+        .inv-creator-form-label { font-size: 13px; font-weight: 800; color: #607D86; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; display: block; }
+        .inv-creator-form-input { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
         .inv-creator-form-input:focus { border-color: #00BCD4 !important; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
         .inv-creator-form-input::placeholder { color: #A0B8BE; }
         .inv-creator-form-input:read-only { background: #F8FAFB; color: #A0B8BE; cursor: not-allowed; }
-        .inv-creator-form-select { width: 100%; padding: 10px 13px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 13px; color: #1A2E35; font-family: inherit; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; transition: all .15s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+        .inv-creator-form-select { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; transition: all .15s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
         .inv-creator-form-select:focus { border-color: #00BCD4 !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
-        .inv-creator-form-textarea { width: 100%; padding: 10px 13px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 13px; color: #1A2E35; font-family: inherit; outline: none; resize: vertical; min-height: 72px; transition: all .15s; }
+        .inv-creator-form-textarea { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; resize: vertical; min-height: 72px; transition: all .15s; }
         .inv-creator-form-textarea:focus { border-color: #00BCD4 !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
         .inv-creator-form-textarea::placeholder { color: #A0B8BE; }
 
@@ -155,22 +172,22 @@ function Toast({ msg }) {
         .inv-creator-form-side { display: flex; flex-direction: column; gap: 16px; }
         .inv-creator-card { background: #FFFFFF; border: 1.5px solid #E0EEF0; border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
         .inv-creator-card-header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #E0EEF0; }
-        .inv-creator-card-title { font-size: 13px; font-weight: 800; color: #1A2E35; }
-        .inv-creator-card-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .inv-creator-card-title { font-size: 15px; font-weight: 800; color: #1A2E35; }
+        .inv-creator-card-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
         .inv-creator-card-body { padding: 18px; }
 
         .inv-creator-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
         .inv-creator-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
         .inv-creator-form-group { margin-bottom: 14px; }
         .inv-creator-form-group:last-child { margin-bottom: 0; }
-        .inv-creator-form-label { font-size: 11px; font-weight: 700; color: #607D86; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; display: block; }
-        .inv-creator-form-input { width: 100%; padding: 10px 13px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 13px; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
+        .inv-creator-form-label { font-size: 13px; font-weight: 800; color: #607D86; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; display: block; }
+        .inv-creator-form-input { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; transition: all .15s; }
         .inv-creator-form-input:focus { border-color: #00BCD4 !important; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
         .inv-creator-form-input::placeholder { color: #A0B8BE; }
         .inv-creator-form-input:read-only { background: #F8FAFB; color: #A0B8BE; cursor: not-allowed; }
-        .inv-creator-form-select { width: 100%; padding: 10px 13px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 13px; color: #1A2E35; font-family: inherit; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; transition: all .15s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+        .inv-creator-form-select { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; transition: all .15s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0B8BE' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
         .inv-creator-form-select:focus { border-color: #00BCD4 !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
-        .inv-creator-form-textarea { width: 100%; padding: 10px 13px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 13px; color: #1A2E35; font-family: inherit; outline: none; resize: vertical; min-height: 72px; transition: all .15s; }
+        .inv-creator-form-textarea { width: 100%; padding: 12px 14px; background: #F5FAFA; border: 1.5px solid #E0EEF0; border-radius: 10px; font-size: 15px; font-weight: 700; color: #1A2E35; font-family: inherit; outline: none; resize: vertical; min-height: 72px; transition: all .15s; }
         .inv-creator-form-textarea:focus { border-color: #00BCD4 !important; box-shadow: 0 0 0 3px rgba(0,188,212,.08); }
         .inv-creator-form-textarea::placeholder { color: #A0B8BE; }
 
@@ -1824,6 +1841,11 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
               </div>
             </div>
           </div>
+          {/* Amount in Words */}
+          <div style={{ margin: "8px 32px 0", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
+            <span style={{ fontSize: "9px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
+            <span style={{ fontSize: "9px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === '₹' ? 'INR ' : (inv.currency || '₹') + ' '}{numberToWords(Math.round(balanceDue))}</span>
+          </div>
 
           {/* Payment details */}
           {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
@@ -2546,6 +2568,11 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
                     <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
                   </div>
                 </div>
+              </div>
+              {/* Amount in Words */}
+              <div style={{ marginTop: "8px", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
+                <span style={{ fontSize: "9px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
+                <span style={{ fontSize: "9px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === '₹' ? 'INR ' : (inv.currency || '₹') + ' '}{numberToWords(Math.round(balanceDue))}</span>
               </div>
 
               {/* BANK DETAILS */}

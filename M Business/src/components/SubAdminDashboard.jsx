@@ -3517,6 +3517,81 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [income, setIncome] = useState([]);
   const [expenses, setExpenses] = useState([]);
 
+  const [pendingLeaves, setPendingLeaves] = useState([]);
+  const [employeeDocs, setEmployeeDocs] = useState([]);
+
+  const fetchPendingLeaves = async () => {
+    try {
+      const companyId = resolveSubadminId();
+      const res = await axios.get(`${BASE_URL}/api/employee-dashboard/leave/all/pending`, {
+        headers: { "x-company-id": companyId }
+      });
+      setPendingLeaves(res.data || []);
+    } catch (e) { console.log(e); }
+  };
+
+  const fetchEmployeeDocs = async () => {
+    try {
+      const companyId = resolveSubadminId();
+      const res = await axios.get(`${BASE_URL}/api/employee-dashboard/documents/company/all`, {
+        headers: { "x-company-id": companyId }
+      });
+      setEmployeeDocs(res.data || []);
+    } catch (e) { console.log(e); }
+  };
+
+  const handleApproveLeave = async (leaveId) => {
+    try {
+      const name = user?.name || "Admin";
+      await axios.patch(`${BASE_URL}/api/employee-dashboard/leave/${leaveId}/approve`, {
+        reviewedBy: name,
+        managerNote: "Approved by Sub-Admin"
+      });
+      toast.success("Leave request approved successfully!");
+      fetchPendingLeaves();
+    } catch (e) {
+      toast.error("Failed to approve leave request");
+      console.log(e);
+    }
+  };
+
+  const handleRejectLeave = async (leaveId) => {
+    try {
+      const name = user?.name || "Admin";
+      await axios.patch(`${BASE_URL}/api/employee-dashboard/leave/${leaveId}/reject`, {
+        reviewedBy: name,
+        managerNote: "Rejected by Sub-Admin"
+      });
+      toast.success("Leave request rejected successfully!");
+      fetchPendingLeaves();
+    } catch (e) {
+      toast.error("Failed to reject leave request");
+      console.log(e);
+    }
+  };
+
+  const handleApproveDoc = async (docId) => {
+    try {
+      await axios.patch(`${BASE_URL}/api/employee-dashboard/documents/${docId}/approve`);
+      toast.success("Document approved successfully!");
+      fetchEmployeeDocs();
+    } catch (e) {
+      toast.error("Failed to approve document");
+      console.log(e);
+    }
+  };
+
+  const handleRejectDoc = async (docId) => {
+    try {
+      await axios.patch(`${BASE_URL}/api/employee-dashboard/documents/${docId}/reject`);
+      toast.success("Document rejected successfully!");
+      fetchEmployeeDocs();
+    } catch (e) {
+      toast.error("Failed to reject document");
+      console.log(e);
+    }
+  };
+
   const fetchProfile = async () => {
     try {
       const id = resolveSubadminId();
@@ -3536,6 +3611,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     hasFetched.current = true;
     fetchProfile();
     fetchClients(); fetchEmployees(); fetchProjects(); fetchManagers(); fetchSubadmins(); fetchPackages(); fetchSubscription(); fetchQuotations(); fetchPaymentHistory(); fetchVendors(); fetchInvoices(); fetchIncome(); fetchExpenses(); fetchTasks(); fetchConfig();
+    fetchPendingLeaves(); fetchEmployeeDocs();
   }, []);
 
   // ── Listen for SEND_DOCUMENT from template designer iframe ──
@@ -4930,6 +5006,205 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                                 </div>
                               </div>
 
+                            </div>
+                          </div>
+
+                          {/* SECONDARY CONTENT AREA */}
+                          <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: 24 }}>
+                            
+                            {/* LEFT COLUMN 2 */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                              
+                              {/* Active Projects */}
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                    <i className="ti ti-folder" style={{ color: "#00BCD4" }}></i> Active Projects
+                                  </div>
+                                  <div onClick={() => setActive("projects")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
+                                    View All →
+                                  </div>
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
+                                    const colors = ["#00BCD4", "#7c3aed", "#2563eb", "#16a34a", "#dc2626"];
+                                    const bColor = colors[idx % colors.length];
+                                    const progress = p.progress || Math.floor(Math.random() * 60) + 20;
+                                    const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
+                                    const badgeText = "IN PROGRESS";
+                                    const badgeColor = "#00BCD4";
+                                    
+                                    return (
+                                      <div key={p._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+                                        <div style={{ display: "flex", gap: 12 }}>
+                                          <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
+                                          <div>
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} • Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : "TBA"}</div>
+                                          </div>
+                                        </div>
+                                        <div style={{ width: 100, textAlign: "right" }}>
+                                          <div style={{ display: "inline-block", color: badgeColor, background: `${badgeColor}15`, padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800, marginBottom: 8, letterSpacing: "0.5px" }}>
+                                            {badgeText}
+                                          </div>
+                                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <div style={{ flex: 1, height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2 }}>
+                                              <div style={{ width: `${progress}%`, height: "100%", background: barColor, borderRadius: 2 }}></div>
+                                            </div>
+                                            <div style={{ fontSize: 11, fontWeight: 800, color: barColor }}>{progress}%</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                  {projects.filter(p => p.status === "Active" || p.status === "Pending").length === 0 && (
+                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No active projects</div>
+                                  )}
+                                </div>
+                              </div>
+                              {/* Leave Requests (Dynamic from backend) */}
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                    <i className="ti ti-user-x" style={{ color: "#00BCD4" }}></i> Leave Requests
+                                    <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
+                                  </div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
+                                    HR Panel →
+                                  </div>
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                  {pendingLeaves.map((l, i) => {
+                                    const initials = l.employeeName ? l.employeeName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : "EE";
+                                    const colors = ["#f59e0b", "#a855f7", "#0ea5e9", "#ec4899", "#22c55e"];
+                                    const bg = colors[i % colors.length];
+                                    const getDuration = () => {
+                                      if (!l.from || !l.to) return "";
+                                      try {
+                                        const d1 = new Date(l.from);
+                                        const d2 = new Date(l.to);
+                                        if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return "";
+                                        const diffTime = Math.abs(d2 - d1);
+                                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                                        return ` (${diffDays}d)`;
+                                      } catch (err) { return ""; }
+                                    };
+                                    const detail = `${l.type || "Leave"} • ${l.from} - ${l.to}${getDuration()}`;
+                                    
+                                    return (
+                                      <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+                                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
+                                          {initials}
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                          <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{l.employeeName}</div>
+                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{detail}</div>
+                                        </div>
+                                        <div style={{ display: "flex", gap: 8 }}>
+                                          <button onClick={() => handleApproveLeave(l._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+                                            <i className="ti ti-check"></i> Approve
+                                          </button>
+                                          <button onClick={() => handleRejectLeave(l._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                                            <i className="ti ti-x"></i>
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                  {pendingLeaves.length === 0 && (
+                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No pending leave requests.</div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* RIGHT COLUMN 2 */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                              
+                              {/* Overdue Tasks */}
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                    <i className="ti ti-alert-circle" style={{ color: "#00BCD4" }}></i> Overdue Tasks
+                                    <span style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>
+                                      {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length}
+                                    </span>
+                                  </div>
+                                  <div onClick={() => setActive("tasks")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
+                                    All Tasks →
+                                  </div>
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                  {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).slice(0, 5).map((t, idx) => (
+                                    <div key={t._id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 16, borderBottom: idx === 4 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+                                      <input type="checkbox" style={{ marginTop: 2, accentColor: "#00BCD4" }} />
+                                      <div style={{ flex: 1 }}>
+                                        <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
+                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} • Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : "TBA"}</div>
+                                      </div>
+                                      <div style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
+                                    </div>
+                                  ))}
+                                  {tasks.filter(t => (t.status || "").toLowerCase() !== "completed" && new Date(t.deadline) < new Date()).length === 0 && <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", padding: "10px 0" }}>No overdue tasks.</div>}
+                                </div>
+                              </div>
+                              {/* Doc Requests (Dynamic from backend) */}
+                              <div style={{ background: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 2px 10px rgba(0,0,0,0.02)" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f1c2e", display: "flex", alignItems: "center", gap: 8 }}>
+                                    <i className="ti ti-file-description" style={{ color: "#00BCD4" }}></i> Doc Requests
+                                    <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{employeeDocs.filter(d => d.status === "PENDING").length} PENDING</span>
+                                  </div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
+                                    Manage
+                                  </div>
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                  {employeeDocs.map((d, i) => {
+                                    const docName = d.docType === "pan" ? "PAN Card" : d.docType === "aadhaar" ? "Aadhaar Card" : d.docType === "passbook" ? "Bank Passbook" : d.docType === "itr" ? "ITR Document" : d.docType;
+                                    const styleConfig = 
+                                      d.docType === "pan" ? { bg: "#f1f5f9", c: "#0ea5e9" } :
+                                      d.docType === "passbook" ? { bg: "#f3e8ff", c: "#a855f7" } :
+                                      d.docType === "aadhaar" ? { bg: "#dcfce7", c: "#22c55e" } :
+                                      { bg: "#fef3c7", c: "#d97706" };
+
+                                    const isPending = d.status === "PENDING";
+                                    const statusColor = d.status === "APPROVED" ? "#16a34a" : d.status === "REJECTED" ? "#dc2626" : "#ea580c";
+
+                                    return (
+                                      <div key={d._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === employeeDocs.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
+                                        <div style={{ width: 32, height: 32, borderRadius: 8, background: styleConfig.bg, color: styleConfig.c, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+                                          <i className="ti ti-file-info"></i>
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e" }}>{docName}</div>
+                                          <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{d.employeeName}</div>
+                                        </div>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                          <a href={d.url} target="_blank" rel="noreferrer" style={{ background: "#f1f5f9", color: "#64748b", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+                                            <i className="ti ti-eye"></i> View
+                                          </a>
+                                          {isPending ? (
+                                            <>
+                                              <button onClick={() => handleApproveDoc(d._id)} style={{ background: "#dcfce7", color: "#166534", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                                                Approve
+                                              </button>
+                                              <button onClick={() => handleRejectDoc(d._id)} style={{ background: "#fef2f2", color: "#dc2626", border: "none", padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                                                Reject
+                                              </button>
+                                            </>
+                                          ) : (
+                                            <div style={{ color: statusColor, fontSize: 10, fontWeight: 800, letterSpacing: "0.5px" }}>{d.status}</div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                  {employeeDocs.length === 0 && (
+                                    <div style={{ fontSize: 13, color: "rgba(15,28,46,0.5)", textAlign: "center", padding: "10px 0" }}>No document requests.</div>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>

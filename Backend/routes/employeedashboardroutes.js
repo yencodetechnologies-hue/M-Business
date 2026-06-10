@@ -90,6 +90,7 @@ try { EmployeeDoc = mongoose.model("EmployeeDoc"); } catch {
     url: { type: String, required: true },
     fileName: { type: String, default: "" },
     fileSize: { type: Number, default: 0 },
+    status: { type: String, enum: ["PENDING", "APPROVED", "REJECTED"], default: "PENDING" },
     uploadedAt: { type: Date, default: Date.now },
   }, { timestamps: true }));
 }
@@ -291,16 +292,46 @@ router.post("/leave", async (req, res) => {
 
 router.get("/leave/all/pending", async (req, res) => {
   try {
-    res.json(await Leave.find({ status: "pending" }).sort({ createdAt: -1 }));
+    const companyId = req.headers['x-company-id'] || req.query.companyId || "";
+    let filter = { status: "pending" };
+    if (companyId) {
+      const employees = await Employee.find({ companyId });
+      const employeeIds = employees.map(e => e._id);
+      const employeeNames = employees.map(e => e.name);
+      filter.$or = [
+        { employeeId: { $in: employeeIds } },
+        { employeeName: { $in: employeeNames } }
+      ];
+    }
+    res.json(await Leave.find(filter).sort({ createdAt: -1 }));
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
 });
 
 router.get("/leave/all/list", async (req, res) => {
   try {
+    const companyId = req.headers['x-company-id'] || req.query.companyId || "";
     const filter = {};
     if (req.query.status) filter.status = req.query.status;
     if (req.query.name) filter.employeeName = { $regex: new RegExp(req.query.name, "i") };
-    res.json(await Leave.find(filter).sort({ createdAt: -1 }));
+    
+    if (companyId) {
+      const employees = await Employee.find({ companyId });
+      const employeeIds = employees.map(e => e._id);
+      const employeeNames = employees.map(e => e.name);
+      
+      const companyFilter = {
+        $or: [
+          { employeeId: { $in: employeeIds } },
+          { employeeName: { $in: employeeNames } }
+        ]
+      };
+      
+      // Merge with existing filter
+      const mergedFilter = { $and: [filter, companyFilter] };
+      res.json(await Leave.find(mergedFilter).sort({ createdAt: -1 }));
+    } else {
+      res.json(await Leave.find(filter).sort({ createdAt: -1 }));
+    }
   } catch (err) { res.status(500).json({ msg: "Server error", error: err.message }); }
 });
 
@@ -563,6 +594,49 @@ router.get("/documents/:name/:docType", async (req, res) => {
     const doc = await EmployeeDoc.findOne(query);
     res.json(doc || {});
   } catch (err) { res.status(500).json({ msg: "Error", error: err.message }); }
+});
+
+// GET all documents uploaded by employees under a company
+router.get("/documents/company/all", async (req, res) => {
+  try {
+    const companyId = req.headers['x-company-id'] || req.query.companyId || "";
+    let query = {};
+    if (companyId) {
+      const employees = await Employee.find({ companyId });
+      const employeeIds = employees.map(e => e._id);
+      const employeeNames = employees.map(e => e.name);
+      query.$or = [
+        { employeeId: { $in: employeeIds } },
+        { employeeName: { $in: employeeNames } }
+      ];
+    }
+    const docs = await EmployeeDoc.find(query).sort({ uploadedAt: -1 });
+    res.json(docs);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching employee documents", error: err.message });
+  }
+});
+
+// Approve a document
+router.patch("/documents/:id/approve", async (req, res) => {
+  try {
+    const doc = await EmployeeDoc.findById(req.params.id);
+    if (!doc) return res.status(404).json({ msg: "Document not found" });
+    doc.status = "APPROVED";
+    await doc.save();
+    res.json({ msg: "Document approved", document: doc });
+  } catch (err) { res.status(500).json({ msg: "Error approving document", error: err.message }); }
+});
+
+// Reject a document
+router.patch("/documents/:id/reject", async (req, res) => {
+  try {
+    const doc = await EmployeeDoc.findById(req.params.id);
+    if (!doc) return res.status(404).json({ msg: "Document not found" });
+    doc.status = "REJECTED";
+    await doc.save();
+    res.json({ msg: "Document rejected", document: doc });
+  } catch (err) { res.status(500).json({ msg: "Error rejecting document", error: err.message }); }
 });
 
 // DELETE /api/employee-dashboard/documents/:name/:docType

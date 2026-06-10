@@ -18,11 +18,11 @@ router.post('/payu/init', PaymentController.initPayU);
 // PayU Success Callback (PayU POSTs here after successful payment)
 router.post('/payu/success', async (req, res) => {
   try {
-    const { txnid, status, amount, productinfo, firstname, email, mihpayid } = req.body;
+    const { txnid, status, amount, productinfo, firstname, email, mihpayid, udf1 } = req.body;
     console.log('PayU success callback:', req.body);
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    // Redirect to frontend with success params
-    res.redirect(`${frontendUrl}/?payment=success&plan=${encodeURIComponent(productinfo)}&txnid=${txnid}&mihpayid=${mihpayid || ''}`);
+    // Redirect to frontend with success params (udf1 holds subscriptionId)
+    res.redirect(`${frontendUrl}/?payment=success&plan=${encodeURIComponent(productinfo)}&txnid=${txnid}&mihpayid=${mihpayid || ''}&subId=${udf1 || ''}`);
   } catch (err) {
     console.error('PayU success handler error:', err);
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';

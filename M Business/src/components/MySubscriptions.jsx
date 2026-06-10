@@ -54,7 +54,7 @@ const InfoRow = ({ label, value, icon }) => {
 };
 
 // ─── Plan Data ───────────────────────────────────────────────────────────────
-const PLANS = [
+const DEFAULT_PLANS = [
   {
     name: "Trial", price: 0, icon: "✨", color: "var(--app-accent)", duration: "30 days", isTrial: true,
     features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"],
@@ -84,7 +84,7 @@ const getStatusColor = (s) => ({ active: T.success, completed: T.success, paid: 
 
 
 // ─── Plan Picker Modal (Choose Your Plan) ────────────────────────────────────
-function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onStartTrial }) {
+function PlanPickerModal({ subscription, payLoading, onClose, onSelectPlan, onStartTrial, PLANS }) {
   const currentPlan = subscription?.planName;
   return (
     <div style={{ position:"fixed", inset:0, zIndex:99990, background:"linear-gradient(135deg,#e0f7fa 0%,#e8f5e9 50%,#e3f2fd 100%)", overflowY:"auto", display:"flex", flexDirection:"column" }}>
@@ -353,7 +353,28 @@ function MockPaymentGateway({ plan, userEmail, userName, payLoading, onClose, on
 }
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview", preloadedSubscription = null, onTabChange }) {
+export default function MySubscriptions({ user, onSubscriptionSuccess, initialTab = "overview", preloadedSubscription = null, onTabChange, packagesList = [] }) {
+  // Convert packagesList to PLANS format if available
+  const PLANS = packagesList && packagesList.length > 0 
+    ? packagesList.map((pkg, index) => ({
+        name: pkg.name,
+        price: pkg.price,
+        icon: index === 0 ? "🌱" : index === packagesList.length - 1 ? "🚀" : "✨",
+        color: "var(--app-accent)",
+        popular: index === Math.floor(packagesList.length / 2),
+        duration: "30 days",
+        isTrial: pkg.price === 0,
+        features: pkg.features || [
+          `${pkg.clientLimit} Clients`,
+          `${pkg.employeeLimit} Employees`,
+          `${pkg.managerLimit} Managers`
+        ],
+        clientLimit: `${pkg.clientLimit} Clients`,
+        employeeLimit: `${pkg.employeeLimit} Employees`,
+        managerLimit: `${pkg.managerLimit} Managers`,
+        btnLabel: pkg.price === 0 ? "Start Free Trial" : undefined
+      }))
+    : DEFAULT_PLANS;
   const [subscription, setSubscription] = useState(preloadedSubscription);
   const [payments, setPayments] = useState([]);
   const [invoices, setInvoices] = useState([]);
@@ -645,6 +666,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
           firstname: payuData.firstname,
           email: payuData.email,
           phone: payuData.phone,
+          udf1: payuData.udf1 || "",
           hash: payuData.hash,
           surl: payuData.surl,
           furl: payuData.furl
@@ -719,6 +741,7 @@ const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
         onClose={() => { setShowPlanPicker(false); if (onTabChange) onTabChange(); }}
         onSelectPlan={(plan) => { setShowPlanPicker(false); startPayUPayment(plan); }}
         onStartTrial={() => startTrial()}
+        PLANS={PLANS}
       />
     );
   }

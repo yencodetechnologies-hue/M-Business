@@ -1,4 +1,5 @@
 const PaymentHistory = require('../models/PaymentHistoryModel');
+const Subscription = require('../models/SubscriptionModel');
 const crypto = require('crypto');
 
 exports.createPaymentOrder = async (req, res) => {
@@ -88,8 +89,26 @@ exports.initPayU = async (req, res) => {
     const firstname = userName || '';
     const email = userEmail || '';
     const phone = '';
-    // Optional udf fields left empty
-    const udf1 = '', udf2 = '', udf3 = '', udf4 = '', udf5 = '';
+    // Create a pending subscription first
+    const pendingSub = new Subscription({
+      userId,
+      userEmail,
+      userName,
+      planName: plan.name || 'Subscription',
+      planPrice: plan.price || 0,
+      billingCycle: "monthly",
+      status: "pending",
+      clientLimit: plan.clientLimit || '',
+      employeeLimit: plan.employeeLimit || '',
+      managerLimit: plan.managerLimit || '',
+      businessLimit: plan.businessLimit || '',
+      features: plan.features || []
+    });
+    await pendingSub.save();
+
+    // Use udf1 to store the subscriptionId so PayU returns it in callbacks
+    const udf1 = pendingSub._id.toString();
+    const udf2 = '', udf3 = '', udf4 = '', udf5 = '';
     // Build hash string as per PayU specification
     const hashString = `${key}|${txnid}|${amount}|${productinfo}|${firstname}|${email}|${udf1}|${udf2}|${udf3}|${udf4}|${udf5}||||||${salt}`;
     console.log('PayU hashString:', hashString);
@@ -111,6 +130,7 @@ exports.initPayU = async (req, res) => {
       firstname,
       email,
       phone,
+      udf1,
       hash,
       surl,
       furl,

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
-export default function EmployeeSubscriptionWarning({ user, onRenew }) {
+export default function EmployeeSubscriptionWarning({ user, onRenew, trigger }) {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +22,7 @@ export default function EmployeeSubscriptionWarning({ user, onRenew }) {
       }
     };
     fetch();
-  }, [user]);
+  }, [user, trigger]);
 
   if (loading) return null; // silent loading — don't block the dashboard
 

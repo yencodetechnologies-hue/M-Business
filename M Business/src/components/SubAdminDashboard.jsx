@@ -3647,6 +3647,18 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       return null;
     } finally {
       setSubLoading(false);
+      // Fetch updated user to get the latest limits (clientLimit, employeeLimit, etc.)
+      try {
+        const id = resolveSubadminId();
+        if (id) {
+          const userRes = await axios.get(`${BASE_URL}/api/users/${id}`);
+          if (userRes.data) {
+            localStorage.setItem("user", JSON.stringify(userRes.data));
+          }
+        }
+      } catch (e) {
+        console.error("Failed to update local user limits:", e);
+      }
     }
   };
   const fetchInvoices = async () => {
@@ -4497,7 +4509,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </div>
 
           <div className="content">
-            <EmployeeSubscriptionWarning user={user} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); }} />
+            <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); }} />
 
             {/* ── Dashboard ── */}
             {validActive === "dashboard" && (
@@ -5104,7 +5116,7 @@ onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} onAddEm
                   </div>
                 )}
 
-                {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} />}
+                {validActive === "mysubscriptions" && <MySubscriptions user={user} onSubscriptionSuccess={fetchSubscription} initialTab={forceUpgradeTab || enforceMySubscriptions ? "upgrade" : "overview"} preloadedSubscription={subscription} onTabChange={() => setForceUpgradeTab(false)} packagesList={packages} />}
                 {validActive === "reports" && <ReportsPage THEME={currentTheme} clients={clients} projects={projects} employees={employees} managers={managers} income={income} expenses={expenses} />}
                 {validActive === "packages" && <PackagesPage packages={packages} onViewPackage={handleViewPackage} onEditPackage={(user?.role !== "subadmin" && user?.role !== "sub_admin" && user?.role !== "sub-admin") ? handleEditPackage : undefined} onSubscribe={() => setActive("mysubscriptions")} THEME={currentTheme} />}
                 {validActive === "vendors" && <VendorsPage vendors={vendors} setVendors={setVendors} />}

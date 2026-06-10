@@ -1880,6 +1880,7 @@ const saveEdit = async () => {
           tasks={tasks.filter(t => (t.project || t.projectId) === (viewTasksProj._id || viewTasksProj.id))}
           user={user}
           onBack={() => setViewTasksProj(null)}
+          onMessageTeam={() => setActive("messaging")}
         />
       </div>
     );
@@ -4663,6 +4664,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                         tasks={tasks.filter(t => (t.project || t.projectId) === (dashTasksProj._id || dashTasksProj.id))}
                         user={user}
                         onBack={() => setDashTasksProj(null)}
+                        onMessageTeam={() => setActive("messaging")}
                       />
                     </div>
                   </div>

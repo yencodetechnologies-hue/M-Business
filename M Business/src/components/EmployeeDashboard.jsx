@@ -2063,7 +2063,7 @@ export default function EmployeeDashboard({ user, setUser }) {
             {page === "dashboard" && <DashboardPage user={resolvedUser} projects={projects} tasks={tasks} proposals={proposals} attendance={attendance} salary={salary} setPage={setPage} docStatus={docStatus} onOpenProfile={() => setProfileOpen(true)} />}
             {page === "myprofile" && <MyProfilePage user={resolvedUser} projects={projects} tasks={tasks} attendance={attendance} onBack={() => setPage("dashboard")} />}
             {page === "projects" && !selectedEmpProject && <ModernEmployeeProjects projects={projects} tasks={tasks} user={resolvedUser} onViewProject={(p) => setSelectedEmpProject(p)} />}
-            {page === "projects" && selectedEmpProject && <ModernEmployeeProjectDetails project={selectedEmpProject} tasks={tasks} user={resolvedUser} onBack={() => setSelectedEmpProject(null)} />}
+            {page === "projects" && selectedEmpProject && <ModernEmployeeProjectDetails project={selectedEmpProject} tasks={tasks} user={resolvedUser} onBack={() => setSelectedEmpProject(null)} onMessageTeam={() => setPage("messaging")} />}
             {page === "proposals" && <ProposalsPage proposals={proposals} />}
             {page === "tasks" && <TasksPage tasks={tasks} onToggle={handleToggleTask} />}
             {page === "attendance" && <AttendancePage attendance={attendance} setAttendance={setAttendance} empName={empName} notify={notify} />}

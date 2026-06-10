@@ -1468,11 +1468,12 @@ export default function ClientDashboard({ user, setUser }) {
         )}
 
         {active === "projects" && selectedClientProject && (
-          <ModernEmployeeProjectDetails
-            project={selectedClientProject}
-            tasks={tasks}
-            user={user}
-            onBack={() => setSelectedClientProject(null)}
+          <ModernEmployeeProjectDetails 
+            project={selectedClientProject} 
+            tasks={tasks} 
+            user={user} 
+            onBack={() => setSelectedClientProject(null)} 
+            onMessageTeam={() => setActive("messages")}
           />
         )}
 

@@ -1012,6 +1012,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
               tasks={currTasks}
               user={{ role: 'client', name: currProject.client }}
               onBack={() => setShowPortalPreview(false)}
+              onMessageTeam={() => alert("Message Team clicked in preview!")}
             />
           </div>
         </div>

@@ -217,7 +217,7 @@ function useToast() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-export default function ModernEmployeeProjectDetails({ project, tasks, user, onBack }) {
+export default function ModernEmployeeProjectDetails({ project, tasks, user, onBack, onMessageTeam }) {
   const { toasts, addToast } = useToast();
 
   // ── Log Time modal state ──────────────────────────────────────────
@@ -638,7 +638,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                 );
               })
             )}
-            <button className="epd2-btn epd2-btn-outline" onClick={() => addToast('Opening team chat...', 'success')} style={{ width: '100%', justifyContent: 'center', fontSize: 12, marginTop: 4 }}>
+            <button className="epd2-btn epd2-btn-outline" onClick={() => { if(onMessageTeam) { onMessageTeam(); } else { addToast('Opening team chat...', 'success'); } }} style={{ width: '100%', justifyContent: 'center', fontSize: 12, marginTop: 4 }}>
               <i className="ti ti-message-circle"></i> Message Team
             </button>
           </div>

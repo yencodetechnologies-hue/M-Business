@@ -82,6 +82,13 @@ router.post("/add", async (req, res) => {
     if (!client) return res.status(400).json({ msg: "Client required" });
 
     console.log("Creating new Project instance...");
+    const portal = portalSettings || portalOpts || {
+      enablePortal: true,
+      showProgress: true,
+      showMilestones: true,
+      showTeam: false,
+      allowMessages: true,
+    };
     const project = new Project({
       name,
       client,
@@ -95,6 +102,7 @@ router.post("/add", async (req, res) => {
       end: end || "",
       deadline: deadline || end || "",
       budget: budget || "",
+      currency: currency || "₹",
       billed: Number(billed) || 0,
       received: Number(received) || 0,
       pending: Number(pending) || 0,
@@ -106,6 +114,11 @@ router.post("/add", async (req, res) => {
       completedTasks: Number(completedTasks) || 0,
       assignedTo: Array.isArray(assignedTo) ? assignedTo : [],
       manager: manager || "",
+      milestones: Array.isArray(milestones) ? milestones : [],
+      portalSettings: portal,
+      updates: Array.isArray(updates) ? updates : [],
+      files: Array.isArray(files) ? files : [],
+      loggedHours: Number(req.body.loggedHours) || 0,
       companyId: req.companyId || "",
     });
 
@@ -184,6 +197,10 @@ router.put("/:id", async (req, res) => {
     const updateData = { ...req.body };
     if (updateData.assignedTo && !Array.isArray(updateData.assignedTo)) {
       updateData.assignedTo = [updateData.assignedTo];
+    }
+    if (updateData.portalOpts && !updateData.portalSettings) {
+      updateData.portalSettings = updateData.portalOpts;
+      delete updateData.portalOpts;
     }
 
     const companyId = req.companyId || "";

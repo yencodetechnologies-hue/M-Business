@@ -28,6 +28,7 @@ const getSubscriptionLimit = (type, sub) => {
     if (feat) {
       const match = feat.match(/\d+/);
       if (match) val = match[0];
+      if (feat.toLowerCase().includes("unlimited")) val = "Infinity";
     }
   }
   return parseLimit(val);
@@ -115,7 +116,6 @@ const adminBypass = (req, res, next) => {
 // Resource limit check - client / employee / manager
 const checkResourceLimit = (resourceType) => async (req, res, next) => {
   try {
-    // companyId-ஐ எல்லா இடத்திலும் தேடு
     const companyId =
       req.body.companyId ||
       req.headers['x-company-id'] ||
@@ -125,21 +125,28 @@ const checkResourceLimit = (resourceType) => async (req, res, next) => {
     if (!companyId) return next();
     if (req.user?.role === 'admin') return next();
 
-    // Active subscription fetch
+    // Fetch most recent subscription (active OR expired — to read the package limits)
+    // Expired subscription still has the correct limits set by admin
     const subscription = await Subscription.findOne({
       $or: [{ userId: companyId }, { companyId: companyId }],
-      status: { $in: ["active", "grace_period", "trial"] }
+      status: { $in: ["active", "grace_period", "trial", "pending", "expired"] }
     }).sort({ createdAt: -1 });
 
-    // Priority 1: Check for manual limit overrides on the User profile
+    // Priority 1: Subscription-based limit (most reliable — set when package assigned)
+    let limit = getSubscriptionLimit(resourceType, subscription);
+
+    // Priority 2: Direct limit on User profile (admin manual override)
+    // Only applied if stricter (lower) than the subscription limit
     const subadmin = await User.findById(companyId);
-    const uLimit = resourceType === "client" ? subadmin?.clientLimit : resourceType === "employee" ? subadmin?.employeeLimit : subadmin?.managerLimit;
-    
-    let limit;
+    const uLimit = resourceType === "client" ? subadmin?.clientLimit
+                 : resourceType === "employee" ? subadmin?.employeeLimit
+                 : subadmin?.managerLimit;
+
     if (uLimit && String(uLimit).trim() !== "" && String(uLimit) !== "0") {
-      limit = parseLimit(uLimit);
-    } else {
-      limit = getSubscriptionLimit(resourceType, subscription);
+      const parsedUserLimit = parseLimit(uLimit);
+      if (parsedUserLimit < limit) {
+        limit = parsedUserLimit;
+      }
     }
 
     let currentCount = 0;

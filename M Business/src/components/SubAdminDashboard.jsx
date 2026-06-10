@@ -1912,29 +1912,41 @@ const saveEdit = async () => {
       />
 
       {viewProj && (
-        <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={550}>
+        <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>
           <div style={{ background: "#fff", borderRadius: 16 }}>
-            {/* Header Info */}
             <div style={{ background: "#f8f7ff", padding: "20px 24px", borderRadius: 16, marginBottom: 18, border: "1px solid #f3efff" }}>
               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 8 }}>{viewProj.name}</h2>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                 <Badge label={viewProj.status || "Pending"} />
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
-                  <span>👥</span> {viewProj.client}
+                {viewProj.priority && <Badge label={viewProj.priority} />}
+                {viewProj.category && <Badge label={viewProj.category} />}
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 20px", marginBottom: 18 }}>
+              {[
+                ["Client", viewProj.client],
+                ["Manager", viewProj.manager],
+                ["Contact Person", viewProj.contactPersonName],
+                ["Contact No", viewProj.contactPersonNo],
+                ["Start Date", viewProj.start ? new Date(viewProj.start).toLocaleDateString("en-IN") : "—"],
+                ["Deadline", (viewProj.end || viewProj.deadline) ? new Date(viewProj.end || viewProj.deadline).toLocaleDateString("en-IN") : "—"],
+                ["Budget", formatCurrency(viewProj.budget, viewProj.currency)],
+                ["Progress", `${viewProj.progress || 0}%`],
+                ["Logged Hours", `${viewProj.loggedHours || 0}h`],
+                ["Purpose", viewProj.purpose],
+              ].map(([label, val]) => (
+                <div key={label}>
+                  <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{val || "—"}</div>
                 </div>
+              ))}
+              <div style={{ gridColumn: "1 / -1" }}>
+                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Description</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--app-sidebar)", lineHeight: 1.6 }}>{viewProj.description || viewProj.purpose || "—"}</div>
               </div>
             </div>
 
-            {/* Budget Row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "#f8f7ff", borderRadius: 16, border: "1px solid #f3efff", marginBottom: 18 }}>
-              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(124,58,237,0.08)" }}>💰</div>
-              <div>
-                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)" }}>{formatCurrency(viewProj.budget, viewProj.currency)}</div>
-              </div>
-            </div>
-
-            {/* Assigned Employees */}
             <div style={{ marginBottom: 18 }}>
               <h3 style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>ASSIGNED EMPLOYEES</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1950,16 +1962,19 @@ const saveEdit = async () => {
               </div>
             </div>
 
-            {/* Purpose Row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
-              <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
-              <div>
-                <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProj.purpose || "—"}</div>
+            {(viewProj.milestones || []).length > 0 && (
+              <div style={{ marginBottom: 18 }}>
+                <h3 style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>MILESTONES</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {viewProj.milestones.map((m, idx) => (
+                    <div key={idx} style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", padding: "8px 12px", background: "var(--app-bg)", borderRadius: 10 }}>
+                      {m.name}{m.date ? ` — ${new Date(m.date).toLocaleDateString("en-IN")}` : ""}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Bottom Buttons */}
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>Edit</button>
               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>👤 Assign</button>
@@ -3615,17 +3630,20 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     try {
       if (!subscription) setSubLoading(true);
       const id = resolveSubadminId();
-      if (!id) return;
+      if (!id) return null;
 
       const res = await axios.get(`${BASE_URL}/api/subscriptions/current/${id}`);
       if (res.data.hasSubscription) {
         setSubscription(res.data.subscription);
+        return res.data.subscription; // return fresh data for immediate use
       } else {
         setSubscription(null);
+        return null;
       }
     } catch (err) {
       console.error("Subscription fetch error:", err);
       setSubscription(null);
+      return null;
     } finally {
       setSubLoading(false);
     }
@@ -4394,9 +4412,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     className="create-btn"
                     title={isUsageAtLimit("client", clients.length) ? `Plan limit reached` : "Add new client"}
                     onClick={async () => {
-                      await fetchSubscription();
-                      const limit = getSubscriptionLimit("client");
-                      if (subscription && clients.length >= limit) {
+                      const freshSub = await fetchSubscription();
+                      const limit = getSubscriptionLimit("client", freshSub || subscription);
+                      if (limit !== Infinity && clients.length >= limit) {
                         setLimitModal({ type: "client", limit });
                         return;
                       }
@@ -4419,9 +4437,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     className="create-btn"
                     title={isUsageAtLimit("employee", employees.length) ? `Plan limit reached` : "Add new employee"}
                     onClick={async () => {
-                      await fetchSubscription();
-                      const limit = getSubscriptionLimit("employee");
-                      if (subscription && employees.length >= limit) {
+                      const freshSub = await fetchSubscription();
+                      const limit = getSubscriptionLimit("employee", freshSub || subscription);
+                      if (limit !== Infinity && employees.length >= limit) {
                         setLimitModal({ type: "employee", limit });
                         return;
                       }
@@ -4446,9 +4464,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   <button
                     className="create-btn"
                     onClick={async () => {
-                      await fetchSubscription();
-                      const limit = getSubscriptionLimit("manager");
-                      if (subscription && managers.length >= limit) {
+                      const freshSub = await fetchSubscription();
+                      const limit = getSubscriptionLimit("manager", freshSub || subscription);
+                      if (limit !== Infinity && managers.length >= limit) {
                         setLimitModal({ type: "manager", limit });
                         return;
                       }
@@ -4927,8 +4945,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     employees={employees}
                     onBack={() => setActive("projects")}
                     onSuccess={(newProj) => {
+                      const saved = newProj?.project || newProj;
                       fetchProjects();
-                      setJumpProject(newProj?.project || newProj); // Ensure we get the project object from the response
+                      setJumpProject(saved);
                       setActive("project-details");
                     }}
                   />

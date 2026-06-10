@@ -360,7 +360,14 @@ export default function ModernProjectsView({
                 <div className="mpv-card-top">
                   {/* Row 1: status badge + priority + action menu */}
                   <div className="mpv-card-row1">
-                    <span className={`mpv-badge ${statusCls}`}>{statusLabel}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <span className={`mpv-badge ${statusCls}`}>{statusLabel}</span>
+                      {p.category && (
+                        <span style={{ fontSize: 10, fontWeight: 700, color: P.primary, background: P.primaryLight, padding: '3px 8px', borderRadius: 20 }}>
+                          {p.category}
+                        </span>
+                      )}
+                    </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span className={`mpv-prio ${prio}`}>{prioLabel}</span>
                       {(onEdit || onDelete || onAssign) && (
@@ -405,11 +412,21 @@ export default function ModernProjectsView({
                     <div className="mpv-card-info">
                       <div className="mpv-card-title">{p.name}</div>
                       <div className="mpv-card-client"><i className="ti ti-building" />{p.client || 'Internal'}</div>
+                      {p.description && (
+                        <div style={{ fontSize: 11, color: P.textLight, marginTop: 3, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
+                          {p.description}
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <>
                       <div className="mpv-card-title">{p.name}</div>
                       <div className="mpv-card-client"><i className="ti ti-building" />{p.client || 'Internal'}</div>
+                      {p.description && (
+                        <div style={{ fontSize: 11.5, color: P.textLight, marginBottom: 10, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                          {p.description}
+                        </div>
+                      )}
                     </>
                   )}
 
@@ -430,7 +447,7 @@ export default function ModernProjectsView({
 
                 <div className="mpv-divider" />
 
-                {/* Bottom row: team avatars + deadline */}
+                {/* Bottom row: team avatars + dates + budget + deadline */}
                 <div className="mpv-card-bottom">
                   <div>
                     <div className="mpv-team-stack">
@@ -455,6 +472,20 @@ export default function ModernProjectsView({
                       <div className="mpv-tasks">
                         <i className="ti ti-checklist" />
                         {taskText}
+                      </div>
+                    )}
+                    {/* Start Date */}
+                    {p.start && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 5, fontSize: 11, color: P.textLight, fontWeight: 600 }}>
+                        <i className="ti ti-calendar-event" style={{ color: P.primary, fontSize: 12 }} />
+                        Start: {fmtDate(p.start)}
+                      </div>
+                    )}
+                    {/* Budget */}
+                    {p.budget && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, fontSize: 11, color: '#059669', fontWeight: 700 }}>
+                        <i className="ti ti-currency-rupee" style={{ fontSize: 12 }} />
+                        Budget: {p.currency || '₹'}{Number(p.budget).toLocaleString('en-IN')}
                       </div>
                     )}
                   </div>

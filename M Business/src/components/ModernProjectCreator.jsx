@@ -465,10 +465,28 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <div className="mpc-pv-row"><span className="mpc-pv-label">Name</span><span className="mpc-pv-val">{name || '—'}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Client</span><span className="mpc-pv-val">{client || '—'}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Category</span><span className="mpc-pv-val">{category}</span></div>
+            <div className="mpc-pv-row"><span className="mpc-pv-label">Status</span><span className="mpc-pv-val">{status}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Priority</span><span className="mpc-pv-val">{priority.charAt(0).toUpperCase() + priority.slice(1)}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Start</span><span className="mpc-pv-val">{start ? new Date(start).toLocaleDateString() : '—'}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Deadline</span><span className="mpc-pv-val">{end ? new Date(end).toLocaleDateString() : '—'}</span></div>
             <div className="mpc-pv-row"><span className="mpc-pv-label">Budget</span><span className="mpc-pv-val">{budget ? `${currency}${Number(budget).toLocaleString()}` : '—'}</span></div>
+            {budget && (
+              <>
+                <div className="mpc-pv-row"><span className="mpc-pv-label">Billed</span><span className="mpc-pv-val">{currency}{Number(billed || 0).toLocaleString()}</span></div>
+                <div className="mpc-pv-row"><span className="mpc-pv-label">Received</span><span className="mpc-pv-val">{currency}{Number(received || 0).toLocaleString()}</span></div>
+                <div className="mpc-pv-row"><span className="mpc-pv-label">Pending</span><span className="mpc-pv-val">{currency}{Number(pending || 0).toLocaleString()}</span></div>
+                <div className="mpc-pv-row"><span className="mpc-pv-label">Spent</span><span className="mpc-pv-val">{currency}{Number(spent || 0).toLocaleString()}</span></div>
+              </>
+            )}
+            <div className="mpc-pv-row"><span className="mpc-pv-label">Team</span><span className="mpc-pv-val">{assigned.length ? assigned.join(', ') : '—'}</span></div>
+            <div className="mpc-pv-row"><span className="mpc-pv-label">Milestones</span><span className="mpc-pv-val">{milestones.filter(m => m.name.trim()).length || 0}</span></div>
+            {description && (
+              <div className="mpc-pv-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
+                <span className="mpc-pv-label">Description</span>
+                <span className="mpc-pv-val" style={{ textAlign: 'left', fontWeight: 600, lineHeight: 1.5 }}>{description}</span>
+              </div>
+            )}
+            <div className="mpc-pv-row"><span className="mpc-pv-label">Client Portal</span><span className="mpc-pv-val">{portalOpts.enablePortal ? 'Enabled' : 'Disabled'}</span></div>
             
             <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 12, marginTop: 8 }}>
               Checklist

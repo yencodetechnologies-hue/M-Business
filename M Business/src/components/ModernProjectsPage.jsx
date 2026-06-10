@@ -3,7 +3,7 @@ import axios from 'axios';
 import './ModernProjectsPage.css';
 import ModernProjectDetails from './ModernProjectDetails';
 import { BASE_URL } from '../config';
-
+ 
 // ─── Avatar helpers ────────────────────────────────────────────
 const AV_COLORS = ['#00BCD4','#8B5CF6','#F59E0B','#26C281','#EC4899','#3B82F6','#EF4444','#10B981'];
 function avColor(name, i = 0) {
@@ -15,7 +15,7 @@ function initials(name) {
   const p = name.trim().split(' ').filter(Boolean);
   return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
 }
-
+ 
 // ─── Status normalise ────────────────────────────────────────────
 function normStatus(raw) {
   const s = (raw || '').toLowerCase().replace(/[\s_-]/g, '');
@@ -25,21 +25,21 @@ function normStatus(raw) {
   if (['overdue','late'].includes(s))                            return { label: 'Overdue',   cls: 'overdue' };
   return { label: raw || 'Pending', cls: 'onhold' };
 }
-
+ 
 function fmtDate(raw) {
   if (!raw) return '—';
   const d = new Date(raw);
   if (isNaN(d)) return raw;
   return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
-
+ 
 function daysLeft(dateStr) {
   if (!dateStr) return null;
   const d = new Date(dateStr);
   if (isNaN(d)) return null;
   return Math.ceil((d - Date.now()) / (1000 * 60 * 60 * 24));
 }
-
+ 
 // ─── Color for progress bar ────────────────────────────────────
 function progGradient(cls) {
   if (cls === 'completed') return 'linear-gradient(90deg,#26C281,#059669)';
@@ -47,7 +47,7 @@ function progGradient(cls) {
   if (cls === 'onhold')    return 'linear-gradient(90deg,#8B5CF6,#7C3AED)';
   return 'linear-gradient(90deg,#00BCD4,#0097A7)';
 }
-
+ 
 // ─── Empty form state ──────────────────────────────────────────
 const EMPTY_FORM = {
   name: '', client: '', purpose: '', description: '',
@@ -55,37 +55,37 @@ const EMPTY_FORM = {
   status: 'In Progress', priority: 'medium',
   assignedTo: '', manager: '', progress: 0,
 };
-
+ 
 // ─── Log Time empty ────────────────────────────────────────────
 const todayStr = () => new Date().toISOString().split('T')[0];
 const EMPTY_LOG = { date: todayStr(), hours: '', task: 'General / Other', notes: '' };
-
+ 
 export default function ModernProjectsPage({ user }) {
   // ── Data ──────────────────────────────────────────────────────
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks]       = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
-
+ 
   // ── UI state ──────────────────────────────────────────────────
   const [selectedProject, setSelectedProject] = useState(null);
   const [searchQuery, setSearchQuery]         = useState('');
   const [activeTab, setActiveTab]             = useState('All');
-
+ 
   // ── Modals ────────────────────────────────────────────────────
   const [showForm, setShowForm]     = useState(false);  // create / edit
   const [editProject, setEditProject] = useState(null); // null = create
   const [form, setForm]             = useState(EMPTY_FORM);
   const [saving, setSaving]         = useState(false);
-
+ 
   const [showLogTime, setShowLogTime] = useState(false);
   const [logTimeProject, setLogTimeProject] = useState(null);
   const [logForm, setLogForm]       = useState(EMPTY_LOG);
   const [logSaving, setLogSaving]   = useState(false);
-
+ 
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting]     = useState(false);
-
+ 
   // ── Fetch ─────────────────────────────────────────────────────
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -103,9 +103,9 @@ export default function ModernProjectsPage({ user }) {
       setLoading(false);
     }
   }, []);
-
+ 
   useEffect(() => { fetchAll(); }, [fetchAll]);
-
+ 
   // ── Stats ──────────────────────────────────────────────────────
   const stats = useMemo(() => ({
     all:       projects.length,
@@ -113,7 +113,7 @@ export default function ModernProjectsPage({ user }) {
     completed: projects.filter(p => ['completed','done','delivered','closed'].includes((p.status||'').toLowerCase().replace(/[\s_-]/g,''))).length,
     onhold:    projects.filter(p => ['onhold','hold','paused','suspended'].includes((p.status||'').toLowerCase().replace(/[\s_-]/g,''))).length,
   }), [projects]);
-
+ 
   // ── Filter ────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     return projects.filter(p => {
@@ -128,19 +128,19 @@ export default function ModernProjectsPage({ user }) {
       return true;
     });
   }, [projects, searchQuery, activeTab]);
-
+ 
   // ── Task counts per project ───────────────────────────────────
   function tasksForProject(proj) {
     return tasks.filter(t => t.projectId === proj._id || t.project === proj.name);
   }
-
+ 
   // ── Open create form ──────────────────────────────────────────
   function openCreate() {
     setEditProject(null);
     setForm(EMPTY_FORM);
     setShowForm(true);
   }
-
+ 
   // ── Open edit form ────────────────────────────────────────────
   function openEdit(p, e) {
     e && e.stopPropagation();
@@ -162,7 +162,7 @@ export default function ModernProjectsPage({ user }) {
     });
     setShowForm(true);
   }
-
+ 
   // ── Save project ──────────────────────────────────────────────
   async function handleSave(e) {
     e.preventDefault();
@@ -187,7 +187,7 @@ export default function ModernProjectsPage({ user }) {
       setSaving(false);
     }
   }
-
+ 
   // ── Delete ────────────────────────────────────────────────────
   async function handleDelete() {
     if (!deleteTarget) return;
@@ -203,7 +203,7 @@ export default function ModernProjectsPage({ user }) {
       setDeleting(false);
     }
   }
-
+ 
   // ── Log Work Time ─────────────────────────────────────────────
   function openLogTime(p, e) {
     e && e.stopPropagation();
@@ -211,7 +211,7 @@ export default function ModernProjectsPage({ user }) {
     setLogForm({ ...EMPTY_LOG, date: todayStr() });
     setShowLogTime(true);
   }
-
+ 
   async function handleSaveLog(e) {
     e.preventDefault();
     if (!logForm.hours) return;
@@ -231,25 +231,34 @@ export default function ModernProjectsPage({ user }) {
       setLogSaving(false);
     }
   }
-
+ 
   // ─── Map backend project → ModernProjectDetails shape ─────────
   function toDetailShape(p) {
     const pt = tasksForProject(p);
     return {
       ...p,
       description: p.description || '',
+      purpose: p.purpose || '',
       client: p.client || 'N/A',
-      category: p.purpose || 'General',
+      category: p.category || p.purpose || 'General',
       priority: p.priority || 'medium',
+      manager: p.manager || '',
+      contactPersonName: p.contactPersonName || '',
+      contactPersonNo: p.contactPersonNo || '',
       assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []),
       budget: Number(p.budget) || 0,
       currency: p.currency || '₹',
+      billed: p.billed || 0,
+      received: p.received || 0,
+      pending: p.pending || 0,
+      spent: p.spent || 0,
       loggedHours: p.loggedHours || 0,
       milestones: p.milestones || [],
+      portalSettings: p.portalSettings || {},
       _tasks: pt,
     };
   }
-
+ 
   // ─── RENDER: Detail view ──────────────────────────────────────
   if (selectedProject) {
     return (
@@ -323,7 +332,7 @@ export default function ModernProjectsPage({ user }) {
       </div>
     );
   }
-
+ 
   // ─── RENDER: Projects list ─────────────────────────────────────
   return (
     <div className="modern-app">
@@ -351,7 +360,7 @@ export default function ModernProjectsPage({ user }) {
           <button className="m-upload-btn" onClick={openCreate}><i className="ti ti-plus" style={{fontSize:'15px'}}></i> New Project</button>
         </div>
       </aside>
-
+ 
       {/* MAIN */}
       <div className="m-main">
         <div className="m-topbar">
@@ -364,7 +373,7 @@ export default function ModernProjectsPage({ user }) {
             <button className="m-create-btn" onClick={openCreate}><i className="ti ti-plus" style={{fontSize:'15px'}}></i> New Project</button>
           </div>
         </div>
-
+ 
         <div className="m-content">
           {/* Header */}
           <div className="m-page-header">
@@ -376,7 +385,7 @@ export default function ModernProjectsPage({ user }) {
               <button className="m-filter-btn" onClick={fetchAll}><i className="ti ti-refresh" style={{fontSize:'14px'}}></i> Refresh</button>
             </div>
           </div>
-
+ 
           {/* Error */}
           {error && (
             <div style={{background:'#FEE2E2', color:'#DC2626', padding:'12px 18px', borderRadius:10, marginBottom:16, fontSize:13, fontWeight:700}}>
@@ -384,7 +393,7 @@ export default function ModernProjectsPage({ user }) {
               <button onClick={fetchAll} style={{marginLeft:12, background:'none', border:'none', color:'#DC2626', cursor:'pointer', fontWeight:700}}>Retry</button>
             </div>
           )}
-
+ 
           {/* Stats */}
           <div className="m-stats-row">
             {[
@@ -402,7 +411,7 @@ export default function ModernProjectsPage({ user }) {
               </div>
             ))}
           </div>
-
+ 
           {/* Tabs */}
           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16}}>
             <div className="m-tabs">
@@ -414,7 +423,7 @@ export default function ModernProjectsPage({ user }) {
               Showing {filtered.length} of {projects.length} projects
             </div>
           </div>
-
+ 
           {/* Loading */}
           {loading && (
             <div style={{display:'flex', alignItems:'center', justifyContent:'center', padding:60, flexDirection:'column', gap:12}}>
@@ -423,7 +432,7 @@ export default function ModernProjectsPage({ user }) {
               <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
             </div>
           )}
-
+ 
           {/* Grid */}
           {!loading && (
             <div className="m-projects-grid">
@@ -436,7 +445,7 @@ export default function ModernProjectsPage({ user }) {
                 const pt = tasksForProject(p);
                 const colorMap = { active:'teal', completed:'green', onhold:'purple', overdue:'red' };
                 const cardColor = colorMap[cls] || 'teal';
-
+ 
                 return (
                   <div
                     key={p._id}
@@ -462,7 +471,7 @@ export default function ModernProjectsPage({ user }) {
                         style={{background:'rgba(255,107,107,.1)', border:'none', borderRadius:6, width:28, height:28, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#FF6B6B'}}
                       ><i className="ti ti-trash" style={{fontSize:13}}></i></button>
                     </div>
-
+ 
                     <div className="m-pc-top">
                       <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
                         <div className="m-pc-icon" style={{background: avColor(p.name, idx)}}>{initials(p.name)}</div>
@@ -472,11 +481,20 @@ export default function ModernProjectsPage({ user }) {
                         </div>
                       </div>
                     </div>
-
-                    <span className={`m-status-badge ${statusLabel.toLowerCase().replace(' ','')}`}>{statusLabel}</span>
-
+ 
+                    <div style={{display:'flex', alignItems:'center', gap:6, marginBottom:8, flexWrap:'wrap'}}>
+                      <span className={`m-status-badge ${statusLabel.toLowerCase().replace(' ','')}`}>{statusLabel}</span>
+                      {p.priority && <span style={{padding:'3px 9px', borderRadius:20, fontSize:11, fontWeight:700, background: p.priority==='high'?'#FEE2E2': p.priority==='low'?'#D1FAE5':'#FEF3C7', color: p.priority==='high'?'#DC2626': p.priority==='low'?'#059669':'#D97706'}}>{p.priority.charAt(0).toUpperCase()+p.priority.slice(1)}</span>}
+                      {p.category && <span style={{padding:'3px 9px', borderRadius:20, fontSize:11, fontWeight:600, background:'#E0F7FA', color:'#0097A7'}}>{p.category}</span>}
+                    </div>
+ 
                     <div className="m-pc-desc">{p.description || p.purpose || 'No description.'}</div>
-
+ 
+                    <div style={{display:'flex', gap:16, marginBottom:8, flexWrap:'wrap'}}>
+                      {p.start && <span style={{fontSize:11, color:'#718096', display:'flex', alignItems:'center', gap:4}}><i className="ti ti-calendar-event" style={{fontSize:12}}></i> Start: <strong style={{color:'#4A5568'}}>{new Date(p.start).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</strong></span>}
+                      {p.budget && <span style={{fontSize:11, color:'#718096', display:'flex', alignItems:'center', gap:4}}><i className="ti ti-wallet" style={{fontSize:12}}></i> Budget: <strong style={{color:'#4A5568'}}>{p.currency||'₹'}{Number(p.budget).toLocaleString()}</strong></span>}
+                    </div>
+ 
                     <div className="m-pc-progress-label">
                       <span className="m-pc-progress-text">Progress</span>
                       <span className="m-pc-progress-pct">{pct}%</span>
@@ -484,7 +502,7 @@ export default function ModernProjectsPage({ user }) {
                     <div className="m-pc-bar">
                       <div className="m-pc-fill" style={{width:`${pct}%`, background: progGradient(cls)}}></div>
                     </div>
-
+ 
                     <div className="m-pc-footer">
                       <div className="m-pc-avatars">
                         {team.length === 0
@@ -508,7 +526,7 @@ export default function ModernProjectsPage({ user }) {
                         }
                       </div>
                     </div>
-
+ 
                     {pt.length > 0 && (
                       <div style={{padding:'8px 16px', borderTop:'1px solid rgba(0,0,0,.06)', fontSize:11, color:'#718096', display:'flex', alignItems:'center', gap:6}}>
                         <i className="ti ti-checklist" style={{fontSize:13, color:'#00BCD4'}}></i>
@@ -518,14 +536,14 @@ export default function ModernProjectsPage({ user }) {
                   </div>
                 );
               })}
-
+ 
               {/* Add new card */}
               <div className="m-add-project-card" onClick={openCreate}>
                 <div className="m-add-icon"><i className="ti ti-plus"></i></div>
                 <div className="m-add-text">Add New Project</div>
                 <div className="m-add-sub">Click to create a new project</div>
               </div>
-
+ 
               {/* Empty state */}
               {filtered.length === 0 && !loading && (
                 <div style={{gridColumn:'1/-1', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:60, gap:12, color:'#718096'}}>
@@ -539,7 +557,7 @@ export default function ModernProjectsPage({ user }) {
           )}
         </div>
       </div>
-
+ 
       {/* ── MODALS ── */}
       {showForm && <ProjectFormModal form={form} setForm={setForm} onSave={handleSave} onClose={() => setShowForm(false)} saving={saving} isEdit={!!editProject} />}
       {deleteTarget && <DeleteModal name={deleteTarget.name} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} deleting={deleting} />}
@@ -547,7 +565,7 @@ export default function ModernProjectsPage({ user }) {
     </div>
   );
 }
-
+ 
 // ─── Project Form Modal ────────────────────────────────────────
 function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
   const f = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
@@ -626,7 +644,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
     </div>
   );
 }
-
+ 
 // ─── Delete Confirm Modal ──────────────────────────────────────
 function DeleteModal({ name, onConfirm, onCancel, deleting }) {
   return (
@@ -649,7 +667,7 @@ function DeleteModal({ name, onConfirm, onCancel, deleting }) {
     </div>
   );
 }
-
+ 
 // ─── Log Work Time Modal ───────────────────────────────────────
 function LogTimeModal({ form, setForm, onSave, onClose, saving, projectName }) {
   const f = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
@@ -693,7 +711,7 @@ function LogTimeModal({ form, setForm, onSave, onClose, saving, projectName }) {
     </div>
   );
 }
-
+ 
 // ─── Shared styles ─────────────────────────────────────────────
 const OVERLAY = {
   position:'fixed', inset:0, background:'rgba(0,0,0,.45)', zIndex:9999,
@@ -729,3 +747,4 @@ const BTN_OUTLINE = {
   background:'transparent', border:'1.5px solid #E2E8F0',
   color:'#4A5568', fontFamily:'Nunito,sans-serif', fontSize:13, fontWeight:700,
 };
+ 

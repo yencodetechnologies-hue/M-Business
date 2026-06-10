@@ -1,14 +1,27 @@
+import React, { useState } from 'react';
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Auditor Login — M Business</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<style>
+export default function AuditorLogin({ onLogin }) {
+  const [email, setEmail] = useState('rajan@srca.co.in');
+  const [password, setPassword] = useState('password');
+
+  const doLogin = () => {
+    if (!email) {
+      alert('Enter email');
+      return;
+    }
+    if (onLogin) onLogin();
+  };
+
+  const otpLogin = () => {
+    alert('OTP sent to registered mobile number.');
+    if (onLogin) onLogin();
+  };
+
+  return (
+    <>
+      <style>{`
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:"Nunito",sans-serif;min-height:100vh;display:flex;background:#0D1B2A;}
+.auditor-login-body {font-family:"Nunito",sans-serif;min-height:100vh;display:flex;background:#0D1B2A;}
 .left-panel{flex:1;background:linear-gradient(135deg,#0D1B2A 0%,#1a2a4a 50%,#0D2040 100%);display:flex;flex-direction:column;justify-content:center;padding:60px;position:relative;overflow:hidden;}
 .left-panel::before{content:"";position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.15) 0%,transparent 70%);}
 .left-panel::after{content:"";position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,188,212,.1) 0%,transparent 70%);}
@@ -43,68 +56,60 @@ body{font-family:"Nunito",sans-serif;min-height:100vh;display:flex;background:#0
 .login-footer{margin-top:28px;font-size:12px;color:#718096;text-align:center;}
 .login-footer a{color:#8B5CF6;font-weight:700;text-decoration:none;}
 .secure-badge{display:flex;align-items:center;gap:6px;background:#F0FFF4;border:1px solid #6EE7B7;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;color:#065F46;margin-bottom:24px;}
-</style>
-</head>
-<body>
-<!-- LEFT PANEL -->
-<div class="left-panel">
-  <div class="brand">
-    <div class="brand-icon"><i class="ti ti-building-skyscraper"></i></div>
-    <div class="brand-name">M <span>Business</span></div>
-  </div>
-  <div class="panel-title">Auditor <span>Portal</span><br>Access</div>
-  <div class="panel-sub">Securely review your client's financial records, download statements, and add audit remarks — all in one place.</div>
-  <div class="features">
-    <div class="feat"><div class="feat-icon" style="background:rgba(139,92,246,.2);"><i class="ti ti-file-analytics" style="color:#8B5CF6;"></i></div>View full income & expense statements</div>
-    <div class="feat"><div class="feat-icon" style="background:rgba(0,188,212,.2);"><i class="ti ti-building-bank" style="color:#00BCD4;"></i></div>Bank reconciliation & transaction review</div>
-    <div class="feat"><div class="feat-icon" style="background:rgba(38,194,129,.2);"><i class="ti ti-download" style="color:#26C281;"></i></div>Download PDF, Excel & CSV reports</div>
-    <div class="feat"><div class="feat-icon" style="background:rgba(245,158,11,.2);"><i class="ti ti-message-2" style="color:#F59E0B;"></i></div>Add audit notes & flag transactions</div>
-  </div>
-</div>
-<!-- RIGHT PANEL -->
-<div class="right-panel">
-  <div class="login-title">Auditor Sign In</div>
-  <div class="login-sub">Enter your credentials to access the audit portal</div>
-  <div class="secure-badge"><i class="ti ti-shield-check" style="font-size:15px;"></i>256-bit encrypted secure access</div>
-  <div class="form-group">
-    <label>Auditor Email *</label>
-    <div class="inp-icon-wrap">
-      <i class="ti ti-mail inp-icon"></i>
-      <input class="inp" id="email" type="email" placeholder="auditor@yourfirm.com" value="rajan@srca.co.in">
-    </div>
-  </div>
-  <div class="form-group">
-    <label>Password *</label>
-    <div class="inp-icon-wrap">
-      <i class="ti ti-lock inp-icon"></i>
-      <input class="inp" id="pass" type="password" placeholder="Enter password" value="••••••••">
-    </div>
-  </div>
-  <div class="form-group">
-    <label>Client Company</label>
-    <div class="inp-icon-wrap">
-      <i class="ti ti-building inp-icon"></i>
-      <input class="inp" value="YENCODE Technologies Pvt Ltd" readonly style="background:#F7FAFC;color:#718096;">
-    </div>
-  </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;font-size:13px;">
-    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:#4A5568;"><input type="checkbox" style="accent-color:#8B5CF6;"> Remember this device</label>
-    <a href="#" style="color:#8B5CF6;font-weight:700;text-decoration:none;">Forgot password?</a>
-  </div>
-  <button class="login-btn" onclick="doLogin()"><i class="ti ti-shield-lock"></i>Sign In to Audit Portal</button>
-  <div class="divider">or verify with</div>
-  <button class="otp-btn" onclick="otpLogin()"><i class="ti ti-device-mobile"></i>Sign In with OTP</button>
-  <div class="login-footer">
-    Not an auditor? <a href="fin-dashboard.html">Back to Admin</a><br><br>
-    <span style="font-size:11px;">Access is restricted to authorised auditors only.<br>All sessions are logged for compliance.</span>
-  </div>
-</div>
-<script>
-function doLogin(){
-  const e=document.getElementById("email").value;
-  if(!e){document.getElementById("email").focus();return;}
-  location.href="auditor-portal.html";
+      `}</style>
+      <div className="auditor-login-body">
+        <div className="left-panel">
+          <div className="brand">
+            <div className="brand-icon"><i className="ti ti-building-skyscraper"></i></div>
+            <div className="brand-name">M <span>Business</span></div>
+          </div>
+          <div className="panel-title">Auditor <span>Portal</span><br />Access</div>
+          <div className="panel-sub">Securely review your client's financial records, download statements, and add audit remarks — all in one place.</div>
+          <div className="features">
+            <div className="feat"><div className="feat-icon" style={{background:'rgba(139,92,246,.2)'}}><i className="ti ti-file-analytics" style={{color:'#8B5CF6'}}></i></div>View full income & expense statements</div>
+            <div className="feat"><div className="feat-icon" style={{background:'rgba(0,188,212,.2)'}}><i className="ti ti-building-bank" style={{color:'#00BCD4'}}></i></div>Bank reconciliation & transaction review</div>
+            <div className="feat"><div className="feat-icon" style={{background:'rgba(38,194,129,.2)'}}><i className="ti ti-download" style={{color:'#26C281'}}></i></div>Download PDF, Excel & CSV reports</div>
+            <div className="feat"><div className="feat-icon" style={{background:'rgba(245,158,11,.2)'}}><i className="ti ti-message-2" style={{color:'#F59E0B'}}></i></div>Add audit notes & flag transactions</div>
+          </div>
+        </div>
+        <div className="right-panel">
+          <div className="login-title">Auditor Sign In</div>
+          <div className="login-sub">Enter your credentials to access the audit portal</div>
+          <div className="secure-badge"><i className="ti ti-shield-check" style={{fontSize:'15px'}}></i>256-bit encrypted secure access</div>
+          <div className="form-group">
+            <label>Auditor Email *</label>
+            <div className="inp-icon-wrap">
+              <i className="ti ti-mail inp-icon"></i>
+              <input className="inp" type="email" placeholder="auditor@yourfirm.com" value={email} onChange={e => setEmail(e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Password *</label>
+            <div className="inp-icon-wrap">
+              <i className="ti ti-lock inp-icon"></i>
+              <input className="inp" type="password" placeholder="Enter password" value={password} onChange={e => setPassword(e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Client Company</label>
+            <div className="inp-icon-wrap">
+              <i className="ti ti-building inp-icon"></i>
+              <input className="inp" defaultValue="YENCODE Technologies Pvt Ltd" readOnly style={{background:'#F7FAFC',color:'#718096'}} />
+            </div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'18px',fontSize:'13px'}}>
+            <label style={{display:'flex',alignItems:'center',gap:'8px',cursor:'pointer',fontWeight:600,color:'#4A5568'}}><input type="checkbox" style={{accentColor:'#8B5CF6'}} /> Remember this device</label>
+            <a href="#" style={{color:'#8B5CF6',fontWeight:700,textDecoration:'none'}}>Forgot password?</a>
+          </div>
+          <button className="login-btn" onClick={doLogin}><i className="ti ti-shield-lock"></i>Sign In to Audit Portal</button>
+          <div className="divider">or verify with</div>
+          <button className="otp-btn" onClick={otpLogin}><i className="ti ti-device-mobile"></i>Sign In with OTP</button>
+          <div className="login-footer">
+            Not an auditor? <a href="#">Back to Admin</a><br /><br />
+            <span style={{fontSize:'11px'}}>Access is restricted to authorised auditors only.<br />All sessions are logged for compliance.</span>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
-function otpLogin(){alert("OTP sent to registered mobile number.");}
-</script>
-</body></html>

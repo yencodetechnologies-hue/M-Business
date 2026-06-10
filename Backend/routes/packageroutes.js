@@ -145,7 +145,7 @@ router.put("/:id", async (req, res) => {
             { planName: title },
             ...(isTrialPackage ? [{ isTrial: true }, { planName: "Free" }] : [])
           ],
-          status: { $in: ["active", "pending", "trial"] } 
+          status: { $in: ["active", "pending", "trial", "grace_period", "expired"] } 
         },
         {
           planName: title,
@@ -160,13 +160,30 @@ router.put("/:id", async (req, res) => {
       );
     }
     // AUTOMATIC SYNC: Update limits for all assigned subadmins
-    if (assignedSubadmins && assignedSubadmins.length > 0) {
+    const subadminsToUpdate = new Set(assignedSubadmins || []);
+
+    // Also find subadmins who have active subscriptions linked to this package
+    // so that User.employeeLimit (Priority 1 in middleware) stays in sync
+    const linkedSubs = await Subscription.find({
+      $or: [
+        { packageId: req.params.id },
+        { planName: title }
+      ],
+      status: { $in: ["active", "pending", "trial", "grace_period"] }
+    }).select("userId companyId");
+
+    linkedSubs.forEach(sub => {
+      if (sub.companyId) subadminsToUpdate.add(String(sub.companyId));
+      if (sub.userId)    subadminsToUpdate.add(String(sub.userId));
+    });
+
+    if (subadminsToUpdate.size > 0) {
       await User.updateMany(
-        { _id: { $in: assignedSubadmins } },
+        { _id: { $in: Array.from(subadminsToUpdate) } },
         { 
-          clientLimit: clientLimit || "3 Clients",
+          clientLimit:   clientLimit   || "3 Clients",
           employeeLimit: employeeLimit || "10 Employees",
-          managerLimit: managerLimit || "1 Manager",
+          managerLimit:  managerLimit  || "1 Manager",
           businessLimit: businessLimit || "Single business manage"
         }
       );
@@ -223,6 +240,67 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error deleting package" });
+  }
+});
+
+
+// ONE-TIME SYNC: Force update all subscriptions + users from their linked package
+router.post("/sync-all-limits", async (req, res) => {
+  try {
+    const packages = await Package.find({});
+    let updated = { subscriptions: 0, users: 0, packages: packages.length };
+
+    for (const pkg of packages) {
+      // Update all subscriptions linked to this package (any status)
+      const subResult = await Subscription.updateMany(
+        {
+          $or: [
+            { packageId: String(pkg._id) },
+            { planName: pkg.title }
+          ]
+        },
+        {
+          clientLimit: pkg.clientLimit || "",
+          employeeLimit: pkg.employeeLimit || "",
+          managerLimit: pkg.managerLimit || "",
+          businessLimit: pkg.businessLimit || "",
+          updatedAt: new Date()
+        }
+      );
+      updated.subscriptions += subResult.modifiedCount;
+
+      // Find linked users and update User model too
+      const linkedSubs = await Subscription.find({
+        $or: [
+          { packageId: String(pkg._id) },
+          { planName: pkg.title }
+        ]
+      }).select("userId companyId");
+
+      const ids = new Set();
+      linkedSubs.forEach(s => {
+        if (s.userId) ids.add(String(s.userId));
+        if (s.companyId) ids.add(String(s.companyId));
+      });
+
+      if (ids.size > 0) {
+        const userResult = await User.updateMany(
+          { _id: { $in: Array.from(ids) } },
+          {
+            clientLimit: pkg.clientLimit || "",
+            employeeLimit: pkg.employeeLimit || "",
+            managerLimit: pkg.managerLimit || "",
+            businessLimit: pkg.businessLimit || ""
+          }
+        );
+        updated.users += userResult.modifiedCount;
+      }
+    }
+
+    res.json({ success: true, message: "Sync complete", updated });
+  } catch (err) {
+    console.error("Sync error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 

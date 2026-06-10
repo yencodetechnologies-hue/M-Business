@@ -11,6 +11,14 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 import { T as GLOBAL_T } from "../index";
 import ModernAccountsView from "./ModernAccountsView";
+import FinDashboard from "./FinDashboard";
+import FinIncome from "./FinIncome";
+import FinExpenses from "./FinExpenses";
+import FinVendors from "./FinVendors";
+import FinBank from "./FinBank";
+import FinReports from "./FinReports";
+import AuditorLogin from "./AuditorLogin";
+import AuditorPortal from "./AuditorPortal";
 
 // ── Constants ─────────────────────────────────────────────
 const ACCOUNTS_API = `${BASE_URL}/api/accounts`;
@@ -351,16 +359,39 @@ export default function AccountsPage({
           <div style={{ fontSize: 20, fontWeight: 800, color: "#0F172A" }}>Revenue & Accounts</div>
         </div>
       )}
-      <div className="tabs" style={{ marginBottom: 32 }}>
-  <button onClick={() => setActiveTab("overview")} className={`tab ${activeTab === "overview" ? "active" : ""}`}>Overview</button>
-  <button onClick={() => setActiveTab("income")} className={`tab ${activeTab === "income" ? "active" : ""}`}>Income</button>
-  <button onClick={() => setActiveTab("expenses")} className={`tab ${activeTab === "expenses" ? "active" : ""}`}>Expenses</button>
-</div>
+      <div className="tabs" style={{ marginBottom: 32, display: "flex", gap: 8, overflowX: "auto", flexWrap: "wrap" }}>
+        <button onClick={() => setActiveTab("overview")} style={tabStyle(activeTab === "overview")}>
+          <i className="ti ti-chart-pie" style={{ marginRight: 6 }} />Overview
+        </button>
+        <button onClick={() => setActiveTab("income")} style={tabStyle(activeTab === "income")}>
+          <i className="ti ti-arrow-bar-down" style={{ marginRight: 6 }} />Income
+        </button>
+        <button onClick={() => setActiveTab("expenses")} style={tabStyle(activeTab === "expenses")}>
+          <i className="ti ti-arrow-bar-up" style={{ marginRight: 6 }} />Expenses
+        </button>
+        <button onClick={() => setActiveTab("vendors")} style={tabStyle(activeTab === "vendors")}>
+          <i className="ti ti-truck" style={{ marginRight: 6 }} />Vendors
+        </button>
+        <button onClick={() => setActiveTab("banks")} style={tabStyle(activeTab === "banks")}>
+          <i className="ti ti-building-bank" style={{ marginRight: 6 }} />Bank Accounts
+        </button>
+        <button onClick={() => setActiveTab("reports")} style={tabStyle(activeTab === "reports")}>
+          <i className="ti ti-file-analytics" style={{ marginRight: 6 }} />Reports
+        </button>
+        <button onClick={() => setActiveTab("auditor")} style={{ ...tabStyle(activeTab === "auditor"), background: activeTab === "auditor" ? "#8B5CF6" : "transparent", color: activeTab === "auditor" ? "#fff" : "#718096" }}>
+          <i className="ti ti-shield-check" style={{ marginRight: 6 }} />Auditor Portal
+        </button>
+      </div>
 
       <div>
-        {activeTab === "overview" && <ModernAccountsView THEME={THEME} income={income} expenses={expenses} />}
-        {activeTab === "income" && <IncomePage THEME={THEME} income={income} setIncome={setIncome} fetchIncome={fetchIncome} />}
-        {activeTab === "expenses" && <ExpensesPage THEME={THEME} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+        {activeTab === "overview" && <FinDashboard THEME={THEME} income={income} expenses={expenses} />}
+        {activeTab === "income" && <FinIncome THEME={THEME} income={income} setIncome={setIncome} fetchIncome={fetchIncome} />}
+        {activeTab === "expenses" && <FinExpenses THEME={THEME} expenses={expenses} setExpenses={setExpenses} fetchExpenses={fetchExpenses} />}
+        {activeTab === "vendors" && <FinVendors THEME={THEME} />}
+        {activeTab === "banks" && <FinBank THEME={THEME} />}
+        {activeTab === "reports" && <FinReports THEME={THEME} />}
+        {activeTab === "auditor" && <AuditorLogin onLogin={() => setActiveTab("auditor-portal")} />}
+        {activeTab === "auditor-portal" && <AuditorPortal onBack={() => setActiveTab("auditor")} />}
       </div>
     </div>
   );

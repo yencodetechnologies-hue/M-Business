@@ -162,6 +162,22 @@ function getAvatarColor(name) {
   return colors[name.charCodeAt(0) % colors.length];
 }
 
+function fmtDetailDate(raw) {
+  if (!raw) return '—';
+  const d = new Date(raw);
+  if (isNaN(d)) return raw;
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function DetailField({ label, value, fullWidth }) {
+  return (
+    <div style={fullWidth ? { gridColumn: '1 / -1' } : undefined}>
+      <div style={{ fontSize: 10, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark, lineHeight: 1.5, whiteSpace: fullWidth ? 'pre-wrap' : 'normal' }}>{value || '—'}</div>
+    </div>
+  );
+}
+
 export default function ModernProjectDetails({ project, onBack, tasks = [], onEdit, onUpdate, fetchProjects, fetchTasks }) {
   const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
@@ -243,6 +259,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
   
   const budgetAmt = currProject.budget ? Number(currProject.budget) : 0;
   const currency = currProject.currency || "₹";
+  const portalSettings = currProject.portalSettings || {};
+  const milestoneCount = (currProject.milestones || []).length;
 
   const assigned = Array.isArray(currProject.assignedTo) ? currProject.assignedTo : (currProject.assignedTo ? [currProject.assignedTo] : []);
   
@@ -546,6 +564,51 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
         </div>
       </div>
 
+      {/* ALL PROJECT FIELDS */}
+      <div className="mpd-card">
+        <div className="mpd-card-header">
+          <div className="mpd-card-title"><i className="ti ti-info-circle"></i> Project Information</div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '18px 24px' }}>
+          <DetailField label="Client" value={clientName} />
+          <DetailField label="Category" value={category} />
+          <DetailField label="Status" value={currProject.status || 'Active'} />
+          <DetailField label="Priority" value={priority.charAt(0).toUpperCase() + priority.slice(1)} />
+          <DetailField label="Start Date" value={fmtDetailDate(currProject.start)} />
+          <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
+          <DetailField label="Manager" value={currProject.manager} />
+          <DetailField label="Contact Person" value={currProject.contactPersonName} />
+          <DetailField label="Contact Number" value={currProject.contactPersonNo} />
+          <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
+          <DetailField label="Logged Hours" value={currProject.loggedHours ? `${currProject.loggedHours}h` : '0h'} />
+          <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />
+          <DetailField label="Team Members" value={assigned.length ? assigned.join(', ') : 'Unassigned'} fullWidth={assigned.length > 2} />
+          <DetailField label="Description" value={currProject.description || currProject.purpose} fullWidth />
+          {budgetAmt > 0 && (
+            <>
+              <DetailField label="Total Budget" value={`${currency}${budgetAmt.toLocaleString()}`} />
+              <DetailField label="Billed" value={`${currency}${billed.toLocaleString()}`} />
+              <DetailField label="Received" value={`${currency}${received.toLocaleString()}`} />
+              <DetailField label="Pending" value={`${currency}${pending.toLocaleString()}`} />
+              <DetailField label="Spent" value={`${currency}${spent.toLocaleString()}`} />
+              <DetailField label="Remaining" value={`${currency}${remaining.toLocaleString()}`} />
+            </>
+          )}
+          <DetailField
+            label="Client Portal"
+            value={portalSettings.enablePortal
+              ? [
+                  portalSettings.showProgress && 'Progress',
+                  portalSettings.showMilestones && 'Milestones',
+                  portalSettings.showTeam && 'Team',
+                  portalSettings.allowMessages && 'Messages',
+                ].filter(Boolean).join(', ') || 'Enabled'
+              : 'Disabled'}
+            fullWidth
+          />
+        </div>
+      </div>
+
       {/* KPIs */}
       <div className="mpd-kpi-row">
         <div className="mpd-kpi">
@@ -844,6 +907,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
             <div className="mpd-brow"><span className="mpd-lbl">Billed</span><span className="mpd-val">{currency}{billed.toLocaleString()}</span></div>
             <div className="mpd-brow"><span className="mpd-lbl">Received</span><span className="mpd-val mpd-g">{currency}{received.toLocaleString()}</span></div>
             <div className="mpd-brow"><span className="mpd-lbl">Pending</span><span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span></div>
+            <div className="mpd-brow"><span className="mpd-lbl">Spent</span><span className="mpd-val">{currency}{spent.toLocaleString()}</span></div>
             <div className="mpd-brow"><span className="mpd-lbl">Remaining</span><span className="mpd-val mpd-p">{currency}{remaining.toLocaleString()}</span></div>
             <div style={{marginTop:10}}>
               <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{width:`${budgetUsedPct}%`}}></div></div>

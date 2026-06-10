@@ -1,0 +1,438 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Audit Portal — M Business</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+/* ── M Business Finance Design System ── */
+:root {
+  --primary:#00BCD4; --primary-dark:#0097A7; --primary-light:#E0F7FA; --primary-mid:#B2EBF2;
+  --text-dark:#1A2332; --text-mid:#4A5568; --text-light:#718096;
+  --bg:#F0F4F8; --white:#FFFFFF; --border:#E2E8F0;
+  --green:#26C281; --green-light:#D1FAE5; --green-dark:#065F46;
+  --orange:#F59E0B; --orange-light:#FEF3C7; --orange-dark:#92400E;
+  --red:#FF6B6B; --red-dark:#EF4444; --red-light:#FEE2E2;
+  --purple:#8B5CF6; --purple-light:#EDE9FE;
+  --blue:#3B82F6; --blue-light:#DBEAFE;
+  --radius:14px; --shadow:0 2px 12px rgba(0,188,212,.08); --shadow-lg:0 8px 32px rgba(0,188,212,.14);
+  --sidebar-w:250px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text-dark);min-height:100vh;display:flex;}
+a{text-decoration:none;color:inherit;}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--white);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;border-right:1px solid var(--border);z-index:100;}
+.sidebar-logo{padding:20px 22px 16px;border-bottom:1px solid var(--border);font-size:19px;font-weight:900;color:var(--primary);display:flex;align-items:center;gap:10px;}
+.logo-icon{width:34px;height:34px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.logo-icon i{color:#fff;font-size:17px;}
+.sidebar-logo span{color:var(--text-dark);}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.nav-sec{font-size:10px;font-weight:700;color:var(--text-light);letter-spacing:1.2px;text-transform:uppercase;padding:12px 12px 6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--text-mid);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s;margin-bottom:2px;}
+.nav-item i{font-size:17px;width:20px;text-align:center;}
+.nav-item:hover{background:var(--primary-light);color:var(--primary);}
+.nav-item.active{background:var(--primary);color:#fff;}
+.sidebar-footer{padding:14px 10px;border-top:1px solid var(--border);}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;}
+.sidebar-user:hover{background:var(--bg);}
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 26px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-light);}
+.breadcrumb a{color:var(--primary);font-weight:700;}
+.page-title{font-size:19px;font-weight:900;color:var(--text-dark);}
+.topbar-actions{display:flex;align-items:center;gap:10px;}
+.content{padding:26px;flex:1;}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
+.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-dark);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);}.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
+.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#1aab6d;}
+.btn-red{background:var(--red-light);color:var(--red-dark);border:1.5px solid #FCA5A5;}.btn-red:hover{background:var(--red-dark);color:#fff;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+/* CARDS */
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;}
+/* KPI */
+.kpi-grid{display:grid;gap:16px;margin-bottom:22px;}
+.kpi-grid-4{grid-template-columns:repeat(4,1fr);}
+.kpi-grid-5{grid-template-columns:repeat(5,1fr);}
+.kpi{background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid transparent;}
+.kpi.income{border-left-color:var(--green);}
+.kpi.expense{border-left-color:var(--red);}
+.kpi.profit{border-left-color:var(--primary);}
+.kpi.pending{border-left-color:var(--orange);}
+.kpi.vendor{border-left-color:var(--purple);}
+.kpi-label{font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
+.kpi-value{font-size:24px;font-weight:900;color:var(--text-dark);margin-bottom:4px;}
+.kpi-sub{font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px;}
+.kpi-sub.up{color:var(--green);}
+.kpi-sub.down{color:var(--red);}
+.kpi-sub.neutral{color:var(--text-light);}
+/* TABLE */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--bg);}
+th{padding:10px 14px;text-align:left;font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;}
+td{padding:12px 14px;border-bottom:1px solid var(--bg);color:var(--text-dark);font-weight:600;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#FAFCFE;}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-income{background:var(--green-light);color:var(--green-dark);}
+.badge-expense{background:var(--red-light);color:var(--red-dark);}
+.badge-paid{background:var(--green-light);color:var(--green-dark);}
+.badge-pending{background:var(--orange-light);color:var(--orange-dark);}
+.badge-overdue{background:var(--red-light);color:var(--red-dark);}
+.badge-partial{background:var(--blue-light);color:#1E40AF;}
+/* FORMS */
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:11px;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text-dark);background:var(--bg);outline:none;transition:border .15s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);background:#fff;}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+.modal-bg.open{display:flex;}
+.modal{background:var(--white);border-radius:18px;padding:28px 30px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .2s ease;}
+.modal-sm{width:420px;}
+.modal-lg{width:720px;}
+@keyframes modalIn{from{opacity:0;transform:translateY(-14px) scale(.97)}to{opacity:1;transform:none}}
+.modal-title{font-size:18px;font-weight:900;color:var(--text-dark);display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+.modal-title i{color:var(--primary);}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid var(--border);}
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px;}
+.tab-btn{padding:10px 18px;font-size:13px;font-weight:700;color:var(--text-mid);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;background:transparent;border-top:none;border-left:none;border-right:none;font-family:'Nunito',sans-serif;transition:all .15s;}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
+.tab-pane{display:none;animation:fadeUp .18s ease;}
+.tab-pane.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* PROGRESS */
+.progress-bg{background:var(--bg);border-radius:20px;height:8px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:20px;}
+.pf-green{background:linear-gradient(90deg,var(--green),#059669);}
+.pf-red{background:linear-gradient(90deg,var(--red),#DC2626);}
+.pf-primary{background:linear-gradient(90deg,var(--primary),var(--primary-dark));}
+.pf-orange{background:linear-gradient(90deg,var(--orange),#D97706);}
+/* AVATAR */
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;}
+.av-sm{width:28px;height:28px;font-size:10px;}
+.av-md{width:36px;height:36px;font-size:13px;}
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:500;display:flex;flex-direction:column;gap:10px;}
+.toast{background:var(--text-dark);color:#fff;padding:13px 20px;border-radius:12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:toastIn .22s ease;min-width:240px;}
+.toast i{font-size:17px;}
+.toast.success i{color:var(--green);}
+.toast.warning i{color:var(--orange);}
+.toast.error i{color:var(--red);}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:9px 14px;min-width:220px;}
+.search-box:focus-within{border-color:var(--primary);}
+.search-box i{color:var(--text-light);font-size:16px;}
+.search-box input{border:none;outline:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;width:100%;}
+.filter-sel{padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:var(--text-mid);background:var(--white);outline:none;cursor:pointer;}
+.filter-sel:focus{border-color:var(--primary);}
+/* EXPORT BUTTONS */
+.export-row{display:flex;gap:8px;flex-wrap:wrap;}
+.exp-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid;transition:all .15s;}
+.exp-pdf{background:var(--red-light);color:var(--red-dark);border-color:#FCA5A5;}.exp-pdf:hover{background:var(--red-dark);color:#fff;}
+.exp-excel{background:var(--green-light);color:var(--green-dark);border-color:#6EE7B7;}.exp-excel:hover{background:var(--green);color:#fff;}
+.exp-csv{background:var(--blue-light);color:#1E40AF;border-color:#93C5FD;}.exp-csv:hover{background:var(--blue);color:#fff;}
+/* LAYOUT HELPERS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.grid-main-side{display:grid;grid-template-columns:1fr 320px;gap:22px;}
+.divider{height:1px;background:var(--border);margin:16px 0;}
+/* AMOUNT COLORS */
+.amt-in{color:var(--green);font-weight:800;}
+.amt-out{color:var(--red-dark);font-weight:800;}
+.amt-neutral{color:var(--text-dark);font-weight:800;}
+
+body{display:block;background:#F0F4F8;}
+.aud-topnav{background:#1A2332;border-bottom:1px solid #2D3748;padding:0 32px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.aud-brand{display:flex;align-items:center;gap:10px;}
+.aud-brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#8B5CF6,#7C3AED);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.aud-brand-icon i{font-size:18px;color:#fff;}
+.aud-brand-name{font-size:16px;font-weight:900;color:#fff;}
+.aud-brand-sub{font-size:12px;color:rgba(255,255,255,.5);margin-left:4px;}
+.aud-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:rgba(255,255,255,.85);}
+.aud-page{max-width:1100px;margin:0 auto;padding:26px 24px;}
+.aud-hero{background:linear-gradient(135deg,#1A2332,#2D3748);border-radius:var(--radius);padding:24px 28px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;}
+.aud-hero-left h1{font-size:19px;font-weight:900;color:#fff;margin-bottom:4px;}
+.aud-hero-left p{font-size:13px;color:rgba(255,255,255,.6);}
+.aud-hero-stats{display:flex;gap:20px;}
+.ahs{text-align:center;background:rgba(255,255,255,.08);border-radius:12px;padding:12px 18px;}
+.ahs .n{font-size:20px;font-weight:900;color:#fff;}
+.ahs .l{font-size:11px;color:rgba(255,255,255,.6);font-weight:600;margin-top:2px;}
+.tabs-bar{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:22px;display:flex;overflow:hidden;}
+.atab{flex:1;padding:14px;text-align:center;font-size:13px;font-weight:700;color:var(--text-mid);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;background:transparent;border-top:none;border-left:none;border-right:none;font-family:"Nunito",sans-serif;}
+.atab.active{color:var(--purple);border-bottom-color:var(--purple);}
+.atab:hover:not(.active){background:var(--bg);}
+.tab-notif{background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:20px;padding:1px 6px;margin-left:4px;}
+/* DOWNLOAD SECTION */
+.dl-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:14px;display:flex;align-items:center;gap:16px;}
+.dl-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dl-icon i{font-size:22px;}
+.dl-title{font-size:14px;font-weight:800;color:var(--text-dark);}
+.dl-meta{font-size:12px;color:var(--text-light);margin-top:2px;}
+.dl-btns{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
+/* TRANSACTIONS */
+.txn-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bg);}
+.txn-row:last-child{border-bottom:none;}
+.txn-type{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.txn-type.in{background:var(--green-light);}
+.txn-type.in i{color:var(--green);}
+.txn-type.out{background:var(--red-light);}
+.txn-type.out i{color:var(--red-dark);}
+.flag-btn{background:var(--orange-light);color:var(--orange-dark);border:1px solid var(--orange);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:"Nunito",sans-serif;}
+.flag-btn:hover{background:var(--orange);color:#fff;}
+.note-btn{background:var(--purple-light);color:var(--purple);border:1px solid var(--purple);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:"Nunito",sans-serif;}
+.note-btn:hover{background:var(--purple);color:#fff;}
+.flagged-row td{background:#FFFBEB !important;}
+.audit-note{font-size:11px;color:var(--orange-dark);font-style:italic;margin-top:3px;display:flex;align-items:center;gap:4px;}
+</style>
+</head>
+<body>
+<!-- AUDITOR NAV -->
+<div class="aud-topnav">
+  <div class="aud-brand">
+    <div class="aud-brand-icon"><i class="ti ti-shield-check"></i></div>
+    <div class="aud-brand-name">Audit Portal</div>
+    <span class="aud-brand-sub">— M Business</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="aud-chip"><div class="av av-sm" style="background:#8B5CF6;">RA</div>Rajan Auditors & Co.</div>
+    <div class="aud-chip" style="color:rgba(255,255,255,.5);cursor:pointer;" onclick="location.href='auditor-login.html'"><i class="ti ti-logout" style="font-size:14px;"></i>Logout</div>
+  </div>
+</div>
+
+<div class="aud-page">
+  <!-- HERO -->
+  <div class="aud-hero">
+    <div class="aud-hero-left">
+      <h1>YENCODE Technologies Pvt Ltd — Audit Access</h1>
+      <p>FY 2025-26 &nbsp;·&nbsp; Period: June 2026 &nbsp;·&nbsp; Last shared: Jun 5, 2026 at 11:42 AM</p>
+    </div>
+    <div class="aud-hero-stats">
+      <div class="ahs"><div class="n">₹18.4L</div><div class="l">Total Income</div></div>
+      <div class="ahs"><div class="n">₹9.9L</div><div class="l">Total Expenses</div></div>
+      <div class="ahs"><div class="n">₹8.5L</div><div class="l">Net Profit</div></div>
+    </div>
+  </div>
+
+  <!-- PERIOD SELECTOR -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+    <span style="font-size:13px;font-weight:700;color:var(--text-mid);">Period:</span>
+    <select class="filter-sel" style="font-size:12px;"><option>June 2026</option><option>May 2026</option><option>Q1 2026</option><option>Q2 2026</option><option>FY 2025-26</option></select>
+    <span style="font-size:13px;font-weight:700;color:var(--text-mid);">Account:</span>
+    <select class="filter-sel" style="font-size:12px;"><option>All Accounts</option><option>HDFC — ••••4821</option><option>ICICI — ••••7734</option></select>
+    <span style="font-size:13px;font-weight:700;color:var(--text-mid);">Type:</span>
+    <select class="filter-sel" style="font-size:12px;"><option>All Transactions</option><option>Income Only</option><option>Expenses Only</option></select>
+  </div>
+
+  <!-- TABS -->
+  <div style="display:flex;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:22px;overflow:hidden;">
+    <button class="atab active" onclick="switchATab('statements',this)"><i class="ti ti-file-analytics" style="font-size:14px;margin-right:5px;"></i>Statements</button>
+    <button class="atab" onclick="switchATab('transactions',this)"><i class="ti ti-list" style="font-size:14px;margin-right:5px;"></i>All Transactions</button>
+    <button class="atab" onclick="switchATab('bank',this)"><i class="ti ti-building-bank" style="font-size:14px;margin-right:5px;"></i>Bank Reconciliation</button>
+    <button class="atab" onclick="switchATab('notes',this)"><i class="ti ti-message-2" style="font-size:14px;margin-right:5px;"></i>Audit Notes<span class="tab-notif">2</span></button>
+  </div>
+
+  <!-- TAB: STATEMENTS (DOWNLOADS) -->
+  <div id="atab-statements">
+    <div style="font-size:13px;color:var(--text-mid);margin-bottom:16px;padding:12px 16px;background:var(--primary-light);border-radius:10px;border-left:4px solid var(--primary);font-weight:600;">
+      <i class="ti ti-info-circle" style="margin-right:6px;color:var(--primary);"></i>
+      All statements are for <strong>June 2026</strong>. Use the period selector above to change the date range.
+    </div>
+    
+<div style="background:linear-gradient(135deg,#1A2332,#2D3748);border-radius:14px;padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+  <div style="width:44px;height:44px;background:rgba(139,92,246,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <i class="ti ti-upload" style="color:#8B5CF6;font-size:22px;"></i>
+  </div>
+  <div style="flex:1;">
+    <div style="font-size:14px;font-weight:800;color:#fff;">Last Import: HDFC ••••4821 — Jun 5, 2026</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;">144 transactions imported · 4 duplicates skipped · 1 flagged for review</div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <span style="background:rgba(38,194,129,.2);border:1px solid rgba(38,194,129,.4);color:#6EE7B7;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:700;">✓ Reconciled</span>
+    <button class="exp-btn exp-pdf" onclick="dlToast('Imported Statement','PDF')"><i class="ti ti-file-type-pdf"></i>Download</button>
+  </div>
+</div>
+    <div class="dl-card">
+      <div class="dl-icon" style="background:var(--green-light);"><i class="ti ti-arrow-bar-down" style="color:var(--green);"></i></div>
+      <div><div class="dl-title">Income Statement</div><div class="dl-meta">18 transactions · ₹18,42,000 total · June 2026</div></div>
+      <div class="dl-btns">
+        <button class="exp-btn exp-pdf" onclick="dlToast('Income Statement','PDF')"><i class="ti ti-file-type-pdf"></i>PDF</button>
+        <button class="exp-btn exp-excel" onclick="dlToast('Income Statement','Excel')"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+        <button class="exp-btn exp-csv" onclick="dlToast('Income Statement','CSV')"><i class="ti ti-file-text"></i>CSV</button>
+      </div>
+    </div>
+    <div class="dl-card">
+      <div class="dl-icon" style="background:var(--red-light);"><i class="ti ti-arrow-bar-up" style="color:var(--red-dark);"></i></div>
+      <div><div class="dl-title">Expense Statement</div><div class="dl-meta">32 transactions · ₹9,87,500 total · June 2026</div></div>
+      <div class="dl-btns">
+        <button class="exp-btn exp-pdf" onclick="dlToast('Expense Statement','PDF')"><i class="ti ti-file-type-pdf"></i>PDF</button>
+        <button class="exp-btn exp-excel" onclick="dlToast('Expense Statement','Excel')"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+        <button class="exp-btn exp-csv" onclick="dlToast('Expense Statement','CSV')"><i class="ti ti-file-text"></i>CSV</button>
+      </div>
+    </div>
+    <div class="dl-card">
+      <div class="dl-icon" style="background:var(--primary-light);"><i class="ti ti-chart-bar" style="color:var(--primary);"></i></div>
+      <div><div class="dl-title">Profit & Loss Statement</div><div class="dl-meta">Net profit ₹8,54,500 · 46% margin · June 2026</div></div>
+      <div class="dl-btns">
+        <button class="exp-btn exp-pdf" onclick="dlToast('P&L Statement','PDF')"><i class="ti ti-file-type-pdf"></i>PDF</button>
+        <button class="exp-btn exp-excel" onclick="dlToast('P&L Statement','Excel')"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+        <button class="exp-btn exp-csv" onclick="dlToast('P&L Statement','CSV')"><i class="ti ti-file-text"></i>CSV</button>
+      </div>
+    </div>
+    <div class="dl-card">
+      <div class="dl-icon" style="background:var(--orange-light);"><i class="ti ti-building-bank" style="color:var(--orange);"></i></div>
+      <div><div class="dl-title">Bank Statement — HDFC ••••4821</div><div class="dl-meta">148 transactions · Closing ₹12,84,320 · June 2026</div></div>
+      <div class="dl-btns">
+        <button class="exp-btn exp-pdf" onclick="dlToast('Bank Statement HDFC','PDF')"><i class="ti ti-file-type-pdf"></i>PDF</button>
+        <button class="exp-btn exp-excel" onclick="dlToast('Bank Statement HDFC','Excel')"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+        <button class="exp-btn exp-csv" onclick="dlToast('Bank Statement HDFC','CSV')"><i class="ti ti-file-text"></i>CSV</button>
+      </div>
+    </div>
+    <div class="dl-card">
+      <div class="dl-icon" style="background:var(--purple-light);"><i class="ti ti-building-bank" style="color:var(--purple);"></i></div>
+      <div><div class="dl-title">Bank Statement — ICICI ••••7734</div><div class="dl-meta">52 transactions · Closing ₹4,21,800 · June 2026</div></div>
+      <div class="dl-btns">
+        <button class="exp-btn exp-pdf" onclick="dlToast('Bank Statement ICICI','PDF')"><i class="ti ti-file-type-pdf"></i>PDF</button>
+        <button class="exp-btn exp-excel" onclick="dlToast('Bank Statement ICICI','Excel')"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+        <button class="exp-btn exp-csv" onclick="dlToast('Bank Statement ICICI','CSV')"><i class="ti ti-file-text"></i>CSV</button>
+      </div>
+    </div>
+    <div class="dl-card" style="border:2px solid var(--text-dark);">
+      <div class="dl-icon" style="background:var(--bg);"><i class="ti ti-files" style="color:var(--text-dark);"></i></div>
+      <div><div class="dl-title">Complete Financial Package</div><div class="dl-meta">All statements combined — Income + Expenses + P&L + Bank · June 2026</div></div>
+      <div class="dl-btns">
+        <button class="exp-btn exp-pdf" style="font-size:13px;padding:9px 18px;" onclick="dlToast('Complete Financial Package','PDF')"><i class="ti ti-file-type-pdf"></i>Full PDF</button>
+        <button class="exp-btn exp-excel" style="font-size:13px;padding:9px 18px;" onclick="dlToast('Complete Package','Excel')"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: ALL TRANSACTIONS -->
+  <div id="atab-transactions" style="display:none;">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:15px;font-weight:800;">All Transactions — June 2026</div>
+        <div class="export-row">
+          <button class="exp-btn exp-pdf" onclick="dlToast('All Transactions','PDF')"><i class="ti ti-file-type-pdf"></i>PDF</button>
+          <button class="exp-btn exp-excel" onclick="dlToast('All Transactions','Excel')"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+          <button class="exp-btn exp-csv" onclick="dlToast('All Transactions','CSV')"><i class="ti ti-file-text"></i>CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Ref</th><th>Description</th><th>Type</th><th>Amount</th><th>Mode</th><th>Status</th><th>Audit Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Jun 5</td><td style="color:var(--primary);font-weight:700;">INV-019</td><td>NovaMart — Milestone 3</td><td><span class="badge badge-income">Income</span></td><td class="amt-in">+₹2,12,500</td><td>Bank Transfer</td><td><span class="badge badge-pending">Pending</span></td><td><div style="display:flex;gap:5px;"><button class="flag-btn" onclick="flagRow(this)"><i class="ti ti-flag" style="font-size:11px;"></i>Flag</button><button class="note-btn" onclick="addNote(this)"><i class="ti ti-message-2" style="font-size:11px;"></i>Note</button></div></td></tr>
+            <tr><td>Jun 4</td><td style="color:var(--red-dark);font-weight:700;">EXP-062</td><td>AWS Cloud — June</td><td><span class="badge badge-expense">Expense</span></td><td class="amt-out">−₹42,000</td><td>Auto-debit</td><td><span class="badge badge-paid">Paid</span></td><td><div style="display:flex;gap:5px;"><button class="flag-btn" onclick="flagRow(this)"><i class="ti ti-flag" style="font-size:11px;"></i>Flag</button><button class="note-btn" onclick="addNote(this)"><i class="ti ti-message-2" style="font-size:11px;"></i>Note</button></div></td></tr>
+            <tr class="flagged-row" id="flaggedRow1"><td>Jun 5</td><td style="color:var(--orange-dark);font-weight:700;">BANK-TXN</td><td>Unknown Credit — IMPS<div class="audit-note"><i class="ti ti-flag" style="font-size:11px;"></i>Flagged: Source unclear — needs clarification</div></td><td><span class="badge badge-income">Income</span></td><td class="amt-in">+₹50,000</td><td>IMPS</td><td><span class="badge badge-pending">Unmatched</span></td><td><div style="display:flex;gap:5px;"><button class="flag-btn" style="background:var(--orange);color:#fff;border-color:var(--orange);">Flagged</button><button class="note-btn" onclick="addNote(this)"><i class="ti ti-message-2" style="font-size:11px;"></i>Note</button></div></td></tr>
+            <tr><td>Jun 3</td><td style="color:var(--primary);font-weight:700;">INV-018</td><td>MediCore — Milestone 1</td><td><span class="badge badge-income">Income</span></td><td class="amt-in">+₹1,87,500</td><td>NEFT</td><td><span class="badge badge-paid">Paid</span></td><td><div style="display:flex;gap:5px;"><button class="flag-btn" onclick="flagRow(this)"><i class="ti ti-flag" style="font-size:11px;"></i>Flag</button><button class="note-btn" onclick="addNote(this)"><i class="ti ti-message-2" style="font-size:11px;"></i>Note</button></div></td></tr>
+            <tr><td>Jun 2</td><td style="color:var(--red-dark);font-weight:700;">EXP-063</td><td>Office Rent — June</td><td><span class="badge badge-expense">Expense</span></td><td class="amt-out">−₹75,000</td><td>NEFT</td><td><span class="badge badge-paid">Paid</span></td><td><div style="display:flex;gap:5px;"><button class="flag-btn" onclick="flagRow(this)"><i class="ti ti-flag" style="font-size:11px;"></i>Flag</button><button class="note-btn" onclick="addNote(this)"><i class="ti ti-message-2" style="font-size:11px;"></i>Note</button></div></td></tr>
+            <tr><td>Jun 1</td><td style="color:var(--red-dark);font-weight:700;">EXP-061</td><td>Salaries — June Payroll</td><td><span class="badge badge-expense">Expense</span></td><td class="amt-out">−₹5,40,000</td><td>Bank Transfer</td><td><span class="badge badge-paid">Paid</span></td><td><div style="display:flex;gap:5px;"><button class="flag-btn" onclick="flagRow(this)"><i class="ti ti-flag" style="font-size:11px;"></i>Flag</button><button class="note-btn" onclick="addNote(this)"><i class="ti ti-message-2" style="font-size:11px;"></i>Note</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: BANK RECONCILIATION -->
+  <div id="atab-bank" style="display:none;">
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px;"><i class="ti ti-building-bank" style="color:var(--primary);"></i>HDFC ••••4821</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);"><span style="color:var(--text-light);">Opening Balance</span><span style="font-weight:700;">₹8,62,320</span></div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);"><span style="color:var(--text-light);">Total Credits</span><span class="amt-in">+₹18,42,000</span></div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);"><span style="color:var(--text-light);">Total Debits</span><span class="amt-out">−₹14,20,000</span></div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0;"><span style="font-weight:800;">Closing Balance</span><span style="font-weight:900;color:var(--primary);font-size:15px;">₹12,84,320</span></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:7px;">
+          <button class="exp-btn exp-pdf" onclick="dlToast('HDFC Bank Statement','PDF')"><i class="ti ti-file-type-pdf"></i>PDF</button>
+          <button class="exp-btn exp-excel" onclick="dlToast('HDFC Bank Statement','Excel')"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+          <button class="exp-btn exp-csv" onclick="dlToast('HDFC Bank Statement','CSV')"><i class="ti ti-file-text"></i>CSV</button>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px;"><i class="ti ti-building-bank" style="color:var(--purple);"></i>ICICI ••••7734</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);"><span style="color:var(--text-light);">Opening Balance</span><span style="font-weight:700;">₹2,80,000</span></div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);"><span style="color:var(--text-light);">Total Credits</span><span class="amt-in">+₹3,50,000</span></div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg);"><span style="color:var(--text-light);">Total Debits</span><span class="amt-out">−₹2,08,200</span></div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0;"><span style="font-weight:800;">Closing Balance</span><span style="font-weight:900;color:var(--purple);font-size:15px;">₹4,21,800</span></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:7px;">
+          <button class="exp-btn exp-pdf" onclick="dlToast('ICICI Bank Statement','PDF')"><i class="ti ti-file-type-pdf"></i>PDF</button>
+          <button class="exp-btn exp-excel" onclick="dlToast('ICICI Bank Statement','Excel')"><i class="ti ti-file-spreadsheet"></i>Excel</button>
+          <button class="exp-btn exp-csv" onclick="dlToast('ICICI Bank Statement','CSV')"><i class="ti ti-file-text"></i>CSV</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:18px;">
+      <div style="font-size:14px;font-weight:800;margin-bottom:14px;">Combined Statement — Both Accounts</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="exp-btn exp-pdf" style="font-size:13px;padding:10px 20px;" onclick="dlToast('Combined Bank Statement','PDF')"><i class="ti ti-file-type-pdf"></i>Download Combined PDF</button>
+        <button class="exp-btn exp-excel" style="font-size:13px;padding:10px 20px;" onclick="dlToast('Combined Bank Statement','Excel')"><i class="ti ti-file-spreadsheet"></i>Download Excel</button>
+        <button class="exp-btn exp-csv" style="font-size:13px;padding:10px 20px;" onclick="dlToast('Combined Bank Statement','CSV')"><i class="ti ti-file-text"></i>Download CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: AUDIT NOTES -->
+  <div id="atab-notes" style="display:none;">
+    <div class="card" style="margin-bottom:18px;">
+      <div style="font-size:14px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:7px;"><i class="ti ti-message-2" style="color:var(--purple);"></i>Add Audit Note</div>
+      <div class="form-group"><label>Transaction / Reference</label><input placeholder="e.g. INV-019 or EXP-063" class="inp" style="border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:Nunito,sans-serif;font-size:13px;width:100%;outline:none;background:var(--bg);" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--border)'"></div>
+      <div class="form-group"><label>Note / Remark</label><textarea placeholder="Enter your audit observation, query or remark here..." style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:13px;color:var(--text-dark);background:var(--bg);outline:none;min-height:90px;resize:vertical;transition:border .15s;" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--border)'"></textarea></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" style="background:var(--orange-light);color:var(--orange-dark);border:1px solid var(--orange);" onclick="saveNote('flag')"><i class="ti ti-flag"></i>Flag Transaction</button>
+        <button class="btn" style="background:var(--purple-light);color:var(--purple);border:1px solid var(--purple);" onclick="saveNote('note')"><i class="ti ti-message-2"></i>Save Note</button>
+      </div>
+    </div>
+    <!-- EXISTING NOTES -->
+    <div class="card">
+      <div style="font-size:14px;font-weight:800;margin-bottom:16px;">Existing Notes & Flags</div>
+      <div style="padding:14px;background:var(--orange-light);border-radius:10px;border-left:4px solid var(--orange);margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:800;color:var(--orange-dark);margin-bottom:4px;display:flex;align-items:center;gap:6px;"><i class="ti ti-flag" style="font-size:14px;"></i>FLAGGED — BANK-TXN (Jun 5)</div>
+        <div style="font-size:13px;color:var(--text-dark);">Unknown credit of ₹50,000 via IMPS. Source of funds unclear. Require supporting documents from management.</div>
+        <div style="font-size:11px;color:var(--text-light);margin-top:6px;">Added by: Rajan Auditors & Co. &nbsp;·&nbsp; Jun 5, 2026 at 2:30 PM</div>
+      </div>
+      <div style="padding:14px;background:var(--purple-light);border-radius:10px;border-left:4px solid var(--purple);">
+        <div style="font-size:12px;font-weight:800;color:var(--purple);margin-bottom:4px;display:flex;align-items:center;gap:6px;"><i class="ti ti-message-2" style="font-size:14px;"></i>NOTE — EXP-063 (Jun 2)</div>
+        <div style="font-size:13px;color:var(--text-dark);">Office rent payment verified against lease agreement. Amount matches contracted rent of ₹75,000/month. No issues.</div>
+        <div style="font-size:11px;color:var(--text-light);margin-top:6px;">Added by: Rajan Auditors & Co. &nbsp;·&nbsp; Jun 5, 2026 at 2:15 PM</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="toast-wrap" id="tw"></div>
+<script>
+function switchATab(id,btn){
+  document.querySelectorAll(".atab").forEach(b=>b.classList.remove("active"));
+  ["statements","transactions","bank","notes"].forEach(t=>{document.getElementById("atab-"+t).style.display="none";});
+  btn.classList.add("active");
+  document.getElementById("atab-"+id).style.display="block";
+}
+function dlToast(name,fmt){toast(`Downloading ${name} as ${fmt}...`,"success");}
+function flagRow(btn){
+  const row=btn.closest("tr");
+  row.style.background="#FFFBEB";
+  btn.textContent="Flagged";btn.style.background="var(--orange)";btn.style.color="#fff";btn.style.borderColor="var(--orange)";
+  toast("Transaction flagged for review!","warning");
+}
+function addNote(btn){const n=prompt("Enter audit note:");if(n)toast("Note saved: "+n,"success");}
+function saveNote(type){toast(type==="flag"?"Transaction flagged!":"Audit note saved!","success");}
+function toast(msg,type="success"){const w=document.getElementById("tw");const t=document.createElement("div");t.className="toast "+type;t.innerHTML=`<i class="ti ti-${type==="success"?"circle-check":"alert-circle"}"></i>${msg}`;w.appendChild(t);setTimeout(()=>t.remove(),3500);}
+</script>
+</body></html>

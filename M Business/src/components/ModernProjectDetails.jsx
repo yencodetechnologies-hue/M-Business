@@ -178,7 +178,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], onEdit, onUpdate, fetchProjects, fetchTasks }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], onEdit, onUpdate, fetchProjects, fetchTasks, onMessageTeam }) {
   const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
@@ -1012,7 +1012,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
               tasks={currTasks}
               user={{ role: 'client', name: currProject.client }}
               onBack={() => setShowPortalPreview(false)}
-              onMessageTeam={() => alert("Message Team clicked in preview!")}
+              onMessageTeam={() => {
+                setShowPortalPreview(false);
+                if (onMessageTeam) onMessageTeam();
+              }}
             />
           </div>
         </div>

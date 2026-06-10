@@ -589,19 +589,14 @@ export default function MySubscriptions({ user, onSubscriptionSuccess, initialTa
   const startTrial = async (targetPkg = null) => {
     try {
       setPayLoading("Trial");
-      const payload = { 
-        userId, 
-        userEmail, 
-        userName,
-        // Pass limits if a specific free package was selected
-        clientLimit: targetPkg?.clientLimit,
-        employeeLimit: targetPkg?.employeeLimit,
-        managerLimit: targetPkg?.managerLimit,
-        businessLimit: targetPkg?.businessLimit,
-        planName: targetPkg?.title || "Free",
-        features: targetPkg?.features
-      };
-      const res = await axios.post(`${BASE_URL}/api/subscriptions/start-trial`, payload);
+const payload = {
+  amount: plan.amount, // numeric, no trailing .00
+  productinfo: plan.name,
+  firstname: user.firstName,
+  email: user.email,
+  phone: user.phone || ''
+};
+const res = await axios.post(`${BASE_URL}/api/payments/payu/init`, payload);
       if (res.data.success) {
         showToast(`🎉 30-day free trial started${targetPkg ? ` with ${targetPkg.title}` : ""}!`);
         await fetchData();

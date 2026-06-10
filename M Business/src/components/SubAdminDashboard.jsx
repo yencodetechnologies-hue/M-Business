@@ -4976,6 +4976,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                     onEdit={() => setActive("edit-project")}
                     onUpdate={fetchTasks}
                     fetchProjects={fetchProjects}
+                    onMessageTeam={() => setActive("messaging")}
                   />
                 )}
                 {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} onAddClient={() => {

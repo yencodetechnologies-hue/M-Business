@@ -12,10 +12,38 @@ router.post("/verify", PaymentController.verifyPayment);
 // Payment Failure Handler
 router.post("/failure", PaymentController.handlePaymentFailure);
 
-// PayU Endpoints
-router.post("/payu/init", PaymentController.initPayUPayment);
-router.post("/payu/success", PaymentController.payuSuccessCallback);
-router.post("/payu/failure", PaymentController.payuFailureCallback);
+// PayU Endpoints (integrated via PaymentController router)
+router.post('/payu/init', PaymentController.initPayU);
+
+// PayU Success Callback (PayU POSTs here after successful payment)
+router.post('/payu/success', async (req, res) => {
+  try {
+    const { txnid, status, amount, productinfo, firstname, email, mihpayid } = req.body;
+    console.log('PayU success callback:', req.body);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    // Redirect to frontend with success params
+    res.redirect(`${frontendUrl}/?payment=success&plan=${encodeURIComponent(productinfo)}&txnid=${txnid}&mihpayid=${mihpayid || ''}`);
+  } catch (err) {
+    console.error('PayU success handler error:', err);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/?payment=success`);
+  }
+});
+
+// PayU Failure Callback (PayU POSTs here after failed payment)
+router.post('/payu/failure', async (req, res) => {
+  try {
+    const { txnid, status, productinfo } = req.body;
+    console.log('PayU failure callback:', req.body);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/?payment=failed&plan=${encodeURIComponent(productinfo || '')}&txnid=${txnid || ''}`);
+  } catch (err) {
+    console.error('PayU failure handler error:', err);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/?payment=failed`);
+  }
+});
+
 
 // Process Refund
 router.post("/refund", PaymentController.processRefund);

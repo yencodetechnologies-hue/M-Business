@@ -1,18 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../config';
 
 export default function FinBank() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isLinkBankModalOpen, setIsLinkBankModalOpen] = useState(false);
+  const [banks, setBanks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newBank, setNewBank] = useState({ bankName: 'HDFC Bank', accountType: 'Current', accountNo: '', ifscCode: '', holderName: '' });
+
+  const fetchBanks = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/banks`, {
+        headers: { "company-id": localStorage.getItem("companyId") || "" }
+      });
+      setBanks(res.data || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBanks();
+  }, []);
 
   const openImport = () => setIsImportModalOpen(true);
   const closeImport = () => setIsImportModalOpen(false);
 
-  const linkBank = () => {
-    setIsLinkBankModalOpen(false);
-    alert('Bank account linked! Verify the test deposit.');
+  const linkBank = async () => {
+    try {
+      await axios.post(`${BASE_URL}/api/banks`, {
+        ...newBank,
+        balance: Math.floor(Math.random() * 500000) + 10000 // random starting balance for demo
+      }, {
+        headers: { "company-id": localStorage.getItem("companyId") || "" }
+      });
+      setIsLinkBankModalOpen(false);
+      alert('Bank account linked! Verify the test deposit.');
+      fetchBanks();
+    } catch (e) {
+      alert('Failed to link bank');
+    }
   };
 
   const toast = (msg) => alert(msg);
+
+  const colors = [
+    { bg: 'linear-gradient(135deg,#00BCD4,#0097A7)', badge: '#00BCD4' },
+    { bg: 'linear-gradient(135deg,#8B5CF6,#7C3AED)', badge: '#8B5CF6' },
+    { bg: 'linear-gradient(135deg,#F59E0B,#D97706)', badge: '#F59E0B' },
+    { bg: 'linear-gradient(135deg,#10B981,#059669)', badge: '#10B981' }
+  ];
 
   return (
     <>
@@ -100,28 +140,24 @@ a { text-decoration: none; color: inherit; }
         </div>
         <div className="content">
           <div className="grid-2" style={{marginBottom:'22px'}}>
-            <div className="bank-card" style={{background:'linear-gradient(135deg,#00BCD4,#0097A7)'}}>
-              <div className="bank-name">HDFC Bank — Current Account</div>
-              <div className="bank-bal">₹12,84,320</div>
-              <div className="bank-acc"><i className="ti ti-credit-card"></i> •••• •••• •••• 4821 &nbsp;·&nbsp; IFSC: HDFC0001234</div>
-              <div style={{display:'flex',gap:'8px',marginTop:'14px'}}>
-                <span style={{background:'rgba(255,255,255,.2)',borderRadius:'8px',padding:'4px 12px',fontSize:'11px',fontWeight:700}}>Primary</span>
-                <span style={{background:'rgba(255,255,255,.2)',borderRadius:'8px',padding:'4px 12px',fontSize:'11px',fontWeight:700}}>Current A/C</span>
-              </div>
-            </div>
-            <div className="bank-card" style={{background:'linear-gradient(135deg,#8B5CF6,#7C3AED)'}}>
-              <div className="bank-name">ICICI Bank — Savings Account</div>
-              <div className="bank-bal">₹4,21,800</div>
-              <div className="bank-acc"><i className="ti ti-credit-card"></i> •••• •••• •••• 7734 &nbsp;·&nbsp; IFSC: ICIC0004567</div>
-              <div style={{display:'flex',gap:'8px',marginTop:'14px'}}>
-                <span style={{background:'rgba(255,255,255,.2)',borderRadius:'8px',padding:'4px 12px',fontSize:'11px',fontWeight:700}}>Secondary</span>
-                <span style={{background:'rgba(255,255,255,.2)',borderRadius:'8px',padding:'4px 12px',fontSize:'11px',fontWeight:700}}>Savings A/C</span>
-              </div>
-            </div>
+            {loading ? <div style={{padding:20}}>Loading banks...</div> : banks.length === 0 ? <div style={{padding:20}}>No bank accounts linked yet.</div> : banks.map((bank, idx) => {
+              const colorTheme = colors[idx % colors.length];
+              return (
+                <div key={bank._id || idx} className="bank-card" style={{background: colorTheme.bg}}>
+                  <div className="bank-name">{bank.bankName} — {bank.accountType} Account</div>
+                  <div className="bank-bal">₹{Number(bank.balance || 0).toLocaleString('en-IN')}</div>
+                  <div className="bank-acc"><i className="ti ti-credit-card"></i> •••• •••• •••• {bank.accountNo?.slice(-4) || 'XXXX'} &nbsp;·&nbsp; IFSC: {bank.ifscCode || 'N/A'}</div>
+                  <div style={{display:'flex',gap:'8px',marginTop:'14px'}}>
+                    <span style={{background:'rgba(255,255,255,.2)',borderRadius:'8px',padding:'4px 12px',fontSize:'11px',fontWeight:700}}>{idx === 0 ? 'Primary' : 'Secondary'}</span>
+                    <span style={{background:'rgba(255,255,255,.2)',borderRadius:'8px',padding:'4px 12px',fontSize:'11px',fontWeight:700}}>{bank.accountType} A/C</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           <div className="kpi-grid kpi-grid-4" style={{marginBottom:'22px'}}>
-            <div className="kpi profit"><div className="kpi-label">Total Balance</div><div className="kpi-value">₹17,06,120</div><div className="kpi-sub up"><i className="ti ti-building-bank"></i>Across 2 accounts</div></div>
+            <div className="kpi profit"><div className="kpi-label">Total Balance</div><div className="kpi-value">₹{banks.reduce((s,b)=>s+Number(b.balance||0), 0).toLocaleString('en-IN')}</div><div className="kpi-sub up"><i className="ti ti-building-bank"></i>Across {banks.length} accounts</div></div>
             <div className="kpi income"><div className="kpi-label">Matched Txns</div><div className="kpi-value">142</div><div className="kpi-sub up"><i className="ti ti-check"></i>96% reconciled</div></div>
             <div className="kpi pending"><div className="kpi-label">Unmatched</div><div className="kpi-value">6</div><div className="kpi-sub down"><i className="ti ti-alert-circle"></i>Need review</div></div>
             <div className="kpi expense"><div className="kpi-label">Last Reconciled</div><div className="kpi-value">Jun 4</div><div className="kpi-sub neutral"><i className="ti ti-clock"></i>Yesterday</div></div>
@@ -179,14 +215,14 @@ a { text-decoration: none; color: inherit; }
       <div className={`modal-bg ${isLinkBankModalOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('modal-bg')) setIsLinkBankModalOpen(false) }}>
         <div className="modal modal-sm">
           <div className="modal-title"><i className="ti ti-building-bank"></i>Link Bank Account</div>
-          <div className="form-group"><label>Bank Name *</label><select><option>HDFC Bank</option><option>ICICI Bank</option></select></div>
-          <div className="form-group"><label>Account Number *</label><input placeholder="Enter account number" /></div>
+          <div className="form-group"><label>Bank Name *</label><select value={newBank.bankName} onChange={e => setNewBank({...newBank, bankName: e.target.value})}><option>HDFC Bank</option><option>ICICI Bank</option><option>State Bank of India</option><option>Axis Bank</option></select></div>
+          <div className="form-group"><label>Account Number *</label><input placeholder="Enter account number" value={newBank.accountNo} onChange={e => setNewBank({...newBank, accountNo: e.target.value})} /></div>
           <div className="form-group"><label>Confirm Account Number *</label><input placeholder="Re-enter account number" /></div>
           <div className="form-2col">
-            <div className="form-group"><label>IFSC Code *</label><input placeholder="e.g. HDFC0001234" /></div>
-            <div className="form-group"><label>Account Type</label><select><option>Current</option><option>Savings</option></select></div>
+            <div className="form-group"><label>IFSC Code *</label><input placeholder="e.g. HDFC0001234" value={newBank.ifscCode} onChange={e => setNewBank({...newBank, ifscCode: e.target.value})} /></div>
+            <div className="form-group"><label>Account Type</label><select value={newBank.accountType} onChange={e => setNewBank({...newBank, accountType: e.target.value})}><option>Current</option><option>Savings</option></select></div>
           </div>
-          <div className="form-group"><label>Account Holder Name</label><input defaultValue="YENCODE Technologies Pvt Ltd" /></div>
+          <div className="form-group"><label>Account Holder Name</label><input value={newBank.holderName} onChange={e => setNewBank({...newBank, holderName: e.target.value})} placeholder="e.g. YENCODE Technologies" /></div>
           <div style={{background:'var(--orange-light)',borderRadius:'10px',padding:'12px 14px',fontSize:'12px',color:'var(--orange-dark)',fontWeight:600,marginBottom:'16px',display:'flex',alignItems:'flex-start',gap:'8px'}}>
             <i className="ti ti-shield-lock" style={{fontSize:'16px',marginTop:'1px'}}></i>
             A small test deposit of ₹1 will be made to verify the account.

@@ -494,7 +494,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <div className="mpc-checklist">
               <div className={`mpc-cl-item ${name ? 'ok' : 'pending'}`}><i className={`ti ${name ? 'ti-circle-check' : 'ti-circle'}`} /> Project name</div>
               <div className={`mpc-cl-item ${client ? 'ok' : 'pending'}`}><i className={`ti ${client ? 'ti-circle-check' : 'ti-circle'}`} /> Client selected</div>
-              <div className={`mpc-cl-item ${(start || end) ? 'ok' : 'pending'}`}><i className={`ti ${(start || end) ? 'ti-circle-check' : 'ti-circle'}`} /> Dates set</div>
+              <div className={`mpc-cl-item ${(start && end) ? 'ok' : 'pending'}`}><i className={`ti ${(start && end) ? 'ti-circle-check' : 'ti-circle'}`} /> Dates set</div>
               <div className={`mpc-cl-item ${assigned.length > 0 ? 'ok' : 'pending'}`}><i className={`ti ${assigned.length > 0 ? 'ti-circle-check' : 'ti-circle'}`} /> Team assigned ({assigned.length})</div>
               <div className={`mpc-cl-item ${budget ? 'ok' : 'pending'}`}><i className={`ti ${budget ? 'ti-circle-check' : 'ti-circle'}`} /> Budget entered</div>
             </div>

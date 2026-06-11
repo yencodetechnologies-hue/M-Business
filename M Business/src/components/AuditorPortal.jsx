@@ -1,24 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../config';
 
 export default function AuditorPortal({ onBack }) {
   const [activeTab, setActiveTab] = useState('statements');
+  const [notes, setNotes] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [banks, setBanks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newNote, setNewNote] = useState({ transactionId: '', note: '' });
+
+  const fetchData = async () => {
+    try {
+      const headers = { "company-id": localStorage.getItem("companyId") || "" };
+      const [nRes, iRes, eRes, bRes] = await Promise.all([
+        axios.get(`${BASE_URL}/api/audit-notes`, { headers }).catch(() => ({ data: [] })),
+        axios.get(`${BASE_URL}/api/income`, { headers }).catch(() => ({ data: [] })),
+        axios.get(`${BASE_URL}/api/expenses`, { headers }).catch(() => ({ data: [] })),
+        axios.get(`${BASE_URL}/api/banks`, { headers }).catch(() => ({ data: [] }))
+      ]);
+
+      setNotes(nRes.data || []);
+      setBanks(bRes.data || []);
+
+      const inc = (iRes.data || []).map(x => ({ ...x, _type: 'Income' }));
+      const exp = (eRes.data || []).map(x => ({ ...x, _type: 'Expense' }));
+      setTransactions([...inc, ...exp].sort((a,b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const dlToast = (name, fmt) => {
     alert(`Downloading ${name} as ${fmt}...`);
   };
 
-  const flagRow = () => {
-    alert('Transaction flagged for review!');
+  const saveNote = async (type) => {
+    if (!newNote.transactionId) return alert('Enter transaction ID');
+    try {
+      await axios.post(`${BASE_URL}/api/audit-notes`, {
+        transactionId: newNote.transactionId,
+        note: newNote.note,
+        flagged: type === 'flag'
+      }, { headers: { "company-id": localStorage.getItem("companyId") || "" } });
+      fetchData();
+      setNewNote({ transactionId: '', note: '' });
+      alert(type === 'flag' ? 'Transaction flagged!' : 'Audit note saved!');
+    } catch (e) {
+      alert('Failed to save note');
+    }
   };
 
-  const addNote = () => {
-    const n = prompt('Enter audit note:');
-    if (n) alert('Note saved: ' + n);
+  const flagRow = async (txn) => {
+    try {
+      await axios.post(`${BASE_URL}/api/audit-notes`, {
+        transactionId: txn.invoiceNumber || txn.expenseId || txn._id,
+        note: 'Flagged from quick action',
+        flagged: true,
+        transactionType: txn._type
+      }, { headers: { "company-id": localStorage.getItem("companyId") || "" } });
+      fetchData();
+      alert('Transaction flagged for review!');
+    } catch (e) {
+      alert('Failed to flag');
+    }
   };
 
-  const saveNote = (type) => {
-    alert(type === 'flag' ? 'Transaction flagged!' : 'Audit note saved!');
+  const addNoteQuick = async (txn) => {
+    const n = prompt('Enter audit note for ' + (txn.invoiceNumber || txn.expenseId || txn._id) + ':');
+    if (n) {
+      try {
+        await axios.post(`${BASE_URL}/api/audit-notes`, {
+          transactionId: txn.invoiceNumber || txn.expenseId || txn._id,
+          note: n,
+          flagged: false,
+          transactionType: txn._type
+        }, { headers: { "company-id": localStorage.getItem("companyId") || "" } });
+        fetchData();
+        alert('Note saved: ' + n);
+      } catch (e) {
+        alert('Failed to save note');
+      }
+    }
   };
+
+  const totalIncome = transactions.filter(t => t._type === 'Income').reduce((s,t) => s + Number(t.amount || t.totalAmount || 0), 0);
+  const totalExpense = transactions.filter(t => t._type === 'Expense').reduce((s,t) => s + Number(t.amount || t.totalAmount || 0), 0);
+  const netProfit = totalIncome - totalExpense;
 
   return (
     <>
@@ -123,9 +197,9 @@ tr:hover td{background:#FAFCFE;}
               <p>FY 2025-26 &nbsp;·&nbsp; Period: June 2026 &nbsp;·&nbsp; Last shared: Jun 5, 2026 at 11:42 AM</p>
             </div>
             <div className="aud-hero-stats">
-              <div className="ahs"><div className="n">₹18.4L</div><div className="l">Total Income</div></div>
-              <div className="ahs"><div className="n">₹9.9L</div><div className="l">Total Expenses</div></div>
-              <div className="ahs"><div className="n">₹8.5L</div><div className="l">Net Profit</div></div>
+              <div className="ahs"><div className="n">₹{totalIncome.toLocaleString('en-IN')}</div><div className="l">Total Income</div></div>
+              <div className="ahs"><div className="n">₹{totalExpense.toLocaleString('en-IN')}</div><div className="l">Total Expenses</div></div>
+              <div className="ahs"><div className="n">₹{netProfit.toLocaleString('en-IN')}</div><div className="l">Net Profit</div></div>
             </div>
           </div>
 
@@ -142,25 +216,25 @@ tr:hover td{background:#FAFCFE;}
             <button className={`atab ${activeTab === 'statements' ? 'active' : ''}`} onClick={() => setActiveTab('statements')}><i className="ti ti-file-analytics" style={{marginRight:'5px'}}></i>Statements</button>
             <button className={`atab ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => setActiveTab('transactions')}><i className="ti ti-list" style={{marginRight:'5px'}}></i>All Transactions</button>
             <button className={`atab ${activeTab === 'bank' ? 'active' : ''}`} onClick={() => setActiveTab('bank')}><i className="ti ti-building-bank" style={{marginRight:'5px'}}></i>Bank Reconciliation</button>
-            <button className={`atab ${activeTab === 'notes' ? 'active' : ''}`} onClick={() => setActiveTab('notes')}><i className="ti ti-message-2" style={{marginRight:'5px'}}></i>Audit Notes<span className="tab-notif">2</span></button>
+            <button className={`atab ${activeTab === 'notes' ? 'active' : ''}`} onClick={() => setActiveTab('notes')}><i className="ti ti-message-2" style={{marginRight:'5px'}}></i>Audit Notes{notes.length > 0 && <span className="tab-notif">{notes.length}</span>}</button>
           </div>
 
           {activeTab === 'statements' && (
             <div>
               <div style={{fontSize:'13px',color:'var(--text-mid)',marginBottom:'16px',padding:'12px 16px',background:'var(--primary-light)',borderRadius:'10px',borderLeft:'4px solid var(--primary)',fontWeight:600}}>
                 <i className="ti ti-info-circle" style={{marginRight:'6px',color:'var(--primary)'}}></i>
-                All statements are for <strong>June 2026</strong>.
+                Statements fetched directly from ledger.
               </div>
               <div className="dl-card">
                 <div className="dl-icon" style={{background:'var(--green-light)'}}><i className="ti ti-arrow-bar-down" style={{color:'var(--green)'}}></i></div>
-                <div><div className="dl-title">Income Statement</div><div className="dl-meta">18 transactions · ₹18,42,000 total · June 2026</div></div>
+                <div><div className="dl-title">Income Statement</div><div className="dl-meta">{transactions.filter(t=>t._type==='Income').length} transactions · ₹{totalIncome.toLocaleString('en-IN')} total</div></div>
                 <div className="dl-btns">
                   <button className="exp-btn exp-pdf" onClick={() => dlToast('Income Statement','PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
                 </div>
               </div>
               <div className="dl-card">
                 <div className="dl-icon" style={{background:'var(--red-light)'}}><i className="ti ti-arrow-bar-up" style={{color:'var(--red-dark)'}}></i></div>
-                <div><div className="dl-title">Expense Statement</div><div className="dl-meta">32 transactions · ₹9,87,500 total · June 2026</div></div>
+                <div><div className="dl-title">Expense Statement</div><div className="dl-meta">{transactions.filter(t=>t._type==='Expense').length} transactions · ₹{totalExpense.toLocaleString('en-IN')} total</div></div>
                 <div className="dl-btns">
                   <button className="exp-btn exp-pdf" onClick={() => dlToast('Expense Statement','PDF')}><i className="ti ti-file-type-pdf"></i>PDF</button>
                 </div>
@@ -177,8 +251,22 @@ tr:hover td{background:#FAFCFE;}
                 <table>
                   <thead><tr><th>Date</th><th>Ref</th><th>Description</th><th>Type</th><th>Amount</th><th>Status</th><th>Audit Actions</th></tr></thead>
                   <tbody>
-                    <tr><td>Jun 5</td><td style={{color:'var(--primary)',fontWeight:700}}>INV-019</td><td>NovaMart — Milestone 3</td><td><span className="badge badge-income">Income</span></td><td className="amt-in">+₹2,12,500</td><td><span className="badge badge-pending">Pending</span></td><td><div style={{display:'flex',gap:'5px'}}><button className="flag-btn" onClick={flagRow}><i className="ti ti-flag"></i>Flag</button><button className="note-btn" onClick={addNote}><i className="ti ti-message-2"></i>Note</button></div></td></tr>
-                    <tr className="flagged-row"><td>Jun 5</td><td style={{color:'var(--orange-dark)',fontWeight:700}}>BANK-TXN</td><td>Unknown Credit<div className="audit-note"><i className="ti ti-flag"></i>Flagged: Source unclear</div></td><td><span className="badge badge-income">Income</span></td><td className="amt-in">+₹50,000</td><td><span className="badge badge-pending">Unmatched</span></td><td><div style={{display:'flex',gap:'5px'}}><button className="flag-btn" style={{background:'var(--orange)',color:'#fff'}}><i className="ti ti-flag"></i>Flagged</button><button className="note-btn" onClick={addNote}><i className="ti ti-message-2"></i>Note</button></div></td></tr>
+                    {loading ? <tr><td colSpan="7">Loading...</td></tr> : transactions.length === 0 ? <tr><td colSpan="7">No transactions found.</td></tr> : transactions.map((txn, i) => {
+                      const id = txn.invoiceNumber || txn.expenseId || txn._id;
+                      const hasNote = notes.find(n => n.transactionId === id);
+                      const isFlagged = hasNote?.flagged;
+                      return (
+                        <tr key={i} className={isFlagged ? "flagged-row" : ""}>
+                          <td>{new Date(txn.date || txn.createdAt).toLocaleDateString()}</td>
+                          <td style={{color: isFlagged ? 'var(--orange-dark)' : 'var(--primary)', fontWeight: 700}}>{id}</td>
+                          <td>{txn.description || txn.clientName || 'Transaction'}{hasNote && <div className="audit-note"><i className="ti ti-message-2"></i>{isFlagged ? "Flagged: " : "Note: "}{hasNote.note}</div>}</td>
+                          <td><span className={`badge ${txn._type === 'Income' ? 'badge-income' : 'badge-expense'}`}>{txn._type}</span></td>
+                          <td className={txn._type === 'Income' ? 'amt-in' : 'amt-out'}>{txn._type === 'Income' ? '+' : '−'}₹{Number(txn.amount || txn.totalAmount || 0).toLocaleString('en-IN')}</td>
+                          <td><span className={`badge ${txn.status === 'Paid' ? 'badge-paid' : 'badge-pending'}`}>{txn.status || 'Completed'}</span></td>
+                          <td><div style={{display:'flex',gap:'5px'}}><button className="flag-btn" style={isFlagged ? {background:'var(--orange)',color:'#fff'} : {}} onClick={() => flagRow(txn)}><i className="ti ti-flag"></i>{isFlagged ? 'Flagged' : 'Flag'}</button><button className="note-btn" onClick={() => addNoteQuick(txn)}><i className="ti ti-message-2"></i>Note</button></div></td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -187,10 +275,12 @@ tr:hover td{background:#FAFCFE;}
 
           {activeTab === 'bank' && (
             <div className="grid-2">
-              <div className="card">
-                <div style={{fontSize:'14px',fontWeight:800,marginBottom:'14px'}}><i className="ti ti-building-bank"></i>HDFC ••••4821</div>
-                <div>Closing Balance: ₹12,84,320</div>
-              </div>
+              {loading ? <div>Loading banks...</div> : banks.map((b, i) => (
+                <div key={i} className="card">
+                  <div style={{fontSize:'14px',fontWeight:800,marginBottom:'14px'}}><i className="ti ti-building-bank"></i>{b.bankName} ••••{b.accountNo?.slice(-4)}</div>
+                  <div>Closing Balance: ₹{Number(b.balance||0).toLocaleString('en-IN')}</div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -198,8 +288,8 @@ tr:hover td{background:#FAFCFE;}
             <div>
               <div className="card" style={{marginBottom:'18px'}}>
                 <div style={{fontSize:'14px',fontWeight:800,marginBottom:'16px'}}><i className="ti ti-message-2" style={{color:'var(--purple)'}}></i>Add Audit Note</div>
-                <div className="form-group"><label>Transaction / Reference</label><input placeholder="e.g. INV-019 or EXP-063" className="inp" /></div>
-                <div className="form-group"><label>Note / Remark</label><textarea placeholder="Enter your audit observation, query or remark here..." style={{width:'100%',padding:'11px 14px',border:'1.5px solid var(--border)',borderRadius:'10px',fontFamily:'Nunito,sans-serif',fontSize:'13px',color:'var(--text-dark)',background:'var(--bg)',outline:'none',minHeight:'90px'}}></textarea></div>
+                <div className="form-group"><label>Transaction / Reference ID</label><input placeholder="e.g. INV-019 or EXP-063" className="inp" style={{width:'100%',padding:'11px 14px',border:'1.5px solid var(--border)',borderRadius:'10px',fontFamily:'Nunito,sans-serif',fontSize:'13px',outline:'none'}} value={newNote.transactionId} onChange={e => setNewNote({...newNote, transactionId: e.target.value})} /></div>
+                <div className="form-group"><label>Note / Remark</label><textarea placeholder="Enter your audit observation, query or remark here..." style={{width:'100%',padding:'11px 14px',border:'1.5px solid var(--border)',borderRadius:'10px',fontFamily:'Nunito,sans-serif',fontSize:'13px',color:'var(--text-dark)',background:'var(--bg)',outline:'none',minHeight:'90px'}} value={newNote.note} onChange={e => setNewNote({...newNote, note: e.target.value})}></textarea></div>
                 <div style={{display:'flex',gap:'10px'}}>
                   <button className="btn" style={{background:'var(--orange-light)',color:'var(--orange-dark)',border:'1px solid var(--orange)'}} onClick={() => saveNote('flag')}><i className="ti ti-flag"></i>Flag Transaction</button>
                   <button className="btn" style={{background:'var(--purple-light)',color:'var(--purple)',border:'1px solid var(--purple)'}} onClick={() => saveNote('note')}><i className="ti ti-message-2"></i>Save Note</button>
@@ -207,10 +297,12 @@ tr:hover td{background:#FAFCFE;}
               </div>
               <div className="card">
                 <div style={{fontSize:'14px',fontWeight:800,marginBottom:'16px'}}>Existing Notes & Flags</div>
-                <div style={{padding:'14px',background:'var(--orange-light)',borderRadius:'10px',borderLeft:'4px solid var(--orange)',marginBottom:'12px'}}>
-                  <div style={{fontSize:'12px',fontWeight:800,color:'var(--orange-dark)',marginBottom:'4px'}}><i className="ti ti-flag"></i>FLAGGED — BANK-TXN (Jun 5)</div>
-                  <div style={{fontSize:'13px',color:'var(--text-dark)'}}>Unknown credit of ₹50,000 via IMPS. Source of funds unclear.</div>
-                </div>
+                {loading ? <div>Loading notes...</div> : notes.length === 0 ? <div>No audit notes added yet.</div> : notes.map((n, i) => (
+                  <div key={i} style={{padding:'14px',background: n.flagged ? 'var(--orange-light)' : 'var(--purple-light)',borderRadius:'10px',borderLeft:`4px solid ${n.flagged ? 'var(--orange)' : 'var(--purple)'}`,marginBottom:'12px'}}>
+                    <div style={{fontSize:'12px',fontWeight:800,color: n.flagged ? 'var(--orange-dark)' : 'var(--purple)',marginBottom:'4px'}}><i className={n.flagged ? "ti ti-flag" : "ti ti-message-2"}></i>{n.flagged ? 'FLAGGED' : 'NOTE'} — {n.transactionId} ({new Date(n.createdAt).toLocaleDateString()})</div>
+                    <div style={{fontSize:'13px',color:'var(--text-dark)'}}>{n.note}</div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

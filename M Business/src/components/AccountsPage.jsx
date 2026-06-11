@@ -339,7 +339,7 @@ export default function AccountsPage({
   }, [propIncome, propExpenses]);
 
   const tabStyle = (on) => ({
-    padding: "12px 28px", borderRadius: 12, fontSize: 14, fontWeight: 800,
+    padding: "12px 28px", borderRadius: 12, fontSize: 16, fontWeight: 900,
     cursor: "pointer", border: "none",
     background: on ? THEME.accent : "transparent",
     color: on ? "#fff" : THEME.muted,

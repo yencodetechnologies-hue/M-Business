@@ -3,8 +3,7 @@ const mongoose = require("mongoose");
 const projectSchema = new mongoose.Schema({
   name: { type: String, required: true },
   client: { type: String, default: "" },
-  contactPersonName: { type: String, default: "" },
-  contactPersonNo: { type: String, default: "" },
+ 
   category: { type: String, default: "Web Development" },
   priority: { type: String, default: "medium" },
   purpose: { type: String, default: "" },
@@ -24,7 +23,7 @@ const projectSchema = new mongoose.Schema({
   tasks: { type: Number, default: 0 },
   completedTasks: { type: Number, default: 0 },
   assignedTo: { type: [String], default: [] },  // ✅ Fixed
-  manager: { type: String, default: "" },
+
   companyId: { type: String, default: "" },
   loggedHours: { type: Number, default: 0 },
   milestones: {

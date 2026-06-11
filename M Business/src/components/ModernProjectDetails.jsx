@@ -583,9 +583,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
           <DetailField label="Priority" value={priority.charAt(0).toUpperCase() + priority.slice(1)} />
           <DetailField label="Start Date" value={fmtDetailDate(currProject.start)} />
           <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
-          <DetailField label="Manager" value={currProject.manager} />
-          <DetailField label="Contact Person" value={currProject.contactPersonName} />
-          <DetailField label="Contact Number" value={currProject.contactPersonNo} />
+
           <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
           <DetailField label="Logged Hours" value={currProject.loggedHours ? `${currProject.loggedHours}h` : '0h'} />
           <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />

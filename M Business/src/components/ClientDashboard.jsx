@@ -67,12 +67,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [fileFilter, setFileFilter] = useState("All");
 
   // Local Chat Mockups
-  const [chatMessages, setChatMessages] = useState([
-    { sender: "Prabhu · YENCODE", msg: "Hi! The final review designs have been uploaded. Please check and let us know your feedback.", time: "9:05 AM", mine: false },
-    { sender: "You", msg: "Looks great! I'll review and get back by EOD. Can we schedule a call too?", time: "9:22 AM", mine: true },
-    { sender: "Prabhu · YENCODE", msg: "Absolutely! I've added a meeting slot for tomorrow 11 AM. Check the schedule section below.", time: "9:30 AM", mine: false },
-    { sender: "You", msg: "Perfect. Also please send the updated invoice when ready.", time: "9:45 AM", mine: true }
-  ]);
+ const [chatMessages, setChatMessages] = useState([]);
   const [chatText, setChatText] = useState("");
 
   // Feedback Mock
@@ -81,11 +76,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   // Approvals Mock
-  const [approvals, setApprovals] = useState([
-    { id: 1, title: "Homepage Design v3", desc: "Phase 1 design revisions approved, awaiting visual layout approval.", icon: "ti-photo" },
-    { id: 2, title: "SEO Keywords Plan", desc: "Approval request for targeting primary and secondary service keywords.", icon: "ti-seo" }
-  ]);
-
+  const [approvals, setApprovals] = useState([]);
   // Calendar states
   const [currentDate, setCurrentDate] = useState(new Date(2026, 5, 19)); // Default mid June 2026
   const [selectedDay, setSelectedDay] = useState(19);
@@ -107,25 +98,32 @@ export default function ClientDashboard({ user, setUser }) {
     }
     const fetchAll = async () => {
       try {
-        const [projRes, taskRes, invRes, notifRes, docRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
-            headers: { 'x-company-id': user.companyId || "" }
-          }),
-          axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
-            headers: { 'x-company-id': user.companyId || "" }
-          }),
-          axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
-            headers: { 'x-company-id': user.companyId || "" }
-          }),
-          axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
-          axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] }))
-        ]);
+const [projRes, taskRes, invRes, notifRes, docRes, msgRes] = await Promise.all([
+  axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
+    headers: { 'x-company-id': user.companyId || "" }
+  }),
+  axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
+    headers: { 'x-company-id': user.companyId || "" }
+  }),
+  axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
+    headers: { 'x-company-id': user.companyId || "" }
+  }),
+  axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
+  axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
+  axios.get(`${BASE_URL}/api/messages?companyId=${user.companyId || ""}`).catch(() => ({ data: [] }))
+]);
 
-        setProjects(projRes.data || []);
-        setTasks(taskRes.data || []);
-        setInvoices(invRes.data || []);
-        setNotifs(notifRes.data || []);
-        setDocs(docRes.data || []);
+setProjects(projRes.data || []);
+setTasks(taskRes.data || []);
+setInvoices(invRes.data || []);
+setNotifs(notifRes.data || []);
+setDocs(docRes.data || []);
+setChatMessages((msgRes.data || []).map(m => ({
+  sender: m.senderName,
+  msg: m.content,
+  time: new Date(m.createdAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+  mine: m.senderId === (user._id || user.id)
+})));
       } catch (err) {
         console.error("Failed to fetch client dashboard data", err);
       } finally {
@@ -261,7 +259,7 @@ export default function ClientDashboard({ user, setUser }) {
     raw: d
   }));
 
-  const allFiles = [...docCards, ...defaultMockFiles];
+  const allFiles = [...docCards];
   const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
 
   // Invoices variables
@@ -282,8 +280,7 @@ export default function ClientDashboard({ user, setUser }) {
     { id: "mock2", invoiceNo: "#INV-2026-1218", desc: "STA Website · Design Milestone", date: "25 Apr 2026", dueDate: "25 Apr 2026", total: 40000, amountPaid: 40000, status: "paid" },
     { id: "mock3", invoiceNo: "#INV-2026-1240", desc: "STA Website · Final Delivery", date: "29 May 2026", dueDate: "30 Jun 2026", total: 40000, amountPaid: 0, status: "pending" }
   ];
-
-  const finalInvoicesList = dbInvoices.length > 0 ? dbInvoices : defaultMockInvoices;
+const finalInvoicesList = dbInvoices; 
 
   const totalPaid = finalInvoicesList.filter(i => i.status === "paid").reduce((sum, i) => sum + i.total, 0);
   const totalPending = finalInvoicesList.filter(i => i.status === "pending" || i.status === "unpaid" || i.status === "sent").reduce((sum, i) => sum + (i.total - i.amountPaid), 0);
@@ -293,7 +290,7 @@ export default function ClientDashboard({ user, setUser }) {
   // Active project calculation
   const activeProjName = projects[0]?.name || "STA Corporate Website";
   const activeProjProgress = projects[0]?.progress || 90;
-  const activeProjDesc = projects[0]?.description || "{project.description}";
+  const activeProjDesc = projects[0]?.description || "";
   const activeProjDeadline = projects[0]?.deadline || "30 Jun 2026";
   const parseDeadline = (str) => {
   if (!str) return null;

@@ -5247,8 +5247,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                   <ModernProjectDetails 
                     project={jumpProject} 
                     tasks={tasks} 
+                    employees={employees}
                     onBack={() => setActive("projects")} 
-                    onEdit={() => setActive("edit-project")}
+                    onEdit={(updatedProj) => { 
+                      if(updatedProj) setJumpProject(updatedProj); 
+                      setActive("edit-project"); 
+                    }}
                     onUpdate={fetchTasks}
                     fetchProjects={fetchProjects}
                     onMessageTeam={() => setActive("messaging")}

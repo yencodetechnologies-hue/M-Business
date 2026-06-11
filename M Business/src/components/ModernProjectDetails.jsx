@@ -178,7 +178,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], onEdit, onUpdate, fetchProjects, fetchTasks, onMessageTeam }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam }) {
   const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
@@ -209,6 +209,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
   const [showAddMilestone, setShowAddMilestone] = useState(false);
 
   const fileInputRef = useRef(null);
+  const composerRef = useRef(null);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [showPortalPreview, setShowPortalPreview] = useState(false);
 
@@ -531,8 +532,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
             const blob = new Blob([text], {type:'text/plain'});
             const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${projName}.txt`; a.click();
           }}><i className="ti ti-download"></i> Export</button>
-          <button className="mpd-btn mpd-btn-primary" onClick={onEdit || (() => {})} style={{gap:6}}><i className="ti ti-edit"></i> Edit</button>
-          <button className="mpd-btn mpd-btn-danger" style={{gap:6}} onClick={() => { if(window.confirm('Delete this project?')) {} }}><i className="ti ti-trash"></i> Delete</button>
+          <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit ? onEdit(currProject) : null} style={{gap:6}}><i className="ti ti-edit"></i> Edit</button>
+          <button className="mpd-btn mpd-btn-danger" style={{gap:6}} onClick={onDelete || (() => window.confirm('Delete this project?'))}><i className="ti ti-trash"></i> Delete</button>
         </div>
       </div>
 
@@ -558,7 +559,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
             <div className="mpd-amt">{budgetAmt ? `${currency}${budgetAmt.toLocaleString()}` : '—'}</div>
             {budgetAmt > 0 && <div className="mpd-sub">Spent {currency}{spent.toLocaleString()} &nbsp;·&nbsp; <span className="mpd-g">Rem {currency}{remaining.toLocaleString()}</span></div>}
           </div>
-          <button className="mpd-btn mpd-btn-primary" onClick={() => setComposerOpen(!composerOpen)}>
+          <button className="mpd-btn mpd-btn-primary" onClick={() => {
+            setComposerOpen(true);
+            setTimeout(() => {
+              composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+          }}>
             <i className="ti ti-speakerphone"></i> Post Update
           </button>
         </div>
@@ -646,8 +652,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
         </div>
       </div>
 
-      {/* UPDATE COMPOSER */}
-      <div className="mpd-upd-composer" style={{ overflow: 'hidden' }}>
+        <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden' }}>
         <div className="mpd-uc-header" onClick={() => setComposerOpen(!composerOpen)} style={{ cursor: 'pointer' }}>
           <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
           <button className="mpd-uc-toggle" onClick={e => { e.stopPropagation(); setComposerOpen(!composerOpen); }}>{composerOpen ? 'Collapse ↑' : 'Expand ↓'}</button>
@@ -727,12 +732,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setComposerOpen(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
               <button
-                disabled={postingUpdate || !updateTitle.trim()}
+                disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim())}
                 onClick={async () => {
-                  if (!updateTitle.trim()) return;
+                  const hasContent = updateTitle.trim() || updateText.trim();
+                  if (!hasContent) return;
                   setPostingUpdate(true);
                   try {
-                    const newUpdate = { text: `${updateTitle}: ${updateText}`.trim(), date: new Date().toISOString(), author: 'Admin', type: updateType };
+                    const title = updateTitle.trim() || updateText.trim().slice(0, 60);
+                    const body = updateText.trim() ? `${updateTitle.trim() ? updateTitle + ': ' : ''}${updateText}`.trim() : updateTitle.trim();
+                    const newUpdate = { text: body, title: title, date: new Date().toISOString(), author: 'Admin', type: updateType };
                     const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
                     await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
                     setUpdateText(''); setUpdateTitle(''); setUpdateType('progress'); setComposerOpen(false);
@@ -740,7 +748,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
                   } catch(err) { console.error(err); alert('Failed to post update'); }
                   finally { setPostingUpdate(false); }
                 }}
-                style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: postingUpdate || !updateTitle.trim() ? 'not-allowed' : 'pointer', opacity: postingUpdate || !updateTitle.trim() ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
+                style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
                 <i className="ti ti-send" style={{ fontSize: 15 }} />
                 {postingUpdate ? 'Sending...' : 'Send to Team & Client'}
               </button>
@@ -987,6 +995,21 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], onEd
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Due Date</label>
                   <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} style={{ width: '100%', padding: '9px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
                 </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
+                <select value={newTaskAssignTo} onChange={e => setNewTaskAssignTo(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="Unassigned">Unassigned</option>
+                  {currProject?.assignedTo?.map(emp => (
+                    <option key={emp} value={employees?.find(e => (e.name||e.employeeName) === emp)?._id || emp}>
+                      {emp}
+                    </option>
+                  ))}
+                  {/* Also allow assigning to employees not in the project team, just in case */}
+                  {employees?.filter(e => !currProject?.assignedTo?.includes(e.name || e.employeeName)).map(emp => (
+                    <option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>
+                  ))}
+                </select>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                 <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>

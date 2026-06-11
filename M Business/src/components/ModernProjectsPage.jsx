@@ -175,7 +175,12 @@ export default function ModernProjectsPage({ user }) {
         progress: Number(form.progress) || 0,
       };
       if (editProject) {
-        await axios.put(`${BASE_URL}/api/projects/${editProject._id}`, payload);
+        const res = await axios.put(`${BASE_URL}/api/projects/${editProject._id}`, payload);
+        // Refresh selectedProject so detail view shows updated data
+        if (selectedProject?._id === editProject._id) {
+          const updated = res.data?.project || res.data || { ...selectedProject, ...payload };
+          setSelectedProject(updated);
+        }
       } else {
         await axios.post(`${BASE_URL}/api/projects/add`, payload);
       }
@@ -297,24 +302,6 @@ export default function ModernProjectsPage({ user }) {
             </div>
           </div>
           <div className="m-content">
-            {/* Actions bar for detail view */}
-            <div style={{display:'flex', alignItems:'center', gap:10, marginBottom:16}}>
-              <button
-                className="mpd-btn mpd-btn-outline"
-                style={{fontSize:13}}
-                onClick={() => openEdit(selectedProject)}
-              ><i className="ti ti-edit"></i> Edit</button>
-              <button
-                className="mpd-btn"
-                style={{background:'#FEE2E2', color:'#DC2626', border:'1.5px solid #FCA5A5', fontSize:13}}
-                onClick={(e) => { e.stopPropagation(); setDeleteTarget(selectedProject); }}
-              ><i className="ti ti-trash"></i> Delete</button>
-              <button
-                className="mpd-btn mpd-btn-outline"
-                style={{fontSize:13}}
-                onClick={(e) => openLogTime(selectedProject, e)}
-              ><i className="ti ti-clock"></i> Log Time</button>
-            </div>
             <ModernProjectDetails
               project={toDetailShape(selectedProject)}
               onBack={() => setSelectedProject(null)}
@@ -322,6 +309,8 @@ export default function ModernProjectsPage({ user }) {
               onUpdate={fetchAll}
               fetchProjects={fetchAll}
               onEdit={() => openEdit(selectedProject)}
+              onDelete={() => setDeleteTarget(selectedProject)}
+              onLogTime={(e) => openLogTime(selectedProject, e)}
             />
           </div>
         </div>

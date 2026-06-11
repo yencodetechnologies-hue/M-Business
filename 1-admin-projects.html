@@ -338,7 +338,7 @@ a{text-decoration:none;color:inherit;}
           <div class="amt">₹8,50,000</div>
           <div class="sub">Spent ₹4,20,000 &nbsp;·&nbsp; <span class="g">Remaining ₹4,30,000</span></div>
         </div>
-        <button class="btn btn-primary" onclick="toggleComposer()"><i class="ti ti-speakerphone"></i>Post Update</button>
+<button class="btn btn-primary" onclick="toggleComposer()"><i class="ti ti-speakerphone"></i>Post Update</button>
       </div>
     </div>
     <!-- KPIs -->
@@ -360,7 +360,7 @@ a{text-decoration:none;color:inherit;}
     </div>
 
     <!-- POST UPDATE COMPOSER (collapsed by default) -->
-    <div class="upd-composer">
+    <div class="upd-composer" id="updComposer">
       <div class="uc-header">
         <h3><i class="ti ti-speakerphone"></i>Post Project Update</h3>
         <button class="uc-toggle" onclick="toggleComposer()" id="ucToggleBtn">Expand ↓</button>
@@ -508,11 +508,40 @@ a{text-decoration:none;color:inherit;}
 </div>
 <div class="toast-wrap" id="tw"></div>
 <script>
+function scrollToComposer(){
+  const el=document.getElementById('updComposer');
+  const tb=document.querySelector('.topbar');
+  const offset=(tb?tb.getBoundingClientRect().bottom:62)+8;
+  const y=window.scrollY+el.getBoundingClientRect().top-offset;
+  window.scrollTo({top:y,behavior:'smooth'});
+}
+function openComposer(){
+  const b=document.getElementById('ucBody');
+  const btn=document.getElementById('ucToggleBtn');
+  b.classList.add('open');
+  btn.textContent='Collapse ↑';
+  setTimeout(scrollToComposer,60);
+}
 function toggleComposer(){
+  const b=document.getElementById('ucBody');
+  const btn=document.getElementById('ucToggleBtn');
+  const open=b.classList.toggle('open');
+  btn.textContent=open?'Collapse ↑':'Expand ↓';
+  if(open) setTimeout(scrollToComposer,60);
+}
   const b=document.getElementById('ucBody');const btn=document.getElementById('ucToggleBtn');
   const open=b.classList.toggle('open');
   btn.textContent=open?'Collapse ↑':'Expand ↓';
-  if(open)b.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(open){
+    setTimeout(()=>{
+      const el=document.getElementById('updComposer');
+      const scroller=document.querySelector('.main')||document.documentElement;
+      const topbar=document.querySelector('.topbar');
+      const offset=topbar?topbar.offsetHeight+10:10;
+      const top=el.offsetTop-offset;
+      scroller.scrollTo({top,behavior:'smooth'});
+    },50);
+  }
 }
 function setType(btn,t){
   document.querySelectorAll('.tc').forEach(c=>c.classList.remove('on'));
@@ -533,7 +562,12 @@ function sendUpdate(){
   toast('Update sent successfully!','success');
   document.getElementById('updTitle').value='';
   document.getElementById('updBody').value='';
-  toggleComposer();
+  // collapse பண்ணி composer-லயே நிக்கும்
+  const b=document.getElementById('ucBody');
+  const btn=document.getElementById('ucToggleBtn');
+  b.classList.remove('open');
+  btn.textContent='Expand ↓';
+  document.querySelector('.upd-composer').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function switchTab(id,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));

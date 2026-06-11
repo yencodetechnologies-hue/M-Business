@@ -254,9 +254,10 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
 
   // Tasks for this project
   const pTasks = tasks.filter(t =>
-    t.project === project.name ||
-    t.projectId === project._id ||
-    t.projectId === project.id
+    (t.project === project.name ||
+     t.projectId === project._id ||
+     t.projectId === project.id) && 
+    (t.assignTo === user?.name || t.assignTo === user?._id || t.assignedTo === user?.name || t.assignedTo === user?._id)
   );
   const pct       = calcPct(project, pTasks);
   const doneCount = pTasks.filter(t => ['done','completed'].includes((t.status||'').toLowerCase())).length;

@@ -105,6 +105,7 @@ function getAvatarColor(name) {
 
 export default function ModernProjectCreator({ onBack, clients = [], employees = [], onSuccess, editProject }) {
   const [loading, setLoading] = useState(false);
+  const [viewStep, setViewStep] = useState(1);
 
   // Form State
   const [name, setName] = useState(editProject?.name || '');
@@ -280,27 +281,28 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         <div>
           {/* STEP BAR */}
           <div className="mpc-step-bar">
-            <div className={`mpc-step ${currentStep > 1 ? 'done' : 'active'}`} onClick={() => document.getElementById('sec1')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+            <div className={`mpc-step ${currentStep > 1 ? 'done' : viewStep === 1 ? 'active' : ''}`} onClick={() => setViewStep(1)} style={{cursor:'pointer'}}>
               <div className="mpc-step-num">{currentStep > 1 ? <i className="ti ti-check" /> : 1}</div> Basic Info
             </div>
             <div className={`mpc-step-line ${currentStep > 1 ? 'done' : ''}`} />
             
-            <div className={`mpc-step ${currentStep > 2 ? 'done' : currentStep === 2 ? 'active' : ''}`} onClick={() => document.getElementById('sec2')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+            <div className={`mpc-step ${currentStep > 2 ? 'done' : viewStep === 2 ? 'active' : ''}`} onClick={() => setViewStep(2)} style={{cursor:'pointer'}}>
               <div className="mpc-step-num">{currentStep > 2 ? <i className="ti ti-check" /> : 2}</div> Team & Dates
             </div>
             <div className={`mpc-step-line ${currentStep > 2 ? 'done' : ''}`} />
             
-            <div className={`mpc-step ${currentStep > 3 ? 'done' : currentStep === 3 ? 'active' : ''}`} onClick={() => document.getElementById('sec3')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+            <div className={`mpc-step ${currentStep > 3 ? 'done' : viewStep === 3 ? 'active' : ''}`} onClick={() => setViewStep(3)} style={{cursor:'pointer'}}>
               <div className="mpc-step-num">{currentStep > 3 ? <i className="ti ti-check" /> : 3}</div> Budget & Milestones
             </div>
             <div className={`mpc-step-line ${currentStep > 3 ? 'done' : ''}`} />
             
-            <div className={`mpc-step ${currentStep === 4 ? 'active' : ''}`} onClick={() => document.getElementById('sec4')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+            <div className={`mpc-step ${viewStep === 4 ? 'active' : ''}`} onClick={() => setViewStep(4)} style={{cursor:'pointer'}}>
               <div className="mpc-step-num">4</div> Launch
             </div>
           </div>
 
           {/* SECTION 1: BASIC INFO */}
+          {viewStep === 1 && (
           <div className="mpc-section-card" id="sec1">
             <div className="mpc-section-heading"><i className="ti ti-file-description" /> Basic Information</div>
             
@@ -344,9 +346,15 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 </select>
               </div>
             </div>
+            <div style={{display:'flex', justifyContent:'flex-end', marginTop: 10}}>
+              <button className="mpc-btn mpc-btn-primary" onClick={() => setViewStep(2)}>Next Step <i className="ti ti-arrow-right"></i></button>
+            </div>
           </div>
+          )}
 
           {/* SECTION 2: TIMELINE */}
+          {viewStep === 2 && (
+          <>
           <div className="mpc-section-card" id="sec2">
             <div className="mpc-section-heading"><i className="ti ti-calendar" /> Project Timeline</div>
             <div className="mpc-form-2col">
@@ -376,9 +384,17 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 );
               })}
             </div>
+            <div style={{display:'flex', justifyContent:'space-between', marginTop: 16}}>
+              <button className="mpc-btn mpc-btn-outline" onClick={() => setViewStep(1)}><i className="ti ti-arrow-left"></i> Previous</button>
+              <button className="mpc-btn mpc-btn-primary" onClick={() => setViewStep(3)}>Next Step <i className="ti ti-arrow-right"></i></button>
+            </div>
           </div>
+          </>
+          )}
 
           {/* SECTION 4: BUDGET */}
+          {viewStep === 3 && (
+          <>
           <div className="mpc-section-card" id="sec3">
             <div className="mpc-section-heading"><i className="ti ti-wallet" /> Budget</div>
             <div className="mpc-form-group">
@@ -427,9 +443,16 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <button className="mpc-btn mpc-btn-outline" style={{ marginTop: 16, fontSize: 12, padding: '8px 16px' }} onClick={addMilestone}>
               <i className="ti ti-plus" /> Add Milestone
             </button>
+            <div style={{display:'flex', justifyContent:'space-between', marginTop: 16}}>
+              <button className="mpc-btn mpc-btn-outline" onClick={() => setViewStep(2)}><i className="ti ti-arrow-left"></i> Previous</button>
+              <button className="mpc-btn mpc-btn-primary" onClick={() => setViewStep(4)}>Next Step <i className="ti ti-arrow-right"></i></button>
+            </div>
           </div>
+          </>
+          )}
 
           {/* SECTION 6: CLIENT PORTAL */}
+          {viewStep === 4 && (
           <div className="mpc-section-card" id="sec4">
             <div className="mpc-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -454,7 +477,11 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                 Allow client to send messages
               </label>
             </div>
+            <div style={{display:'flex', justifyContent:'space-between', marginTop: 16}}>
+              <button className="mpc-btn mpc-btn-outline" onClick={() => setViewStep(3)}><i className="ti ti-arrow-left"></i> Previous</button>
+            </div>
           </div>
+          )}
         </div>
 
         {/* RIGHT: PREVIEW */}

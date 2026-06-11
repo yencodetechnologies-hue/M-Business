@@ -310,9 +310,7 @@ const daysLeft = (() => {
   if (!d) return 0;
   return Math.max(0, Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24)));
 })();
-const daysLeft = activeProjDeadline
-  ? Math.max(0, Math.ceil((new Date(activeProjDeadline) - new Date()) / (1000 * 60 * 60 * 24)))
-  : 0;
+
   // Styles Injection
   const CSS = `
     .cp-root {

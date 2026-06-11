@@ -263,4 +263,14 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// Approve/Reject an update
+router.patch("/:id/updates/:updateId", async (req, res) => {
+  const { status } = req.body; // "approved" or "rejected"
+  const project = await Project.findOneAndUpdate(
+    { _id: req.params.id, "updates._id": req.params.updateId },
+    { $set: { "updates.$.type": status } },
+    { new: true }
+  );
+  res.json(project);
+});
 module.exports = router;

@@ -293,9 +293,11 @@ export default function ClientDashboard({ user, setUser }) {
   // Active project calculation
   const activeProjName = projects[0]?.name || "STA Corporate Website";
   const activeProjProgress = projects[0]?.progress || 90;
-  const activeProjDesc = projects[0]?.description || "Your project is progressing well and is currently in the final review stage. All major milestones have been delivered on schedule.";
+  const activeProjDesc = projects[0]?.description || "{project.description}";
   const activeProjDeadline = projects[0]?.deadline || "30 Jun 2026";
-
+const daysLeft = activeProjDeadline
+  ? Math.max(0, Math.ceil((new Date(activeProjDeadline) - new Date()) / (1000 * 60 * 60 * 24)))
+  : 0;
   // Styles Injection
   const CSS = `
     .cp-root {
@@ -726,7 +728,7 @@ export default function ClientDashboard({ user, setUser }) {
                 <div className="hs-label">Complete</div>
               </div>
               <div className="hs-item">
-                <div className="hs-val">30</div>
+         <div className="hs-val">{daysLeft}</div>
                 <div className="hs-label">Days Left</div>
               </div>
               <div className="hs-item">

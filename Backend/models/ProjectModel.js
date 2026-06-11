@@ -38,6 +38,8 @@ const projectSchema = new mongoose.Schema({
   updates: {
     type: [{
       text: { type: String, required: true },
+      title: { type: String, default: "" },
+      type: { type: String, default: "general" },
       date: { type: Date, default: Date.now },
       author: { type: String, default: "System" }
     }],

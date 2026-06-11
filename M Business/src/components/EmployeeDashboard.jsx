@@ -530,7 +530,11 @@ function DashboardPage({ user, projects, tasks, proposals, attendance, salary, s
                 <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>{p.client || "—"} · Due {p.deadline || "—"}</div>
                 <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
                   {(() => {
-                    const pTasks = tasks.filter(t => t.project === p.name || t.projectId === p._id || t.projectId === p.id);
+                    const pTasks = tasks.filter(t => {
+                      const tProjId = t.projectId && typeof t.projectId === 'object' ? t.projectId._id : t.projectId;
+                      const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
+                      return (tProjId && (tProjId === p._id || tProjId === p.id)) || (tProjName && tProjName === p.name);
+                    });
                     const s = (p.status || "").toLowerCase();
                     let pct = 0;
                     if (s === "done" || s === "completed") pct = 100;
@@ -745,7 +749,11 @@ function MyProfilePage({ user, projects, tasks, attendance, onBack }) {
           <div style={headStyle}><div style={titleStyle}>💼 My Projects</div><span style={{ fontSize:12, fontWeight:800, color:TC.teal }}>{activeProj} active</span></div>
           <div style={{ padding:"8px 18px" }}>
             {projects.slice(0,4).map((p,i)=>{
-              const pTasks=tasks.filter(t=>t.project===p.name||t.projectId===p._id);
+              const pTasks = tasks.filter(t => {
+                const tProjId = t.projectId && typeof t.projectId === 'object' ? t.projectId._id : t.projectId;
+                const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
+                return (tProjId && (tProjId === p._id || tProjId === p.id)) || (tProjName && tProjName === p.name);
+              });
               const s=(p.status||"").toLowerCase();
               const pct=s==="done"||s==="completed"?100:pTasks.length>0?Math.round((pTasks.filter(t=>["done","completed"].includes((t.status||"").toLowerCase())).length/pTasks.length)*100):s==="in progress"?50:(p.progress||0);
               return(
@@ -840,7 +848,11 @@ function ProjectsPage({ projects, tasks }) {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 10, marginBottom: 20 }}>
           {(() => {
-            const pTasks = tasks.filter(t => t.project === selected.name || t.projectId === selected._id || t.projectId === selected.id);
+            const pTasks = tasks.filter(t => {
+              const tProjId = t.projectId && typeof t.projectId === 'object' ? t.projectId._id : t.projectId;
+              const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
+              return (tProjId && (tProjId === selected._id || tProjId === selected.id)) || (tProjName && tProjName === selected.name);
+            });
             const s = (selected.status || "").toLowerCase();
             let pct = 0;
             if (s === "done" || s === "completed") pct = 100;
@@ -864,7 +876,11 @@ function ProjectsPage({ projects, tasks }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {(() => {
-            const pTasks = tasks.filter(t => t.project === selected.name || t.projectId === selected._id || t.projectId === selected.id);
+            const pTasks = tasks.filter(t => {
+              const tProjId = t.projectId && typeof t.projectId === 'object' ? t.projectId._id : t.projectId;
+              const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
+              return (tProjId && (tProjId === selected._id || tProjId === selected.id)) || (tProjName && tProjName === selected.name);
+            });
             const s = (selected.status || "").toLowerCase();
             let pct = 0;
             if (s === "done" || s === "completed") pct = 100;
@@ -912,7 +928,11 @@ function ProjectsPage({ projects, tasks }) {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 {(() => {
-                  const pTasks = tasks.filter(t => t.project === p.name || t.projectId === p._id || t.projectId === p.id);
+                  const pTasks = tasks.filter(t => {
+                    const tProjId = t.projectId && typeof t.projectId === 'object' ? t.projectId._id : t.projectId;
+                    const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
+                    return (tProjId && (tProjId === p._id || tProjId === p.id)) || (tProjName && tProjName === p.name);
+                  });
                   const s = (p.status || "").toLowerCase();
                   let pct = 0;
                   if (s === "done" || s === "completed") pct = 100;

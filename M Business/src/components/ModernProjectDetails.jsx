@@ -560,6 +560,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             {budgetAmt > 0 && <div className="mpd-sub">Spent {currency}{spent.toLocaleString()} &nbsp;·&nbsp; <span className="mpd-g">Rem {currency}{remaining.toLocaleString()}</span></div>}
           </div>
           <button className="mpd-btn mpd-btn-primary" onClick={() => {
+            setActiveTab('updates');
             setComposerOpen(true);
             setTimeout(() => {
               composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -652,111 +653,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         </div>
       </div>
 
-        <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden' }}>
-        <div className="mpd-uc-header" onClick={() => setComposerOpen(!composerOpen)} style={{ cursor: 'pointer' }}>
-          <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
-          <button className="mpd-uc-toggle" onClick={e => { e.stopPropagation(); setComposerOpen(!composerOpen); }}>{composerOpen ? 'Collapse ↑' : 'Expand ↓'}</button>
-        </div>
-        {composerOpen && (
-        <div style={{ padding: '18px 22px' }}>
-          {/* SEND TO */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Send To</div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <div onClick={() => setSendToTeam(!sendToTeam)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToTeam ? P.primary : P.border}`, background: sendToTeam ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToTeam ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
-                <i className="ti ti-users" style={{ fontSize: 16 }} />
-                Team ({assigned.length} members)
-              </div>
-              <div onClick={() => setSendToClient(!sendToClient)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToClient ? P.primary : P.border}`, background: sendToClient ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToClient ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
-                <i className="ti ti-building" style={{ fontSize: 16 }} />
-                Client Portal — {clientName}
-              </div>
-            </div>
-          </div>
 
-          {/* UPDATE TYPE CHIPS */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Type</div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {[
-                { key: 'progress', label: 'Progress', icon: 'ti-chart-bar' },
-                { key: 'milestone', label: 'Milestone', icon: 'ti-flag' },
-                { key: 'blocker', label: 'Blocker', icon: 'ti-alert-triangle' },
-                { key: 'general', label: 'General', icon: 'ti-speakerphone' },
-                { key: 'delivery', label: 'Delivery', icon: 'ti-package' },
-              ].map(({ key, label, icon }) => (
-                <button key={key} onClick={() => setUpdateType(key)} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === key ? P.primary : P.border}`, background: updateType === key ? P.primary : '#fff', color: updateType === key ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
-                  <i className={`ti ${icon}`} style={{ fontSize: 13 }} />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* UPDATE TITLE */}
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Update Title *</div>
-            <input
-              value={updateTitle}
-              onChange={e => setUpdateTitle(e.target.value)}
-              placeholder="e.g. Checkout flow 80% complete"
-              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
-            />
-          </div>
-
-          {/* DETAILS */}
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Details</div>
-            <textarea
-              value={updateText}
-              onChange={e => setUpdateText(e.target.value)}
-              placeholder="What's done, what's next, any blockers or decisions needed..."
-              style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', minHeight: 90, outline: 'none', boxSizing: 'border-box', lineHeight: 1.6 }}
-            />
-          </div>
-
-          {/* ATTACHMENTS ROW + SEND BUTTON */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background='#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background='none'}>
-                <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
-              </button>
-              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background='#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background='none'}>
-                <i className="ti ti-file" style={{ fontSize: 15 }} /> File/Doc
-              </button>
-              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background='#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background='none'}>
-                <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> Attach
-              </button>
-              <span style={{ fontSize: 11, color: P.textLight, alignSelf: 'center' }}>Drag &amp; drop supported</span>
-            </div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setComposerOpen(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
-              <button
-                disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim())}
-                onClick={async () => {
-                  const hasContent = updateTitle.trim() || updateText.trim();
-                  if (!hasContent) return;
-                  setPostingUpdate(true);
-                  try {
-                    const title = updateTitle.trim() || updateText.trim().slice(0, 60);
-                    const body = updateText.trim() ? `${updateTitle.trim() ? updateTitle + ': ' : ''}${updateText}`.trim() : updateTitle.trim();
-                    const newUpdate = { text: body, title: title, date: new Date().toISOString(), author: 'Admin', type: updateType };
-                    const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
-                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
-                    setUpdateText(''); setUpdateTitle(''); setUpdateType('progress'); setComposerOpen(false);
-                    loadLatest(); if (onUpdate) onUpdate(); if (fetchProjects) fetchProjects();
-                  } catch(err) { console.error(err); alert('Failed to post update'); }
-                  finally { setPostingUpdate(false); }
-                }}
-                style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
-                <i className="ti ti-send" style={{ fontSize: 15 }} />
-                {postingUpdate ? 'Sending...' : 'Send to Team & Client'}
-              </button>
-            </div>
-          </div>
-        </div>
-        )}
-      </div>
 
       {/* MAIN CONTENT GRID */}
       <div className="mpd-grid-main-side">
@@ -864,6 +761,112 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
             </div>
 
             <div className={`mpd-tab-pane ${activeTab==='updates'?'mpd-active':''}`}>
+        <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', marginBottom: 20 }}>
+        <div className="mpd-uc-header" onClick={() => setComposerOpen(!composerOpen)} style={{ cursor: 'pointer' }}>
+          <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
+          <button className="mpd-uc-toggle" onClick={e => { e.stopPropagation(); setComposerOpen(!composerOpen); }}>{composerOpen ? 'Collapse ↑' : 'Expand ↓'}</button>
+        </div>
+        {composerOpen && (
+        <div style={{ padding: '18px 22px' }}>
+          {/* SEND TO */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Send To</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <div onClick={() => setSendToTeam(!sendToTeam)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToTeam ? P.primary : P.border}`, background: sendToTeam ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToTeam ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
+                <i className="ti ti-users" style={{ fontSize: 16 }} />
+                Team ({assigned.length} members)
+              </div>
+              <div onClick={() => setSendToClient(!sendToClient)} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `2px solid ${sendToClient ? P.primary : P.border}`, background: sendToClient ? P.primaryLight : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: sendToClient ? P.primaryDark : P.textMid, transition: 'all .15s' }}>
+                <i className="ti ti-building" style={{ fontSize: 16 }} />
+                Client Portal — {clientName}
+              </div>
+            </div>
+          </div>
+
+          {/* UPDATE TYPE CHIPS */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>Update Type</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {[
+                { key: 'progress', label: 'Progress', icon: 'ti-chart-bar' },
+                { key: 'milestone', label: 'Milestone', icon: 'ti-flag' },
+                { key: 'blocker', label: 'Blocker', icon: 'ti-alert-triangle' },
+                { key: 'general', label: 'General', icon: 'ti-speakerphone' },
+                { key: 'delivery', label: 'Delivery', icon: 'ti-package' },
+              ].map(({ key, label, icon }) => (
+                <button key={key} onClick={() => setUpdateType(key)} style={{ padding: '6px 14px', borderRadius: 20, border: `2px solid ${updateType === key ? P.primary : P.border}`, background: updateType === key ? P.primary : '#fff', color: updateType === key ? '#fff' : P.textMid, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all .15s' }}>
+                  <i className={`ti ${icon}`} style={{ fontSize: 13 }} />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* UPDATE TITLE */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Update Title *</div>
+            <input
+              value={updateTitle}
+              onChange={e => setUpdateTitle(e.target.value)}
+              placeholder="e.g. Checkout flow 80% complete"
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          {/* DETAILS */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 6 }}>Details</div>
+            <textarea
+              value={updateText}
+              onChange={e => setUpdateText(e.target.value)}
+              placeholder="What's done, what's next, any blockers or decisions needed..."
+              style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', minHeight: 90, outline: 'none', boxSizing: 'border-box', lineHeight: 1.6 }}
+            />
+          </div>
+
+          {/* ATTACHMENTS ROW + SEND BUTTON */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background='#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background='none'}>
+                <i className="ti ti-photo" style={{ fontSize: 15 }} /> Image
+              </button>
+              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background='#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background='none'}>
+                <i className="ti ti-file" style={{ fontSize: 15 }} /> File/Doc
+              </button>
+              <button onClick={triggerFileUpload} style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMid, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: '6px 10px', borderRadius: 8, transition: 'background .15s' }} onMouseEnter={e => e.currentTarget.style.background='#f0f4f8'} onMouseLeave={e => e.currentTarget.style.background='none'}>
+                <i className="ti ti-paperclip" style={{ fontSize: 15 }} /> Attach
+              </button>
+              <span style={{ fontSize: 11, color: P.textLight, alignSelf: 'center' }}>Drag &amp; drop supported</span>
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setComposerOpen(false)} style={{ padding: '9px 18px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Draft</button>
+              <button
+                disabled={postingUpdate || (!updateTitle.trim() && !updateText.trim())}
+                onClick={async () => {
+                  const hasContent = updateTitle.trim() || updateText.trim();
+                  if (!hasContent) return;
+                  setPostingUpdate(true);
+                  try {
+                    const title = updateTitle.trim() || updateText.trim().slice(0, 60);
+                    const body = updateText.trim() ? `${updateTitle.trim() ? updateTitle + ': ' : ''}${updateText}`.trim() : updateTitle.trim();
+                    const newUpdate = { text: body, title: title, date: new Date().toISOString(), author: 'Admin', type: updateType };
+                    const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
+                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
+                    setUpdateText(''); setUpdateTitle(''); setUpdateType('progress'); setComposerOpen(false);
+                    loadLatest(); if (onUpdate) onUpdate(); if (fetchProjects) fetchProjects();
+                  } catch(err) { console.error(err); alert('Failed to post update'); }
+                  finally { setPostingUpdate(false); }
+                }}
+                style={{ padding: '9px 22px', borderRadius: 10, background: P.primary, color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: 13, fontWeight: 800, cursor: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 'not-allowed' : 'pointer', opacity: (postingUpdate || (!updateTitle.trim() && !updateText.trim())) ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,188,212,.25)', transition: 'all .15s' }}>
+                <i className="ti ti-send" style={{ fontSize: 15 }} />
+                {postingUpdate ? 'Sending...' : 'Send to Team & Client'}
+              </button>
+            </div>
+          </div>
+        </div>
+        )}
+      </div>
+
               {(!currProject.updates || currProject.updates.length === 0) ? (
                 <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No updates posted yet.</div>
               ) : (

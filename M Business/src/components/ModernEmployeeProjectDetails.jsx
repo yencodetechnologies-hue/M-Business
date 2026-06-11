@@ -230,7 +230,25 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
 
   // ── Updates state ─────────────────────────────────────────────────
   const [updates, setUpdates]   = useState([]);
-  const [readIds, setReadIds]   = useState(new Set());
+  const readStorageKey = `read_updates_${user?._id || user?.id || 'guest'}_${project._id}`;
+  const [readIds, setReadIds]   = useState(() => {
+    try {
+      const saved = localStorage.getItem(readStorageKey);
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  // Save read state to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(readStorageKey, JSON.stringify(Array.from(readIds)));
+    } catch (e) {
+      console.error("Failed to save read updates to localStorage:", e);
+    }
+  }, [readIds, readStorageKey]);
+
   const [updLoading, setUpdLoading] = useState(false);
 
   // ── Task done toggle (local) ───────────────────────────────────────
@@ -253,12 +271,22 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   const badgeCls = isDone ? 'epd2-badge-completed' : isHold ? 'epd2-badge-hold' : 'epd2-badge-active';
 
   // Tasks for this project
-  const pTasks = tasks.filter(t =>
-    (t.project === project.name ||
-     t.projectId === project._id ||
-     t.projectId === project.id) && 
-    (t.assignTo === user?.name || t.assignTo === user?._id || t.assignedTo === user?.name || t.assignedTo === user?._id)
-  );
+  const pTasks = tasks.filter(t => {
+    const tProjId = t.projectId && typeof t.projectId === 'object' ? t.projectId._id : t.projectId;
+    const tProjName = t.projectId && typeof t.projectId === 'object' ? t.projectId.name : t.project;
+    const belongsToProj = (tProjId && (tProjId === project._id || tProjId === project.id)) || (tProjName && tProjName === project.name);
+    if (!belongsToProj) return false;
+    
+    // Clients can see all project tasks to track progress. Employees only see their own tasks.
+    if (user?.role === 'client') return true;
+    
+    const myName = (user?.name || '').toLowerCase().trim();
+    const myId = user?._id || user?.id || '';
+    return (t.assignTo && t.assignTo.toLowerCase().trim() === myName) || 
+           (t.assignTo === myId) || 
+           (Array.isArray(t.assignedTo) && (t.assignedTo.includes(myId) || t.assignedTo.includes(user?.name))) || 
+           (t.assignedTo === myId || t.assignedTo === user?.name);
+  });
   const pct       = calcPct(project, pTasks);
   const doneCount = pTasks.filter(t => ['done','completed'].includes((t.status||'').toLowerCase())).length;
   const openCount = pTasks.length - doneCount;
@@ -279,25 +307,33 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
   useEffect(() => {
     if (!project._id) return;
     setUpdLoading(true);
-    axios.get(`${BASE_URL}/api/projects/${project._id}`)
+    axios.get(`${BASE_URL}/api/projects/${project._id}`, {
+      headers: { "x-company-id": user?.companyId || "" }
+    })
       .then(res => {
         const upds = res.data?.updates || res.data?.notes || [];
         setUpdates(Array.isArray(upds) ? upds : []);
-        setReadIds(new Set());
       })
       .catch(err => {
         console.error("Failed to fetch project details:", err.message);
         setUpdates([]);
       })
       .finally(() => setUpdLoading(false));
-  }, [project._id]);
+  }, [project._id, user?.companyId]);
 
+  const getUpdKey = (u) => u._id || u.id || u.date || u.text;
   const displayUpdates = updates.length > 0 ? updates : sampleUpdates;
-  const unreadCount    = displayUpdates.filter(u => !readIds.has(u._id) && u.unread !== false).length;
+  const unreadCount    = displayUpdates.filter(u => !readIds.has(getUpdKey(u)) && u.unread !== false).length;
 
-  const markRead    = (id) => setReadIds(prev => { const n = new Set(prev); n.add(id); return n; });
-  const markAllRead = () => setReadIds(new Set(displayUpdates.map(u => u._id)));
-  const isUnread    = (u) => !readIds.has(u._id) && u.unread !== false;
+  const markRead    = (u) => setReadIds(prev => {
+    const key = getUpdKey(u);
+    if (!key) return prev;
+    const n = new Set(prev);
+    n.add(key);
+    return n;
+  });
+  const markAllRead = () => setReadIds(new Set(displayUpdates.map(u => getUpdKey(u)).filter(Boolean)));
+  const isUnread    = (u) => !readIds.has(getUpdKey(u)) && u.unread !== false;
 
   // ── Log Time save ──────────────────────────────────────────────────
   const handleSaveLog = async (e) => {
@@ -428,17 +464,18 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
             </div>
           )}
 
-          {!updLoading && displayUpdates.map((upd) => {
+          {!updLoading && displayUpdates.map((upd, idx) => {
             const tc   = getTypeConfig(upd.type);
             const unrd = isUnread(upd);
-            const postedByInitials = getInitials(upd.postedBy || upd.from || 'Admin');
-            const postedByColor    = avColor(upd.postedBy || 'Admin');
+            const authorName = upd.author || upd.postedBy || upd.from || 'Admin';
+            const postedByInitials = getInitials(authorName);
+            const postedByColor    = avColor(authorName);
 
             return (
               <div
-                key={upd._id}
+                key={upd._id || upd.date || idx}
                 className={`epd2-uf ${tc.border} ${unrd ? 'unread' : ''}`}
-                onClick={() => markRead(upd._id)}
+                onClick={() => markRead(upd)}
               >
                 <div className="epd2-uf-inner">
                   {/* Top row: type badge + internal + NEW */}
@@ -456,7 +493,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                   <div className="epd2-uf-title">{upd.title || upd.subject || 'Project Update'}</div>
 
                   {/* Body */}
-                  <div className="epd2-uf-body">{upd.body || upd.message || upd.content || ''}</div>
+                  <div className="epd2-uf-body">{upd.text || upd.body || upd.message || upd.content || ''}</div>
 
                   {/* Progress box (if progress update) */}
                   {upd.type === 'progress' && (upd.oldProgress != null || upd.newProgress != null) && (
@@ -514,10 +551,10 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                       <div className="epd2-av epd2-av-sm" style={{ background: postedByColor }}>
                         {postedByInitials}
                       </div>
-                      {upd.postedBy || upd.from || 'Admin'} · Admin
+                      {authorName} · Admin
                     </div>
                     <div className="epd2-uf-date">
-                      {upd.createdAt ? fmtDate(upd.createdAt) : '—'}
+                      {upd.date || upd.createdAt ? fmtDate(upd.date || upd.createdAt) : '—'}
                     </div>
                   </div>
                 </div>

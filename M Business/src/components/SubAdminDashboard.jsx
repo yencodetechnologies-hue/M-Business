@@ -5218,6 +5218,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                 {/* ── Pages using new components ── */}
                 {validActive === "create-project" && (
                   <ModernProjectCreator
+                    key="create"
                     clients={clients}
                     employees={employees}
                     onBack={() => setActive("projects")}
@@ -5232,7 +5233,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
 
 {validActive === "edit-project" && (
   <ModernProjectCreator
-    key={jumpProject?._id || "edit"}
+    key={jumpProject?._id}
     editProject={jumpProject}        // ← இது important
     clients={clients}
     employees={employees}

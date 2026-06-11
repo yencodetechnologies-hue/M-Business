@@ -113,6 +113,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
   const [category, setCategory] = useState(editProject?.category || 'Web Development');
   const [priority, setPriority] = useState(editProject?.priority || 'medium');
   const [status, setStatus] = useState(editProject?.status || 'Active');
+  const [progress, setProgress] = useState(editProject?.progress || 0);
   
   const [start, setStart] = useState(editProject?.start ? new Date(editProject.start).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
   const [end, setEnd] = useState(editProject?.end || editProject?.deadline || '');
@@ -148,6 +149,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
       setCategory(editProject.category || 'Web Development');
       setPriority(editProject.priority || 'medium');
       setStatus(editProject.status || 'Active');
+      setProgress(editProject.progress || 0);
       setStart(editProject.start ? new Date(editProject.start).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
       setEnd(editProject.end || editProject.deadline || '');
       setAssigned(Array.isArray(editProject.assignedTo) ? editProject.assignedTo : (editProject.assignedTo ? [editProject.assignedTo] : []));
@@ -215,6 +217,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         purpose: description,
         priority,
         status,
+        progress,
         start,
         end,
         deadline: end || start || '',
@@ -225,7 +228,7 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
         pending: pending || 0,
         spent: spent || 0,
         assignedTo: assigned,
-        progress: editProject?.progress || 0,
+        progress: progress,
         milestones: milestones.filter(m => m.name.trim()),
         portalSettings: portalOpts
       };
@@ -352,6 +355,17 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
             <div className="mpc-form-2col">
               <div className="mpc-form-group"><label>Start Date</label><input type="date" value={start} onChange={e => setStart(e.target.value)} /></div>
               <div className="mpc-form-group"><label>Deadline</label><input type="date" value={end} onChange={e => setEnd(e.target.value)} /></div>
+              <div className="mpc-form-group">
+  <label>Progress (%)</label>
+  <input 
+    type="number" 
+    min="0" 
+    max="100" 
+    value={progress} 
+    onChange={e => setProgress(Number(e.target.value))} 
+    placeholder="0" 
+  />
+</div>
             </div>
           </div>
 

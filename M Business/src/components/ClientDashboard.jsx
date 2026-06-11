@@ -67,7 +67,12 @@ export default function ClientDashboard({ user, setUser }) {
   const [fileFilter, setFileFilter] = useState("All");
 
   // Local Chat Mockups
- const [chatMessages, setChatMessages] = useState([]);
+  const [chatMessages, setChatMessages] = useState([
+    { sender: "Prabhu · YENCODE", msg: "Hi! The final review designs have been uploaded. Please check and let us know your feedback.", time: "9:05 AM", mine: false },
+    { sender: "You", msg: "Looks great! I'll review and get back by EOD. Can we schedule a call too?", time: "9:22 AM", mine: true },
+    { sender: "Prabhu · YENCODE", msg: "Absolutely! I've added a meeting slot for tomorrow 11 AM. Check the schedule section below.", time: "9:30 AM", mine: false },
+    { sender: "You", msg: "Perfect. Also please send the updated invoice when ready.", time: "9:45 AM", mine: true }
+  ]);
   const [chatText, setChatText] = useState("");
 
   // Feedback Mock
@@ -76,7 +81,11 @@ export default function ClientDashboard({ user, setUser }) {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   // Approvals Mock
-  const [approvals, setApprovals] = useState([]);
+  const [approvals, setApprovals] = useState([
+    { id: 1, title: "Homepage Design v3", desc: "Phase 1 design revisions approved, awaiting visual layout approval.", icon: "ti-photo" },
+    { id: 2, title: "SEO Keywords Plan", desc: "Approval request for targeting primary and secondary service keywords.", icon: "ti-seo" }
+  ]);
+
   // Calendar states
   const [currentDate, setCurrentDate] = useState(new Date(2026, 5, 19)); // Default mid June 2026
   const [selectedDay, setSelectedDay] = useState(19);
@@ -98,32 +107,25 @@ export default function ClientDashboard({ user, setUser }) {
     }
     const fetchAll = async () => {
       try {
-const [projRes, taskRes, invRes, notifRes, docRes, msgRes] = await Promise.all([
-  axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
-    headers: { 'x-company-id': user.companyId || "" }
-  }),
-  axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
-    headers: { 'x-company-id': user.companyId || "" }
-  }),
-  axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
-    headers: { 'x-company-id': user.companyId || "" }
-  }),
-  axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
-  axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
-  axios.get(`${BASE_URL}/api/messages?companyId=${user.companyId || ""}`).catch(() => ({ data: [] }))
-]);
+        const [projRes, taskRes, invRes, notifRes, docRes] = await Promise.all([
+          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
+          axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] }))
+        ]);
 
-setProjects(projRes.data || []);
-setTasks(taskRes.data || []);
-setInvoices(invRes.data || []);
-setNotifs(notifRes.data || []);
-setDocs(docRes.data || []);
-setChatMessages((msgRes.data || []).map(m => ({
-  sender: m.senderName,
-  msg: m.content,
-  time: new Date(m.createdAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
-  mine: m.senderId === (user._id || user.id)
-})));
+        setProjects(projRes.data || []);
+        setTasks(taskRes.data || []);
+        setInvoices(invRes.data || []);
+        setNotifs(notifRes.data || []);
+        setDocs(docRes.data || []);
       } catch (err) {
         console.error("Failed to fetch client dashboard data", err);
       } finally {
@@ -259,7 +261,7 @@ setChatMessages((msgRes.data || []).map(m => ({
     raw: d
   }));
 
-  const allFiles = [...docCards];
+  const allFiles = [...docCards, ...(projects[0]?.files || []).map(f => ({ name: f.name, meta: `${f.type || "File"}`, date: new Date(f.uploadedAt || Date.now()).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }), type: "Documents", icon: "ti-file", bg: C.blueBg, col: C.blue }))];
   const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
 
   // Invoices variables
@@ -280,7 +282,8 @@ setChatMessages((msgRes.data || []).map(m => ({
     { id: "mock2", invoiceNo: "#INV-2026-1218", desc: "STA Website · Design Milestone", date: "25 Apr 2026", dueDate: "25 Apr 2026", total: 40000, amountPaid: 40000, status: "paid" },
     { id: "mock3", invoiceNo: "#INV-2026-1240", desc: "STA Website · Final Delivery", date: "29 May 2026", dueDate: "30 Jun 2026", total: 40000, amountPaid: 0, status: "pending" }
   ];
-const finalInvoicesList = dbInvoices; 
+
+  const finalInvoicesList = dbInvoices;
 
   const totalPaid = finalInvoicesList.filter(i => i.status === "paid").reduce((sum, i) => sum + i.total, 0);
   const totalPending = finalInvoicesList.filter(i => i.status === "pending" || i.status === "unpaid" || i.status === "sent").reduce((sum, i) => sum + (i.total - i.amountPaid), 0);
@@ -289,24 +292,9 @@ const finalInvoicesList = dbInvoices;
 
   // Active project calculation
   const activeProjName = projects[0]?.name || "STA Corporate Website";
-  const activeProjProgress = projects[0]?.progress || 90;
+  const activeProjProgress = projects[0]?.progress ?? 0;
   const activeProjDesc = projects[0]?.description || "";
-  const activeProjDeadline = projects[0]?.deadline || "30 Jun 2026";
-  const parseDeadline = (str) => {
-  if (!str) return null;
-  // "30 Jun 2026" format handle பண்ண:
-  const d = new Date(str);
-  if (!isNaN(d)) return d;
-  // DD MMM YYYY format:
-  const parts = str.split(" ");
-  if (parts.length === 3) return new Date(`${parts[1]} ${parts[0]}, ${parts[2]}`);
-  return null;
-};
-const daysLeft = (() => {
-  const d = parseDeadline(activeProjDeadline);
-  if (!d) return 0;
-  return Math.max(0, Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24)));
-})();
+  const activeProjDeadline = projects[0]?.deadline || projects[0]?.end || "";
 
   // Styles Injection
   const CSS = `
@@ -738,7 +726,7 @@ const daysLeft = (() => {
                 <div className="hs-label">Complete</div>
               </div>
               <div className="hs-item">
-         <div className="hs-val">{daysLeft}</div>
+                <div className="hs-val">30</div>
                 <div className="hs-label">Days Left</div>
               </div>
               <div className="hs-item">
@@ -860,7 +848,7 @@ const daysLeft = (() => {
 
               {/* Rows */}
               <div className="tl-row">
-                <div><div class="tl-task-name">Discovery</div><div class="tl-task-sub">Planning</div></div>
+                <div><div className="tl-task-name">Discovery</div><div className="tl-task-sub">Planning</div></div>
                 <div className="tl-grid-cell">
                   <div className="tl-bar-wrap">
                     <div className="tl-bar" style={{ width: "90%", left: "0%", background: C.teal }}>✓</div>
@@ -874,7 +862,7 @@ const daysLeft = (() => {
               </div>
 
               <div className="tl-row">
-                <div><div class="tl-task-name">UI/UX Design</div><div class="tl-task-sub">Design</div></div>
+                <div><div className="tl-task-name">UI/UX Design</div><div className="tl-task-sub">Design</div></div>
                 <div className="tl-grid-cell">
                   <div className="tl-bar-wrap">
                     <div className="tl-bar" style={{ width: "100%", left: "0%", background: C.teal }}>Design ✓</div>
@@ -892,7 +880,7 @@ const daysLeft = (() => {
               </div>
 
               <div className="tl-row">
-                <div><div class="tl-task-name">Development</div><div class="tl-task-sub">Frontend + Backend</div></div>
+                <div><div className="tl-task-name">Development</div><div className="tl-task-sub">Frontend + Backend</div></div>
                 <div className="tl-grid-cell"></div>
                 <div className="tl-grid-cell">
                   <div className="tl-bar-wrap">
@@ -910,7 +898,7 @@ const daysLeft = (() => {
               </div>
 
               <div className="tl-row">
-                <div><div class="tl-task-name">CMS & SEO Setup</div><div class="tl-task-sub">Content + SEO</div></div>
+                <div><div className="tl-task-name">CMS & SEO Setup</div><div className="tl-task-sub">Content + SEO</div></div>
                 <div className="tl-grid-cell"></div>
                 <div className="tl-grid-cell">
                   <div className="tl-bar-wrap">
@@ -928,7 +916,7 @@ const daysLeft = (() => {
               </div>
 
               <div className="tl-row">
-                <div><div class="tl-task-name">Final Review</div><div class="tl-task-sub">Client Review</div></div>
+                <div><div className="tl-task-name">Final Review</div><div className="tl-task-sub">Client Review</div></div>
                 <div className="tl-grid-cell"></div>
                 <div className="tl-grid-cell"></div>
                 <div className="tl-grid-cell" style={{ position: "relative" }}>
@@ -944,7 +932,7 @@ const daysLeft = (() => {
               </div>
 
               <div className="tl-row">
-                <div><div class="tl-task-name">Launch 🚀</div><div class="tl-task-sub">Go Live</div></div>
+                <div><div className="tl-task-name">Launch 🚀</div><div className="tl-task-sub">Go Live</div></div>
                 <div className="tl-grid-cell"></div>
                 <div className="tl-grid-cell"></div>
                 <div className="tl-grid-cell">

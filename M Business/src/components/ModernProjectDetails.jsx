@@ -281,8 +281,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const doneTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length || 0;
   const inprogTasks = projTasks.filter(t => t.status === 'in_progress').length || 0;
   const openTasks = totalTasks - doneTasks - inprogTasks;
-  const progressPct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : (currProject.progress || 0);
-
+const progressPct = totalTasks > 0 
+  ? Math.round((doneTasks / totalTasks) * 100) 
+  : (currProject.progress || 0);
   // Budget spent data (Real values from backend)
   const billed = currProject.billed || 0;
   const received = currProject.received || 0;

@@ -295,6 +295,21 @@ export default function ClientDashboard({ user, setUser }) {
   const activeProjProgress = projects[0]?.progress || 90;
   const activeProjDesc = projects[0]?.description || "{project.description}";
   const activeProjDeadline = projects[0]?.deadline || "30 Jun 2026";
+  const parseDeadline = (str) => {
+  if (!str) return null;
+  // "30 Jun 2026" format handle பண்ண:
+  const d = new Date(str);
+  if (!isNaN(d)) return d;
+  // DD MMM YYYY format:
+  const parts = str.split(" ");
+  if (parts.length === 3) return new Date(`${parts[1]} ${parts[0]}, ${parts[2]}`);
+  return null;
+};
+const daysLeft = (() => {
+  const d = parseDeadline(activeProjDeadline);
+  if (!d) return 0;
+  return Math.max(0, Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24)));
+})();
 const daysLeft = activeProjDeadline
   ? Math.max(0, Math.ceil((new Date(activeProjDeadline) - new Date()) / (1000 * 60 * 60 * 24)))
   : 0;

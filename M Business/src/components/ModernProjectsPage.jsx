@@ -54,6 +54,7 @@ const EMPTY_FORM = {
   start: '', end: '', budget: '', currency: '₹',
   status: 'In Progress', priority: 'medium',
   assignedTo: '', manager: '', progress: 0,
+  contactPersonName: '', contactPersonNo: '',
 };
  
 // ─── Log Time empty ────────────────────────────────────────────
@@ -95,8 +96,15 @@ export default function ModernProjectsPage({ user }) {
         axios.get(`${BASE_URL}/api/projects`),
         axios.get(`${BASE_URL}/api/tasks`),
       ]);
-      setProjects(Array.isArray(pRes.data) ? pRes.data : []);
+      const freshProjects = Array.isArray(pRes.data) ? pRes.data : [];
+      setProjects(freshProjects);
       setTasks(Array.isArray(tRes.data) ? tRes.data : []);
+      // Keep selectedProject in sync with latest backend data
+      setSelectedProject(prev => {
+        if (!prev) return prev;
+        const updated = freshProjects.find(p => p._id === prev._id);
+        return updated || prev;
+      });
     } catch (err) {
       setError('Failed to load projects. Check backend connection.');
     } finally {
@@ -159,6 +167,8 @@ export default function ModernProjectsPage({ user }) {
       assignedTo:  Array.isArray(p.assignedTo) ? p.assignedTo.join(', ') : (p.assignedTo || ''),
       manager:     p.manager || '',
       progress:    p.progress || 0,
+      contactPersonName: p.contactPersonName || '',
+      contactPersonNo:   p.contactPersonNo || '',
     });
     setShowForm(true);
   }
@@ -175,17 +185,12 @@ export default function ModernProjectsPage({ user }) {
         progress: Number(form.progress) || 0,
       };
       if (editProject) {
-        const res = await axios.put(`${BASE_URL}/api/projects/${editProject._id}`, payload);
-        // Refresh selectedProject so detail view shows updated data
-        if (selectedProject?._id === editProject._id) {
-          const updated = res.data?.project || res.data || { ...selectedProject, ...payload };
-          setSelectedProject(updated);
-        }
+        await axios.put(`${BASE_URL}/api/projects/${editProject._id}`, payload);
       } else {
         await axios.post(`${BASE_URL}/api/projects/add`, payload);
       }
       setShowForm(false);
-      fetchAll();
+      await fetchAll();
     } catch (err) {
       alert('Save failed: ' + (err.response?.data?.msg || err.message));
     } finally {
@@ -226,9 +231,13 @@ export default function ModernProjectsPage({ user }) {
       const newHours = (Number(logTimeProject.loggedHours) || 0) + hrs;
       await axios.put(`${BASE_URL}/api/projects/${logTimeProject._id}`, { loggedHours: newHours });
       setShowLogTime(false);
-      fetchAll();
+      // Re-fetch fresh data then sync selectedProject from updated list
+      const pRes = await axios.get(`${BASE_URL}/api/projects`);
+      const fresh = Array.isArray(pRes.data) ? pRes.data : [];
+      setProjects(fresh);
       if (selectedProject?._id === logTimeProject._id) {
-        setSelectedProject(prev => ({ ...prev, loggedHours: newHours }));
+        const updated = fresh.find(p => p._id === logTimeProject._id);
+        if (updated) setSelectedProject(updated);
       }
     } catch (err) {
       alert('Log failed: ' + (err.response?.data?.msg || err.message));
@@ -605,7 +614,12 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
             <div>
               <label style={LBL}>Status</label>
               <select style={INP} value={form.status} onChange={e => f('status', e.target.value)}>
-                {['In Progress','Active','On Hold','Completed','Pending','Overdue'].map(s => <option key={s}>{s}</option>)}
+                <option value="In Progress">In Progress</option>
+                <option value="Active">Active</option>
+                <option value="On Hold">On Hold</option>
+                <option value="Completed">Completed</option>
+                <option value="Pending">Pending</option>
+                <option value="Overdue">Overdue</option>
               </select>
             </div>
             <div>
@@ -623,6 +637,14 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
             <div>
               <label style={LBL}>Manager</label>
               <input style={INP} value={form.manager} onChange={e => f('manager', e.target.value)} placeholder="Manager name" />
+            </div>
+            <div>
+              <label style={LBL}>Contact Person Name</label>
+              <input style={INP} value={form.contactPersonName} onChange={e => f('contactPersonName', e.target.value)} placeholder="e.g. Ravi Kumar" />
+            </div>
+            <div style={{gridColumn:'1/-1'}}>
+              <label style={LBL}>Contact Person Phone No</label>
+              <input style={INP} value={form.contactPersonNo} onChange={e => f('contactPersonNo', e.target.value)} placeholder="e.g. +91 98765 43210" />
             </div>
           </div>
           <div style={{display:'flex', justifyContent:'flex-end', gap:10, marginTop:20}}>

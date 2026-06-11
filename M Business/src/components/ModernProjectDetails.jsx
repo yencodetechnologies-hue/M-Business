@@ -213,37 +213,31 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [uploadingFile, setUploadingFile] = useState(false);
   const [showPortalPreview, setShowPortalPreview] = useState(false);
 
-  const loadLatest = useCallback(async () => {
+  const loadLatest = useCallback(async (silent = false) => {
     if (!project?._id) return;
-    setLoadingProject(true);
+    if (!silent) setLoadingProject(true);
     try {
       const [pRes, tRes] = await Promise.all([
         axios.get(`${BASE_URL}/api/projects/${project._id}`),
         axios.get(`${BASE_URL}/api/tasks`)
       ]);
-      if (pRes.data) {
-        setCurrProject(pRes.data);
-      }
-      if (Array.isArray(tRes.data)) {
-        setCurrTasks(tRes.data);
-      }
+      if (pRes.data) setCurrProject(pRes.data);
+      if (Array.isArray(tRes.data)) setCurrTasks(tRes.data);
     } catch (e) {
       console.error("Error loading project details:", e);
     } finally {
-      setLoadingProject(false);
+      if (!silent) setLoadingProject(false);
     }
   }, [project?._id]);
 
-  useEffect(() => {
-    setCurrProject(project);
-  }, [project]);
+  useEffect(() => { setCurrProject(project); }, [project]);
+  useEffect(() => { setCurrTasks(tasks); }, [tasks]);
+  useEffect(() => { loadLatest(); }, [loadLatest]);
 
+  // Auto-refresh every 15 seconds silently from backend
   useEffect(() => {
-    setCurrTasks(tasks);
-  }, [tasks]);
-
-  useEffect(() => {
-    loadLatest();
+    const interval = setInterval(() => loadLatest(true), 15000);
+    return () => clearInterval(interval);
   }, [loadLatest]);
 
   if (!currProject) return null;
@@ -426,6 +420,22 @@ const progressPct = totalTasks > 0
   const handleAddMilestone = async (e) => {
     e.preventDefault();
     if (!newMilestoneName.trim()) return;
+
+    // Issue 5: Validate milestone date is within project start–end range
+    if (newMilestoneDate) {
+      const mDate = new Date(newMilestoneDate);
+      const pStart = currProject.start ? new Date(currProject.start) : null;
+      const pEnd = (currProject.end || currProject.deadline) ? new Date(currProject.end || currProject.deadline) : null;
+      if (pStart && mDate < pStart) {
+        alert(`Milestone date cannot be before project start date (${pStart.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}).`);
+        return;
+      }
+      if (pEnd && mDate > pEnd) {
+        alert(`Milestone date cannot be after project deadline (${pEnd.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}).`);
+        return;
+      }
+    }
+
     try {
       const newMilestone = {
         name: newMilestoneName.trim(),
@@ -527,6 +537,9 @@ const progressPct = totalTasks > 0
           <span style={{color:P.textDark}}>{projName}</span>
         </div>
         <div className="mpd-topbar-actions">
+          <button className="mpd-btn mpd-btn-outline" onClick={() => loadLatest(false)} style={{gap:6}} title="Refresh from server">
+            <i className="ti ti-refresh" style={{fontSize:14}}></i> {loadingProject ? 'Refreshing…' : 'Refresh'}
+          </button>
           <button className="mpd-btn mpd-btn-outline" onClick={handleShare} style={{gap:6}}><i className="ti ti-share"></i> Share</button>
           <button className="mpd-btn mpd-btn-outline" style={{gap:6}} onClick={() => {
             const text = `Project: ${projName}\nClient: ${clientName}\nStatus: ${currProject.status}\nProgress: ${progressPct}%\nBudget: ${currency}${budgetAmt.toLocaleString()}`;
@@ -698,6 +711,9 @@ const progressPct = totalTasks > 0
               <button className={`mpd-tab-btn ${activeTab==='milestones'?'mpd-active':''}`} onClick={()=>setActiveTab('milestones')}>Milestones</button>
               <button className={`mpd-tab-btn ${activeTab==='activity'?'mpd-active':''}`} onClick={()=>setActiveTab('activity')}>Activity</button>
               <button className={`mpd-tab-btn ${activeTab==='updates'?'mpd-active':''}`} onClick={()=>setActiveTab('updates')}>Updates</button>
+              <button className={`mpd-tab-btn ${activeTab==='finance'?'mpd-active':''}`} onClick={()=>setActiveTab('finance')}><i className="ti ti-receipt" style={{marginRight:4}}></i>Finance</button>
+              <button className={`mpd-tab-btn ${activeTab==='contact'?'mpd-active':''}`} onClick={()=>setActiveTab('contact')}><i className="ti ti-address-book" style={{marginRight:4}}></i>Contact</button>
+              <button className={`mpd-tab-btn ${activeTab==='settings'?'mpd-active':''}`} onClick={()=>setActiveTab('settings')}><i className="ti ti-settings" style={{marginRight:4}}></i>Settings</button>
             </div>
             
             <div className={`mpd-tab-pane ${activeTab==='milestones'?'mpd-active':''}`}>
@@ -890,6 +906,53 @@ const progressPct = totalTasks > 0
                 ))
               )}
             </div>
+
+            {/* FINANCE TAB */}
+            <div className={`mpd-tab-pane ${activeTab==='finance'?'mpd-active':''}`}>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px 24px', padding:'4px 0'}}>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Total Budget</div><div style={{fontSize:16,fontWeight:900,color:P.textDark}}>{currency}{budgetAmt.toLocaleString()}</div></div>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Billed</div><div style={{fontSize:16,fontWeight:900,color:P.textDark}}>{currency}{billed.toLocaleString()}</div></div>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Received</div><div style={{fontSize:16,fontWeight:900,color:P.green}}>{currency}{received.toLocaleString()}</div></div>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Pending</div><div style={{fontSize:16,fontWeight:900,color:P.red}}>{currency}{pending.toLocaleString()}</div></div>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Spent</div><div style={{fontSize:16,fontWeight:900,color:P.textDark}}>{currency}{spent.toLocaleString()}</div></div>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Remaining</div><div style={{fontSize:16,fontWeight:900,color:P.primary}}>{currency}{remaining.toLocaleString()}</div></div>
+              </div>
+              <div style={{marginTop:14}}>
+                <div style={{fontSize:11,color:P.textLight,marginBottom:6}}>Budget utilisation</div>
+                <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{width:`${budgetUsedPct}%`}}></div></div>
+                <div style={{fontSize:11,color:P.textLight,marginTop:4}}>{budgetUsedPct}% used</div>
+              </div>
+            </div>
+
+            {/* CONTACT TAB */}
+            <div className={`mpd-tab-pane ${activeTab==='contact'?'mpd-active':''}`}>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px 24px', padding:'4px 0'}}>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Client / Company</div><div style={{fontSize:13,fontWeight:700,color:P.textDark}}>{clientName}</div></div>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Manager</div><div style={{fontSize:13,fontWeight:700,color:P.textDark}}>{currProject.manager || '—'}</div></div>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Contact Person</div><div style={{fontSize:13,fontWeight:700,color:P.textDark}}>{currProject.contactPersonName || '—'}</div></div>
+                <div><div style={{fontSize:10,fontWeight:800,color:P.textLight,textTransform:'uppercase',letterSpacing:'.7px',marginBottom:4}}>Contact Phone</div><div style={{fontSize:13,fontWeight:700,color:P.textDark}}>{currProject.contactPersonNo || '—'}</div></div>
+              </div>
+            </div>
+
+            {/* SETTINGS TAB */}
+            <div className={`mpd-tab-pane ${activeTab==='settings'?'mpd-active':''}`}>
+              <div style={{display:'flex', flexDirection:'column', gap:14, padding:'4px 0'}}>
+                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', borderRadius:10, border:`1.5px solid ${P.border}`, background:P.bg}}>
+                  <div><div style={{fontSize:13,fontWeight:800,color:P.textDark}}>Client Portal</div><div style={{fontSize:11,color:P.textLight}}>Allow client to view project progress</div></div>
+                  <div style={{fontSize:12,fontWeight:700,color:portalSettings.enablePortal?P.green:P.textLight}}>{portalSettings.enablePortal ? '✓ Enabled' : 'Disabled'}</div>
+                </div>
+                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', borderRadius:10, border:`1.5px solid ${P.border}`, background:P.bg}}>
+                  <div><div style={{fontSize:13,fontWeight:800,color:P.textDark}}>Priority</div><div style={{fontSize:11,color:P.textLight}}>Current project priority level</div></div>
+                  <span className={`mpd-prio ${prioClass}`}>{priority.charAt(0).toUpperCase()+priority.slice(1)}</span>
+                </div>
+                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', borderRadius:10, border:`1.5px solid ${P.border}`, background:P.bg}}>
+                  <div><div style={{fontSize:13,fontWeight:800,color:P.textDark}}>Status</div><div style={{fontSize:11,color:P.textLight}}>Change from the Edit button above</div></div>
+                  <span className={`mpd-status-badge ${badgeClass}`}>{currProject.status || 'Active'}</span>
+                </div>
+                <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit ? onEdit(currProject) : null} style={{alignSelf:'flex-start'}}><i className="ti ti-edit"></i> Edit Project Settings</button>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -899,15 +962,19 @@ const progressPct = totalTasks > 0
           <div className="mpd-card">
             <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-users"></i> Team</div></div>
             {assigned.length === 0 ? <div style={{fontSize:12,color:P.textLight}}>No team members assigned.</div> : null}
-            {assigned.map((a, i) => (
+            {assigned.map((a, i) => {
+              const emp = (employees || []).find(e => (e.name || e.employeeName) === a);
+              const role = emp?.role || emp?.designation || emp?.jobTitle || 'Member';
+              return (
               <div key={i} className="mpd-member-row">
                 <div className="mpd-av mpd-av-sm" style={{background:getAvatarColor(a)}}>{getInitials(a)}</div>
                 <div>
                   <div style={{fontSize:13, fontWeight:700, color:P.textDark}}>{a}</div>
-                  <div style={{fontSize:11, color:P.textLight}}>Member</div>
+                  <div style={{fontSize:11, color:P.textLight}}>{role}</div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* BUDGET */}

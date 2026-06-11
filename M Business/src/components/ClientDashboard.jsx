@@ -58,7 +58,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [invoices, setInvoices] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const [docs, setDocs] = useState([]);
-  const [events, setEvents] = useState([]); 
+  const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Profile Dropdown
@@ -68,8 +68,12 @@ export default function ClientDashboard({ user, setUser }) {
   const [fileFilter, setFileFilter] = useState("All");
 
   // Local Chat Mockups
- const [chatMessages, setChatMessages] = useState([]);
-// useEffect-ல fetch பண்ணணும் messaging API-ல இருந்து
+  const [chatMessages, setChatMessages] = useState([
+    { sender: "Prabhu · YENCODE", msg: "Hi! The final review designs have been uploaded. Please check and let us know your feedback.", time: "9:05 AM", mine: false },
+    { sender: "You", msg: "Looks great! I'll review and get back by EOD. Can we schedule a call too?", time: "9:22 AM", mine: true },
+    { sender: "Prabhu · YENCODE", msg: "Absolutely! I've added a meeting slot for tomorrow 11 AM. Check the schedule section below.", time: "9:30 AM", mine: false },
+    { sender: "You", msg: "Perfect. Also please send the updated invoice when ready.", time: "9:45 AM", mine: true }
+  ]);
   const [chatText, setChatText] = useState("");
 
   // Feedback Mock
@@ -77,12 +81,12 @@ export default function ClientDashboard({ user, setUser }) {
   const [feedbackText, setFeedbackText] = useState("");
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
-  // Approvals Mock
-const [approvals, setApprovals] = useState([]);
+  // Approvals — start empty, real data comes from backend updates/notifications
+  const [approvals, setApprovals] = useState([]);
 
-  // Calendar states
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 5, 19)); // Default mid June 2026
-  const [selectedDay, setSelectedDay] = useState(19);
+  // Calendar states — use real current date
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState(new Date().getDate());
 
   // Document preview states
   const [selectedDoc, setSelectedDoc] = useState(null);
@@ -101,29 +105,27 @@ const [approvals, setApprovals] = useState([]);
     }
     const fetchAll = async () => {
       try {
-  const [projRes, taskRes, invRes, notifRes, docRes, eventsRes] = await Promise.all([
-  axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
-    headers: { 'x-company-id': user.companyId || "" }
-  }),
-  axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
-    headers: { 'x-company-id': user.companyId || "" }
-  }),
-  axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
-    headers: { 'x-company-id': user.companyId || "" }
-  }),
-  axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
-  axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
-  axios.get(`${BASE_URL}/api/events?client=${encodeURIComponent(clientName)}`, {
-    headers: { 'x-company-id': user.companyId || "" }
-  }).catch(() => ({ data: [] }))  // ← இது 6th item
-]);
+        const [projRes, taskRes, invRes, notifRes, docRes, meetRes] = await Promise.all([
+          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
+            headers: { 'x-company-id': user.companyId || "" }
+          }),
+          axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
+          axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
+          axios.get(`${BASE_URL}/api/meetings?client=${encodeURIComponent(clientName)}`).catch(() => ({ data: [] }))
+        ]);
 
         setProjects(projRes.data || []);
         setTasks(taskRes.data || []);
         setInvoices(invRes.data || []);
         setNotifs(notifRes.data || []);
         setDocs(docRes.data || []);
-        setEvents(eventsRes.data || []);
+        setMeetings(Array.isArray(meetRes.data) ? meetRes.data : []);
       } catch (err) {
         console.error("Failed to fetch client dashboard data", err);
       } finally {
@@ -208,34 +210,55 @@ const [approvals, setApprovals] = useState([]);
     }
   };
 
-  // Mock Calendar Calculations for June 2026
+  // Dynamic Calendar — uses real currentDate state
   const getCalendarDays = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrev = new Date(year, month, 0).getDate();
     const days = [];
-    // Previous month padding (May 2026 ends on Sunday 31) -> none or fill 5 days from previous week if start is weekday
-    // June 2026 starts on Monday (1)
-    // May days: 25, 26, 27, 28, 29, 30, 31 (7 days)
-    for (let i = 25; i <= 31; i++) {
-      days.push({ day: i, isOtherMonth: true });
+    // Previous month padding
+    for (let i = firstDay - 1; i >= 0; i--) {
+      days.push({ day: daysInPrev - i, isOtherMonth: true });
     }
-    // June days: 1 to 30
-    for (let i = 1; i <= 30; i++) {
+    // Current month
+    for (let i = 1; i <= daysInMonth; i++) {
       days.push({ day: i, isOtherMonth: false });
     }
-    // Next month padding (July 2026 starts on Wednesday)
-    // July days: 1 to 5
-    for (let i = 1; i <= 5; i++) {
-      days.push({ day: i, isOtherMonth: true });
+    // Next month padding to fill grid (multiple of 7)
+    const remaining = 7 - (days.length % 7);
+    if (remaining < 7) {
+      for (let i = 1; i <= remaining; i++) {
+        days.push({ day: i, isOtherMonth: true });
+      }
     }
     return days;
   };
 
   const getEventClass = (day, other) => {
     if (other) return "";
-    const eventDays = [2, 6, 10, 25];
-    return eventDays.includes(day) ? "has-event" : "";
+    // Highlight days that have meetings from backend
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const hasMeeting = (meetings || []).some(m => {
+      const d = new Date(m.date || m.scheduledAt || m.meetingDate || "");
+      return !isNaN(d) && d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+    });
+    return hasMeeting ? "has-event" : "";
   };
 
-
+  // File grid logic
+  const defaultMockFiles = [
+    { name: "Homepage_Final_v3.fig", meta: "Figma Design · 8.4 MB", date: "28 May 2026", type: "Designs", icon: "ti-photo", bg: C.blueBg, col: C.blue, badge: "New" },
+    { name: "Brand_Guidelines_v2.pdf", meta: "PDF · 2.4 MB", date: "22 May 2026", type: "Documents", icon: "ti-file-type-pdf", bg: C.redBg, col: C.red },
+    { name: "SEO_Audit_Report.xlsx", meta: "Excel · 890 KB", date: "20 May 2026", type: "Reports", icon: "ti-file-spreadsheet", bg: C.greenBg, col: C.green },
+    { name: "STA_Phase2_Proposal.docx", meta: "Word · 340 KB", date: "15 May 2026", type: "Documents", icon: "ti-file-text", bg: C.purpleBg, col: C.purple },
+    { name: "AboutPage_Design.png", meta: "PNG · 1.2 MB", date: "12 May 2026", type: "Designs", icon: "ti-photo", bg: C.amberBg, col: C.amber },
+    { name: "Project_Contract.pdf", meta: "PDF · 560 KB", date: "01 Apr 2026", type: "Documents", icon: "ti-file-type-pdf", bg: C.redBg, col: C.red },
+    { name: "ContactPage_v2.png", meta: "PNG · 980 KB", date: "29 May 2026", type: "Designs", icon: "ti-photo", bg: C.blueBg, col: C.blue, badge: "New" },
+    { name: "Content_Brief.docx", meta: "Word · 210 KB", date: "08 Apr 2026", type: "Documents", icon: "ti-file-text", bg: C.greenBg, col: C.green }
+  ];
 
   // Convert uploaded docs to matching file card format
   const docCards = docs.map(d => ({
@@ -264,7 +287,13 @@ const [approvals, setApprovals] = useState([]);
     status: (inv.status || "draft").toLowerCase()
   }));
 
- 
+  // Mock fallback if DB has no invoices
+  const defaultMockInvoices = [
+    { id: "mock1", invoiceNo: "#INV-2026-1230", desc: "STA Website · Advance Payment", date: "01 May 2026", dueDate: "01 May 2026", total: 40000, amountPaid: 40000, status: "paid" },
+    { id: "mock2", invoiceNo: "#INV-2026-1218", desc: "STA Website · Design Milestone", date: "25 Apr 2026", dueDate: "25 Apr 2026", total: 40000, amountPaid: 40000, status: "paid" },
+    { id: "mock3", invoiceNo: "#INV-2026-1240", desc: "STA Website · Final Delivery", date: "29 May 2026", dueDate: "30 Jun 2026", total: 40000, amountPaid: 0, status: "pending" }
+  ];
+
   const finalInvoicesList = dbInvoices;
 
   const totalPaid = finalInvoicesList.filter(i => i.status === "paid").reduce((sum, i) => sum + i.total, 0);
@@ -708,7 +737,7 @@ const [approvals, setApprovals] = useState([]);
                 <div className="hs-label">Complete</div>
               </div>
               <div className="hs-item">
-                <div className="hs-val">30</div>
+                <div className="hs-val">{activeProjDeadline ? Math.max(0, Math.ceil((new Date(activeProjDeadline) - Date.now()) / (1000*60*60*24))) : '—'}</div>
                 <div className="hs-label">Days Left</div>
               </div>
               <div className="hs-item">
@@ -739,93 +768,118 @@ const [approvals, setApprovals] = useState([]);
       </div>
     );
   }
-const milestones = projects[0]?.milestones || [];
 
-const mDate = (idx) => {
-  const m = milestones[idx];
-  if (!m || !m.done || !m.date) return "Done";
-  return "Done · " + new Date(m.date).toLocaleDateString("en-IN", { 
-    day: "numeric", month: "short" 
-  });
-};
   // Render Gantt Timeline helper
   function renderTimelineComponent() {
+    const proj = projects[0];
+    const milestones = proj?.milestones || [];
+    const today = new Date();
+
+    // ── Milestone Steps ──────────────────────────────────────────
+    const stepNodes = milestones.length > 0 ? milestones.map((m, idx) => {
+      const isDone = m.done === true;
+      const isActive = !isDone && idx === milestones.findIndex(x => !x.done);
+      const dateLabel = m.date ? new Date(m.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '';
+      const statusText = isDone ? `Done · ${dateLabel}` : isActive ? 'Active' : 'Pending';
+      const statusColor = isDone ? C.green : isActive ? C.teal : C.text3;
+      return (
+        <div key={idx} className="step-item">
+          <div className={`step-circle ${isDone ? 'done' : isActive ? 'active' : 'pending'}`}>
+            {isDone ? <i className="ti ti-check" style={{ fontSize: 15 }}></i> : idx + 1}
+          </div>
+          <div className="step-name">{m.name}</div>
+          <div className="step-date" style={{ color: statusColor }}>{statusText}</div>
+        </div>
+      );
+    }) : (
+      // Fallback if no milestones yet
+      <div style={{ gridColumn: '1/-1', textAlign: 'center', color: C.text3, fontSize: 13, padding: '12px 0' }}>
+        No milestones defined for this project yet.
+      </div>
+    );
+
+    // ── Gantt Chart ───────────────────────────────────────────────
+    // Compute month range from project start→end
+    const pStart = proj?.start ? new Date(proj.start) : new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const pEnd   = (proj?.end || proj?.deadline) ? new Date(proj.end || proj.deadline) : new Date(today.getFullYear(), today.getMonth() + 2, 0);
+    // Build 6 month labels centered around today
+    const ganttMonths = [];
+    for (let i = -1; i <= 4; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+      ganttMonths.push({ label: d.toLocaleString('en-IN', { month: 'short' }), year: d.getFullYear(), month: d.getMonth() });
+    }
+    const totalSpan = ganttMonths.length; // 6 columns
+
+    function monthIndex(date) {
+      if (!date) return -1;
+      const d = new Date(date);
+      return ganttMonths.findIndex(m => m.month === d.getMonth() && m.year === d.getFullYear());
+    }
+
+    // Today line: which column + percentage within that column
+    const todayColIdx = ganttMonths.findIndex(m => m.month === today.getMonth() && m.year === today.getFullYear());
+    const daysInTodayMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    const todayPct = (today.getDate() / daysInTodayMonth) * 100;
+
+    const ganttRows = milestones.map((m, idx) => {
+      const mDate = m.date ? new Date(m.date) : null;
+      const colIdx = mDate ? monthIndex(mDate) : -1;
+      const daysInCol = mDate ? new Date(mDate.getFullYear(), mDate.getMonth() + 1, 0).getDate() : 30;
+      const barLeft = mDate ? ((mDate.getDate() - 1) / daysInCol) * 100 : 0;
+      const barWidth = 30; // fixed width pill
+      const barColor = m.done ? C.teal : (colIdx === todayColIdx ? C.amber : '#CBD5E1');
+      const textColor = m.done ? '#fff' : C.text2;
+
+      return (
+        <div key={idx} className="tl-row">
+          <div>
+            <div className="tl-task-name">{m.name}</div>
+            <div className="tl-task-sub">{m.done ? '✓ Done' : 'Pending'}</div>
+          </div>
+          {ganttMonths.map((gm, gi) => {
+            const isToday = gi === todayColIdx;
+            return (
+              <div key={gi} className="tl-grid-cell" style={{ position: 'relative' }}>
+                {isToday && (
+                  <>
+                    <div className="today-label">TODAY</div>
+                    <div className="today-line" style={{ left: `${todayPct}%` }}></div>
+                  </>
+                )}
+                {gi === colIdx && mDate && (
+                  <div className="tl-bar-wrap">
+                    <div className="tl-bar" style={{ width: `${barWidth}%`, left: `${barLeft}%`, background: barColor, color: textColor }}>
+                      {m.done ? '✓' : ''}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    });
+
     return (
       <div>
         {/* Milestone Steps */}
         <div style={{ background: C.surface, border: "1.5px solid " + C.border, borderRadius: "16px", padding: 22, marginBottom: 14 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: C.text2, marginBottom: 18 }}>Milestone Progress</div>
-          <div className="steps-grid">
-            <div className="step-item">
-              <div className={`step-circle ${activeProjProgress > 15 ? "done" : "active"}`}>
-                {activeProjProgress > 15 ? <i className="ti ti-check" style={{ fontSize: 16 }}></i> : "1"}
-              </div>
-              <div className="step-name">Discovery</div>
-              <div className="step-date" style={{ color: activeProjProgress > 15 ? C.green : C.teal }}>
-                {activeProjProgress > 15 ? mDate(0) : "Active"}
-              </div>
-            </div>
-            <div className="step-item">
-              <div className={`step-circle ${activeProjProgress > 40 ? "done" : activeProjProgress > 15 ? "active" : "pending"}`}>
-                {activeProjProgress > 40 ? <i className="ti ti-check" style={{ fontSize: 16 }}></i> : "2"}
-              </div>
-              <div className="step-name">UI/UX Design</div>
-              <div className="step-date" style={{ color: activeProjProgress > 40 ? C.green : activeProjProgress > 15 ? C.teal : C.text3 }}>
-                {activeProjProgress > 40 ?  mDate(1) : activeProjProgress > 15 ? "Active" : "Pending"}
-              </div>
-            </div>
-            <div className="step-item">
-              <div className={`step-circle ${activeProjProgress > 70 ? "done" : activeProjProgress > 40 ? "active" : "pending"}`}>
-                {activeProjProgress > 70 ? <i className="ti ti-check" style={{ fontSize: 16 }}></i> : "3"}
-              </div>
-              <div className="step-name">Development</div>
-              <div className="step-date" style={{ color: activeProjProgress > 70 ? C.green : activeProjProgress > 40 ? C.teal : C.text3 }}>
-                {activeProjProgress > 70 ?  mDate(2) : activeProjProgress > 40 ? "Active" : "Pending"}
-              </div>
-            </div>
-            <div className="step-item">
-              <div className={`step-circle ${activeProjProgress > 85 ? "done" : activeProjProgress > 70 ? "active" : "pending"}`}>
-                {activeProjProgress > 85 ? <i className="ti ti-check" style={{ fontSize: 16 }}></i> : "4"}
-              </div>
-              <div className="step-name">CMS & SEO</div>
-              <div className="step-date" style={{ color: activeProjProgress > 85 ? C.green : activeProjProgress > 70 ? C.teal : C.text3 }}>
-                {activeProjProgress > 85 ? mDate(3) : activeProjProgress > 70 ? "Active" : "Pending"}
-              </div>
-            </div>
-            <div className="step-item">
-              <div className={`step-circle ${activeProjProgress >= 100 ? "done" : activeProjProgress >= 85 ? "active" : "pending"}`}>
-                {activeProjProgress >= 100 ? <i className="ti ti-check" style={{ fontSize: 15 }}></i> : <i className="ti ti-eye" style={{ fontSize: 15 }}></i>}
-              </div>
-              <div className="step-name">Final Review</div>
-              <div className="step-date" style={{ color: activeProjProgress >= 100 ? C.green : activeProjProgress >= 85 ? C.teal : C.text3 }}>
-                {activeProjProgress >= 100 ? "Done · 2 Jun" : activeProjProgress >= 85 ? "Active now" : "Pending"}
-              </div>
-            </div>
-            <div className="step-item">
-              <div className={`step-circle ${activeProjProgress >= 100 ? "active" : "pending"}`}>
-                {activeProjProgress >= 100 ? <i className="ti ti-rocket" style={{ fontSize: 15 }}></i> : "6"}
-              </div>
-              <div className="step-name">Launch 🚀</div>
-              <div className="step-date" style={{ color: activeProjProgress >= 100 ? C.teal : C.text3 }}>
-                {activeProjProgress >= 100 ? "Launch Now!" : activeProjDeadline}
-              </div>
-            </div>
+          <div className="steps-grid" style={{ gridTemplateColumns: `repeat(${Math.max(milestones.length, 1)}, 1fr)` }}>
+            {stepNodes}
           </div>
         </div>
 
         {/* Gantt Chart */}
         <div className="timeline-card">
           <div className="tc-header">
-<div className="tc-title">{(() => {
-  const s = projects[0]?.start ? new Date(projects[0].start) : null;
-  const e = projects[0]?.end ? new Date(projects[0].end) : null;
-  const fmt = d => d?.toLocaleDateString("en-IN", { month: "short", year: "numeric" });
-  return s && e ? `Gantt Chart · ${fmt(s)} – ${fmt(e)}` : "Gantt Chart";
-})()}</div>
+            <div className="tc-title">
+              Gantt Chart · {ganttMonths[0]?.label} {ganttMonths[0]?.year} – {ganttMonths[ganttMonths.length - 1]?.label} {ganttMonths[ganttMonths.length - 1]?.year}
+            </div>
             <div className="tc-legend">
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.teal }}></div>Completed</div>
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.amber }}></div>Active</div>
-              <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.border2 }}></div>Pending</div>
+              <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: '#CBD5E1' }}></div>Pending</div>
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.red }}></div>Today</div>
             </div>
           </div>
@@ -833,114 +887,15 @@ const mDate = (idx) => {
             <div className="timeline-wrap">
               <div className="tl-months">
                 <div className="tl-month"></div>
-                <div className="tl-month">Apr</div>
-                <div className="tl-month">May</div>
-                <div className="tl-month" style={{ color: C.teal, fontWeight: 800 }}>Jun ←</div>
-                <div className="tl-month">Jul</div>
-                <div className="tl-month">Aug</div>
-                <div className="tl-month">Sep</div>
+                {ganttMonths.map((gm, gi) => (
+                  <div key={gi} className="tl-month" style={gi === todayColIdx ? { color: C.teal, fontWeight: 800 } : {}}>
+                    {gm.label} {gi === todayColIdx ? '←' : ''}
+                  </div>
+                ))}
               </div>
-
-              {/* Rows */}
-              <div className="tl-row">
-                <div><div className="tl-task-name">Discovery</div><div className="tl-task-sub">Planning</div></div>
-                <div className="tl-grid-cell">
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: "90%", left: "0%", background: C.teal }}>✓</div>
-                  </div>
-                </div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-              </div>
-
-              <div className="tl-row">
-                <div><div className="tl-task-name">UI/UX Design</div><div className="tl-task-sub">Design</div></div>
-                <div className="tl-grid-cell">
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: "100%", left: "0%", background: C.teal }}>Design ✓</div>
-                  </div>
-                </div>
-                <div className="tl-grid-cell">
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: "40%", left: "0%", background: C.teal }}></div>
-                  </div>
-                </div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-              </div>
-
-              <div className="tl-row">
-                <div><div className="tl-task-name">Development</div><div className="tl-task-sub">Frontend + Backend</div></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell">
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: "100%", left: "0%", background: C.teal }}>Dev ✓</div>
-                  </div>
-                </div>
-                <div className="tl-grid-cell">
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: "20%", left: "0%", background: activeProjProgress >= 70 ? C.teal : C.amber }}></div>
-                  </div>
-                </div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-              </div>
-
-              <div className="tl-row">
-                <div><div className="tl-task-name">CMS & SEO Setup</div><div className="tl-task-sub">Content + SEO</div></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell">
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: "60%", left: "40%", background: C.teal }}>CMS ✓</div>
-                  </div>
-                </div>
-                <div className="tl-grid-cell">
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: "20%", left: "0%", background: activeProjProgress >= 85 ? C.teal : C.amber }}></div>
-                  </div>
-                </div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-              </div>
-
-              <div className="tl-row">
-                <div><div className="tl-task-name">Final Review</div><div className="tl-task-sub">Client Review</div></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell" style={{ position: "relative" }}>
-                  <div className="today-label">TODAY</div>
-                  <div className="today-line"></div>
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: "50%", left: "0%", background: activeProjProgress >= 100 ? C.teal : C.amber }}>In Review</div>
-                  </div>
-                </div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-              </div>
-
-              <div className="tl-row">
-                <div><div className="tl-task-name">Launch 🚀</div><div className="tl-task-sub">Go Live</div></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell">
-                  <div className="tl-bar-wrap">
-                    <div className="tl-bar" style={{ width: "100%", left: "0%", background: activeProjProgress >= 100 ? C.amber : "#CBD5E1", color: C.text2 }}>
-                      {activeProjProgress >= 100 ? "Ready to Launch!" : "Planned"}
-                    </div>
-                  </div>
-                </div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-                <div className="tl-grid-cell"></div>
-              </div>
+              {milestones.length > 0 ? ganttRows : (
+                <div style={{ padding: 20, textAlign: 'center', color: C.text3, fontSize: 13 }}>No milestones to display.</div>
+              )}
             </div>
           </div>
         </div>
@@ -1090,21 +1045,24 @@ const mDate = (idx) => {
   // Render Calendar helper
   function renderCalendarComponent() {
     const calendarDays = getCalendarDays();
-    const meetings = events.map(ev => ({
-      id: ev._id,
-      title: ev.title,
-      time: new Date(ev.date).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
-      dur: ev.duration || "",
-      meta: ev.description || ""
-    }));
+    const today = new Date();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const monthLabel = currentDate.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+
+    // Filter meetings for current displayed month
+    const monthMeetings = meetings.filter(m => {
+      const d = new Date(m.date || m.scheduledAt || m.meetingDate || "");
+      return !isNaN(d) && d.getFullYear() === year && d.getMonth() === month;
+    });
 
     return (
       <div className="calendar-panel">
         <div className="cal-header">
-          <div className="cal-month">June 2026</div>
+          <div className="cal-month">{monthLabel}</div>
           <div className="cal-nav">
-            <div className="cal-nav-btn" onClick={() => alert("Previous month (May 2026)")}><i className="ti ti-chevron-left"></i></div>
-            <div className="cal-nav-btn" onClick={() => alert("Next month (July 2026)")}><i className="ti ti-chevron-right"></i></div>
+            <div className="cal-nav-btn" onClick={() => setCurrentDate(new Date(year, month - 1, 1))}><i className="ti ti-chevron-left"></i></div>
+            <div className="cal-nav-btn" onClick={() => setCurrentDate(new Date(year, month + 1, 1))}><i className="ti ti-chevron-right"></i></div>
           </div>
         </div>
         <div className="cal-grid">
@@ -1116,8 +1074,7 @@ const mDate = (idx) => {
             {calendarDays.map((dayObj, idx) => {
               const eventClass = getEventClass(dayObj.day, dayObj.isOtherMonth);
               const isSelected = selectedDay === dayObj.day && !dayObj.isOtherMonth;
-              const isToday = dayObj.day === 1 && !dayObj.isOtherMonth; // Mock June 1st today
-
+              const isToday = dayObj.day === today.getDate() && !dayObj.isOtherMonth && month === today.getMonth() && year === today.getFullYear();
               return (
                 <div key={idx} className={`cal-day ${dayObj.isOtherMonth ? "other-month" : ""} ${isToday ? "today" : ""} ${eventClass} ${isSelected ? "selected" : ""}`}
                   onClick={() => !dayObj.isOtherMonth && setSelectedDay(dayObj.day)}>
@@ -1129,20 +1086,29 @@ const mDate = (idx) => {
         </div>
         <div style={{ padding: "0 14px 8px", fontSize: 10, fontWeight: 700, color: C.text3, textTransform: "uppercase", letterSpacing: .6 }}>Upcoming Meetings</div>
         <div className="meetings-list">
-          {meetings.map((meet) => (
-            <div key={meet.id} className="meeting-item" onClick={() => alert(`Redirecting to Google Meet link for ${meet.title}...`)}>
-              <div className="mi-time-col">
-                <div className="mi-time">{meet.time}</div>
-                <div className="mi-dur">{meet.dur}</div>
-              </div>
-              <div className="mi-divider"></div>
-              <div style={{ flex: 1 }}>
-                <div className="mi-title">{meet.title}</div>
-                <div className="mi-meta">{meet.meta}</div>
-              </div>
-              <div className="mi-join"><i className="ti ti-video" style={{ fontSize: 12 }}></i> Join</div>
-            </div>
-          ))}
+          {monthMeetings.length === 0 ? (
+            <div style={{ padding: '10px 14px', fontSize: 12, color: C.text3, textAlign: 'center' }}>No meetings scheduled this month.</div>
+          ) : (
+            monthMeetings.map((meet, i) => {
+              const meetDate = new Date(meet.date || meet.scheduledAt || meet.meetingDate || "");
+              const timeStr = !isNaN(meetDate) ? meetDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : (meet.time || '—');
+              const dateStr = !isNaN(meetDate) ? meetDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '';
+              return (
+                <div key={meet._id || i} className="meeting-item" onClick={() => meet.meetLink ? window.open(meet.meetLink, '_blank') : alert(`Meeting: ${meet.title || meet.subject}`)}>
+                  <div className="mi-time-col">
+                    <div className="mi-time">{timeStr}</div>
+                    <div className="mi-dur">{meet.duration || '1h'}</div>
+                  </div>
+                  <div className="mi-divider"></div>
+                  <div style={{ flex: 1 }}>
+                    <div className="mi-title">{meet.title || meet.subject || 'Meeting'}</div>
+                    <div className="mi-meta">{dateStr} · {meet.platform || 'Google Meet'} · {meet.attendees || ''}</div>
+                  </div>
+                  {meet.meetLink && <div className="mi-join"><i className="ti ti-video" style={{ fontSize: 12 }}></i> Join</div>}
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     );
@@ -1177,28 +1143,41 @@ const mDate = (idx) => {
 
   // Render Activity Feed helper
   function renderActivityFeed() {
-    const feedItems = notifs.slice(0, 5).map(n => ({
-      id: n._id,
-      title: n.message || n.title || "Notification",
-      time: new Date(n.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }),
-      icon: n.type === "payment" ? "ti-receipt" : n.type === "file" ? "ti-file-upload" : "ti-bell"
+    // Build from backend: project updates + notifications
+    const proj = projects[0];
+    const projUpdates = (proj?.updates || []).slice(0, 3).map((upd, i) => ({
+      id: 'upd-' + i,
+      title: upd.text || upd.title || 'Project update posted',
+      time: upd.date ? new Date(upd.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+      icon: 'ti-speakerphone'
     }));
+    const notifItems = notifs.slice(0, 3).map((n, i) => ({
+      id: 'notif-' + i,
+      title: n.message || n.title || 'Notification',
+      time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '',
+      icon: 'ti-bell'
+    }));
+    const feedItems = [...projUpdates, ...notifItems].slice(0, 4);
 
     return (
       <div className="activity-feed">
         <div style={{ fontSize: 12, fontWeight: 800, color: C.text2, marginBottom: 14 }}>Recent Activity</div>
-        {feedItems.map((item) => (
-          <div key={item.id} className="af-item">
-            <div className="af-dot-col">
-              <div className="af-dot"><i className={`ti ${item.icon}`}></i></div>
-              <div className="af-line"></div>
+        {feedItems.length === 0 ? (
+          <div style={{ fontSize: 12, color: C.text3, textAlign: 'center', padding: '12px 0' }}>No recent activity.</div>
+        ) : (
+          feedItems.map((item) => (
+            <div key={item.id} className="af-item">
+              <div className="af-dot-col">
+                <div className="af-dot"><i className={`ti ${item.icon}`}></i></div>
+                <div className="af-line"></div>
+              </div>
+              <div>
+                <div className="af-title">{item.title}</div>
+                <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 12 }}></i> {item.time}</div>
+              </div>
             </div>
-            <div>
-              <div className="af-title">{item.title}</div>
-              <div className="af-time"><i className="ti ti-clock" style={{ fontSize: 12 }}></i> {item.time}</div>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     );
   }
@@ -1225,18 +1204,23 @@ const mDate = (idx) => {
 
   // Render Contact Card helper
   function renderContactCard() {
+    const proj = projects[0];
+    const managerName = proj?.manager || proj?.contactPersonName || 'Project Manager';
+    const managerPhone = proj?.contactPersonNo || '';
+    const managerEmail = proj?.managerEmail || '';
     return (
       <div className="contact-card">
         <div className="cc-label">Your Account Manager</div>
-        <div className="cc-name">Prabhu</div>
-        <div className="cc-role">Senior Project Lead, YENCODE</div>
+        <div className="cc-name">{managerName}</div>
+        <div className="cc-role">{proj?.managerRole || 'Project Lead, YENCODE'}</div>
         <div className="cc-contacts">
-          <div className="cc-contact-row"><i className="ti ti-mail"></i> prabhu@yencode.com</div>
-          <div className="cc-contact-row"><i className="ti ti-phone"></i> +91 98765 43210</div>
+          {managerEmail && <div className="cc-contact-row"><i className="ti ti-mail"></i> {managerEmail}</div>}
+          {managerPhone && <div className="cc-contact-row"><i className="ti ti-phone"></i> {managerPhone}</div>}
+          {!managerEmail && !managerPhone && <div className="cc-contact-row" style={{ opacity: 0.6 }}><i className="ti ti-info-circle"></i> Contact details not set</div>}
         </div>
         <div className="cc-actions">
           <button className="cc-btn" onClick={() => setActive("messages")}><i className="ti ti-message-2"></i> Chat</button>
-          <button className="cc-btn" onClick={() => alert("Initiating call to account manager...")}><i className="ti ti-phone-call"></i> Call</button>
+          <button className="cc-btn" onClick={() => managerPhone ? window.open('tel:' + managerPhone) : alert("Phone not available")}><i className="ti ti-phone-call"></i> Call</button>
         </div>
       </div>
     );

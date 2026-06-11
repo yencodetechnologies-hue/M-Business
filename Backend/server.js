@@ -101,6 +101,7 @@ app.use("/api/groups", Group);
 app.use("/api/client-dashboard", clientDashRoutes);
 app.use("/api/invoices", Invoices);
 app.use("/api/events", eventRoutes);
+app.use("/api/meetings", eventRoutes);
 app.use("/api/accounts", accountRoutes);
 app.use("/api/expenses", accountRoutes);
 app.use("/api/income", incomeRoutes);

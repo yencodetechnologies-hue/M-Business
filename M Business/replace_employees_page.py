@@ -84,7 +84,9 @@ new_employees_page = """function EmployeesPage({ employees, setEmployees }) {
     }
   };
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+const res = await fetch(`/api/tasks?person=${encodeURIComponent(user.name)}`, {
+  headers: { "x-company-id": user.companyId }
+});
   const companyId = user?.companyId || user?.company || user?._id || user?.id || "";
   const onboardingLink = `${window.location.origin}/employee-onboarding?company=${encodeURIComponent(user.companyName || "Our Company")}&companyId=${companyId}`;
   const [linkCopied, setLinkCopied] = useState(false);

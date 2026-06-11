@@ -12,13 +12,16 @@ exports.getAllTasks = async (req, res) => {
     if (companyId) filter.companyId = companyId;
     if (req.query.groupId)  filter.groupId  = req.query.groupId;
     if (req.query.status)   filter.status   = req.query.status;
-    if (req.query.assignTo) filter.assignTo = req.query.assignTo;
-    if (req.query.person) {
-      filter.$or = [
-        { assignedTo: req.query.person },
-        { "invitedMembers.email": req.query.person }
-      ];
-    }
+if (req.query.assignTo) {
+  filter.assignTo = { $regex: new RegExp(`^\\s*${req.query.assignTo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, "i") };
+}
+if (req.query.person) {
+  filter.$or = [
+    { assignTo: { $regex: new RegExp(`^\\s*${req.query.person.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, "i") } },
+    { assignedTo: req.query.person },
+    { "invitedMembers.email": req.query.person }
+  ];
+}
 
     const tasks = await Task.find(filter)
       .populate("projectId", "name color")
@@ -48,10 +51,10 @@ exports.getBoardData = async (req, res) => {
 
         if (employeeName) {
           const nameRegex = new RegExp(`^\\s*${escapeRegExp(employeeName)}\\s*$`, "i");
-          taskFilter.$or = [
-            { assignTo: nameRegex },
-            { "invitedMembers.email": nameRegex }
-          ];
+       taskFilter.$or = [
+  { assignTo: nameRegex },
+  { "invitedMembers.email": nameRegex }
+];
         }
 
         const tasks = await Task.find(taskFilter)

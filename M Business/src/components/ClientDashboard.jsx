@@ -58,6 +58,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [invoices, setInvoices] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const [docs, setDocs] = useState([]);
+  const [events, setEvents] = useState([]); 
   const [loading, setLoading] = useState(true);
 
   // Profile Dropdown
@@ -67,12 +68,8 @@ export default function ClientDashboard({ user, setUser }) {
   const [fileFilter, setFileFilter] = useState("All");
 
   // Local Chat Mockups
-  const [chatMessages, setChatMessages] = useState([
-    { sender: "Prabhu · YENCODE", msg: "Hi! The final review designs have been uploaded. Please check and let us know your feedback.", time: "9:05 AM", mine: false },
-    { sender: "You", msg: "Looks great! I'll review and get back by EOD. Can we schedule a call too?", time: "9:22 AM", mine: true },
-    { sender: "Prabhu · YENCODE", msg: "Absolutely! I've added a meeting slot for tomorrow 11 AM. Check the schedule section below.", time: "9:30 AM", mine: false },
-    { sender: "You", msg: "Perfect. Also please send the updated invoice when ready.", time: "9:45 AM", mine: true }
-  ]);
+ const [chatMessages, setChatMessages] = useState([]);
+// useEffect-ல fetch பண்ணணும் messaging API-ல இருந்து
   const [chatText, setChatText] = useState("");
 
   // Feedback Mock
@@ -81,10 +78,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   // Approvals Mock
-  const [approvals, setApprovals] = useState([
-    { id: 1, title: "Homepage Design v3", desc: "Phase 1 design revisions approved, awaiting visual layout approval.", icon: "ti-photo" },
-    { id: 2, title: "SEO Keywords Plan", desc: "Approval request for targeting primary and secondary service keywords.", icon: "ti-seo" }
-  ]);
+const [approvals, setApprovals] = useState([]);
 
   // Calendar states
   const [currentDate, setCurrentDate] = useState(new Date(2026, 5, 19)); // Default mid June 2026
@@ -107,25 +101,29 @@ export default function ClientDashboard({ user, setUser }) {
     }
     const fetchAll = async () => {
       try {
-        const [projRes, taskRes, invRes, notifRes, docRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
-            headers: { 'x-company-id': user.companyId || "" }
-          }),
-          axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
-            headers: { 'x-company-id': user.companyId || "" }
-          }),
-          axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
-            headers: { 'x-company-id': user.companyId || "" }
-          }),
-          axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
-          axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] }))
-        ]);
+  const [projRes, taskRes, invRes, notifRes, docRes, eventsRes] = await Promise.all([
+  axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
+    headers: { 'x-company-id': user.companyId || "" }
+  }),
+  axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
+    headers: { 'x-company-id': user.companyId || "" }
+  }),
+  axios.get(`${BASE_URL}/api/invoices/client/${encodeURIComponent(clientName)}`, {
+    headers: { 'x-company-id': user.companyId || "" }
+  }),
+  axios.get(`${BASE_URL}/api/notifications/${user._id || user.id}`),
+  axios.get(`${BASE_URL}/api/documents?companyId=${user.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
+  axios.get(`${BASE_URL}/api/events?client=${encodeURIComponent(clientName)}`, {
+    headers: { 'x-company-id': user.companyId || "" }
+  }).catch(() => ({ data: [] }))  // ← இது 6th item
+]);
 
         setProjects(projRes.data || []);
         setTasks(taskRes.data || []);
         setInvoices(invRes.data || []);
         setNotifs(notifRes.data || []);
         setDocs(docRes.data || []);
+        setEvents(eventsRes.data || []);
       } catch (err) {
         console.error("Failed to fetch client dashboard data", err);
       } finally {
@@ -237,17 +235,7 @@ export default function ClientDashboard({ user, setUser }) {
     return eventDays.includes(day) ? "has-event" : "";
   };
 
-  // File grid logic
-  const defaultMockFiles = [
-    { name: "Homepage_Final_v3.fig", meta: "Figma Design · 8.4 MB", date: "28 May 2026", type: "Designs", icon: "ti-photo", bg: C.blueBg, col: C.blue, badge: "New" },
-    { name: "Brand_Guidelines_v2.pdf", meta: "PDF · 2.4 MB", date: "22 May 2026", type: "Documents", icon: "ti-file-type-pdf", bg: C.redBg, col: C.red },
-    { name: "SEO_Audit_Report.xlsx", meta: "Excel · 890 KB", date: "20 May 2026", type: "Reports", icon: "ti-file-spreadsheet", bg: C.greenBg, col: C.green },
-    { name: "STA_Phase2_Proposal.docx", meta: "Word · 340 KB", date: "15 May 2026", type: "Documents", icon: "ti-file-text", bg: C.purpleBg, col: C.purple },
-    { name: "AboutPage_Design.png", meta: "PNG · 1.2 MB", date: "12 May 2026", type: "Designs", icon: "ti-photo", bg: C.amberBg, col: C.amber },
-    { name: "Project_Contract.pdf", meta: "PDF · 560 KB", date: "01 Apr 2026", type: "Documents", icon: "ti-file-type-pdf", bg: C.redBg, col: C.red },
-    { name: "ContactPage_v2.png", meta: "PNG · 980 KB", date: "29 May 2026", type: "Designs", icon: "ti-photo", bg: C.blueBg, col: C.blue, badge: "New" },
-    { name: "Content_Brief.docx", meta: "Word · 210 KB", date: "08 Apr 2026", type: "Documents", icon: "ti-file-text", bg: C.greenBg, col: C.green }
-  ];
+
 
   // Convert uploaded docs to matching file card format
   const docCards = docs.map(d => ({
@@ -276,13 +264,7 @@ export default function ClientDashboard({ user, setUser }) {
     status: (inv.status || "draft").toLowerCase()
   }));
 
-  // Mock fallback if DB has no invoices
-  const defaultMockInvoices = [
-    { id: "mock1", invoiceNo: "#INV-2026-1230", desc: "STA Website · Advance Payment", date: "01 May 2026", dueDate: "01 May 2026", total: 40000, amountPaid: 40000, status: "paid" },
-    { id: "mock2", invoiceNo: "#INV-2026-1218", desc: "STA Website · Design Milestone", date: "25 Apr 2026", dueDate: "25 Apr 2026", total: 40000, amountPaid: 40000, status: "paid" },
-    { id: "mock3", invoiceNo: "#INV-2026-1240", desc: "STA Website · Final Delivery", date: "29 May 2026", dueDate: "30 Jun 2026", total: 40000, amountPaid: 0, status: "pending" }
-  ];
-
+ 
   const finalInvoicesList = dbInvoices;
 
   const totalPaid = finalInvoicesList.filter(i => i.status === "paid").reduce((sum, i) => sum + i.total, 0);
@@ -757,7 +739,15 @@ export default function ClientDashboard({ user, setUser }) {
       </div>
     );
   }
+const milestones = projects[0]?.milestones || [];
 
+const mDate = (idx) => {
+  const m = milestones[idx];
+  if (!m || !m.done || !m.date) return "Done";
+  return "Done · " + new Date(m.date).toLocaleDateString("en-IN", { 
+    day: "numeric", month: "short" 
+  });
+};
   // Render Gantt Timeline helper
   function renderTimelineComponent() {
     return (
@@ -772,7 +762,7 @@ export default function ClientDashboard({ user, setUser }) {
               </div>
               <div className="step-name">Discovery</div>
               <div className="step-date" style={{ color: activeProjProgress > 15 ? C.green : C.teal }}>
-                {activeProjProgress > 15 ? "Done · 10 Apr" : "Active"}
+                {activeProjProgress > 15 ? mDate(0) : "Active"}
               </div>
             </div>
             <div className="step-item">
@@ -781,7 +771,7 @@ export default function ClientDashboard({ user, setUser }) {
               </div>
               <div className="step-name">UI/UX Design</div>
               <div className="step-date" style={{ color: activeProjProgress > 40 ? C.green : activeProjProgress > 15 ? C.teal : C.text3 }}>
-                {activeProjProgress > 40 ? "Done · 25 Apr" : activeProjProgress > 15 ? "Active" : "Pending"}
+                {activeProjProgress > 40 ?  mDate(1) : activeProjProgress > 15 ? "Active" : "Pending"}
               </div>
             </div>
             <div className="step-item">
@@ -790,7 +780,7 @@ export default function ClientDashboard({ user, setUser }) {
               </div>
               <div className="step-name">Development</div>
               <div className="step-date" style={{ color: activeProjProgress > 70 ? C.green : activeProjProgress > 40 ? C.teal : C.text3 }}>
-                {activeProjProgress > 70 ? "Done · 20 May" : activeProjProgress > 40 ? "Active" : "Pending"}
+                {activeProjProgress > 70 ?  mDate(2) : activeProjProgress > 40 ? "Active" : "Pending"}
               </div>
             </div>
             <div className="step-item">
@@ -799,7 +789,7 @@ export default function ClientDashboard({ user, setUser }) {
               </div>
               <div className="step-name">CMS & SEO</div>
               <div className="step-date" style={{ color: activeProjProgress > 85 ? C.green : activeProjProgress > 70 ? C.teal : C.text3 }}>
-                {activeProjProgress > 85 ? "Done · 27 May" : activeProjProgress > 70 ? "Active" : "Pending"}
+                {activeProjProgress > 85 ? mDate(3) : activeProjProgress > 70 ? "Active" : "Pending"}
               </div>
             </div>
             <div className="step-item">
@@ -826,7 +816,12 @@ export default function ClientDashboard({ user, setUser }) {
         {/* Gantt Chart */}
         <div className="timeline-card">
           <div className="tc-header">
-            <div className="tc-title">Gantt Chart · Apr – Jun 2026</div>
+<div className="tc-title">{(() => {
+  const s = projects[0]?.start ? new Date(projects[0].start) : null;
+  const e = projects[0]?.end ? new Date(projects[0].end) : null;
+  const fmt = d => d?.toLocaleDateString("en-IN", { month: "short", year: "numeric" });
+  return s && e ? `Gantt Chart · ${fmt(s)} – ${fmt(e)}` : "Gantt Chart";
+})()}</div>
             <div className="tc-legend">
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.teal }}></div>Completed</div>
               <div className="tc-legend-item"><div className="tc-legend-dot" style={{ background: C.amber }}></div>Active</div>
@@ -1095,10 +1090,13 @@ export default function ClientDashboard({ user, setUser }) {
   // Render Calendar helper
   function renderCalendarComponent() {
     const calendarDays = getCalendarDays();
-    const meetings = [
-      { id: 1, title: "Final Review Call", time: "11:00", dur: "1h", meta: "2 Jun · Google Meet · Prabhu + STA Admin" },
-      { id: 2, title: "Launch Coordination Sync", time: "3:00", dur: "45m", meta: "6 Jun · Google Meet · Prabhu + Dev team" }
-    ];
+    const meetings = events.map(ev => ({
+      id: ev._id,
+      title: ev.title,
+      time: new Date(ev.date).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+      dur: ev.duration || "",
+      meta: ev.description || ""
+    }));
 
     return (
       <div className="calendar-panel">
@@ -1179,11 +1177,12 @@ export default function ClientDashboard({ user, setUser }) {
 
   // Render Activity Feed helper
   function renderActivityFeed() {
-    const feedItems = [
-      { id: 1, title: "Prabhu uploaded Homepage_Final_v3.fig", time: "2 hours ago", icon: "ti-file-upload" },
-      { id: 2, title: "Payment #INV-2026-1218 approved by gateway", time: "1 day ago", icon: "ti-receipt" },
-      { id: 3, title: "Meeting Final Review Call scheduled by Prabhu", time: "2 days ago", icon: "ti-video" }
-    ];
+    const feedItems = notifs.slice(0, 5).map(n => ({
+      id: n._id,
+      title: n.message || n.title || "Notification",
+      time: new Date(n.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }),
+      icon: n.type === "payment" ? "ti-receipt" : n.type === "file" ? "ti-file-upload" : "ti-bell"
+    }));
 
     return (
       <div className="activity-feed">

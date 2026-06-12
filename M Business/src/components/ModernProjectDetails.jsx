@@ -222,7 +222,9 @@ const [addingExpense, setAddingExpense] = useState(false);
     try {
       const [pRes, tRes] = await Promise.all([
         axios.get(`${BASE_URL}/api/projects/${project._id}`),
-        axios.get(`${BASE_URL}/api/tasks`)
+        axios.get(`${BASE_URL}/api/tasks`, {
+          headers: { 'x-company-id': project?.companyId || '' }
+        })
       ]);
       if (pRes.data) {
         setCurrProject(pRes.data);
@@ -314,6 +316,25 @@ const progressPct = totalTasks > 0
       const isCurrentlyDone = task.status === 'done' || task.status === 'completed';
       const newStatus = isCurrentlyDone ? 'in_progress' : 'completed';
       await axios.put(`${BASE_URL}/api/tasks/${task._id}`, { status: newStatus });
+
+      // Recalculate progress and save to project DB
+      const latestTasks = await axios.get(`${BASE_URL}/api/tasks`, {
+        headers: { 'x-company-id': currProject?.companyId || '' }
+      });
+      const allTasks = Array.isArray(latestTasks.data) ? latestTasks.data : [];
+      const projTasks = allTasks.filter(t => t.project === currProject?.name && !t.isDeleted);
+      const totalT = projTasks.length;
+      const doneT = projTasks.filter(t => {
+        const s = t.status;
+        return s === 'done' || s === 'completed' || (t._id === task._id ? !isCurrentlyDone : false);
+      }).length;
+      const newProgress = totalT > 0 ? Math.round((doneT / totalT) * 100) : (currProject.progress || 0);
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        progress: newProgress,
+        completedTasks: doneT,
+        tasks: totalT,
+      });
+
       loadLatest();
       if (onUpdate) onUpdate();
       if (fetchTasks) fetchTasks();
@@ -446,8 +467,19 @@ const handleAddExpense = async (e) => {
         return m;
       });
 
+      // Recalculate progress from milestones if no tasks exist
+      const totalM = updatedMilestones.length;
+      const doneM = updatedMilestones.filter(m => m.done).length;
+      const totalT = projTasks.length;
+      const newProgress = totalT > 0
+        ? Math.round((projTasks.filter(t => t.status === 'done' || t.status === 'completed').length / totalT) * 100)
+        : totalM > 0
+          ? Math.round((doneM / totalM) * 100)
+          : (currProject.progress || 0);
+
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
-        milestones: updatedMilestones
+        milestones: updatedMilestones,
+        progress: newProgress,
       });
       loadLatest();
       if (onUpdate) onUpdate();

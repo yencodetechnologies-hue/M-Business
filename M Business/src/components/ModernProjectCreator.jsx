@@ -242,11 +242,14 @@ useEffect(() => {
         portalSettings: portalOpts
       };
 
+      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const headers = { 'x-company-id': currentUser.companyId || "" };
+
       let res;
       if (editProject) {
-        res = await axios.put(`${BASE_URL}/api/projects/${editProject._id || editProject.id}`, payload);
+        res = await axios.put(`${BASE_URL}/api/projects/${editProject._id || editProject.id}`, payload, { headers });
       } else {
-        res = await axios.post(`${BASE_URL}/api/projects/add`, payload);
+        res = await axios.post(`${BASE_URL}/api/projects/add`, payload, { headers });
       }
       
       // Notify assigned employees

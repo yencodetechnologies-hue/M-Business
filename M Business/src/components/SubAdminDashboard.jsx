@@ -5265,8 +5265,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       try {
         const current = Number(jumpProject?.loggedHours || 0);
         const updated = current + Number(hours || 0);
-        await axios.put(`${BASE_URL}/api/projects/${jumpProject._id}`, { loggedHours: updated });
-        setJumpProject(prev => ({ ...prev, loggedHours: updated }));
+       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { loggedHours: updated });
+setCurrProject(prev => ({ ...prev, loggedHours: updated }));
+setShowLogTimeModal(false);
+loadLatest();
+if (fetchProjects)
         fetchProjects();
       } catch(e) { console.error(e); }
     }}

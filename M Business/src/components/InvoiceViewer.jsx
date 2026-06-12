@@ -44,23 +44,42 @@ export default function InvoiceViewer() {
       const decoded = decodeURIComponent(escape(atob(safeEncoded)));
       const slim = JSON.parse(decoded);
       const inv = {
-        invoiceNo: slim.no, date: slim.date, dueDate: slim.due,
-        companyName: slim.co, companyEmail: slim.email,
-        companyPhone: slim.phone, companyAddress: slim.addr,
-        client: slim.cl, project: slim.proj,
-        gstRate: slim.gst, notes: slim.notes, terms: slim.terms,
-        isGstIncluded: slim.incGst, amountPaid: slim.paid || 0,
-        upiId: slim.upi || "", currency: slim.cur || "₹",
-        paymentHistory: slim.history || [],
-        logoUrl: slim.logo || "",
-        cid: slim.cid || "",
-        signature: slim.sig || "",
-        signatureType: slim.sigType || "text",
-        template: slim.temp || "Classic",
+        invoiceNo: slim.no || slim.invoiceNo, 
+        date: slim.date || slim.date, 
+        dueDate: slim.due || slim.dueDate,
+        companyName: slim.co || slim.companyName || "", 
+        companyEmail: slim.email || slim.companyEmail || "",
+        companyPhone: slim.phone || slim.companyPhone || "", 
+        companyAddress: slim.addr || slim.companyAddress || "",
+        client: slim.cl || slim.client || "", 
+        project: slim.proj || slim.project || "",
+        gstRate: slim.gst || slim.gstRate || 0, 
+        notes: slim.notes || slim.notes || "", 
+        terms: slim.terms || slim.terms || "",
+        isGstIncluded: slim.incGst !== undefined ? slim.incGst : slim.isGstIncluded, 
+        amountPaid: slim.paid || slim.amountPaid || 0,
+        upiId: slim.upi || slim.upiId || "", 
+        currency: slim.cur || slim.currency || "₹",
+        paymentHistory: slim.history || slim.paymentHistory || [],
+        logoUrl: slim.logo || slim.logoUrl || "",
+        cid: slim.cid || slim.companyId || "",
+        signature: slim.sig || slim.signature || "",
+        signatureType: slim.sigType || slim.signatureType || "text",
+        template: slim.temp || slim.template || "Classic",
       };
-      const items = (slim.items || []).map((i, idx) => ({
-        id: idx + 1, description: i.d, quantity: i.q, rate: i.r,
-      }));
+      
+      let items = [];
+      if (slim.items && slim.items.length > 0) {
+        if (slim.items[0].d !== undefined) {
+          items = slim.items.map((i, idx) => ({
+            id: idx + 1, description: i.d, quantity: i.q, rate: i.r,
+          }));
+        } else {
+          items = slim.items.map((i, idx) => ({
+            id: idx + 1, description: i.description, quantity: i.quantity, rate: i.rate,
+          }));
+        }
+      }
       const subtotalRaw = items.reduce((s, i) => s + (parseFloat(i.rate)||0) * (parseFloat(i.quantity)||0), 0);
       let subtotal, gstAmt, total;
       if (inv.isGstIncluded) {
@@ -78,25 +97,29 @@ export default function InvoiceViewer() {
       setData({ inv, items, subtotal, gstAmt, total, balanceDue, finalPaid });
 
       // Fetch latest invoice details from backend to get full signature/branding/payments
-      axios.get(`${BASE_URL}/api/invoices/no/${slim.no}`)
-        .then(res => {
-          if (res.data && res.data.inv) {
-            const fetched = res.data.inv;
-            setData(prev => {
-              if (!prev) return prev;
-              return {
-                ...prev,
-                inv: {
-                  ...prev.inv,
-                  signature: fetched.signature || prev.inv.signature,
-                  signatureType: fetched.signatureType || prev.inv.signatureType,
-                  template: fetched.template || prev.inv.template,
-                }
-              };
-            });
-          }
-        })
-        .catch(() => {});
+      // Fetch latest invoice details from backend to get full signature/branding/payments
+      const invoiceIdentifier = slim.no || slim.invoiceNo;
+      if (invoiceIdentifier) {
+        axios.get(`${BASE_URL}/api/invoices/no/${invoiceIdentifier}`)
+          .then(res => {
+            if (res.data && res.data.inv) {
+              const fetched = res.data.inv;
+              setData(prev => {
+                if (!prev) return prev;
+                return {
+                  ...prev,
+                  inv: {
+                    ...prev.inv,
+                    signature: fetched.signature || prev.inv.signature,
+                    signatureType: fetched.signatureType || prev.inv.signatureType,
+                    template: fetched.template || prev.inv.template,
+                  }
+                };
+              });
+            }
+          })
+          .catch(() => {});
+      }
 
       // Fetch branding if CID exists and no logo in payload
       if (inv.cid && !inv.logoUrl) {
@@ -112,6 +135,15 @@ export default function InvoiceViewer() {
       setError("Could not read invoice data.");
     }
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("print") === "true" && data) {
+      setTimeout(() => {
+        window.print();
+      }, 800); // Wait for fonts and images to render
+    }
+  }, [data]);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -144,11 +176,10 @@ export default function InvoiceViewer() {
 
   const { inv, items, subtotal, gstAmt, total, balanceDue, finalPaid } = data;
   const isPaid = balanceDue <= 0;
-  const qrData = window.location.href;
-
-  useEffect(() => {
-    // Only auto-print if data is loaded! We will move this logic below.
-  }, []);
+  // Prevent QRCodeSVG from crashing if the URL with base64 payload is too large
+  const qrData = window.location.href.length > 1000 
+    ? `${window.location.origin}/invoice-view?no=${inv.invoiceNo}` 
+    : window.location.href;
 
   const getTemplateStyles = (templateName) => {
     switch (templateName) {
@@ -199,15 +230,6 @@ export default function InvoiceViewer() {
       remaining = remaining.slice(ITEMS_PER_PAGE_REST);
     }
   }
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("print") === "true" && data) {
-      setTimeout(() => {
-        window.print();
-      }, 800); // Wait for fonts and images to render
-    }
-  }, [data]);
 
   return (
     <div className="print-wrapper" style={{ fontFamily: currentT.fontFamily || "'Plus Jakarta Sans', sans-serif", background: "#f1f5f9", minHeight: "100vh", padding: "20px 12px" }}>

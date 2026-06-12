@@ -68,12 +68,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [fileFilter, setFileFilter] = useState("All");
 
   // Local Chat Mockups
-  const [chatMessages, setChatMessages] = useState([
-    { sender: "Prabhu · YENCODE", msg: "Hi! The final review designs have been uploaded. Please check and let us know your feedback.", time: "9:05 AM", mine: false },
-    { sender: "You", msg: "Looks great! I'll review and get back by EOD. Can we schedule a call too?", time: "9:22 AM", mine: true },
-    { sender: "Prabhu · YENCODE", msg: "Absolutely! I've added a meeting slot for tomorrow 11 AM. Check the schedule section below.", time: "9:30 AM", mine: false },
-    { sender: "You", msg: "Perfect. Also please send the updated invoice when ready.", time: "9:45 AM", mine: true }
-  ]);
+  const [chatMessages, setChatMessages] = useState([]);
   const [chatText, setChatText] = useState("");
 
   // Feedback Mock
@@ -272,7 +267,7 @@ export default function ClientDashboard({ user, setUser }) {
     raw: d
   }));
 
-  const allFiles = [...docCards, ...(projects[0]?.files || []).map(f => ({ name: f.name, meta: `${f.type || "File"}`, date: new Date(f.uploadedAt || Date.now()).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }), type: "Documents", icon: "ti-file", bg: C.blueBg, col: C.blue }))];
+  const allFiles = [...docCards, ...(projects[0]?.files || []).map(f => ({ name: f.name, meta: `${f.type || "File"}`, date: new Date(f.uploadedAt || Date.now()).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }), type: "Documents", icon: "ti-file", bg: C.blueBg, col: C.blue, raw: f }))];
   const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
 
   // Invoices variables
@@ -284,15 +279,9 @@ export default function ClientDashboard({ user, setUser }) {
     date: inv.date || "01 May 2026",
     total: inv.total || 0,
     amountPaid: inv.amountPaid || 0,
-    status: (inv.status || "draft").toLowerCase()
+    status: (inv.status || "draft").toLowerCase(),
+    raw: inv
   }));
-
-  // Mock fallback if DB has no invoices
-  const defaultMockInvoices = [
-    { id: "mock1", invoiceNo: "#INV-2026-1230", desc: "STA Website · Advance Payment", date: "01 May 2026", dueDate: "01 May 2026", total: 40000, amountPaid: 40000, status: "paid" },
-    { id: "mock2", invoiceNo: "#INV-2026-1218", desc: "STA Website · Design Milestone", date: "25 Apr 2026", dueDate: "25 Apr 2026", total: 40000, amountPaid: 40000, status: "paid" },
-    { id: "mock3", invoiceNo: "#INV-2026-1240", desc: "STA Website · Final Delivery", date: "29 May 2026", dueDate: "30 Jun 2026", total: 40000, amountPaid: 0, status: "pending" }
-  ];
 
   const finalInvoicesList = dbInvoices;
 
@@ -302,7 +291,7 @@ export default function ClientDashboard({ user, setUser }) {
   const totalInvoiced = totalPaid + totalPending + totalOverdue;
 
   // Active project calculation
-  const activeProjName = projects[0]?.name || "STA Corporate Website";
+  const activeProjName = projects[0]?.name || "";
   const activeProjProgress = projects[0]?.progress ?? 0;
   const activeProjDesc = projects[0]?.description || "";
   const activeProjDeadline = projects[0]?.deadline || projects[0]?.end || "";
@@ -918,7 +907,31 @@ export default function ClientDashboard({ user, setUser }) {
           {filteredFiles.map((file, idx) => (
             <div key={idx} className="file-card" onClick={() => file.raw && setSelectedDoc(file.raw)}>
               {file.badge && <span className="fc-new-badge">{file.badge}</span>}
-              <div className="fc-download"><i className="ti ti-download"></i></div>
+              <div className="fc-download" onClick={(e) => {
+                e.stopPropagation();
+                if (!file.raw) return alert("File not available.");
+                if (file.raw.url) {
+                  const url = file.raw.url;
+                  const dlUrl = url.includes('res.cloudinary.com') && url.includes('/upload/') 
+                    ? url.replace('/upload/', '/upload/fl_attachment/') 
+                    : url;
+                  const a = document.createElement('a');
+                  a.href = dlUrl;
+                  a.download = file.name || 'download';
+                  a.target = '_blank';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                } else if (file.raw.htmlContent) {
+                  const blob = new Blob([file.raw.htmlContent], { type: 'text/html' });
+                  const a = document.createElement('a');
+                  a.href = URL.createObjectURL(blob);
+                  a.download = file.name || 'Document.html';
+                  a.click();
+                } else {
+                  alert("No valid file URL found.");
+                }
+              }}><i className="ti ti-download"></i></div>
               <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
               <div className="fc-name">{file.name}</div>
               <div className="fc-meta">{file.meta}</div>
@@ -980,7 +993,13 @@ export default function ClientDashboard({ user, setUser }) {
                 <div className="inv-date">{inv.status === "paid" ? inv.date : `Due ${inv.dueDate}`}</div>
               </div>
               <span className={`badge ${inv.status}`}>{inv.status}</span>
-              <div className="inv-dl" style={{ marginLeft: "8px" }} onClick={(e) => { e.stopPropagation(); alert("Downloading invoice PDF..."); }}>
+              <div className="inv-dl" style={{ marginLeft: "8px" }} onClick={(e) => { 
+                e.stopPropagation(); 
+                if(!inv.raw) return alert("Invoice data missing");
+                const slim = { ...inv.raw };
+                const d = btoa(unescape(encodeURIComponent(JSON.stringify(slim))));
+                window.open(`${window.location.origin}/invoice-view?d=${d}`, '_blank');
+              }}>
                 <i className="ti ti-download"></i>
               </div>
             </div>
@@ -1020,6 +1039,9 @@ export default function ClientDashboard({ user, setUser }) {
     return (
       <div className="messages-panel">
         <div className="msg-list">
+          {chatMessages.length === 0 && (
+            <div style={{ padding: 24, textAlign: "center", color: C.text3, fontSize: 12, margin: "auto" }}>No messages yet. Say hello!</div>
+          )}
           {chatMessages.map((msg, idx) => (
             <div key={idx} className={`msg-row ${msg.mine ? "mine" : ""}`}>
               <div className="msg-av" style={{ background: msg.mine ? "linear-gradient(135deg, " + C.amber + ", #D97706)" : "linear-gradient(135deg, " + C.teal + ", " + C.teal3 + ")" }}>
@@ -1261,7 +1283,17 @@ export default function ClientDashboard({ user, setUser }) {
                   <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
                   Files & Documents
                 </div>
-                <div className="sec-action" onClick={() => alert("Downloading all files shared...")}>
+                <div className="sec-action" onClick={() => {
+                  if(allFiles.length === 0) return alert("No files available to download.");
+                  let downloaded = 0;
+                  allFiles.forEach(f => {
+                    if (f.raw && f.raw.url) {
+                      window.open(f.raw.url, '_blank');
+                      downloaded++;
+                    }
+                  });
+                  if(downloaded === 0) alert("No downloadable files found.");
+                }}>
                   <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
                 </div>
               </div>
@@ -1322,7 +1354,17 @@ export default function ClientDashboard({ user, setUser }) {
                 <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
                 Files & Documents Checklist
               </div>
-              <div className="sec-action" onClick={() => alert("Downloading all files shared...")}>
+              <div className="sec-action" onClick={() => {
+                if(allFiles.length === 0) return alert("No files available to download.");
+                let downloaded = 0;
+                allFiles.forEach(f => {
+                  if (f.raw && f.raw.url) {
+                    window.open(f.raw.url, '_blank');
+                    downloaded++;
+                  }
+                });
+                if(downloaded === 0) alert("No downloadable files found.");
+              }}>
                 <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
               </div>
             </div>

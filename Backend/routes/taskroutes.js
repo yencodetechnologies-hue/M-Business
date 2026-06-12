@@ -35,7 +35,9 @@ router.get("/client/:clientName", async (req, res) => {
     const projectConditions = [];
     if (safeName)    projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`,    "i") } });
     if (safeCompany) projectConditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
-    const projects   = await Project.find(projectConditions.length ? { $or: projectConditions } : {});
+    const companyId = req.companyId || "";
+    const projectBaseFilter = companyId ? { companyId } : {};
+    const projects   = await Project.find(projectConditions.length ? { ...projectBaseFilter, $or: projectConditions } : projectBaseFilter);
     const projectIds = projects.map(p => p._id);
 
     // Build a lookup: projectId string -> project name
@@ -50,6 +52,7 @@ router.get("/client/:clientName", async (req, res) => {
     const taskFilter = {
       $or: [ { projectId: { $in: projectIds } }, ...assignConditions ],
       isDeleted: false,
+      ...(companyId ? { companyId } : {}),
     };
 
     const tasks = await Task.find(taskFilter).sort({ createdAt: -1 });

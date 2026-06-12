@@ -30,7 +30,8 @@ router.get("/client/:clientName", async (req, res) => {
     if (safeName) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeName}\\s*$`, "i") } });
     if (safeCompany) conditions.push({ client: { $regex: new RegExp(`^\\s*${safeCompany}\\s*$`, "i") } });
 
-    const filter = conditions.length > 0 ? { $or: conditions } : {};
+    const baseFilter = companyId ? { companyId } : {};
+    const filter = conditions.length > 0 ? { ...baseFilter, $or: conditions } : baseFilter;
 
     const projects = await Project.find(filter).sort({ createdAt: -1 });
     res.json(projects);

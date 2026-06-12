@@ -108,23 +108,35 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
 
   // Form State
   const [name, setName] = useState(editProject?.name || '');
-  const [description, setDescription] = useState(editProject?.description || '');
+const [description, setDescription] = useState(editProject?.description || editProject?.purpose || '');
   const [client, setClient] = useState(editProject?.client || '');
   const [category, setCategory] = useState(editProject?.category || 'Web Development');
   const [priority, setPriority] = useState(editProject?.priority || 'medium');
   const [status, setStatus] = useState(editProject?.status || 'Active');
   const [progress, setProgress] = useState(editProject?.progress || 0);
   
-  const [start, setStart] = useState(editProject?.start ? new Date(editProject.start).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
-  const [end, setEnd] = useState(editProject?.end || editProject?.deadline || '');
-  
-  const [assigned, setAssigned] = useState(Array.isArray(editProject?.assignedTo) ? editProject.assignedTo : (editProject?.assignedTo ? [editProject.assignedTo] : [])); // array of employee names
-  
+const safeDate = (d) => { try { return d ? new Date(d).toISOString().split('T')[0] : ''; } catch { return ''; } };
+const [start, setStart] = useState(safeDate(editProject?.start) || new Date().toISOString().split('T')[0]);
+const [end, setEnd] = useState(safeDate(editProject?.end) || safeDate(editProject?.deadline) || '');
+const [assigned, setAssigned] = useState(() => {
+  const a = editProject?.assignedTo;
+  if (!a) return [];
+  if (Array.isArray(a)) return a.map(x => typeof x === 'object' ? (x.name || x.employeeName || '') : String(x)).filter(Boolean);
+  return [String(a)];
+});
   const [budget, setBudget] = useState(editProject?.budget || '');
   const [currency, setCurrency] = useState(editProject?.currency || '₹');
   const [billed, setBilled] = useState(editProject?.billed || '');
   const [received, setReceived] = useState(editProject?.received || '');
-  const [pending, setPending] = useState(editProject?.pending || '');
+const [pending, setPending] = useState(editProject?.pending || '');
+
+// Auto-calculate pending
+useEffect(() => {
+  if (budget && received) {
+    const calc = Number(budget) - Number(received);
+    setPending(calc >= 0 ? String(calc) : '0');
+  }
+}, [budget, received]);
   const [spent, setSpent] = useState(editProject?.spent || '');
 
   const [milestones, setMilestones] = useState(editProject?.milestones?.length ? editProject.milestones : [
@@ -415,9 +427,9 @@ export default function ModernProjectCreator({ onBack, clients = [], employees =
                   <input type="number" value={received} onChange={e => setReceived(e.target.value)} placeholder="0" />
                 </div>
                 <div className="mpc-form-group">
-                  <label>Pending Amount</label>
-                  <input type="number" value={pending} onChange={e => setPending(e.target.value)} placeholder="0" />
-                </div>
+  <label>Pending Amount</label>
+<input type="number" value={pending} readOnly style={{background:'#f0f4f8', cursor:'not-allowed'}} />
+</div>
                 <div className="mpc-form-group">
                   <label>Spent Amount</label>
                   <input type="number" value={spent} onChange={e => setSpent(e.target.value)} placeholder="0" />

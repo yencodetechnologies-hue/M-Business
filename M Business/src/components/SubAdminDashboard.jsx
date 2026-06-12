@@ -1934,7 +1934,7 @@ const saveEdit = async () => {
                 ["Deadline", (viewProj.end || viewProj.deadline) ? new Date(viewProj.end || viewProj.deadline).toLocaleDateString("en-IN") : "—"],
                 ["Budget", formatCurrency(viewProj.budget, viewProj.currency)],
                 ["Progress", `${viewProj.progress || 0}%`],
-                ["Logged Hours", `${viewProj.loggedHours || 0}h`],
+
                 ["Purpose", viewProj.purpose],
               ].map(([label, val]) => (
                 <div key={label}>
@@ -2040,10 +2040,7 @@ const saveEdit = async () => {
         </div>
       </div>
 
-      {/* Logged Hours */}
-      <Fld label="Logged Hours" value={editForm.loggedHours}
-        type="number" placeholder="0"
-        onChange={v => setEditForm(p => ({ ...p, loggedHours: Number(v) || 0 }))} />
+
 
       {/* Dates */}
       <Fld label="Start Date" value={editForm.start} type="date"
@@ -5245,20 +5242,29 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   />
 )}
                 {validActive === "project-details" && (
-                  <ModernProjectDetails 
-                    project={jumpProject} 
-                    tasks={tasks} 
-                    employees={employees}
-                    onBack={() => setActive("projects")} 
-                    onEdit={(updatedProj) => { 
-                      if(updatedProj) setJumpProject(updatedProj); 
-                      setActive("edit-project"); 
-                    }}
-                    onUpdate={fetchTasks}
-                    fetchProjects={fetchProjects}
-                    onMessageTeam={() => setActive("messaging")}
-                  />
-                )}
+  <ModernProjectDetails 
+    project={jumpProject} 
+    tasks={tasks} 
+    employees={employees}
+    onBack={() => setActive("projects")} 
+    onEdit={(updatedProj) => { 
+      if(updatedProj) setJumpProject(updatedProj); 
+      setActive("edit-project"); 
+    }}
+    onUpdate={fetchTasks}
+    fetchProjects={fetchProjects}
+    onMessageTeam={() => setActive("messaging")}
+    onLogTime={async (hours) => {
+      try {
+        const current = Number(jumpProject?.loggedHours || 0);
+        const updated = current + Number(hours || 0);
+        await axios.put(`${BASE_URL}/api/projects/${jumpProject._id}`, { loggedHours: updated });
+        setJumpProject(prev => ({ ...prev, loggedHours: updated }));
+        fetchProjects();
+      } catch(e) { console.error(e); }
+    }}
+  />
+)}
                 {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
                   const limit = getSubscriptionLimit("client");
                   if (subscription && clients.length >= limit) {

@@ -5241,7 +5241,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     }}
   />
 )}
-                {validActive === "project-details" && (
+{validActive === "project-details" && (
   <ModernProjectDetails 
     project={jumpProject} 
     tasks={tasks} 
@@ -5252,6 +5252,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setActive("edit-project"); 
     }}
     onUpdate={fetchTasks}
+    fetchTasks={fetchTasks}
     fetchProjects={fetchProjects}
     onMessageTeam={() => setActive("messaging")}
     onLogTime={async (hours) => {

@@ -211,8 +211,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const fileInputRef = useRef(null);
   const composerRef = useRef(null);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [showPortalPreview, setShowPortalPreview] = useState(false);
-
+const [showPortalPreview, setShowPortalPreview] = useState(false);
+const [showAddExpense, setShowAddExpense] = useState(false);
+const [expenseAmt, setExpenseAmt] = useState('');
+const [addingExpense, setAddingExpense] = useState(false);
   const loadLatest = useCallback(async () => {
     if (!project?._id) return;
     setLoadingProject(true);
@@ -276,7 +278,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   if (priority.includes('low')) prioClass = 'mpd-prio-low';
 
   // Tasks Logic
-  const projTasks = currTasks.filter(t => t.projectId === currProject._id || t.project === projName || (t.projectId && t.projectId._id === currProject._id));
+  const _pid = String(currProject._id);
+  const projTasks = currTasks.filter(t => {
+    if (!t || t.isDeleted) return false;
+    const tPid = t.projectId ? (t.projectId._id ? String(t.projectId._id) : String(t.projectId)) : null;
+    return tPid === _pid || t.project === projName;
+  });
   const totalTasks = projTasks.length || 0;
   const doneTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length || 0;
   const inprogTasks = projTasks.filter(t => t.status === 'in_progress').length || 0;
@@ -402,7 +409,24 @@ const progressPct = totalTasks > 0
       setPostingUpdate(false);
     }
   };
-
+const handleAddExpense = async (e) => {
+  e.preventDefault();
+  const amt = parseFloat(expenseAmt);
+  if (!amt || amt <= 0) return;
+  setAddingExpense(true);
+  try {
+    const newSpent = (currProject.spent || 0) + amt;
+    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { spent: newSpent });
+    setExpenseAmt('');
+    setShowAddExpense(false);
+    loadLatest();
+    if (onUpdate) onUpdate();
+  } catch (err) {
+    alert("Failed to add expense.");
+  } finally {
+    setAddingExpense(false);
+  }
+};
   const handleToggleMilestone = async (index) => {
     try {
       const updatedMilestones = (currProject.milestones || []).map((m, idx) => {
@@ -915,7 +939,27 @@ const progressPct = totalTasks > 0
 
           {/* BUDGET */}
           <div className="mpd-card">
-            <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div></div>
+<div className="mpd-card-header">
+  <div className="mpd-card-title"><i className="ti ti-wallet"></i> Budget</div>
+  <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddExpense(true)} style={{padding:'5px 10px',fontSize:11}}>
+    <i className="ti ti-plus"></i> Add Expense
+  </button>
+</div>
+
+{showAddExpense && (
+  <div style={{background:'#f0f4f8',borderRadius:10,padding:16,marginBottom:14}}>
+    <form onSubmit={handleAddExpense}>
+      <div style={{marginBottom:10}}>
+        <label style={{fontSize:11,fontWeight:700,display:'block',marginBottom:4}}>Amount (₹)</label>
+        <input type="number" min="0" step="0.01" value={expenseAmt} onChange={e=>setExpenseAmt(e.target.value)} placeholder="e.g. 5000" required style={{width:'100%',padding:'8px',borderRadius:8,border:'1.5px solid #e2e8f0',fontSize:13,boxSizing:'border-box'}} />
+      </div>
+      <div style={{display:'flex',gap:8}}>
+        <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingExpense} style={{flex:1,justifyContent:'center'}}>{addingExpense ? 'Saving...' : 'Add'}</button>
+        <button type="button" className="mpd-btn mpd-btn-outline" onClick={()=>setShowAddExpense(false)}>Cancel</button>
+      </div>
+    </form>
+  </div>
+)}
             <div className="mpd-brow"><span className="mpd-lbl">Total Budget</span><span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span></div>
             <div className="mpd-brow"><span className="mpd-lbl">Billed</span><span className="mpd-val">{currency}{billed.toLocaleString()}</span></div>
             <div className="mpd-brow"><span className="mpd-lbl">Received</span><span className="mpd-val mpd-g">{currency}{received.toLocaleString()}</span></div>

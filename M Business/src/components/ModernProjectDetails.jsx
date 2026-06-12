@@ -178,7 +178,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions }) {
   const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
@@ -561,6 +561,7 @@ const handleAddExpense = async (e) => {
           <span style={{color:P.textDark}}>{projName}</span>
         </div>
         <div className="mpd-topbar-actions">
+          {!hideTopActions && (<>
           <button className="mpd-btn mpd-btn-outline" onClick={handleShare} style={{gap:6}}><i className="ti ti-share"></i> Share</button>
           <button className="mpd-btn mpd-btn-outline" style={{gap:6}} onClick={() => {
             const text = `Project: ${projName}\nClient: ${clientName}\nStatus: ${currProject.status}\nProgress: ${progressPct}%\nBudget: ${currency}${budgetAmt.toLocaleString()}`;
@@ -569,6 +570,7 @@ const handleAddExpense = async (e) => {
           }}><i className="ti ti-download"></i> Export</button>
           <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit && onEdit(currProject)} style={{gap:6}}><i className="ti ti-edit"></i> Edit</button>
           <button className="mpd-btn mpd-btn-danger" style={{gap:6}} onClick={onDelete || (() => window.confirm('Delete this project?'))}><i className="ti ti-trash"></i> Delete</button>
+          </>)}
         </div>
       </div>
 
@@ -1100,7 +1102,7 @@ const handleAddExpense = async (e) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: `1px solid ${P.border}`, paddingBottom: 12 }}>
               <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
               <button className="mpd-btn mpd-btn-danger" onClick={() => setShowPortalPreview(false)}>
-                <i className="ti ti-arrow-left"></i> Exit Preview
+                <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Update Project' : 'Exit Preview'}
               </button>
             </div>
             <ModernEmployeeProjectDetails

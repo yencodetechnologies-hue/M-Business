@@ -3251,6 +3251,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [active, setActive] = useState(() => localStorage.getItem("activeTab_subadmin") || "dashboard");
   useEffect(() => { localStorage.setItem("activeTab_subadmin", active); }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
+  const [fromEditProject, setFromEditProject] = useState(false);
   const [jumpInvoice, setJumpInvoice] = useState(null);
   const [sidebarOverride, setSidebarOverride] = useState(null);
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
@@ -5215,6 +5216,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
                       const saved = newProj?.project || newProj;
                       fetchProjects();
                       setJumpProject(saved);
+                      setFromEditProject(false);
                       setActive("project-details");
                     }}
                   />
@@ -5228,10 +5230,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     employees={employees}
     onBack={() => setActive("projects")}
     onSuccess={(updatedProj) => {
-      const saved = updatedProj?.project || updatedProj || jumpProject;
       fetchProjects();
-      setJumpProject(saved);
-      setActive("project-details");
+      setFromEditProject(false);
+      setActive("projects");
     }}
   />
 )}
@@ -5240,8 +5241,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     project={jumpProject} 
     tasks={tasks} 
     employees={employees}
-    onBack={() => setActive("projects")} 
+    hideTopActions={fromEditProject}
+    onBack={() => { setFromEditProject(false); setActive("projects"); }} 
     onEdit={(updatedProj) => { 
+      setFromEditProject(false);
       if(updatedProj) setJumpProject(updatedProj); 
       setActive("edit-project"); 
     }}

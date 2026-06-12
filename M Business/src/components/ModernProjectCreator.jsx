@@ -140,8 +140,9 @@ useEffect(() => {
   const [spent, setSpent] = useState(editProject?.spent || '');
 
   const [milestones, setMilestones] = useState(editProject?.milestones?.length ? editProject.milestones : [
-   
-    { name: '', date: '' }
+    { name: 'Kickoff & Requirements', date: '' },
+    { name: 'Design Approval', date: '' },
+    { name: 'Development Complete', date: '' }
   ]);
 
   const [portalOpts, setPortalOpts] = useState(editProject?.portalSettings || {
@@ -171,7 +172,9 @@ useEffect(() => {
       setPending(editProject.pending || '');
       setSpent(editProject.spent || '');
       setMilestones(editProject.milestones?.length ? editProject.milestones : [
-      
+        { name: 'Kickoff & Requirements', date: '' },
+        { name: 'Design Approval', date: '' },
+        { name: 'Development Complete', date: '' }
       ]);
       setPortalOpts(editProject.portalSettings || {
         enablePortal: true,
@@ -189,6 +192,9 @@ useEffect(() => {
   if (name && client) currentStep = 2;
   if (currentStep === 2 && assigned.length > 0) currentStep = 3;
   if (currentStep === 3 && budget) currentStep = 4;
+
+  // Wizard step (controls which section is visible)
+  const [step, setStep] = useState(1);
 
   const toggleMember = (empName) => {
     if (assigned.includes(empName)) {
@@ -292,27 +298,28 @@ useEffect(() => {
         <div>
           {/* STEP BAR */}
           <div className="mpc-step-bar">
-            <div className={`mpc-step ${currentStep > 1 ? 'done' : 'active'}`} onClick={() => document.getElementById('sec1')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+            <div className={`mpc-step ${step > 1 ? 'done' : 'active'} ${step===1?'active':''}`} onClick={() => setStep(1)} style={{cursor:'pointer'}}>
               <div className="mpc-step-num">{currentStep > 1 ? <i className="ti ti-check" /> : 1}</div> Basic Info
             </div>
             <div className={`mpc-step-line ${currentStep > 1 ? 'done' : ''}`} />
             
-            <div className={`mpc-step ${currentStep > 2 ? 'done' : currentStep === 2 ? 'active' : ''}`} onClick={() => document.getElementById('sec2')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+            <div className={`mpc-step ${step > 2 ? 'done' : step === 2 ? 'active' : ''}`} onClick={() => setStep(2)} style={{cursor:'pointer'}}>
               <div className="mpc-step-num">{currentStep > 2 ? <i className="ti ti-check" /> : 2}</div> Team & Dates
             </div>
             <div className={`mpc-step-line ${currentStep > 2 ? 'done' : ''}`} />
             
-            <div className={`mpc-step ${currentStep > 3 ? 'done' : currentStep === 3 ? 'active' : ''}`} onClick={() => document.getElementById('sec3')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+            <div className={`mpc-step ${step > 3 ? 'done' : step === 3 ? 'active' : ''}`} onClick={() => setStep(3)} style={{cursor:'pointer'}}>
               <div className="mpc-step-num">{currentStep > 3 ? <i className="ti ti-check" /> : 3}</div> Budget & Milestones
             </div>
             <div className={`mpc-step-line ${currentStep > 3 ? 'done' : ''}`} />
             
-            <div className={`mpc-step ${currentStep === 4 ? 'active' : ''}`} onClick={() => document.getElementById('sec4')?.scrollIntoView({behavior:'smooth'})} style={{cursor:'pointer'}}>
+            <div className={`mpc-step ${step === 4 ? 'active' : step > 4 ? 'done' : ''}`} onClick={() => setStep(4)} style={{cursor:'pointer'}}>
               <div className="mpc-step-num">4</div> Launch
             </div>
           </div>
 
           {/* SECTION 1: BASIC INFO */}
+          {step === 1 && (
           <div className="mpc-section-card" id="sec1">
             <div className="mpc-section-heading"><i className="ti ti-file-description" /> Basic Information</div>
             
@@ -357,8 +364,10 @@ useEffect(() => {
               </div>
             </div>
           </div>
+          )}
 
           {/* SECTION 2: TIMELINE */}
+          {step === 2 && (
           <div className="mpc-section-card" id="sec2">
             <div className="mpc-section-heading"><i className="ti ti-calendar" /> Project Timeline</div>
             <div className="mpc-form-2col">
@@ -377,8 +386,10 @@ useEffect(() => {
 </div>
             </div>
           </div>
+          )}
 
           {/* SECTION 3: TEAM */}
+          {step === 2 && (
           <div className="mpc-section-card">
             <div className="mpc-section-heading"><i className="ti ti-users" /> Assign Team Members</div>
             <div className="mpc-team-selector">
@@ -400,8 +411,10 @@ useEffect(() => {
               })}
             </div>
           </div>
+          )}
 
           {/* SECTION 4: BUDGET */}
+          {step === 3 && (
           <div className="mpc-section-card" id="sec3">
             <div className="mpc-section-heading"><i className="ti ti-wallet" /> Budget</div>
             <div className="mpc-form-group">
@@ -434,8 +447,10 @@ useEffect(() => {
               </div>
             )}
           </div>
+          )}
 
           {/* SECTION 5: MILESTONES */}
+          {step === 3 && (
           <div className="mpc-section-card">
             <div className="mpc-section-heading"><i className="ti ti-flag" /> Milestones</div>
             <div className="mpc-milestone-list">
@@ -451,8 +466,10 @@ useEffect(() => {
               <i className="ti ti-plus" /> Add Milestone
             </button>
           </div>
+          )}
 
           {/* SECTION 6: CLIENT PORTAL */}
+          {step === 4 && (
           <div className="mpc-section-card" id="sec4">
             <div className="mpc-section-heading"><i className="ti ti-building" /> Client Portal Settings</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -478,6 +495,7 @@ useEffect(() => {
               </label>
             </div>
           </div>
+          )}
         </div>
 
         {/* RIGHT: PREVIEW */}
@@ -531,11 +549,19 @@ useEffect(() => {
           Ensure all required fields are filled before launching.
         </div>
         <div style={{ display: "flex", gap: 12 }}>
-          {onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
-          <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
-            {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
-            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Update Project' : 'Create & Launch Project')}
-          </button>
+          {step === 1 && onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
+          {step > 1 && <button className="mpc-btn mpc-btn-outline" onClick={() => setStep(step - 1)}>Back</button>}
+          {step < 4 && (
+            <button className="mpc-btn mpc-btn-primary" onClick={() => setStep(step + 1)}>
+              Next <i className="ti ti-arrow-right" />
+            </button>
+          )}
+          {step === 4 && (
+            <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
+              {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
+              {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Update Project' : 'Create & Launch Project')}
+            </button>
+          )}
         </div>
       </div>
     </div>

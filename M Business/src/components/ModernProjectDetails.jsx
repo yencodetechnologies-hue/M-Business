@@ -1102,7 +1102,7 @@ const handleAddExpense = async (e) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: `1px solid ${P.border}`, paddingBottom: 12 }}>
               <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
               <button className="mpd-btn mpd-btn-danger" onClick={() => setShowPortalPreview(false)}>
-                <i className="ti ti-arrow-left"></i> {hideTopActions ? 'Update Project' : 'Exit Preview'}
+                <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Update Project' : 'Exit Preview'}
               </button>
             </div>
             <ModernEmployeeProjectDetails

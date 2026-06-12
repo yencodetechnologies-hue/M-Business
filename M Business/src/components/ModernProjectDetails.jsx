@@ -190,6 +190,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
   // Modal / Input states
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState('medium');
   const [newTaskAssignTo, setNewTaskAssignTo] = useState('Unassigned');
@@ -348,24 +349,33 @@ const progressPct = totalTasks > 0
         alert("Could not find or create a task group.");
         return;
       }
-
-      await axios.post(`${BASE_URL}/api/tasks`, {
-        title: newTaskTitle.trim(),
-        description: newTaskDesc.trim(),
-        priority: newTaskPriority,
-        assignTo: newTaskAssignTo,
-        date: newTaskDue,
-        groupId: gId,
-        projectId: currProject._id,
-        status: 'Not Started'
-      });
+if(editingTask){
+  await axios.put(`${BASE_URL}/api/tasks/${editingTask._id}`,{
+    title:newTaskTitle.trim(),
+    description:newTaskDesc.trim(),
+    priority:newTaskPriority,
+    assignTo:newTaskAssignTo,
+    date:newTaskDue
+  });
+}else{
+  await axios.post(`${BASE_URL}/api/tasks`, {
+    title: newTaskTitle.trim(),
+    description: newTaskDesc.trim(),
+    priority: newTaskPriority,
+    assignTo: newTaskAssignTo,
+    date: newTaskDue,
+    groupId: gId,
+    projectId: currProject._id,
+    status: 'Not Started'
+  });
+}
 
       setNewTaskTitle('');
       setNewTaskDesc('');
       setNewTaskPriority('medium');
       setNewTaskAssignTo('Unassigned');
       setNewTaskDue('');
-      setShowAddTaskModal(false);
+      setShowAddTaskModal(null);
 
       loadLatest();
       if (onUpdate) onUpdate();
@@ -557,7 +567,7 @@ const handleAddExpense = async (e) => {
             const blob = new Blob([text], {type:'text/plain'});
             const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${projName}.txt`; a.click();
           }}><i className="ti ti-download"></i> Export</button>
-          <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit ? onEdit(currProject) : null} style={{gap:6}}><i className="ti ti-edit"></i> Edit</button>
+          <button className="mpd-btn mpd-btn-primary" onClick={() => onEdit && onEdit(currProject)} style={{gap:6}}><i className="ti ti-edit"></i> Edit</button>
           <button className="mpd-btn mpd-btn-danger" style={{gap:6}} onClick={onDelete || (() => window.confirm('Delete this project?'))}><i className="ti ti-trash"></i> Delete</button>
         </div>
       </div>
@@ -704,13 +714,21 @@ const handleAddExpense = async (e) => {
                 filteredTasks.map(t => {
                   const isDone = t.status === 'done' || t.status === 'completed';
                   return (
-                    <div key={t._id} className="mpd-task-row" onClick={() => handleToggleTask(t)}>
-                      <div className={`mpd-task-chk ${isDone ? 'mpd-done' : ''}`}></div>
-                      <div className={`mpd-task-prio ${t.priority==='high'?'mpd-h':(t.priority==='medium'?'mpd-m':'mpd-l')}`}></div>
-                      <div className={`mpd-task-name ${isDone ? 'mpd-done' : ''}`}>{t.title || t.name}</div>
-                      <div className="mpd-task-assign">{t.assignTo || t.assignedTo || 'Unassigned'}</div>
-                      <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN', {day:'numeric',month:'short'}) : ''}</div>
-                    </div>
+                   <div key={t._id} className="mpd-task-row" style={{display:'flex',alignItems:'center',gap:10,padding:'11px 0',borderBottom:`1px solid ${P.bg}`}}>
+  <div style={{display:'flex',alignItems:'center',gap:10,flex:1,cursor:'pointer'}} onClick={() => handleToggleTask(t)}>
+    <div className={`mpd-task-chk ${isDone ? 'mpd-done' : ''}`}></div>
+    <div className={`mpd-task-prio ${t.priority==='high'?'mpd-h':(t.priority==='medium'?'mpd-m':'mpd-l')}`}></div>
+    <div className={`mpd-task-name ${isDone ? 'mpd-done' : ''}`}>{t.title || t.name}</div>
+<div className="mpd-task-assign">
+  {t.assignTo && t.assignTo.match(/^[a-f0-9]{24}$/i)
+    ? (employees?.find(e => e._id === t.assignTo)?.name || 'Unassigned')
+    : (t.assignTo || 'Unassigned')}
+</div>
+    <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : ''}</div>
+</div>
+  <button onClick={e=>{e.stopPropagation();setEditingTask(t);setNewTaskTitle(t.title||'');setNewTaskDesc(t.description||'');setNewTaskPriority(t.priority||'medium');setNewTaskAssignTo(t.assignTo||'Unassigned');setNewTaskDue(t.date||'');setShowAddTaskModal(true);}} style={{background:'none',border:'none',cursor:'pointer',color:P.primary,fontSize:13,padding:'2px 6px'}}>✏️</button>
+  <button onClick={e=>{e.stopPropagation();if(confirm('Delete?'))axios.put(`${BASE_URL}/api/tasks/${t._id}`,{isDeleted:true}).then(loadLatest);}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,padding:'2px 6px'}}>🗑️</button>
+</div>
                   );
                 })
               )}
@@ -737,7 +755,7 @@ const handleAddExpense = async (e) => {
                   const statusLabel = isDone ? '✓ Completed' : isInProgress ? 'In Progress' : 'Pending';
                   const statusColor = isDone ? P.green : isInProgress ? P.primary : P.textLight;
                   return (
-                    <div key={idx} onClick={() => handleToggleMilestone(idx)} style={{display:'flex', gap:12, marginBottom:20, cursor: 'pointer'}}>
+<div key={idx} style={{display:'flex', gap:12, marginBottom:20, alignItems:'flex-start', justifyContent:'space-between'}}>
                       <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
                         <div style={{width:13, height:13, borderRadius:'50%', background:dotColor, border:dotBorder, marginTop:3, flexShrink:0}}></div>
                         {idx !== currProject.milestones.length-1 && <div style={{width:2, flex:1, background:P.border, minHeight:24, marginTop:4}}></div>}
@@ -747,6 +765,7 @@ const handleAddExpense = async (e) => {
                         <div style={{fontSize:11, color:P.textLight, marginTop:2}}>{m.date ? new Date(m.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
                         <div style={{fontSize:11, fontWeight:700, color:statusColor, marginTop:2}}>{statusLabel}</div>
                       </div>
+                       <button onClick={()=>{if(confirm('Delete milestone?')){const m=(currProject.milestones||[]).filter((_,i)=>i!==idx);axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{milestones:m}).then(loadLatest);}}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,marginTop:2}}>🗑️</button>
                     </div>
                   );
                 })
@@ -961,9 +980,14 @@ const handleAddExpense = async (e) => {
   </div>
 )}
             <div className="mpd-brow"><span className="mpd-lbl">Total Budget</span><span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span></div>
-            <div className="mpd-brow"><span className="mpd-lbl">Billed</span><span className="mpd-val">{currency}{billed.toLocaleString()}</span></div>
-            <div className="mpd-brow"><span className="mpd-lbl">Received</span><span className="mpd-val mpd-g">{currency}{received.toLocaleString()}</span></div>
-            <div className="mpd-brow"><span className="mpd-lbl">Pending</span><span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span></div>
+{[['Billed','billed',billed,''],['Received','received',received,'mpd-g'],['Pending','pending',pending,'mpd-r']].map(([lbl,key,val,cls])=>(
+  <div key={key} className="mpd-brow">
+    <span className="mpd-lbl">{lbl}</span>
+    <span className={`mpd-val ${cls}`} style={{cursor:'pointer'}} onClick={()=>{const v=prompt(`${lbl} amount:`,val);if(v!==null)axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{[key]:Number(v)}).then(loadLatest);}}>
+      {currency}{val.toLocaleString()} ✏️
+    </span>
+  </div>
+))}
             <div className="mpd-brow"><span className="mpd-lbl">Spent</span><span className="mpd-val">{currency}{spent.toLocaleString()}</span></div>
             <div className="mpd-brow"><span className="mpd-lbl">Remaining</span><span className="mpd-val mpd-p">{currency}{remaining.toLocaleString()}</span></div>
             <div style={{marginTop:10}}>
@@ -1021,7 +1045,7 @@ const handleAddExpense = async (e) => {
       {showAddTaskModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: '#fff', borderRadius: P.radius, width: 440, padding: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box' }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: 18, color: P.textDark }}>Add New Task</h3>
+<h3 style={{ margin: '0 0 16px', fontSize: 18, color: P.textDark }}>{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
             <form onSubmit={handleCreateTask}>
               <div style={{ marginBottom: 12 }}>
                 <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Task Name</label>
@@ -1050,19 +1074,19 @@ const handleAddExpense = async (e) => {
                 <select value={newTaskAssignTo} onChange={e => setNewTaskAssignTo(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
                   <option value="Unassigned">Unassigned</option>
                   {currProject?.assignedTo?.map(emp => (
-                    <option key={emp} value={employees?.find(e => (e.name||e.employeeName) === emp)?._id || emp}>
+                    <option key={emp} value={emp.name || emp.employeeName}>
                       {emp}
                     </option>
                   ))}
                   {/* Also allow assigning to employees not in the project team, just in case */}
-                  {employees?.filter(e => !currProject?.assignedTo?.includes(e.name || e.employeeName)).map(emp => (
-                    <option key={emp._id} value={emp._id}>{emp.name || emp.employeeName}</option>
-                  ))}
+              {employees?.filter(e => !currProject?.assignedTo?.includes(e.name || e.employeeName)).map(emp => (
+  <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}</option>
+))}
                 </select>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                 <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
-                <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : 'Add Task'}</button>
+                <button type="submit" className="mpd-btn mpd-btn-primary" disabled={addingTask}>{addingTask ? 'Adding...' : editingTask ? 'Update Task' : 'Add Task'}</button>
               </div>
             </form>
           </div>

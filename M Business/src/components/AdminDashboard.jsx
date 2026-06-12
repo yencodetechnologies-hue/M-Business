@@ -1814,6 +1814,9 @@ function ManagersPage({ THEME, managers, setManagers }) {
 function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees, fetchTasks }) {
   const [search, setSearch] = useState("");
   const [viewTasksProj, setViewTasksProj] = useState(null);
+  const [editProj, setEditProj] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [saving, setSaving] = useState(false);
 
   const projectsWithProgress = (projects || []).map(p => {
     let pct = p.progress || 0;
@@ -1828,6 +1831,54 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
     (p.name || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.client || "").toLowerCase().includes(search.toLowerCase())
   );
+
+  function openEdit(p) {
+    setEditProj(p);
+    setEditForm({
+      name:        p.name || "",
+      client:      p.client || "",
+      purpose:     p.purpose || p.category || "",
+      description: p.description || "",
+      start:       p.start || p.startDate || "",
+      end:         p.end || p.deadline || "",
+      budget:      p.budget || "",
+      status:      p.status || "In Progress",
+      priority:    p.priority || "medium",
+      assignedTo:  Array.isArray(p.assignedTo) ? p.assignedTo.join(", ") : (p.assignedTo || ""),
+      manager:     p.manager || "",
+      progress:    p.progress || 0,
+      contactPersonName: p.contactPersonName || "",
+      contactPersonNo:   p.contactPersonNo || "",
+    });
+  }
+
+  async function handleEditSave(e) {
+    e.preventDefault();
+    if (!editForm.name.trim()) return;
+    setSaving(true);
+    try {
+      const payload = {
+        ...editForm,
+        assignedTo: editForm.assignedTo.split(",").map(s => s.trim()).filter(Boolean),
+        progress: Number(editForm.progress) || 0,
+      };
+      await axios.put(`${BASE_URL}/api/projects/${editProj._id}`, payload);
+      setEditProj(null);
+      if (setProjects) {
+        const res = await axios.get(BASE_URL + "/api/projects");
+        setProjects(res.data);
+      }
+    } catch (err) {
+      alert("Save failed: " + (err.response?.data?.msg || err.message));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const f = (key, val) => setEditForm(prev => ({ ...prev, [key]: val }));
+
+  const INP = { width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${THEME.border}`, fontSize: 13, background: THEME.surface, color: THEME.text, boxSizing: "border-box", outline: "none" };
+  const LBL = { display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.5 };
 
   if (viewTasksProj) {
     return (
@@ -1866,7 +1917,106 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
           style={{ padding: "8px 16px", borderRadius: 10, fontSize: 13, minWidth: 240, background: THEME.surface, color: THEME.text, border: `1px solid ${THEME.border}` }}
         />
       </div>
-      <ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => setViewTasksProj(p)} />
+      <ModernProjectsView
+        projects={projectsWithProgress}
+        searchQuery={search}
+        onViewTasks={(p) => setViewTasksProj(p)}
+        onEdit={(p) => openEdit(p)}
+      />
+
+      {/* ── Edit Project Modal ── */}
+      {editProj && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}
+          onClick={e => { if (e.target === e.currentTarget) setEditProj(null); }}>
+          <div style={{ background: "#fff", borderRadius: 16, width: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.18)" }}>
+            <div style={{ padding: "18px 24px 14px", borderBottom: "1px solid #eef0f4", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1A2332" }}>✏️ Edit Project</h3>
+              <button onClick={() => setEditProj(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>×</button>
+            </div>
+            <form onSubmit={handleEditSave} style={{ padding: "20px 24px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div style={{ gridColumn: "1/-1" }}>
+                  <label style={LBL}>Project Name *</label>
+                  <input style={INP} required value={editForm.name} onChange={e => f("name", e.target.value)} placeholder="Project name" />
+                </div>
+                <div>
+                  <label style={LBL}>Client</label>
+                  <input style={INP} value={editForm.client} onChange={e => f("client", e.target.value)} placeholder="Client name" />
+                </div>
+                <div>
+                  <label style={LBL}>Category / Purpose</label>
+                  <input style={INP} value={editForm.purpose} onChange={e => f("purpose", e.target.value)} placeholder="e.g. Web Development" />
+                </div>
+                <div style={{ gridColumn: "1/-1" }}>
+                  <label style={LBL}>Description</label>
+                  <textarea style={{ ...INP, height: 72, resize: "vertical" }} value={editForm.description} onChange={e => f("description", e.target.value)} placeholder="Brief project description…" />
+                </div>
+                <div>
+                  <label style={LBL}>Start Date</label>
+                  <input style={INP} type="date" value={editForm.start} onChange={e => f("start", e.target.value)} />
+                </div>
+                <div>
+                  <label style={LBL}>Deadline</label>
+                  <input style={INP} type="date" value={editForm.end} onChange={e => f("end", e.target.value)} />
+                </div>
+                <div>
+                  <label style={LBL}>Budget (₹)</label>
+                  <input style={INP} type="number" min="0" value={editForm.budget} onChange={e => f("budget", e.target.value)} placeholder="e.g. 500000" />
+                </div>
+                <div>
+                  <label style={LBL}>Progress (%)</label>
+                  <input style={INP} type="number" min="0" max="100" value={editForm.progress} onChange={e => f("progress", e.target.value)} />
+                </div>
+                <div>
+                  <label style={LBL}>Status</label>
+                  <select style={INP} value={editForm.status} onChange={e => f("status", e.target.value)}>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Active">Active</option>
+                    <option value="On Hold">On Hold</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Overdue">Overdue</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={LBL}>Priority</label>
+                  <select style={INP} value={editForm.priority} onChange={e => f("priority", e.target.value)}>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+                <div style={{ gridColumn: "1/-1" }}>
+                  <label style={LBL}>Assigned To (comma-separated)</label>
+                  <input style={INP} value={editForm.assignedTo} onChange={e => f("assignedTo", e.target.value)} placeholder="e.g. Prabhu R, Yuvan S" />
+                </div>
+                <div>
+                  <label style={LBL}>Manager</label>
+                  <input style={INP} value={editForm.manager} onChange={e => f("manager", e.target.value)} placeholder="Manager name" />
+                </div>
+                <div>
+                  <label style={LBL}>Contact Person Name</label>
+                  <input style={INP} value={editForm.contactPersonName} onChange={e => f("contactPersonName", e.target.value)} placeholder="e.g. Ravi Kumar" />
+                </div>
+                <div style={{ gridColumn: "1/-1" }}>
+                  <label style={LBL}>Contact Person Phone</label>
+                  <input style={INP} value={editForm.contactPersonNo} onChange={e => f("contactPersonNo", e.target.value)} placeholder="e.g. +91 98765 43210" />
+                </div>
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
+                <button type="button" onClick={() => setEditProj(null)}
+                  style={{ padding: "9px 20px", borderRadius: 9, border: "1.5px solid #d1d5db", background: "#fff", color: "#374151", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={saving}
+                  style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "var(--app-accent, #7c3aed)", color: "#fff", fontWeight: 700, cursor: saving ? "default" : "pointer", fontSize: 13, opacity: saving ? 0.7 : 1 }}>
+                  {saving ? "Saving…" : "✓ Update Project"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

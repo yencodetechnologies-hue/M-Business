@@ -1902,15 +1902,7 @@ const saveEdit = async () => {
   </div>
 </div>
 
-      <ModernProjectsView
-        projects={projectsWithProgress}
-        searchQuery={search}
-        onViewTasks={(p) => setViewTasksProj(p)}
-        onEdit={openEdit}
-        onDelete={setDeleteTarget}
-        onAssign={(p) => { setAssignModal(p); setAssignTo(Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : [])); }}
-        onCreate={onCreateProject}
-      />
+   <ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => setViewTasksProj(p)} onEdit={(p) => openEdit(p)} />
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>

@@ -2388,7 +2388,11 @@ export default function TaskPage({ projects = [], employees = [], config, user, 
     try {
       const id = task._id || task.id;
       const r = await axios.post(`${API}/tasks/${id}/auto-assign`);
-      const assignedName = r.data.assignedTo?.[0]?.name || r.data.assignTo;
+const assignedName = r.data.assignedTo?.[0]?.name || 
+                     (typeof r.data.assignTo === 'string' && 
+                      !r.data.assignTo.match(/^[a-f0-9]{24}$/i) 
+                      ? r.data.assignTo : null) || 
+                     randomUser?.name;
       
       setGroups(p => p.map(g => ({
         ...g,

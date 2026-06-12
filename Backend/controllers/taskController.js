@@ -342,13 +342,14 @@ exports.autoAssignTask = async (req, res) => {
     const randomUser = availableUsers[Math.floor(Math.random() * availableUsers.length)];
     
     const updatedTask = await Task.findByIdAndUpdate(
-      taskId,
-      { 
-        $addToSet: { assignedTo: randomUser._id },
-        autoAssign: true
-      },
-      { returnDocument: 'after' }
-    ).populate("assignedTo", "name email");
+  taskId,
+  { 
+    $addToSet: { assignedTo: randomUser._id },
+    assignTo: randomUser.name,  // ← இது வேணும்!
+    autoAssign: true
+  },
+  { returnDocument: 'after' }
+).populate("assignedTo", "name email");
 
     res.json(updatedTask);
   } catch (err) {

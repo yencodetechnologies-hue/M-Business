@@ -620,10 +620,9 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           <div style={{ padding: "14px 16px" }}>
             {[
               { icon: "ti-mail", label: "Email", val: activeClient.email, bg: "#E0F7FA", col: "#00BCD4" },
-              { icon: "ti-phone", label: "Phone", val: activeClient.phone, bg: "#E0F7FA", col: "#00BCD4" },
+{ icon: "ti-phone", label: "Phone", val: activeClient.phone || activeClient.contactPersonNo || "—", bg: "#E0F7FA", col: "#00BCD4" },
               { icon: "ti-map-pin", label: "Location", val: activeClient.address, bg: "#FEF5E6", col: "#F5A623" },
-              activeClient.gstNumber && { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber, bg: "#EFF4FF", col: "#2563EB" },
-              { icon: "ti-briefcase", label: "Industry", val: activeClient.industry || "—", bg: "#E8FAF3", col: "#26C281" },
+              activeClient.gstNumber && { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber, bg: "#EFF4FF", col: "#2563EB" }
             ].filter(Boolean).map((row, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 4 ? 10 : 0 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: row.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: row.col, flexShrink: 0 }}><i className={`ti ${row.icon}`} /></div>
@@ -929,7 +928,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
             <Fld label="Contact Person No" value={editForm.contactPersonNo} onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
             <Fld label="Category" value={editForm.category || "Web Development"} onChange={v => setEditForm(p => ({ ...p, category: v }))} options={["Web Development", "Mobile App", "UI/UX Design", "Marketing", "Consulting", "Other"]} />
 
-            <Fld label="Office No" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
+<Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
             <Fld label="Company Tax/GST" value={editForm.gstNumber} onChange={v => setEditForm(p => ({ ...p, gstNumber: v }))} />
             <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
           </div>
@@ -5738,7 +5737,7 @@ onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} onAddEm
                   <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: "" })); }} type="email" error={ncError.email} />
                   <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
                   <Fld label="Contact Person No" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
-                  <Fld label="Office No" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
+<Fld label="Phone Number" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
                   <Fld label="Company Tax/GST" value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
                   <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={["Active", "Inactive"]} />
                 </div>

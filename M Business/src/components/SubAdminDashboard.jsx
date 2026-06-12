@@ -5228,8 +5228,10 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     employees={employees}
     onBack={() => setActive("projects")}
     onSuccess={(updatedProj) => {
+      const saved = updatedProj?.project || updatedProj || jumpProject;
       fetchProjects();
-      setActive("projects");
+      setJumpProject(saved);
+      setActive("project-details");
     }}
   />
 )}

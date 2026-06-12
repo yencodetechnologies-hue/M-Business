@@ -140,9 +140,8 @@ useEffect(() => {
   const [spent, setSpent] = useState(editProject?.spent || '');
 
   const [milestones, setMilestones] = useState(editProject?.milestones?.length ? editProject.milestones : [
-    { name: 'Kickoff & Requirements', date: '' },
-    { name: 'Design Approval', date: '' },
-    { name: 'Development Complete', date: '' }
+   
+    { name: '', date: '' }
   ]);
 
   const [portalOpts, setPortalOpts] = useState(editProject?.portalSettings || {
@@ -172,9 +171,7 @@ useEffect(() => {
       setPending(editProject.pending || '');
       setSpent(editProject.spent || '');
       setMilestones(editProject.milestones?.length ? editProject.milestones : [
-        { name: 'Kickoff & Requirements', date: '' },
-        { name: 'Design Approval', date: '' },
-        { name: 'Development Complete', date: '' }
+      
       ]);
       setPortalOpts(editProject.portalSettings || {
         enablePortal: true,

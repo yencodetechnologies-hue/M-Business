@@ -1902,7 +1902,7 @@ const saveEdit = async () => {
   </div>
 </div>
 
-   <ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => setViewTasksProj(p)} onEdit={(p) => openEdit(p)} />
+   <ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} />
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>
@@ -5230,11 +5230,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     employees={employees}
     onBack={() => setActive("projects")}
     onSuccess={(updatedProj) => {
-      const saved = updatedProj?.project || updatedProj || jumpProject;
       fetchProjects();
-      setJumpProject(saved);
-      setFromEditProject(true);
-      setActive("project-details");
+      setFromEditProject(false);
+      setActive("projects");
     }}
   />
 )}
@@ -5249,6 +5247,14 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
       setFromEditProject(false);
       if(updatedProj) setJumpProject(updatedProj); 
       setActive("edit-project"); 
+    }}
+    onDelete={async () => {
+      if (!window.confirm(`Delete "${jumpProject?.name}"? This cannot be undone.`)) return;
+      try {
+        await axios.delete(`${BASE_URL}/api/projects/${jumpProject._id}`);
+        fetchProjects();
+        setActive("projects");
+      } catch(e) { alert("Delete failed: " + (e.response?.data?.msg || e.message)); }
     }}
     onUpdate={fetchTasks}
     fetchTasks={fetchTasks}

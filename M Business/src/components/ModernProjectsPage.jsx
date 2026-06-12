@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import './ModernProjectsPage.css';
 import ModernProjectDetails from './ModernProjectDetails';
@@ -63,6 +64,8 @@ const EMPTY_LOG = { date: todayStr(), hours: '', task: 'General / Other', notes:
  
 export default function ModernProjectsPage({ user }) {
   // ── Data ──────────────────────────────────────────────────────
+  const navigate = useNavigate();
+  const { projectId } = useParams();
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks]       = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -113,6 +116,14 @@ export default function ModernProjectsPage({ user }) {
   }, []);
  
   useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  // ── Auto-select project from URL param ───────────────────────
+  useEffect(() => {
+    if (projectId && projects.length > 0) {
+      const found = projects.find(p => p._id === projectId);
+      if (found) setSelectedProject(found);
+    }
+  }, [projectId, projects]);
  
   // ── Stats ──────────────────────────────────────────────────────
   const stats = useMemo(() => ({
@@ -205,7 +216,7 @@ export default function ModernProjectsPage({ user }) {
     try {
       await axios.delete(`${BASE_URL}/api/projects/${deleteTarget._id}`);
       setDeleteTarget(null);
-      if (selectedProject?._id === deleteTarget._id) setSelectedProject(null);
+      if (selectedProject?._id === deleteTarget._id) { setSelectedProject(null); navigate('/modern-projects'); }
       fetchAll();
     } catch (err) {
       alert('Delete failed: ' + (err.response?.data?.msg || err.message));
@@ -289,7 +300,7 @@ export default function ModernProjectsPage({ user }) {
           <nav className="m-nav">
             <div className="m-nav-item"><i className="ti ti-layout-dashboard"></i>Dashboard</div>
             <div className="m-nav-label">Management</div>
-            <div className="m-nav-item active" onClick={() => setSelectedProject(null)} style={{cursor:'pointer'}}>
+            <div className="m-nav-item active" onClick={() => { setSelectedProject(null); navigate('/modern-projects'); }} style={{cursor:'pointer'}}>
               <i className="ti ti-briefcase"></i>Projects<span className="m-nav-badge">{stats.all}</span>
             </div>
             <div className="m-nav-item"><i className="ti ti-users"></i>Clients</div>
@@ -313,7 +324,7 @@ export default function ModernProjectsPage({ user }) {
           <div className="m-content">
             <ModernProjectDetails
               project={toDetailShape(selectedProject)}
-              onBack={() => setSelectedProject(null)}
+              onBack={() => { setSelectedProject(null); navigate('/modern-projects'); }}
               tasks={tasksForProject(selectedProject)}
               onUpdate={fetchAll}
               fetchProjects={fetchAll}
@@ -451,7 +462,7 @@ export default function ModernProjectsPage({ user }) {
                   <div
                     key={p._id}
                     className={`m-project-card c-${cardColor}`}
-                    onClick={() => setSelectedProject(p)}
+                    onClick={() => { localStorage.setItem('activeTab_subadmin', 'projects'); window.location.href = '/'; }}
                     style={{cursor:'pointer', position:'relative'}}
                   >
                     {/* Card actions */}

@@ -6,22 +6,20 @@ const Event = require("../models/EventModels");
 // GET all events
 router.get("/", async (req, res) => {
   try {
-    const { companyId, employeeName, client, projectNames } = req.query;
+    const { companyId, employeeName, projectNames, client } = req.query;
     const filter = {};
-
-    // Support ?client=... (used by ClientDashboard via /api/meetings?client=...)
-    if (client) {
-      const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      filter.client = { $regex: new RegExp(`^\\s*${escapeRegExp(client)}\\s*$`, "i") };
-      const events = await Event.find(filter).sort({ date: 1 });
-      return res.json(events);
-    }
     
     if (companyId && companyId !== "admin-company-id" && companyId !== "default") {
       filter.companyId = companyId;
-    } else if (!employeeName) {
-      // If no companyId and no employeeName, we return nothing for safety
+    } else if (!employeeName && !client) {
+      // If no companyId, no employeeName, and no client, return nothing for safety
       return res.json([]);
+    }
+
+    // Client filter — for client dashboard meetings
+    if (client) {
+      const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.client = { $regex: new RegExp(`^\\s*${escapeRegExp(client)}\\s*$`, "i") };
     }
 
     // If employeeName is provided, we filter to show:

@@ -5243,6 +5243,13 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     project={jumpProject} 
     tasks={tasks} 
     employees={employees}
+    onDelete={async () => {
+  try {
+    await axios.delete(`${BASE_URL}/api/projects/${jumpProject._id}`);
+    fetchProjects();
+    setActive("projects");
+  } catch(e) { console.error(e); }
+}}
     hideTopActions={fromEditProject}
     onBack={() => { setFromEditProject(false); setActive("projects"); }} 
     onEdit={(updatedProj) => { 

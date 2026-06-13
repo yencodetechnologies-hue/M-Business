@@ -157,11 +157,21 @@ export default function ClientDashboard({ user, setUser }) {
     }, 1500);
   };
 
-  const submitFeedback = (e) => {
+ const submitFeedback = async (e) => {
     e.preventDefault();
+    try {
+      await axios.post(`${BASE_URL}/api/clients/feedback`, {
+        clientName: user?.name || user?.clientName || "",
+        rating: feedbackRating,
+        message: feedbackText,
+      });
+    } catch (err) {
+      console.error("Feedback save failed", err);
+    }
     setFeedbackSubmitted(true);
     setTimeout(() => {
       setFeedbackText("");
+      setFeedbackRating(4);
       setFeedbackSubmitted(false);
       alert("Thank you for your feedback! We appreciate your support.");
     }, 1000);

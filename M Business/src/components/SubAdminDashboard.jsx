@@ -620,9 +620,14 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           <div style={{ padding: "14px 16px" }}>
             {[
               { icon: "ti-mail", label: "Email", val: activeClient.email, bg: "#E0F7FA", col: "#00BCD4" },
-{ icon: "ti-phone", label: "Phone", val: activeClient.phone || activeClient.contactPersonNo || "—", bg: "#E0F7FA", col: "#00BCD4" },
-              { icon: "ti-map-pin", label: "Location", val: activeClient.address, bg: "#FEF5E6", col: "#F5A623" },
-              activeClient.gstNumber && { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber, bg: "#EFF4FF", col: "#2563EB" }
+              { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "—", bg: "#E0F7FA", col: "#00BCD4" },
+              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "—", bg: "#E0F7FA", col: "#00BCD4" },
+{ icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#F3E8FF", col: "#7C5CFC" },
+{ icon: "ti-phone", label: "Phone", val: activeClient.phone || "—", bg: "#E0F7FA", col: "#00BCD4" },
+{ icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "—", bg: "#EFF4FF", col: "#2563EB" },
+{ icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active", bg: "#E8FAF3", col: "#26C281" },
+              { icon: "ti-map-pin", label: "Company Address", val: activeClient.address, bg: "#FEF5E6", col: "#F5A623" },
+
             ].filter(Boolean).map((row, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 4 ? 10 : 0 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: row.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: row.col, flexShrink: 0 }}><i className={`ti ${row.icon}`} /></div>
@@ -5733,7 +5738,8 @@ onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} onAddEm
                   </div>
                 </div>
                 <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-                  <Fld label="Company Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: "" })); }} error={ncError.name} />
+                  <Fld label="Client Name *" value={nc.name} onChange={v => { setNc({ ...nc, name: v }); setNcError(p => ({ ...p, name: "" })); }} error={ncError.name} />
+<Fld label="Company Name" value={nc.company} onChange={v => setNc({ ...nc, company: v })} />
                   <Fld label="Email *" value={nc.email} onChange={v => { setNc({ ...nc, email: v }); setNcError(p => ({ ...p, email: "" })); }} type="email" error={ncError.email} />
                   <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v => setNc({ ...nc, contactPersonName: v })} />
                   <Fld label="Contact Person No" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />

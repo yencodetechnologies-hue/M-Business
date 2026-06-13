@@ -3,7 +3,7 @@ const router = express.Router();
 const Client = require("../models/ClientModel");
 const { addClient } = require("../controllers/ClientController");
 const Project = require("../models/ProjectModel");
-
+const Feedback = require("../models/FeedbackModel");
 router.get("/projects/:name", async (req, res) => {
   try {
     const name = decodeURIComponent(req.params.name);
@@ -80,4 +80,14 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.post("/feedback", async (req, res) => {
+  try {
+    const { clientName, rating, message } = req.body;
+    const fb = new Feedback({ clientName, rating, message, companyId: req.companyId || "" });
+    await fb.save();
+    res.json({ message: "Feedback saved" });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
 module.exports = router;

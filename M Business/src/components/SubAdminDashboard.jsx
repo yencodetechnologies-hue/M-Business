@@ -468,7 +468,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 // ═══════════════════════════════════════════════════════════
 // CLIENTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject, triggerCrop }) {
+function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject, triggerCrop, onCreateProject }) {
 
   const [search, setSearch] = useState("");
   const [filterMode, setFilterMode] = useState("all");
@@ -644,11 +644,16 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
               <div style={{ width: 26, height: 26, borderRadius: 7, background: "#EFF4FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#2563EB" }}><i className="ti ti-briefcase" /></div>
               Projects
             </span>
-            <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>View all</span>
+<div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+  <button onClick={() => onCreateProject && onCreateProject()} style={{ background: "#00BCD4", border: "none", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700 }}>+ Add Project</button>
+  <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>View all</span>
+</div>
+            
           </div>
           <div style={{ padding: "14px 16px" }}>
             {cProjs.length === 0 ? (
-              <div style={{ textAlign: "center", color: "#A0B8BE", fontSize: 12, padding: "20px 0" }}>No projects yet</div>
+                <div style={{ textAlign: "center", color: "#A0B8BE", fontSize: 12, padding: "20px 0" }}>
+     </div>
             ) : cProjs.map((p, i) => {
               const pct = p.progress || 0;
               return (
@@ -4412,7 +4417,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
         <div className="no-print" style={{ display: "contents" }}>
           <Sidebar
             user={user}
-  active={["projects","create-project","edit-project","project-details"].includes(validActive) ? "projects" : (sidebarOverride || validActive)}
+active={
+  sidebarOverride ? sidebarOverride :
+  ["projects","edit-project","project-details"].includes(validActive) ? "projects" :
+  validActive
+}
             setActive={(val) => { setSidebarOverride(null); setActive(val); }}
             onLogout={handleLogout}
             open={sidebarOpen}
@@ -5286,12 +5295,13 @@ if (fetchProjects)
                     return;
                   }
                   setNcError({}); setShowClientPass(false); setModal("client");
-                }} triggerCrop={triggerCrop} />}
+                }} triggerCrop={triggerCrop}  onCreateProject={() => { 
+  setSidebarOverride("clients"); setActive("create-project")}}/>}
 
                 {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
 {validActive === "projects" && <ProjectsPage 
-  onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() => setActive("create-project")} // ProjectsPage-ல் இது இருக்கணும்
+  onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() =>{setSidebarOverride("clients");  setActive("create-project")}} // ProjectsPage-ல் இது இருக்கணும்
 onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} onAddEmployee={() => {
                   const limit = getSubscriptionLimit("employee");
                   if (subscription && employees.length >= limit) {

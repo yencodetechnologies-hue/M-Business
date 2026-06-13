@@ -264,7 +264,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 // ═══════════════════════════════════════════════════════════
 // CLIENTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ClientsPage({ clients, setClients, projects = [], onAddClient }) {
+function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject, triggerCrop, onCreateProject  }) {
   const [search, setSearch] = useState("");
   const [viewClient, setViewClient] = useState(null);
   const [editClient, setEditClient] = useState(null);

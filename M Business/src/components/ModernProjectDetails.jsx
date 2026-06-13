@@ -127,7 +127,7 @@ const CSS = `
 .mpd-tabs { display:flex; border-bottom:2px solid ${P.border}; margin-bottom:20px; }
 .mpd-tab-btn { padding:10px 18px; font-size:13px; font-weight:700; color:${P.textMid}; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .15s; background:transparent; border-top:none; border-left:none; border-right:none; font-family:'Nunito',sans-serif; }
 .mpd-tab-btn.mpd-active { color:${P.primary}; border-bottom-color:${P.primary}; }
-.mpd-tab-pane { display:none; }
+.mpd-tab-pane { display:block; }
 .mpd-tab-pane.mpd-active { display:block; animation:fadeUp .18s ease; }
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -179,7 +179,8 @@ function DetailField({ label, value, fullWidth }) {
 }
 
 export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext }) {
-  const [activeTab, setActiveTab] = useState('milestones');
+  const [activeTab, setActiveTab] = useState('updates');
+
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
 
@@ -721,63 +722,7 @@ const handleAddExpense = async (e) => {
         </div>
       </div>
 
-
-
-      {/* MAIN CONTENT GRID */}
-      <div className="mpd-grid-main-side">
-        {/* LEFT COL */}
-        <div>
-          {/* TASKS COMPONENT */}
-          <div className="mpd-card" style={{padding:0, overflow:'hidden', marginBottom: 20}}>
-            <div className="mpd-card-header" style={{padding:'20px 24px 10px', marginBottom:0}}>
-              <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
-              <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setShowAddTaskModal(true); }} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
-            </div>
-            <div style={{padding:'0 24px 14px'}}>
-              <div className="mpd-task-filters">
-                <button className={`mpd-tf ${taskFilter==='all'?'mpd-on':''}`} onClick={()=>setTaskFilter('all')}>All ({totalTasks})</button>
-                <button className={`mpd-tf ${taskFilter==='open'?'mpd-on':''}`} onClick={()=>setTaskFilter('open')}>Open ({openTasks})</button>
-                <button className={`mpd-tf ${taskFilter==='inprog'?'mpd-on':''}`} onClick={()=>setTaskFilter('inprog')}>In Progress ({inprogTasks})</button>
-                <button className={`mpd-tf ${taskFilter==='done'?'mpd-on':''}`} onClick={()=>setTaskFilter('done')}>Done ({doneTasks})</button>
-              </div>
-            </div>
-            <div style={{padding:'0 24px 20px'}}>
-              {filteredTasks.length === 0 ? (
-                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No tasks found for this filter.</div>
-              ) : (
-                filteredTasks.map(t => {
-                  const isDone = t.status === 'done' || t.status === 'completed';
-                  return (
-                   <div key={t._id} className="mpd-task-row" style={{display:'flex',alignItems:'center',gap:10,padding:'11px 0',borderBottom:`1px solid ${P.bg}`}}>
-  <div style={{display:'flex',alignItems:'center',gap:10,flex:1,cursor:'pointer'}} onClick={() => handleToggleTask(t)}>
-    <div className={`mpd-task-chk ${isDone ? 'mpd-done' : ''}`}></div>
-    <div className={`mpd-task-prio ${t.priority==='high'?'mpd-h':(t.priority==='medium'?'mpd-m':'mpd-l')}`}></div>
-    <div className={`mpd-task-name ${isDone ? 'mpd-done' : ''}`}>{t.title || t.name}</div>
-<div className="mpd-task-assign">
-  {t.assignTo && t.assignTo.match(/^[a-f0-9]{24}$/i)
-    ? (employees?.find(e => e._id === t.assignTo)?.name || 'Unassigned')
-    : (t.assignTo || 'Unassigned')}
-</div>
-    <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : ''}</div>
-</div>
-  <button onClick={e=>{e.stopPropagation();setEditingTask(t);setNewTaskTitle(t.title||'');setNewTaskDesc(t.description||'');setNewTaskPriority(t.priority||'medium');setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []);setNewTaskDue(t.date||'');setShowAddTaskModal(true);}} style={{background:'none',border:'none',cursor:'pointer',color:P.primary,fontSize:13,padding:'2px 6px'}}>✏️</button>
-  <button onClick={e=>{e.stopPropagation();if(confirm('Delete?'))axios.delete(`${BASE_URL}/api/tasks/${t._id}`).catch(()=>axios.put(`${BASE_URL}/api/tasks/${t._id}`,{isDeleted:true})).then(loadLatest);}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,padding:'2px 6px'}}>🗑️</button>
-</div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-
-          {/* TABS */}
-          <div className="mpd-card">
-            <div className="mpd-tabs">
-              <button className={`mpd-tab-btn ${activeTab==='milestones'?'mpd-active':''}`} onClick={()=>setActiveTab('milestones')}>Milestones</button>
-              <button className={`mpd-tab-btn ${activeTab==='activity'?'mpd-active':''}`} onClick={()=>setActiveTab('activity')}>Activity</button>
-              <button className={`mpd-tab-btn ${activeTab==='updates'?'mpd-active':''}`} onClick={()=>setActiveTab('updates')}>Updates</button>
-            </div>
-            
-            <div className={`mpd-tab-pane ${activeTab==='milestones'?'mpd-active':''}`}>
+  <div className={`mpd-tab-pane ${activeTab==='milestones'?'mpd-active':''}`}>
               {(!currProject.milestones || currProject.milestones.length === 0) ? (
                 <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No milestones defined.</div>
               ) : (
@@ -839,7 +784,62 @@ const handleAddExpense = async (e) => {
                   + Add Milestone
                 </button>
               )}
+            </div>  
+
+      {/* MAIN CONTENT GRID */}
+      <div className="mpd-grid-main-side">
+        {/* LEFT COL */}
+        <div>
+          {/* TASKS COMPONENT */}
+          <div className="mpd-card" style={{padding:0, overflow:'hidden', marginBottom: 20}}>
+            <div className="mpd-card-header" style={{padding:'20px 24px 10px', marginBottom:0}}>
+              <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
+              <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setShowAddTaskModal(true); }} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
             </div>
+            <div style={{padding:'0 24px 14px'}}>
+              <div className="mpd-task-filters">
+                <button className={`mpd-tf ${taskFilter==='all'?'mpd-on':''}`} onClick={()=>setTaskFilter('all')}>All ({totalTasks})</button>
+                <button className={`mpd-tf ${taskFilter==='open'?'mpd-on':''}`} onClick={()=>setTaskFilter('open')}>Open ({openTasks})</button>
+                <button className={`mpd-tf ${taskFilter==='inprog'?'mpd-on':''}`} onClick={()=>setTaskFilter('inprog')}>In Progress ({inprogTasks})</button>
+                <button className={`mpd-tf ${taskFilter==='done'?'mpd-on':''}`} onClick={()=>setTaskFilter('done')}>Done ({doneTasks})</button>
+              </div>
+            </div>
+            <div style={{padding:'0 24px 20px'}}>
+              {filteredTasks.length === 0 ? (
+                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No tasks found for this filter.</div>
+              ) : (
+                filteredTasks.map(t => {
+                  const isDone = t.status === 'done' || t.status === 'completed';
+                  return (
+                   <div key={t._id} className="mpd-task-row" style={{display:'flex',alignItems:'center',gap:10,padding:'11px 0',borderBottom:`1px solid ${P.bg}`}}>
+  <div style={{display:'flex',alignItems:'center',gap:10,flex:1,cursor:'pointer'}} onClick={() => handleToggleTask(t)}>
+    <div className={`mpd-task-chk ${isDone ? 'mpd-done' : ''}`}></div>
+    <div className={`mpd-task-prio ${t.priority==='high'?'mpd-h':(t.priority==='medium'?'mpd-m':'mpd-l')}`}></div>
+    <div className={`mpd-task-name ${isDone ? 'mpd-done' : ''}`}>{t.title || t.name}</div>
+<div className="mpd-task-assign">
+  {t.assignTo && t.assignTo.match(/^[a-f0-9]{24}$/i)
+    ? (employees?.find(e => e._id === t.assignTo)?.name || 'Unassigned')
+    : (t.assignTo || 'Unassigned')}
+</div>
+    <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : ''}</div>
+</div>
+  <button onClick={e=>{e.stopPropagation();setEditingTask(t);setNewTaskTitle(t.title||'');setNewTaskDesc(t.description||'');setNewTaskPriority(t.priority||'medium');setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []);setNewTaskDue(t.date||'');setShowAddTaskModal(true);}} style={{background:'none',border:'none',cursor:'pointer',color:P.primary,fontSize:13,padding:'2px 6px'}}>✏️</button>
+  <button onClick={e=>{e.stopPropagation();if(confirm('Delete?'))axios.delete(`${BASE_URL}/api/tasks/${t._id}`).catch(()=>axios.put(`${BASE_URL}/api/tasks/${t._id}`,{isDeleted:true})).then(loadLatest);}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,padding:'2px 6px'}}>🗑️</button>
+</div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* TABS */}
+          <div className="mpd-card">
+            <div className="mpd-tabs">
+              <button className={`mpd-tab-btn ${activeTab==='updates'?'mpd-active':''}`} onClick={()=>setActiveTab('updates')}>Updates</button>
+                            <button className={`mpd-tab-btn ${activeTab==='activity'?'mpd-active':''}`} onClick={()=>setActiveTab('activity')}>Activity Logs</button>
+            </div>
+            
+         
 
             <div className={`mpd-tab-pane ${activeTab==='activity'?'mpd-active':''}`}>
                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>
@@ -993,6 +993,7 @@ const handleAddExpense = async (e) => {
         <div style={{display:'flex', flexDirection:'column', gap:20}}>
           {/* TEAM */}
           <div className="mpd-card">
+          
             <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-users"></i> Team</div></div>
             {assigned.length === 0 ? <div style={{fontSize:12,color:P.textLight}}>No team members assigned.</div> : null}
             {assigned.map((a, i) => (

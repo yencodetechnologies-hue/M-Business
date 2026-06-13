@@ -526,7 +526,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     return (
       <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)" }}>
         
-        <div className="content" ref={mainScrollRef}>
+        <div className="content">
           <div className="page-header">
             <div>
               <div className="page-title">Quotations</div>
@@ -535,6 +535,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
             <div className="header-actions">
               <div className="search-wrap" style={{ width: 250 }}>
                 <i className="ti ti-search" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "var(--text3)", fontSize: 16 }}></i>
+              
                 <input 
                   type="text" 
                   placeholder="Search quotations…" 

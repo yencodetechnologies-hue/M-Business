@@ -1454,13 +1454,13 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
           </div>
         )}
 
-      {active === "projects" && selectedClientProject && (
+  {active === "projects" && selectedClientProject && (
   <ModernEmployeeProjectDetails 
     project={{
       ...selectedClientProject,
-      contactPersonName: selectedClientProject.contactPersonName || user?.contactPersonName || "",
-      contactPersonNo: selectedClientProject.contactPersonNo || user?.contactPersonNo || user?.phone || "",
-      contactEmail: selectedClientProject.contactEmail || selectedClientProject.managerEmail || user?.email || "",
+      contactEmail: selectedClientProject.contactEmail || user?.email || "",
+      contactPersonName: selectedClientProject.contactPersonName || "",
+      contactPersonNo: selectedClientProject.contactPersonNo || user?.phone || "",
     }} 
     tasks={tasks} 
     user={user} 
@@ -1468,7 +1468,6 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
     onMessageTeam={() => setActive("messages")}
   />
 )}
-
       </div>
 
       {/* MOBILE BOTTOM NAV */}

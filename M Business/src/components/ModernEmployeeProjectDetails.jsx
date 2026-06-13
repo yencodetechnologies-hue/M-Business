@@ -642,14 +642,14 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                 {days !== null ? (days > 0 ? days + ' days' : 'Overdue') : '—'}
               </span>
             </div>
-         <div className="epd2-info-row">
+            <div className="epd2-info-row">
               <span className="epd2-info-lbl">My tasks</span>
               <span className="epd2-info-val">{openCount} open · {doneCount} done</span>
             </div>
-            {project.contactPersonName && (
+            {(project.contactPersonName || project.manager) && (
               <div className="epd2-info-row">
                 <span className="epd2-info-lbl">Contact</span>
-                <span className="epd2-info-val" style={{ fontWeight: 700 }}>{project.contactPersonName}</span>
+                <span className="epd2-info-val" style={{ fontWeight: 700 }}>{project.contactPersonName || project.manager}</span>
               </div>
             )}
             {project.contactPersonNo && (
@@ -660,11 +660,13 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
                 </span>
               </div>
             )}
-            {project.contactEmail && (
+            {(project.contactEmail || project.clientEmail || user?.email) && (
               <div className="epd2-info-row">
                 <span className="epd2-info-lbl">Email</span>
                 <span className="epd2-info-val" style={{ fontSize: 11, wordBreak: 'break-all' }}>
-                  <a href={`mailto:${project.contactEmail}`} style={{ color: 'inherit', textDecoration: 'none' }}>{project.contactEmail}</a>
+                  <a href={`mailto:${project.contactEmail || project.clientEmail || user?.email}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                    {project.contactEmail || project.clientEmail || user?.email}
+                  </a>
                 </span>
               </div>
             )}

@@ -5333,12 +5333,24 @@ if (fetchProjects)
                     return;
                   }
                   setNcError({}); setShowClientPass(false); setModal("client");
-                }} triggerCrop={triggerCrop}  onCreateProject={(proj, isEdit) => { 
+                }} triggerCrop={triggerCrop}  
+ onCreateProject={(proj, isEdit) => { 
   setSidebarOverride("clients"); 
   if (isEdit && proj) {
     setJumpProject(proj);
     setActive("edit-project");
   } else {
+    // Active client-ஓட details புதிய project-க்கு pass பண்ணு
+    const activeC = clients.find(c => c._id === proj?._id) || clients.find(c => (c.clientName || c.name) === proj?.client);
+    if (activeC) {
+      // ClientsPage-ல் activeClient select ஆகி இருக்கு — அந்த client details save பண்ணு
+      setJumpProject({ 
+        _prefillClient: activeC.clientName || activeC.name,
+        _prefillContactName: activeC.contactPersonName || "",
+        _prefillContactNo: activeC.contactPersonNo || "",
+        _prefillEmail: activeC.email || "",
+      });
+    }
     setActive("create-project");
   }
 }}/>}
@@ -5881,7 +5893,7 @@ onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} onAddEm
                       ...np,
                       client: v,
                       contactPersonName: sel?.contactPersonName || "",
-                      contactPersonNo: sel?.contactPersonNo || ""
+                      contactPersonNo: sel?.contactPersonNo || "",
                     });
                     setNpError(p => ({ ...p, client: "" }));
                   }}

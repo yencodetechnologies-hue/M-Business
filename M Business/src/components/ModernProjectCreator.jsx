@@ -126,6 +126,9 @@ const [assigned, setAssigned] = useState(() => {
 });
   const [budget, setBudget] = useState(editProject?.budget || '');
   const [currency, setCurrency] = useState(editProject?.currency || '₹');
+  const [contactPersonName, setContactPersonName] = useState(editProject?.contactPersonName || '');
+const [contactPersonNo, setContactPersonNo] = useState(editProject?.contactPersonNo || '');
+const [contactEmail, setContactEmail] = useState(editProject?.contactEmail || editProject?.clientEmail || '');
   const [billed, setBilled] = useState(editProject?.billed || '');
   const [received, setReceived] = useState(editProject?.received || '');
 const [pending, setPending] = useState(editProject?.pending || '');
@@ -166,6 +169,9 @@ useEffect(() => {
       setAssigned(Array.isArray(editProject.assignedTo) ? editProject.assignedTo : (editProject.assignedTo ? [editProject.assignedTo] : []));
       setBudget(editProject.budget || '');
       setCurrency(editProject.currency || '₹');
+      setContactPersonName(editProject.contactPersonName || '');
+setContactPersonNo(editProject.contactPersonNo || '');
+setContactEmail(editProject.contactEmail || editProject.clientEmail || '');
       setBilled(editProject.billed || '');
       setReceived(editProject.received || '');
       setPending(editProject.pending || '');
@@ -221,7 +227,10 @@ useEffect(() => {
       const payload = {
         name,
         description,
-        client,
+      client,
+contactPersonName,
+contactPersonNo,
+contactEmail,
         category,
         purpose: description,
         priority,
@@ -332,10 +341,19 @@ useEffect(() => {
             <div className="mpc-form-2col">
               <div className="mpc-form-group">
                 <label>Client *</label>
-                <select value={client} onChange={e => setClient(e.target.value)}>
-                  <option value="">Select client...</option>
-                  {clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
-                </select>
+               <select value={client} onChange={e => {
+  const selectedName = e.target.value;
+  setClient(selectedName);
+  const sel = clients.find(c => (c.clientName || c.name) === selectedName);
+  if (sel) {
+    setContactPersonName(sel.contactPersonName || '');
+    setContactPersonNo(sel.contactPersonNo || '');
+    setContactEmail(sel.email || '');
+  }
+}}>
+  <option value="">Select client...</option>
+  {clients.map(c => <option key={c._id || c.id} value={c.clientName || c.name}>{c.clientName || c.name}</option>)}
+</select>
               </div>
               <div className="mpc-form-group">
                 <label>Category</label>

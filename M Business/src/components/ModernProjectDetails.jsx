@@ -178,7 +178,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, scrollContainerRef }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext }) {
   const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
@@ -781,28 +781,46 @@ const handleAddExpense = async (e) => {
               {(!currProject.milestones || currProject.milestones.length === 0) ? (
                 <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No milestones defined.</div>
               ) : (
-                currProject.milestones.map((m, idx) => {
-                  const isDone = m.done === true;
-                  const isInProgress = !isDone && idx === currProject.milestones.findIndex(x => !x.done);
-                  const dotColor = isDone ? P.green : isInProgress ? P.primary : P.border;
-                  const dotBorder = isDone || isInProgress ? 'none' : `2px solid ${P.border}`;
-                  const statusLabel = isDone ? '✓ Completed' : isInProgress ? 'In Progress' : 'Pending';
-                  const statusColor = isDone ? P.green : isInProgress ? P.primary : P.textLight;
-                  return (
-<div key={idx} style={{display:'flex', gap:12, marginBottom:20, alignItems:'flex-start', justifyContent:'space-between'}}>
-                      <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-                        <div style={{width:13, height:13, borderRadius:'50%', background:dotColor, border:dotBorder, marginTop:3, flexShrink:0}}></div>
-                        {idx !== currProject.milestones.length-1 && <div style={{width:2, flex:1, background:P.border, minHeight:24, marginTop:4}}></div>}
-                      </div>
-                      <div>
-                        <div style={{fontSize:13, fontWeight:800, color:P.textDark}}>{m.name}</div>
-                        <div style={{fontSize:11, color:P.textLight, marginTop:2}}>{m.date ? new Date(m.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
-                        <div style={{fontSize:11, fontWeight:700, color:statusColor, marginTop:2}}>{statusLabel}</div>
-                      </div>
-                       <button onClick={()=>{if(confirm('Delete milestone?')){const m=(currProject.milestones||[]).filter((_,i)=>i!==idx);axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{milestones:m}).then(loadLatest);}}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,marginTop:2}}>🗑️</button>
-                    </div>
-                  );
-                })
+                <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: P.textDark, marginBottom: 24 }}>Milestone Progress</div>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones||[]).length * 100) }}>
+                    <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
+                    {(currProject.milestones||[]).map((m, idx) => {
+                      const isDone = m.done === true;
+                      const firstNotDone = (currProject.milestones||[]).findIndex(x => !x.done);
+                      const isActive = !isDone && idx === firstNotDone;
+                      const circleColor = isDone ? P.green : isActive ? '#E0F7FA' : '#fff';
+                      const circleBorder = isDone ? P.green : isActive ? P.primary : P.border;
+                      const textColor = isDone ? P.green : isActive ? P.primary : P.textLight;
+                      const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
+                      return (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1 }}>
+                          <div
+                            onClick={() => handleToggleMilestone(idx)}
+                            title="Click to toggle done"
+                            style={{
+                              width: 36, height: 36, borderRadius: '50%',
+                              background: circleColor,
+                              border: `2.5px solid ${circleBorder}`,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 13, fontWeight: 800,
+                              color: isDone ? '#fff' : isActive ? P.primary : P.textLight,
+                              cursor: 'pointer',
+                              boxShadow: isActive ? `0 0 0 4px ${P.primaryLight}` : 'none',
+                              transition: 'all .2s'
+                            }}
+                          >
+                            {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>✓</span> : idx + 1}
+                          </div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, wordBreak: 'break-word' }}>{m.name}</div>
+                          {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center' }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
+                          <div style={{ fontSize: 10, fontWeight: 700, color: textColor }}>{statusLabel}</div>
+                          <button onClick={e => { e.stopPropagation(); if(confirm('Delete milestone?')){ const ms=(currProject.milestones||[]).filter((_,i)=>i!==idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{milestones:ms}).then(loadLatest); }}} style={{ background:'none', border:'none', cursor:'pointer', color: P.red, fontSize: 11, padding: 0 }}>🗑️</button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
 
               {showAddMilestone ? (
@@ -1148,13 +1166,17 @@ const handleAddExpense = async (e) => {
               <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
 <button className="mpd-btn mpd-btn-danger" onClick={() => {
   setShowPortalPreview(false);
-  if (scrollContainerRef?.current) {
-    scrollContainerRef.current.scrollTop = 0;
-  }
-  window.scrollTo(0, 0);
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
   onBack();
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    const mainContent = document.querySelector('.main-content') 
+      || document.querySelector('[class*="content"]')
+      || document.querySelector('[class*="main"]')
+      || document.getElementById('main');
+    if (mainContent) mainContent.scrollTop = 0;
+  }, 100);
 }}>
   <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Next' : 'Exit Preview'}
 </button>

@@ -178,7 +178,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext }) {
   const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
@@ -193,7 +193,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [editingTask, setEditingTask] = useState(null);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState('medium');
-  const [newTaskAssignTo, setNewTaskAssignTo] = useState('Unassigned');
+  const [newTaskAssignTo, setNewTaskAssignTo] = useState([]);
   const [newTaskDue, setNewTaskDue] = useState('');
   const [newTaskDesc, setNewTaskDesc] = useState('');
   const [addingTask, setAddingTask] = useState(false);
@@ -375,7 +375,7 @@ if(editingTask){
     title:newTaskTitle.trim(),
     description:newTaskDesc.trim(),
     priority:newTaskPriority,
-    assignTo:newTaskAssignTo,
+assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskAssignTo,
     date:newTaskDue
   });
 }else{
@@ -383,7 +383,7 @@ if(editingTask){
     title: newTaskTitle.trim(),
     description: newTaskDesc.trim(),
     priority: newTaskPriority,
-    assignTo: newTaskAssignTo,
+    assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskAssignTo,
     date: newTaskDue,
     groupId: gId,
     projectId: currProject._id,
@@ -731,7 +731,7 @@ const handleAddExpense = async (e) => {
           <div className="mpd-card" style={{padding:0, overflow:'hidden', marginBottom: 20}}>
             <div className="mpd-card-header" style={{padding:'20px 24px 10px', marginBottom:0}}>
               <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
-              <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(true)} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
+              <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setShowAddTaskModal(true); }} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
             </div>
             <div style={{padding:'0 24px 14px'}}>
               <div className="mpd-task-filters">
@@ -760,8 +760,8 @@ const handleAddExpense = async (e) => {
 </div>
     <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : ''}</div>
 </div>
-  <button onClick={e=>{e.stopPropagation();setEditingTask(t);setNewTaskTitle(t.title||'');setNewTaskDesc(t.description||'');setNewTaskPriority(t.priority||'medium');setNewTaskAssignTo(t.assignTo||'Unassigned');setNewTaskDue(t.date||'');setShowAddTaskModal(true);}} style={{background:'none',border:'none',cursor:'pointer',color:P.primary,fontSize:13,padding:'2px 6px'}}>✏️</button>
-  <button onClick={e=>{e.stopPropagation();if(confirm('Delete?'))axios.put(`${BASE_URL}/api/tasks/${t._id}`,{isDeleted:true}).then(loadLatest);}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,padding:'2px 6px'}}>🗑️</button>
+  <button onClick={e=>{e.stopPropagation();setEditingTask(t);setNewTaskTitle(t.title||'');setNewTaskDesc(t.description||'');setNewTaskPriority(t.priority||'medium');setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []);setNewTaskDue(t.date||'');setShowAddTaskModal(true);}} style={{background:'none',border:'none',cursor:'pointer',color:P.primary,fontSize:13,padding:'2px 6px'}}>✏️</button>
+  <button onClick={e=>{e.stopPropagation();if(confirm('Delete?'))axios.delete(`${BASE_URL}/api/tasks/${t._id}`).catch(()=>axios.put(`${BASE_URL}/api/tasks/${t._id}`,{isDeleted:true})).then(loadLatest);}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,padding:'2px 6px'}}>🗑️</button>
 </div>
                   );
                 })
@@ -1105,18 +1105,31 @@ const handleAddExpense = async (e) => {
               </div>
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
-                <select value={newTaskAssignTo} onChange={e => setNewTaskAssignTo(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
-                  <option value="Unassigned">Unassigned</option>
-                  {currProject?.assignedTo?.map(emp => (
-                    <option key={emp} value={emp.name || emp.employeeName}>
-                      {emp}
-                    </option>
-                  ))}
-                  {/* Also allow assigning to employees not in the project team, just in case */}
-              {employees?.filter(e => !currProject?.assignedTo?.includes(e.name || e.employeeName)).map(emp => (
-  <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}</option>
-))}
-                </select>
+                <div style={{border:`1.5px solid ${P.border}`,borderRadius:8,maxHeight:150,overflowY:'auto',padding:'4px 0'}}>
+{(employees||[]).map(emp=>{
+    const name=emp.name||emp.employeeName||'Unassigned';
+    const selected=Array.isArray(newTaskAssignTo)?newTaskAssignTo.includes(name):false;
+    return(
+      <div key={emp._id} onClick={()=>{
+        if(name==='Unassigned'){setNewTaskAssignTo([]);return;}
+        const cur=Array.isArray(newTaskAssignTo)?newTaskAssignTo.filter(n=>n!=='Unassigned'):[];
+        setNewTaskAssignTo(selected?cur.filter(n=>n!==name):[...cur,name]);
+      }} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 12px',cursor:'pointer',background:selected?P.primaryLight:'transparent',transition:'background .1s'}}>
+        <div style={{width:16,height:16,borderRadius:4,border:`2px solid ${selected?P.primary:P.border}`,background:selected?P.primary:'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+          {selected&&<span style={{color:'#fff',fontSize:10,fontWeight:900,lineHeight:1}}>✓</span>}
+        </div>
+        <span style={{fontSize:13,color:P.textDark,fontWeight:selected?700:500}}>{name}</span>
+      </div>
+    );
+  })}
+</div>
+{Array.isArray(newTaskAssignTo)&&newTaskAssignTo.length>0&&(
+  <div style={{marginTop:6,display:'flex',flexWrap:'wrap',gap:4}}>
+    {newTaskAssignTo.map(n=>(
+      <span key={n} style={{background:P.primaryLight,color:P.primary,padding:'2px 8px',borderRadius:20,fontSize:11,fontWeight:700}}>{n} ×</span>
+    ))}
+  </div>
+)}
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                 <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
@@ -1133,9 +1146,22 @@ const handleAddExpense = async (e) => {
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: `1px solid ${P.border}`, paddingBottom: 12 }}>
               <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
-              <button className="mpd-btn mpd-btn-danger" onClick={() => setShowPortalPreview(false)}>
-                <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Update Project' : 'Exit Preview'}
-              </button>
+<button className="mpd-btn mpd-btn-danger" onClick={() => {
+  setShowPortalPreview(false);
+  onBack();
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    const mainContent = document.querySelector('.main-content') 
+      || document.querySelector('[class*="content"]')
+      || document.querySelector('[class*="main"]')
+      || document.getElementById('main');
+    if (mainContent) mainContent.scrollTop = 0;
+  }, 100);
+}}>
+  <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Next' : 'Exit Preview'}
+</button>
             </div>
             <ModernEmployeeProjectDetails
               project={currProject}

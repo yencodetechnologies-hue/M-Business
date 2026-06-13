@@ -282,14 +282,14 @@ useEffect(() => {
       <style>{CSS}</style>
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <div style={{ fontSize: 22, fontWeight: 900, color: P.textDark }}>{editProject ? 'Edit Project' : 'Create New Project'}</div>
-        {onBack && (
-          <button onClick={onBack} className="mpc-btn mpc-btn-outline">
-            <i className="ti ti-arrow-left" /> Back
-          </button>
-        )}
-      </div>
+     <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+  {onBack && (
+    <button onClick={onBack} className="mpc-btn mpc-btn-outline" style={{ padding: "8px 14px", flexShrink: 0 }}>
+      <i className="ti ti-arrow-left" />
+    </button>
+  )}
+  <div style={{ fontSize: 22, fontWeight: 900, color: P.textDark }}>{editProject ? 'Edit Project' : 'Create New Project'}</div>
+</div>
 
       <div className="mpc-create-layout">
         <div>
@@ -537,7 +537,7 @@ useEffect(() => {
           {onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
           <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
             {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
-            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Update Project' : 'Create & Launch Project')}
+            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Next' : 'Create & Launch Project')}
           </button>
         </div>
       </div>

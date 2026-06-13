@@ -13,7 +13,7 @@ const taskSchema = new mongoose.Schema(
       type: String,
       default: "—",
     },
-    assignTo:      { type: String, default: "Unassigned" },
+assignTo:      { type: String, default: "Unassigned", set: v => Array.isArray(v) ? v.join(', ') : (v || "Unassigned") },
     assignedTo:    [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     invitedMembers: [{ 
       email: { type: String, required: true },

@@ -2010,7 +2010,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
                 </button>
                 <button type="submit" disabled={saving}
                   style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: "var(--app-accent, #7c3aed)", color: "#fff", fontWeight: 700, cursor: saving ? "default" : "pointer", fontSize: 13, opacity: saving ? 0.7 : 1 }}>
-                  {saving ? "Saving…" : "✓ Update Project"}
+                  {saving ? "Saving…" : "✓ Next"}
                 </button>
               </div>
             </form>

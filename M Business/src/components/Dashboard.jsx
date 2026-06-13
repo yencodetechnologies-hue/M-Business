@@ -1304,7 +1304,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
           <button onClick={() => setTsModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Saving…" : tsModal === "add" ? "Save Project →" : "Update Project →"}</button>
+          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Saving…" : tsModal === "add" ? "Save Project →" : "Next →"}</button>
         </div>
       </Mdl>)}
     </div>

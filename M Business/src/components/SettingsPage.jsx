@@ -322,7 +322,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
         }}>{toast}</div>
       )}
 
-      <div className="content" style={{ padding: "22px 28px 32px" }}>
+      <div className="content" ref={mainScrollRef}> style={{ padding: "22px 28px 32px" }}>
         <div className="page-header" style={{ marginBottom: 22 }}>
           <div>
             <div className="page-title" style={{ fontSize: 20, fontWeight: 800 }}>Settings</div>

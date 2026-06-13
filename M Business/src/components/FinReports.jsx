@@ -89,7 +89,7 @@ a { text-decoration: none; color: inherit; }
             <button className="btn btn-outline" style={{background:'var(--purple)',color:'#fff',border:'none'}}><i className="ti ti-shield-check"></i>Auditor Portal</button>
           </div>
         </div>
-        <div className="content">
+        <div className="content" ref={mainScrollRef}>
           <div className="period-selector">
             <div className="period-title"><i className="ti ti-calendar"></i>Select Period for Reports</div>
             <div style={{display:'flex',gap:'14px',flexWrap:'wrap',alignItems:'center'}}>

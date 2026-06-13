@@ -189,7 +189,7 @@ tr:hover td{background:#FAFCFE;}
           </div>
         </div>
         
-        <div className="content">
+        <div className="content" ref={mainScrollRef}>
           <div className="kpi-grid kpi-grid-5">
             <div className="kpi income">
               <div className="kpi-label">Total Income</div>

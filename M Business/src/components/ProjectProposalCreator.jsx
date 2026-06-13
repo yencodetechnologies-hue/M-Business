@@ -1927,7 +1927,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 </div>
               </div>
 
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 20 }}>
+              <div  style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 20 }}>
 
                 {/* Shapes */}
                 {/* <div>
@@ -1972,7 +1972,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
             {/* TEXT */}
             {leftPanel === "text" && <>
 
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 20 }}>
+              <div  style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 20 }}>
 
                 <button onClick={() => addElement({ type: "text", val: "New Text Box", fontSize: 18, fontWeight: 500 })} style={{ background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "14px", fontSize: 15, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 12px rgba(139,92,246,0.25)", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "all 0.2s" }} className="hb" onMouseDown={e => e.currentTarget.style.transform = "scale(0.98)"} onMouseUp={e => e.currentTarget.style.transform = "scale(1)"}>
                   <span style={{ fontSize: 18 }}>T</span> Add a text box
@@ -2036,7 +2036,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
               </div>
 
-              <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
+              <div  style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
                   {uploads.map(up => (
                     <div key={up._id} onClick={() => addElement({ type: "image", src: up.url, width: 250 })}
@@ -2062,7 +2062,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                 <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>Brand Kit</div>
                 <button style={{ width: "100%", background: "var(--app-accent)", color: "#fff", border: "none", borderRadius: 8, padding: "12px", fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 12px rgba(125,42,232,0.2)" }}>Set up your Brand Kit 👑</button>
               </div>
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 24 }}>
+              <div  style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 24 }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a", marginBottom: 12 }}>Brand Colors</div>
                   <div style={{ display: "flex", gap: 8 }}>
@@ -2085,7 +2085,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
               <div style={{ padding: "16px", borderBottom: "1px solid #f1f5f9" }}>
                 <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>Magic Studio ✨</div>
               </div>
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
+              <div  style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
                 {[
                   { icon: "✂️", title: "Background Remover", desc: "Remove image backgrounds in 1 click" },
 
@@ -2110,7 +2110,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                   <input placeholder="Search your designs" style={{ width: "100%", boxSizing: "border-box", border: "1px solid #e2e8f0", borderRadius: 8, padding: "10px 14px 10px 36px", fontSize: 14, outline: "none", fontFamily: "inherit", background: "#f8fafc" }} />
                 </div>
               </div>
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div  style={{ flex: 1, overflowY: "auto", padding: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {proposals.map(p => (
                   <div key={p._id || p.id} onClick={() => flash("Can't open another project while editing")} style={{ cursor: "pointer", borderRadius: 8, border: "1px solid #e2e8f0", overflow: "hidden", background: "#fff" }} className="pgthumb">
                     <div style={{ height: 70, background: THEMES.find(t => t.name === p.theme)?.g || "#e2e8f0", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "#fff", fontSize: 20 }}>📄</span></div>
@@ -2129,7 +2129,7 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
                   <input placeholder="Search apps" style={{ width: "100%", boxSizing: "border-box", border: "1px solid #e2e8f0", borderRadius: 8, padding: "10px 14px 10px 36px", fontSize: 14, outline: "none", fontFamily: "inherit", background: "#f8fafc" }} />
                 </div>
               </div>
-              <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div  style={{ flex: 1, overflowY: "auto", padding: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[
                   { icon: "📶", name: "QR Code" },
                   { icon: "🤖", name: "DALL·E" },

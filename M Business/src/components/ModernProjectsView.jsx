@@ -330,9 +330,7 @@ export default function ModernProjectsView({
       {/* ── Project Cards ── */}
       {displayed.length === 0 ? (
         <div className="mpv-empty">
-          <i className="ti ti-layout-kanban" />
-          <div className="mpv-empty-title">No projects found</div>
-          <div className="mpv-empty-sub">Try a different search or status filter.</div>
+         
         </div>
       ) : (
         <div className={`mpv-grid${view === 'list' ? ' list' : ''}`}>

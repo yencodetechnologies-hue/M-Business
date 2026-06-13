@@ -101,7 +101,7 @@ export default function QuotationCreatorModern({{ user, clients = [], projects =
             <button className="btn-teal btn-amber" onClick={{sendQuote}}><i className="ti ti-send" style={{{{fontSize: "13px"}}}}></i> Send Quote</button>
           </div>
         </header>
-        <div className="content">
+        <div className="content" ref={mainScrollRef}>
           <h1>Work in Progress - Complex JSX injection requires manual fixing</h1>
           {{/* The original HTML is too complex with raw javascript attributes. A full rewrite of the JSX is needed */}}
         </div>

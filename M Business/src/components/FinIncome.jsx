@@ -102,7 +102,7 @@ tr:hover td{background:#FAFCFE;}
             <button className="btn btn-green" onClick={() => setIsAddIncomeModalOpen(true)}><i className="ti ti-plus"></i>Add Income</button>
           </div>
         </div>
-        <div className="content">
+        <div className="content" ref={mainScrollRef}>
           <div className="kpi-grid kpi-grid-4" style={{marginBottom:'22px'}}>
             <div className="kpi income"><div className="kpi-label">This Month</div><div className="kpi-value">₹18,42,000</div><div className="kpi-sub up"><i className="ti ti-trending-up"></i>+12% vs May</div></div>
             <div className="kpi income"><div className="kpi-label">Project Revenue</div><div className="kpi-value">₹15,87,500</div><div className="kpi-sub neutral"><i className="ti ti-layout-kanban"></i>6 projects</div></div>

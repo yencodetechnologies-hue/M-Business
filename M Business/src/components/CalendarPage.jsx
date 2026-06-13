@@ -589,7 +589,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
                 </div>
                 <div style={{ fontSize: 12, color: finalTheme.muted, marginTop: 4 }}>
                   {search || selectedDate
-                    ? "Try a different filter or click a date on the calendar"
+                    ? ""
                     : "Add your first event using the form above"}
                 </div>
               </div>

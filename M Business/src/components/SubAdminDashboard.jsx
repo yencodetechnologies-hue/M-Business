@@ -910,7 +910,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           </div>
 
           {/* TAB CONTENT */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+          <div ref={mainScrollRef}  style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
             {renderTabContent()}
           </div>
         </div>
@@ -3604,7 +3604,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     } catch (e) { console.log("Profile sync failed", e); }
   };
 
-  const hasFetched = useRef(false);
+const hasFetched = useRef(false);
+const mainScrollRef = useRef(null);
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
@@ -4584,7 +4585,7 @@ active={
             </div>
           </div>
 
-          <div className="content">
+          <div className="content" ref={mainScrollRef}>
             <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); }} />
 
             {/* ── Dashboard ── */}
@@ -5260,6 +5261,7 @@ active={
     project={jumpProject} 
     tasks={tasks} 
     employees={employees}
+    scrollContainerRef={mainScrollRef}
     onDelete={async () => {
   try {
     await axios.delete(`${BASE_URL}/api/projects/${jumpProject._id}`);

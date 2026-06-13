@@ -317,7 +317,7 @@ body{display:flex;min-height:100vh}
     </div>
   </header>
 
-  <div className="content">
+  <div className="content" ref={mainScrollRef}>
 
     
     <div className="form-side">

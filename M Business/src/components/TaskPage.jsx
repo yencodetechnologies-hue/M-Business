@@ -1067,7 +1067,7 @@ function ImportModal({ onClose, onImportTasks }) {
           <div><div style={{ fontSize: 16, fontWeight: 800, color: "#323338" }}>📥 Import tasks</div><div style={{ fontSize: 12, color: "#676879", marginTop: 2 }}>Upload CSV or Excel file</div></div>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#676879" }}>×</button>
         </div>
-        <div style={{ flex: 1, overflowY: "auto", padding: "18px 22px" }}>
+        <div  style={{ flex: 1, overflowY: "auto", padding: "18px 22px" }}>
           {!file ? (
             <div onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }} onClick={() => fileRef.current?.click()}
               style={{ border: `2px dashed ${dragOver ? "var(--app-accent)" : "#d0d4e4"}`, borderRadius: 12, padding: "36px 24px", textAlign: "center", cursor: "pointer", background: dragOver ? "#e8f4fd" : "#fafbfc" }}>
@@ -1133,7 +1133,7 @@ function SidekickPanel({ onClose, groups }) {
           </div>
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: 14 }}>
+      <div  style={{ flex: 1, overflowY: "auto", padding: 14 }}>
         <div style={{ background: P.light, border: `1.5px solid ${P.border}`, borderRadius: 12, padding: "12px 13px", marginBottom: 12 }}>
           <div style={{ fontSize: 10, color: P.muted, fontWeight: 700, letterSpacing: .8, textTransform: "uppercase", marginBottom: 6 }}>💡 Insight</div>
           <div style={{ fontSize: 12, color: P.text, lineHeight: 1.65 }}>
@@ -1209,7 +1209,7 @@ function IntegrateModal({ onClose, showToast }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>🔗 Integrations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
-        <div style={{ flex: 1, overflowY: "auto", padding: "4px 20px 16px" }}>
+        <div  style={{ flex: 1, overflowY: "auto", padding: "4px 20px 16px" }}>
           {integrations.map(({ icon, name, desc, badge }) => (
             <div key={name} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 0", borderBottom: `1px solid ${P.border}` }}>
               <div style={{ width: 42, height: 42, borderRadius: 10, background: P.light, border: `1.5px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{icon}</div>
@@ -1249,7 +1249,7 @@ function AutomateModal({ onClose }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,10,60,0.45)", zIndex: 8000, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{ background: "#fff", borderRadius: 16, width: 520, maxHeight: "80vh", boxShadow: "0 24px 80px rgba(124,58,237,0.25)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ background: `linear-gradient(135deg,${P.dark},${P.mid})`, padding: "18px 20px" }}><div style={{ display: "flex", justifyContent: "space-between" }}><div style={{ fontSize: 17, fontWeight: 800, color: "#fff" }}>⚙️ Automations</div><button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button></div></div>
-        <div style={{ flex: 1, overflowY: "auto", padding: "8px 20px 16px" }}>
+        <div  style={{ flex: 1, overflowY: "auto", padding: "8px 20px 16px" }}>
           {automations.map(({ icon, title, desc }) => (
             <div key={title} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: `1px solid ${P.border}` }}>
               <div style={{ width: 38, height: 38, borderRadius: 9, background: P.light, border: `1.5px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{icon}</div>
@@ -1892,7 +1892,7 @@ function TaskRow({ task, onCheck, onField, onStatus, onPriority, onDup, onDel, o
 //           {["updates", "", ""].map(t => (<div key={t} onClick={() => setTab(t)} style={{ padding: "8px 14px", fontSize: 13, fontWeight: tab === t ? 700 : 500, color: tab === t ? P.text : P.muted, borderBottom: tab === t ? `2px solid ${P.accent}` : "2px solid transparent", cursor: "pointer", textTransform: "capitalize" }}>{t}</div>))}
 //         </div>
 //       </div>
-//       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
+//       <div  style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
 //         {tab === "updates" && (<>
 //           <div style={{ margin: "12px 18px", border: `1.5px solid ${P.border}`, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
 //             <textarea value={updateText} onChange={e => setUpdateText(e.target.value)} placeholder="Write an update..." style={{ width: "100%", minHeight: 100, border: "none", outline: "none", resize: "none", padding: "12px 14px", fontSize: 13, fontFamily: "inherit", color: P.text, boxSizing: "border-box" }} />

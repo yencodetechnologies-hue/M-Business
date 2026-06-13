@@ -560,8 +560,7 @@ export default function ModernProjectsPage({ user }) {
               {filtered.length === 0 && !loading && (
                 <div style={{gridColumn:'1/-1', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:60, gap:12, color:'#718096'}}>
                   <i className="ti ti-layout-kanban" style={{fontSize:48, color:'#B2EBF2'}}></i>
-                  <div style={{fontSize:16, fontWeight:800, color:'#4A5568'}}>No projects found</div>
-                  <div style={{fontSize:13}}>Try a different search or create a new project.</div>
+                 
                   <button className="m-create-btn" onClick={openCreate} style={{marginTop:8}}><i className="ti ti-plus"></i> New Project</button>
                 </div>
               )}

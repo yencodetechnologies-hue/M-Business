@@ -178,7 +178,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, scrollContainerRef }) {
   const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
@@ -1148,17 +1148,13 @@ const handleAddExpense = async (e) => {
               <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
 <button className="mpd-btn mpd-btn-danger" onClick={() => {
   setShowPortalPreview(false);
+  if (scrollContainerRef?.current) {
+    scrollContainerRef.current.scrollTop = 0;
+  }
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
   onBack();
-  setTimeout(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    const mainContent = document.querySelector('.main-content') 
-      || document.querySelector('[class*="content"]')
-      || document.querySelector('[class*="main"]')
-      || document.getElementById('main');
-    if (mainContent) mainContent.scrollTop = 0;
-  }, 100);
 }}>
   <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Next' : 'Exit Preview'}
 </button>

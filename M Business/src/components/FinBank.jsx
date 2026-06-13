@@ -138,7 +138,7 @@ a { text-decoration: none; color: inherit; }
             <button className="btn btn-primary" onClick={() => setIsLinkBankModalOpen(true)}><i className="ti ti-plus"></i>Link Bank Account</button>
           </div>
         </div>
-        <div className="content">
+        <div className="content" ref={mainScrollRef}>
           <div className="grid-2" style={{marginBottom:'22px'}}>
             {loading ? <div style={{padding:20}}>Loading banks...</div> : banks.length === 0 ? <div style={{padding:20}}>No bank accounts linked yet.</div> : banks.map((bank, idx) => {
               const colorTheme = colors[idx % colors.length];

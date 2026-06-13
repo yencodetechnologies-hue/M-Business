@@ -111,7 +111,7 @@ tr:hover td{background:#FAFCFE;}
             <button className="btn btn-red" style={{background:'var(--red-dark)',color:'#fff',border:'none'}} onClick={() => setIsAddExpModalOpen(true)}><i className="ti ti-plus"></i>Add Expense</button>
           </div>
         </div>
-        <div className="content">
+        <div className="content" ref={mainScrollRef}>
           <div className="kpi-grid kpi-grid-4">
             <div className="kpi expense"><div className="kpi-label">This Month</div><div className="kpi-value">₹9,87,500</div><div className="kpi-sub down"><i className="ti ti-trending-up"></i>+5% vs May</div></div>
             <div className="kpi expense"><div className="kpi-label">Payroll</div><div className="kpi-value">₹5,40,000</div><div className="kpi-sub neutral"><i className="ti ti-users"></i>6 employees</div></div>

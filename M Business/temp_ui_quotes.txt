@@ -57,7 +57,7 @@
     return (
       <div style={{ fontFamily: "var(--font, 'Nunito', sans-serif)", minHeight: "100%", background: "var(--bg, #F5FAFA)" }}>
         
-        <div className="content">
+        <div className="content" ref={mainScrollRef}>
           <div className="page-header">
             <div>
               <div className="page-title">Quotations</div>

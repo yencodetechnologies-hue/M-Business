@@ -1209,9 +1209,9 @@ export default function ClientDashboard({ user, setUser }) {
   // Render Contact Card helper
   function renderContactCard() {
     const proj = projects[0];
-    const managerName = proj?.manager || proj?.contactPersonName || 'Project Manager';
-    const managerPhone = proj?.contactPersonNo || '';
-    const managerEmail = proj?.managerEmail || '';
+const managerName = proj?.manager || proj?.contactPersonName || 'Project Manager';
+const managerPhone = proj?.contactPersonNo || proj?.managerPhone || '';
+const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
     return (
       <div className="contact-card">
         <div className="cc-label">Your Account Manager</div>
@@ -1454,15 +1454,20 @@ export default function ClientDashboard({ user, setUser }) {
           </div>
         )}
 
-        {active === "projects" && selectedClientProject && (
-          <ModernEmployeeProjectDetails 
-            project={selectedClientProject} 
-            tasks={tasks} 
-            user={user} 
-            onBack={() => setSelectedClientProject(null)} 
-            onMessageTeam={() => setActive("messages")}
-          />
-        )}
+      {active === "projects" && selectedClientProject && (
+  <ModernEmployeeProjectDetails 
+    project={{
+      ...selectedClientProject,
+      contactPersonName: selectedClientProject.contactPersonName || user?.contactPersonName || "",
+      contactPersonNo: selectedClientProject.contactPersonNo || user?.contactPersonNo || user?.phone || "",
+      contactEmail: selectedClientProject.contactEmail || selectedClientProject.managerEmail || user?.email || "",
+    }} 
+    tasks={tasks} 
+    user={user} 
+    onBack={() => setSelectedClientProject(null)} 
+    onMessageTeam={() => setActive("messages")}
+  />
+)}
 
       </div>
 

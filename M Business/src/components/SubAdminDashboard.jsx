@@ -468,8 +468,8 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 // ═══════════════════════════════════════════════════════════
 // CLIENTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewProject, triggerCrop, onCreateProject }) {
-
+function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject }) {
+  const mainScrollRef = useRef(null);
   const [search, setSearch] = useState("");
   const [filterMode, setFilterMode] = useState("all");
   const [activeClientId, setActiveClientId] = useState(null);
@@ -645,7 +645,6 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
               Projects
             </span>
 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-  <button onClick={() => onCreateProject && onCreateProject()} style={{ background: "#00BCD4", border: "none", borderRadius: 7, padding: "4px 10px", fontSize: 11, color: "#fff", cursor: "pointer", fontWeight: 700 }}>+ Add Project</button>
   <span onClick={() => setActiveTab("projects")} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>View all</span>
 </div>
             
@@ -663,11 +662,26 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35" }}>{p.name}</div>
                     <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 1 }}>{p.type || p.status}</div>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 12, fontWeight: 800, color: "#00BCD4" }}>{pct}%</div>
-                    <div style={{ width: 60, height: 4, background: "#E0EEF0", borderRadius: 2, overflow: "hidden", marginTop: 4 }}>
-                      <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#00BCD4,#26D0CE)", width: `${pct}%` }} />
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ textAlign: "right", marginRight: 8 }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: "#00BCD4" }}>{pct}%</div>
+                      <div style={{ width: 60, height: 4, background: "#E0EEF0", borderRadius: 2, overflow: "hidden", marginTop: 4 }}>
+                        <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#00BCD4,#26D0CE)", width: `${pct}%` }} />
+                      </div>
                     </div>
+                   <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
+<button onClick={() => onViewProject && onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>
+<button onClick={async (e) => { 
+  e.stopPropagation(); 
+  if(!window.confirm(`"${p.name}" delete பண்ணவா?`)) return; 
+  try { 
+    await axios.delete(`${BASE_URL}/api/projects/${p._id}`); 
+    setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
+    showToast("🗑️ Project deleted!"); 
+  } catch(err) { 
+    showToast("❌ Delete failed!"); 
+  } 
+}} style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#EF4444", cursor: "pointer", fontWeight: 700 }}>Delete</button>
                   </div>
                 </div>
               );
@@ -678,8 +692,14 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
     );
   };
 
-  const renderProjects = () => (
+ const renderProjects = () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {/* Header with Add Project button */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
+        <button onClick={() => onCreateProject && onCreateProject()} style={{ background: "#00BCD4", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
+          <i className="ti ti-plus" style={{ fontSize: 13 }} /> Add Project
+        </button>
+      </div>
       {clientProjects.length === 0 ? (
         <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE" }}>No projects for this client</div>
       ) : clientProjects.map((p, i) => (
@@ -691,7 +711,19 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#26C281" }}>{p.status || "Active"}</span>
-            {onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>}
+{onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>}
+<button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
+<button onClick={async (e) => { 
+  e.stopPropagation(); 
+  if(!window.confirm(`"${p.name}" delete பண்ணவா?`)) return; 
+  try { 
+    await axios.delete(`${BASE_URL}/api/projects/${p._id}`); 
+    setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
+    showToast("🗑️ Project deleted!"); 
+  } catch(err) { 
+    showToast("❌ Delete failed!"); 
+  } 
+}} style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#EF4444", cursor: "pointer", fontWeight: 700 }}>Delete</button>
           </div>
         </div>
       ))}
@@ -910,7 +942,7 @@ function ClientsPage({ clients, setClients, projects = [], onAddClient, onViewPr
           </div>
 
           {/* TAB CONTENT */}
-          <div ref={mainScrollRef}  style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
             {renderTabContent()}
           </div>
         </div>
@@ -4585,7 +4617,7 @@ active={
             </div>
           </div>
 
-          <div className="content" ref={mainScrollRef}>
+          <div className="content">
             <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); }} />
 
             {/* ── Dashboard ── */}
@@ -5294,15 +5326,22 @@ if (fetchProjects)
     }}
   />
 )}
-                {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
+                {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
                   const limit = getSubscriptionLimit("client");
                   if (subscription && clients.length >= limit) {
                     setLimitModal({ type: "client", limit });
                     return;
                   }
                   setNcError({}); setShowClientPass(false); setModal("client");
-                }} triggerCrop={triggerCrop}  onCreateProject={() => { 
-  setSidebarOverride("clients"); setActive("create-project")}}/>}
+                }} triggerCrop={triggerCrop}  onCreateProject={(proj, isEdit) => { 
+  setSidebarOverride("clients"); 
+  if (isEdit && proj) {
+    setJumpProject(proj);
+    setActive("edit-project");
+  } else {
+    setActive("create-project");
+  }
+}}/>}
 
                 {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}

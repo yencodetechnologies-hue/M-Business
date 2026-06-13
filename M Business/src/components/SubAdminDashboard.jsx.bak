@@ -3554,7 +3554,7 @@ const handleEditPackage = (pkg) => {
           </>)}
 
           {/* ── Pages using new components ── */}
-          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} triggerCrop={triggerCrop} />}
+          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} onViewProject={(p) => { setJumpProject(p); setActive("projects"); }} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} triggerCrop={triggerCrop} />}
 
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}

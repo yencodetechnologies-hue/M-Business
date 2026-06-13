@@ -992,9 +992,13 @@ const handleAddExpense = async (e) => {
         {/* RIGHT COL */}
         <div style={{display:'flex', flexDirection:'column', gap:20}}>
           {/* TEAM */}
-          <div className="mpd-card">
-          
-            <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-users"></i> Team</div></div>
+<div className="mpd-card">
+  <div className="mpd-card-header">
+    <div className="mpd-card-title"><i className="ti ti-users"></i> Team</div>
+    <button className="mpd-btn mpd-btn-outline" onClick={() => onEdit && onEdit(currProject)} style={{padding:'5px 10px',fontSize:11}}>
+      <i className="ti ti-plus"></i> Add Team Members
+    </button>
+  </div>
             {assigned.length === 0 ? <div style={{fontSize:12,color:P.textLight}}>No team members assigned.</div> : null}
             {assigned.map((a, i) => (
               <div key={i} className="mpd-member-row">

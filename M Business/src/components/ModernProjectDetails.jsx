@@ -292,8 +292,11 @@ const [addingExpense, setAddingExpense] = useState(false);
   const doneTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length || 0;
   const inprogTasks = projTasks.filter(t => t.status === 'in_progress').length || 0;
   const openTasks = totalTasks - doneTasks - inprogTasks;
-const progressPct = totalTasks > 0 
-  ? Math.round((doneTasks / totalTasks) * 100) 
+const milestonesArr = currProject.milestones || [];
+const doneMilestones = milestonesArr.filter(m => m.done).length;
+const totalMilestones = milestonesArr.length;
+const progressPct = totalMilestones > 0
+  ? Math.round((doneMilestones / totalMilestones) * 100)
   : (currProject.progress || 0);
   // Budget spent data (Real values from backend)
   const billed = currProject.billed || 0;
@@ -329,12 +332,10 @@ const progressPct = totalTasks > 0
         const s = t.status;
         return s === 'done' || s === 'completed' || (t._id === task._id ? !isCurrentlyDone : false);
       }).length;
-      const newProgress = totalT > 0 ? Math.round((doneT / totalT) * 100) : (currProject.progress || 0);
-      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
-        progress: newProgress,
-        completedTasks: doneT,
-        tasks: totalT,
-      });
+    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+  completedTasks: doneT,
+  tasks: totalT,
+});
 
       loadLatest();
       if (onUpdate) onUpdate();
@@ -472,11 +473,9 @@ const handleAddExpense = async (e) => {
       const totalM = updatedMilestones.length;
       const doneM = updatedMilestones.filter(m => m.done).length;
       const totalT = projTasks.length;
-      const newProgress = totalT > 0
-        ? Math.round((projTasks.filter(t => t.status === 'done' || t.status === 'completed').length / totalT) * 100)
-        : totalM > 0
-          ? Math.round((doneM / totalM) * 100)
-          : (currProject.progress || 0);
+   const newProgress = totalM > 0
+  ? Math.round((doneM / totalM) * 100)
+  : (currProject.progress || 0);
 
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         milestones: updatedMilestones,
@@ -711,7 +710,7 @@ const handleAddExpense = async (e) => {
           <div className="mpd-prog-num">{progressPct}%</div>
           <div className="mpd-prog-lbl">Overall</div>
           <div className="mpd-progress-bg"><div className="mpd-progress-fill" style={{width:`${progressPct}%`}}></div></div>
-          <div className="mpd-prog-sub">{doneTasks} of {totalTasks} tasks</div>
+          <div className="mpd-prog-sub">{doneMilestones} of {totalMilestones} milestones</div>
         </div>
         <div className="mpd-prog-divider"></div>
         <div className="mpd-prog-item">
@@ -797,12 +796,11 @@ const handleAddExpense = async (e) => {
               <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setShowAddTaskModal(true); }} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
             </div>
             <div style={{padding:'0 24px 14px'}}>
-              <div className="mpd-task-filters">
-                <button className={`mpd-tf ${taskFilter==='all'?'mpd-on':''}`} onClick={()=>setTaskFilter('all')}>All ({totalTasks})</button>
-                <button className={`mpd-tf ${taskFilter==='open'?'mpd-on':''}`} onClick={()=>setTaskFilter('open')}>Open ({openTasks})</button>
-                <button className={`mpd-tf ${taskFilter==='inprog'?'mpd-on':''}`} onClick={()=>setTaskFilter('inprog')}>In Progress ({inprogTasks})</button>
-                <button className={`mpd-tf ${taskFilter==='done'?'mpd-on':''}`} onClick={()=>setTaskFilter('done')}>Done ({doneTasks})</button>
-              </div>
+             <div className="mpd-task-filters">
+  <button className={`mpd-tf ${taskFilter==='all'?'mpd-on':''}`} onClick={()=>setTaskFilter('all')}>All ({totalTasks})</button>
+  <button className={`mpd-tf ${taskFilter==='inprog'?'mpd-on':''}`} onClick={()=>setTaskFilter('inprog')}>In Progress ({inprogTasks})</button>
+  <button className={`mpd-tf ${taskFilter==='done'?'mpd-on':''}`} onClick={()=>setTaskFilter('done')}>Completed ({doneTasks})</button>
+</div>
             </div>
             <div style={{padding:'0 24px 20px'}}>
               {filteredTasks.length === 0 ? (

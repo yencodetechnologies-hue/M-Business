@@ -184,10 +184,6 @@ function daysLeft(dateStr) {
 function calcPct(project, pTasks) {
   const s = (project.status || '').toLowerCase();
   if (['done', 'completed', 'delivered'].includes(s)) return 100;
-  if (pTasks.length > 0) {
-    const done = pTasks.filter(t => ['done','completed'].includes((t.status||'').toLowerCase())).length;
-    return Math.round((done / pTasks.length) * 100);
-  }
   return Number(project.progress) || 0;
 }
 

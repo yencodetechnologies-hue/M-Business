@@ -127,7 +127,7 @@ const CSS = `
 .mpd-tabs { display:flex; border-bottom:2px solid ${P.border}; margin-bottom:20px; }
 .mpd-tab-btn { padding:10px 18px; font-size:13px; font-weight:700; color:${P.textMid}; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .15s; background:transparent; border-top:none; border-left:none; border-right:none; font-family:'Nunito',sans-serif; }
 .mpd-tab-btn.mpd-active { color:${P.primary}; border-bottom-color:${P.primary}; }
-.mpd-tab-pane { display:block; }
+.mpd-tab-pane { display:none; }
 .mpd-tab-pane.mpd-active { display:block; animation:fadeUp .18s ease; }
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}

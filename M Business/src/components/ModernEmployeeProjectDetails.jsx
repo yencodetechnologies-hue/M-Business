@@ -570,6 +570,7 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
           )}
 
           {/* MY TASKS CARD */}
+          {user?.role !== 'client' && (
           <div className="epd2-card">
             <div className="epd2-card-hdr">
               <div className="epd2-card-title">
@@ -616,7 +617,9 @@ export default function ModernEmployeeProjectDetails({ project, tasks, user, onB
               })
             )}
           </div>
+            )}
         </div>
+      
 
         {/* ── RIGHT COLUMN ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>

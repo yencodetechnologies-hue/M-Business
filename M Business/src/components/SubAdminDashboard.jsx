@@ -4579,7 +4579,7 @@ active={
 {validActive === "projects" && (
   <>
     <button className="create-btn" onClick={() => { setNpError({}); setActive("create-project"); }}><i className="ti ti-plus"></i> New Project</button>
-    <button className="create-btn" style={{marginLeft:10}} onClick={() => { setInvoicePrefill({ client: "", project: "", _t: Date.now() }); setActive("invoices"); }}><i className="ti ti-plus"></i> New Invoice</button>
+
   </>
 )}
               {validActive === "managers" && (

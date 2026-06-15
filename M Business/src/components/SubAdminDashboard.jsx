@@ -1798,7 +1798,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject }) {
+function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill }) {
   const [search, setSearch] = useState("");
 
   const projectsWithProgress = (projects || []).map(p => {
@@ -1932,7 +1932,7 @@ const saveEdit = async () => {
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       {/* ── Page header ── */}
-   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
     {onBack && (
       <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "#E0F7FA", border: "none", borderRadius: 10, cursor: "pointer", color: "#00BCD4", flexShrink: 0 }}>
@@ -1941,9 +1941,11 @@ const saveEdit = async () => {
     )}
     <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2332" }}>Projects</div>
   </div>
+  <button className="create-btn" onClick={() => { setInvoicePrefill && setInvoicePrefill({ client: "", project: "", _t: Date.now() }); setActive && setActive("invoices"); }}>
+    <i className="ti ti-plus"></i> New Invoice
+  </button>
 </div>
-
-<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() }); setActive("invoices"); }} />
+<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { setInvoicePrefill && setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() }); setActive && setActive("invoices"); }} />
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>
@@ -4574,9 +4576,12 @@ active={
                   </button>
                 </div>
               )}
-              {validActive === "projects" && (
-                <button className="create-btn" onClick={() => { setNpError({}); setActive("create-project"); }}><i className="ti ti-plus"></i> New Project</button>
-              )}
+{validActive === "projects" && (
+  <>
+    <button className="create-btn" onClick={() => { setNpError({}); setActive("create-project"); }}><i className="ti ti-plus"></i> New Project</button>
+    <button className="create-btn" style={{marginLeft:10}} onClick={() => { setInvoicePrefill({ client: "", project: "", _t: Date.now() }); setActive("invoices"); }}><i className="ti ti-plus"></i> New Invoice</button>
+  </>
+)}
               {validActive === "managers" && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {subscription && (
@@ -5365,7 +5370,7 @@ if (fetchProjects)
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
 {validActive === "projects" && <ProjectsPage 
   onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() =>{setSidebarOverride("clients");  setActive("create-project")}} // ProjectsPage-ல் இது இருக்கணும்
-onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} onAddEmployee={() => {
+onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} setActive={setActive} setInvoicePrefill={setInvoicePrefill} onAddEmployee={() => {
                   const limit = getSubscriptionLimit("employee");
                   if (subscription && employees.length >= limit) {
                     setLimitModal({ type: "employee", limit });

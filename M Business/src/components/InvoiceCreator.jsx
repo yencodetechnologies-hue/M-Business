@@ -463,12 +463,14 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     if (step === "preview") window.scrollTo(0, 0);
   }, [step]);
 
-  useEffect(() => {
+ useEffect(() => {
     if (jumpInvoice) {
       loadEntry(jumpInvoice);
       setStep("preview");
     }
-    useEffect(() => {
+  }, [jumpInvoice]);
+
+  useEffect(() => {
     if (newInvoicePrefill) {
       setInv({ ...blank, invoiceNo: generateInvoiceNo(), client: newInvoicePrefill.client || "", project: newInvoicePrefill.project || "" });
       setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
@@ -477,7 +479,6 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       setStep("form");
     }
   }, [newInvoicePrefill]);
-  }, [jumpInvoice]);
 
   const [invoiceList, setInvoiceList] = useState([]);
   const [listLoading, setListLoading] = useState(false);

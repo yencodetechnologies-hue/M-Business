@@ -3,8 +3,6 @@ import axios from "axios";
 import { T } from "../index";
 import { BASE_URL } from "../config";
 
-
-
 export default function MessagingPage({ user }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);

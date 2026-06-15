@@ -1,10 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
-import './ModernProjectsPage.css';
 import ModernProjectDetails from './ModernProjectDetails';
+import InvoiceCreator from './InvoiceCreator';
 import { BASE_URL } from '../config';
- 
 // ─── Avatar helpers ────────────────────────────────────────────
 const AV_COLORS = ['#00BCD4','#8B5CF6','#F59E0B','#26C281','#EC4899','#3B82F6','#EF4444','#10B981'];
 function avColor(name, i = 0) {
@@ -66,11 +63,15 @@ export default function ModernProjectsPage({ user }) {
   // ── Data ──────────────────────────────────────────────────────
   const navigate = useNavigate();
   const { projectId } = useParams();
-  const [projects, setProjects] = useState([]);
+const [projects, setProjects] = useState([]);
   const [tasks, setTasks]       = useState([]);
+  const [clients, setClients]   = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
- 
+
+  // ── Invoice ───────────────────────────────────────────────────
+  const [showInvoiceCreator, setShowInvoiceCreator] = useState(false);
+  const [invoicePrefill, setInvoicePrefill] = useState(null);
   // ── UI state ──────────────────────────────────────────────────
   const [selectedProject, setSelectedProject] = useState(null);
   const [searchQuery, setSearchQuery]         = useState('');
@@ -95,13 +96,15 @@ export default function ModernProjectsPage({ user }) {
     setLoading(true);
     setError('');
     try {
-      const [pRes, tRes] = await Promise.all([
+const [pRes, tRes, cRes] = await Promise.all([
         axios.get(`${BASE_URL}/api/projects`),
         axios.get(`${BASE_URL}/api/tasks`),
+        axios.get(`${BASE_URL}/api/clients`).catch(() => ({ data: [] })),
       ]);
       const freshProjects = Array.isArray(pRes.data) ? pRes.data : [];
       setProjects(freshProjects);
       setTasks(Array.isArray(tRes.data) ? tRes.data : []);
+      setClients(Array.isArray(cRes.data) ? cRes.data : []);
       // Keep selectedProject in sync with latest backend data
       setSelectedProject(prev => {
         if (!prev) return prev;
@@ -330,7 +333,11 @@ export default function ModernProjectsPage({ user }) {
               fetchProjects={fetchAll}
               onEdit={() => openEdit(selectedProject)}
               onDelete={() => setDeleteTarget(selectedProject)}
-              onLogTime={(e) => openLogTime(selectedProject, e)}
+          onLogTime={(e) => openLogTime(selectedProject, e)}
+              onNewInvoice={(proj) => {
+                setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now() });
+                setShowInvoiceCreator(true);
+              }}
             />
           </div>
         </div>
@@ -338,10 +345,22 @@ export default function ModernProjectsPage({ user }) {
         {showForm && <ProjectFormModal form={form} setForm={setForm} onSave={handleSave} onClose={() => setShowForm(false)} saving={saving} isEdit={!!editProject} />}
         {deleteTarget && <DeleteModal name={deleteTarget.name} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} deleting={deleting} />}
         {showLogTime && <LogTimeModal form={logForm} setForm={setLogForm} onSave={handleSaveLog} onClose={() => setShowLogTime(false)} saving={logSaving} projectName={logTimeProject?.name} />}
+
+        {/* ── NEW INVOICE OVERLAY ── */}
+        {showInvoiceCreator && (
+          <div style={{position:'fixed', inset:0, background:'#F4F7FB', zIndex:9999, overflowY:'auto'}}>
+            <InvoiceCreator
+              user={user}
+              clients={clients}
+              projects={projects}
+              newInvoicePrefill={invoicePrefill}
+              onBack={() => setShowInvoiceCreator(false)}
+            />
+          </div>
+        )}
       </div>
     );
   }
- 
   // ─── RENDER: Projects list ─────────────────────────────────────
   return (
     <div className="modern-app">
@@ -390,8 +409,9 @@ export default function ModernProjectsPage({ user }) {
               <div className="m-page-title">Projects</div>
               <div className="m-page-sub">Manage and track all your projects</div>
             </div>
-            <div className="m-header-actions">
+          <div className="m-header-actions">
               <button className="m-filter-btn" onClick={fetchAll}><i className="ti ti-refresh" style={{fontSize:'14px'}}></i> Refresh</button>
+              <button className="m-create-btn" onClick={() => { setInvoicePrefill(null); setShowInvoiceCreator(true); }}><i className="ti ti-plus" style={{fontSize:'15px'}}></i> New Invoice</button>
             </div>
           </div>
  
@@ -570,9 +590,23 @@ export default function ModernProjectsPage({ user }) {
       </div>
  
       {/* ── MODALS ── */}
+  {/* ── MODALS ── */}
       {showForm && <ProjectFormModal form={form} setForm={setForm} onSave={handleSave} onClose={() => setShowForm(false)} saving={saving} isEdit={!!editProject} />}
       {deleteTarget && <DeleteModal name={deleteTarget.name} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} deleting={deleting} />}
       {showLogTime && <LogTimeModal form={logForm} setForm={setLogForm} onSave={handleSaveLog} onClose={() => setShowLogTime(false)} saving={logSaving} projectName={logTimeProject?.name} />}
+
+      {/* ── NEW INVOICE OVERLAY ── */}
+      {showInvoiceCreator && (
+        <div style={{position:'fixed', inset:0, background:'#F4F7FB', zIndex:9999, overflowY:'auto'}}>
+          <InvoiceCreator
+            user={user}
+            clients={clients}
+            projects={projects}
+            newInvoicePrefill={invoicePrefill}
+            onBack={() => setShowInvoiceCreator(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }

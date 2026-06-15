@@ -178,9 +178,8 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice }) {
-  const [activeTab, setActiveTab] = useState('updates');
-
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions }) {
+  const [activeTab, setActiveTab] = useState('milestones');
   const [composerOpen, setComposerOpen] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
 
@@ -194,7 +193,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [editingTask, setEditingTask] = useState(null);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState('medium');
-  const [newTaskAssignTo, setNewTaskAssignTo] = useState([]);
+  const [newTaskAssignTo, setNewTaskAssignTo] = useState('Unassigned');
   const [newTaskDue, setNewTaskDue] = useState('');
   const [newTaskDesc, setNewTaskDesc] = useState('');
   const [addingTask, setAddingTask] = useState(false);
@@ -217,7 +216,6 @@ const [showPortalPreview, setShowPortalPreview] = useState(false);
 const [showAddExpense, setShowAddExpense] = useState(false);
 const [expenseAmt, setExpenseAmt] = useState('');
 const [addingExpense, setAddingExpense] = useState(false);
-const [projectInvoices, setProjectInvoices] = useState([]);
   const loadLatest = useCallback(async () => {
     if (!project?._id) return;
     setLoadingProject(true);
@@ -249,28 +247,12 @@ const [projectInvoices, setProjectInvoices] = useState([]);
     setCurrTasks(tasks);
   }, [tasks]);
 
-useEffect(() => {
+  useEffect(() => {
     loadLatest();
   }, [loadLatest]);
 
-  // Auto-fetch invoices for this project to calculate Billed/Received/Pending
-  useEffect(() => {
-    if (!project) return;
-    const pName = project.name || "";
-    const cName = project.client || project.clientName || "";
-    axios.get(`${BASE_URL}/api/invoices`)
-      .then(res => {
-        const all = res.data?.invoices || res.data || [];
-        const matched = (Array.isArray(all) ? all : []).filter(inv =>
-          (inv.project && inv.project === pName) ||
-          (!inv.project && inv.client === cName)
-        );
-        setProjectInvoices(matched);
-      })
-      .catch(() => setProjectInvoices([]));
-  }, [project?._id, project?.name, project?.client]);
-
   if (!currProject) return null;
+
   // Derived Project Data
   const projName = currProject.name || "Unnamed Project";
   const clientName = currProject.client || currProject.clientName || "Unknown Client";
@@ -309,16 +291,13 @@ useEffect(() => {
   const doneTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length || 0;
   const inprogTasks = projTasks.filter(t => t.status === 'in_progress').length || 0;
   const openTasks = totalTasks - doneTasks - inprogTasks;
-const milestonesArr = currProject.milestones || [];
-const doneMilestones = milestonesArr.filter(m => m.done).length;
-const totalMilestones = milestonesArr.length;
-const progressPct = totalMilestones > 0
-  ? Math.round((doneMilestones / totalMilestones) * 100)
+const progressPct = totalTasks > 0 
+  ? Math.round((doneTasks / totalTasks) * 100) 
   : (currProject.progress || 0);
-// Budget spent data (Auto-calculated from invoices)
-  const billed = projectInvoices.reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
-  const received = projectInvoices.reduce((sum, inv) => sum + (Number(inv.amountPaid) || 0), 0);
-  const pending = Math.max(0, billed - received);
+  // Budget spent data (Real values from backend)
+  const billed = currProject.billed || 0;
+  const received = currProject.received || 0;
+  const pending = currProject.pending || 0;
   const spent = currProject.spent || 0;
   const remaining = budgetAmt > 0 ? (budgetAmt - spent) : 0;
   const budgetUsedPct = budgetAmt > 0 ? Math.round((spent / budgetAmt) * 100) : 0;
@@ -349,10 +328,12 @@ const progressPct = totalMilestones > 0
         const s = t.status;
         return s === 'done' || s === 'completed' || (t._id === task._id ? !isCurrentlyDone : false);
       }).length;
-    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
-  completedTasks: doneT,
-  tasks: totalT,
-});
+      const newProgress = totalT > 0 ? Math.round((doneT / totalT) * 100) : (currProject.progress || 0);
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        progress: newProgress,
+        completedTasks: doneT,
+        tasks: totalT,
+      });
 
       loadLatest();
       if (onUpdate) onUpdate();
@@ -394,7 +375,7 @@ if(editingTask){
     title:newTaskTitle.trim(),
     description:newTaskDesc.trim(),
     priority:newTaskPriority,
-assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskAssignTo,
+    assignTo:newTaskAssignTo,
     date:newTaskDue
   });
 }else{
@@ -402,7 +383,7 @@ assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskA
     title: newTaskTitle.trim(),
     description: newTaskDesc.trim(),
     priority: newTaskPriority,
-    assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskAssignTo,
+    assignTo: newTaskAssignTo,
     date: newTaskDue,
     groupId: gId,
     projectId: currProject._id,
@@ -490,9 +471,11 @@ const handleAddExpense = async (e) => {
       const totalM = updatedMilestones.length;
       const doneM = updatedMilestones.filter(m => m.done).length;
       const totalT = projTasks.length;
-   const newProgress = totalM > 0
-  ? Math.round((doneM / totalM) * 100)
-  : (currProject.progress || 0);
+      const newProgress = totalT > 0
+        ? Math.round((projTasks.filter(t => t.status === 'done' || t.status === 'completed').length / totalT) * 100)
+        : totalM > 0
+          ? Math.round((doneM / totalM) * 100)
+          : (currProject.progress || 0);
 
       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
         milestones: updatedMilestones,
@@ -611,9 +594,6 @@ const handleAddExpense = async (e) => {
         </div>
         <div className="mpd-topbar-actions">
           {!hideTopActions && (<>
-          {onNewInvoice && (
-            <button className="mpd-btn mpd-btn-primary" onClick={() => onNewInvoice(currProject)} style={{gap:6}}><i className="ti ti-file-invoice"></i> New Invoice</button>
-          )}
           <button className="mpd-btn mpd-btn-outline" onClick={handleShare} style={{gap:6}}><i className="ti ti-share"></i> Share</button>
           <button className="mpd-btn mpd-btn-outline" style={{gap:6}} onClick={() => {
             const text = `Project: ${projName}\nClient: ${clientName}\nStatus: ${currProject.status}\nProgress: ${progressPct}%\nBudget: ${currency}${budgetAmt.toLocaleString()}`;
@@ -730,7 +710,7 @@ const handleAddExpense = async (e) => {
           <div className="mpd-prog-num">{progressPct}%</div>
           <div className="mpd-prog-lbl">Overall</div>
           <div className="mpd-progress-bg"><div className="mpd-progress-fill" style={{width:`${progressPct}%`}}></div></div>
-          <div className="mpd-prog-sub">{doneMilestones} of {totalMilestones} milestones</div>
+          <div className="mpd-prog-sub">{doneTasks} of {totalTasks} tasks</div>
         </div>
         <div className="mpd-prog-divider"></div>
         <div className="mpd-prog-item">
@@ -741,69 +721,7 @@ const handleAddExpense = async (e) => {
         </div>
       </div>
 
-  <div className={`mpd-tab-pane ${activeTab==='milestones'?'mpd-active':''}`}>
-              {(!currProject.milestones || currProject.milestones.length === 0) ? (
-                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No milestones defined.</div>
-              ) : (
-                <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: P.textDark, marginBottom: 24 }}>Milestone Progress</div>
-                  <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones||[]).length * 100) }}>
-                    <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
-                    {(currProject.milestones||[]).map((m, idx) => {
-                      const isDone = m.done === true;
-                      const firstNotDone = (currProject.milestones||[]).findIndex(x => !x.done);
-                      const isActive = !isDone && idx === firstNotDone;
-                      const circleColor = isDone ? P.green : isActive ? '#E0F7FA' : '#fff';
-                      const circleBorder = isDone ? P.green : isActive ? P.primary : P.border;
-                      const textColor = isDone ? P.green : isActive ? P.primary : P.textLight;
-                      const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
-                      return (
-                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1 }}>
-                          <div
-                            onClick={() => handleToggleMilestone(idx)}
-                            title="Click to toggle done"
-                            style={{
-                              width: 36, height: 36, borderRadius: '50%',
-                              background: circleColor,
-                              border: `2.5px solid ${circleBorder}`,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: 13, fontWeight: 800,
-                              color: isDone ? '#fff' : isActive ? P.primary : P.textLight,
-                              cursor: 'pointer',
-                              boxShadow: isActive ? `0 0 0 4px ${P.primaryLight}` : 'none',
-                              transition: 'all .2s'
-                            }}
-                          >
-                            {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>✓</span> : idx + 1}
-                          </div>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, wordBreak: 'break-word' }}>{m.name}</div>
-                          {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center' }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
-                          <div style={{ fontSize: 10, fontWeight: 700, color: textColor }}>{statusLabel}</div>
-                          <button onClick={e => { e.stopPropagation(); if(confirm('Delete milestone?')){ const ms=(currProject.milestones||[]).filter((_,i)=>i!==idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{milestones:ms}).then(loadLatest); }}} style={{ background:'none', border:'none', cursor:'pointer', color: P.red, fontSize: 11, padding: 0 }}>🗑️</button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
 
-              {showAddMilestone ? (
-                <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
-                  <div style={{ marginBottom: 8 }}>
-                    <input type="text" value={newMilestoneName} onChange={e => setNewMilestoneName(e.target.value)} placeholder="Milestone name..." required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }} />
-                  </div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <input type="date" value={newMilestoneDate} onChange={e => setNewMilestoneDate(e.target.value)} style={{ padding: '6px 8px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1 }} />
-                    <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
-                    <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
-                  </div>
-                </form>
-              ) : (
-                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(true)} style={{ width: '100%', justifyContent: 'center', marginTop: 12, padding: '8px', fontSize: 12 }}>
-                  + Add Milestone
-                </button>
-              )}
-            </div>  
 
       {/* MAIN CONTENT GRID */}
       <div className="mpd-grid-main-side">
@@ -813,14 +731,15 @@ const handleAddExpense = async (e) => {
           <div className="mpd-card" style={{padding:0, overflow:'hidden', marginBottom: 20}}>
             <div className="mpd-card-header" style={{padding:'20px 24px 10px', marginBottom:0}}>
               <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
-              <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setShowAddTaskModal(true); }} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
+              <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(true)} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
             </div>
             <div style={{padding:'0 24px 14px'}}>
-             <div className="mpd-task-filters">
-  <button className={`mpd-tf ${taskFilter==='all'?'mpd-on':''}`} onClick={()=>setTaskFilter('all')}>All ({totalTasks})</button>
-  <button className={`mpd-tf ${taskFilter==='inprog'?'mpd-on':''}`} onClick={()=>setTaskFilter('inprog')}>In Progress ({inprogTasks})</button>
-  <button className={`mpd-tf ${taskFilter==='done'?'mpd-on':''}`} onClick={()=>setTaskFilter('done')}>Completed ({doneTasks})</button>
-</div>
+              <div className="mpd-task-filters">
+                <button className={`mpd-tf ${taskFilter==='all'?'mpd-on':''}`} onClick={()=>setTaskFilter('all')}>All ({totalTasks})</button>
+                <button className={`mpd-tf ${taskFilter==='open'?'mpd-on':''}`} onClick={()=>setTaskFilter('open')}>Open ({openTasks})</button>
+                <button className={`mpd-tf ${taskFilter==='inprog'?'mpd-on':''}`} onClick={()=>setTaskFilter('inprog')}>In Progress ({inprogTasks})</button>
+                <button className={`mpd-tf ${taskFilter==='done'?'mpd-on':''}`} onClick={()=>setTaskFilter('done')}>Done ({doneTasks})</button>
+              </div>
             </div>
             <div style={{padding:'0 24px 20px'}}>
               {filteredTasks.length === 0 ? (
@@ -841,8 +760,8 @@ const handleAddExpense = async (e) => {
 </div>
     <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : ''}</div>
 </div>
-  <button onClick={e=>{e.stopPropagation();setEditingTask(t);setNewTaskTitle(t.title||'');setNewTaskDesc(t.description||'');setNewTaskPriority(t.priority||'medium');setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []);setNewTaskDue(t.date||'');setShowAddTaskModal(true);}} style={{background:'none',border:'none',cursor:'pointer',color:P.primary,fontSize:13,padding:'2px 6px'}}>✏️</button>
-  <button onClick={e=>{e.stopPropagation();if(confirm('Delete?'))axios.delete(`${BASE_URL}/api/tasks/${t._id}`).catch(()=>axios.put(`${BASE_URL}/api/tasks/${t._id}`,{isDeleted:true})).then(loadLatest);}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,padding:'2px 6px'}}>🗑️</button>
+  <button onClick={e=>{e.stopPropagation();setEditingTask(t);setNewTaskTitle(t.title||'');setNewTaskDesc(t.description||'');setNewTaskPriority(t.priority||'medium');setNewTaskAssignTo(t.assignTo||'Unassigned');setNewTaskDue(t.date||'');setShowAddTaskModal(true);}} style={{background:'none',border:'none',cursor:'pointer',color:P.primary,fontSize:13,padding:'2px 6px'}}>✏️</button>
+  <button onClick={e=>{e.stopPropagation();if(confirm('Delete?'))axios.put(`${BASE_URL}/api/tasks/${t._id}`,{isDeleted:true}).then(loadLatest);}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,padding:'2px 6px'}}>🗑️</button>
 </div>
                   );
                 })
@@ -853,11 +772,56 @@ const handleAddExpense = async (e) => {
           {/* TABS */}
           <div className="mpd-card">
             <div className="mpd-tabs">
+              <button className={`mpd-tab-btn ${activeTab==='milestones'?'mpd-active':''}`} onClick={()=>setActiveTab('milestones')}>Milestones</button>
+              <button className={`mpd-tab-btn ${activeTab==='activity'?'mpd-active':''}`} onClick={()=>setActiveTab('activity')}>Activity</button>
               <button className={`mpd-tab-btn ${activeTab==='updates'?'mpd-active':''}`} onClick={()=>setActiveTab('updates')}>Updates</button>
-                            <button className={`mpd-tab-btn ${activeTab==='activity'?'mpd-active':''}`} onClick={()=>setActiveTab('activity')}>Activity Logs</button>
             </div>
             
-         
+            <div className={`mpd-tab-pane ${activeTab==='milestones'?'mpd-active':''}`}>
+              {(!currProject.milestones || currProject.milestones.length === 0) ? (
+                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No milestones defined.</div>
+              ) : (
+                currProject.milestones.map((m, idx) => {
+                  const isDone = m.done === true;
+                  const isInProgress = !isDone && idx === currProject.milestones.findIndex(x => !x.done);
+                  const dotColor = isDone ? P.green : isInProgress ? P.primary : P.border;
+                  const dotBorder = isDone || isInProgress ? 'none' : `2px solid ${P.border}`;
+                  const statusLabel = isDone ? '✓ Completed' : isInProgress ? 'In Progress' : 'Pending';
+                  const statusColor = isDone ? P.green : isInProgress ? P.primary : P.textLight;
+                  return (
+<div key={idx} style={{display:'flex', gap:12, marginBottom:20, alignItems:'flex-start', justifyContent:'space-between'}}>
+                      <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
+                        <div style={{width:13, height:13, borderRadius:'50%', background:dotColor, border:dotBorder, marginTop:3, flexShrink:0}}></div>
+                        {idx !== currProject.milestones.length-1 && <div style={{width:2, flex:1, background:P.border, minHeight:24, marginTop:4}}></div>}
+                      </div>
+                      <div>
+                        <div style={{fontSize:13, fontWeight:800, color:P.textDark}}>{m.name}</div>
+                        <div style={{fontSize:11, color:P.textLight, marginTop:2}}>{m.date ? new Date(m.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
+                        <div style={{fontSize:11, fontWeight:700, color:statusColor, marginTop:2}}>{statusLabel}</div>
+                      </div>
+                       <button onClick={()=>{if(confirm('Delete milestone?')){const m=(currProject.milestones||[]).filter((_,i)=>i!==idx);axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{milestones:m}).then(loadLatest);}}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,marginTop:2}}>🗑️</button>
+                    </div>
+                  );
+                })
+              )}
+
+              {showAddMilestone ? (
+                <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <input type="text" value={newMilestoneName} onChange={e => setNewMilestoneName(e.target.value)} placeholder="Milestone name..." required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input type="date" value={newMilestoneDate} onChange={e => setNewMilestoneDate(e.target.value)} style={{ padding: '6px 8px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1 }} />
+                    <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
+                    <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
+                  </div>
+                </form>
+              ) : (
+                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(true)} style={{ width: '100%', justifyContent: 'center', marginTop: 12, padding: '8px', fontSize: 12 }}>
+                  + Add Milestone
+                </button>
+              )}
+            </div>
 
             <div className={`mpd-tab-pane ${activeTab==='activity'?'mpd-active':''}`}>
                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>
@@ -1010,13 +974,8 @@ const handleAddExpense = async (e) => {
         {/* RIGHT COL */}
         <div style={{display:'flex', flexDirection:'column', gap:20}}>
           {/* TEAM */}
-<div className="mpd-card">
-  <div className="mpd-card-header">
-    <div className="mpd-card-title"><i className="ti ti-users"></i> Team</div>
-    <button className="mpd-btn mpd-btn-outline" onClick={() => onEdit && onEdit(currProject)} style={{padding:'5px 10px',fontSize:11}}>
-      <i className="ti ti-plus"></i> Add Team Members
-    </button>
-  </div>
+          <div className="mpd-card">
+            <div className="mpd-card-header"><div className="mpd-card-title"><i className="ti ti-users"></i> Team</div></div>
             {assigned.length === 0 ? <div style={{fontSize:12,color:P.textLight}}>No team members assigned.</div> : null}
             {assigned.map((a, i) => (
               <div key={i} className="mpd-member-row">
@@ -1055,18 +1014,14 @@ const handleAddExpense = async (e) => {
   </div>
 )}
             <div className="mpd-brow"><span className="mpd-lbl">Total Budget</span><span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span></div>
-{[['Billed','billed',billed,''],['Received','received',received,'mpd-g']].map(([lbl,key,val,cls])=>(
+{[['Billed','billed',billed,''],['Received','received',received,'mpd-g'],['Pending','pending',pending,'mpd-r']].map(([lbl,key,val,cls])=>(
   <div key={key} className="mpd-brow">
     <span className="mpd-lbl">{lbl}</span>
-    <span className={`mpd-val ${cls}`}>
-      {currency}{val.toLocaleString()}
+    <span className={`mpd-val ${cls}`} style={{cursor:'pointer'}} onClick={()=>{const v=prompt(`${lbl} amount:`,val);if(v!==null)axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{[key]:Number(v)}).then(loadLatest);}}>
+      {currency}{val.toLocaleString()} ✏️
     </span>
   </div>
 ))}
-<div className="mpd-brow">
-  <span className="mpd-lbl">Pending</span>
-  <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>
-</div>
             <div className="mpd-brow"><span className="mpd-lbl">Spent</span><span className="mpd-val">{currency}{spent.toLocaleString()}</span></div>
             <div className="mpd-brow"><span className="mpd-lbl">Remaining</span><span className="mpd-val mpd-p">{currency}{remaining.toLocaleString()}</span></div>
             <div style={{marginTop:10}}>
@@ -1150,31 +1105,18 @@ const handleAddExpense = async (e) => {
               </div>
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
-                <div style={{border:`1.5px solid ${P.border}`,borderRadius:8,maxHeight:150,overflowY:'auto',padding:'4px 0'}}>
-{(employees||[]).map(emp=>{
-    const name=emp.name||emp.employeeName||'Unassigned';
-    const selected=Array.isArray(newTaskAssignTo)?newTaskAssignTo.includes(name):false;
-    return(
-      <div key={emp._id} onClick={()=>{
-        if(name==='Unassigned'){setNewTaskAssignTo([]);return;}
-        const cur=Array.isArray(newTaskAssignTo)?newTaskAssignTo.filter(n=>n!=='Unassigned'):[];
-        setNewTaskAssignTo(selected?cur.filter(n=>n!==name):[...cur,name]);
-      }} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 12px',cursor:'pointer',background:selected?P.primaryLight:'transparent',transition:'background .1s'}}>
-        <div style={{width:16,height:16,borderRadius:4,border:`2px solid ${selected?P.primary:P.border}`,background:selected?P.primary:'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-          {selected&&<span style={{color:'#fff',fontSize:10,fontWeight:900,lineHeight:1}}>✓</span>}
-        </div>
-        <span style={{fontSize:13,color:P.textDark,fontWeight:selected?700:500}}>{name}</span>
-      </div>
-    );
-  })}
-</div>
-{Array.isArray(newTaskAssignTo)&&newTaskAssignTo.length>0&&(
-  <div style={{marginTop:6,display:'flex',flexWrap:'wrap',gap:4}}>
-    {newTaskAssignTo.map(n=>(
-      <span key={n} style={{background:P.primaryLight,color:P.primary,padding:'2px 8px',borderRadius:20,fontSize:11,fontWeight:700}}>{n} ×</span>
-    ))}
-  </div>
-)}
+                <select value={newTaskAssignTo} onChange={e => setNewTaskAssignTo(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="Unassigned">Unassigned</option>
+                  {currProject?.assignedTo?.map(emp => (
+                    <option key={emp} value={emp.name || emp.employeeName}>
+                      {emp}
+                    </option>
+                  ))}
+                  {/* Also allow assigning to employees not in the project team, just in case */}
+              {employees?.filter(e => !currProject?.assignedTo?.includes(e.name || e.employeeName)).map(emp => (
+  <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}</option>
+))}
+                </select>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                 <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddTaskModal(false)}>Cancel</button>
@@ -1191,22 +1133,9 @@ const handleAddExpense = async (e) => {
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: `1px solid ${P.border}`, paddingBottom: 12 }}>
               <h2 style={{ margin: 0, fontSize: 20, color: P.textDark }}>Client Portal Live Preview</h2>
-<button className="mpd-btn mpd-btn-danger" onClick={() => {
-  setShowPortalPreview(false);
-  onBack();
-  setTimeout(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    const mainContent = document.querySelector('.main-content') 
-      || document.querySelector('[class*="content"]')
-      || document.querySelector('[class*="main"]')
-      || document.getElementById('main');
-    if (mainContent) mainContent.scrollTop = 0;
-  }, 100);
-}}>
-  <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Next' : 'Exit Preview'}
-</button>
+              <button className="mpd-btn mpd-btn-danger" onClick={() => setShowPortalPreview(false)}>
+                <i className="ti ti-arrow-right"></i> {hideTopActions ? 'Update Project' : 'Exit Preview'}
+              </button>
             </div>
             <ModernEmployeeProjectDetails
               project={currProject}

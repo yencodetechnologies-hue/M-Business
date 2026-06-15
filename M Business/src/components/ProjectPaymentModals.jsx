@@ -31,13 +31,18 @@ export default function ProjectPaymentModals({
   setModalsState, 
   onSaveSuccess 
 }) {
-  const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment } = modalsState;
+  const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, editData, editIndex } = modalsState;
 
   // Generic form state
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (editData) {
+      setForm(editData);
+      return;
+    }
+    
     if (showNewInvoice && !form.invoiceNo) {
       const len = (project?.invoices || []).length + 1;
       setForm(prev => ({ ...prev, invoiceNo: `INV-${String(len).padStart(3, '0')}` }));
@@ -58,10 +63,10 @@ export default function ProjectPaymentModals({
       const len = (project?.milestonePayments || []).length + 1;
       setForm(prev => ({ ...prev, milestoneNo: `MS-${String(len).padStart(3, '0')}` }));
     }
-  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, project, form]);
+  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, project, editData]);
 
   const closeModals = () => {
-    setModalsState({ showNewInvoice: false, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false });
+    setModalsState({ showNewInvoice: false, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, editData: null, editIndex: null });
     setForm({});
   };
 
@@ -80,9 +85,15 @@ export default function ProjectPaymentModals({
       else if (type === 'additional') arrayName = 'additionalCharges';
       else if (type === 'milestone') arrayName = 'milestonePayments';
 
-      const newRecord = { ...form, createdAt: new Date() };
       const currentList = project[arrayName] || [];
-      const updatedList = [newRecord, ...currentList];
+      let updatedList = [...currentList];
+
+      if (editIndex !== undefined && editIndex !== null) {
+        updatedList[editIndex] = { ...updatedList[editIndex], ...form };
+      } else {
+        const newRecord = { ...form, createdAt: new Date() };
+        updatedList = [newRecord, ...currentList];
+      }
 
       await axios.put(`${BASE_URL}/api/projects/${project._id}`, {
         [arrayName]: updatedList

@@ -221,13 +221,30 @@ const [expenseAmt, setExpenseAmt] = useState('');
 const [addingExpense, setAddingExpense] = useState(false);
 const [projectInvoices, setProjectInvoices] = useState([]);
 
-const [paymentModalsState, setPaymentModalsState] = useState({
-  showNewInvoice: false,
-  showPayment: false,
-  showAdvance: false,
-  showMilestonePayment: false,
-  showAdditional: false
-});
+  const [paymentModalsState, setPaymentModalsState] = useState({
+    showNewInvoice: false,
+    showPayment: false,
+    showAdvance: false,
+    showMilestonePayment: false,
+    showAdditional: false,
+    editData: null,
+    editIndex: null
+  });
+
+  const handleDeleteRecord = async (arrayName, index) => {
+    if (!confirm('Are you sure you want to delete this record?')) return;
+    try {
+      const currentList = currProject[arrayName] || [];
+      const updatedList = currentList.filter((_, i) => i !== index);
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+        [arrayName]: updatedList
+      });
+      loadLatest();
+    } catch (err) {
+      alert('Failed to delete record.');
+    }
+  };
+
   const loadLatest = useCallback(async () => {
     if (!project?._id) return;
     setLoadingProject(true);
@@ -1124,8 +1141,8 @@ const handleAddExpense = async (e) => {
                           </span>
                         </div>
                         <div style={{display:'flex',gap:4}}>
-                          <button style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}}><i className="ti ti-eye"></i></button>
-                          <button style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}}><i className="ti ti-edit"></i></button>
+                          <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i }))} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}} title="Edit"><i className="ti ti-edit"></i></button>
+                          <button onClick={() => handleDeleteRecord('invoices', i)} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#EF4444'}} title="Delete"><i className="ti ti-trash"></i></button>
                         </div>
                       </div>
                     ))
@@ -1143,7 +1160,11 @@ const handleAddExpense = async (e) => {
                 </div>
 
                 {/* PAYMENT / ADVANCE / ADDITIONAL / MILESTONE panels (hidden by default) */}
-                {[{key:'pay',label:'Payments Received',btnLabel:'Record Payment',icon:'ti-credit-card',color:'#22C55E'},{key:'adv',label:'Advance Payments',btnLabel:'Add Advance',icon:'ti-pig-money',color:'#8B5CF6'},{key:'add',label:'Additional Charges',btnLabel:'Add Additional',icon:'ti-circle-plus',color:'#F97316'},{key:'mile',label:'Milestone Payments',btnLabel:'Add Milestone',icon:'ti-flag',color:'#F59E0B'}].map(p=>(
+                {[{key:'pay',label:'Payments Received',btnLabel:'Record Payment',icon:'ti-credit-card',color:'#22C55E'},{key:'adv',label:'Advance Payments',btnLabel:'Add Advance',icon:'ti-pig-money',color:'#8B5CF6'},{key:'add',label:'Additional Charges',btnLabel:'Add Additional',icon:'ti-circle-plus',color:'#F97316'},{key:'mile',label:'Milestone Payments',btnLabel:'Add Milestone',icon:'ti-flag',color:'#F59E0B'}].map(p=>{
+                  const arrayKeyMap = { pay: 'paymentsReceived', adv: 'advances', add: 'additionalCharges', mile: 'milestonePayments' };
+                  const arrayName = arrayKeyMap[p.key];
+                  const records = currProject[arrayName] || [];
+                  return (
                   <div key={p.key} data-paytab={p.key} style={{display:'none',background:'#fff',border:'1px solid #E8EDF2',borderRadius:14,overflow:'hidden'}}>
                     <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 18px',borderBottom:'1px solid #E8EDF2'}}>
                       <div style={{display:'flex',alignItems:'center',gap:8,fontSize:13,fontWeight:900,color:'#0D1B2A'}}>
@@ -1160,12 +1181,46 @@ const handleAddExpense = async (e) => {
                         <i className="ti ti-plus" style={{fontSize:13}}></i> {p.btnLabel}
                       </button>
                     </div>
-                    <div style={{padding:'32px 20px',textAlign:'center',color:'#7B8FA1',fontSize:13}}>
-                      <i className={`ti ${p.icon}`} style={{fontSize:32,display:'block',marginBottom:10,opacity:.3,color:p.color}}></i>
-                      No {p.label.toLowerCase()} recorded yet.
-                    </div>
+                    
+                    {records.length > 0 ? (
+                      <div>
+                        {/* Headers */}
+                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr 1fr 80px',gap:8,padding:'8px 18px',background:'#FAFBFD',borderBottom:'1px solid #E8EDF2'}}>
+                          {p.key === 'pay' && ['Payment #','Invoice','Amount','Date','Mode',''].map(h=><div key={h} style={{fontSize:10,fontWeight:900,color:'#7B8FA1',textTransform:'uppercase'}}>{h}</div>)}
+                          {p.key === 'adv' && ['Advance #','Description','Amount','Date','Status',''].map(h=><div key={h} style={{fontSize:10,fontWeight:900,color:'#7B8FA1',textTransform:'uppercase'}}>{h}</div>)}
+                          {p.key === 'add' && ['Charge #','Description','Amount','Date','Status',''].map(h=><div key={h} style={{fontSize:10,fontWeight:900,color:'#7B8FA1',textTransform:'uppercase'}}>{h}</div>)}
+                          {p.key === 'mile' && ['Milestone #','Name','Amount','Due Date','Status',''].map(h=><div key={h} style={{fontSize:10,fontWeight:900,color:'#7B8FA1',textTransform:'uppercase'}}>{h}</div>)}
+                        </div>
+                        {/* Rows */}
+                        {records.map((rec, i) => (
+                          <div key={i} style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr 1fr 80px',gap:8,padding:'0 18px',alignItems:'center',minHeight:48,borderBottom:'1px solid #E8EDF2'}}>
+                            <div style={{fontSize:12,fontWeight:800,color:'#0D1B2A'}}>{rec.paymentNo || rec.advanceNo || rec.chargeNo || rec.milestoneNo}</div>
+                            <div style={{fontSize:12,fontWeight:700,color:'#7B8FA1'}}>{rec.linkedInvoice || rec.description || rec.name || '—'}</div>
+                            <div style={{fontSize:13,fontWeight:800,color:'#15803D'}}>{currency}{(rec.amount||0).toLocaleString()}</div>
+                            <div style={{fontSize:11,fontWeight:700,color:'#2D3E50'}}>{rec.paymentDate || rec.dateReceived || rec.date || rec.dueDate ? new Date(rec.paymentDate || rec.dateReceived || rec.date || rec.dueDate).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : '—'}</div>
+                            <div style={{fontSize:11,fontWeight:800,color:'#475569'}}>{rec.paymentMode || rec.adjustmentStatus || rec.status || '—'}</div>
+                            <div style={{display:'flex',gap:4}}>
+                              <button onClick={() => {
+                                let modalKey = '';
+                                if(p.key==='pay') modalKey = 'showPayment';
+                                else if(p.key==='adv') modalKey = 'showAdvance';
+                                else if(p.key==='add') modalKey = 'showAdditional';
+                                else if(p.key==='mile') modalKey = 'showMilestonePayment';
+                                setPaymentModalsState(prev => ({ ...prev, [modalKey]: true, editData: rec, editIndex: i }));
+                              }} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}} title="Edit"><i className="ti ti-edit"></i></button>
+                              <button onClick={() => handleDeleteRecord(arrayName, i)} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#EF4444'}} title="Delete"><i className="ti ti-trash"></i></button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{padding:'32px 20px',textAlign:'center',color:'#7B8FA1',fontSize:13}}>
+                        <i className={`ti ${p.icon}`} style={{fontSize:32,display:'block',marginBottom:10,opacity:.3,color:p.color}}></i>
+                        No {p.label.toLowerCase()} recorded yet.
+                      </div>
+                    )}
                   </div>
-                ))}
+                )})}
 
               </div>
             </div>

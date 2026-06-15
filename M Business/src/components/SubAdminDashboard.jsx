@@ -476,7 +476,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [activeTab, setActiveTab] = useState("overview");
   const [editClient, setEditClient] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [editForm, setEditForm] = useState({ companyName: "", email: "", phone: "", address: "", status: "Active", gstNumber: "", logoUrl: "", contactPersonName: "", contactPersonNo: "", password: "" });
+  const [editForm, setEditForm] = useState({ companyName: "", email: "", phone: "", address: "", status: "Active", gstNumber: "", logoUrl: "", contactPersonName: "", contactPersonNo: "", password: "", category: "" });
   const [editErr, setEditErr] = useState({});
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
@@ -509,7 +509,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   }, []);
 
   const openEdit = (c) => {
-    setEditForm({ companyName: c.companyName || c.company || c.clientName || c.name || "", email: c.email || "", phone: c.phone || "", address: c.address || "", status: c.status || "Active", gstNumber: c.gstNumber || "", logoUrl: c.logoUrl || "", contactPersonName: c.contactPersonName || "", contactPersonNo: c.contactPersonNo || "", password: "" });
+    setEditForm({ companyName: c.companyName || c.company || c.clientName || c.name || "", email: c.email || "", phone: c.phone || "", address: c.address || "", status: c.status || "Active", gstNumber: c.gstNumber || "", logoUrl: c.logoUrl || "", contactPersonName: c.contactPersonName || "", contactPersonNo: c.contactPersonNo || "", password: "", category: c.category || "" });
     setEditErr({});
     setEditClient(c);
   };
@@ -3472,7 +3472,7 @@ const [invoicePrefill, setInvoicePrefill] = useState(null);
   }, [profileDropdownOpen]);
 
   const [clients, setClients] = useState([]);
-  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "" });
+  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", category: "" });
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
@@ -4067,13 +4067,14 @@ const mainScrollRef = useRef(null);
         contactPersonNo: nc.contactPersonNo,
         gstNumber: nc.gstNumber,
         logoUrl: nc.logoUrl,
+        category: nc.category || "",
         companyId: resolveSubadminId()
       };
       const res = await axios.post(BASE_URL + "/api/clients/add", payload);
       setClients(prev => [res.data.client, ...prev]);
       // Store credentials for the success screen
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
-      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "" });
+      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "" });
       setNcError({});
       if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
       // Don't close modal yet if no return - show success screen (this depends on existing logic)
@@ -5823,6 +5824,7 @@ onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} setActi
                   <Fld label="Contact Person No" value={nc.contactPersonNo} onChange={v => setNc({ ...nc, contactPersonNo: v })} />
 <Fld label="Phone Number" value={nc.phone} onChange={v => setNc({ ...nc, phone: v })} />
                   <Fld label="Company Tax/GST" value={nc.gstNumber} onChange={v => setNc({ ...nc, gstNumber: v })} />
+                  <Fld label="Category" value={nc.category||""} onChange={v => setNc({ ...nc, category: v })} options={["Web Development","Mobile App","UI/UX Design","Marketing","Consulting","Other"]} />
                   <Fld label="Status" value={nc.status} onChange={v => setNc({ ...nc, status: v })} options={["Active", "Inactive"]} />
                 </div>
                 <Fld label="Company Address" value={nc.address} onChange={v => setNc({ ...nc, address: v })} />

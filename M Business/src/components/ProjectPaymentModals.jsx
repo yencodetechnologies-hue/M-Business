@@ -31,7 +31,7 @@ export default function ProjectPaymentModals({
   setModalsState, 
   onSaveSuccess 
 }) {
-  const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, editData, editIndex } = modalsState;
+  const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, editData, editIndex } = modalsState;
 
   // Generic form state
   const [form, setForm] = useState({});
@@ -63,10 +63,14 @@ export default function ProjectPaymentModals({
       const len = (project?.milestonePayments || []).length + 1;
       setForm(prev => ({ ...prev, milestoneNo: `MS-${String(len).padStart(3, '0')}` }));
     }
-  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, project, editData]);
+    if (showExpense && !form.expenseNo) {
+      const len = (project?.expenses || []).length + 1;
+      setForm(prev => ({ ...prev, expenseNo: `EXP-${String(len).padStart(3, '0')}` }));
+    }
+  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, project, editData]);
 
   const closeModals = () => {
-    setModalsState({ showNewInvoice: false, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, editData: null, editIndex: null });
+    setModalsState({ showNewInvoice: false, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: null, editIndex: null });
     setForm({});
   };
 
@@ -84,6 +88,7 @@ export default function ProjectPaymentModals({
       else if (type === 'advance') arrayName = 'advances';
       else if (type === 'additional') arrayName = 'additionalCharges';
       else if (type === 'milestone') arrayName = 'milestonePayments';
+      else if (type === 'expense') arrayName = 'expenses';
 
       const currentList = project[arrayName] || [];
       let updatedList = [...currentList];
@@ -95,9 +100,36 @@ export default function ProjectPaymentModals({
         updatedList = [newRecord, ...currentList];
       }
 
-      await axios.put(`${BASE_URL}/api/projects/${project._id}`, {
+      let updatesPayload = project.updates || [];
+      if (form.notifyClient) {
+        const title = `New ${type.charAt(0).toUpperCase() + type.slice(1)} Added`;
+        const no = form.invoiceNo || form.paymentNo || form.advanceNo || form.chargeNo || form.milestoneNo || form.expenseNo || '';
+        const amt = form.amount ? ` for ₹${form.amount}` : '';
+        const newUpdate = {
+          text: `A new ${type} (${no})${amt} has been recorded and is visible in the client portal.`,
+          title: title,
+          date: new Date().toISOString(),
+          author: 'System',
+          type: 'billing'
+        };
+        updatesPayload = [newUpdate, ...updatesPayload];
+      }
+
+      const updatePayload = {
         [arrayName]: updatedList
-      });
+      };
+
+      if (form.notifyClient) {
+        updatePayload.updates = updatesPayload;
+      }
+      
+      // If it's an expense, also update the 'spent' counter for backward compatibility
+      if (type === 'expense') {
+         const diff = editIndex !== undefined ? ((form.amount||0) - (currentList[editIndex]?.amount||0)) : (form.amount||0);
+         updatePayload.spent = (project.spent || 0) + diff;
+      }
+
+      await axios.put(`${BASE_URL}/api/projects/${project._id}`, updatePayload);
 
       onSaveSuccess();
       closeModals();
@@ -134,13 +166,48 @@ export default function ProjectPaymentModals({
               <div><label style={labelStyle}>Issue Date</label><input type="date" required style={inputStyle} value={form.issueDate || ''} onChange={e => handleInputChange('issueDate', e.target.value)} /></div>
               <div><label style={labelStyle}>Due Date</label><input type="date" required style={inputStyle} value={form.dueDate || ''} onChange={e => handleInputChange('dueDate', e.target.value)} /></div>
             </div>
-            <div style={rowStyle}>
-              <div><label style={labelStyle}>Tax (%)</label><input type="number" style={inputStyle} value={form.taxPercent || ''} onChange={e => handleInputChange('taxPercent', Number(e.target.value))} placeholder="18" /></div>
-              <div><label style={labelStyle}>Status</label><select style={inputStyle} value={form.status || 'Draft'} onChange={e => handleInputChange('status', e.target.value)}>
-                <option>Draft</option><option>Sent</option><option>Paid</option><option>Overdue</option>
-              </select></div>
+            <div style={{marginBottom:12}}>
+              <label style={labelStyle}>Tax</label>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
+                <div>
+                  <input type="number" style={inputStyle} value={form.taxPercent || ''} onChange={e => handleInputChange('taxPercent', Number(e.target.value))} placeholder="e.g. 18" />
+                  <div style={{fontSize:9,color:'#7B8FA1',marginTop:3,fontWeight:600}}>TAX RATE (%)</div>
+                </div>
+                <div>
+                  <select style={inputStyle} value={form.taxType || 'exclusive'} onChange={e => handleInputChange('taxType', e.target.value)}>
+                    <option value="exclusive">Excluding Tax</option>
+                    <option value="inclusive">Including Tax</option>
+                  </select>
+                  <div style={{fontSize:9,color:'#7B8FA1',marginTop:3,fontWeight:600}}>TAX TYPE</div>
+                </div>
+                <div>
+                  <select style={inputStyle} value={form.status || 'Draft'} onChange={e => handleInputChange('status', e.target.value)}>
+                    <option>Draft</option><option>Sent</option><option>Paid</option><option>Overdue</option>
+                  </select>
+                  <div style={{fontSize:9,color:'#7B8FA1',marginTop:3,fontWeight:600}}>STATUS</div>
+                </div>
+              </div>
+              {form.amount > 0 && form.taxPercent > 0 && (
+                <div style={{marginTop:10, padding:'8px 12px', background: form.taxType==='inclusive' ? '#F0FDF4' : '#FFFBEB', borderRadius:8, fontSize:12, color:'#374151', display:'flex', justifyContent:'space-between'}}>
+                  {form.taxType === 'inclusive' ? (
+                    <><span>Base Amount: <strong>₹{Math.round(form.amount / (1 + form.taxPercent/100)).toLocaleString()}</strong></span>
+                    <span>GST included: <strong>₹{Math.round(form.amount - form.amount/(1+form.taxPercent/100)).toLocaleString()}</strong></span>
+                    <span>Total: <strong>₹{form.amount.toLocaleString()}</strong></span></>
+                  ) : (
+                    <><span>Base: <strong>₹{form.amount.toLocaleString()}</strong></span>
+                    <span>GST: <strong>₹{Math.round(form.amount * form.taxPercent/100).toLocaleString()}</strong></span>
+                    <span>Total: <strong>₹{Math.round(form.amount * (1+form.taxPercent/100)).toLocaleString()}</strong></span></>
+                  )}
+                </div>
+              )}
             </div>
             <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:80}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Additional notes for this invoice..." /></div>
+            
+            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+              <input type="checkbox" id="notify-inv" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
+              <label htmlFor="notify-inv" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
+            </div>
+
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
               <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✓ Save Invoice'}</button>
@@ -182,6 +249,12 @@ export default function ProjectPaymentModals({
               <div><label style={labelStyle}>Transaction Ref</label><input style={inputStyle} value={form.transactionRef || ''} onChange={e => handleInputChange('transactionRef', e.target.value)} placeholder="TXN / UTR / Cheque No." /></div>
             </div>
             <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:80}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Any additional notes..." /></div>
+            
+            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+              <input type="checkbox" id="notify-pay" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
+              <label htmlFor="notify-pay" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
+            </div>
+
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
               <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✓ Record Payment'}</button>
@@ -223,6 +296,12 @@ export default function ProjectPaymentModals({
             </div>
             <div style={{marginBottom: 16}}><label style={labelStyle}>Amount Adjusted So Far</label><input type="number" style={inputStyle} value={form.amountAdjusted || ''} onChange={e => handleInputChange('amountAdjusted', Number(e.target.value))} placeholder="₹ 0" /></div>
             <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:80}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Terms or remarks..." /></div>
+            
+            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+              <input type="checkbox" id="notify-adv" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
+              <label htmlFor="notify-adv" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
+            </div>
+
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
               <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✓ Save Advance'}</button>
@@ -265,6 +344,12 @@ export default function ProjectPaymentModals({
               <div><label style={labelStyle}>Paid On</label><input type="date" style={inputStyle} value={form.paidOn || ''} onChange={e => handleInputChange('paidOn', e.target.value)} /></div>
               <div></div>
             </div>
+            
+            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+              <input type="checkbox" id="notify-mil" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
+              <label htmlFor="notify-mil" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
+            </div>
+
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
               <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✓ Save Milestone'}</button>
@@ -289,22 +374,80 @@ export default function ProjectPaymentModals({
           <form onSubmit={e => handleSave(e, 'additional')}>
             <div style={rowStyle}>
               <div><label style={labelStyle}>Charge #</label><input required style={inputStyle} value={form.chargeNo || ''} onChange={e => handleInputChange('chargeNo', e.target.value)} placeholder="ADC-001" /></div>
-              <div><label style={labelStyle}>Project</label><select style={inputStyle} disabled><option>{project.name}</option></select></div>
+              <div><label style={labelStyle}>Category</label><select style={inputStyle} value={form.category || 'Scope Change'} onChange={e => handleInputChange('category', e.target.value)}>
+                <option>Scope Change</option><option>Infrastructure</option><option>Consulting</option><option>Travel</option><option>Other</option>
+              </select></div>
             </div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Extra server resources" /></div>
+            <div style={{marginBottom: 16}}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="Describe the additional charge" /></div>
             <div style={rowStyle}>
               <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="₹ 0" /></div>
               <div><label style={labelStyle}>Date</label><input type="date" required style={inputStyle} value={form.date || ''} onChange={e => handleInputChange('date', e.target.value)} /></div>
             </div>
             <div style={rowStyle}>
+              <div>
+                <label style={labelStyle}>Approved By</label>
+                <select style={inputStyle} value={form.approvedBy || ''} onChange={e => handleInputChange('approvedBy', e.target.value)}>
+                  <option value="">-- Select Approved By --</option>
+                  <option value={project?.client || project?.clientName || 'Client'}>{project?.client || project?.clientName || 'Client'}</option>
+                  {project?.contactPersonName && <option value={project.contactPersonName}>{project.contactPersonName} (Contact Person)</option>}
+                  <option value="Project Manager">Project Manager</option>
+                  <option value="System Admin">System Admin</option>
+                </select>
+              </div>
               <div><label style={labelStyle}>Status</label><select style={inputStyle} value={form.status || 'Pending'} onChange={e => handleInputChange('status', e.target.value)}>
                 <option>Pending</option><option>Invoiced</option><option>Paid</option>
               </select></div>
             </div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:80}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Reason for extra charge..." /></div>
+            <div style={{marginBottom: 16}}><label style={labelStyle}>Justification / Notes</label><textarea style={{...inputStyle, height:80}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Why is this charge being raised?" /></div>
+            
+            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+              <input type="checkbox" id="notify-add" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
+              <label htmlFor="notify-add" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
+            </div>
+
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
               <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✓ Save Charge'}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  if (showExpense) {
+    return (
+      <div style={overlayStyle}>
+        <div style={modalStyle}>
+          <div style={headerStyle}>
+            <h3 style={titleStyle}>
+              <div style={{background:'#F3F4F6', color:'#6B7280', padding:8, borderRadius:8}}><i className="ti ti-receipt"></i></div>
+              Add Project Expense
+            </h3>
+            <button style={closeBtnStyle} onClick={closeModals}>✕</button>
+          </div>
+          <form onSubmit={e => handleSave(e, 'expense')}>
+            <div style={rowStyle}>
+              <div><label style={labelStyle}>Expense #</label><input required style={inputStyle} value={form.expenseNo || ''} onChange={e => handleInputChange('expenseNo', e.target.value)} placeholder="EXP-001" /></div>
+              <div><label style={labelStyle}>Category</label><select style={inputStyle} value={form.category || 'Software'} onChange={e => handleInputChange('category', e.target.value)}>
+                <option>Software</option><option>Hardware</option><option>Contractor</option><option>Travel</option><option>Marketing</option><option>Other</option>
+              </select></div>
+            </div>
+            <div style={{marginBottom: 16}}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="Describe the expense" /></div>
+            <div style={rowStyle}>
+              <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="₹ 0" /></div>
+              <div><label style={labelStyle}>Date Incurred</label><input type="date" required style={inputStyle} value={form.date || ''} onChange={e => handleInputChange('date', e.target.value)} /></div>
+            </div>
+            <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:60}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Additional details..." /></div>
+            
+            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+              <input type="checkbox" id="notify-exp" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
+              <label htmlFor="notify-exp" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Log to Project Updates</label>
+            </div>
+
+            <div style={btnRowStyle}>
+              <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✓ Save Expense'}</button>
             </div>
           </form>
         </div>

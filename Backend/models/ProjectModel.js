@@ -64,6 +64,7 @@ const projectSchema = new mongoose.Schema({
       taxPercent: { type: Number, default: 0 },
       status: { type: String, default: "Draft" },
       notes: { type: String, default: "" },
+      notifyClient: { type: Boolean, default: false },
       createdAt: { type: Date, default: Date.now }
     }],
     default: []
@@ -78,6 +79,7 @@ const projectSchema = new mongoose.Schema({
       paymentMode: { type: String, default: "" },
       transactionRef: { type: String, default: "" },
       notes: { type: String, default: "" },
+      notifyClient: { type: Boolean, default: false },
       createdAt: { type: Date, default: Date.now }
     }],
     default: []
@@ -92,6 +94,7 @@ const projectSchema = new mongoose.Schema({
       adjustmentStatus: { type: String, default: "Pending" },
       amountAdjusted: { type: Number, default: 0 },
       notes: { type: String, default: "" },
+      notifyClient: { type: Boolean, default: false },
       createdAt: { type: Date, default: Date.now }
     }],
     default: []
@@ -99,11 +102,28 @@ const projectSchema = new mongoose.Schema({
   additionalCharges: {
     type: [{
       chargeNo: { type: String, required: true },
+      category: { type: String, default: "" },
       description: { type: String, default: "" },
       amount: { type: Number, default: 0 },
+      approvedBy: { type: String, default: "" },
       date: { type: String, default: "" },
       status: { type: String, default: "Pending" },
       notes: { type: String, default: "" },
+      notifyClient: { type: Boolean, default: false },
+      createdAt: { type: Date, default: Date.now }
+    }],
+    default: []
+  },
+  expenses: {
+    type: [{
+      expenseNo: { type: String, required: true },
+      category: { type: String, default: "" },
+      description: { type: String, default: "" },
+      amount: { type: Number, default: 0 },
+      date: { type: String, default: "" },
+      status: { type: String, default: "Paid" },
+      notes: { type: String, default: "" },
+      notifyClient: { type: Boolean, default: false },
       createdAt: { type: Date, default: Date.now }
     }],
     default: []
@@ -118,6 +138,7 @@ const projectSchema = new mongoose.Schema({
       dueDate: { type: String, default: "" },
       status: { type: String, default: "Upcoming" },
       paidOn: { type: String, default: "" },
+      notifyClient: { type: Boolean, default: false },
       createdAt: { type: Date, default: Date.now }
     }],
     default: []

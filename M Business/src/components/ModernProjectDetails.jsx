@@ -178,7 +178,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice }) {
   const [activeTab, setActiveTab] = useState('updates');
 
   const [composerOpen, setComposerOpen] = useState(false);
@@ -611,6 +611,9 @@ const handleAddExpense = async (e) => {
         </div>
         <div className="mpd-topbar-actions">
           {!hideTopActions && (<>
+          {onNewInvoice && (
+            <button className="mpd-btn mpd-btn-primary" onClick={() => onNewInvoice(currProject)} style={{gap:6}}><i className="ti ti-file-invoice"></i> New Invoice</button>
+          )}
           <button className="mpd-btn mpd-btn-outline" onClick={handleShare} style={{gap:6}}><i className="ti ti-share"></i> Share</button>
           <button className="mpd-btn mpd-btn-outline" style={{gap:6}} onClick={() => {
             const text = `Project: ${projName}\nClient: ${clientName}\nStatus: ${currProject.status}\nProgress: ${progressPct}%\nBudget: ${currency}${budgetAmt.toLocaleString()}`;

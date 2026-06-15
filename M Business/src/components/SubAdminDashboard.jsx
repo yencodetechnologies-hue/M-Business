@@ -1943,7 +1943,7 @@ const saveEdit = async () => {
   </div>
 </div>
 
-<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} />
+<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() }); setActive("invoices"); }} />
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>
@@ -3294,6 +3294,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [jumpProject, setJumpProject] = useState(null);
   const [fromEditProject, setFromEditProject] = useState(false);
   const [jumpInvoice, setJumpInvoice] = useState(null);
+const [invoicePrefill, setInvoicePrefill] = useState(null);
   const [sidebarOverride, setSidebarOverride] = useState(null);
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
@@ -5312,6 +5313,11 @@ active={
     fetchTasks={fetchTasks}
     fetchProjects={fetchProjects}
     onMessageTeam={() => setActive("messaging")}
+    onMessageTeam={() => setActive("messaging")}
+    onNewInvoice={(proj) => {
+      setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now() });
+      setActive("invoices");
+    }}
     onLogTime={async (hours) => {
       try {
         const current = Number(jumpProject?.loggedHours || 0);
@@ -5369,7 +5375,7 @@ onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} onAddEm
                 }} />}
                 {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
-                {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive("dashboard")} jumpInvoice={jumpInvoice} onAddClient={() => {
+                {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive("dashboard")} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} onAddClient={() => {
                   const limit = getSubscriptionLimit("client");
                   if (subscription && clients.length >= limit) {
                     setLimitModal({ type: "client", limit });

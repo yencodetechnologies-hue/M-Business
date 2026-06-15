@@ -191,13 +191,13 @@ const CSS = `
   .mpv-grid { grid-template-columns:1fr; }
 }
 `;
-
 export default function ModernProjectsView({
   projects = [],
   onViewTasks,
   onEdit,
   onDelete,
   onAssign,
+  onNewInvoice,
   searchQuery = '',
 }) {
   const [search, setSearch]       = useState(searchQuery);
@@ -368,7 +368,7 @@ export default function ModernProjectsView({
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span className={`mpv-prio ${prio}`}>{prioLabel}</span>
-                      {(onEdit || onDelete || onAssign) && (
+{(onEdit || onDelete || onAssign || onNewInvoice) && (
                         <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
                           <button
                             className="mpv-more-btn"
@@ -391,6 +391,11 @@ export default function ModernProjectsView({
                               {onViewTasks && (
                                 <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onViewTasks(p); }}>
                                   <i className="ti ti-checklist" /> View Tasks
+                                </div>
+                              )}
+                        {onNewInvoice && (
+                                <div className="mpv-menu-item" onClick={() => { setOpenMenu(null); onNewInvoice(p); }}>
+                                  <i className="ti ti-file-invoice" /> New Invoice
                                 </div>
                               )}
                               {onDelete && (

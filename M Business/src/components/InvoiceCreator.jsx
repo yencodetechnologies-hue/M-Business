@@ -453,7 +453,7 @@ function CanvasSignature({ onSave }) {
 }
 
 // ════════════════════════════════════════════════════════════
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
@@ -468,6 +468,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
       loadEntry(jumpInvoice);
       setStep("preview");
     }
+    useEffect(() => {
+    if (newInvoicePrefill) {
+      setInv({ ...blank, invoiceNo: generateInvoiceNo(), client: newInvoicePrefill.client || "", project: newInvoicePrefill.project || "" });
+      setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
+      setEditingId(null);
+      setErrors({});
+      setStep("form");
+    }
+  }, [newInvoicePrefill]);
   }, [jumpInvoice]);
 
   const [invoiceList, setInvoiceList] = useState([]);

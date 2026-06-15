@@ -485,14 +485,21 @@ const totalMilestones = milestonesArr.length;
 const progressPct = totalMilestones > 0
   ? Math.round((doneMilestones / totalMilestones) * 100)
   : (currProject.progress || 0);
-// Budget spent data (Auto-calculated from invoices)
-  const billed = projectInvoices.reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
-  const received = projectInvoices.reduce((sum, inv) => sum + (Number(inv.amountPaid) || 0), 0);
+  const parseAmt = (val) => {
+    if (val === undefined || val === null) return 0;
+    if (typeof val === 'number') return val;
+    const num = Number(String(val).replace(/[^0-9.-]+/g, ''));
+    return isNaN(num) ? 0 : num;
+  };
+
+  // Budget spent data (Auto-calculated from invoices)
+  const billed = projectInvoices.reduce((sum, inv) => sum + parseAmt(inv.total), 0);
+  const received = (currProject.paymentsReceived || []).reduce((sum, p) => sum + parseAmt(p.amount), 0);
   const pending = Math.max(0, billed - received);
   // Spent = dynamically summed from expenses array; fallback to stored spent value
   const spent = (currProject.expenses && currProject.expenses.length > 0)
-    ? currProject.expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0)
-    : (currProject.spent || 0);
+    ? currProject.expenses.reduce((sum, exp) => sum + parseAmt(exp.amount), 0)
+    : parseAmt(currProject.spent);
   const remaining = budgetAmt > 0 ? (budgetAmt - spent) : 0;
   const budgetUsedPct = budgetAmt > 0 ? Math.round((spent / budgetAmt) * 100) : 0;
 
@@ -1818,7 +1825,7 @@ const handleAddExpense = async (e) => {
                     <i className="ti ti-trash" style={{fontSize:13}}></i> Delete
                   </button>
                   <button onClick={() => {
-                    setTimeout(() => window.print(), 100);
+                    window.print();
                   }} style={{padding:'6px 14px',background:'#00BCD4',color:'#fff',border:'none',borderRadius:7,fontSize:12,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',gap:5}}>
                     <i className="ti ti-printer" style={{fontSize:13}}></i> Print / PDF
                   </button>

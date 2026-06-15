@@ -133,8 +133,13 @@ export default function ProjectPaymentModals({
       
       // If it's an expense, also update the 'spent' counter for backward compatibility
       if (type === 'expense') {
-         const diff = editIndex !== undefined ? ((form.amount||0) - (currentList[editIndex]?.amount||0)) : (form.amount||0);
-         updatePayload.spent = (project.spent || 0) + diff;
+         const parseAmt = (val) => {
+           if (val === undefined || val === null) return 0;
+           const num = Number(String(val).replace(/[^0-9.-]+/g, ''));
+           return isNaN(num) ? 0 : num;
+         };
+         const diff = editIndex !== undefined ? (parseAmt(form.amount) - parseAmt(currentList[editIndex]?.amount)) : parseAmt(form.amount);
+         updatePayload.spent = parseAmt(project.spent) + diff;
       }
 
       await axios.put(`${BASE_URL}/api/projects/${project._id}`, updatePayload);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 import ModernEmployeeProjectDetails from './ModernEmployeeProjectDetails';
+import ProjectPaymentModals from './ProjectPaymentModals';
 
 // ── Shared Colors ──
 const P = {
@@ -197,6 +198,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [newTaskAssignTo, setNewTaskAssignTo] = useState([]);
   const [newTaskDue, setNewTaskDue] = useState('');
   const [newTaskDesc, setNewTaskDesc] = useState('');
+  const [newTaskMilestone, setNewTaskMilestone] = useState('');
   const [addingTask, setAddingTask] = useState(false);
 
   const [updateText, setUpdateText] = useState('');
@@ -218,6 +220,14 @@ const [showAddExpense, setShowAddExpense] = useState(false);
 const [expenseAmt, setExpenseAmt] = useState('');
 const [addingExpense, setAddingExpense] = useState(false);
 const [projectInvoices, setProjectInvoices] = useState([]);
+
+const [paymentModalsState, setPaymentModalsState] = useState({
+  showNewInvoice: false,
+  showPayment: false,
+  showAdvance: false,
+  showMilestonePayment: false,
+  showAdditional: false
+});
   const loadLatest = useCallback(async () => {
     if (!project?._id) return;
     setLoadingProject(true);
@@ -394,8 +404,9 @@ if(editingTask){
     title:newTaskTitle.trim(),
     description:newTaskDesc.trim(),
     priority:newTaskPriority,
-assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskAssignTo,
-    date:newTaskDue
+    assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskAssignTo,
+    date:newTaskDue,
+    milestone: newTaskMilestone
   });
 }else{
   await axios.post(`${BASE_URL}/api/tasks`, {
@@ -404,6 +415,7 @@ assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskA
     priority: newTaskPriority,
     assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskAssignTo,
     date: newTaskDue,
+    milestone: newTaskMilestone,
     groupId: gId,
     projectId: currProject._id,
     status: 'Not Started'
@@ -415,6 +427,7 @@ assignTo: Array.isArray(newTaskAssignTo) ? newTaskAssignTo.join(', ') : newTaskA
       setNewTaskPriority('medium');
       setNewTaskAssignTo('Unassigned');
       setNewTaskDue('');
+      setNewTaskMilestone('');
       setShowAddTaskModal(null);
 
       loadLatest();
@@ -755,8 +768,16 @@ const handleAddExpense = async (e) => {
       <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones||[]).length * 100) }}>
         <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
         {(currProject.milestones||[]).map((m, idx) => {
-          const isDone = m.done === true;
-          const firstNotDone = (currProject.milestones||[]).findIndex(x => !x.done);
+          const tasksForMilestone = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+          const allTasksCompleted = tasksForMilestone.length > 0 && tasksForMilestone.every(t => t.status === 'done' || t.status === 'completed');
+          const isDone = m.done === true || allTasksCompleted;
+          
+          const firstNotDone = (currProject.milestones||[]).findIndex(x => {
+             const mTasks = currTasks.filter(t => t.milestone === x.name && !t.isDeleted);
+             const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
+             return x.done !== true && !mAllCompleted;
+          });
+          
           const isActive = !isDone && idx === firstNotDone;
           const circleColor = isDone ? P.green : isActive ? '#E0F7FA' : '#fff';
           const circleBorder = isDone ? P.green : isActive ? P.primary : P.border;
@@ -764,14 +785,29 @@ const handleAddExpense = async (e) => {
           const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
           return (
             <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1 }}>
+              {tasksForMilestone.length > 0 && (
+                <div style={{ position: 'absolute', top: 18, left: idx === 0 ? '0%' : '-50%', right: '50%', transform: 'translateY(-50%)', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', zIndex: 0 }}>
+                  {tasksForMilestone.map((t, i) => {
+                    const taskDone = t.status === 'done' || t.status === 'completed';
+                    return (
+                      <div key={t._id} title={t.title} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: taskDone ? P.green : P.primary, border: '2px solid #fff', zIndex: 2 }}></div>
+                        <div style={{ position: 'absolute', top: 14, fontSize: 9, color: taskDone ? P.green : P.textDark, whiteSpace: 'nowrap', fontWeight: 700, maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'center' }}>
+                          {t.title}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               <div onClick={() => handleToggleMilestone(idx)} title="Click to toggle done"
-                style={{ width: 36, height: 36, borderRadius: '50%', background: circleColor, border: `2.5px solid ${circleBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: isDone ? '#fff' : isActive ? P.primary : P.textLight, cursor: 'pointer', boxShadow: isActive ? `0 0 0 4px ${P.primaryLight}` : 'none', transition: 'all .2s' }}>
+                style={{ width: 36, height: 36, borderRadius: '50%', background: circleColor, border: `2.5px solid ${circleBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: isDone ? '#fff' : isActive ? P.primary : P.textLight, cursor: 'pointer', boxShadow: isActive ? `0 0 0 4px ${P.primaryLight}` : 'none', transition: 'all .2s', position: 'relative', zIndex: 1 }}>
                 {isDone ? <span style={{color:'#fff',fontSize:14}}>✓</span> : idx + 1}
               </div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, wordBreak: 'break-word' }}>{m.name}</div>
-              {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center' }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
-              <div style={{ fontSize: 10, fontWeight: 700, color: textColor }}>{statusLabel}</div>
-              <button onClick={e => { e.stopPropagation(); if(confirm('Delete milestone?')){ const ms=(currProject.milestones||[]).filter((_,i)=>i!==idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{milestones:ms}).then(loadLatest); }}} style={{ background:'none', border:'none', cursor:'pointer', color: P.red, fontSize: 11, padding: 0 }}>🗑️</button>
+              <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, wordBreak: 'break-word', position: 'relative', zIndex: 1 }}>{m.name}</div>
+              {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center', position: 'relative', zIndex: 1 }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
+              <div style={{ fontSize: 10, fontWeight: 700, color: textColor, position: 'relative', zIndex: 1 }}>{statusLabel}</div>
+              <button onClick={e => { e.stopPropagation(); if(confirm('Delete milestone?')){ const ms=(currProject.milestones||[]).filter((_,i)=>i!==idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{milestones:ms}).then(loadLatest); }}} style={{ background:'none', border:'none', cursor:'pointer', color: P.red, fontSize: 11, padding: 0, position: 'relative', zIndex: 1 }}>🗑️</button>
             </div>
           );
         })}
@@ -792,71 +828,6 @@ const handleAddExpense = async (e) => {
   )}
 </div>
 
-{/* MAIN CONTENT GRID */}
-<div className="mpd-grid-main-side"></div>
-  <div className={`mpd-tab-pane ${activeTab==='milestones'?'mpd-active':''}`}>
-              {(!currProject.milestones || currProject.milestones.length === 0) ? (
-                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No milestones defined.</div>
-              ) : (
-                <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: P.textDark, marginBottom: 24 }}>Milestone Progress</div>
-                  <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones||[]).length * 100) }}>
-                    <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
-                    {(currProject.milestones||[]).map((m, idx) => {
-                      const isDone = m.done === true;
-                      const firstNotDone = (currProject.milestones||[]).findIndex(x => !x.done);
-                      const isActive = !isDone && idx === firstNotDone;
-                      const circleColor = isDone ? P.green : isActive ? '#E0F7FA' : '#fff';
-                      const circleBorder = isDone ? P.green : isActive ? P.primary : P.border;
-                      const textColor = isDone ? P.green : isActive ? P.primary : P.textLight;
-                      const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
-                      return (
-                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1 }}>
-                          <div
-                            onClick={() => handleToggleMilestone(idx)}
-                            title="Click to toggle done"
-                            style={{
-                              width: 36, height: 36, borderRadius: '50%',
-                              background: circleColor,
-                              border: `2.5px solid ${circleBorder}`,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: 13, fontWeight: 800,
-                              color: isDone ? '#fff' : isActive ? P.primary : P.textLight,
-                              cursor: 'pointer',
-                              boxShadow: isActive ? `0 0 0 4px ${P.primaryLight}` : 'none',
-                              transition: 'all .2s'
-                            }}
-                          >
-                            {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>✓</span> : idx + 1}
-                          </div>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: P.textDark, textAlign: 'center', maxWidth: 80, wordBreak: 'break-word' }}>{m.name}</div>
-                          {m.date && <div style={{ fontSize: 10, color: P.textLight, textAlign: 'center' }}>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>}
-                          <div style={{ fontSize: 10, fontWeight: 700, color: textColor }}>{statusLabel}</div>
-                          <button onClick={e => { e.stopPropagation(); if(confirm('Delete milestone?')){ const ms=(currProject.milestones||[]).filter((_,i)=>i!==idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{milestones:ms}).then(loadLatest); }}} style={{ background:'none', border:'none', cursor:'pointer', color: P.red, fontSize: 11, padding: 0 }}>🗑️</button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {showAddMilestone ? (
-                <form onSubmit={handleAddMilestone} style={{ background: P.bg, padding: 14, borderRadius: 10, marginTop: 12 }}>
-                  <div style={{ marginBottom: 8 }}>
-                    <input type="text" value={newMilestoneName} onChange={e => setNewMilestoneName(e.target.value)} placeholder="Milestone name..." required style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none' }} />
-                  </div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <input type="date" value={newMilestoneDate} onChange={e => setNewMilestoneDate(e.target.value)} style={{ padding: '6px 8px', borderRadius: 6, border: `1.5px solid ${P.border}`, fontSize: 12, outline: 'none', flex: 1 }} />
-                    <button type="submit" className="mpd-btn mpd-btn-primary" style={{ padding: '6px 12px', fontSize: 11 }}>Add</button>
-                    <button type="button" className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(false)} style={{ padding: '6px 12px', fontSize: 11 }}>✕</button>
-                  </div>
-                </form>
-              ) : (
-                <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(true)} style={{ width: '100%', justifyContent: 'center', marginTop: 12, padding: '8px', fontSize: 12 }}>
-                  + Add Milestone
-                </button>
-              )}
-            </div>  
 
       {/* MAIN CONTENT GRID */}
       <div className="mpd-grid-main-side">
@@ -866,7 +837,7 @@ const handleAddExpense = async (e) => {
           <div className="mpd-card" style={{padding:0, overflow:'hidden', marginBottom: 20}}>
             <div className="mpd-card-header" style={{padding:'20px 24px 10px', marginBottom:0}}>
               <div className="mpd-card-title"><i className="ti ti-list-check"></i> Tasks</div>
-              <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setShowAddTaskModal(true); }} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
+              <button className="mpd-btn mpd-btn-outline" onClick={() => { setEditingTask(null); setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskPriority('medium'); setNewTaskAssignTo([]); setNewTaskDue(''); setNewTaskMilestone(''); setShowAddTaskModal(true); }} style={{padding:'6px 12px', fontSize:12}}><i className="ti ti-plus"></i> Add Task</button>
             </div>
             <div style={{padding:'0 24px 14px'}}>
              <div className="mpd-task-filters">
@@ -894,7 +865,7 @@ const handleAddExpense = async (e) => {
 </div>
     <div className="mpd-task-due">{t.date ? new Date(t.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : ''}</div>
 </div>
-  <button onClick={e=>{e.stopPropagation();setEditingTask(t);setNewTaskTitle(t.title||'');setNewTaskDesc(t.description||'');setNewTaskPriority(t.priority||'medium');setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []);setNewTaskDue(t.date||'');setShowAddTaskModal(true);}} style={{background:'none',border:'none',cursor:'pointer',color:P.primary,fontSize:13,padding:'2px 6px'}}>✏️</button>
+  <button onClick={e=>{e.stopPropagation();setEditingTask(t);setNewTaskTitle(t.title||'');setNewTaskDesc(t.description||'');setNewTaskPriority(t.priority||'medium');setNewTaskAssignTo(t.assignTo ? t.assignTo.split(', ').filter(Boolean) : []);setNewTaskDue(t.date||'');setNewTaskMilestone(t.milestone||'');setShowAddTaskModal(true);}} style={{background:'none',border:'none',cursor:'pointer',color:P.primary,fontSize:13,padding:'2px 6px'}}>✏️</button>
   <button onClick={e=>{e.stopPropagation();if(confirm('Delete?'))axios.delete(`${BASE_URL}/api/tasks/${t._id}`).catch(()=>axios.put(`${BASE_URL}/api/tasks/${t._id}`,{isDeleted:true})).then(loadLatest);}} style={{background:'none',border:'none',cursor:'pointer',color:P.red,fontSize:13,padding:'2px 6px'}}>🗑️</button>
 </div>
                   );
@@ -907,7 +878,8 @@ const handleAddExpense = async (e) => {
           <div className="mpd-card">
             <div className="mpd-tabs">
               <button className={`mpd-tab-btn ${activeTab==='updates'?'mpd-active':''}`} onClick={()=>setActiveTab('updates')}>Updates</button>
-                            <button className={`mpd-tab-btn ${activeTab==='activity'?'mpd-active':''}`} onClick={()=>setActiveTab('activity')}>Activity Logs</button>
+              <button className={`mpd-tab-btn ${activeTab==='activity'?'mpd-active':''}`} onClick={()=>setActiveTab('activity')}>Activity Logs</button>
+              <button className={`mpd-tab-btn ${activeTab==='payments'?'mpd-active':''}`} onClick={()=>setActiveTab('payments')}><i className="ti ti-arrows-exchange" style={{marginRight:5}}></i>Payments</button>
             </div>
             
          
@@ -927,7 +899,7 @@ const handleAddExpense = async (e) => {
             </div>
 
             <div className={`mpd-tab-pane ${activeTab==='updates'?'mpd-active':''}`}>
-        <div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', marginBottom: 20 }}>
+<div ref={composerRef} className="mpd-upd-composer" style={{ overflow: 'hidden', marginBottom: composerOpen ? 20 : 0, display: activeTab === 'updates' ? 'block' : 'none' }}>
         <div className="mpd-uc-header" onClick={() => setComposerOpen(!composerOpen)} style={{ cursor: 'pointer' }}>
           <h3><i className="ti ti-speakerphone"></i> Post Project Update</h3>
           <button className="mpd-uc-toggle" onClick={e => { e.stopPropagation(); setComposerOpen(!composerOpen); }}>{composerOpen ? 'Collapse ↑' : 'Expand ↓'}</button>
@@ -1057,6 +1029,147 @@ const handleAddExpense = async (e) => {
                 ))
               )}
             </div>
+
+            {/* ── PAYMENTS TAB ── */}
+            <div className={`mpd-tab-pane ${activeTab==='payments'?'mpd-active':''}`}>
+              <div style={{padding:'18px 20px'}}>
+
+                {/* STATS ROW */}
+                <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:20}}>
+                  {[
+                    {lbl:'Total Invoiced',val:`${currency}${(budgetAmt||0).toLocaleString()}`,sub:'Invoices raised',color:'#3B82F6',icon:'ti-file-invoice'},
+                    {lbl:'Received',val:`${currency}${(received||0).toLocaleString()}`,sub:`${budgetAmt>0?Math.round((received/budgetAmt)*100):0}% collected`,color:'#22C55E',icon:'ti-circle-check'},
+                    {lbl:'Advance Paid',val:`${currency}${(currProject.advance||0).toLocaleString()}`,sub:'Adjusted in invoice',color:'#8B5CF6',icon:'ti-pig-money'},
+                    {lbl:'Additional',val:`${currency}${(currProject.additionalCharges||0).toLocaleString()}`,sub:'Extra charges',color:'#F97316',icon:'ti-circle-plus'},
+                    {lbl:'Outstanding',val:`${currency}${(pending||0).toLocaleString()}`,sub:'Balance due',color:'#F59E0B',icon:'ti-alert-circle'},
+                  ].map(s=>(
+                    <div key={s.lbl} style={{background:'#fff',border:'1px solid #E8EDF2',borderRadius:12,padding:'14px 16px',position:'relative',overflow:'hidden'}}>
+                      <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:s.color,borderRadius:'12px 12px 0 0'}}></div>
+                      <i className={`ti ${s.icon}`} style={{position:'absolute',top:14,right:14,fontSize:20,opacity:.13,color:s.color}}></i>
+                      <div style={{fontSize:10,fontWeight:900,color:'#7B8FA1',textTransform:'uppercase',letterSpacing:'.7px',marginBottom:5}}>{s.lbl}</div>
+                      <div style={{fontSize:20,fontWeight:900,color:'#0D1B2A',letterSpacing:'-.5px',lineHeight:1}}>{s.val}</div>
+                      <div style={{fontSize:11,color:'#7B8FA1',fontWeight:600,marginTop:4}}>{s.sub}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* PAYMENT TYPE TABS */}
+                <div style={{display:'flex',background:'#fff',border:'1px solid #E8EDF2',borderRadius:10,overflow:'hidden',marginBottom:18}}>
+                  {[
+                    {key:'inv',label:'Invoice',desc:'Standard billing',icon:'ti-file-invoice',color:'#3B82F6',bg:'#DBEAFE'},
+                    {key:'pay',label:'Payment',desc:'Received amounts',icon:'ti-credit-card',color:'#22C55E',bg:'#DCFCE7'},
+                    {key:'adv',label:'Advance',desc:'Upfront payments',icon:'ti-pig-money',color:'#8B5CF6',bg:'#EDE9FE'},
+                    {key:'add',label:'Additional',desc:'Extra charges',icon:'ti-circle-plus',color:'#F97316',bg:'#FFEDD5'},
+                    {key:'mile',label:'Milestone',desc:'Phase billing',icon:'ti-flag',color:'#F59E0B',bg:'#FEF3C7'},
+                  ].map((t,i)=>(
+                    <div key={t.key} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4,padding:'12px 8px',cursor:'pointer',borderRight:i<4?'1px solid #E8EDF2':'none',transition:'all .14s',background: (currProject._payTab||'inv')===t.key ? '#00BCD4' : '#fff'}}
+                      onClick={()=>{
+                        const proj={...currProject,_payTab:t.key};
+                        // local state update trick
+                        document.querySelectorAll('[data-paytab]').forEach(el=>el.dataset.paytab===t.key?(el.style.display='block'):(el.style.display='none'));
+                        document.querySelectorAll('[data-paytabbtn]').forEach(el=>{
+                          el.style.background=el.dataset.paytabbtn===t.key?'#00BCD4':'#fff';
+                          el.querySelector('.pt-lbl').style.color=el.dataset.paytabbtn===t.key?'#fff':'#0D1B2A';
+                          el.querySelector('.pt-desc').style.color=el.dataset.paytabbtn===t.key?'rgba(255,255,255,.7)':'#7B8FA1';
+                          el.querySelector('.pt-ico').style.background=el.dataset.paytabbtn===t.key?'rgba(255,255,255,.2)':el.dataset.origbg;
+                          el.querySelector('.pt-ico').style.color=el.dataset.paytabbtn===t.key?'#fff':el.dataset.origcolor;
+                        });
+                      }}
+                      data-paytabbtn={t.key}
+                      data-origbg={t.bg}
+                      data-origcolor={t.color}
+                    >
+                      <div className="pt-ico" style={{width:32,height:32,borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,background:t.bg,color:t.color,transition:'all .14s'}}>
+                        <i className={`ti ${t.icon}`}></i>
+                      </div>
+                      <div className="pt-lbl" style={{fontSize:12,fontWeight:900,color:'#0D1B2A',transition:'color .14s'}}>{t.label}</div>
+                      <div className="pt-desc" style={{fontSize:10,fontWeight:600,color:'#7B8FA1',transition:'color .14s',textAlign:'center'}}>{t.desc}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* INVOICE TABLE */}
+                <div data-paytab="inv" style={{background:'#fff',border:'1px solid #E8EDF2',borderRadius:14,overflow:'hidden'}}>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 18px',borderBottom:'1px solid #E8EDF2'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:8,fontSize:13,fontWeight:900,color:'#0D1B2A'}}>
+                      <i className="ti ti-file-invoice" style={{color:'#00BCD4',fontSize:15}}></i> Invoices
+                      <span style={{background:'#E0F7FA',color:'#0097A7',fontSize:10,fontWeight:900,padding:'2px 8px',borderRadius:20}}>{(currProject.invoices||[]).length || 0}</span>
+                    </div>
+                    <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true }))} style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#00BCD4',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
+                      <i className="ti ti-plus" style={{fontSize:13}}></i> New Invoice
+                    </button>
+                  </div>
+                  {/* Table Header */}
+                  <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr 1fr 80px',gap:8,padding:'8px 18px',background:'#FAFBFD',borderBottom:'1px solid #E8EDF2'}}>
+                    {['Invoice','Amount','Issue Date','Due Date','Status',''].map(h=>(
+                      <div key={h} style={{fontSize:10,fontWeight:900,color:'#7B8FA1',textTransform:'uppercase',letterSpacing:'.7px'}}>{h}</div>
+                    ))}
+                  </div>
+                  {/* Rows */}
+                  {(currProject.invoices && currProject.invoices.length > 0) ? (
+                    currProject.invoices.map((inv,i)=>(
+                      <div key={i} style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr 1fr 80px',gap:8,padding:'0 18px',alignItems:'center',minHeight:56,borderBottom:'1px solid #E8EDF2',borderLeft:`3px solid ${inv.status==='paid'?'#22C55E':inv.status==='overdue'?'#EF4444':'#F59E0B'}`}}>
+                        <div>
+                          <div style={{fontSize:10,fontWeight:700,color:'#7B8FA1'}}>{inv.invoiceNo||`INV-00${i+1}`}</div>
+                          <div style={{fontSize:13,fontWeight:800,color:'#0D1B2A'}}>{inv.description||'Invoice'}</div>
+                          <div style={{fontSize:11,color:'#7B8FA1',fontWeight:600}}>{clientName}</div>
+                        </div>
+                        <div style={{fontSize:14,fontWeight:900,color:inv.status==='paid'?'#15803D':'#0D1B2A'}}>{currency}{(inv.amount||0).toLocaleString()}</div>
+                        <div style={{fontSize:12,fontWeight:700,color:'#2D3E50'}}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
+                        <div style={{fontSize:12,fontWeight:700,color:'#2D3E50'}}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
+                        <div>
+                          <span style={{display:'inline-flex',alignItems:'center',gap:4,padding:'4px 10px',borderRadius:20,fontSize:11,fontWeight:900,background:inv.status==='paid'?'#DCFCE7':inv.status==='overdue'?'#FEE2E2':'#FEF3C7',color:inv.status==='paid'?'#15803D':inv.status==='overdue'?'#B91C1C':'#B45309'}}>
+                            <i className={`ti ${inv.status==='paid'?'ti-circle-check':inv.status==='overdue'?'ti-alert-circle':'ti-clock'}`} style={{fontSize:10}}></i>
+                            {inv.status ? inv.status.charAt(0).toUpperCase()+inv.status.slice(1) : 'Pending'}
+                          </span>
+                        </div>
+                        <div style={{display:'flex',gap:4}}>
+                          <button style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}}><i className="ti ti-eye"></i></button>
+                          <button style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}}><i className="ti ti-edit"></i></button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{padding:'32px 20px',textAlign:'center',color:'#7B8FA1',fontSize:13}}>
+                      <i className="ti ti-file-invoice" style={{fontSize:32,display:'block',marginBottom:10,opacity:.3}}></i>
+                      No invoices yet for this project.
+                      <div style={{marginTop:12}}>
+                        <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true }))} style={{padding:'8px 18px',background:'#00BCD4',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
+                          <i className="ti ti-plus" style={{marginRight:6}}></i>Create First Invoice
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* PAYMENT / ADVANCE / ADDITIONAL / MILESTONE panels (hidden by default) */}
+                {[{key:'pay',label:'Payments Received',btnLabel:'Record Payment',icon:'ti-credit-card',color:'#22C55E'},{key:'adv',label:'Advance Payments',btnLabel:'Add Advance',icon:'ti-pig-money',color:'#8B5CF6'},{key:'add',label:'Additional Charges',btnLabel:'Add Additional',icon:'ti-circle-plus',color:'#F97316'},{key:'mile',label:'Milestone Payments',btnLabel:'Add Milestone',icon:'ti-flag',color:'#F59E0B'}].map(p=>(
+                  <div key={p.key} data-paytab={p.key} style={{display:'none',background:'#fff',border:'1px solid #E8EDF2',borderRadius:14,overflow:'hidden'}}>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 18px',borderBottom:'1px solid #E8EDF2'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:8,fontSize:13,fontWeight:900,color:'#0D1B2A'}}>
+                        <i className={`ti ${p.icon}`} style={{color:p.color,fontSize:15}}></i> {p.label}
+                      </div>
+                      <button 
+                        onClick={() => {
+                          if (p.key === 'pay') setPaymentModalsState(prev => ({ ...prev, showPayment: true }));
+                          else if (p.key === 'adv') setPaymentModalsState(prev => ({ ...prev, showAdvance: true }));
+                          else if (p.key === 'add') setPaymentModalsState(prev => ({ ...prev, showAdditional: true }));
+                          else if (p.key === 'mile') setPaymentModalsState(prev => ({ ...prev, showMilestonePayment: true }));
+                        }}
+                        style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#00BCD4',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
+                        <i className="ti ti-plus" style={{fontSize:13}}></i> {p.btnLabel}
+                      </button>
+                    </div>
+                    <div style={{padding:'32px 20px',textAlign:'center',color:'#7B8FA1',fontSize:13}}>
+                      <i className={`ti ${p.icon}`} style={{fontSize:32,display:'block',marginBottom:10,opacity:.3,color:p.color}}></i>
+                      No {p.label.toLowerCase()} recorded yet.
+                    </div>
+                  </div>
+                ))}
+
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1201,6 +1314,15 @@ const handleAddExpense = async (e) => {
                   <input type="date" value={newTaskDue} onChange={e => setNewTaskDue(e.target.value)} style={{ width: '100%', padding: '9px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }} />
                 </div>
               </div>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Link to Milestone (Optional)</label>
+                <select value={newTaskMilestone} onChange={e => setNewTaskMilestone(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px solid ${P.border}`, outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="">-- No Milestone --</option>
+                  {(currProject.milestones || []).map((m, i) => (
+                    <option key={i} value={m.name}>{m.name}</option>
+                  ))}
+                </select>
+              </div>
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textLight, marginBottom: 4 }}>Assign To</label>
                 <div style={{border:`1.5px solid ${P.border}`,borderRadius:8,maxHeight:150,overflowY:'auto',padding:'4px 0'}}>
@@ -1274,6 +1396,14 @@ const handleAddExpense = async (e) => {
           </div>
         </div>
       )}
+
+      {/* Payment Modals */}
+      <ProjectPaymentModals 
+        project={currProject} 
+        modalsState={paymentModalsState} 
+        setModalsState={setPaymentModalsState} 
+        onSaveSuccess={loadLatest} 
+      />
     </div>
   );
 }

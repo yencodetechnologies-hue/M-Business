@@ -54,6 +54,74 @@ const projectSchema = new mongoose.Schema({
     }],
     default: []
   },
+  invoices: {
+    type: [{
+      invoiceNo: { type: String, required: true },
+      description: { type: String, default: "" },
+      amount: { type: Number, default: 0 },
+      issueDate: { type: String, default: "" },
+      dueDate: { type: String, default: "" },
+      taxPercent: { type: Number, default: 0 },
+      status: { type: String, default: "Draft" },
+      notes: { type: String, default: "" },
+      createdAt: { type: Date, default: Date.now }
+    }],
+    default: []
+  },
+  paymentsReceived: {
+    type: [{
+      paymentNo: { type: String, required: true },
+      linkedInvoice: { type: String, default: "" },
+      description: { type: String, default: "" },
+      amount: { type: Number, default: 0 },
+      paymentDate: { type: String, default: "" },
+      paymentMode: { type: String, default: "" },
+      transactionRef: { type: String, default: "" },
+      notes: { type: String, default: "" },
+      createdAt: { type: Date, default: Date.now }
+    }],
+    default: []
+  },
+  advances: {
+    type: [{
+      advanceNo: { type: String, required: true },
+      description: { type: String, default: "" },
+      amount: { type: Number, default: 0 },
+      dateReceived: { type: String, default: "" },
+      paymentMode: { type: String, default: "" },
+      adjustmentStatus: { type: String, default: "Pending" },
+      amountAdjusted: { type: Number, default: 0 },
+      notes: { type: String, default: "" },
+      createdAt: { type: Date, default: Date.now }
+    }],
+    default: []
+  },
+  additionalCharges: {
+    type: [{
+      chargeNo: { type: String, required: true },
+      description: { type: String, default: "" },
+      amount: { type: Number, default: 0 },
+      date: { type: String, default: "" },
+      status: { type: String, default: "Pending" },
+      notes: { type: String, default: "" },
+      createdAt: { type: Date, default: Date.now }
+    }],
+    default: []
+  },
+  milestonePayments: {
+    type: [{
+      milestoneNo: { type: String, required: true },
+      name: { type: String, default: "" },
+      description: { type: String, default: "" },
+      amount: { type: Number, default: 0 },
+      percentage: { type: Number, default: 0 },
+      dueDate: { type: String, default: "" },
+      status: { type: String, default: "Upcoming" },
+      paidOn: { type: String, default: "" },
+      createdAt: { type: Date, default: Date.now }
+    }],
+    default: []
+  },
   portalSettings: {
     type: Object,
     default: {

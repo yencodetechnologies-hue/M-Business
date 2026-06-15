@@ -23,6 +23,7 @@ assignTo:      { type: String, default: "Unassigned", set: v => Array.isArray(v)
     }],
     autoAssign:    { type: Boolean, default: false },
     type:          { type: String, default: "" },
+    milestone:     { type: String, default: "" },
     date:          { type: String, default: "" },
     time:          { type: String, default: "" },
     estimatedTime: { type: String, default: "" },

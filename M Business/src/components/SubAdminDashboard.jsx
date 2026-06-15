@@ -1798,7 +1798,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill }) {
+function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice }) {
   const [search, setSearch] = useState("");
 
   const projectsWithProgress = (projects || []).map(p => {
@@ -1941,11 +1941,11 @@ const saveEdit = async () => {
     )}
     <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2332" }}>Projects</div>
   </div>
-  <button className="create-btn" onClick={() => { setInvoicePrefill && setInvoicePrefill({ client: "", project: "", _t: Date.now() }); setActive && setActive("invoices"); }}>
+  <button className="create-btn" onClick={() => { if (setJumpInvoice) setJumpInvoice(null); setInvoicePrefill && setInvoicePrefill({ client: "", project: "", _t: Date.now() }); setActive && setActive("invoices"); }}>
     <i className="ti ti-plus"></i> New Invoice
   </button>
 </div>
-<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { setInvoicePrefill && setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() }); setActive && setActive("invoices"); }} />
+<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { if (setJumpInvoice) setJumpInvoice(null); setInvoicePrefill && setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() }); setActive && setActive("invoices"); }} />
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>
@@ -5300,6 +5300,8 @@ active={
     project={jumpProject} 
     tasks={tasks} 
     employees={employees}
+    user={user}
+    clients={clients}
     scrollContainerRef={mainScrollRef}
     onDelete={async () => {
   try {
@@ -5321,6 +5323,7 @@ active={
     onMessageTeam={() => setActive("messaging")}
     onMessageTeam={() => setActive("messaging")}
     onNewInvoice={(proj) => {
+      setJumpInvoice(null);
       setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now() });
       setActive("invoices");
     }}
@@ -5371,7 +5374,7 @@ if (fetchProjects)
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
 {validActive === "projects" && <ProjectsPage 
   onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() =>{setSidebarOverride("clients");  setActive("create-project")}} // ProjectsPage-ல் இது இருக்கணும்
-onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} setActive={setActive} setInvoicePrefill={setInvoicePrefill} onAddEmployee={() => {
+onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} setActive={setActive} setInvoicePrefill={setInvoicePrefill} setJumpInvoice={setJumpInvoice} onAddEmployee={() => {
                   const limit = getSubscriptionLimit("employee");
                   if (subscription && employees.length >= limit) {
                     setLimitModal({ type: "employee", limit });

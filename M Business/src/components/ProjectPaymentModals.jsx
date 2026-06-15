@@ -93,10 +93,18 @@ export default function ProjectPaymentModals({
       const currentList = project[arrayName] || [];
       let updatedList = [...currentList];
 
+      const payloadToSave = { ...form };
+      if (payloadToSave.category === 'Other' && payloadToSave.customCategory) {
+        payloadToSave.category = payloadToSave.customCategory;
+      }
+      if (payloadToSave.paymentMode === 'Custom' && payloadToSave.customPaymentMode) {
+        payloadToSave.paymentMode = payloadToSave.customPaymentMode;
+      }
+
       if (editIndex !== undefined && editIndex !== null) {
-        updatedList[editIndex] = { ...updatedList[editIndex], ...form };
+        updatedList[editIndex] = { ...updatedList[editIndex], ...payloadToSave };
       } else {
-        const newRecord = { ...form, createdAt: new Date() };
+        const newRecord = { ...payloadToSave, createdAt: new Date() };
         updatedList = [newRecord, ...currentList];
       }
 
@@ -433,10 +441,21 @@ export default function ProjectPaymentModals({
                 <option>Software</option><option>Hardware</option><option>Contractor</option><option>Travel</option><option>Marketing</option><option>Other</option>
               </select></div>
             </div>
+            {form.category === 'Other' && (
+              <div style={{marginBottom: 16}}><label style={labelStyle}>Custom Category</label><input required style={inputStyle} value={form.customCategory || ''} onChange={e => handleInputChange('customCategory', e.target.value)} placeholder="Enter custom category" /></div>
+            )}
             <div style={{marginBottom: 16}}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="Describe the expense" /></div>
             <div style={rowStyle}>
               <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="₹ 0" /></div>
               <div><label style={labelStyle}>Date Incurred</label><input type="date" required style={inputStyle} value={form.date || ''} onChange={e => handleInputChange('date', e.target.value)} /></div>
+            </div>
+            <div style={rowStyle}>
+              <div><label style={labelStyle}>Payment Mode</label><select style={inputStyle} value={form.paymentMode || 'Bank Transfer'} onChange={e => handleInputChange('paymentMode', e.target.value)}>
+                <option>Bank Transfer</option><option>UPI</option><option>Credit Card</option><option>Cash</option><option>Cheque</option><option>Custom</option>
+              </select></div>
+              {form.paymentMode === 'Custom' ? (
+                <div><label style={labelStyle}>Custom Payment Mode</label><input required style={inputStyle} value={form.customPaymentMode || ''} onChange={e => handleInputChange('customPaymentMode', e.target.value)} placeholder="Enter payment mode" /></div>
+              ) : <div></div>}
             </div>
             <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:60}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Additional details..." /></div>
             

@@ -121,6 +121,7 @@ const projectSchema = new mongoose.Schema({
       description: { type: String, default: "" },
       amount: { type: Number, default: 0 },
       date: { type: String, default: "" },
+      paymentMode: { type: String, default: "" },
       status: { type: String, default: "Paid" },
       notes: { type: String, default: "" },
       notifyClient: { type: Boolean, default: false },

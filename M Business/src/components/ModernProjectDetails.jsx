@@ -185,7 +185,7 @@ function DetailField({ label, value, fullWidth }) {
 
 export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice }) {
   const [activeTab, setActiveTab] = useState('updates');
-  const [infoExpanded, setInfoExpanded] = useState(false);
+  const [infoExpanded, setInfoExpanded] = useState(true);
   const [previewInvoice, setPreviewInvoice] = useState(null);
   const [selectedPaymentItems, setSelectedPaymentItems] = useState([]);
   const [activePayTab, setActivePayTab] = useState('inv');
@@ -197,6 +197,41 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [currProject, setCurrProject] = useState(project);
   const [currTasks, setCurrTasks] = useState(tasks);
   const [loadingProject, setLoadingProject] = useState(false);
+
+  const tabsRef = useRef(null);
+  
+  useEffect(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    let isDown = false, startX, scrollLeft;
+    
+    const onMouseDown = e => { isDown = true; el.classList.add('grabbing'); startX = e.pageX - el.offsetLeft; scrollLeft = el.scrollLeft; };
+    const onMouseLeave = () => { isDown = false; el.classList.remove('grabbing'); };
+    const onMouseUp = () => { isDown = false; el.classList.remove('grabbing'); };
+    const onMouseMove = e => { if (!isDown) return; e.preventDefault(); const walk = (e.pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
+    
+    const onTouchStart = e => { isDown = true; startX = e.touches[0].pageX - el.offsetLeft; scrollLeft = el.scrollLeft; };
+    const onTouchEnd = () => { isDown = false; };
+    const onTouchMove = e => { if (!isDown) return; const walk = (e.touches[0].pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
+
+    el.addEventListener('mousedown', onMouseDown);
+    el.addEventListener('mouseleave', onMouseLeave);
+    el.addEventListener('mouseup', onMouseUp);
+    el.addEventListener('mousemove', onMouseMove);
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: true });
+
+    return () => {
+      el.removeEventListener('mousedown', onMouseDown);
+      el.removeEventListener('mouseleave', onMouseLeave);
+      el.removeEventListener('mouseup', onMouseUp);
+      el.removeEventListener('mousemove', onMouseMove);
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchmove', onTouchMove);
+    };
+  }, []);
 
   // Modal / Input states
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -244,9 +279,12 @@ const [projectInvoices, setProjectInvoices] = useState([]);
     try {
       const currentList = currProject[arrayName] || [];
       const updatedList = currentList.filter((_, i) => i !== index);
-      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
-        [arrayName]: updatedList
-      });
+      const updatePayload = { [arrayName]: updatedList };
+      // When deleting an expense, recalculate the spent total from remaining expenses
+      if (arrayName === 'expenses') {
+        updatePayload.spent = updatedList.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+      }
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, updatePayload);
       loadLatest();
     } catch (err) {
       alert('Failed to delete record.');
@@ -401,7 +439,10 @@ const progressPct = totalMilestones > 0
   const billed = projectInvoices.reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
   const received = projectInvoices.reduce((sum, inv) => sum + (Number(inv.amountPaid) || 0), 0);
   const pending = Math.max(0, billed - received);
-  const spent = currProject.spent || 0;
+  // Spent = dynamically summed from expenses array; fallback to stored spent value
+  const spent = (currProject.expenses && currProject.expenses.length > 0)
+    ? currProject.expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0)
+    : (currProject.spent || 0);
   const remaining = budgetAmt > 0 ? (budgetAmt - spent) : 0;
   const budgetUsedPct = budgetAmt > 0 ? Math.round((spent / budgetAmt) * 100) : 0;
 
@@ -974,50 +1015,7 @@ const handleAddExpense = async (e) => {
           {/* TABS - draggable scroll */}
           <div className="mpd-card">
             <div className="mpd-tabs" 
-              ref={el => {
-                if (!el) return;
-                if (el.dataset.dragBound) return;
-                el.dataset.dragBound = 'true';
-                let isDown = false, startX, scrollLeft;
-                
-                el.addEventListener('mousedown', e => {
-                  isDown = true;
-                  el.classList.add('grabbing');
-                  startX = e.pageX - el.offsetLeft;
-                  scrollLeft = el.scrollLeft;
-                });
-                el.addEventListener('mouseleave', () => {
-                  isDown = false;
-                  el.classList.remove('grabbing');
-                });
-                el.addEventListener('mouseup', () => {
-                  isDown = false;
-                  el.classList.remove('grabbing');
-                });
-                el.addEventListener('mousemove', e => {
-                  if (!isDown) return;
-                  e.preventDefault();
-                  const x = e.pageX - el.offsetLeft;
-                  const walk = (x - startX) * 2.0; // smooth speed
-                  el.scrollLeft = scrollLeft - walk;
-                });
-                
-                // touch screens
-                el.addEventListener('touchstart', e => {
-                  isDown = true;
-                  startX = e.touches[0].pageX - el.offsetLeft;
-                  scrollLeft = el.scrollLeft;
-                }, { passive: true });
-                el.addEventListener('touchend', () => {
-                  isDown = false;
-                }, { passive: true });
-                el.addEventListener('touchmove', e => {
-                  if (!isDown) return;
-                  const x = e.touches[0].pageX - el.offsetLeft;
-                  const walk = (x - startX) * 2.0;
-                  el.scrollLeft = scrollLeft - walk;
-                }, { passive: true });
-              }}
+              ref={tabsRef}
               style={{overflowX:'auto', scrollbarWidth:'none', cursor:'grab'}}
             >
               <button className={`mpd-tab-btn ${activeTab==='updates'?'mpd-active':''}`} onClick={()=>setActiveTab('updates')}>Updates</button>
@@ -1243,9 +1241,18 @@ const handleAddExpense = async (e) => {
                     </div>
                     <div style={{display:'flex',gap:10,alignItems:'center'}}>
                       {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
-                        <button onClick={handleSendSelectedToPortal} style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#22C55E',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
-                          <i className="ti ti-send" style={{fontSize:13}}></i> Send Selected ({selectedPaymentItems.length}) to Client Portal
-                        </button>
+                        <div style={{display:'flex',alignItems:'center',gap:8}}>
+                          <select value={currProject.client} style={{padding:'6px 10px', borderRadius:8, border:'1px solid #E8EDF2', fontSize:12, fontWeight:700, color:'#1A2332', outline:'none', cursor:'pointer', background:'#fff'}}>
+                            <option value={currProject.client}>{currProject.client || 'Project Client'}</option>
+                            {/* Optionally allow selecting other clients if needed */}
+                            {clients && clients.filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
+                              <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+                            ))}
+                          </select>
+                          <button onClick={handleSendSelectedToPortal} style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#22C55E',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
+                            <i className="ti ti-send" style={{fontSize:13}}></i> Send ({selectedPaymentItems.length})
+                          </button>
+                        </div>
                       )}
                       <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true }))} style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#00BCD4',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
                         <i className="ti ti-plus" style={{fontSize:13}}></i> New Invoice
@@ -1686,21 +1693,18 @@ const handleAddExpense = async (e) => {
         const statusColor = inv.status==='Paid' ? '#22C55E' : inv.status==='Overdue' ? '#EF4444' : '#F59E0B';
         const statusBg = inv.status==='Paid' ? '#DCFCE7' : inv.status==='Overdue' ? '#FEE2E2' : '#FEF3C7';
         return (
-          <div style={{position:'fixed',inset:0,zIndex:99999,background:'rgba(0,0,0,0.7)',display:'flex',alignItems:'flex-start',justifyContent:'center',overflowY:'auto',padding:'30px 16px'}}>
+          <div className="mpd-print-overlay" style={{position:'fixed',inset:0,zIndex:99999,background:'rgba(0,0,0,0.7)',display:'flex',alignItems:'flex-start',justifyContent:'center',overflowY:'auto',padding:'30px 16px'}}>
             <div style={{background:'#fff',width:'100%',maxWidth:640,borderRadius:12,boxShadow:'0 20px 60px rgba(0,0,0,0.3)',fontFamily:'Arial,sans-serif',overflow:'hidden'}}>
               
               {/* Modal Toolbar */}
-              <div style={{background:'#1A2332',padding:'12px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <div className="mpd-print-toolbar" style={{background:'#1A2332',padding:'12px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                 <div style={{display:'flex',alignItems:'center',gap:10}}>
                   <i className="ti ti-file-invoice" style={{color:'#00BCD4',fontSize:18}}></i>
                   <span style={{color:'#fff',fontWeight:800,fontSize:14}}>Invoice Preview — {inv.invoiceNo}</span>
                 </div>
                 <div style={{display:'flex',gap:8}}>
                   <button onClick={() => {
-                    const printWin = window.open('','_blank');
-                    const el = document.getElementById('invoice-print-area');
-                    printWin.document.write(`<html><head><title>${inv.invoiceNo}</title><style>body{margin:0;font-family:Arial,sans-serif;}</style></head><body>${el.innerHTML}</body></html>`);
-                    printWin.document.close(); printWin.print();
+                    setTimeout(() => window.print(), 100);
                   }} style={{padding:'6px 14px',background:'#00BCD4',color:'#fff',border:'none',borderRadius:7,fontSize:12,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',gap:5}}>
                     <i className="ti ti-printer" style={{fontSize:13}}></i> Print / Share
                   </button>
@@ -1708,20 +1712,34 @@ const handleAddExpense = async (e) => {
                 </div>
               </div>
 
+              <style>{`
+                @media print {
+                  body > *:not(.mpd-print-overlay) { display: none !important; }
+                  .mpd-print-overlay { position: static !important; inset: auto !important; background: white !important; display: block !important; overflow: visible !important; }
+                  .mpd-print-overlay > div { box-shadow: none !important; max-width: 100% !important; border-radius: 0 !important; }
+                  .mpd-print-toolbar { display: none !important; }
+                  #invoice-print-area { padding: 0 !important; }
+                }
+              `}</style>
+
               {/* A4 Invoice Content */}
               <div id="invoice-print-area" style={{padding:'36px 40px',background:'#fff'}}>
                 
                 {/* Header */}
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:28}}>
                   <div>
-                    <div style={{width:52,height:52,borderRadius:12,background:'linear-gradient(135deg,#EF4444,#DC2626)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12}}>
-                      <span style={{color:'#fff',fontWeight:900,fontSize:22}}>Y</span>
-                    </div>
-                    <div style={{fontWeight:900,fontSize:18,color:'#111827',letterSpacing:'-.3px'}}>YENCODE TECHNOLOGIES</div>
+                    {user?.logoUrl ? (
+                      <img src={user.logoUrl} alt="Logo" style={{height: 52, borderRadius: 12, marginBottom: 12, objectFit: 'contain'}} />
+                    ) : (
+                      <div style={{width:52,height:52,borderRadius:12,background:'linear-gradient(135deg,#EF4444,#DC2626)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12}}>
+                        <span style={{color:'#fff',fontWeight:900,fontSize:22}}>{(user?.companyName || 'Y')[0].toUpperCase()}</span>
+                      </div>
+                    )}
+                    <div style={{fontWeight:900,fontSize:18,color:'#111827',letterSpacing:'-.3px'}}>{user?.companyName || 'YENCODE TECHNOLOGIES'}</div>
                     <div style={{fontSize:11,color:'#6B7280',marginTop:3,lineHeight:1.7}}>
-                      yencodetechnologies@gmail.com<br/>
-                      +91 89254 33533<br/>
-                      Chennai, Tamil Nadu, India – 600001
+                      {user?.email || 'yencodetechnologies@gmail.com'}<br/>
+                      {user?.phone || '+91 89254 33533'}<br/>
+                      {user?.address || 'Chennai, Tamil Nadu, India – 600001'}
                     </div>
                   </div>
                   <div style={{textAlign:'right'}}>

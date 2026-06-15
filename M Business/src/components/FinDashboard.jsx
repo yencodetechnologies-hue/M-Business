@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 export default function FinDashboard() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [impCurrentStep, setImpCurrentStep] = useState(1);
   const [selectedBank, setSelectedBank] = useState('HDFC');
   const [importedFile, setImportedFile] = useState(null);
+  const mainScrollRef = useRef(null);
 
   const stepLabels = ['','Select Bank','Upload File','Map Columns','Review & Import'];
 

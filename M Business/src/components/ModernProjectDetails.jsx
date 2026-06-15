@@ -217,6 +217,7 @@ const [showPortalPreview, setShowPortalPreview] = useState(false);
 const [showAddExpense, setShowAddExpense] = useState(false);
 const [expenseAmt, setExpenseAmt] = useState('');
 const [addingExpense, setAddingExpense] = useState(false);
+const [projectInvoices, setProjectInvoices] = useState([]);
   const loadLatest = useCallback(async () => {
     if (!project?._id) return;
     setLoadingProject(true);
@@ -248,12 +249,28 @@ const [addingExpense, setAddingExpense] = useState(false);
     setCurrTasks(tasks);
   }, [tasks]);
 
-  useEffect(() => {
+useEffect(() => {
     loadLatest();
   }, [loadLatest]);
 
-  if (!currProject) return null;
+  // Auto-fetch invoices for this project to calculate Billed/Received/Pending
+  useEffect(() => {
+    if (!project) return;
+    const pName = project.name || "";
+    const cName = project.client || project.clientName || "";
+    axios.get(`${BASE_URL}/api/invoices`)
+      .then(res => {
+        const all = res.data?.invoices || res.data || [];
+        const matched = (Array.isArray(all) ? all : []).filter(inv =>
+          (inv.project && inv.project === pName) ||
+          (!inv.project && inv.client === cName)
+        );
+        setProjectInvoices(matched);
+      })
+      .catch(() => setProjectInvoices([]));
+  }, [project?._id, project?.name, project?.client]);
 
+  if (!currProject) return null;
   // Derived Project Data
   const projName = currProject.name || "Unnamed Project";
   const clientName = currProject.client || currProject.clientName || "Unknown Client";
@@ -298,10 +315,10 @@ const totalMilestones = milestonesArr.length;
 const progressPct = totalMilestones > 0
   ? Math.round((doneMilestones / totalMilestones) * 100)
   : (currProject.progress || 0);
-  // Budget spent data (Real values from backend)
-  const billed = currProject.billed || 0;
-  const received = currProject.received || 0;
-  const pending = currProject.pending || 0;
+// Budget spent data (Auto-calculated from invoices)
+  const billed = projectInvoices.reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
+  const received = projectInvoices.reduce((sum, inv) => sum + (Number(inv.amountPaid) || 0), 0);
+  const pending = Math.max(0, billed - received);
   const spent = currProject.spent || 0;
   const remaining = budgetAmt > 0 ? (budgetAmt - spent) : 0;
   const budgetUsedPct = budgetAmt > 0 ? Math.round((spent / budgetAmt) * 100) : 0;
@@ -1035,14 +1052,18 @@ const handleAddExpense = async (e) => {
   </div>
 )}
             <div className="mpd-brow"><span className="mpd-lbl">Total Budget</span><span className="mpd-val">{currency}{budgetAmt.toLocaleString()}</span></div>
-{[['Billed','billed',billed,''],['Received','received',received,'mpd-g'],['Pending','pending',pending,'mpd-r']].map(([lbl,key,val,cls])=>(
+{[['Billed','billed',billed,''],['Received','received',received,'mpd-g']].map(([lbl,key,val,cls])=>(
   <div key={key} className="mpd-brow">
     <span className="mpd-lbl">{lbl}</span>
-    <span className={`mpd-val ${cls}`} style={{cursor:'pointer'}} onClick={()=>{const v=prompt(`${lbl} amount:`,val);if(v!==null)axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{[key]:Number(v)}).then(loadLatest);}}>
-      {currency}{val.toLocaleString()} ✏️
+    <span className={`mpd-val ${cls}`}>
+      {currency}{val.toLocaleString()}
     </span>
   </div>
 ))}
+<div className="mpd-brow">
+  <span className="mpd-lbl">Pending</span>
+  <span className="mpd-val mpd-r">{currency}{pending.toLocaleString()}</span>
+</div>
             <div className="mpd-brow"><span className="mpd-lbl">Spent</span><span className="mpd-val">{currency}{spent.toLocaleString()}</span></div>
             <div className="mpd-brow"><span className="mpd-lbl">Remaining</span><span className="mpd-val mpd-p">{currency}{remaining.toLocaleString()}</span></div>
             <div style={{marginTop:10}}>

@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
 const AdminPaymentManagement = () => {
-  const [payments, setPayments] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [filter, setFilter] = useState({
+const [payments, setPayments] = useState([]);
+const [stats, setStats] = useState(null);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState('');
+const [filter, setFilter] = useState({
     status: '',
     type: '',
     userId: '',
     page: 1
   });
-  const [selectedPayment, setSelectedPayment] = useState(null);
-  const [showStatusModal, setShowStatusModal] = useState(false);
+const [selectedPayment, setSelectedPayment] = useState(null);
+const [showStatusModal, setShowStatusModal] = useState(false);
 
   useEffect(() => {
     fetchPayments();
     fetchStats();
   }, [filter]);
 
-  const fetchPayments = async () => {
+const fetchPayments = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${BASE_URL}/api/payments/all`, {
+const response = await axios.get(`${BASE_URL}/api/payments/all`, {
         params: filter
       });
       setPayments(response.data.payments || []);
@@ -36,16 +36,16 @@ const AdminPaymentManagement = () => {
     }
   };
 
-  const fetchStats = async () => {
+const fetchStats = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/payments/stats`);
+const response = await axios.get(`${BASE_URL}/api/payments/stats`);
       setStats(response.data);
     } catch (err) {
       console.error('Stats fetch error:', err);
     }
   };
 
-  const handleStatusUpdate = async (paymentId, newStatus) => {
+const handleStatusUpdate = async (paymentId, newStatus) => {
     try {
       await axios.put(`${BASE_URL}/api/payments/${paymentId}/status`, {
         status: newStatus,
@@ -61,7 +61,7 @@ const AdminPaymentManagement = () => {
     }
   };
 
-  const formatDate = (date) => {
+const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-IN', {
       day: '2-digit',
       month: 'short',
@@ -71,15 +71,15 @@ const AdminPaymentManagement = () => {
     });
   };
 
-  const formatCurrency = (amount, currency = 'INR') => {
+const formatCurrency = (amount, currency = 'INR') => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency
     }).format(amount);
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
+const getStatusColor = (status) => {
+const colors = {
       completed: '#22C55E',
       pending: '#F59E0B',
       failed: '#EF4444',
@@ -89,8 +89,8 @@ const AdminPaymentManagement = () => {
     return colors[status] || '#6B7280';
   };
 
-  const getTypeColor = (type) => {
-    const colors = {
+const getTypeColor = (type) => {
+const colors = {
       subscription: '#8B5CF6',
       invoice: '#10B981',
       quotation: '#F59E0B',

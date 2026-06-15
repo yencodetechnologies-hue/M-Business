@@ -580,9 +580,8 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   };
 
   const [inv, setInv] = useState(blank);
-  const [items, setItems] = useState([
-    { id: 1, description: "UI/UX Design", quantity: 1, rate: "20000" },
-    { id: 2, description: "Frontend Development", quantity: 1, rate: "30000" }
+const [items, setItems] = useState([
+    { id: 1, description: "", quantity: 1, rate: "" }
   ]);
   const [editingId, setEditingId] = useState(null); // backend _id if editing existing
 
@@ -733,11 +732,10 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   };
 
   // ── Clear ───────────────────────────────────────────────────
-  const clearForm = () => {
+ const clearForm = () => {
     setInv({ ...blank, invoiceNo: generateInvoiceNo() });
     setItems([
-      { id: 1, description: "UI/UX Design", quantity: 1, rate: "20000" },
-      { id: 2, description: "Frontend Development", quantity: 1, rate: "30000" }
+      { id: 1, description: "", quantity: 1, rate: "" }
     ]);
     setErrors({});
     setEditingId(null);

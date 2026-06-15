@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 export default function FinIncome() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAddIncomeModalOpen, setIsAddIncomeModalOpen] = useState(false);
-
+const mainScrollRef = useRef(null);
   const openImport = () => setIsImportModalOpen(true);
   const closeImport = () => setIsImportModalOpen(false);
 

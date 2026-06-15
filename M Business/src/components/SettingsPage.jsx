@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
-
 function hexToRgb(hex) {
   if (!hex || !hex.startsWith('#')) return "0, 188, 212";
   const bigint = parseInt(hex.replace(/^#/, ''), 16);
@@ -10,7 +9,6 @@ function hexToRgb(hex) {
   const b = bigint & 255;
   return `${r}, ${g}, ${b}`;
 }
-
 // ─────────────────────────────────────────────────────────────
 //  Reusable Components
 // ─────────────────────────────────────────────────────────────
@@ -138,7 +136,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
-
+ const mainScrollRef = useRef(null);  
   // Profile state
   const [profile, setProfile] = useState({ name: "", email: "", phone: "", companyName: "" });
   const [profileSaving, setProfileSaving] = useState(false);
@@ -322,7 +320,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
         }}>{toast}</div>
       )}
 
-      <div className="content" ref={mainScrollRef}> style={{ padding: "22px 28px 32px" }}>
+<div className="content" ref={mainScrollRef} style={{ padding: "22px 28px 32px" }}>
         <div className="page-header" style={{ marginBottom: 22 }}>
           <div>
             <div className="page-title" style={{ fontSize: 20, fontWeight: 800 }}>Settings</div>

@@ -183,9 +183,9 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice, autoOpenInvoice, onAutoOpenInvoiceDone }) {
   const [activeTab, setActiveTab] = useState('updates');
-  const [infoExpanded, setInfoExpanded] = useState(true);
+  const [infoExpanded, setInfoExpanded] = useState(false);
   const [previewInvoice, setPreviewInvoice] = useState(null);
   const [selectedPaymentItems, setSelectedPaymentItems] = useState([]);
   const [activePayTab, setActivePayTab] = useState('inv');
@@ -199,39 +199,77 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [loadingProject, setLoadingProject] = useState(false);
 
   const tabsRef = useRef(null);
+  const tabContentRef = useRef(null);
+  const [tabOrder, setTabOrder] = useState(() => {
+    try {
+      const saved = localStorage.getItem('project_tabs_order');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return ['updates', 'activity', 'payments'];
+  });
   
   useEffect(() => {
-    const el = tabsRef.current;
+    localStorage.setItem('project_tabs_order', JSON.stringify(tabOrder));
+  }, [tabOrder]);
+
+  const [draggingTab, setDraggingTab] = useState(null);
+
+  // Swipe-to-switch-tab on content area
+  useEffect(() => {
+    const el = tabContentRef.current;
     if (!el) return;
-    let isDown = false, startX, scrollLeft;
-    
-    const onMouseDown = e => { isDown = true; el.classList.add('grabbing'); startX = e.pageX - el.offsetLeft; scrollLeft = el.scrollLeft; };
-    const onMouseLeave = () => { isDown = false; el.classList.remove('grabbing'); };
-    const onMouseUp = () => { isDown = false; el.classList.remove('grabbing'); };
-    const onMouseMove = e => { if (!isDown) return; e.preventDefault(); const walk = (e.pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
-    
-    const onTouchStart = e => { isDown = true; startX = e.touches[0].pageX - el.offsetLeft; scrollLeft = el.scrollLeft; };
-    const onTouchEnd = () => { isDown = false; };
-    const onTouchMove = e => { if (!isDown) return; const walk = (e.touches[0].pageX - el.offsetLeft - startX) * 2; el.scrollLeft = scrollLeft - walk; };
+    let startX = null;
+    let startY = null;
+    let dragging = false;
+
+    const onMouseDown = e => { startX = e.clientX; startY = e.clientY; dragging = true; };
+    const onMouseUp = e => {
+      if (!dragging || startX === null) return;
+      dragging = false;
+      const dx = e.clientX - startX;
+      const dy = Math.abs(e.clientY - startY);
+      if (Math.abs(dx) > 60 && dy < 80) {
+        setActiveTab(prev => {
+          const idx = tabOrder.indexOf(prev);
+          if (dx < 0 && idx < tabOrder.length - 1) return tabOrder[idx + 1];
+          if (dx > 0 && idx > 0) return tabOrder[idx - 1];
+          return prev;
+        });
+      }
+      startX = null;
+    };
+    const onMouseLeave = () => { dragging = false; startX = null; };
+
+    const onTouchStart = e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; };
+    const onTouchEnd = e => {
+      if (startX === null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = Math.abs(e.changedTouches[0].clientY - startY);
+      if (Math.abs(dx) > 60 && dy < 80) {
+        setActiveTab(prev => {
+          const idx = tabOrder.indexOf(prev);
+          if (dx < 0 && idx < tabOrder.length - 1) return tabOrder[idx + 1];
+          if (dx > 0 && idx > 0) return tabOrder[idx - 1];
+          return prev;
+        });
+      }
+      startX = null;
+    };
 
     el.addEventListener('mousedown', onMouseDown);
-    el.addEventListener('mouseleave', onMouseLeave);
     el.addEventListener('mouseup', onMouseUp);
-    el.addEventListener('mousemove', onMouseMove);
+    el.addEventListener('mouseleave', onMouseLeave);
     el.addEventListener('touchstart', onTouchStart, { passive: true });
     el.addEventListener('touchend', onTouchEnd, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: true });
 
     return () => {
       el.removeEventListener('mousedown', onMouseDown);
-      el.removeEventListener('mouseleave', onMouseLeave);
       el.removeEventListener('mouseup', onMouseUp);
-      el.removeEventListener('mousemove', onMouseMove);
+      el.removeEventListener('mouseleave', onMouseLeave);
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchend', onTouchEnd);
-      el.removeEventListener('touchmove', onTouchMove);
     };
-  }, []);
+  }, [tabOrder]);
 
   // Modal / Input states
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -263,6 +301,8 @@ const [showAddExpense, setShowAddExpense] = useState(false);
 const [expenseAmt, setExpenseAmt] = useState('');
 const [addingExpense, setAddingExpense] = useState(false);
 const [projectInvoices, setProjectInvoices] = useState([]);
+const [showSendPopup, setShowSendPopup] = useState(false);
+const [sendToClient, setSendToClient] = useState('');
 
   const [paymentModalsState, setPaymentModalsState] = useState({
     showNewInvoice: false,
@@ -291,7 +331,7 @@ const [projectInvoices, setProjectInvoices] = useState([]);
     }
   };
 
-  const handleSendSelectedToPortal = async () => {
+  const handleSendSelectedToPortal = async (targetClient) => {
     if (selectedPaymentItems.length === 0) return;
     const arrayKeyMap = { inv: 'invoices', pay: 'paymentsReceived', adv: 'advances', add: 'additionalCharges', mile: 'milestonePayments', exp: 'expenses' };
     const arrayName = arrayKeyMap[activePayTab];
@@ -301,7 +341,7 @@ const [projectInvoices, setProjectInvoices] = useState([]);
       const currentList = currProject[arrayName] || [];
       const updatedList = currentList.map((rec, idx) => {
         if (selectedPaymentItems.includes(idx)) {
-          return { ...rec, notifyClient: true };
+          return { ...rec, notifyClient: true, sentToClient: targetClient };
         }
         return rec;
       });
@@ -330,7 +370,8 @@ const [projectInvoices, setProjectInvoices] = useState([]);
       });
 
       setSelectedPaymentItems([]);
-      alert('Selected items successfully sent to Client Portal.');
+      setShowSendPopup(false);
+      alert(`Selected items successfully sent to ${targetClient}'s Portal.`);
       loadLatest();
     } catch (err) {
       console.error(err);
@@ -372,6 +413,15 @@ const [projectInvoices, setProjectInvoices] = useState([]);
 useEffect(() => {
     loadLatest();
   }, [loadLatest]);
+
+  // Auto-open invoice modal when navigated from project card New Invoice button
+  useEffect(() => {
+    if (autoOpenInvoice) {
+      setActiveTab('payments');
+      setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true }));
+      if (onAutoOpenInvoiceDone) onAutoOpenInvoiceDone();
+    }
+  }, [autoOpenInvoice]);
 
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
   useEffect(() => {
@@ -577,7 +627,6 @@ if(editingTask){
       setComposerOpen(false);
       loadLatest();
       if (onUpdate) onUpdate();
-      if (fetchProjects) fetchProjects();
     } catch (err) {
       console.error("Failed to post update:", err);
       alert("Failed to post update.");
@@ -626,7 +675,6 @@ const handleAddExpense = async (e) => {
       });
       loadLatest();
       if (onUpdate) onUpdate();
-      if (fetchProjects) fetchProjects();
     } catch (err) {
       console.error("Failed to toggle milestone:", err);
     }
@@ -652,7 +700,6 @@ const handleAddExpense = async (e) => {
       setShowAddMilestone(false);
       loadLatest();
       if (onUpdate) onUpdate();
-      if (fetchProjects) fetchProjects();
     } catch (err) {
       console.error("Failed to add milestone:", err);
       alert("Failed to add milestone.");
@@ -694,7 +741,6 @@ const handleAddExpense = async (e) => {
 
       loadLatest();
       if (onUpdate) onUpdate();
-      if (fetchProjects) fetchProjects();
     } catch (err) {
       console.error("Failed to upload file:", err);
       alert("Failed to upload file. Make sure it's an image (JPG/PNG).");
@@ -712,7 +758,6 @@ const handleAddExpense = async (e) => {
       });
       loadLatest();
       if (onUpdate) onUpdate();
-      if (fetchProjects) fetchProjects();
     } catch (err) {
       console.error("Failed to delete file:", err);
     }
@@ -738,7 +783,10 @@ const handleAddExpense = async (e) => {
         <div className="mpd-topbar-actions">
           {!hideTopActions && (<>
           {onNewInvoice && (
-            <button className="mpd-btn mpd-btn-primary" onClick={() => onNewInvoice(currProject)} style={{gap:6}}>
+            <button className="mpd-btn mpd-btn-primary" onClick={() => {
+              setActiveTab('payments');
+              setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true }));
+            }} style={{gap:6}}>
               <i className="ti ti-file-invoice"></i> New Invoice
             </button>
           )}
@@ -1016,15 +1064,47 @@ const handleAddExpense = async (e) => {
           <div className="mpd-card">
             <div className="mpd-tabs" 
               ref={tabsRef}
-              style={{overflowX:'auto', scrollbarWidth:'none', cursor:'grab'}}
+              style={{overflowX:'auto', scrollbarWidth:'none'}}
             >
-              <button className={`mpd-tab-btn ${activeTab==='updates'?'mpd-active':''}`} onClick={()=>setActiveTab('updates')}>Updates</button>
-              <button className={`mpd-tab-btn ${activeTab==='activity'?'mpd-active':''}`} onClick={()=>setActiveTab('activity')}>Activity Logs</button>
-              <button className={`mpd-tab-btn ${activeTab==='payments'?'mpd-active':''}`} onClick={()=>setActiveTab('payments')}><i className="ti ti-arrows-exchange" style={{marginRight:5}}></i>Payments</button>
+              {tabOrder.map(tab => {
+                let lbl = '', icon = null;
+                if (tab === 'updates') lbl = 'Updates';
+                if (tab === 'activity') lbl = 'Activity Logs';
+                if (tab === 'payments') { lbl = 'Payments'; icon = 'ti-arrows-exchange'; }
+                return (
+                  <button 
+                    key={tab}
+                    draggable
+                    onDragStart={(e) => { setDraggingTab(tab); e.dataTransfer.effectAllowed = "move"; }}
+                    onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (!draggingTab || draggingTab === tab) return;
+                      const oldIdx = tabOrder.indexOf(draggingTab);
+                      const newIdx = tabOrder.indexOf(tab);
+                      const newOrder = [...tabOrder];
+                      newOrder.splice(oldIdx, 1);
+                      newOrder.splice(newIdx, 0, draggingTab);
+                      setTabOrder(newOrder);
+                      setDraggingTab(null);
+                    }}
+                    onDragEnd={() => setDraggingTab(null)}
+                    className={`mpd-tab-btn ${activeTab===tab?'mpd-active':''}`} 
+                    onClick={()=>setActiveTab(tab)}
+                    style={{ opacity: draggingTab === tab ? 0.4 : 1, cursor: 'grab', transition: 'all 0.2s' }}
+                  >
+                    {icon && <i className={`ti ${icon}`} style={{marginRight:5}}></i>}{lbl}
+                  </button>
+                );
+              })}
+              
+              <div style={{marginLeft:'auto', display:'flex', alignItems:'center', gap:8, paddingRight:12, fontSize:13, color:'#9CA3AF', userSelect:'none', whiteSpace:'nowrap'}}>
+                {tabOrder.indexOf(activeTab) > 0 && <span onClick={() => setActiveTab(tabOrder[tabOrder.indexOf(activeTab)-1])} style={{cursor:'pointer', padding:'4px 8px', borderRadius:6, background:'#F3F4F6', color:'#4B5563'}}><i className="ti ti-chevron-left"></i></span>}
+                {tabOrder.indexOf(activeTab) < tabOrder.length-1 && <span onClick={() => setActiveTab(tabOrder[tabOrder.indexOf(activeTab)+1])} style={{cursor:'pointer', padding:'4px 8px', borderRadius:6, background:'#F3F4F6', color:'#4B5563'}}><i className="ti ti-chevron-right"></i></span>}
+              </div>
             </div>
             
-         
-
+          <div ref={tabContentRef} style={{userSelect:'none'}}>
             <div className={`mpd-tab-pane ${activeTab==='activity'?'mpd-active':''}`}>
                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>
                  {(currProject.updates && currProject.updates.length > 0) ? (
@@ -1132,7 +1212,7 @@ const handleAddExpense = async (e) => {
                     const updatedUpdates = [newUpdate, ...(currProject.updates || [])];
                     await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { updates: updatedUpdates });
                     setUpdateText(''); setUpdateTitle(''); setUpdateType('progress'); setComposerOpen(false);
-                    loadLatest(); if (onUpdate) onUpdate(); if (fetchProjects) fetchProjects();
+                    loadLatest(); if (onUpdate) onUpdate();
                   } catch(err) { console.error(err); alert('Failed to post update'); }
                   finally { setPostingUpdate(false); }
                 }}
@@ -1242,14 +1322,7 @@ const handleAddExpense = async (e) => {
                     <div style={{display:'flex',gap:10,alignItems:'center'}}>
                       {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
                         <div style={{display:'flex',alignItems:'center',gap:8}}>
-                          <select value={currProject.client} style={{padding:'6px 10px', borderRadius:8, border:'1px solid #E8EDF2', fontSize:12, fontWeight:700, color:'#1A2332', outline:'none', cursor:'pointer', background:'#fff'}}>
-                            <option value={currProject.client}>{currProject.client || 'Project Client'}</option>
-                            {/* Optionally allow selecting other clients if needed */}
-                            {clients && clients.filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
-                              <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
-                            ))}
-                          </select>
-                          <button onClick={handleSendSelectedToPortal} style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#22C55E',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
+                          <button onClick={() => { setSendToClient(currProject.client); setShowSendPopup(true); }} style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#22C55E',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
                             <i className="ti ti-send" style={{fontSize:13}}></i> Send ({selectedPaymentItems.length})
                           </button>
                         </div>
@@ -1463,6 +1536,7 @@ const handleAddExpense = async (e) => {
               </div>
             </div>
 
+          </div>{/* end tabContentRef wrapper */}
           </div>
         </div>
 
@@ -1679,6 +1753,32 @@ const handleAddExpense = async (e) => {
         setModalsState={setPaymentModalsState} 
         onSaveSuccess={loadLatest} 
       />
+
+      {/* Send to Client Popup */}
+      {showSendPopup && (
+        <div style={{position:'fixed',inset:0,zIndex:99999,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
+          <div style={{background:'#fff',width:'100%',maxWidth:400,borderRadius:16,boxShadow:'0 20px 40px rgba(0,0,0,0.2)',overflow:'hidden'}}>
+            <div style={{padding:'20px 24px',borderBottom:'1px solid #E8EDF2',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <div style={{fontSize:16,fontWeight:900,color:'#0D1B2A'}}>Send to Client Portal</div>
+              <button onClick={()=>setShowSendPopup(false)} style={{background:'none',border:'none',fontSize:20,color:'#7B8FA1',cursor:'pointer'}}>✕</button>
+            </div>
+            <div style={{padding:24}}>
+              <div style={{fontSize:13,fontWeight:700,color:'#374151',marginBottom:8}}>Select Client</div>
+              <select value={sendToClient} onChange={e => setSendToClient(e.target.value)} style={{width:'100%',padding:'10px 14px',borderRadius:8,border:'1px solid #E8EDF2',fontSize:13,color:'#1A2332',outline:'none',background:'#FAFBFD'}}>
+                <option value="">-- Select Client --</option>
+                <option value={currProject.client}>{currProject.client || 'Project Client'}</option>
+                {clients && clients.filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
+                  <option key={c._id || c.clientName || c.name} value={c.clientName || c.name}>{c.clientName || c.name}</option>
+                ))}
+              </select>
+              <div style={{marginTop:24,display:'flex',gap:10}}>
+                <button onClick={()=>setShowSendPopup(false)} style={{flex:1,padding:'10px',background:'#F3F4F6',color:'#4B5563',border:'none',borderRadius:8,fontSize:13,fontWeight:800,cursor:'pointer'}}>Cancel</button>
+                <button onClick={()=>handleSendSelectedToPortal(sendToClient)} disabled={!sendToClient} style={{flex:1,padding:'10px',background:'#22C55E',color:'#fff',border:'none',borderRadius:8,fontSize:13,fontWeight:800,cursor:!sendToClient?'not-allowed':'pointer',opacity:!sendToClient?0.5:1}}>Send ({selectedPaymentItems.length})</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* INVOICE PREVIEW MODAL */}
       {previewInvoice && (() => {

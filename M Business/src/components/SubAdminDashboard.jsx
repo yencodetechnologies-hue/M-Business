@@ -1945,7 +1945,7 @@ const saveEdit = async () => {
     <i className="ti ti-plus"></i> New Invoice
   </button>
 </div>
-<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { if (setJumpInvoice) setJumpInvoice(null); setInvoicePrefill && setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() }); setActive && setActive("invoices"); }} />
+<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { setJumpProject(p); setAutoOpenInvoice(true); setActive("project-details"); }} />
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>
@@ -3298,6 +3298,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [jumpInvoice, setJumpInvoice] = useState(null);
 const [invoicePrefill, setInvoicePrefill] = useState(null);
   const [sidebarOverride, setSidebarOverride] = useState(null);
+  const [autoOpenInvoice, setAutoOpenInvoice] = useState(false);
   const [selectedProjectForTasks, setSelectedProjectForTasks] = useState(null);
   const [autoOpenTaskModal, setAutoOpenTaskModal] = useState(false);
   const [modal, setModal] = useState(null);
@@ -5303,6 +5304,8 @@ active={
     user={user}
     clients={clients}
     scrollContainerRef={mainScrollRef}
+    autoOpenInvoice={autoOpenInvoice}
+    onAutoOpenInvoiceDone={() => setAutoOpenInvoice(false)}
     onDelete={async () => {
   try {
     await axios.delete(`${BASE_URL}/api/projects/${jumpProject._id}`);
@@ -5331,11 +5334,8 @@ active={
       try {
         const current = Number(jumpProject?.loggedHours || 0);
         const updated = current + Number(hours || 0);
-       await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { loggedHours: updated });
-setCurrProject(prev => ({ ...prev, loggedHours: updated }));
-setShowLogTimeModal(false);
-loadLatest();
-if (fetchProjects)
+        await axios.put(`${BASE_URL}/api/projects/${jumpProject._id}`, { loggedHours: updated });
+        setJumpProject(prev => ({ ...prev, loggedHours: updated }));
         fetchProjects();
       } catch(e) { console.error(e); }
     }}

@@ -5324,7 +5324,6 @@ active={
     fetchTasks={fetchTasks}
     fetchProjects={fetchProjects}
     onMessageTeam={() => setActive("messaging")}
-    onMessageTeam={() => setActive("messaging")}
     onNewInvoice={(proj) => {
       setJumpInvoice(null);
       setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now() });

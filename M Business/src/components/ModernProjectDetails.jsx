@@ -302,7 +302,7 @@ const [expenseAmt, setExpenseAmt] = useState('');
 const [addingExpense, setAddingExpense] = useState(false);
 const [projectInvoices, setProjectInvoices] = useState([]);
 const [showSendPopup, setShowSendPopup] = useState(false);
-const [sendToClient, setSendToClient] = useState('');
+const [targetPortalClient, setTargetPortalClient] = useState('');
 
   const [paymentModalsState, setPaymentModalsState] = useState({
     showNewInvoice: false,
@@ -1322,7 +1322,7 @@ const handleAddExpense = async (e) => {
                     <div style={{display:'flex',gap:10,alignItems:'center'}}>
                       {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
                         <div style={{display:'flex',alignItems:'center',gap:8}}>
-                          <button onClick={() => { setSendToClient(currProject.client); setShowSendPopup(true); }} style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#22C55E',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
+                          <button onClick={() => { setTargetPortalClient(currProject.client); setShowSendPopup(true); }} style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'#22C55E',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:800,cursor:'pointer',fontFamily:'inherit'}}>
                             <i className="ti ti-send" style={{fontSize:13}}></i> Send ({selectedPaymentItems.length})
                           </button>
                         </div>
@@ -1764,7 +1764,7 @@ const handleAddExpense = async (e) => {
             </div>
             <div style={{padding:24}}>
               <div style={{fontSize:13,fontWeight:700,color:'#374151',marginBottom:8}}>Select Client</div>
-              <select value={sendToClient} onChange={e => setSendToClient(e.target.value)} style={{width:'100%',padding:'10px 14px',borderRadius:8,border:'1px solid #E8EDF2',fontSize:13,color:'#1A2332',outline:'none',background:'#FAFBFD'}}>
+              <select value={targetPortalClient} onChange={e => setTargetPortalClient(e.target.value)} style={{width:'100%',padding:'10px 14px',borderRadius:8,border:'1px solid #E8EDF2',fontSize:13,color:'#1A2332',outline:'none',background:'#FAFBFD'}}>
                 <option value="">-- Select Client --</option>
                 <option value={currProject.client}>{currProject.client || 'Project Client'}</option>
                 {clients && clients.filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
@@ -1773,7 +1773,7 @@ const handleAddExpense = async (e) => {
               </select>
               <div style={{marginTop:24,display:'flex',gap:10}}>
                 <button onClick={()=>setShowSendPopup(false)} style={{flex:1,padding:'10px',background:'#F3F4F6',color:'#4B5563',border:'none',borderRadius:8,fontSize:13,fontWeight:800,cursor:'pointer'}}>Cancel</button>
-                <button onClick={()=>handleSendSelectedToPortal(sendToClient)} disabled={!sendToClient} style={{flex:1,padding:'10px',background:'#22C55E',color:'#fff',border:'none',borderRadius:8,fontSize:13,fontWeight:800,cursor:!sendToClient?'not-allowed':'pointer',opacity:!sendToClient?0.5:1}}>Send ({selectedPaymentItems.length})</button>
+                <button onClick={()=>handleSendSelectedToPortal(targetPortalClient)} disabled={!targetPortalClient} style={{flex:1,padding:'10px',background:'#22C55E',color:'#fff',border:'none',borderRadius:8,fontSize:13,fontWeight:800,cursor:!targetPortalClient?'not-allowed':'pointer',opacity:!targetPortalClient?0.5:1}}>Send ({selectedPaymentItems.length})</button>
               </div>
             </div>
           </div>
@@ -1802,11 +1802,25 @@ const handleAddExpense = async (e) => {
                   <i className="ti ti-file-invoice" style={{color:'#00BCD4',fontSize:18}}></i>
                   <span style={{color:'#fff',fontWeight:800,fontSize:14}}>Invoice Preview — {inv.invoiceNo}</span>
                 </div>
-                <div style={{display:'flex',gap:8}}>
+                <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                  <button onClick={() => {
+                    setPreviewInvoice(null);
+                    setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: (currProject.invoices||[]).findIndex(i => i.invoiceNo === inv.invoiceNo) }));
+                  }} style={{padding:'6px 14px',background:'#fff',color:'#374151',border:'1px solid #E8EDF2',borderRadius:7,fontSize:12,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',gap:5}}>
+                    <i className="ti ti-edit" style={{fontSize:13}}></i> Edit
+                  </button>
+                  <button onClick={() => {
+                    if (confirm('Are you sure you want to delete this invoice?')) {
+                      handleDeleteRecord('invoices', (currProject.invoices||[]).findIndex(i => i.invoiceNo === inv.invoiceNo));
+                      setPreviewInvoice(null);
+                    }
+                  }} style={{padding:'6px 14px',background:'#FEE2E2',color:'#EF4444',border:'1px solid #FECACA',borderRadius:7,fontSize:12,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',gap:5}}>
+                    <i className="ti ti-trash" style={{fontSize:13}}></i> Delete
+                  </button>
                   <button onClick={() => {
                     setTimeout(() => window.print(), 100);
                   }} style={{padding:'6px 14px',background:'#00BCD4',color:'#fff',border:'none',borderRadius:7,fontSize:12,fontWeight:800,cursor:'pointer',display:'flex',alignItems:'center',gap:5}}>
-                    <i className="ti ti-printer" style={{fontSize:13}}></i> Print / Share
+                    <i className="ti ti-printer" style={{fontSize:13}}></i> Print / PDF
                   </button>
                   <button onClick={() => setPreviewInvoice(null)} style={{padding:'6px 14px',background:'#374151',color:'#fff',border:'none',borderRadius:7,fontSize:12,fontWeight:800,cursor:'pointer'}}>✕ Close</button>
                 </div>
@@ -1823,97 +1837,114 @@ const handleAddExpense = async (e) => {
               `}</style>
 
               {/* A4 Invoice Content */}
-              <div id="invoice-print-area" style={{padding:'36px 40px',background:'#fff'}}>
+              <div id="invoice-print-area" style={{padding:'36px 40px',background:'#fff', position:'relative', overflow:'hidden'}}>
+                
+                {/* Header background blob similar to global template */}
+                <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, rgba(0,188,212,0.05), transparent)`, top: -80, right: -40, pointerEvents: "none" }} />
                 
                 {/* Header */}
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:28}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:28, position:'relative', zIndex:1}}>
                   <div>
                     {user?.logoUrl ? (
-                      <img src={user.logoUrl} alt="Logo" style={{height: 52, borderRadius: 12, marginBottom: 12, objectFit: 'contain'}} />
+                      <img src={user.logoUrl} alt="Logo" style={{height: 70, borderRadius: 12, marginBottom: 12, objectFit: 'contain'}} />
                     ) : (
-                      <div style={{width:52,height:52,borderRadius:12,background:'linear-gradient(135deg,#EF4444,#DC2626)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12}}>
-                        <span style={{color:'#fff',fontWeight:900,fontSize:22}}>{(user?.companyName || 'Y')[0].toUpperCase()}</span>
+                      <div style={{width:60,height:60,borderRadius:12,background:'linear-gradient(135deg,#00BCD4,#0097A7)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12}}>
+                        <span style={{color:'#fff',fontWeight:900,fontSize:24}}>{(user?.companyName || 'Y')[0].toUpperCase()}</span>
                       </div>
                     )}
-                    <div style={{fontWeight:900,fontSize:18,color:'#111827',letterSpacing:'-.3px'}}>{user?.companyName || 'YENCODE TECHNOLOGIES'}</div>
-                    <div style={{fontSize:11,color:'#6B7280',marginTop:3,lineHeight:1.7}}>
+                    <div style={{fontWeight:900,fontSize:20,color:'#0f1c2e',letterSpacing:'1px',textTransform:'uppercase'}}>{user?.companyName || 'YENCODE TECHNOLOGIES'}</div>
+                    <div style={{fontSize:11,color:'#6B7280',marginTop:4,lineHeight:1.7}}>
                       {user?.email || 'yencodetechnologies@gmail.com'}<br/>
                       {user?.phone || '+91 89254 33533'}<br/>
                       {user?.address || 'Chennai, Tamil Nadu, India – 600001'}
                     </div>
                   </div>
                   <div style={{textAlign:'right'}}>
-                    <div style={{fontSize:28,fontWeight:900,color:'#D1D5DB',letterSpacing:'2px',marginBottom:6}}>INVOICE</div>
-                    <div style={{fontSize:16,fontWeight:900,color:'#00BCD4'}}>{inv.invoiceNo}</div>
-                    <div style={{display:'flex',gap:16,marginTop:12,justifyContent:'flex-end'}}>
-                      <div>
-                        <div style={{fontSize:9,fontWeight:800,color:'#9CA3AF',textTransform:'uppercase',letterSpacing:'.5px'}}>Date</div>
-                        <div style={{fontSize:12,fontWeight:700,color:'#111827'}}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</div>
+                    <div style={{fontSize:32,fontWeight:900,color:'rgba(0,188,212,0.1)',letterSpacing:'-1px',marginBottom:4}}>INVOICE</div>
+                    <div style={{fontSize:16,fontWeight:800,color:'#00BCD4'}}>{inv.invoiceNo}</div>
+                    
+                    <div style={{display:'flex',gap:20,marginTop:14,justifyContent:'flex-end'}}>
+                      <div style={{textAlign:'right'}}>
+                        <div style={{fontSize:9,fontWeight:700,color:'#9CA3AF',textTransform:'uppercase',letterSpacing:'1.5px',marginBottom:3}}>Date</div>
+                        <div style={{fontSize:12,fontWeight:700,color:'#0f1c2e'}}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</div>
                       </div>
-                      <div>
-                        <div style={{fontSize:9,fontWeight:800,color:'#9CA3AF',textTransform:'uppercase',letterSpacing:'.5px'}}>Due Date</div>
-                        <div style={{fontSize:12,fontWeight:700,color:'#EF4444'}}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</div>
+                      <div style={{textAlign:'right'}}>
+                        <div style={{fontSize:9,fontWeight:700,color:'#9CA3AF',textTransform:'uppercase',letterSpacing:'1.5px',marginBottom:3}}>Due Date</div>
+                        <div style={{fontSize:12,fontWeight:700,color:'#ea580c'}}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</div>
                       </div>
                     </div>
-                    <div style={{marginTop:10,display:'inline-block',padding:'4px 14px',borderRadius:20,background:statusBg,color:statusColor,fontSize:11,fontWeight:900}}>{inv.status||'Draft'}</div>
-                    <div style={{marginTop:8}}>
-                      <div style={{fontSize:9,fontWeight:800,color:'#9CA3AF',textTransform:'uppercase',letterSpacing:'.5px',textAlign:'right'}}>Project</div>
-                      <div style={{fontSize:12,fontWeight:800,color:'#111827',textAlign:'right'}}>{inv.projectName||currProject.name}</div>
+                    
+                    {/* Status Badge */}
+                    <div style={{marginTop:12,textAlign:'right'}}>
+                      <span style={{display:'inline-block',padding:'4px 14px',borderRadius:20,background:statusBg,color:statusColor,fontSize:11,fontWeight:800,border:`1.5px solid ${statusColor}`,letterSpacing:1}}>{inv.status ? inv.status.toUpperCase() : 'DRAFT'}</span>
+                    </div>
+
+                    <div style={{marginTop:24}}>
+                      <div style={{fontSize:9,fontWeight:700,color:'#9CA3AF',textTransform:'uppercase',letterSpacing:'2px',textAlign:'right',marginBottom:6}}>Project</div>
+                      <div style={{fontSize:14,fontWeight:800,color:'#0f1c2e',textAlign:'right'}}>{inv.projectName||currProject.name}</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Bill To */}
-                <div style={{marginBottom:24}}>
-                  <div style={{fontSize:9,fontWeight:800,color:'#9CA3AF',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}}>Bill To</div>
-                  <div style={{fontWeight:900,fontSize:15,color:'#111827'}}>{inv.clientName||clientName}</div>
-                  <div style={{fontSize:12,color:'#00BCD4',fontWeight:700,marginTop:2}}>{inv.clientName||clientName}</div>
+                <div style={{borderBottom:'2px solid #E8EDF2',paddingBottom:20,marginBottom:20}}>
+                  <div style={{fontSize:9,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'2px',marginBottom:10}}>Bill To</div>
+                  <div style={{fontWeight:800,fontSize:17,color:'#0f1c2e'}}>{inv.clientName||clientName}</div>
+                  <div style={{fontSize:13,color:'#00BCD4',fontWeight:600,marginTop:2}}>{inv.clientName||clientName}</div>
                 </div>
 
                 {/* Items Table */}
-                <table style={{width:'100%',borderCollapse:'collapse',marginBottom:20}}>
-                  <thead>
-                    <tr style={{background:'#F9FAFB'}}>
-                      {['#','Description','Qty','Unit Rate','Tax Rate','Amount'].map(h => (
-                        <th key={h} style={{padding:'10px 12px',textAlign:h==='Amount'||h==='Unit Rate'?'right':'left',fontSize:10,fontWeight:800,color:'#6B7280',textTransform:'uppercase',letterSpacing:'.5px',borderBottom:'2px solid #E5E7EB'}}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td style={{padding:'14px 12px',fontSize:12,color:'#111827',borderBottom:'1px solid #F3F4F6',fontWeight:700}}>01</td>
-                      <td style={{padding:'14px 12px',fontSize:12,color:'#111827',borderBottom:'1px solid #F3F4F6',fontWeight:700}}>{inv.description||'Service'}</td>
-                      <td style={{padding:'14px 12px',fontSize:12,color:'#111827',borderBottom:'1px solid #F3F4F6'}}>1</td>
-                      <td style={{padding:'14px 12px',fontSize:12,color:'#111827',borderBottom:'1px solid #F3F4F6',textAlign:'right',fontWeight:700}}>{inv.currency||currency}{(inv.taxType==='inclusive'?subtotal:(inv.amount||0)).toLocaleString()}.00</td>
-                      <td style={{padding:'14px 12px',fontSize:12,color:'#6B7280',borderBottom:'1px solid #F3F4F6',textAlign:'right'}}>{inv.taxPercent||0}%</td>
-                      <td style={{padding:'14px 12px',fontSize:12,color:'#111827',borderBottom:'1px solid #F3F4F6',textAlign:'right',fontWeight:800}}>{inv.currency||currency}{(inv.taxType==='inclusive'?subtotal:(inv.amount||0)).toLocaleString()}.00</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div style={{overflowX:'auto',marginBottom:20}}>
+                  <table style={{width:'100%',borderCollapse:'collapse',minWidth:360}}>
+                    <thead>
+                      <tr style={{background:'#f8fafc'}}>
+                        {['#','Description','Qty','Unit Rate','Tax Rate','Amount'].map(h => (
+                          <th key={h} style={{padding:'9px 11px',textAlign:h==='Amount'||h==='Unit Rate'||h==='Qty'||h==='Tax Rate'?'right':'left',fontSize:9,fontWeight:800,color:'#64748b',textTransform:'uppercase',letterSpacing:1.5,borderBottom:'2px solid #E8EDF2'}}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{borderBottom:'1px solid #E8EDF2'}}>
+                        <td style={{padding:'12px 11px',fontSize:12,color:'#64748b',fontWeight:700}}>01</td>
+                        <td style={{padding:'12px 11px',fontSize:13,color:'#0f1c2e',fontWeight:600}}>{inv.description||'Service'}</td>
+                        <td style={{padding:'12px 11px',fontSize:13,color:'#374151',textAlign:'right'}}>1</td>
+                        <td style={{padding:'12px 11px',fontSize:13,color:'#374151',textAlign:'right'}}>{inv.currency||currency}{(inv.taxType==='inclusive'?subtotal:(inv.amount||0)).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td style={{padding:'12px 11px',fontSize:13,color:'#6b7280',textAlign:'right'}}>{inv.taxPercent||0}% {inv.taxType==='inclusive'?'(Incl)':''}</td>
+                        <td style={{padding:'12px 11px',fontSize:14,color:'#0f1c2e',textAlign:'right',fontWeight:700}}>{inv.currency||currency}{(inv.taxType==='inclusive'?subtotal:(inv.amount||0)).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
                 {/* Totals */}
-                <div style={{display:'flex',justifyContent:'flex-end',marginBottom:24}}>
-                  <div style={{width:260}}>
+                <div style={{display:'flex',justifyContent:'flex-end',marginBottom:24,padding:'0 11px'}}>
+                  <div style={{width:200}}>
                     {[
-                      {label:'Subtotal', val:`${inv.currency||currency}${subtotal.toLocaleString()}.00`},
-                      {label:'GST / Tax', val:`${inv.currency||currency}${taxAmt.toLocaleString()}.00`},
+                      {label:'Subtotal', val:`${inv.currency||currency}${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`},
+                      {label:'GST / Tax', val:`${inv.currency||currency}${taxAmt.toLocaleString(undefined, {minimumFractionDigits: 2})}`},
                     ].map(r => (
-                      <div key={r.label} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid #F3F4F6',fontSize:12,color:'#374151'}}>
-                        <span style={{fontWeight:600}}>{r.label}</span><span style={{fontWeight:700}}>{r.val}</span>
+                      <div key={r.label} style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:10,borderBottom:'1px solid #E8EDF2'}}>
+                        <span style={{color:'#64748b'}}>{r.label}</span>
+                        <span style={{fontWeight:700}}>{r.val}</span>
                       </div>
                     ))}
-                    <div style={{display:'flex',justifyContent:'space-between',padding:'10px 14px',background:'#111827',borderRadius:8,marginTop:8,fontSize:13,color:'#fff',fontWeight:900}}>
-                      <span>Balance Due</span>
-                      <span>{inv.currency||currency}{total.toLocaleString()}.00</span>
+                    <div style={{display:'flex',justifyContent:'space-between',padding:'6px 8px',background:'#0f1c2e',borderRadius:6,marginTop:4,color:'#fff'}}>
+                      <span style={{fontSize:10,fontWeight:800}}>Balance Due</span>
+                      <span style={{fontSize:12,fontWeight:900}}>{inv.currency||currency}{total.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Notes */}
+                {/* Footer notes */}
+                <div style={{padding:'7px 12px',background:'#f8fafc',border:'1px dashed #CBD5E1',borderRadius:6,marginBottom:16}}>
+                  <span style={{fontSize:9,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:.6}}>Amount in Words: </span>
+                  <span style={{fontSize:9,fontWeight:800,color:'#0f1c2e'}}>We received the payment. Thank you!</span>
+                </div>
+
                 {inv.notes && (
-                  <div style={{borderTop:'1px solid #E5E7EB',paddingTop:14}}>
-                    <div style={{fontSize:10,fontWeight:800,color:'#9CA3AF',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:5}}>Notes</div>
-                    <div style={{fontSize:12,color:'#374151'}}>{inv.notes}</div>
+                  <div style={{borderTop:'1px solid #E8EDF2',paddingTop:14}}>
+                    <div style={{fontSize:8,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.6px',marginBottom:2}}>Notes</div>
+                    <div style={{fontSize:8,color:'#64748b',lineHeight:1.5}}>{inv.notes}</div>
                   </div>
                 )}
               </div>

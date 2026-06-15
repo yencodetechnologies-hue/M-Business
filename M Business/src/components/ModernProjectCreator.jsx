@@ -246,7 +246,6 @@ contactEmail,
         pending: pending || 0,
         spent: spent || 0,
         assignedTo: assigned,
-        progress: progress,
         milestones: milestones.filter(m => m.name.trim()),
         portalSettings: portalOpts
       };

@@ -1297,13 +1297,34 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
                   Files & Documents
                 </div>
                 <div className="sec-action" onClick={async () => {
-  const links = filteredFiles.map(f => f.url).filter(Boolean);
-  for (const url of links) {
+  const links = allFiles.map(f => f.url).filter(Boolean);
+  if (links.length === 0) return;
+  // Single file → direct download
+  if (links.length === 1) {
     const a = document.createElement("a");
-    a.href = url; a.target = "_blank"; a.download = "";
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a);
-    await new Promise(r => setTimeout(r, 400));
+    a.href = links[0];
+    a.download = allFiles[0]?.name || "file";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    return;
+  }
+  // Multiple files → fetch as blob and download one by one
+  for (let i = 0; i < links.length; i++) {
+    try {
+      const res = await fetch(links[i]);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = allFiles[i]?.name || `file_${i+1}`;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      await new Promise(r => setTimeout(r, 800));
+    } catch(e) {
+      // CORS issue-ஆ இருந்தா new tab-ல் open பண்ணு
+      window.open(links[i], "_blank");
+      await new Promise(r => setTimeout(r, 800));
+    }
   }
 }}>
                   <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
@@ -1367,13 +1388,34 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
                 Files & Documents Checklist
               </div>
               <div className="sec-action" onClick={async () => {
-  const links = filteredFiles.map(f => f.url).filter(Boolean);
-  for (const url of links) {
+  const links = allFiles.map(f => f.url).filter(Boolean);
+  if (links.length === 0) return;
+  // Single file → direct download
+  if (links.length === 1) {
     const a = document.createElement("a");
-    a.href = url; a.target = "_blank"; a.download = "";
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a);
-    await new Promise(r => setTimeout(r, 400));
+    a.href = links[0];
+    a.download = allFiles[0]?.name || "file";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    return;
+  }
+  // Multiple files → fetch as blob and download one by one
+  for (let i = 0; i < links.length; i++) {
+    try {
+      const res = await fetch(links[i]);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = allFiles[i]?.name || `file_${i+1}`;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      await new Promise(r => setTimeout(r, 800));
+    } catch(e) {
+      // CORS issue-ஆ இருந்தா new tab-ல் open பண்ணு
+      window.open(links[i], "_blank");
+      await new Promise(r => setTimeout(r, 800));
+    }
   }
 }}>
                 <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All

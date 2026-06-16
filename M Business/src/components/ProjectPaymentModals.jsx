@@ -93,13 +93,16 @@ export default function ProjectPaymentModals({
       const currentList = project[arrayName] || [];
       let updatedList = [...currentList];
 
-      const payloadToSave = { ...form };
-      if (payloadToSave.category === 'Other' && payloadToSave.customCategory) {
-        payloadToSave.category = payloadToSave.customCategory;
-      }
-      if (payloadToSave.paymentMode === 'Custom' && payloadToSave.customPaymentMode) {
-        payloadToSave.paymentMode = payloadToSave.customPaymentMode;
-      }
+   const payloadToSave = { ...form };
+if (payloadToSave.category === 'Other' && payloadToSave.customCategory) {
+  payloadToSave.category = payloadToSave.customCategory;
+}
+if (payloadToSave.paymentMode === 'Custom' && payloadToSave.customPaymentMode) {
+  payloadToSave.paymentMode = payloadToSave.customPaymentMode;
+}
+if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
+  payloadToSave.taxPercent = payloadToSave.customTaxPercent;
+}
 
       if (editIndex !== undefined && editIndex !== null) {
         updatedList[editIndex] = { ...updatedList[editIndex], ...payloadToSave };
@@ -183,8 +186,29 @@ export default function ProjectPaymentModals({
               <label style={labelStyle}>Tax</label>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
                 <div>
-                  <input type="number" style={inputStyle} value={form.taxPercent || ''} onChange={e => handleInputChange('taxPercent', Number(e.target.value))} placeholder="e.g. 18" />
-                  <div style={{fontSize:9,color:'#7B8FA1',marginTop:3,fontWeight:600}}>TAX RATE (%)</div>
+                 <select
+  style={inputStyle}
+  value={form.taxPercent || ''}
+  onChange={e => handleInputChange('taxPercent', e.target.value === 'custom' ? '' : Number(e.target.value))}
+>
+  <option value="">-- Select --</option>
+  <option value={0}>0% (No Tax)</option>
+  <option value={5}>5% (GST)</option>
+  <option value={12}>12% (GST)</option>
+  <option value={18}>18% (GST)</option>
+  <option value={28}>28% (GST)</option>
+  <option value="custom">Custom %</option>
+</select>
+<div style={{fontSize:9,color:'#7B8FA1',marginTop:3,fontWeight:600}}>TAX RATE (%)</div>
+{form.taxPercent === '' && (
+  <input
+    type="number"
+    style={{...inputStyle, marginTop: 6}}
+    value={form.customTaxPercent || ''}
+    onChange={e => handleInputChange('customTaxPercent', Number(e.target.value))}
+    placeholder="Enter custom %"
+  />
+)}
                 </div>
                 <div>
                   <select style={inputStyle} value={form.taxType || 'exclusive'} onChange={e => handleInputChange('taxType', e.target.value)}>
@@ -193,12 +217,7 @@ export default function ProjectPaymentModals({
                   </select>
                   <div style={{fontSize:9,color:'#7B8FA1',marginTop:3,fontWeight:600}}>TAX TYPE</div>
                 </div>
-                <div>
-                  <select style={inputStyle} value={form.status || 'Draft'} onChange={e => handleInputChange('status', e.target.value)}>
-                    <option>Draft</option><option>Sent</option><option>Paid</option><option>Overdue</option>
-                  </select>
-                  <div style={{fontSize:9,color:'#7B8FA1',marginTop:3,fontWeight:600}}>STATUS</div>
-                </div>
+              
               </div>
               {form.amount > 0 && form.taxPercent > 0 && (
                 <div style={{marginTop:10, padding:'8px 12px', background: form.taxType==='inclusive' ? '#F0FDF4' : '#FFFBEB', borderRadius:8, fontSize:12, color:'#374151', display:'flex', justifyContent:'space-between'}}>
@@ -326,52 +345,102 @@ export default function ProjectPaymentModals({
   }
 
   if (showMilestonePayment) {
-    return (
-      <div style={overlayStyle}>
-        <div style={modalStyle}>
-          <div style={headerStyle}>
-            <h3 style={titleStyle}>
-              <div style={{background:'#FEF3C7', color:'#F59E0B', padding:8, borderRadius:8}}><i className="ti ti-flag"></i></div>
-              Add Milestone Payment
-            </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>✕</button>
-          </div>
-          <form onSubmit={e => handleSave(e, 'milestone')}>
-            <div style={rowStyle}>
-              <div><label style={labelStyle}>Milestone #</label><input required style={inputStyle} value={form.milestoneNo || ''} onChange={e => handleInputChange('milestoneNo', e.target.value)} placeholder="MS-005" /></div>
-              <div><label style={labelStyle}>Project</label><select style={inputStyle} disabled><option>{project.name}</option></select></div>
+  return (
+    <div style={overlayStyle}>
+      <div style={modalStyle}>
+        <div style={headerStyle}>
+          <h3 style={titleStyle}>
+            <div style={{background:'#FEF3C7', color:'#F59E0B', padding:8, borderRadius:8}}>
+              <i className="ti ti-flag"></i>
             </div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Milestone Name</label><input required style={inputStyle} value={form.name || ''} onChange={e => handleInputChange('name', e.target.value)} placeholder="e.g. UAT Sign-off" /></div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Description / Deliverables</label><textarea required style={{...inputStyle, height:60}} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="What will be delivered at this milestone?" /></div>
-            <div style={rowStyle}>
-              <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="₹ 0" /></div>
-              <div><label style={labelStyle}>% of Total</label><input type="number" style={inputStyle} value={form.percentage || ''} onChange={e => handleInputChange('percentage', Number(e.target.value))} placeholder="e.g. 25" /></div>
-            </div>
-            <div style={rowStyle}>
-              <div><label style={labelStyle}>Due Date</label><input type="date" required style={inputStyle} value={form.dueDate || ''} onChange={e => handleInputChange('dueDate', e.target.value)} /></div>
-              <div><label style={labelStyle}>Status</label><select style={inputStyle} value={form.status || 'Upcoming'} onChange={e => handleInputChange('status', e.target.value)}>
-                <option>Upcoming</option><option>Invoiced</option><option>Paid</option>
-              </select></div>
-            </div>
-            <div style={rowStyle}>
-              <div><label style={labelStyle}>Paid On</label><input type="date" style={inputStyle} value={form.paidOn || ''} onChange={e => handleInputChange('paidOn', e.target.value)} /></div>
-              <div></div>
-            </div>
-            
-            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
-              <input type="checkbox" id="notify-mil" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-mil" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
-            </div>
-
-            <div style={btnRowStyle}>
-              <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✓ Save Milestone'}</button>
-            </div>
-          </form>
+            Add Milestone Payment
+          </h3>
+          <button style={closeBtnStyle} onClick={closeModals}>✕</button>
         </div>
+        <form onSubmit={e => handleSave(e, 'milestone')}>
+          <div style={rowStyle}>
+            <div>
+              <label style={labelStyle}>Milestone #</label>
+              <input required style={inputStyle} value={form.milestoneNo || ''} onChange={e => handleInputChange('milestoneNo', e.target.value)} placeholder="MS-005" />
+            </div>
+            <div>
+              <label style={labelStyle}>Project</label>
+              <select style={inputStyle} disabled><option>{project.name}</option></select>
+            </div>
+          </div>
+
+          <div style={{marginBottom: 16}}>
+            <label style={labelStyle}>Milestone Name</label>
+            <select
+              required
+              style={inputStyle}
+              value={form.name || ''}
+              onChange={e => handleInputChange('name', e.target.value)}
+            >
+              <option value="">-- Select Milestone --</option>
+              {(project?.milestones || []).map((m, i) => (
+                <option key={i} value={m.name}>{m.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{marginBottom: 16}}>
+            <label style={labelStyle}>Description / Deliverables</label>
+            <textarea required style={{...inputStyle, height:60}} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="What will be delivered at this milestone?" />
+          </div>
+
+          <div style={rowStyle}>
+            <div>
+              <label style={labelStyle}>Amount</label>
+              <input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="₹ 0" />
+            </div>
+            <div>
+              <label style={labelStyle}>% of Total</label>
+              <input type="number" style={inputStyle} value={form.percentage || ''} onChange={e => handleInputChange('percentage', Number(e.target.value))} placeholder="e.g. 25" />
+            </div>
+          </div>
+
+          <div style={rowStyle}>
+            <div>
+              <label style={labelStyle}>Due Date</label>
+              <input type="date" required style={inputStyle} value={form.dueDate || ''} onChange={e => handleInputChange('dueDate', e.target.value)} />
+            </div>
+            <div>
+              <label style={labelStyle}>Status</label>
+              <select style={inputStyle} value={form.status || 'Upcoming'} onChange={e => handleInputChange('status', e.target.value)}>
+                <option>Upcoming</option>
+                <option>Invoiced</option>
+                <option>Paid</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={rowStyle}>
+            <div>
+              <label style={labelStyle}>Paid On</label>
+              <input type="date" style={inputStyle} value={form.paidOn || ''} onChange={e => handleInputChange('paidOn', e.target.value)} />
+            </div>
+            <div></div>
+          </div>
+
+          <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+            <input type="checkbox" id="notify-mil" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
+            <label htmlFor="notify-mil" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>
+              Send to Client Portal (Notify Client)
+            </label>
+          </div>
+
+          <div style={btnRowStyle}>
+            <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
+            <button type="submit" style={submitBtnStyle} disabled={saving}>
+              {saving ? 'Saving...' : '✓ Save Milestone'}
+            </button>
+          </div>
+        </form>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   if (showAdditional) {
     return (

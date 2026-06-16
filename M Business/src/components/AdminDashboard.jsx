@@ -1932,7 +1932,7 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
         projects={projectsWithProgress}
         searchQuery={search}
         onViewTasks={(p) => setViewTasksProj(p)}
-        onEdit={(p) => openEdit(p)}
+        onEdit={(p) => { setJumpProject(p); setActive("project-details"); }}
       />
 
       {/* ── Edit Project Modal ── */}

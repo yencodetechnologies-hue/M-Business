@@ -931,8 +931,14 @@ const newFileObj = {
           <div className="mpd-ph-meta">
             <div className="mpd-pm-item"><i className="ti ti-building"></i> Client: <strong>{clientName}</strong></div>
             <div className="mpd-pm-item"><i className="ti ti-calendar"></i> Start: <strong>{startD}</strong></div>
-            <div className="mpd-pm-item"><i className="ti ti-calendar-due"></i> Deadline: <strong>{endD}</strong></div>
-            <div className="mpd-pm-item"><i className="ti ti-tag"></i> <strong>{category}</strong></div>
+<div className="mpd-pm-item"><i className="ti ti-calendar-due"></i> Deadline: <strong>{endD}</strong></div>
+{(currProject.contactPersonName || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName) && (
+  <div className="mpd-pm-item"><i className="ti ti-user"></i> Contact: <strong>{currProject.contactPersonName || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName}</strong></div>
+)}
+{(currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo) && (
+  <div className="mpd-pm-item"><i className="ti ti-phone"></i> <strong>{currProject.contactPersonNo || clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo}</strong></div>
+)}
+<div className="mpd-pm-item"><i className="ti ti-tag"></i> <strong>{category}</strong></div>
           </div>
         </div>
         <div className="mpd-ph-right">

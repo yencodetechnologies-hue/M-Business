@@ -97,6 +97,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   const clientName = user?.clientName || user?.name || "Client";
+const clientCompany = user?.companyName || user?.company || clientName;
 
   useEffect(() => {
     if (!user) {
@@ -283,12 +284,14 @@ export default function ClientDashboard({ user, setUser }) {
   }));
 
 const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
- .filter(f => {
+.filter(f => {
   if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return false;
   const sc = (f.sentToClient || "").toLowerCase().trim();
   const cn = (clientName || "").toLowerCase().trim();
-  // "client" என்று generic ஆ save ஆனதும் show பண்ணு, அல்லது client name match ஆனாலும் show பண்ணு
-  return sc === "client" || sc === cn || sc.includes(cn) || cn.includes(sc);
+  const cc = (clientCompany || "").toLowerCase().trim();
+  return sc === "client" || sc === cn || sc === cc || 
+         sc.includes(cn) || cn.includes(sc) ||
+         sc.includes(cc) || cc.includes(sc);
 })
   .map(f => ({ 
     name: f.name || f.heading || 'File', 

@@ -283,7 +283,13 @@ export default function ClientDashboard({ user, setUser }) {
   }));
 
 const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
- .filter(f => f.sentToClient && f.sentToClient !== null && f.sentToClient !== "")
+ .filter(f => {
+  if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return false;
+  const sc = (f.sentToClient || "").toLowerCase().trim();
+  const cn = (clientName || "").toLowerCase().trim();
+  // "client" என்று generic ஆ save ஆனதும் show பண்ணு, அல்லது client name match ஆனாலும் show பண்ணு
+  return sc === "client" || sc === cn || sc.includes(cn) || cn.includes(sc);
+})
   .map(f => ({ 
     name: f.name || f.heading || 'File', 
     meta: f.type && f.size ? `${f.type} · ${Math.round(f.size/1024)} KB` : (f.type || 'File'),
@@ -648,7 +654,7 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
   if (loading) {
     return (
       <div style={{ display: 'flex', height: '100vh', background: C.bg, alignItems: 'center', justifyContent: 'center', color: C.text, fontFamily: 'sans-serif' }}>
-        Loading Client Portal...
+  
       </div>
     );
   }
@@ -931,9 +937,23 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
         </div>
         <div className="files-grid">
           {filteredFiles.map((file, idx) => (
-            <div key={idx} className="file-card" onClick={() => file.raw && setSelectedDoc(file.raw)}>
-              {file.badge && <span className="fc-new-badge">{file.badge}</span>}
-              <div className="fc-download"><i className="ti ti-download"></i></div>
+<div key={idx} className="file-card" onClick={() => {
+  if (file.url) {
+    window.open(file.url, "_blank");
+  } else if (file.raw) {
+    setSelectedDoc(file.raw);
+  }
+}}>
+  {file.badge && <span className="fc-new-badge">{file.badge}</span>}
+  <div className="fc-download" onClick={(e) => {
+    e.stopPropagation();
+    if (file.url) {
+      const a = document.createElement("a");
+      a.href = file.url; a.download = file.name || "file";
+      a.target = "_blank";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+  }}><i className="ti ti-download"></i></div>
               <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
               <div className="fc-name">{file.name}</div>
               <div className="fc-meta">{file.meta}</div>
@@ -995,7 +1015,7 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
                 <div className="inv-date">{inv.status === "paid" ? inv.date : `Due ${inv.dueDate}`}</div>
               </div>
               <span className={`badge ${inv.status}`}>{inv.status}</span>
-              <div className="inv-dl" style={{ marginLeft: "8px" }} onClick={(e) => { e.stopPropagation(); alert("Downloading invoice PDF..."); }}>
+              <div className="inv-dl" style={{ marginLeft: "8px" }} onClick={(e) => { e.stopPropagation(); }}>
                 <i className="ti ti-download"></i>
               </div>
             </div>
@@ -1276,7 +1296,16 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
                   <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
                   Files & Documents
                 </div>
-                <div className="sec-action" onClick={() => alert("Downloading all files shared...")}>
+                <div className="sec-action" onClick={async () => {
+  const links = filteredFiles.map(f => f.url).filter(Boolean);
+  for (const url of links) {
+    const a = document.createElement("a");
+    a.href = url; a.target = "_blank"; a.download = "";
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    await new Promise(r => setTimeout(r, 400));
+  }
+}}>
                   <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
                 </div>
               </div>
@@ -1337,7 +1366,16 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
                 <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
                 Files & Documents Checklist
               </div>
-              <div className="sec-action" onClick={() => alert("Downloading all files shared...")}>
+              <div className="sec-action" onClick={async () => {
+  const links = filteredFiles.map(f => f.url).filter(Boolean);
+  for (const url of links) {
+    const a = document.createElement("a");
+    a.href = url; a.target = "_blank"; a.download = "";
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    await new Promise(r => setTimeout(r, 400));
+  }
+}}>
                 <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
               </div>
             </div>

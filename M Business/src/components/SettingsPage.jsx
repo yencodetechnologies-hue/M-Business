@@ -187,6 +187,33 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     } catch { setDocsSaving(false); showToast('Failed to save'); }
   };
 
+  // Invoice Creation state (embedded in settings)
+  const [invState, setInvState] = useState({
+    invNum: `INV-${new Date().getFullYear()}-${Math.floor(Math.random()*9000)+1000}`,
+    invDate: new Date().toISOString().split('T')[0],
+    dueDate: '',
+    category: 'Consulting',
+    client: '',
+    project: '',
+    discount: 0,
+    shipping: 0
+  });
+  const [invItems, setInvItems] = useState([{ desc: 'Item description', qty: 1, price: 0, tax: 18 }]);
+  
+  const calcInvTotals = () => {
+    let subtotal = 0;
+    let taxTotal = 0;
+    invItems.forEach(item => {
+      const itemTotal = (parseFloat(item.qty)||0) * (parseFloat(item.price)||0);
+      subtotal += itemTotal;
+      taxTotal += itemTotal * ((parseFloat(item.tax)||0)/100);
+    });
+    const discountAmt = subtotal * ((parseFloat(invState.discount)||0)/100);
+    const totalAmt = subtotal - discountAmt + taxTotal + (parseFloat(invState.shipping)||0);
+    return { subtotal, discountAmt, taxTotal, totalAmt };
+  };
+  const invTotals = calcInvTotals();
+
   // Load initial data
   useEffect(() => {
     if (user) {
@@ -512,6 +539,78 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                     </div>
                   </div>
                 </div>
+
+                {/* --- EMBEDDED INVOICE CREATOR --- */}
+                <div style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:12,marginBottom:14,overflow:'hidden'}}>
+                  <div style={{padding:'14px 18px',borderBottom:'1px solid #F1F5F9',display:'flex',alignItems:'center',gap:10}}>
+                    <div style={{width:32,height:32,borderRadius:8,background:'#E0F7FA',display:'flex',alignItems:'center',justifyContent:'center'}}><i className="ti ti-file-invoice" style={{color:'#00BCD4'}}></i></div>
+                    <div><div style={{fontSize:14,fontWeight:700}}>Invoice Details</div><div style={{fontSize:11,color:'#6b7a8d'}}>Create invoice directly from settings</div></div>
+                  </div>
+                  <div style={{padding:20}}>
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
+                      <div className="form-group"><label className="form-label">Invoice Number</label><input className="form-input" value={invState.invNum} onChange={e=>setInvState(s=>({...s,invNum:e.target.value}))} /></div>
+                      <div className="form-group"><label className="form-label">Invoice Date</label><input type="date" className="form-input" value={invState.invDate} onChange={e=>setInvState(s=>({...s,invDate:e.target.value}))} /></div>
+                      <div className="form-group"><label className="form-label">Due Date</label><input type="date" className="form-input" value={invState.dueDate} onChange={e=>setInvState(s=>({...s,dueDate:e.target.value}))} /></div>
+                      <div className="form-group"><label className="form-label">Category</label><select className="form-input" value={invState.category} onChange={e=>setInvState(s=>({...s,category:e.target.value}))}><option>Consulting</option><option>Development</option><option>Design</option></select></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:12,marginBottom:14,overflow:'hidden'}}>
+                  <div style={{padding:'14px 18px',borderBottom:'1px solid #F1F5F9',display:'flex',alignItems:'center',gap:10}}>
+                    <div style={{width:32,height:32,borderRadius:8,background:'#FEF3C7',display:'flex',alignItems:'center',justifyContent:'center'}}><i className="ti ti-user" style={{color:'#F59E0B'}}></i></div>
+                    <div><div style={{fontSize:14,fontWeight:700}}>Bill To (Client)</div></div>
+                  </div>
+                  <div style={{padding:20}}>
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+                      <div className="form-group"><label className="form-label">Company / Client Name *</label><select className="form-input" value={invState.client} onChange={e=>setInvState(s=>({...s,client:e.target.value}))}><option>-- Select Company Name --</option><option>Urban Cafe</option></select></div>
+                      <div className="form-group"><label className="form-label">Project</label><select className="form-input" value={invState.project} onChange={e=>setInvState(s=>({...s,project:e.target.value}))}><option>-- Select Project --</option><option>Billing Software</option></select></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:12,marginBottom:14,overflow:'hidden'}}>
+                  <div style={{padding:'14px 18px',borderBottom:'1px solid #F1F5F9',display:'flex',alignItems:'center',gap:10}}>
+                    <div style={{width:32,height:32,borderRadius:8,background:'#EDE9FE',display:'flex',alignItems:'center',justifyContent:'center'}}><i className="ti ti-list-details" style={{color:'#8B5CF6'}}></i></div>
+                    <div><div style={{fontSize:14,fontWeight:700}}>Line Items</div></div>
+                  </div>
+                  <div style={{padding:20}}>
+                    <table style={{width:'100%',borderCollapse:'collapse',marginBottom:14}}>
+                      <thead><tr style={{background:'#F8FAFC'}}><th style={{padding:'10px',fontSize:10,fontWeight:700,color:'#6b7a8d',textAlign:'left'}}>Description</th><th style={{padding:'10px',fontSize:10,fontWeight:700,color:'#6b7a8d',textAlign:'center'}}>Qty</th><th style={{padding:'10px',fontSize:10,fontWeight:700,color:'#6b7a8d',textAlign:'center'}}>Unit Price</th><th style={{padding:'10px',fontSize:10,fontWeight:700,color:'#6b7a8d',textAlign:'center'}}>Tax %</th><th style={{padding:'10px',fontSize:10,fontWeight:700,color:'#6b7a8d',textAlign:'right'}}>Total</th><th></th></tr></thead>
+                      <tbody>
+                        {invItems.map((item, idx) => (
+                          <tr key={idx}>
+                            <td style={{padding:'8px'}}><input className="form-input" value={item.desc} onChange={e=>{const n=[...invItems];n[idx].desc=e.target.value;setInvItems(n);}} /></td>
+                            <td style={{padding:'8px',width:80}}><input type="number" className="form-input" value={item.qty} onChange={e=>{const n=[...invItems];n[idx].qty=e.target.value;setInvItems(n);}} style={{textAlign:'center'}} /></td>
+                            <td style={{padding:'8px',width:120}}><input type="number" className="form-input" value={item.price} onChange={e=>{const n=[...invItems];n[idx].price=e.target.value;setInvItems(n);}} style={{textAlign:'center'}} /></td>
+                            <td style={{padding:'8px',width:100}}>
+                              <select className="form-input" value={item.tax} onChange={e=>{const n=[...invItems];n[idx].tax=e.target.value;setInvItems(n);}}>
+                                <option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option>
+                              </select>
+                            </td>
+                            <td style={{padding:'8px',textAlign:'right',fontWeight:700,fontSize:14}}>₹{((item.qty||0)*(item.price||0)).toFixed(2)}</td>
+                            <td style={{padding:'8px',width:40}}><button onClick={()=>{if(invItems.length>1)setInvItems(invItems.filter((_,i)=>i!==idx))}} style={{background:'none',border:'none',color:'#ef4444',cursor:'pointer'}}><i className="ti ti-trash"></i></button></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <button onClick={()=>setInvItems([...invItems,{desc:'',qty:1,price:0,tax:18}])} style={{width:'100%',padding:'10px',background:'#E0F7FA',border:'1px dashed #00BCD4',color:'#0097A7',fontWeight:700,borderRadius:8,cursor:'pointer',marginBottom:20}}>+ Add Line Item</button>
+                    
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
+                      <div className="form-group"><label className="form-label">Discount (%)</label><input type="number" className="form-input" value={invState.discount} onChange={e=>setInvState(s=>({...s,discount:e.target.value}))} /></div>
+                      <div className="form-group"><label className="form-label">Shipping / Extra Charges</label><input type="number" className="form-input" value={invState.shipping} onChange={e=>setInvState(s=>({...s,shipping:e.target.value}))} /></div>
+                    </div>
+
+                    <div style={{background:'#F8FAFC',borderRadius:10,padding:16}}>
+                      <div style={{display:'flex',justifyContent:'space-between',marginBottom:8,fontSize:13,color:'#6b7a8d'}}><span>Subtotal</span><span style={{fontWeight:700,color:'#1a2332'}}>₹{invTotals.subtotal.toFixed(2)}</span></div>
+                      <div style={{display:'flex',justifyContent:'space-between',marginBottom:8,fontSize:13,color:'#6b7a8d'}}><span>Discount</span><span style={{fontWeight:700,color:'#22c55e'}}>- ₹{invTotals.discountAmt.toFixed(2)}</span></div>
+                      <div style={{display:'flex',justifyContent:'space-between',marginBottom:8,fontSize:13,color:'#6b7a8d'}}><span>GST / Tax</span><span style={{fontWeight:700,color:'#f59e0b'}}>+ ₹{invTotals.taxTotal.toFixed(2)}</span></div>
+                      <div style={{display:'flex',justifyContent:'space-between',marginBottom:14,fontSize:13,color:'#6b7a8d'}}><span>Extra Charges</span><span style={{fontWeight:700,color:'#1a2332'}}>+ ₹{(parseFloat(invState.shipping)||0).toFixed(2)}</span></div>
+                      <div style={{display:'flex',justifyContent:'space-between',paddingTop:14,borderTop:'1px solid #E2E8F0',fontSize:16,fontWeight:800}}><span>Total Amount</span><span style={{color:'#00BCD4'}}>₹{invTotals.totalAmt.toFixed(2)}</span></div>
+                    </div>
+                  </div>
+                </div>
+                {/* --------------------------------- */}
 
                 {/* Document Footer */}
                 <div style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:12,marginBottom:14,overflow:'hidden'}}>

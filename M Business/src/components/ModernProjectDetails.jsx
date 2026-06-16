@@ -1441,10 +1441,10 @@ const handleAddExpense = async (e) => {
                 <div style={{display:'flex',background:'#fff',border:'1px solid #E8EDF2',borderRadius:10,overflow:'hidden',marginBottom:18}}>
                   {[
                     {key:'inv',label:'Invoice',desc:'Standard billing',icon:'ti-file-invoice',color:'#3B82F6',bg:'#DBEAFE'},
-                    {key:'pay',label:'Payment',desc:'Received amounts',icon:'ti-credit-card',color:'#22C55E',bg:'#DCFCE7'},
                     {key:'adv',label:'Advance',desc:'Upfront payments',icon:'ti-pig-money',color:'#8B5CF6',bg:'#EDE9FE'},
                     {key:'add',label:'Additional',desc:'Extra charges',icon:'ti-circle-plus',color:'#F97316',bg:'#FFEDD5'},
                     {key:'mile',label:'Milestone',desc:'Phase billing',icon:'ti-flag',color:'#F59E0B',bg:'#FEF3C7'},
+                                        {key:'pay',label:'Payment',desc:'Received amounts',icon:'ti-credit-card',color:'#22C55E',bg:'#DCFCE7'},
                     {key:'exp',label:'Expenses',desc:'Project costs',icon:'ti-receipt',color:'#6B7280',bg:'#F3F4F6'},
                   ].map((t,i)=>(
                     <div key={t.key} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4,padding:'12px 8px',cursor:'pointer',borderRight:i<5?'1px solid #E8EDF2':'none',transition:'all .14s',background: activePayTab===t.key ? '#00BCD4' : '#fff'}}
@@ -1496,14 +1496,14 @@ const handleAddExpense = async (e) => {
                     </div>
                   </div>
                   {/* Table Header */}
-                  <div style={{display:'grid',gridTemplateColumns:'40px 2fr 1fr 1fr 1fr 1fr 80px',gap:8,padding:'8px 18px',background:'#FAFBFD',borderBottom:'1px solid #E8EDF2'}}>
+                  <div style={{display:'grid',gridTemplateColumns:'40px 2fr 1fr 1fr 1fr 80px',gap:8,padding:'8px 18px',background:'#FAFBFD',borderBottom:'1px solid #E8EDF2'}}>
                     <div style={{display:'flex',alignItems:'center'}}>
                       <input type="checkbox" checked={(currProject.invoices||[]).length > 0 && selectedPaymentItems.length === (currProject.invoices||[]).length} onChange={e => {
                         if (e.target.checked) setSelectedPaymentItems((currProject.invoices||[]).map((_,idx)=>idx));
                         else setSelectedPaymentItems([]);
                       }} style={{cursor:'pointer'}} />
                     </div>
-                    {['Invoice','Amount','Issue Date','Due Date','Status',''].map(h=>(
+                    {['Invoice','Amount','Issue Date','Due Date',''].map(h=>(
                       <div key={h} style={{fontSize:10,fontWeight:900,color:'#7B8FA1',textTransform:'uppercase',letterSpacing:'.7px'}}>{h}</div>
                     ))}
                   </div>
@@ -1513,7 +1513,7 @@ const handleAddExpense = async (e) => {
                       const invTaxAmt = inv.taxType === 'inclusive' ? 0 : Math.round((inv.amount||0) * (inv.taxPercent||0)/100);
                       const totalInvoiceAmt = (inv.amount||0) + invTaxAmt;
                       return (
-                      <div key={i} style={{display:'grid',gridTemplateColumns:'40px 2fr 1fr 1fr 1fr 1fr 80px',gap:8,padding:'0 18px',alignItems:'center',minHeight:56,borderBottom:'1px solid #E8EDF2',borderLeft:`3px solid ${inv.status==='paid'?'#22C55E':inv.status==='overdue'?'#EF4444':'#F59E0B'}`}}>
+                      <div key={i} style={{display:'grid',gridTemplateColumns:'40px 2fr 1fr 1fr 1fr 1fr 80px',gap:8,padding:'0 18px',alignItems:'center',minHeight:56,borderBottom:'1px solid #E8EDF2',borderLeft:`3px solid ${(inv.status||'').toLowerCase()==='paid'?'#22C55E':(inv.status||'').toLowerCase()==='overdue'?'#EF4444':'#F59E0B'}`}}>
                         <div style={{display:'flex',alignItems:'center'}}>
                           <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={e => {
                             if (e.target.checked) setSelectedPaymentItems(prev => [...prev, i]);
@@ -1524,11 +1524,7 @@ const handleAddExpense = async (e) => {
                           <div style={{fontSize:10,fontWeight:700,color:'#7B8FA1'}}>{inv.invoiceNo||`INV-00${i+1}`}</div>
                           <div style={{fontSize:13,fontWeight:800,color:'#0D1B2A',display:'flex',alignItems:'center',gap:6}}>
                             {inv.description||'Invoice'}
-                            {inv.notifyClient && (
-                              <span style={{background:'#E8F5E9',color:'#2E7D32',fontSize:9,fontWeight:800,padding:'1px 5px',borderRadius:4,display:'inline-flex',alignItems:'center',gap:2}}>
-                                <i className="ti ti-circle-check" style={{fontSize:9}}></i> Portal
-                              </span>
-                            )}
+                         
                           </div>
                           <div style={{fontSize:11,color:'#7B8FA1',fontWeight:600}}>{clientName}</div>
                         </div>
@@ -1538,17 +1534,12 @@ const handleAddExpense = async (e) => {
                         </div>
                         <div style={{fontSize:12,fontWeight:700,color:'#2D3E50'}}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
                         <div style={{fontSize:12,fontWeight:700,color:'#2D3E50'}}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
-                        <div>
-                          <span style={{display:'inline-flex',alignItems:'center',gap:4,padding:'4px 10px',borderRadius:20,fontSize:11,fontWeight:900,background:inv.status==='paid'?'#DCFCE7':inv.status==='overdue'?'#FEE2E2':'#FEF3C7',color:inv.status==='paid'?'#15803D':inv.status==='overdue'?'#B91C1C':'#B45309'}}>
-                            <i className={`ti ${inv.status==='paid'?'ti-circle-check':inv.status==='overdue'?'ti-alert-circle':'ti-clock'}`} style={{fontSize:10}}></i>
-                            {inv.status ? inv.status.charAt(0).toUpperCase()+inv.status.slice(1) : 'Pending'}
-                          </span>
-                        </div>
-                        <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
-                          <button onClick={() => setPreviewInvoice({...inv, projectName: currProject.name, clientName, currency})} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#00BCD4'}} title="View Template"><i className="ti ti-eye"></i></button>
-                          <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i }))} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}} title="Edit"><i className="ti ti-edit"></i></button>
-                          <button onClick={() => handleDeleteRecord('invoices', i)} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#EF4444'}} title="Delete"><i className="ti ti-trash"></i></button>
-                        </div>
+                      <div></div>
+<div style={{display:'flex',gap:4,alignItems:'center'}}>
+  <button onClick={() => setPreviewInvoice({...inv, projectName: currProject.name, clientName, currency})} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#00BCD4'}} title="View"><i className="ti ti-eye"></i></button>
+  <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i }))} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}} title="Edit"><i className="ti ti-edit"></i></button>
+  <button onClick={() => handleDeleteRecord('invoices', i)} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#EF4444'}} title="Delete"><i className="ti ti-trash"></i></button>
+</div>
                       </div>
                     )})
                   ) : (
@@ -1964,8 +1955,9 @@ const handleAddExpense = async (e) => {
           ? Math.round((inv.amount || 0) / (1 + (inv.taxPercent || 0) / 100))
           : (inv.amount || 0);
         const total = inv.taxType === 'inclusive' ? (inv.amount || 0) : (inv.amount || 0) + taxAmt;
-        const statusColor = inv.status === 'Paid' ? '#22C55E' : inv.status === 'Overdue' ? '#EF4444' : '#F59E0B';
-        const statusBg = inv.status === 'Paid' ? '#DCFCE7' : inv.status === 'Overdue' ? '#FEE2E2' : '#FEF3C7';
+const s = (inv.status || '').toLowerCase();
+const statusColor = s === 'paid' ? '#22C55E' : s === 'overdue' ? '#EF4444' : s === 'sent' ? '#3B82F6' : '#F59E0B';
+const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 'sent' ? '#DBEAFE' : '#FEF3C7';
         return (
           <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '30px 16px' }}>
             <div style={{ background: '#fff', width: '100%', maxWidth: 640, borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', fontFamily: 'Arial,sans-serif', overflow: 'hidden' }}>
@@ -2016,7 +2008,11 @@ const handleAddExpense = async (e) => {
                       </div>
                     </div>
                     <div style={{ marginTop: 12, textAlign: 'right' }}>
-                      <span style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 20, background: statusBg, color: statusColor, fontSize: 11, fontWeight: 800, border: `1.5px solid ${statusColor}`, letterSpacing: 1 }}>{inv.status ? inv.status.toUpperCase() : 'PENDING'}</span>
+                      <span style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 20, background: statusBg, color: statusColor, fontSize: 11, fontWeight: 800, border: `1.5px solid ${statusColor}`, letterSpacing: 1 }}>{(() => {
+  const s = (inv.status || '').toLowerCase();
+  if (s === 'draft' || s === '') return 'Pending';
+  return inv.status.charAt(0).toUpperCase() + inv.status.slice(1).toLowerCase();
+})()}</span>
                     </div>
                     <div style={{ marginTop: 24 }}>
                       <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'right', marginBottom: 6 }}>Project</div>

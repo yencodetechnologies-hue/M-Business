@@ -210,14 +210,24 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
   />
 )}
                 </div>
-                <div>
+           <div>
                   <select style={inputStyle} value={form.taxType || 'exclusive'} onChange={e => handleInputChange('taxType', e.target.value)}>
                     <option value="exclusive">Excluding Tax</option>
                     <option value="inclusive">Including Tax</option>
                   </select>
                   <div style={{fontSize:9,color:'#7B8FA1',marginTop:3,fontWeight:600}}>TAX TYPE</div>
                 </div>
-              
+
+                <div>
+                  <select style={inputStyle} value={form.status || 'Pending'} onChange={e => handleInputChange('status', e.target.value)}>
+                    <option>Pending</option>
+                    <option>Sent</option>
+                    <option>Paid</option>
+                    <option>Overdue</option>
+                  </select>
+                  <div style={{fontSize:9,color:'#7B8FA1',marginTop:3,fontWeight:600}}>STATUS</div>
+                </div>
+
               </div>
               {form.amount > 0 && form.taxPercent > 0 && (
                 <div style={{marginTop:10, padding:'8px 12px', background: form.taxType==='inclusive' ? '#F0FDF4' : '#FFFBEB', borderRadius:8, fontSize:12, color:'#374151', display:'flex', justifyContent:'space-between'}}>

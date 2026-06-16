@@ -950,8 +950,22 @@ const handleAddExpense = async (e) => {
               <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
               <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
               <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />
-              <DetailField label="Team Members" value={assigned.length ? assigned.join(', ') : 'Unassigned'} fullWidth={assigned.length > 2} />
-              <DetailField label="Description" value={currProject.description || currProject.purpose} fullWidth />
+<DetailField 
+  label="Contact Person" 
+  value={
+    currProject.contactPersonName || 
+    clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName || 
+    '—'
+  } 
+/>
+<DetailField 
+  label="Contact Person No" 
+  value={
+    currProject.contactPersonNo || 
+    clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo || 
+    '—'
+  } 
+/>
               {budgetAmt > 0 && (
                 <>
                   <DetailField label="Total Budget" value={`${currency}${budgetAmt.toLocaleString()}`} />

@@ -460,8 +460,20 @@ export default function ProjectPaymentModals({
               </select></div>
               {form.paymentMode === 'Custom' ? (
                 <div><label style={labelStyle}>Custom Payment Mode</label><input required style={inputStyle} value={form.customPaymentMode || ''} onChange={e => handleInputChange('customPaymentMode', e.target.value)} placeholder="Enter payment mode" /></div>
-              ) : <div></div>}
+              ) : (
+                <div><label style={labelStyle}>Status</label><select style={inputStyle} value={form.status || 'Paid'} onChange={e => handleInputChange('status', e.target.value)}>
+                  <option>Paid</option><option>Pending</option>
+                </select></div>
+              )}
             </div>
+            {form.paymentMode === 'Custom' && (
+              <div style={rowStyle}>
+                <div><label style={labelStyle}>Status</label><select style={inputStyle} value={form.status || 'Paid'} onChange={e => handleInputChange('status', e.target.value)}>
+                  <option>Paid</option><option>Pending</option>
+                </select></div>
+                <div></div>
+              </div>
+            )}
             <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:60}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Additional details..." /></div>
             
             <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>

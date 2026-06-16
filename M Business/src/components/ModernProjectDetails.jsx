@@ -183,7 +183,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice, autoOpenInvoice, onAutoOpenInvoiceDone }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice, onNewProposal, onNewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone }) {
   const [activeTab, setActiveTab] = useState('updates');
   const [infoExpanded, setInfoExpanded] = useState(false);
   const [previewInvoice, setPreviewInvoice] = useState(null);
@@ -431,10 +431,11 @@ useEffect(() => {
     axios.get(`${BASE_URL}/api/invoices`)
       .then(res => {
         const all = res.data?.invoices || res.data || [];
-        const matched = (Array.isArray(all) ? all : []).filter(inv =>
-          (inv.project && inv.project === pName) ||
-          (!inv.project && inv.client === cName)
-        );
+        const matched = (Array.isArray(all) ? all : []).filter(e => {
+          const eProj = e.inv?.project || e.project;
+          const eClient = e.inv?.clientName || e.inv?.client || e.client;
+          return (eProj && eProj === pName) || (!eProj && eClient === cName);
+        });
         setProjectInvoices(matched);
       })
       .catch(() => setProjectInvoices([]));
@@ -478,7 +479,7 @@ useEffect(() => {
   const totalTasks = projTasks.length || 0;
   const doneTasks = projTasks.filter(t => t.status === 'done' || t.status === 'completed').length || 0;
   const inprogTasks = projTasks.filter(t => t.status === 'in_progress').length || 0;
-  const openTasks = totalTasks - doneTasks - inprogTasks;
+const openTasks = totalTasks - doneTasks - inprogTasks;
 const milestonesArr = currProject.milestones || [];
 const doneMilestones = milestonesArr.filter(m => m.done).length;
 const totalMilestones = milestonesArr.length;
@@ -493,7 +494,14 @@ const progressPct = totalMilestones > 0
   };
 
   // Budget spent data (Auto-calculated from invoices)
-  const billed = projectInvoices.reduce((sum, inv) => sum + parseAmt(inv.total), 0);
+  const billedGlobal = projectInvoices.reduce((sum, inv) => sum + parseAmt(inv.total), 0);
+  const billedLocal = (currProject.invoices || []).reduce((sum, inv) => {
+    const invAmount = parseAmt(inv.amount) || parseAmt(inv.total);
+    const taxPercent = parseAmt(inv.taxPercent);
+    const taxAmt = inv.taxType === 'inclusive' ? 0 : Math.round(invAmount * (taxPercent / 100));
+    return sum + invAmount + taxAmt;
+  }, 0);
+  const billed = billedGlobal + billedLocal;
   const received = (currProject.paymentsReceived || []).reduce((sum, p) => sum + parseAmt(p.amount), 0);
   const pending = Math.max(0, billed - received);
   // Spent = dynamically summed from expenses array; fallback to stored spent value
@@ -831,15 +839,30 @@ const handleAddExpense = async (e) => {
             <div className="mpd-amt">{budgetAmt ? `${currency}${budgetAmt.toLocaleString()}` : '—'}</div>
             {budgetAmt > 0 && <div className="mpd-sub">Spent {currency}{spent.toLocaleString()} &nbsp;·&nbsp; <span className="mpd-g">Rem {currency}{remaining.toLocaleString()}</span></div>}
           </div>
-          <button className="mpd-btn mpd-btn-primary" onClick={() => {
-            setActiveTab('updates');
-            setComposerOpen(true);
-            setTimeout(() => {
-              composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
-          }}>
-            <i className="ti ti-speakerphone"></i> Post Update
-          </button>
+          <div style={{display:'flex', alignItems:'center', gap:10}}>
+            {onNewProposal && (
+              <button className="mpd-btn mpd-btn-outline" onClick={() => onNewProposal(currProject)}>
+                + New Proposal
+              </button>
+            )}
+            {onNewQuotation && (
+              <button className="mpd-btn mpd-btn-outline" onClick={() => onNewQuotation(currProject)}>
+                + New Quotation
+              </button>
+            )}
+            <button className="mpd-btn mpd-btn-outline" onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true }))}>
+              + New Invoice
+            </button>
+            <button className="mpd-btn mpd-btn-primary" onClick={() => {
+              setActiveTab('updates');
+              setComposerOpen(true);
+              setTimeout(() => {
+                composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }, 100);
+            }}>
+              <i className="ti ti-speakerphone"></i> Post Update
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1835,11 +1858,10 @@ const handleAddExpense = async (e) => {
 
               <style>{`
                 @media print {
-                  body > *:not(.mpd-print-overlay) { display: none !important; }
-                  .mpd-print-overlay { position: static !important; inset: auto !important; background: white !important; display: block !important; overflow: visible !important; }
-                  .mpd-print-overlay > div { box-shadow: none !important; max-width: 100% !important; border-radius: 0 !important; }
+                  body * { visibility: hidden; }
+                  #invoice-print-area, #invoice-print-area * { visibility: visible; }
+                  #invoice-print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; background: white !important; }
                   .mpd-print-toolbar { display: none !important; }
-                  #invoice-print-area { padding: 0 !important; }
                 }
               `}</style>
 

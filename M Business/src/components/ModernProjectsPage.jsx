@@ -334,6 +334,12 @@ const [pRes, tRes, cRes] = await Promise.all([
               onEdit={() => openEdit(selectedProject)}
               onDelete={() => setDeleteTarget(selectedProject)}
           onLogTime={(e) => openLogTime(selectedProject, e)}
+              onNewProposal={(proj) => {
+                navigate('/dashboard');
+              }}
+              onNewQuotation={(proj) => {
+                navigate('/dashboard');
+              }}
               onNewInvoice={(proj) => {
                 setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now() });
                 setShowInvoiceCreator(true);

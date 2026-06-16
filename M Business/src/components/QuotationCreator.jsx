@@ -741,7 +741,8 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
       items: items.map((i) => ({ d: i.description, q: i.quantity, r: i.rate })),
       cid: user?.companyId || user?.company || user?._id || "",
     };
-    const qrData = `${FRONTEND_URL}/quotation-view?d=${encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))))}`;
+    let qrData = `${FRONTEND_URL}/quotation-view?d=${encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload)))))}`;
+    if (qrData.length > 1000) qrData = `${FRONTEND_URL}/quotation-view?no=${qt.quoteNo}`;
 
     return (
       <div className="print-wrapper" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: "#ecfdf5", minHeight: "100vh", padding: "20px 12px" }}>

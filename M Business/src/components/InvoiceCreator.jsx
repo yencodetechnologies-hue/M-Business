@@ -877,7 +877,8 @@ const [items, setItems] = useState([
     sigType: inv.signatureType || "text",
     temp: inv.template || "Classic",
   };
-  const qrData = `${FRONTEND_URL}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
+  let qrData = `${FRONTEND_URL}/invoice-view?d=${btoa(unescape(encodeURIComponent(JSON.stringify(slimPayload))))}`;
+  if (qrData.length > 1000) qrData = `${FRONTEND_URL}/invoice-view?no=${inv.invoiceNo}`;
 
   const triggerPDFShare = async (entry, type, force = false) => {
     if (step !== "preview" && !force) {

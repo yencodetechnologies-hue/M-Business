@@ -292,7 +292,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [newMilestoneName, setNewMilestoneName] = useState('');
   const [newMilestoneDate, setNewMilestoneDate] = useState('');
   const [showAddMilestone, setShowAddMilestone] = useState(false);
-
+  const [milestoneView, setMilestoneView] = useState('timeline'); // 'timeline' | 'list'
+  const [dragMilestoneIdx, setDragMilestoneIdx] = useState(null);
+  const [dragOverMilestoneIdx, setDragOverMilestoneIdx] = useState(null);
+const [updatesPage, setUpdatesPage] = useState(0);
+const [activityPage, setActivityPage] = useState(0);
   const fileInputRef = useRef(null);
   const composerRef = useRef(null);
   const [uploadingFile, setUploadingFile] = useState(false);
@@ -721,6 +725,40 @@ const handleAddExpense = async (e) => {
     }
   };
 
+  const handleMilestoneDragStart = (idx) => {
+    setDragMilestoneIdx(idx);
+  };
+
+  const handleMilestoneDragOver = (e, idx) => {
+    e.preventDefault();
+    setDragOverMilestoneIdx(idx);
+  };
+
+  const handleMilestoneDrop = async (e, dropIdx) => {
+    e.preventDefault();
+    if (dragMilestoneIdx === null || dragMilestoneIdx === dropIdx) {
+      setDragMilestoneIdx(null);
+      setDragOverMilestoneIdx(null);
+      return;
+    }
+    const milestones = [...(currProject.milestones || [])];
+    const dragged = milestones.splice(dragMilestoneIdx, 1)[0];
+    milestones.splice(dropIdx, 0, dragged);
+    setDragMilestoneIdx(null);
+    setDragOverMilestoneIdx(null);
+    try {
+      await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones });
+      loadLatest();
+    } catch (err) {
+      console.error("Failed to reorder milestones:", err);
+    }
+  };
+
+  const handleMilestoneDragEnd = () => {
+    setDragMilestoneIdx(null);
+    setDragOverMilestoneIdx(null);
+  };
+
   const triggerFileUpload = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -943,10 +981,7 @@ const handleAddExpense = async (e) => {
           <div className="mpd-kpi-icon" style={{background:P.greenLight}}><i className="ti ti-clock" style={{color:P.green}}></i></div>
           <div><div className="mpd-kpi-val">{currProject.loggedHours || 0}h</div><div className="mpd-kpi-lbl">Hours Logged</div><div className="mpd-kpi-trend mpd-up">Active</div></div>
         </div>
-        <div className="mpd-kpi">
-          <div className="mpd-kpi-icon" style={{background:P.orangeLight}}><i className="ti ti-alert-triangle" style={{color:P.orange}}></i></div>
-          <div><div className="mpd-kpi-val">{openTasks}</div><div className="mpd-kpi-lbl">Open Tasks</div><div className="mpd-kpi-trend mpd-down">Pending</div></div>
-        </div>
+       
         <div className="mpd-kpi">
           <div className="mpd-kpi-icon" style={{background:P.purpleLight}}><i className="ti ti-users" style={{color:P.purple}}></i></div>
           <div><div className="mpd-kpi-val">{assigned.length}</div><div className="mpd-kpi-lbl">Team Members</div><div className="mpd-kpi-trend mpd-up">Assigned</div></div>
@@ -973,13 +1008,29 @@ const handleAddExpense = async (e) => {
 <div className="mpd-card">
   <div className="mpd-card-header">
     <div className="mpd-card-title"><i className="ti ti-flag"></i> Milestone Progress</div>
-    <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(true)} style={{padding:'6px 12px', fontSize:12}}>
-      <i className="ti ti-plus"></i> Add Milestone
-    </button>
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <div style={{ display: 'flex', background: P.bg, borderRadius: 8, border: `1px solid ${P.border}`, overflow: 'hidden' }}>
+        <button
+          onClick={() => setMilestoneView('timeline')}
+          style={{ padding: '6px 12px', fontSize: 11, border: 'none', cursor: 'pointer', background: milestoneView === 'timeline' ? P.primary : 'transparent', color: milestoneView === 'timeline' ? '#fff' : P.textLight, fontWeight: 700, transition: 'all .2s' }}
+        >
+          <i className="ti ti-timeline"></i> Timeline
+        </button>
+        <button
+          onClick={() => setMilestoneView('list')}
+          style={{ padding: '6px 12px', fontSize: 11, border: 'none', cursor: 'pointer', background: milestoneView === 'list' ? P.primary : 'transparent', color: milestoneView === 'list' ? '#fff' : P.textLight, fontWeight: 700, transition: 'all .2s' }}
+        >
+          <i className="ti ti-list"></i> List
+        </button>
+      </div>
+      <button className="mpd-btn mpd-btn-outline" onClick={() => setShowAddMilestone(true)} style={{padding:'6px 12px', fontSize:12}}>
+        <i className="ti ti-plus"></i> Add Milestone
+      </button>
+    </div>
   </div>
   {(!currProject.milestones || currProject.milestones.length === 0) ? (
     <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No milestones defined.</div>
-  ) : (
+  ) : milestoneView === 'timeline' ? (
     <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
       <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', minWidth: Math.max(300, (currProject.milestones||[]).length * 100) }}>
         <div style={{ position: 'absolute', top: 18, left: '5%', right: '5%', height: 2, background: P.border, zIndex: 0 }} />
@@ -1000,7 +1051,7 @@ const handleAddExpense = async (e) => {
           const textColor = isDone ? P.green : isActive ? P.primary : P.textLight;
           const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
           return (
-            <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1 }}>
+            <div key={idx} draggable="true" onDragStart={(e) => { e.stopPropagation(); setDragMilestoneIdx(idx); }} onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOverMilestoneIdx(idx); }} onDrop={(e) => { e.preventDefault(); e.stopPropagation(); if (dragMilestoneIdx === null || dragMilestoneIdx === idx) { setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); return; } const ms = [...(currProject.milestones || [])]; const dragged = ms.splice(dragMilestoneIdx, 1)[0]; ms.splice(idx, 0, dragged); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { milestones: ms }).then(loadLatest); }} onDragEnd={(e) => { e.stopPropagation(); setDragMilestoneIdx(null); setDragOverMilestoneIdx(null); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1, position: 'relative', zIndex: 1, opacity: dragMilestoneIdx === idx ? 0.4 : 1, cursor: 'grab', outline: dragOverMilestoneIdx === idx && dragMilestoneIdx !== idx ? `2.5px dashed ${P.primary}` : 'none', borderRadius: 8, transition: 'opacity .2s' }}>
               {tasksForMilestone.length > 0 && (
                 <div style={{ position: 'absolute', top: 18, left: idx === 0 ? '0%' : '-50%', right: '50%', transform: 'translateY(-50%)', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', zIndex: 0 }}>
                   {tasksForMilestone.map((t, i) => {
@@ -1028,6 +1079,42 @@ const handleAddExpense = async (e) => {
           );
         })}
       </div>
+    </div>
+  ) : (
+    /* LIST VIEW */
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '4px 0' }}>
+      {(currProject.milestones||[]).map((m, idx) => {
+        const tasksForMilestone = currTasks.filter(t => t.milestone === m.name && !t.isDeleted);
+        const allTasksCompleted = tasksForMilestone.length > 0 && tasksForMilestone.every(t => t.status === 'done' || t.status === 'completed');
+        const isDone = m.done === true || allTasksCompleted;
+        const firstNotDone = (currProject.milestones||[]).findIndex(x => {
+          const mTasks = currTasks.filter(t => t.milestone === x.name && !t.isDeleted);
+          const mAllCompleted = mTasks.length > 0 && mTasks.every(t => t.status === 'done' || t.status === 'completed');
+          return x.done !== true && !mAllCompleted;
+        });
+        const isActive = !isDone && idx === firstNotDone;
+        const statusLabel = isDone ? 'Done' : isActive ? 'Active' : 'Pending';
+        const statusColor = isDone ? P.green : isActive ? P.primary : P.textLight;
+        const statusBg = isDone ? '#E8F5E9' : isActive ? P.primaryLight : '#f5f5f5';
+        const doneTasks = tasksForMilestone.filter(t => t.status === 'done' || t.status === 'completed').length;
+        return (
+          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: P.bg, border: `1.5px solid ${isDone ? P.green : isActive ? P.primary : P.border}`, transition: 'all .2s' }}>
+            <div onClick={() => handleToggleMilestone(idx)} title="Click to toggle done"
+              style={{ width: 30, height: 30, borderRadius: '50%', background: isDone ? P.green : '#fff', border: `2px solid ${statusColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all .2s' }}>
+              {isDone ? <span style={{ color: '#fff', fontSize: 14 }}>✓</span> : <span style={{ fontSize: 11, color: P.textLight, fontWeight: 700 }}>{idx + 1}</span>}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{m.name}</div>
+              <div style={{ display: 'flex', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
+                {m.date && <span style={{ fontSize: 11, color: P.textLight }}><i className="ti ti-calendar" style={{marginRight:3}}></i>{new Date(m.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
+                {tasksForMilestone.length > 0 && <span style={{ fontSize: 11, color: P.textLight }}><i className="ti ti-list-check" style={{marginRight:3}}></i>{doneTasks}/{tasksForMilestone.length} tasks</span>}
+              </div>
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, padding: '3px 10px', borderRadius: 6, background: statusBg, flexShrink: 0 }}>{statusLabel}</span>
+            <button onClick={e => { e.stopPropagation(); if(confirm('Delete milestone?')){ const ms=(currProject.milestones||[]).filter((_,i)=>i!==idx); axios.put(`${BASE_URL}/api/projects/${currProject._id}`,{milestones:ms}).then(loadLatest); }}} style={{ background:'none', border:'none', cursor:'pointer', color: P.red, fontSize: 13, padding: 0, flexShrink: 0 }}>🗑️</button>
+          </div>
+        );
+      })}
     </div>
   )}
   {showAddMilestone && (
@@ -1133,20 +1220,34 @@ const handleAddExpense = async (e) => {
                 {tabOrder.indexOf(activeTab) < tabOrder.length-1 && <span onClick={() => setActiveTab(tabOrder[tabOrder.indexOf(activeTab)+1])} style={{cursor:'pointer', padding:'4px 8px', borderRadius:6, background:'#F3F4F6', color:'#4B5563'}}><i className="ti ti-chevron-right"></i></span>}
               </div>
             </div>
-            
+
           <div ref={tabContentRef} style={{userSelect:'none'}}>
             <div className={`mpd-tab-pane ${activeTab==='activity'?'mpd-active':''}`}>
-               <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>
-                 {(currProject.updates && currProject.updates.length > 0) ? (
-                   <div style={{ textAlign: 'left' }}>
-                     {currProject.updates.map((upd, idx) => (
-                       <div key={idx} style={{ padding: '8px 0', borderBottom: `1px solid ${P.bg}`, fontSize: 12.5, color: P.textMid }}>
-                         📢 Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
-                       </div>
-                     ))}
-                   </div>
-                 ) : "Activity logs will appear here."}
-               </div>
+            <div style={{padding:'12px 16px', color:P.textLight, fontSize:13}}>
+  {(currProject.updates && currProject.updates.length > 0) ? (() => {
+    const perPage = 10;
+    const totalPages = Math.ceil(currProject.updates.length / perPage);
+    const pageItems = currProject.updates.slice(activityPage * perPage, activityPage * perPage + perPage);
+    return (
+      <div>
+        <div style={{ textAlign: 'left' }}>
+          {currProject.updates.slice(activityPage * 10, activityPage * 10 + 10).map((upd, idx) => (
+            <div key={idx} style={{ padding: '8px 0', borderBottom: `1px solid ${P.bg}`, fontSize: 12.5, color: P.textMid }}>
+              📢 Update posted: <strong>{upd.text}</strong> by {upd.author} on {new Date(upd.date).toLocaleDateString()}
+            </div>
+          ))}
+        </div>
+        {Math.ceil(currProject.updates.length / 10) > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: `1px solid ${P.border}` }}>
+            <button onClick={() => setActivityPage(p => Math.max(0, p-1))} disabled={activityPage === 0} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: activityPage === 0 ? P.bg : '#fff', color: activityPage === 0 ? P.textLight : P.textDark, cursor: activityPage === 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>← Prev</button>
+            <span style={{ fontSize: 12, color: P.textLight }}>{activityPage + 1} / {Math.ceil(currProject.updates.length / 10)}</span>
+            <button onClick={() => setActivityPage(p => Math.min(Math.ceil(currProject.updates.length / 10)-1, p+1))} disabled={activityPage === Math.ceil(currProject.updates.length / 10)-1} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: activityPage === Math.ceil(currProject.updates.length / 10)-1 ? P.bg : '#fff', color: activityPage === Math.ceil(currProject.updates.length / 10)-1 ? P.textLight : P.textDark, cursor: activityPage === Math.ceil(currProject.updates.length / 10)-1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>Next →</button>
+          </div>
+        )}
+      </div>
+    );
+  })() : <div style={{textAlign:'center', padding: 20}}>Activity logs will appear here.</div>}
+</div>
             </div>
 
             <div className={`mpd-tab-pane ${activeTab==='updates'?'mpd-active':''}`}>
@@ -1256,29 +1357,39 @@ const handleAddExpense = async (e) => {
         )}
       </div>
 
-              {(!currProject.updates || currProject.updates.length === 0) ? (
-                <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No updates posted yet.</div>
-              ) : (
-                currProject.updates.map((upd, idx) => (
-                  <div key={idx} style={{ padding: '12px 14px', borderBottom: `1px solid ${P.bg}`, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <div style={{ background: P.primaryLight, color: P.primary, borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 13 }}>
-                      {getInitials(upd.author)}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                        <strong style={{ fontSize: 13, color: P.textDark }}>{upd.author}</strong>
-                        <span style={{ fontSize: 11, color: P.textLight }}>{new Date(upd.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                      <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.5 }}>
-                        <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: P.primaryLight, color: P.primary, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', marginRight: 6 }}>
-                          {upd.type || 'general'}
-                        </span>
-                        {upd.text}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
+           {(!currProject.updates || currProject.updates.length === 0) ? (
+  <div style={{padding:20, textAlign:'center', color:P.textLight, fontSize:13}}>No updates posted yet.</div>
+) : (() => {
+  const perPage = 10;
+  const totalPages = Math.ceil(currProject.updates.length / perPage);
+  const pageItems = currProject.updates.slice(updatesPage * perPage, updatesPage * perPage + perPage);
+  return (
+    <div>
+      {pageItems.map((upd, idx) => (
+        <div key={idx} style={{ padding: '12px 14px', borderBottom: `1px solid ${P.bg}`, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+          <div style={{ background: P.primaryLight, color: P.primary, borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 13 }}>{getInitials(upd.author)}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <strong style={{ fontSize: 13, color: P.textDark }}>{upd.author}</strong>
+              <span style={{ fontSize: 11, color: P.textLight }}>{new Date(upd.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <div style={{ fontSize: 13, color: P.textMid, lineHeight: 1.5 }}>
+              <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, background: P.primaryLight, color: P.primary, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', marginRight: 6 }}>{upd.type || 'general'}</span>
+              {upd.text}
+            </div>
+          </div>
+        </div>
+      ))}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', borderTop: `1px solid ${P.border}` }}>
+          <button onClick={() => setUpdatesPage(p => Math.max(0, p-1))} disabled={updatesPage === 0} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: updatesPage === 0 ? P.bg : '#fff', color: updatesPage === 0 ? P.textLight : P.textDark, cursor: updatesPage === 0 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>← Prev</button>
+          <span style={{ fontSize: 12, color: P.textLight }}>{updatesPage + 1} / {totalPages}</span>
+          <button onClick={() => setUpdatesPage(p => Math.min(totalPages-1, p+1))} disabled={updatesPage === totalPages-1} style={{ padding: '5px 14px', borderRadius: 6, border: `1px solid ${P.border}`, background: updatesPage === totalPages-1 ? P.bg : '#fff', color: updatesPage === totalPages-1 ? P.textLight : P.textDark, cursor: updatesPage === totalPages-1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700 }}>Next →</button>
+        </div>
+      )}
+    </div>
+  );
+})()}
             </div>
 
             {/* ── PAYMENTS TAB ── */}

@@ -200,6 +200,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   const [activePayTab, setActivePayTab] = useState('inv');
 
   const [composerOpen, setComposerOpen] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+const [uploadFileObj, setUploadFileObj] = useState(null);
+const [uploadHeading, setUploadHeading] = useState('');
+const [uploadDescription, setUploadDescription] = useState('');
+const [uploadSendToClient, setUploadSendToClient] = useState(false);
+const [uploadSendToEmployee, setUploadSendToEmployee] = useState(false);
+const [uploadClientName, setUploadClientName] = useState('');
+const [uploadEmployeeName, setUploadEmployeeName] = useState('');
+const [uploadingModal, setUploadingModal] = useState(false);
   const [taskFilter, setTaskFilter] = useState('all');
 
   // Live state synchronized with backend
@@ -769,10 +778,8 @@ const handleAddExpense = async (e) => {
     setDragOverMilestoneIdx(null);
   };
 
-  const triggerFileUpload = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+ const triggerFileUpload = () => {
+    setShowUploadModal(true);
   };
 
   const handleFileUpload = async (e) => {
@@ -811,6 +818,51 @@ const handleAddExpense = async (e) => {
       setUploadingFile(false);
     }
   };
+  const handleModalFileSelect = (e) => {
+  const file = e.target.files[0];
+  if (file) setUploadFileObj(file);
+};
+
+const handleModalUpload = async () => {
+  if (!uploadFileObj) return;
+  setUploadingModal(true);
+  const formData = new FormData();
+  formData.append("file", uploadFileObj);
+  try {
+    const res = await axios.post(`${BASE_URL}/api/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    const uploadedUrl = res.data.url;
+    const newFileObj = {
+      name: uploadHeading || uploadFileObj.name,
+      description: uploadDescription,
+      url: uploadedUrl,
+      size: uploadFileObj.size,
+      type: uploadFileObj.type,
+      uploadedAt: new Date().toISOString(),
+      sentToClient: uploadSendToClient ? uploadClientName : null,
+      sentToEmployee: uploadSendToEmployee ? uploadEmployeeName : null,
+    };
+    const updatedFiles = [...(currProject.files || []), newFileObj];
+    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {
+      files: updatedFiles
+    });
+    setShowUploadModal(false);
+    setUploadFileObj(null);
+    setUploadHeading('');
+    setUploadDescription('');
+    setUploadSendToClient(false);
+    setUploadSendToEmployee(false);
+    setUploadClientName('');
+    setUploadEmployeeName('');
+    loadLatest();
+    if (onUpdate) onUpdate();
+  } catch (err) {
+    alert("Failed to upload file.");
+  } finally {
+    setUploadingModal(false);
+  }
+};
 
   const handleDeleteFile = async (fileId) => {
     if (!confirm("Are you sure you want to delete this file?")) return;
@@ -1749,8 +1801,8 @@ const handleAddExpense = async (e) => {
           <div className="mpd-card">
             <div className="mpd-card-header">
               <div className="mpd-card-title"><i className="ti ti-paperclip"></i> Files</div>
-              <button className="mpd-btn mpd-btn-outline" onClick={triggerFileUpload} disabled={uploadingFile} style={{padding:'5px 10px',fontSize:11}}>
-                <i className="ti ti-upload"></i> {uploadingFile ? 'Uploading...' : 'Upload'}
+             <button className="mpd-btn mpd-btn-outline" onClick={() => setShowUploadModal(true)} style={{padding:'5px 10px',fontSize:11}}>
+                <i className="ti ti-upload"></i> Upload
               </button>
             </div>
             
@@ -2069,6 +2121,115 @@ const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 
           </div>
         );
       })()}
+      {/* Upload File Modal */}
+      {showUploadModal && (
+        <div style={{ position:'fixed', inset:0, zIndex:99998, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>
+          <div style={{ background:'#fff', borderRadius:P.radius, width:'100%', maxWidth:480, boxShadow:'0 8px 32px rgba(0,0,0,0.18)', overflow:'hidden' }}>
+            {/* Header */}
+            <div style={{ background:`linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding:'16px 22px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                <i className="ti ti-upload" style={{ color:'#fff', fontSize:18 }}></i>
+                <span style={{ color:'#fff', fontWeight:800, fontSize:15 }}>Upload File</span>
+              </div>
+              <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background:'rgba(255,255,255,0.2)', border:'none', color:'#fff', borderRadius:8, width:28, height:28, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16 }}>✕</button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding:'22px 24px', maxHeight:'80vh', overflowY:'auto' }}>
+
+              {/* Drop Zone */}
+              <div onClick={() => document.getElementById('modal-file-input').click()}
+                style={{ border:`2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius:10, padding:'22px 16px', textAlign:'center', cursor:'pointer', marginBottom:16, background: uploadFileObj ? P.primaryLight : P.bg, transition:'all .2s' }}>
+                <i className={`ti ${uploadFileObj ? 'ti-file-check' : 'ti-cloud-upload'}`} style={{ fontSize:28, color: uploadFileObj ? P.green : P.textLight, display:'block', marginBottom:6 }}></i>
+                {uploadFileObj ? (
+                  <div>
+                    <div style={{ fontSize:13, fontWeight:700, color:P.textDark }}>{uploadFileObj.name}</div>
+                    <div style={{ fontSize:11, color:P.textLight, marginTop:3 }}>{(uploadFileObj.size/1024).toFixed(1)} KB · Click to change</div>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize:13, fontWeight:700, color:P.textDark }}>Click to browse or drag & drop</div>
+                    <div style={{ fontSize:11, color:P.textLight, marginTop:3 }}>Images, PDFs, Docs supported</div>
+                  </div>
+                )}
+              </div>
+              <input id="modal-file-input" type="file" onChange={handleModalFileSelect} style={{ display:'none' }} />
+
+              {/* Heading */}
+              <div style={{ marginBottom:12 }}>
+                <label style={{ fontSize:11, fontWeight:800, color:P.textLight, textTransform:'uppercase', letterSpacing:'.7px', display:'block', marginBottom:5 }}>File Heading</label>
+                <input type="text" value={uploadHeading} onChange={e => setUploadHeading(e.target.value)} placeholder="e.g. Design Mockup v2"
+                  style={{ width:'100%', padding:'10px 12px', borderRadius:8, border:`1.5px solid ${P.border}`, fontSize:13, fontFamily:'Nunito,sans-serif', outline:'none', boxSizing:'border-box' }} />
+              </div>
+
+              {/* Description */}
+              <div style={{ marginBottom:16 }}>
+                <label style={{ fontSize:11, fontWeight:800, color:P.textLight, textTransform:'uppercase', letterSpacing:'.7px', display:'block', marginBottom:5 }}>Description</label>
+                <textarea value={uploadDescription} onChange={e => setUploadDescription(e.target.value)} placeholder="Brief description of this file..." rows={2}
+                  style={{ width:'100%', padding:'10px 12px', borderRadius:8, border:`1.5px solid ${P.border}`, fontSize:13, fontFamily:'Nunito,sans-serif', outline:'none', resize:'vertical', boxSizing:'border-box' }} />
+              </div>
+
+              {/* Share With label */}
+              <div style={{ fontSize:11, fontWeight:800, color:P.textLight, textTransform:'uppercase', letterSpacing:'.7px', marginBottom:10 }}>Share With</div>
+
+              {/* Client Portal Toggle */}
+              <div style={{ border:`1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius:10, padding:'12px 14px', marginBottom:10, background: uploadSendToClient ? P.primaryLight : '#fff', transition:'all .15s' }}>
+                <div onClick={() => { setUploadSendToClient(!uploadSendToClient); setUploadClientName(''); }} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer' }}>
+                  <div style={{ width:20, height:20, borderRadius:6, border:`2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    {uploadSendToClient && <span style={{ color:'#fff', fontSize:11, fontWeight:900 }}>✓</span>}
+                  </div>
+                  <i className="ti ti-building" style={{ color:P.primary, fontSize:16 }}></i>
+                  <span style={{ fontSize:13, fontWeight:700, color:P.textDark }}>Send to Client Portal</span>
+                </div>
+                {uploadSendToClient && (
+                  <select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)}
+                    style={{ width:'100%', padding:'9px 12px', borderRadius:8, border:`1.5px solid ${P.primary}`, fontSize:13, fontFamily:'Nunito,sans-serif', outline:'none', background:'#fff', color:P.textDark, marginTop:10 }}>
+                    <option value="">-- Select Client --</option>
+                    {currProject.client && <option value={currProject.client}>{currProject.client}</option>}
+                    {(clients||[]).filter(c => (c.clientName||c.name) !== currProject.client).map(c => (
+                      <option key={c._id||c.clientName} value={c.clientName||c.name}>{c.clientName||c.name}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Employee Portal Toggle */}
+              <div style={{ border:`1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius:10, padding:'12px 14px', marginBottom:20, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition:'all .15s' }}>
+                <div onClick={() => { setUploadSendToEmployee(!uploadSendToEmployee); setUploadEmployeeName(''); }} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer' }}>
+                  <div style={{ width:20, height:20, borderRadius:6, border:`2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    {uploadSendToEmployee && <span style={{ color:'#fff', fontSize:11, fontWeight:900 }}>✓</span>}
+                  </div>
+                  <i className="ti ti-users" style={{ color:P.purple, fontSize:16 }}></i>
+                  <span style={{ fontSize:13, fontWeight:700, color:P.textDark }}>Send to Employee Portal</span>
+                </div>
+                {uploadSendToEmployee && (
+                  <select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)}
+                    style={{ width:'100%', padding:'9px 12px', borderRadius:8, border:`1.5px solid ${P.purple}`, fontSize:13, fontFamily:'Nunito,sans-serif', outline:'none', background:'#fff', color:P.textDark, marginTop:10 }}>
+                    <option value="">-- Select Employee --</option>
+                    {(employees||[]).map(emp => (
+                      <option key={emp._id} value={emp.name||emp.employeeName}>{emp.name||emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div style={{ display:'flex', gap:10 }}>
+                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }}
+                  style={{ flex:1, padding:'10px', borderRadius:10, border:`1.5px solid ${P.border}`, background:'transparent', color:P.textMid, fontFamily:'Nunito,sans-serif', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                  Cancel
+                </button>
+                <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal}
+                  style={{ flex:2, padding:'10px', borderRadius:10, border:'none', background:(!uploadFileObj||uploadingModal) ? P.border : P.primary, color:(!uploadFileObj||uploadingModal) ? P.textLight : '#fff', fontFamily:'Nunito,sans-serif', fontSize:13, fontWeight:800, cursor:(!uploadFileObj||uploadingModal)?'not-allowed':'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'all .15s' }}>
+                  <i className="ti ti-upload" style={{ fontSize:15 }}></i>
+                  {uploadingModal ? 'Uploading...' : 'Upload & Share'}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

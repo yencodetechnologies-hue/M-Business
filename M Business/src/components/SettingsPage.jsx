@@ -154,6 +154,10 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   // Avatar upload state (optional extension)
   const [avatarUrl, setAvatarUrl] = useState(user?.logoUrl || user?.avatar || "");
 
+  // Bank Details state
+  const [bank, setBank] = useState({ bankName: "", accountNo: "", ifscCode: "", upiId: "", paymentDue: "NOW", paymentMethod: "Bank Transfer / NEFT", currency: "INR" });
+  const [bankSaving, setBankSaving] = useState(false);
+
   // Security state
   const [passwords, setPasswords] = useState({ old: "", new: "", confirm: "" });
   const [securityLoading, setSecurityLoading] = useState(false);
@@ -161,6 +165,10 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   // Load initial data
   useEffect(() => {
     if (user) {
+      // Load bank details
+      const savedBank = localStorage.getItem("bankDetails");
+      if (savedBank) { try { setBank(JSON.parse(savedBank)); } catch(e) {} }
+
       setProfile({
         name: user?.companyName || user?.name || "",
         email: user?.email || "",
@@ -285,12 +293,22 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
     }
   };
 
+  const saveBank = () => {
+    setBankSaving(true);
+    try {
+      localStorage.setItem("bankDetails", JSON.stringify(bank));
+      setTimeout(() => setBankSaving(false), 800);
+      showToast("Bank details saved!");
+    } catch(e) { setBankSaving(false); showToast("Failed to save"); }
+  };
+
   // Sidebar navigation items
   const navItems = [
     { id: "profile", icon: "👤", label: "Profile" },
     { id: "branding", icon: "🎨", label: "Branding" },
  
-    { id: "security", icon: "🔒", label: "Security" }
+    { id: "security", icon: "🔒", label: "Security" },
+    { id: "bank", icon: "🏦", label: "Bank Details" }
   ];
 
   const displayName = user?.companyName || user?.name || user?.email?.split("@")[0] || "Admin";
@@ -428,6 +446,75 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
               </div>
             )}
 
+
+            {activeTab === "bank" && (
+              <div className="settings-section">
+                <div className="ss-header">
+                  <div className="ss-header-icon" style={{ background: "rgba(0,188,212,0.12)", color: "#00BCD4" }}>🏦</div>
+                  <div>
+                    <div className="ss-title">Payment Terms & Bank Details</div>
+                    <div className="ss-sub">Used in invoices and proposals</div>
+                  </div>
+                </div>
+                <div className="ss-body">
+                  <div className="form-group">
+                    <label className="form-label">PAYMENT DUE</label>
+                    <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+                      {[{val:"NOW",lbl:"NOW",sub:"Immediate"},{val:"7",lbl:"7",sub:"Net 7 days"},{val:"15",lbl:"15",sub:"Net 15 days"},{val:"30",lbl:"30",sub:"Net 30 days"}].map(opt => (
+                        <div key={opt.val} onClick={() => setBank(b => ({ ...b, paymentDue: opt.val }))}
+                          style={{ padding:"12px 20px", borderRadius:10, border:`2px solid ${bank.paymentDue===opt.val?"#00BCD4":"#E2E8F0"}`, background: bank.paymentDue===opt.val?"#E0F7FA":"#fff", cursor:"pointer", textAlign:"center", minWidth:80 }}>
+                          <div style={{ fontSize:18, fontWeight:900, color: bank.paymentDue===opt.val?"#00BCD4":"#1A2332" }}>{opt.lbl}</div>
+                          <div style={{ fontSize:11, color:"#718096", fontWeight:600 }}>{opt.sub}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                    <div className="form-group">
+                      <label className="form-label">PAYMENT METHOD</label>
+                      <select className="form-input" value={bank.paymentMethod} onChange={e => setBank(b => ({ ...b, paymentMethod: e.target.value }))}>
+                        {["Bank Transfer / NEFT","UPI","Cash","Cheque","Credit Card","PayPal"].map(m => <option key={m}>{m}</option>)}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">CURRENCY</label>
+                      <select className="form-input" value={bank.currency} onChange={e => setBank(b => ({ ...b, currency: e.target.value }))}>
+                        <option value="INR">INR - Indian Rupee</option>
+                        <option value="USD">USD - US Dollar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="GBP">GBP - British Pound</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                    <div className="form-group">
+                      <label className="form-label">BANK NAME</label>
+                      <input className="form-input" value={bank.bankName} onChange={e => setBank(b => ({ ...b, bankName: e.target.value }))} placeholder="e.g. HDFC Bank" />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">ACCOUNT NUMBER</label>
+                      <input className="form-input" value={bank.accountNo} onChange={e => setBank(b => ({ ...b, accountNo: e.target.value }))} placeholder="e.g. 5020123456789" />
+                    </div>
+                  </div>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                    <div className="form-group">
+                      <label className="form-label">IFSC CODE</label>
+                      <input className="form-input" value={bank.ifscCode} onChange={e => setBank(b => ({ ...b, ifscCode: e.target.value }))} placeholder="e.g. HDFC0001234" />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">UPI ID</label>
+                      <input className="form-input" value={bank.upiId} onChange={e => setBank(b => ({ ...b, upiId: e.target.value }))} placeholder="e.g. yencode@okaxis" />
+                    </div>
+                  </div>
+                  <div style={{ marginTop:24 }}>
+                    <button className="sec-save-btn" onClick={saveBank} disabled={bankSaving}>
+                      {bankSaving ? "Saving..." : "Save Bank Details"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {activeTab === "security" && (
               <div className="settings-section">
                 <div className="ss-header">
@@ -438,10 +525,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                   </div>
                 </div>
                 <div className="ss-body">
-                  <div className="form-group" style={{ maxWidth: 400 }}>
-                    <label className="form-label">Current Password</label>
-                    <input className="form-input" type="password" value={passwords.old} onChange={e => setPasswords(p => ({ ...p, old: e.target.value }))} placeholder="••••••••" />
-                  </div>
+                 
                   <div className="form-group" style={{ maxWidth: 400 }}>
                     <label className="form-label">New Password</label>
                     <input className="form-input" type="password" value={passwords.new} onChange={e => setPasswords(p => ({ ...p, new: e.target.value }))} placeholder="••••••••" />

@@ -841,7 +841,7 @@ const newFileObj = {
       size: uploadFileObj.size,
       type: uploadFileObj.type,
       uploadedAt: new Date().toISOString(),
-      sentToClient: uploadSendToClient ? uploadClientName : null,
+      sentToClient: uploadSendToClient ? (uploadClientName || currProject.client || clientName || 'client') : null,
       sentToEmployee: uploadSendToEmployee ? uploadEmployeeName : null,
     };
     const updatedFiles = [...(currProject.files || []), newFileObj];
@@ -997,14 +997,7 @@ const newFileObj = {
           <div style={{borderTop:`1px solid ${P.border}`,padding:'20px 24px',animation:'fadeSlideIn .18s ease'}}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '18px 24px' }}>
               <DetailField label="Client" value={clientName} />
-              <DetailField label="Category" value={category} />
-              <DetailField label="Status" value={currProject.status || 'Active'} />
-              <DetailField label="Priority" value={priority.charAt(0).toUpperCase() + priority.slice(1)} />
-              <DetailField label="Start Date" value={fmtDetailDate(currProject.start)} />
-              <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
-              <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
-              <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />
-<DetailField 
+              <DetailField 
   label="Contact Person" 
   value={
     currProject.contactPersonName || 
@@ -1020,6 +1013,13 @@ const newFileObj = {
     '—'
   } 
 />
+              <DetailField label="Category" value={category} />
+              <DetailField label="Status" value={currProject.status || 'Active'} />
+              <DetailField label="Priority" value={priority.charAt(0).toUpperCase() + priority.slice(1)} />
+              <DetailField label="Start Date" value={fmtDetailDate(currProject.start)} />
+              <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
+              <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
+              <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />
               {budgetAmt > 0 && (
                 <>
                   <DetailField label="Total Budget" value={`${currency}${budgetAmt.toLocaleString()}`} />
@@ -1030,18 +1030,7 @@ const newFileObj = {
                   <DetailField label="Remaining" value={`${currency}${remaining.toLocaleString()}`} />
                 </>
               )}
-              <DetailField
-                label="Client Portal"
-                value={portalSettings.enablePortal
-                  ? [
-                      portalSettings.showProgress && 'Progress',
-                      portalSettings.showMilestones && 'Milestones',
-                      portalSettings.showTeam && 'Team',
-                      portalSettings.allowMessages && 'Messages',
-                    ].filter(Boolean).join(', ') || 'Enabled'
-                  : 'Disabled'}
-                fullWidth
-              />
+          
             </div>
           </div>
         )}
@@ -2263,7 +2252,7 @@ const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 
 
               {/* Client Portal Toggle */}
               <div style={{ border:`1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius:10, padding:'12px 14px', marginBottom:10, background: uploadSendToClient ? P.primaryLight : '#fff', transition:'all .15s' }}>
-                <div onClick={() => { setUploadSendToClient(!uploadSendToClient); setUploadClientName(''); }} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer' }}>
+                <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); }} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer' }}>
                   <div style={{ width:20, height:20, borderRadius:6, border:`2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                     {uploadSendToClient && <span style={{ color:'#fff', fontSize:11, fontWeight:900 }}>✓</span>}
                   </div>

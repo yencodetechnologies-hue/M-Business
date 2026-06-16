@@ -3297,7 +3297,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     if (["project-details", "create-project", "edit-project"].includes(saved)) return "projects";
     return saved;
   });
-  useEffect(() => { localStorage.setItem("activeTab_subadmin", active); }, [active]);
+ useEffect(() => { 
+    const toSave = ["project-details","create-project","edit-project"].includes(active) 
+      ? "projects" 
+      : active;
+    localStorage.setItem("activeTab_subadmin", toSave); 
+  }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
   const [fromEditProject, setFromEditProject] = useState(false);
   const [jumpInvoice, setJumpInvoice] = useState(null);
@@ -5301,9 +5306,9 @@ active={
     }}
   />
 )}
-{validActive === "project-details" && (
+{validActive === "project-details" && jumpProject && (
   <ModernProjectDetails 
-    project={jumpProject} 
+    project={jumpProject}
     tasks={tasks} 
     employees={employees}
     user={user}

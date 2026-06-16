@@ -334,16 +334,31 @@ function EmployeeDocumentsPage({ user, notifications = [], onAcknowledge }) {
         console.log("[EmployeeDocs] user=", user);
         console.log("[EmployeeDocs] companyId=", companyId, "displayName=", displayName);
         // Fetch all employee docs (bypassing strict companyId requirement) then filter by name client-side
-        const res = await axios.get(`${BASE_URL}/api/documents?sendTo=employee`);
-        const allDocs = Array.isArray(res.data) ? res.data : (res.data?.value || []);
-        console.log("[EmployeeDocs] allDocs=", allDocs);
-        // Filter: show docs where client name matches this employee (case-insensitive)
+        const [docsRes, projRes] = await Promise.all([
+          axios.get(`${BASE_URL}/api/documents?sendTo=employee`),
+          axios.get(`${BASE_URL}/api/projects`)
+        ]);
+        const allDocs = Array.isArray(docsRes.data) ? docsRes.data : (docsRes.data?.value || []);
         const myDocs = allDocs.filter(d => {
           const docClient = (d.client || "").trim().toLowerCase();
           return !displayName || docClient === displayName || docClient.includes(displayName) || displayName.includes(docClient);
         });
-        console.log("[EmployeeDocs] myDocs=", myDocs);
-        setDocs(myDocs);
+        const empName = user?.name || user?.employeeName || '';
+        const projFiles = (Array.isArray(projRes.data) ? projRes.data : []).flatMap(p =>
+          (p.files || [])
+            .filter(f => f.sentToEmployee && f.sentToEmployee === empName)
+            .map(f => ({
+              _id: f._id || f.url,
+              docType: f.name || 'File',
+              htmlContent: `<div style="padding:20px"><h3>${f.name}</h3><p>From Project: <strong>${p.name}</strong></p><a href="${f.url}" target="_blank" style="color:#9b6fd4;font-weight:700">📎 Open / Download File</a></div>`,
+              client: empName,
+              fromProject: p.name,
+              dateSent: f.uploadedAt,
+              isProjectFile: true,
+              url: f.url,
+            }))
+        );
+        setDocs([...myDocs, ...projFiles]);
       } catch (err) {
         console.error("[EmployeeDocs] Failed to fetch documents:", err);
       } finally {

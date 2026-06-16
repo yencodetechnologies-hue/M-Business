@@ -282,9 +282,18 @@ export default function ClientDashboard({ user, setUser }) {
     raw: d
   }));
 
-const allFiles = [...docCards, ...(projects[0]?.files || [])
-  .filter(f => f.sentToClient && f.sentToClient === (clientName || projects[0]?.client))
-  .map(f => ({ name: f.name, meta: `${f.type || "File"}`, date: new Date(f.uploadedAt || Date.now()).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }), type: "Documents", icon: "ti-file", bg: C.blueBg, col: C.blue }))];
+const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
+ .filter(f => f.sentToClient && f.sentToClient !== null && f.sentToClient !== "")
+  .map(f => ({ 
+    name: f.name || f.heading || 'File', 
+    meta: f.type && f.size ? `${f.type} · ${Math.round(f.size/1024)} KB` : (f.type || 'File'),
+    date: f.uploadedAt ? new Date(f.uploadedAt).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) : '—',
+    type: 'Documents',
+    icon: 'ti-file',
+    bg: C.blueBg,
+    col: C.blue,
+    url: f.url
+  }))];
   const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
 
   // Invoices variables

@@ -1513,7 +1513,7 @@ const handleAddExpense = async (e) => {
                       const invTaxAmt = inv.taxType === 'inclusive' ? 0 : Math.round((inv.amount||0) * (inv.taxPercent||0)/100);
                       const totalInvoiceAmt = (inv.amount||0) + invTaxAmt;
                       return (
-                      <div key={i} style={{display:'grid',gridTemplateColumns:'40px 2fr 1fr 1fr 1fr 1fr 80px',gap:8,padding:'0 18px',alignItems:'center',minHeight:56,borderBottom:'1px solid #E8EDF2',borderLeft:`3px solid ${(inv.status||'').toLowerCase()==='paid'?'#22C55E':(inv.status||'').toLowerCase()==='overdue'?'#EF4444':'#F59E0B'}`}}>
+                      <div key={i} style={{display:'grid',gridTemplateColumns:'40px 2fr 1fr 1fr 1fr 80px',gap:8,padding:'0 18px',alignItems:'center',minHeight:56,borderBottom:'1px solid #E8EDF2',borderLeft:`3px solid ${(inv.status||'').toLowerCase()==='paid'?'#22C55E':(inv.status||'').toLowerCase()==='overdue'?'#EF4444':'#F59E0B'}`}}>
                         <div style={{display:'flex',alignItems:'center'}}>
                           <input type="checkbox" checked={selectedPaymentItems.includes(i)} onChange={e => {
                             if (e.target.checked) setSelectedPaymentItems(prev => [...prev, i]);
@@ -1534,7 +1534,7 @@ const handleAddExpense = async (e) => {
                         </div>
                         <div style={{fontSize:12,fontWeight:700,color:'#2D3E50'}}>{inv.issueDate ? new Date(inv.issueDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
                         <div style={{fontSize:12,fontWeight:700,color:'#2D3E50'}}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
-                      <div></div>
+                   
 <div style={{display:'flex',gap:4,alignItems:'center'}}>
   <button onClick={() => setPreviewInvoice({...inv, projectName: currProject.name, clientName, currency})} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#00BCD4'}} title="View"><i className="ti ti-eye"></i></button>
   <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i }))} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}} title="Edit"><i className="ti ti-edit"></i></button>

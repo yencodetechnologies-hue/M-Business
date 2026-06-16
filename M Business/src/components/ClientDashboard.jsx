@@ -313,16 +313,35 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
   // "client" என்று generic ஆ save ஆனதும் show பண்ணு, அல்லது client name match ஆனாலும் show பண்ணு
   return sc === "client" || sc === cn || sc.includes(cn) || cn.includes(sc);
 })
-  .map(f => ({ 
-    name: f.name || f.heading || 'File', 
-    meta: f.type && f.size ? `${f.type} · ${Math.round(f.size/1024)} KB` : (f.type || 'File'),
-    date: f.uploadedAt ? new Date(f.uploadedAt).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) : '—',
-    type: 'Documents',
-    icon: 'ti-file',
-    bg: C.blueBg,
-    col: C.blue,
-    url: f.url
-  }))];
+  .map(f => {
+    const mime = (f.type || '').toLowerCase();
+    const fname = (f.name || '').toLowerCase();
+    let icon = 'ti-file', bg = C.blueBg, col = C.blue, fileType = 'Documents';
+    if (mime.includes('pdf') || fname.endsWith('.pdf')) {
+      icon = 'ti-file-type-pdf'; bg = C.redBg; col = C.red; fileType = 'Documents';
+    } else if (mime.includes('image') || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fname)) {
+      icon = 'ti-photo'; bg = C.purpleBg || '#f3e8ff'; col = C.purple || '#7c3aed'; fileType = 'Designs';
+    } else if (mime.includes('spreadsheet') || mime.includes('excel') || /\.(xlsx|xls|csv)$/.test(fname)) {
+      icon = 'ti-file-spreadsheet'; bg = C.greenBg; col = C.green; fileType = 'Reports';
+    } else if (mime.includes('word') || /\.(doc|docx)$/.test(fname)) {
+      icon = 'ti-file-text'; bg = C.blueBg; col = C.blue; fileType = 'Documents';
+    } else if (mime.includes('zip') || mime.includes('rar') || /\.(zip|rar|tar|gz)$/.test(fname)) {
+      icon = 'ti-file-zip'; bg = C.amberBg || '#fef3c7'; col = C.amber || '#d97706'; fileType = 'Documents';
+    } else if (mime.includes('video') || /\.(mp4|mov|avi|mkv)$/.test(fname)) {
+      icon = 'ti-video'; bg = C.purpleBg || '#f3e8ff'; col = C.purple || '#7c3aed'; fileType = 'Designs';
+    }
+    return {
+      name: f.name || f.heading || 'File',
+      meta: f.size ? `${Math.round(f.size / 1024)} KB` : (f.type || 'File'),
+      date: f.uploadedAt ? new Date(f.uploadedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—',
+      type: fileType,
+      icon,
+      bg,
+      col,
+      url: f.url,
+      description: f.description || ''
+    };
+  })];
   const filteredFiles = fileFilter === "All" ? allFiles : allFiles.filter(f => f.type === fileFilter);
 
   // Invoices variables
@@ -983,6 +1002,7 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
   }}><i className="ti ti-download"></i></div>
               <div className="fc-icon" style={{ background: file.bg, color: file.col }}><i className={`ti ${file.icon}`}></i></div>
               <div className="fc-name">{file.name}</div>
+              {file.description && <div style={{ fontSize: 10, color: C.text3, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>{file.description}</div>}
               <div className="fc-meta">{file.meta}</div>
               <div className="fc-date">{file.date}</div>
             </div>

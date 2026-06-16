@@ -1419,9 +1419,9 @@ const [items, setItems] = useState([
               </thead>
               <tbody>
                 {listLoading ? (
-                  <tr><td colSpan={10} style={{textAlign:"center",padding:40,color:"var(--text3)"}}>Loading invoices...</td></tr>
+                  <tr><td colSpan={10} style={{textAlign:"center",padding:40,color:"var(--text3)"}}></td></tr>
                 ) : enriched.length === 0 ? (
-                  <tr><td colSpan={10} style={{textAlign:"center",padding:40,color:"var(--text3)"}}>No invoices yet</td></tr>
+                  <tr><td colSpan={10} style={{textAlign:"center",padding:40,color:"var(--text3)"}}></td></tr>
                 ) : enriched.filter(e => {
                   if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
                   if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "part_paid") return false;

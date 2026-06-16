@@ -1003,14 +1003,7 @@ const newFileObj = {
           <div style={{borderTop:`1px solid ${P.border}`,padding:'20px 24px',animation:'fadeSlideIn .18s ease'}}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '18px 24px' }}>
               <DetailField label="Client" value={clientName} />
-              <DetailField label="Category" value={category} />
-              <DetailField label="Status" value={currProject.status || 'Active'} />
-              <DetailField label="Priority" value={priority.charAt(0).toUpperCase() + priority.slice(1)} />
-              <DetailField label="Start Date" value={fmtDetailDate(currProject.start)} />
-              <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
-              <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
-              <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />
-<DetailField 
+              <DetailField 
   label="Contact Person" 
   value={
     currProject.contactPersonName || 
@@ -1026,6 +1019,14 @@ const newFileObj = {
     '—'
   } 
 />
+              <DetailField label="Category" value={category} />
+              <DetailField label="Status" value={currProject.status || 'Active'} />
+              <DetailField label="Priority" value={priority.charAt(0).toUpperCase() + priority.slice(1)} />
+              <DetailField label="Start Date" value={fmtDetailDate(currProject.start)} />
+              <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
+              <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
+              <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />
+
               {budgetAmt > 0 && (
                 <>
                   <DetailField label="Total Budget" value={`${currency}${budgetAmt.toLocaleString()}`} />
@@ -1036,18 +1037,7 @@ const newFileObj = {
                   <DetailField label="Remaining" value={`${currency}${remaining.toLocaleString()}`} />
                 </>
               )}
-              <DetailField
-                label="Client Portal"
-                value={portalSettings.enablePortal
-                  ? [
-                      portalSettings.showProgress && 'Progress',
-                      portalSettings.showMilestones && 'Milestones',
-                      portalSettings.showTeam && 'Team',
-                      portalSettings.allowMessages && 'Messages',
-                    ].filter(Boolean).join(', ') || 'Enabled'
-                  : 'Disabled'}
-                fullWidth
-              />
+            
             </div>
           </div>
         )}
@@ -1481,11 +1471,11 @@ const newFileObj = {
                 {/* STATS ROW */}
                 <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:20}}>
                   {[
-                    {lbl:'Total Invoiced',val:`${currency}${(budgetAmt||0).toLocaleString()}`,sub:'Invoices raised',color:'#3B82F6',icon:'ti-file-invoice'},
-                    {lbl:'Received',val:`${currency}${(received||0).toLocaleString()}`,sub:`${budgetAmt>0?Math.round((received/budgetAmt)*100):0}% collected`,color:'#22C55E',icon:'ti-circle-check'},
-                    {lbl:'Advance Paid',val:`${currency}${(currProject.advance||0).toLocaleString()}`,sub:'Adjusted in invoice',color:'#8B5CF6',icon:'ti-pig-money'},
-                    {lbl:'Additional',val:`${currency}${(currProject.additionalCharges||0).toLocaleString()}`,sub:'Extra charges',color:'#F97316',icon:'ti-circle-plus'},
-                    {lbl:'Outstanding',val:`${currency}${(pending||0).toLocaleString()}`,sub:'Balance due',color:'#F59E0B',icon:'ti-alert-circle'},
+                    {lbl:'Total Invoiced',val:`${currency}${(billed||0).toLocaleString()}`,sub:'Invoices raised',color:'#3B82F6',icon:'ti-file-invoice'},
+                    {lbl:'Received',val:`${currency}${(received||0).toLocaleString()}`,sub:`${billed>0?Math.round((received/billed)*100):0}% collected`,color:'#22C55E',icon:'ti-circle-check'},
+                    {lbl:'Advance Paid',val:`${currency}${((currProject.advances||[]).reduce((s,a)=>s+(parseAmt(a.amount)||0),0)||0).toLocaleString()}`,sub:'Adjusted in invoice',color:'#8B5CF6',icon:'ti-pig-money'},
+                    {lbl:'Additional',val:`${currency}${((currProject.additionalCharges||[]).reduce((s,a)=>s+(parseAmt(a.amount)||0),0)||parseAmt(currProject.additionalChargesTotal)||0).toLocaleString()}`,sub:'Extra charges',color:'#F97316',icon:'ti-circle-plus'},
+                    {lbl:'Outstanding',val:`${currency}${(pending||0).toLocaleString()}`,sub:'Balance due',color:'#EF4444',icon:'ti-alert-circle'},
                   ].map(s=>(
                     <div key={s.lbl} style={{background:'#fff',border:'1px solid #E8EDF2',borderRadius:12,padding:'14px 16px',position:'relative',overflow:'hidden'}}>
                       <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:s.color,borderRadius:'12px 12px 0 0'}}></div>
@@ -1497,40 +1487,25 @@ const newFileObj = {
                   ))}
                 </div>
 
-                {/* PAYMENT TYPE TABS */}
-                <div style={{display:'flex',background:'#fff',border:'1px solid #E8EDF2',borderRadius:10,overflow:'hidden',marginBottom:18}}>
+                {/* PAYMENT TYPE TABS — card style matching mockup */}
+                <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:10,marginBottom:18}}>
                   {[
-                    {key:'inv',label:'Invoice',desc:'Standard billing',icon:'ti-file-invoice',color:'#3B82F6',bg:'#DBEAFE'},
-                    {key:'adv',label:'Advance',desc:'Upfront payments',icon:'ti-pig-money',color:'#8B5CF6',bg:'#EDE9FE'},
-                    {key:'add',label:'Additional',desc:'Extra charges',icon:'ti-circle-plus',color:'#F97316',bg:'#FFEDD5'},
-                    {key:'mile',label:'Milestone',desc:'Phase billing',icon:'ti-flag',color:'#F59E0B',bg:'#FEF3C7'},
-                                        {key:'pay',label:'Payment',desc:'Received amounts',icon:'ti-credit-card',color:'#22C55E',bg:'#DCFCE7'},
-                    {key:'exp',label:'Expenses',desc:'Project costs',icon:'ti-receipt',color:'#6B7280',bg:'#F3F4F6'},
-                  ].map((t,i)=>(
-                    <div key={t.key} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4,padding:'12px 8px',cursor:'pointer',borderRight:i<5?'1px solid #E8EDF2':'none',transition:'all .14s',background: activePayTab===t.key ? '#00BCD4' : '#fff'}}
-                      onClick={()=>{
-                        setActivePayTab(t.key);
-                        setSelectedPaymentItems([]);
-                        const proj={...currProject,_payTab:t.key};
-                        // local state update trick
-                        document.querySelectorAll('[data-paytab]').forEach(el=>el.dataset.paytab===t.key?(el.style.display='block'):(el.style.display='none'));
-                        document.querySelectorAll('[data-paytabbtn]').forEach(el=>{
-                          el.style.background=el.dataset.paytabbtn===t.key?'#00BCD4':'#fff';
-                          el.querySelector('.pt-lbl').style.color=el.dataset.paytabbtn===t.key?'#fff':'#0D1B2A';
-                          el.querySelector('.pt-desc').style.color=el.dataset.paytabbtn===t.key?'rgba(255,255,255,.7)':'#7B8FA1';
-                          el.querySelector('.pt-ico').style.background=el.dataset.paytabbtn===t.key?'rgba(255,255,255,.2)':el.dataset.origbg;
-                          el.querySelector('.pt-ico').style.color=el.dataset.paytabbtn===t.key?'#fff':el.dataset.origcolor;
-                        });
-                      }}
-                      data-paytabbtn={t.key}
-                      data-origbg={t.bg}
-                      data-origcolor={t.color}
+                    {key:'inv',label:'Invoice',desc:'Standard billing',icon:'ti-file-invoice',color:'#3B82F6',bg:'rgba(59,130,246,.1)'},
+                    {key:'adv',label:'Advance',desc:'Upfront payments',icon:'ti-pig-money',color:'#8B5CF6',bg:'rgba(139,92,246,.1)'},
+                    {key:'add',label:'Additional',desc:'Extra charges',icon:'ti-circle-plus',color:'#F97316',bg:'rgba(249,115,22,.1)'},
+                    {key:'mile',label:'Milestone',desc:'Phase billing',icon:'ti-flag',color:'#F59E0B',bg:'rgba(245,158,11,.1)'},
+                    {key:'pay',label:'Payment',desc:'Received amounts',icon:'ti-credit-card',color:'#22C55E',bg:'rgba(34,197,94,.1)'},
+                    {key:'exp',label:'Expenses',desc:'Project costs',icon:'ti-receipt',color:'#6B7280',bg:'rgba(107,114,128,.1)'},
+                  ].map(t=>(
+                    <div key={t.key}
+                      onClick={()=>{ setActivePayTab(t.key); setSelectedPaymentItems([]); }}
+                      style={{background: activePayTab===t.key ? '#00BCD4' : '#fff', border:`1px solid ${activePayTab===t.key?'#00BCD4':'#E8EDF2'}`, borderRadius:12, padding:'14px 8px', textAlign:'center', cursor:'pointer', transition:'all .15s'}}
                     >
-                      <div className="pt-ico" style={{width:32,height:32,borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,background:t.bg,color:t.color,transition:'all .14s'}}>
+                      <div style={{width:38,height:38,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 8px',fontSize:18,background: activePayTab===t.key ? 'rgba(255,255,255,.25)' : t.bg, color: activePayTab===t.key ? '#fff' : t.color}}>
                         <i className={`ti ${t.icon}`}></i>
                       </div>
-                      <div className="pt-lbl" style={{fontSize:12,fontWeight:900,color:'#0D1B2A',transition:'color .14s'}}>{t.label}</div>
-                      <div className="pt-desc" style={{fontSize:10,fontWeight:600,color:'#7B8FA1',transition:'color .14s',textAlign:'center'}}>{t.desc}</div>
+                      <div style={{fontSize:12,fontWeight:800,color: activePayTab===t.key ? '#fff' : '#0D1B2A'}}>{t.label}</div>
+                      <div style={{fontSize:10,fontWeight:600,color: activePayTab===t.key ? 'rgba(255,255,255,.75)' : '#7B8FA1',marginTop:2}}>{t.desc}</div>
                     </div>
                   ))}
                 </div>

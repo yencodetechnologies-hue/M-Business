@@ -76,7 +76,10 @@ const [projects, setProjects] = useState([]);
   const [showInvoiceCreator, setShowInvoiceCreator] = useState(false);
   const [invoicePrefill, setInvoicePrefill] = useState(null);
   // ── UI state ──────────────────────────────────────────────────
-  const [selectedProject, setSelectedProject] = useState(null);
+const [selectedProject, setSelectedProject] = useState(() => {
+  const saved = sessionStorage.getItem('selectedProjectId');
+  return saved ? { _id: saved } : null;
+});
   const [searchQuery, setSearchQuery]         = useState('');
   const [activeTab, setActiveTab]             = useState('All');
  
@@ -109,11 +112,16 @@ const [pRes, tRes, cRes] = await Promise.all([
       setTasks(Array.isArray(tRes.data) ? tRes.data : []);
       setClients(Array.isArray(cRes.data) ? cRes.data : []);
       // Keep selectedProject in sync with latest backend data
-      setSelectedProject(prev => {
-        if (!prev) return prev;
-        const updated = freshProjects.find(p => p._id === prev._id);
-        return updated || prev;
-      });
+     setSelectedProject(prev => {
+  if (!prev) return prev;
+  const updated = freshProjects.find(p => p._id === prev._id);
+  if (updated) {
+    sessionStorage.setItem('selectedProjectId', updated._id);
+    return updated;
+  }
+  // If not found yet, keep prev so page doesn't reset
+  return prev;
+});
     } catch (err) {
       setError('Failed to load projects. Check backend connection.');
     } finally {
@@ -222,7 +230,7 @@ const [pRes, tRes, cRes] = await Promise.all([
     try {
       await axios.delete(`${BASE_URL}/api/projects/${deleteTarget._id}`);
       setDeleteTarget(null);
-      if (selectedProject?._id === deleteTarget._id) { setSelectedProject(null); navigate('/modern-projects'); }
+      if (selectedProject?._id === deleteTarget._id) { sessionStorage.removeItem('selectedProjectId'); setSelectedProject(null); navigate('/modern-projects'); }
       fetchAll();
     } catch (err) {
       alert('Delete failed: ' + (err.response?.data?.msg || err.message));
@@ -306,7 +314,7 @@ const [pRes, tRes, cRes] = await Promise.all([
           <nav className="m-nav">
             <div className="m-nav-item"><i className="ti ti-layout-dashboard"></i>Dashboard</div>
             <div className="m-nav-label">Management</div>
-            <div className="m-nav-item active" onClick={() => { setSelectedProject(null); navigate('/modern-projects'); }} style={{cursor:'pointer'}}>
+            <div className="m-nav-item active" onClick={() => { sessionStorage.removeItem('selectedProjectId'); setSelectedProject(null); navigate('/modern-projects'); }} style={{cursor:'pointer'}}>
               <i className="ti ti-briefcase"></i>Projects<span className="m-nav-badge">{stats.all}</span>
             </div>
             <div className="m-nav-item"><i className="ti ti-users"></i>Clients</div>
@@ -330,7 +338,7 @@ const [pRes, tRes, cRes] = await Promise.all([
           <div className="m-content">
             <ModernProjectDetails
               project={toDetailShape(selectedProject)}
-onBack={() => { setSelectedProject(null); }}
+onBack={() => { sessionStorage.removeItem('selectedProjectId'); setSelectedProject(null); }}
               tasks={tasksForProject(selectedProject)}
               onUpdate={fetchAll}
               fetchProjects={fetchAll}
@@ -485,7 +493,7 @@ onBack={() => { setSelectedProject(null); }}
                   <div
                     key={p._id}
                     className={`m-project-card c-${cardColor}`}
-onClick={() => { setSelectedProject(p); }}
+onClick={() => { sessionStorage.setItem('selectedProjectId', p._id); setSelectedProject(p); }}
                     style={{cursor:'pointer', position:'relative'}}
                   >
                     {/* Card actions */}

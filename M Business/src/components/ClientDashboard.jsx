@@ -60,6 +60,7 @@ export default function ClientDashboard({ user, setUser }) {
   const [docs, setDocs] = useState([]);
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Profile Dropdown
   const [profileOpen, setProfileOpen] = useState(false);
@@ -97,7 +98,9 @@ export default function ClientDashboard({ user, setUser }) {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   const clientName = user?.clientName || user?.name || "Client";
-const clientCompany = user?.companyName || user?.company || clientName;
+  // client company - user object-ல் இல்லன்னா clientName-ஐ fallback ஆ use பண்ணு
+  // Backend-ல் project.client = "Urban Cafe" type company name save ஆகும்
+  const clientCompany = user?.companyName || user?.company || user?.clientCompany || user?.organization || "";
 
   useEffect(() => {
     if (!user) {
@@ -107,7 +110,7 @@ const clientCompany = user?.companyName || user?.company || clientName;
     const fetchAll = async () => {
       try {
         const [projRes, taskRes, invRes, notifRes, docRes, meetRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}`, {
+          axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
             headers: { 'x-company-id': user.companyId || "" }
           }),
           axios.get(`${BASE_URL}/api/tasks/client/${encodeURIComponent(clientName)}`, {
@@ -134,7 +137,26 @@ const clientCompany = user?.companyName || user?.company || clientName;
       }
     };
     fetchAll();
+    // Every 30s auto-refresh — new files உடனே show ஆகும்
+    const interval = setInterval(fetchAll, 30000);
+    return () => clearInterval(interval);
   }, [user, clientName]);
+
+  // Manual refresh function
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const [projRes, docRes] = await Promise.all([
+        axios.get(`${BASE_URL}/api/projects/client/${encodeURIComponent(clientName)}?company=${encodeURIComponent(clientCompany)}`, {
+          headers: { 'x-company-id': user?.companyId || "" }
+        }),
+        axios.get(`${BASE_URL}/api/documents?companyId=${user?.companyId || ""}&client=${encodeURIComponent(clientName)}&sendTo=client`).catch(() => ({ data: [] })),
+      ]);
+      setProjects(projRes.data || []);
+      setDocs(docRes.data || []);
+    } catch(e) { console.error(e); }
+    setRefreshing(false);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -284,14 +306,12 @@ const clientCompany = user?.companyName || user?.company || clientName;
   }));
 
 const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
-.filter(f => {
+ .filter(f => {
   if (!f.sentToClient || f.sentToClient === null || f.sentToClient === "") return false;
   const sc = (f.sentToClient || "").toLowerCase().trim();
   const cn = (clientName || "").toLowerCase().trim();
-  const cc = (clientCompany || "").toLowerCase().trim();
-  return sc === "client" || sc === cn || sc === cc || 
-         sc.includes(cn) || cn.includes(sc) ||
-         sc.includes(cc) || cc.includes(sc);
+  // "client" என்று generic ஆ save ஆனதும் show பண்ணு, அல்லது client name match ஆனாலும் show பண்ணு
+  return sc === "client" || sc === cn || sc.includes(cn) || cn.includes(sc);
 })
   .map(f => ({ 
     name: f.name || f.heading || 'File', 
@@ -626,6 +646,10 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
     .cp-root .modal-close:hover { color: var(--text); }
     .cp-root .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
     @keyframes popUp {
       from { transform: scale(0.95); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
@@ -1299,10 +1323,14 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
                   <div className="sec-title-icon" style={{ background: C.blueBg, color: C.blue }}><i className="ti ti-files"></i></div>
                   Files & Documents
                 </div>
+                <div style={{display:"flex",gap:8}}>
+                  <div className="sec-action" onClick={handleRefresh} style={{opacity: refreshing ? 0.6 : 1}}>
+                    <i className={`ti ${refreshing ? "ti-loader-2" : "ti-refresh"}`} style={{ fontSize: 13, animation: refreshing ? "spin 1s linear infinite" : "none" }}></i>
+                    {refreshing ? "Refreshing..." : "Refresh"}
+                  </div>
                 <div className="sec-action" onClick={async () => {
   const links = allFiles.map(f => f.url).filter(Boolean);
   if (links.length === 0) return;
-  // Single file → direct download
   if (links.length === 1) {
     const a = document.createElement("a");
     a.href = links[0];
@@ -1310,7 +1338,6 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     return;
   }
-  // Multiple files → fetch as blob and download one by one
   for (let i = 0; i < links.length; i++) {
     try {
       const res = await fetch(links[i]);
@@ -1324,13 +1351,13 @@ const managerEmail = proj?.managerEmail || proj?.contactEmail || '';
       setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
       await new Promise(r => setTimeout(r, 800));
     } catch(e) {
-      // CORS issue-ஆ இருந்தா new tab-ல் open பண்ணு
       window.open(links[i], "_blank");
       await new Promise(r => setTimeout(r, 800));
     }
   }
 }}>
                   <i className="ti ti-download" style={{ fontSize: 13 }}></i> Download All
+                </div>
                 </div>
               </div>
               {renderFilesComponent()}

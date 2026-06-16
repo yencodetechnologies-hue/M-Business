@@ -1955,7 +1955,7 @@ const saveEdit = async () => {
     <i className="ti ti-plus"></i> New Invoice
   </button>
 </div>
-<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => openEdit(p)} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { setJumpProject(p); setAutoOpenInvoice(true); setActive("project-details"); }} />
+<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => { setJumpProject(p); setActive("project-details"); }} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { setJumpProject(p); setActive("project-details"); }} />
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>

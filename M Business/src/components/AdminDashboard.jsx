@@ -512,7 +512,18 @@ const T = darkMode ? {
         <div style={{ flex: 1, padding: 32, overflowY: "auto" }}>
           {active === "dashboard" && <OverviewPage THEME={THEME} subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} invoices={invoices} />}
           {active === "subadmins" && <SubadminsList THEME={THEME} subadmins={subadmins} refresh={fetchSubadmins} packages={packages} subscriptions={subscriptions} fetchSubscriptions={fetchSubscriptions} />}
-          {active === "clients" && <ClientsPage THEME={THEME} clients={clients} setClients={setClients} />}
+          {active === "clients" && <ClientsPage THEME={THEME} clients={clients} setClients={setClients} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} />}
+{active === "project-details" && jumpProject && (
+  <ModernProjectDetails
+    project={jumpProject}
+    onBack={() => { setActive("clients"); setJumpProject(null); }}
+    tasks={[]}
+    employees={[]}
+    user={user}
+    clients={clients}
+    onUpdate={() => {}}
+  />
+)}
           {active === "employees" && <EmployeesPage THEME={THEME} employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage THEME={THEME} managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} fetchTasks={fetchTasks} />}
@@ -1718,7 +1729,7 @@ function PackagesPage({ THEME, packages, onEdit, onDelete, darkMode }) {
 }
 
 // ── Clients Page ──
-function ClientsPage({ THEME, clients, setClients }) {
+function ClientsPage({ THEME, clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject }) {
   const [search, setSearch] = useState("");
   const filtered = clients.filter(c =>
     (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) ||

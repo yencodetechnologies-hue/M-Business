@@ -997,7 +997,14 @@ const newFileObj = {
           <div style={{borderTop:`1px solid ${P.border}`,padding:'20px 24px',animation:'fadeSlideIn .18s ease'}}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '18px 24px' }}>
               <DetailField label="Client" value={clientName} />
-              <DetailField 
+              <DetailField label="Category" value={category} />
+              <DetailField label="Status" value={currProject.status || 'Active'} />
+              <DetailField label="Priority" value={priority.charAt(0).toUpperCase() + priority.slice(1)} />
+              <DetailField label="Start Date" value={fmtDetailDate(currProject.start)} />
+              <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
+              <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
+              <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />
+<DetailField 
   label="Contact Person" 
   value={
     currProject.contactPersonName || 
@@ -1013,13 +1020,6 @@ const newFileObj = {
     '—'
   } 
 />
-              <DetailField label="Category" value={category} />
-              <DetailField label="Status" value={currProject.status || 'Active'} />
-              <DetailField label="Priority" value={priority.charAt(0).toUpperCase() + priority.slice(1)} />
-              <DetailField label="Start Date" value={fmtDetailDate(currProject.start)} />
-              <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
-              <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
-              <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />
               {budgetAmt > 0 && (
                 <>
                   <DetailField label="Total Budget" value={`${currency}${budgetAmt.toLocaleString()}`} />
@@ -1030,7 +1030,18 @@ const newFileObj = {
                   <DetailField label="Remaining" value={`${currency}${remaining.toLocaleString()}`} />
                 </>
               )}
-          
+              <DetailField
+                label="Client Portal"
+                value={portalSettings.enablePortal
+                  ? [
+                      portalSettings.showProgress && 'Progress',
+                      portalSettings.showMilestones && 'Milestones',
+                      portalSettings.showTeam && 'Team',
+                      portalSettings.allowMessages && 'Messages',
+                    ].filter(Boolean).join(', ') || 'Enabled'
+                  : 'Disabled'}
+                fullWidth
+              />
             </div>
           </div>
         )}

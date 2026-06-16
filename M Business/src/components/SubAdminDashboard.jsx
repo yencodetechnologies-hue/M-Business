@@ -659,7 +659,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < cProjs.length - 1 ? "1px solid #E0EEF0" : "none" }}>
                   <div style={{ width: 4, height: 36, borderRadius: 2, background: "#00BCD4", flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35" }}>{p.name}</div>
+                    <div 
+  onClick={() => onViewProject && onViewProject(p)} 
+  style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", cursor: "pointer" }}
+>
+  {p.name}
+</div>
                     <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 1 }}>{p.type || p.status}</div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -706,7 +711,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         <div key={i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35" }}>{p.name}</div>
+            <div 
+  onClick={() => onViewProject && onViewProject(p)} 
+  style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", cursor: "pointer"}}
+>
+  {p.name}
+</div>
             <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 2 }}>{p.type || "—"} · {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

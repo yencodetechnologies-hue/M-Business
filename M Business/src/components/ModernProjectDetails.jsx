@@ -325,6 +325,7 @@ const [expenseAmt, setExpenseAmt] = useState('');
 const [addingExpense, setAddingExpense] = useState(false);
 const [projectInvoices, setProjectInvoices] = useState([]);
 const [showSendPopup, setShowSendPopup] = useState(false);
+const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 const [targetPortalClient, setTargetPortalClient] = useState('');
 
   const [paymentModalsState, setPaymentModalsState] = useState({
@@ -1588,7 +1589,33 @@ const handleModalUpload = async () => {
                         <div style={{fontSize:12,fontWeight:700,color:'#2D3E50'}}>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
                    
 <div style={{display:'flex',gap:4,alignItems:'center'}}>
-  <button onClick={() => setPreviewInvoice({...inv, projectName: currProject.name, clientName, currency})} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#00BCD4'}} title="View"><i className="ti ti-eye"></i></button>
+<div style={{position:'relative'}}>
+  <button onClick={() => setPreviewInvoice(prev => prev?.invoiceNo === inv.invoiceNo ? null : {...inv, projectName: currProject.name, clientName, currency})} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#00BCD4'}} title="Change Status"><i className="ti ti-eye"></i></button>
+  {previewInvoice?.invoiceNo === inv.invoiceNo && (
+    <div style={{position:'absolute',right:0,top:30,zIndex:999,background:'#fff',border:'1px solid #E8EDF2',borderRadius:10,boxShadow:'0 4px 20px rgba(0,0,0,0.12)',minWidth:140,overflow:'hidden'}}>
+      {[
+        {label:'Pending', color:'#B45309', bg:'#FEF3C7', icon:'⏳'},
+        {label:'Paid', color:'#15803D', bg:'#DCFCE7', icon:'✓'},
+        {label:'Overdue', color:'#DC2626', bg:'#FEE2E2', icon:'⚠'},
+        {label:'Sent', color:'#1D4ED8', bg:'#DBEAFE', icon:'📨'},
+      ].map(opt => (
+        <div key={opt.label} onClick={async () => {
+          const updatedInvoices = (currProject.invoices||[]).map((x,xi) => xi === i ? {...x, status: opt.label} : x);
+          await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, {invoices: updatedInvoices});
+          setPreviewInvoice(null);
+          loadLatest();
+        }} style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',cursor:'pointer',background: (inv.status||'').toLowerCase()===opt.label.toLowerCase() ? opt.bg : '#fff',borderBottom:'1px solid #F3F4F6'}}
+          onMouseEnter={e=>e.currentTarget.style.background=opt.bg}
+          onMouseLeave={e=>e.currentTarget.style.background=(inv.status||'').toLowerCase()===opt.label.toLowerCase()?opt.bg:'#fff'}
+        >
+          <span>{opt.icon}</span>
+          <span style={{fontSize:13,fontWeight:700,color:opt.color}}>{opt.label}</span>
+          {(inv.status||'').toLowerCase()===opt.label.toLowerCase() && <span style={{marginLeft:'auto',fontSize:11,color:opt.color}}>✓</span>}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
   <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i }))} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#7B8FA1'}} title="Edit"><i className="ti ti-edit"></i></button>
   <button onClick={() => handleDeleteRecord('invoices', i)} style={{width:26,height:26,borderRadius:6,background:'none',border:'1px solid #E8EDF2',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,color:'#EF4444'}} title="Delete"><i className="ti ti-trash"></i></button>
 </div>
@@ -2110,17 +2137,78 @@ const statusBg = s === 'paid' ? '#DCFCE7' : s === 'overdue' ? '#FEE2E2' : s === 
                     </div>
                   </div>
                 </div>
-                {inv.notes && (
+              {inv.notes && (
                   <div style={{ borderTop: '1px solid #E8EDF2', paddingTop: 14 }}>
                     <div style={{ fontSize: 8, fontWeight: 700, color: '#00BCD4', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 2 }}>Notes</div>
                     <div style={{ fontSize: 8, color: '#64748b', lineHeight: 1.5 }}>{inv.notes}</div>
                   </div>
                 )}
-              </div>
+       </div>
+
+              {/* ── Footer Status Bar ── */}
+           {/* ── Footer Status Bar ── */}
+<div style={{ borderTop: '1px solid #E8EDF2', padding: '10px 40px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
+  <div style={{ position: 'relative' }}>
+    {(() => {
+      const st = (inv.status || '').toLowerCase();
+      const cfg = st === 'paid'
+        ? { label: 'Paid',    bg: '#DCFCE7', color: '#15803D', icon: '✓' }
+        : st === 'overdue'
+        ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '⚠' }
+        : st === 'sent'
+        ? { label: 'Sent',    bg: '#DBEAFE', color: '#1D4ED8', icon: '📨' }
+        : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '⏳' };
+      return (
+        <>
+          <span
+            onClick={() => setShowStatusDropdown(prev => !prev)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}
+          >
+            {cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span>
+          </span>
+          {showStatusDropdown && (
+            <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
+              {[
+                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },
+                { label: 'Paid',    color: '#15803D', bg: '#DCFCE7', icon: '✓' },
+                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '⚠' },
+                { label: 'Sent',    color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
+              ].map(opt => (
+                <div key={opt.label}
+                  onClick={async () => {
+                    const updatedInvoices = (currProject.invoices || []).map(x =>
+                      x.invoiceNo === inv.invoiceNo ? { ...x, status: opt.label } : x
+                    );
+                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
+                    setShowStatusDropdown(false);
+                    setPreviewInvoice(prev => ({ ...prev, status: opt.label }));
+                    loadLatest();
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', cursor: 'pointer', background: st === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }}
+                  onMouseEnter={e => e.currentTarget.style.background = opt.bg}
+                  onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}
+                >
+                  <span>{opt.icon}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
+                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓</span>}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      );
+    })()}
+  </div>
+  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>Urban Cafe Billing Software</div>
+</div>
+
             </div>
           </div>
         );
       })()}
+          
+          
       {/* Upload File Modal */}
       {showUploadModal && (
         <div style={{ position:'fixed', inset:0, zIndex:99998, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>

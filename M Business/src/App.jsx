@@ -127,8 +127,8 @@ const getRootPage = () => {
         <Route path="/project-proposal" element={<ProjectProposalCreator />} />
         <Route path="/interview-apply/:companySlug" element={<InterviewApplyForm />} />
         <Route path="/employee-onboarding" element={<EmployeeOnboarding />} />
-        <Route path="/modern-projects"   element={<ModernProjectsPage />} />
-        <Route path="/modern-projects/:projectId" element={<ModernProjectsPage />} />
+        <Route path="/modern-projects"   element={user ? <ModernProjectsPage user={user} /> : <Navigate to="/" replace />} />
+        <Route path="/modern-projects/:projectId" element={user ? <ModernProjectsPage user={user} /> : <Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

@@ -1,7 +1,10 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 import ModernProjectDetails from './ModernProjectDetails';
 import InvoiceCreator from './InvoiceCreator';
 import { BASE_URL } from '../config';
+import './ModernProjectsPage.css';
 // ─── Avatar helpers ────────────────────────────────────────────
 const AV_COLORS = ['#00BCD4','#8B5CF6','#F59E0B','#26C281','#EC4899','#3B82F6','#EF4444','#10B981'];
 function avColor(name, i = 0) {
@@ -482,7 +485,7 @@ const [pRes, tRes, cRes] = await Promise.all([
                   <div
                     key={p._id}
                     className={`m-project-card c-${cardColor}`}
-                    onClick={() => { localStorage.setItem('activeTab_subadmin', 'projects'); window.location.href = '/'; }}
+   onClick={() => { setSelectedProject(p); navigate(`/modern-projects/${p._id}`); }}
                     style={{cursor:'pointer', position:'relative'}}
                   >
                     {/* Card actions */}

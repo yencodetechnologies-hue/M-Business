@@ -44,16 +44,20 @@ const projectSchema = new mongoose.Schema({
     }],
     default: []
   },
-  files: {
+   files: {
     type: [{
       name: { type: String, required: true },
       url: { type: String, required: true },
       size: { type: Number, default: 0 },
       type: { type: String, default: "" },
-      uploadedAt: { type: Date, default: Date.now }
+      description: { type: String, default: "" },
+      uploadedAt: { type: Date, default: Date.now },
+      sentToClient: { type: String, default: null },
+      sentToEmployee: { type: String, default: null }
     }],
     default: []
   },
+
   invoices: {
     type: [{
       invoiceNo: { type: String, required: true },

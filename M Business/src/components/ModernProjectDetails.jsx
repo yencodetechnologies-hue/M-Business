@@ -834,7 +834,7 @@ const handleModalUpload = async () => {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     const uploadedUrl = res.data.url;
-    const newFileObj = {
+const newFileObj = {
       name: uploadHeading || uploadFileObj.name,
       description: uploadDescription,
       url: uploadedUrl,
@@ -859,8 +859,9 @@ const handleModalUpload = async () => {
     loadLatest();
     if (onUpdate) onUpdate();
   } catch (err) {
-    alert("Failed to upload file.");
-  } finally {
+  console.error("Upload error:", err.response?.data || err.message || err);
+  alert("Failed to upload file: " + (err.response?.data?.msg || err.message || "Unknown error"));
+} finally {
     setUploadingModal(false);
   }
 };

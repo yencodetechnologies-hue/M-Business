@@ -3291,7 +3291,12 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "M Business";
   const [dashSearch, setDashSearch] = useState("");
   const [dashTasksProj, setDashTasksProj] = useState(null);
-  const [active, setActive] = useState(() => localStorage.getItem("activeTab_subadmin") || "dashboard");
+  const [active, setActive] = useState(() => {
+    const saved = localStorage.getItem("activeTab_subadmin") || "dashboard";
+    // Refresh பண்ணும்போது projects/project-details-ல இருந்தா dashboard-க்கு போ
+    if (["project-details", "create-project", "edit-project"].includes(saved)) return "projects";
+    return saved;
+  });
   useEffect(() => { localStorage.setItem("activeTab_subadmin", active); }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
   const [fromEditProject, setFromEditProject] = useState(false);

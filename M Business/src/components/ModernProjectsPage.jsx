@@ -330,7 +330,7 @@ const [pRes, tRes, cRes] = await Promise.all([
           <div className="m-content">
             <ModernProjectDetails
               project={toDetailShape(selectedProject)}
-              onBack={() => { setSelectedProject(null); navigate('/modern-projects'); }}
+onBack={() => { setSelectedProject(null); }}
               tasks={tasksForProject(selectedProject)}
               onUpdate={fetchAll}
               fetchProjects={fetchAll}
@@ -485,7 +485,7 @@ const [pRes, tRes, cRes] = await Promise.all([
                   <div
                     key={p._id}
                     className={`m-project-card c-${cardColor}`}
-   onClick={() => { setSelectedProject(p); navigate(`/modern-projects/${p._id}`); }}
+onClick={() => { setSelectedProject(p); }}
                     style={{cursor:'pointer', position:'relative'}}
                   >
                     {/* Card actions */}

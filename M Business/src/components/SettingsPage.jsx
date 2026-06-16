@@ -191,6 +191,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
   const [invState, setInvState] = useState({
     invNum: `INV-${new Date().getFullYear()}-${Math.floor(Math.random()*9000)+1000}`,
     invDate: new Date().toISOString().split('T')[0],
+    dueDateType: '15',
     dueDate: '',
     category: 'Consulting',
     client: '',
@@ -550,7 +551,21 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                     <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
                       <div className="form-group"><label className="form-label">Invoice Number</label><input className="form-input" value={invState.invNum} onChange={e=>setInvState(s=>({...s,invNum:e.target.value}))} /></div>
                       <div className="form-group"><label className="form-label">Invoice Date</label><input type="date" className="form-input" value={invState.invDate} onChange={e=>setInvState(s=>({...s,invDate:e.target.value}))} /></div>
-                      <div className="form-group"><label className="form-label">Due Date</label><input type="date" className="form-input" value={invState.dueDate} onChange={e=>setInvState(s=>({...s,dueDate:e.target.value}))} /></div>
+                      <div className="form-group">
+                        <label className="form-label">Payment Due</label>
+                        <div style={{display:'flex',gap:10}}>
+                          <select className="form-input" value={invState.dueDateType} onChange={e=>setInvState(s=>({...s,dueDateType:e.target.value}))} style={{flex:1}}>
+                            <option value="0">Due on receipt</option>
+                            <option value="15">Next 15 days</option>
+                            <option value="30">Next 30 days</option>
+                            <option value="45">Next 45 days</option>
+                            <option value="custom">Custom date</option>
+                          </select>
+                          {invState.dueDateType === 'custom' && (
+                            <input type="date" className="form-input" value={invState.dueDate} onChange={e=>setInvState(s=>({...s,dueDate:e.target.value}))} style={{flex:1}} />
+                          )}
+                        </div>
+                      </div>
                       <div className="form-group"><label className="form-label">Category</label><select className="form-input" value={invState.category} onChange={e=>setInvState(s=>({...s,category:e.target.value}))}><option>Consulting</option><option>Development</option><option>Design</option></select></div>
                     </div>
                   </div>

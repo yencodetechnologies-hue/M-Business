@@ -634,6 +634,7 @@ function ProjectFormModal({ form, setForm, onSave, onClose, saving, isEdit }) {
         </div>
         <form onSubmit={onSave} style={{padding:'20px 24px'}}>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:14}}>
+            
             <div style={{gridColumn:'1/-1'}}>
               <label style={LBL}>Project Name *</label>
               <input style={INP} required value={form.name} onChange={e => f('name', e.target.value)} placeholder="e.g. M Business v2" />

@@ -484,7 +484,7 @@ export default function SettingsPage({ user, appTheme, setAppTheme, themes, cust
                   <div style={{padding:'14px 18px',borderBottom:'1px solid #F1F5F9',display:'flex',alignItems:'center',gap:10}}>
                     <div style={{width:32,height:32,borderRadius:8,background:'#E0F7FA',display:'flex',alignItems:'center',justifyContent:'center'}}><i className="ti ti-layout-navbar" style={{color:'#00BCD4'}}></i></div>
                     <div><div style={{fontSize:14,fontWeight:700}}>Document header</div><div style={{fontSize:11,color:'#6b7a8d'}}>Top section of every document sent to clients</div></div>
-                    <span style={{marginLeft:'auto',display:'inline-flex',alignItems:'center',gap:4,fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:20,background:'#E0F7FA',color:'#0097A7'}}><i className="ti ti-lock" style={{fontSize:9}}></i> Auto-applied to all types</span>
+
                   </div>
                   <div style={{padding:20}}>
                     {/* Logo upload */}

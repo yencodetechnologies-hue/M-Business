@@ -972,75 +972,21 @@ const newFileObj = {
         </div>
       </div>
 
-      {/* ALL PROJECT FIELDS - ACCORDION */}
-      <div className="mpd-card" style={{padding:0, overflow:'hidden'}}>
-        <div 
-          onClick={() => setInfoExpanded(!infoExpanded)}
-          style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 24px', cursor:'pointer', userSelect:'none', background: infoExpanded ? '#F8FCFF' : '#fff', transition:'background .15s'}}
-        >
-          <div style={{display:'flex', alignItems:'center', gap:10}}>
-            <div style={{width:34,height:34,borderRadius:10,background:P.primaryLight,display:'flex',alignItems:'center',justifyContent:'center'}}>
-              <i className="ti ti-info-circle" style={{color:P.primary,fontSize:17}}></i>
-            </div>
-            <div>
-              <div style={{fontSize:14,fontWeight:800,color:P.textDark}}>Project Information</div>
-              <div style={{fontSize:11,color:P.textLight,fontWeight:600}}>{clientName} · {category} · {currProject.status||'Active'}</div>
-            </div>
-          </div>
-          <div style={{display:'flex',alignItems:'center',gap:14}}>
-            <div style={{display:'flex',gap:8}}>
-              {[{label:priority.charAt(0).toUpperCase()+priority.slice(1), bg:'#FEF3C7', color:'#92400E', icon:'ti-flame'},{label: currProject.status||'Active', bg:'#D1FAE5', color:'#065F46', icon:'ti-circle-check'}].map(b=>(
-                <span key={b.label} style={{padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:800,background:b.bg,color:b.color,display:'flex',alignItems:'center',gap:4}}>
-                  <i className={`ti ${b.icon}`} style={{fontSize:10}}></i>{b.label}
-                </span>
-              ))}
-            </div>
-            <i className={`ti ti-chevron-${infoExpanded?'up':'down'}`} style={{fontSize:18,color:P.textLight,transition:'transform .2s'}}></i>
-          </div>
+    {/* PROGRESS */}
+      <div className="mpd-prog-card">
+        <div className="mpd-prog-item">
+          <div className="mpd-prog-num">{progressPct}%</div>
+          <div className="mpd-prog-lbl">Overall</div>
+          <div className="mpd-progress-bg"><div className="mpd-progress-fill" style={{width:`${progressPct}%`}}></div></div>
+          <div className="mpd-prog-sub">{doneMilestones} of {totalMilestones} milestones</div>
         </div>
-
-        {infoExpanded && (
-          <div style={{borderTop:`1px solid ${P.border}`,padding:'20px 24px',animation:'fadeSlideIn .18s ease'}}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '18px 24px' }}>
-              <DetailField label="Client" value={clientName} />
-              <DetailField 
-  label="Contact Person" 
-  value={
-    currProject.contactPersonName || 
-    clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonName || 
-    '—'
-  } 
-/>
-<DetailField 
-  label="Contact Person No" 
-  value={
-    currProject.contactPersonNo || 
-    clients?.find(c => (c.clientName || c.name) === clientName)?.contactPersonNo || 
-    '—'
-  } 
-/>
-              <DetailField label="Category" value={category} />
-              <DetailField label="Status" value={currProject.status || 'Active'} />
-              <DetailField label="Priority" value={priority.charAt(0).toUpperCase() + priority.slice(1)} />
-              <DetailField label="Start Date" value={fmtDetailDate(currProject.start)} />
-              <DetailField label="Deadline" value={fmtDetailDate(currProject.end || currProject.deadline)} />
-              <DetailField label="Progress" value={`${currProject.progress ?? progressPct}%`} />
-              <DetailField label="Milestones" value={milestoneCount ? `${milestoneCount} defined` : 'None'} />
-
-              {budgetAmt > 0 && (
-                <>
-                  <DetailField label="Total Budget" value={`${currency}${budgetAmt.toLocaleString()}`} />
-                  <DetailField label="Billed" value={`${currency}${billed.toLocaleString()}`} />
-                  <DetailField label="Received" value={`${currency}${received.toLocaleString()}`} />
-                  <DetailField label="Pending" value={`${currency}${pending.toLocaleString()}`} />
-                  <DetailField label="Spent" value={`${currency}${spent.toLocaleString()}`} />
-                  <DetailField label="Remaining" value={`${currency}${remaining.toLocaleString()}`} />
-                </>
-              )}
-            
-            </div>
-          </div>
-        )}
+        <div className="mpd-prog-divider"></div>
+        <div className="mpd-prog-item">
+          <div className="mpd-prog-num">{budgetUsedPct}%</div>
+          <div className="mpd-prog-lbl">Budget Used</div>
+          <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{width:`${budgetUsedPct}%`}}></div></div>
+          <div className="mpd-prog-sub">{currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}</div>
+        </div>
       </div>
 
       {/* KPIs */}
@@ -1060,22 +1006,7 @@ const newFileObj = {
         </div>
       </div>
 
-      {/* PROGRESS */}
-      <div className="mpd-prog-card">
-        <div className="mpd-prog-item">
-          <div className="mpd-prog-num">{progressPct}%</div>
-          <div className="mpd-prog-lbl">Overall</div>
-          <div className="mpd-progress-bg"><div className="mpd-progress-fill" style={{width:`${progressPct}%`}}></div></div>
-          <div className="mpd-prog-sub">{doneMilestones} of {totalMilestones} milestones</div>
-        </div>
-        <div className="mpd-prog-divider"></div>
-        <div className="mpd-prog-item">
-          <div className="mpd-prog-num">{budgetUsedPct}%</div>
-          <div className="mpd-prog-lbl">Budget Used</div>
-          <div className="mpd-progress-bg"><div className="mpd-progress-fill mpd-purple" style={{width:`${budgetUsedPct}%`}}></div></div>
-          <div className="mpd-prog-sub">{currency}{spent.toLocaleString()} of {currency}{budgetAmt.toLocaleString()}</div>
-        </div>
-      </div>
+    
 {/* MILESTONES STANDALONE CARD */}
 <div className="mpd-card">
   <div className="mpd-card-header">

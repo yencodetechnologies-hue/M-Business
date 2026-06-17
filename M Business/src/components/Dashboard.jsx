@@ -619,23 +619,6 @@ function EmployeesPage({ employees, setEmployees }) {
     setEditEmp(e);
   };
 
-  const saveEdit = async () => {
-    const errs = {};
-    if (!editForm.name.trim()) errs.name = "Name required";
-    if (!editForm.email.trim()) errs.email = "Email required";
-    if (Object.keys(errs).length) { setEditErr(errs); return; }
-    try {
-      setSaving(true);
-      const res = await axios.put(`${BASE_URL}/api/employees/${editEmp._id}`, editForm);
-      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...(res.data || editForm) } : e));
-      setEditEmp(null);
-      showToast("✅ Employee updated!");
-    } catch {
-      setEmployees(prev => prev.map(e => e._id === editEmp._id ? { ...e, ...editForm } : e));
-      setEditEmp(null);
-      showToast("✅ Updated locally!");
-    } finally { setSaving(false); }
-  };
 
   const doDelete = async () => {
     try {
@@ -1731,6 +1714,8 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
+  const [viewClientModal, setViewClientModal] = useState(false);
+  const [docUploading, setDocUploading] = useState(false);
   const [clientSuccessData, setClientSuccessData] = useState(null);
 
   const [employees, setEmployees] = useState([]);

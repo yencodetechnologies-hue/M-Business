@@ -481,8 +481,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
   const [statusDropOpen, setStatusDropOpen] = useState(false);
-  const [viewClientModal, setViewClientModal] = useState(false);
+
   const [showClientPass, setShowClientPass] = useState(false);
+  const [viewClientModal, setViewClientModal] = useState(false);
+  const [docUploading, setDocUploading] = useState(false);
   const statusDropRef = useRef(null);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
@@ -626,7 +628,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-          <div style={{ fontSize: 12, fontWeight: 800, color: "#1A2E35" }}>{revenue ? "₹" + Number(revenue).toLocaleString("en-IN") : "—"}</div>
+
           <div style={{ width: 8, height: 8, borderRadius: "50%", background: st.dot }} />
         </div>
       </div>
@@ -773,29 +775,104 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     </div>
   );
 
-  const renderDocuments = () => {
-    const docs = activeClient?.documents || activeClient?.docs || [];
-    return (
-      <div>
-        {docs.length === 0 ? (
-          <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE", fontSize: 12 }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
-            No documents uploaded yet
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10 }}>
-            {docs.map((d, i) => (
-              <div key={i} style={{ padding: 12, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, cursor: "pointer", transition: "all .15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.boxShadow = "0 3px 10px rgba(0,188,212,.1)"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.boxShadow = "none"; }}>
-                <div style={{ fontSize: 22, marginBottom: 8 }}>📄</div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#1A2E35", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.name || d.fileName || "Document"}</div>
-                <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{d.size || d.type || "—"}</div>
-              </div>
-            ))}
-          </div>
-        )}
+const renderDocuments = () => {
+  const docs = activeClient?.documents || activeClient?.docs || [];
+
+ const handleUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  setDocUploading(true);
+  try {
+    // Convert file to base64
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result;
+      const newDoc = {
+        name: file.name,
+        fileName: file.name,
+        type: file.type,
+        size: (file.size / 1024).toFixed(1) + " KB",
+        url: base64,
+        uploadedAt: new Date().toISOString()
+      };
+
+      const existingDocs = activeClient?.documents || [];
+      const updatedDocs = [...existingDocs, newDoc];
+
+      // Use existing PUT endpoint
+      try {
+        await axios.put(
+          `${BASE_URL}/api/clients/${activeClient._id}`, 
+          { documents: updatedDocs }
+        );
+      } catch (err) {
+        console.log("API save failed, saving locally");
+      }
+
+      // Update local state
+      setClients(prev => prev.map(c =>
+        c._id === activeClient._id
+          ? { ...c, documents: updatedDocs }
+          : c
+      ));
+
+      showToast("✅ Document uploaded!");
+      setDocUploading(false);
+    };
+    reader.onerror = () => {
+      showToast("❌ Failed to read file!");
+      setDocUploading(false);
+    };
+    reader.readAsDataURL(file);
+  } catch (err) {
+    showToast("❌ Upload failed!");
+    setDocUploading(false);
+  }
+};
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+        <label style={{ 
+          background: "#00BCD4", border: "none", borderRadius: 8, 
+          padding: "7px 14px", fontSize: 12, color: "#fff", cursor: "pointer", 
+          fontWeight: 700, display: "flex", alignItems: "center", gap: 5 
+        }}>
+          <i className="ti ti-upload" style={{ fontSize: 13 }} />
+          {docUploading ? "Uploading..." : "Upload Document"}
+          <input 
+            type="file" 
+            style={{ display: "none" }} 
+            onChange={handleUpload} 
+            disabled={docUploading} 
+          />
+        </label>
       </div>
-    );
-  };
+      {docs.length === 0 ? (
+        <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE", fontSize: 12 }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
+          No documents uploaded yet
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10 }}>
+          {docs.map((d, i) => (
+            <div key={i} style={{ 
+              padding: 12, background: "#F5FAFA", 
+              border: "1.5px solid #E0EEF0", borderRadius: 10, cursor: "pointer" 
+            }}>
+              <div style={{ fontSize: 22, marginBottom: 8 }}>📄</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#1A2E35" }}>
+                {d.name || d.fileName || "Document"}
+              </div>
+              <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>
+                {d.size || d.type || "—"}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
   const renderActivity = () => {
     const activity = [
@@ -938,7 +1015,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                     )}
                   </div>
                   <button 
-  onClick={() => window.open(`/client-portal/${activeClient._id}`, '_blank')} 
+  onClick={() => setViewClientModal(true)} 
   style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }} 
   onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }} 
   onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}
@@ -1124,6 +1201,60 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       )}
 
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
+        {viewClientModal && activeClient && (
+        <Mdl title="Client Details" onClose={() => setViewClientModal(false)} maxWidth={600}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+              {activeClient.logoUrl ? (
+                <img src={activeClient.logoUrl} alt="logo" style={{ width: 80, height: 80, borderRadius: 16, objectFit: "contain", background: "#fff", border: "2px solid #E0EEF0" }} />
+              ) : (
+                <div style={{ width: 80, height: 80, borderRadius: 16, background: `linear-gradient(135deg,${getAvatarColor(activeClient)},${getAvatarColor(activeClient)}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#fff" }}>
+                  {getAvatar(activeClient)}
+                </div>
+              )}
+            </div>
+            {[
+              { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "—" },
+              { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "—" },
+              { icon: "ti-mail", label: "Email", val: activeClient.email || "—" },
+              { icon: "ti-phone", label: "Phone", val: activeClient.phone || "—" },
+              { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "—" },
+              { icon: "ti-phone-call", label: "Contact No", val: activeClient.contactPersonNo || "—" },
+              { icon: "ti-tag", label: "Category", val: activeClient.category || "—" },
+              { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "—" },
+              { icon: "ti-map-pin", label: "Address", val: activeClient.address || "—" },
+              { icon: "ti-map", label: "City", val: activeClient.city || "—" },
+              { icon: "ti-map-2", label: "State", val: activeClient.state || "—" },
+              { icon: "ti-hash", label: "Pincode", val: activeClient.pincode || "—" },
+              { icon: "ti-world", label: "Country", val: activeClient.country || "—" },
+              { icon: "ti-globe", label: "Website", val: activeClient.website || "—" },
+              { icon: "ti-brand-linkedin", label: "LinkedIn", val: activeClient.linkedin || "—" },
+              { icon: "ti-coin", label: "Billing Currency", val: activeClient.billingCurrency || "—" },
+              { icon: "ti-credit-card", label: "Payment Terms", val: activeClient.paymentTerms || "—" },
+              { icon: "ti-wallet", label: "Credit Limit", val: activeClient.creditLimit || "—" },
+              { icon: "ti-cash", label: "Preferred Payment", val: activeClient.preferredPaymentMode || "—" },
+              { icon: "ti-source", label: "Client Source", val: activeClient.source || "—" },
+              { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active" },
+              { icon: "ti-calendar", label: "Joined", val: activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
+              { icon: "ti-notes", label: "Notes", val: activeClient.notes || "—" },
+            ].filter(row => row.val && row.val !== "—").map((row, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: "#F5FAFA", borderRadius: 9, border: "1px solid #E0EEF0" }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#00BCD4", flexShrink: 0 }}>
+                  <i className={`ti ${row.icon}`} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", marginTop: 1, wordBreak: "break-word" }}>{row.val}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 16 }}>
+            <button onClick={() => { setViewClientModal(false); openEdit(activeClient); }} style={{ padding: "9px 18px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+            <button onClick={() => setViewClientModal(false)} style={{ padding: "9px 18px", background: "#F5FAFA", border: "1px solid #E0EEF0", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+          </div>
+        </Mdl>
+      )}
     </div>
   );
 }
@@ -1688,64 +1819,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
       showToast("✅ Subadmin updated locally!");
     } finally { setSaving(false); }
   };
- {viewClientModal && activeClient && (
-  <Mdl title="Client Details" onClose={() => setViewClientModal(false)} maxWidth={600}>
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      {/* Logo/Avatar */}
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
-        {activeClient.logoUrl ? (
-          <img src={activeClient.logoUrl} alt="logo" style={{ width: 80, height: 80, borderRadius: 16, objectFit: "contain", background: "#fff", border: "2px solid #E0EEF0" }} />
-        ) : (
-          <div style={{ width: 80, height: 80, borderRadius: 16, background: `linear-gradient(135deg,${getAvatarColor(activeClient)},${getAvatarColor(activeClient)}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#fff" }}>
-            {getAvatar(activeClient)}
-          </div>
-        )}
-      </div>
-      
-      {/* All Details */}
-      {[
-        { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "—" },
-        { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "—" },
-        { icon: "ti-mail", label: "Email", val: activeClient.email || "—" },
-        { icon: "ti-phone", label: "Phone", val: activeClient.phone || "—" },
-        { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "—" },
-        { icon: "ti-phone-call", label: "Contact No", val: activeClient.contactPersonNo || "—" },
-        { icon: "ti-tag", label: "Category / Industry", val: activeClient.category || "—" },
-        { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "—" },
-        { icon: "ti-map-pin", label: "Address", val: activeClient.address || "—" },
-        { icon: "ti-map", label: "City", val: activeClient.city || "—" },
-        { icon: "ti-map-2", label: "State", val: activeClient.state || "—" },
-        { icon: "ti-hash", label: "Pincode", val: activeClient.pincode || "—" },
-        { icon: "ti-world", label: "Country", val: activeClient.country || "—" },
-        { icon: "ti-globe", label: "Website", val: activeClient.website || "—" },
-        { icon: "ti-brand-linkedin", label: "LinkedIn", val: activeClient.linkedin || "—" },
-        { icon: "ti-coin", label: "Billing Currency", val: activeClient.billingCurrency || "—" },
-        { icon: "ti-credit-card", label: "Payment Terms", val: activeClient.paymentTerms || "—" },
-        { icon: "ti-wallet", label: "Credit Limit", val: activeClient.creditLimit || "—" },
-        { icon: "ti-cash", label: "Preferred Payment", val: activeClient.preferredPaymentMode || "—" },
-        { icon: "ti-source", label: "Client Source", val: activeClient.source || "—" },
-        { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active" },
-        { icon: "ti-calendar", label: "Joined", val: activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
-        { icon: "ti-calendar-plus", label: "Onboarded On", val: activeClient.onboardedOn ? new Date(activeClient.onboardedOn).toLocaleDateString("en-IN") : "—" },
-        { icon: "ti-notes", label: "Notes", val: activeClient.notes || "—" },
-      ].filter(row => row.val && row.val !== "—").map((row, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: "#F5FAFA", borderRadius: 9, border: "1px solid #E0EEF0" }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#00BCD4", flexShrink: 0 }}>
-            <i className={`ti ${row.icon}`} />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", marginTop: 1, wordBreak: "break-word" }}>{row.val}</div>
-          </div>
-        </div>
-      ))}
-    </div>
-    <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 16 }}>
-      <button onClick={() => { setViewClientModal(false); openEdit(activeClient); }} style={{ padding: "9px 18px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
-      <button onClick={() => setViewClientModal(false)} style={{ padding: "9px 18px", background: "#F5FAFA", border: "1px solid #E0EEF0", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
-    </div>
-  </Mdl>
-)}
+
 
   const doDelete = async () => {
     try {
@@ -2065,28 +2139,6 @@ const openEdit = (p) => {
   }
 };
 
-const saveEdit = async () => {
-  const errs = {};
-  if (!editForm.name.trim()) errs.name = "Name required";
-  if (!editForm.client.trim()) errs.client = "Company name required";
-  if (Object.keys(errs).length) { setEditErr(errs); return; }
-  try {
-    setSaving(true);
-    const payload = {
-      ...editForm,
-      deadline: editForm.end || editForm.start || "",
-    };
-    const res = await axios.put(`${BASE_URL}/api/projects/${editProj._id}`, payload);
-    setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...(res.data.project || payload) } : p));
-    setEditProj(null);
-    showToast("✅ Project updated!");
-  } catch {
-    setProjects(prev => prev.map(p => p._id === editProj._id ? { ...p, ...editForm } : p));
-    setEditProj(null);
-    showToast("✅ Updated locally!");
-  } finally { setSaving(false); }
-};
-
   const doDelete = async () => {
     try { await axios.delete(`${BASE_URL}/api/projects/${deleteTarget._id}`); } catch { }
     setProjects(prev => prev.filter(p => p._id !== deleteTarget._id));
@@ -2136,7 +2188,25 @@ const saveEdit = async () => {
     <i className="ti ti-plus"></i> New Invoice
   </button>
 </div>
-<ModernProjectsView projects={projectsWithProgress} searchQuery={search} onViewTasks={(p) => onViewTasks && onViewTasks(p)} onEdit={(p) => { setJumpProject(p); setActive("project-details"); }} onDelete={(p) => setDeleteTarget(p)} onNewInvoice={(p) => { setJumpProject(p); setActive("project-details"); }} />
+<ModernProjectsView 
+  projects={projectsWithProgress} 
+  searchQuery={search} 
+  onViewTasks={(p) => { 
+    if (!p || !p._id) return; 
+    onViewTasks && onViewTasks(p); 
+  }} 
+  onEdit={(p) => { 
+    if (!p || !p._id) return;
+    setJumpProject(p); 
+    setActive("edit-project"); 
+  }} 
+  onDelete={(p) => setDeleteTarget(p)} 
+  onNewInvoice={(p) => { 
+    if (!p) return;
+    setJumpProject(p); 
+    setActive("project-details"); 
+  }} 
+/>
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>
@@ -3334,7 +3404,7 @@ function VendorsPage({ vendors, setVendors }) {
   const [editErr, setEditErr] = useState({});
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
-const [viewClientModal, setViewClientModal] = useState(false);
+
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
   const filtered = vendors.filter(v =>
@@ -3679,6 +3749,8 @@ const [invoicePrefill, setInvoicePrefill] = useState(null);
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
+  const [viewClientModal, setViewClientModal] = useState(false);
+  const [docUploading, setDocUploading] = useState(false);
   const [clientSuccessData, setClientSuccessData] = useState(null);
 
   const [uploadFileTarget, setUploadFileTarget] = useState(null);
@@ -4120,15 +4192,11 @@ const mainScrollRef = useRef(null);
 
   // Re-fetch packages when navigating to Packages tab to show admin-added packages
   // Also refresh subscription when visiting resource tabs to ensure latest limits
-  useEffect(() => {
-    if (active === "packages") {
-      fetchPackages();
-    }
-    if (["dashboard", "clients", "employees", "managers", "mysubscriptions"].includes(active)) {
-      fetchSubscription();
-    }
-  }, [active]);
-
+useEffect(() => {
+  if (active === "packages") {
+    fetchPackages();
+  }
+}, [active]);
   // Package view/edit handlers
   const handleViewPackage = (pkg) => {
     setViewPackage(pkg);
@@ -5291,7 +5359,7 @@ active={
                                   {projects.filter(p => p.status === "Active" || p.status === "Pending").slice(0, 5).map((p, idx) => {
                                     const colors = ["#00BCD4", "#7c3aed", "#2563eb", "#16a34a", "#dc2626"];
                                     const bColor = colors[idx % colors.length];
-                                    const progress = p.progress || Math.floor(Math.random() * 60) + 20;
+const progress = p.progress || 25;
                                     const barColor = progress > 70 ? "#16a34a" : progress > 40 ? "#f59e0b" : "#dc2626";
                                     const badgeText = "IN PROGRESS";
                                     const badgeColor = "#00BCD4";
@@ -5589,16 +5657,39 @@ active={
 
                 {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-{validActive === "projects" && <ProjectsPage 
-  onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} jumpProject={jumpProject} setJumpProject={setJumpProject} config={config} onViewTasks={(proj) => { setJumpProject(proj); setActive("project-details"); }} user={user} fetchTasks={fetchTasks} onCreateProject={() =>{setSidebarOverride("clients");  setActive("create-project")}} // ProjectsPage-ல் இது இருக்கணும்
-onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} setActive={setActive} setInvoicePrefill={setInvoicePrefill} setJumpInvoice={setJumpInvoice} onAddEmployee={() => {
-                  const limit = getSubscriptionLimit("employee");
-                  if (subscription && employees.length >= limit) {
-                    setLimitModal({ type: "employee", limit });
-                    return;
-                  }
-                  setReturnToModal(null); setModal("employee");
-                }} />}
+{validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
+                {validActive === "projects" && <ProjectsPage 
+                  onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} 
+                  projects={projects} 
+                  tasks={tasks} 
+                  setProjects={setProjects} 
+                  clients={clients} 
+                  employees={employees} 
+                  jumpProject={jumpProject} 
+                  setJumpProject={setJumpProject} 
+                  config={config} 
+                  onViewTasks={(proj) => { 
+                    if (!proj) return;
+                    setJumpProject(proj); 
+                    setActive("project-details"); 
+                  }} 
+                  user={user} 
+                  fetchTasks={fetchTasks} 
+                  onCreateProject={() => { setSidebarOverride("clients"); setActive("create-project"); }} 
+                  onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} 
+                  setActive={setActive} 
+                  setInvoicePrefill={setInvoicePrefill} 
+                  setJumpInvoice={setJumpInvoice} 
+                  onAddEmployee={() => {
+                    const limit = getSubscriptionLimit("employee");
+                    if (subscription && employees.length >= limit) {
+                      setLimitModal({ type: "employee", limit });
+                      return;
+                    }
+                    setReturnToModal(null); setModal("employee");
+                  }} 
+                />}
+
                 {validActive === "subadmins" && <SubadminsPage subadmins={subadmins} setSubadmins={setSubadmins} employees={employees} managers={managers} quotations={quotations} />}
 
                 {validActive === "invoices" && <InvoiceCreator user={user} clients={clients} projects={projects} companyLogo={companyLogo} companyName={companyNameStr} onLogoChange={onLogoChange} onBack={() => setActive("dashboard")} jumpInvoice={jumpInvoice} newInvoicePrefill={invoicePrefill} onAddClient={() => {

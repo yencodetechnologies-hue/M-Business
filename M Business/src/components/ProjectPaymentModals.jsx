@@ -169,6 +169,7 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
             <button style={closeBtnStyle} onClick={closeModals}>✕</button>
           </div>
           <form onSubmit={e => handleSave(e, 'invoice')}>
+       
             <div style={rowStyle}>
               <div><label style={labelStyle}>Invoice #</label><input required style={inputStyle} value={form.invoiceNo || ''} onChange={e => handleInputChange('invoiceNo', e.target.value)} placeholder="INV-005" /></div>
               <div><label style={labelStyle}>Project</label><select style={inputStyle} disabled><option>{project.name}</option></select></div>

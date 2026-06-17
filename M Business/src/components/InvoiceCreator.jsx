@@ -567,7 +567,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   const dueDefault = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
 
   const blank = {
-    invoiceNo: generateInvoiceNo(), orderNo: "", date: "2026-06-01", dueDate: "2026-06-15",
+    invoiceNo: generateInvoiceNo(), orderNo: "", date: "2026-06-01", dueDate: "2026-06-15",dueDateType: "30",
     client: "", project: "", gstRate: 18, notes: "Thank you for your business! Please make payment within the due date.\nFor queries contact: yencodetechnologies@gmail.com",
     terms: "1. Payment is due within the agreed terms.\n2. Late payments are subject to 2% monthly interest.\n3. All disputes subject to Chennai jurisdiction.",
     companyName: "YENCODE Technologies", companyEmail: "yencodetechnologies@gmail.com",
@@ -2039,21 +2039,10 @@ const [items, setItems] = useState([
               <div className="inv-creator-form-row">
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Due Date</label>
-                  <input className="inv-creator-form-input" type="date" value={inv.dueDate} onChange={(e) => upd("dueDate", e.target.value)} />
-                </div>
-                <div className="inv-creator-form-group">
-                  <label className="inv-creator-form-label">Category</label>
-                  <select className="inv-creator-form-select" value={inv.category || "Consulting"} onChange={(e) => upd("category", e.target.value)}>
-                    <option value="Advance Payment">Advance Payment</option>
-                    <option value="Milestone">Milestone</option>
-                    <option value="Final Invoice">Final Invoice</option>
-                    <option value="Monthly Retainer">Monthly Retainer</option>
-                    <option value="Consulting">Consulting</option>
-                  </select>
-                </div>
-                {/* Line 2234 - existing label கு கீழே, terms grid-க்கு பதிலா இதை போடு */}
+                                {/* Line 2234 - existing label கு கீழே, terms grid-க்கு பதிலா இதை போடு */}
 <div style={{display:'flex', gap:10}}>
-  <select className="inv-creator-form-select" value={inv.dueDateType || '0'}
+  <select className="inv-creator-form-select"
+    value={inv.dueDateType || '30'}
     onChange={e => {
       const val = e.target.value;
       upd('dueDateType', val);
@@ -2070,15 +2059,26 @@ const [items, setItems] = useState([
     <option value="45">Next 45 days</option>
     <option value="custom">Custom date</option>
   </select>
-  {(inv.dueDateType === 'custom') && (
+  {inv.dueDateType === 'custom' && (
     <input type="date" className="inv-creator-form-input"
-      value={inv.dueDate} onChange={e => upd('dueDate', e.target.value)}
+      value={inv.dueDate}
+      onChange={e => upd('dueDate', e.target.value)}
       style={{flex:1}} />
   )}
 </div>
-                
-              </div>
-              
+                </div>
+                <div className="inv-creator-form-group">
+                  <label className="inv-creator-form-label">Category</label>
+                  <select className="inv-creator-form-select" value={inv.category || "Consulting"} onChange={(e) => upd("category", e.target.value)}>
+                    <option value="Advance Payment">Advance Payment</option>
+                    <option value="Milestone">Milestone</option>
+                    <option value="Final Invoice">Final Invoice</option>
+                    <option value="Monthly Retainer">Monthly Retainer</option>
+                    <option value="Consulting">Consulting</option>
+                  </select>
+                </div>
+  
+              </div>            
             </div>
           </div>
 
@@ -2258,27 +2258,7 @@ const [items, setItems] = useState([
               <div className="inv-creator-card-title">Payment Terms & Bank Details</div>
             </div>
             <div className="inv-creator-card-body">
-              <label className="inv-creator-form-label">Payment Due</label>
-              <div className="inv-creator-payment-terms-grid">
-                {[
-                  { label: "Immediate", days: "NOW", val: 0 },
-                  { label: "Net 7 days", days: "7", val: 7 },
-                  { label: "Net 15 days", days: "15", val: 15 },
-                  { label: "Net 30 days", days: "30", val: 30 }
-                ].map(term => {
-                  const isSel = (term.val === 0 && inv.dueDate === inv.date) || 
-                                (term.val !== 0 && new Date(new Date(inv.date).getTime() + term.val * 86400000).toISOString().split("T")[0] === inv.dueDate);
-                  return (
-                    <div key={term.label} className={`inv-creator-pt-opt ${isSel ? "selected" : ""}`} onClick={() => {
-                      const newDue = new Date(new Date(inv.date).getTime() + term.val * 86400000).toISOString().split("T")[0];
-                      upd("dueDate", newDue);
-                    }}>
-                      <div className="inv-creator-pt-opt-days">{term.days}</div>
-                      <div className="inv-creator-pt-opt-label">{term.label}</div>
-                    </div>
-                  );
-                })}
-              </div>
+            
               <div className="inv-creator-form-row">
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Payment Method</label>

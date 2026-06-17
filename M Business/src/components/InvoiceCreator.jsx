@@ -2051,7 +2051,34 @@ const [items, setItems] = useState([
                     <option value="Consulting">Consulting</option>
                   </select>
                 </div>
+                {/* Line 2234 - existing label கு கீழே, terms grid-க்கு பதிலா இதை போடு */}
+<div style={{display:'flex', gap:10}}>
+  <select className="inv-creator-form-select" value={inv.dueDateType || '0'}
+    onChange={e => {
+      const val = e.target.value;
+      upd('dueDateType', val);
+      if (val !== 'custom') {
+        const days = parseInt(val) || 0;
+        const newDue = new Date(new Date(inv.date).getTime() + days * 86400000)
+          .toISOString().split('T')[0];
+        upd('dueDate', newDue);
+      }
+    }} style={{flex:1}}>
+    <option value="0">Due on receipt</option>
+    <option value="15">Next 15 days</option>
+    <option value="30">Next 30 days</option>
+    <option value="45">Next 45 days</option>
+    <option value="custom">Custom date</option>
+  </select>
+  {(inv.dueDateType === 'custom') && (
+    <input type="date" className="inv-creator-form-input"
+      value={inv.dueDate} onChange={e => upd('dueDate', e.target.value)}
+      style={{flex:1}} />
+  )}
+</div>
+                
               </div>
+              
             </div>
           </div>
 

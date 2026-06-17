@@ -481,6 +481,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
   const [statusDropOpen, setStatusDropOpen] = useState(false);
+  const [viewClientModal, setViewClientModal] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
   const statusDropRef = useRef(null);
 
@@ -509,7 +510,36 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   }, []);
 
   const openEdit = (c) => {
-    setEditForm({ companyName: c.companyName || c.company || c.clientName || c.name || "", email: c.email || "", phone: c.phone || "", address: c.address || "", status: c.status || "Active", gstNumber: c.gstNumber || "", logoUrl: c.logoUrl || "", contactPersonName: c.contactPersonName || "", contactPersonNo: c.contactPersonNo || "", password: "", category: c.category || "" });
+    setEditForm({ 
+      clientName: c.clientName || c.name || "",
+      companyName: c.companyName || c.company || "", 
+      email: c.email || "", 
+      phone: c.phone || "", 
+      address: c.address || "", 
+      status: c.status || "Active", 
+      gstNumber: c.gstNumber || "", 
+      logoUrl: c.logoUrl || "", 
+      contactPersonName: c.contactPersonName || "", 
+      contactPersonNo: c.contactPersonNo || "", 
+      password: "", 
+      category: c.category || "",
+      clientType: c.clientType || "b2b",
+      source: c.source || "",
+      onboardedOn: c.onboardedOn || "",
+      city: c.city || "",
+      state: c.state || "",
+      pincode: c.pincode || "",
+      country: c.country || "India",
+      website: c.website || "",
+      linkedin: c.linkedin || "",
+      billingCurrency: c.billingCurrency || "INR — Indian Rupee",
+      paymentTerms: c.paymentTerms || "",
+      creditLimit: c.creditLimit || "",
+      preferredPaymentMode: c.preferredPaymentMode || "",
+      notes: c.notes || "",
+      designation: c.designation || "",
+      altEmail: c.altEmail || ""
+    });
     setEditErr({});
     setEditClient(c);
   };
@@ -615,7 +645,10 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
               <div style={{ width: 26, height: 26, borderRadius: 7, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#00BCD4" }}><i className="ti ti-user-circle" /></div>
               Contact Information
             </span>
-            <span onClick={() => openEdit(activeClient)} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>Edit</span>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+  <span onClick={() => setViewClientModal(true)} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>View</span>
+  <span onClick={() => openEdit(activeClient)} style={{ fontSize: 11, color: "#00BCD4", fontWeight: 700, cursor: "pointer" }}>Edit</span>
+</div>
           </div>
           <div style={{ padding: "14px 16px" }}>
             {[
@@ -904,11 +937,18 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                       </div>
                     )}
                   </div>
+                  <button 
+  onClick={() => window.open(`/client-portal/${activeClient._id}`, '_blank')} 
+  style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }} 
+  onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }} 
+  onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}
+>
+  <i className="ti ti-eye" style={{ fontSize: 12 }} />View
+</button>
                   <button onClick={() => openEdit(activeClient)} style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", background: "none", border: "1.5px solid #E0EEF0", borderRadius: 20, fontSize: 11, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#00BCD4"; e.currentTarget.style.color = "#00BCD4"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "#E0EEF0"; e.currentTarget.style.color = "#607D86"; }}>
                     <i className="ti ti-edit" style={{ fontSize: 12 }} />Edit
                   </button>
                 </div>
-                <div style={{ fontSize: 13, color: "#607D86", marginTop: 2, fontWeight: 600 }}>{activeClient.companyName || activeClient.company || "—"}</div>
                 <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
                   {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E0F7FA", color: "#00BCD4" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
@@ -968,30 +1008,113 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       {/* Edit Modal */}
       {editClient && (
         <Mdl title="Edit Client" onClose={() => setEditClient(null)}>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-            <div onClick={() => { const input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.onchange = (e) => triggerCrop(e, (img) => setEditForm(p => ({ ...p, logoUrl: img })), 1); input.click(); }} style={{ cursor: "pointer", padding: editForm.logoUrl ? 4 : 24, borderRadius: 20, background: "#fff", border: "2.5px dashed var(--app-border)", display: "flex", alignItems: "center", justifyContent: "center", minWidth: 100, minHeight: 100, overflow: "hidden" }}>
-              {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{ width: "auto", height: "auto", maxWidth: 240, maxHeight: 120, objectFit: "contain", display: "block", borderRadius: 12 }} /> : <div style={{ textAlign: "center" }}><div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div><div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Change Logo</div></div>}
+          {/* LOGO */}
+          <div style={{marginBottom:16,padding:'14px',background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA'}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#5A6A7A',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:10}}>Client Logo</div>
+            <div style={{display:'flex',alignItems:'center',gap:16}}>
+              <div style={{position:'relative',width:72,height:72}}>
+                <div style={{width:72,height:72,borderRadius:14,background:'#fff',border:'2px dashed #E0E6EA',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
+                  {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{width:'100%',height:'100%',objectFit:'contain'}} /> : <span style={{fontSize:30}}>🏢</span>}
+                </div>
+                <label style={{position:'absolute',bottom:0,right:0,background:'#00BCD4',width:24,height:24,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',border:'2px solid #fff'}}>
+                  <span style={{fontSize:12}}>📷</span>
+                  <input type="file" accept="image/*" style={{display:'none'}} onChange={e=>{const file=e.target.files[0];if(file){const r=new FileReader();r.onloadend=()=>setEditForm(p=>({...p,logoUrl:r.result}));r.readAsDataURL(file);}}} />
+                </label>
+              </div>
+              <div style={{fontSize:12,color:'#94A3B0'}}>PNG, JPG · Max 2MB</div>
             </div>
           </div>
-          <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-            <Fld label="Company Name *" value={editForm.companyName} onChange={v => setEditForm(p => ({ ...p, companyName: v }))} error={editErr.companyName} />
-            <Fld label="Email *" value={editForm.email} onChange={v => setEditForm(p => ({ ...p, email: v }))} type="email" error={editErr.email} />
-            <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
-            <Fld label="Contact Person No" value={editForm.contactPersonNo} onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
-            <Fld label="Category" value={editForm.category || "Web Development"} onChange={v => setEditForm(p => ({ ...p, category: v }))} options={["Web Development", "Mobile App", "UI/UX Design", "Marketing", "Consulting", "Other"]} />
 
-<Fld label="Phone Number" value={editForm.phone} onChange={v => setEditForm(p => ({ ...p, phone: v }))} />
-            <Fld label="Company Tax/GST" value={editForm.gstNumber} onChange={v => setEditForm(p => ({ ...p, gstNumber: v }))} />
-            <Fld label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={["Active", "Inactive"]} />
+          {/* CLIENT TYPE */}
+          <div style={{marginBottom:14}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#5A6A7A',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:8}}>Client Type</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
+              {[{val:'b2b',icon:'🏢',label:'B2B',sub:'Company / Business'},{val:'b2c',icon:'👤',label:'B2C',sub:'Individual'},{val:'freelancer',icon:'💼',label:'Freelancer',sub:'Consultant / Solo'}].map(t=>(
+                <div key={t.val} onClick={()=>setEditForm(p=>({...p,clientType:t.val}))}
+                  style={{border:`2px solid ${editForm.clientType===t.val?'#00BCD4':'#E0E6EA'}`,borderRadius:10,padding:'10px 8px',textAlign:'center',cursor:'pointer',background:editForm.clientType===t.val?'#E0F7FA':'#F4F6F8'}}>
+                  <div style={{fontSize:20,marginBottom:3}}>{t.icon}</div>
+                  <div style={{fontSize:12,fontWeight:700,color:editForm.clientType===t.val?'#007B8A':'#1A2332'}}>{t.label}</div>
+                  <div style={{fontSize:10,color:'#94A3B0'}}>{t.sub}</div>
+                </div>
+              ))}
+            </div>
           </div>
-          <Fld label="Company Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>PASSWORD (OPTIONAL)</label>
+
+          {/* BASIC INFO */}
+          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🏢 Basic Info</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
+              <Fld label="Client / Display Name *" value={editForm.clientName} onChange={v=>{setEditForm(p=>({...p,clientName:v}));setEditErr(p=>({...p,clientName:''}));}} error={editErr.clientName} />
+              <Fld label="Company Name" value={editForm.companyName} onChange={v=>setEditForm(p=>({...p,companyName:v}))} />
+              <Fld label="Category / Industry" value={editForm.category} onChange={v=>setEditForm(p=>({...p,category:v}))} options={['','Web Development','Mobile App Development','UI/UX Design','Digital Marketing','IT Consulting','E-commerce','Healthcare','Education','Finance','Real Estate','Manufacturing','Retail','Logistics','Media & Entertainment','Other']} />
+              <Fld label="Company Tax / GST No." value={editForm.gstNumber} onChange={v=>setEditForm(p=>({...p,gstNumber:v}))} />
+              <Fld label="Client Source" value={editForm.source} onChange={v=>setEditForm(p=>({...p,source:v}))} options={['','Referral','Website / Organic','Social Media','Cold Outreach','LinkedIn','Event / Conference','Google Ads','Word of Mouth','Other']} />
+              <Fld label="Onboarded On" value={editForm.onboardedOn} onChange={v=>setEditForm(p=>({...p,onboardedOn:v}))} type="date" />
+              <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={['Active','Inactive']} />
+            </div>
+          </div>
+
+          {/* PRIMARY CONTACT */}
+          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>📋 Primary Contact</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
+              <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v=>setEditForm(p=>({...p,contactPersonName:v}))} />
+              <Fld label="Designation" value={editForm.designation} onChange={v=>setEditForm(p=>({...p,designation:v}))} />
+              <Fld label="Email *" value={editForm.email} onChange={v=>{setEditForm(p=>({...p,email:v}));setEditErr(p=>({...p,email:''}));}} type="email" error={editErr.email} />
+              <Fld label="Alt. Email" value={editForm.altEmail} onChange={v=>setEditForm(p=>({...p,altEmail:v}))} type="email" />
+              <Fld label="Contact Person Mobile" value={editForm.contactPersonNo} onChange={v=>setEditForm(p=>({...p,contactPersonNo:v}))} />
+              <Fld label="Office Phone" value={editForm.phone} onChange={v=>setEditForm(p=>({...p,phone:v}))} />
+            </div>
+          </div>
+
+          {/* ADDRESS */}
+          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>📍 Address</div>
+            <div style={{marginBottom:12}}><Fld label="Street / Building Address" value={editForm.address} onChange={v=>setEditForm(p=>({...p,address:v}))} /></div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
+              <Fld label="City" value={editForm.city} onChange={v=>setEditForm(p=>({...p,city:v}))} />
+              <Fld label="State / Province" value={editForm.state} onChange={v=>setEditForm(p=>({...p,state:v}))} />
+              <Fld label="Pincode / ZIP" value={editForm.pincode} onChange={v=>setEditForm(p=>({...p,pincode:v}))} />
+              <Fld label="Country" value={editForm.country} onChange={v=>setEditForm(p=>({...p,country:v}))} options={['India','United States','United Kingdom','United Arab Emirates','Singapore','Australia','Canada','Germany','France','Other']} />
+            </div>
+          </div>
+
+          {/* ONLINE PRESENCE */}
+          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🌐 Online Presence</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
+              <Fld label="Website URL" value={editForm.website} onChange={v=>setEditForm(p=>({...p,website:v}))} />
+              <Fld label="LinkedIn Profile" value={editForm.linkedin} onChange={v=>setEditForm(p=>({...p,linkedin:v}))} />
+            </div>
+          </div>
+
+          {/* BILLING & TERMS */}
+          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>💳 Billing & Terms</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
+              <Fld label="Billing Currency" value={editForm.billingCurrency} onChange={v=>setEditForm(p=>({...p,billingCurrency:v}))} options={['INR — Indian Rupee','USD — US Dollar','GBP — British Pound','EUR — Euro','AED — UAE Dirham','SGD — Singapore Dollar','AUD — Australian Dollar']} />
+              <Fld label="Payment Terms" value={editForm.paymentTerms} onChange={v=>setEditForm(p=>({...p,paymentTerms:v}))} options={['','Due on receipt','Net 7','Net 15','Net 30','Net 45','Net 60','50% Advance + 50% on delivery','Custom']} />
+              <Fld label="Credit Limit" value={editForm.creditLimit} onChange={v=>setEditForm(p=>({...p,creditLimit:v}))} type="number" />
+              <Fld label="Preferred Payment Mode" value={editForm.preferredPaymentMode} onChange={v=>setEditForm(p=>({...p,preferredPaymentMode:v}))} options={['','Bank Transfer / NEFT','UPI','Cheque','Credit Card','Cash','PayPal','Stripe','Other']} />
+            </div>
+          </div>
+
+          {/* PORTAL PASSWORD */}
+          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🔒 Portal Access</div>
             <div style={{ position: "relative" }}>
-              <input type={showClientPass ? "text" : "password"} value={editForm.password} onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Update client password (optional)" />
-              <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showClientPass ? "HIDE" : "SHOW"}</button>
+               <input type={showClientPass ? "text" : "password"} value={editForm.password} onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Update client password (optional)" />
+               <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showClientPass ? "HIDE" : "SHOW"}</button>
             </div>
             {editErr.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {editErr.password}</div>}
+          </div>
+
+          {/* INTERNAL NOTES */}
+          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>📝 Internal Notes</div>
+            <textarea value={editForm.notes} onChange={e=>setEditForm(p=>({...p,notes:e.target.value}))}
+              style={{width:'100%',border:'1.5px solid #E0E6EA',borderRadius:10,padding:'10px 14px',fontSize:13,color:T.text,background:'#fff',boxSizing:'border-box',outline:'none',minHeight:70,resize:'vertical',fontFamily:'inherit'}}
+              placeholder="Any internal context, special instructions..." />
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => setEditClient(null)} style={{ flex: 1, padding: 10, background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
@@ -1565,6 +1688,64 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
       showToast("✅ Subadmin updated locally!");
     } finally { setSaving(false); }
   };
+ {viewClientModal && activeClient && (
+  <Mdl title="Client Details" onClose={() => setViewClientModal(false)} maxWidth={600}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {/* Logo/Avatar */}
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+        {activeClient.logoUrl ? (
+          <img src={activeClient.logoUrl} alt="logo" style={{ width: 80, height: 80, borderRadius: 16, objectFit: "contain", background: "#fff", border: "2px solid #E0EEF0" }} />
+        ) : (
+          <div style={{ width: 80, height: 80, borderRadius: 16, background: `linear-gradient(135deg,${getAvatarColor(activeClient)},${getAvatarColor(activeClient)}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#fff" }}>
+            {getAvatar(activeClient)}
+          </div>
+        )}
+      </div>
+      
+      {/* All Details */}
+      {[
+        { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "—" },
+        { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "—" },
+        { icon: "ti-mail", label: "Email", val: activeClient.email || "—" },
+        { icon: "ti-phone", label: "Phone", val: activeClient.phone || "—" },
+        { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "—" },
+        { icon: "ti-phone-call", label: "Contact No", val: activeClient.contactPersonNo || "—" },
+        { icon: "ti-tag", label: "Category / Industry", val: activeClient.category || "—" },
+        { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "—" },
+        { icon: "ti-map-pin", label: "Address", val: activeClient.address || "—" },
+        { icon: "ti-map", label: "City", val: activeClient.city || "—" },
+        { icon: "ti-map-2", label: "State", val: activeClient.state || "—" },
+        { icon: "ti-hash", label: "Pincode", val: activeClient.pincode || "—" },
+        { icon: "ti-world", label: "Country", val: activeClient.country || "—" },
+        { icon: "ti-globe", label: "Website", val: activeClient.website || "—" },
+        { icon: "ti-brand-linkedin", label: "LinkedIn", val: activeClient.linkedin || "—" },
+        { icon: "ti-coin", label: "Billing Currency", val: activeClient.billingCurrency || "—" },
+        { icon: "ti-credit-card", label: "Payment Terms", val: activeClient.paymentTerms || "—" },
+        { icon: "ti-wallet", label: "Credit Limit", val: activeClient.creditLimit || "—" },
+        { icon: "ti-cash", label: "Preferred Payment", val: activeClient.preferredPaymentMode || "—" },
+        { icon: "ti-source", label: "Client Source", val: activeClient.source || "—" },
+        { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active" },
+        { icon: "ti-calendar", label: "Joined", val: activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
+        { icon: "ti-calendar-plus", label: "Onboarded On", val: activeClient.onboardedOn ? new Date(activeClient.onboardedOn).toLocaleDateString("en-IN") : "—" },
+        { icon: "ti-notes", label: "Notes", val: activeClient.notes || "—" },
+      ].filter(row => row.val && row.val !== "—").map((row, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: "#F5FAFA", borderRadius: 9, border: "1px solid #E0EEF0" }}>
+          <div style={{ width: 30, height: 30, borderRadius: 8, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#00BCD4", flexShrink: 0 }}>
+            <i className={`ti ${row.icon}`} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", marginTop: 1, wordBreak: "break-word" }}>{row.val}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 16 }}>
+      <button onClick={() => { setViewClientModal(false); openEdit(activeClient); }} style={{ padding: "9px 18px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
+      <button onClick={() => setViewClientModal(false)} style={{ padding: "9px 18px", background: "#F5FAFA", border: "1px solid #E0EEF0", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#607D86", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+    </div>
+  </Mdl>
+)}
 
   const doDelete = async () => {
     try {
@@ -3153,7 +3334,7 @@ function VendorsPage({ vendors, setVendors }) {
   const [editErr, setEditErr] = useState({});
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
-
+const [viewClientModal, setViewClientModal] = useState(false);
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
   const filtered = vendors.filter(v =>
@@ -3290,6 +3471,7 @@ function VendorsPage({ vendors, setVendors }) {
       )}
 
       {deleteTarget && <ConfirmModal title="Delete Vendor" message={`Are you sure you want to delete "${deleteTarget.vendorName}"?`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
+
     </div>
   );
 }

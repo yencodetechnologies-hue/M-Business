@@ -38,7 +38,6 @@ router.get("/", async (req, res) => {
         invoiceNo:      doc.invoiceNo      || "",
         orderNo:        doc.orderNo        || "",
         date:           doc.date           || "",
-        dueDate:        doc.dueDate        || "",
         dueDateType: doc.dueDateType || "30",
         client:         doc.client         || "",
         project:        doc.project        || "",

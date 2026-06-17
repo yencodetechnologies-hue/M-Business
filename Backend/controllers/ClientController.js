@@ -16,6 +16,23 @@ exports.addClient = async (req, res) => {
       password,  
       gstNumber,
       logoUrl,
+      clientType,
+      clientSource,
+      onboardedOn,
+      designation,
+      altEmail,
+      officePhone,
+      city,
+      state,
+      pincode,
+      country,
+      websiteUrl,
+      linkedinUrl,
+      billingCurrency,
+      paymentTerms,
+      creditLimit,
+      preferredPaymentMode,
+      internalNotes
     } = req.body;
 
     console.log("Adding client:", { clientName, email, companyId: req.companyId });
@@ -41,6 +58,23 @@ exports.addClient = async (req, res) => {
       gstNumber: gstNumber || "",
       logoUrl: logoUrl || "",
       companyId: req.companyId || "",
+      clientType: clientType || "b2b",
+      clientSource: clientSource || "",
+      onboardedOn: onboardedOn || "",
+      designation: designation || "",
+      altEmail: altEmail || "",
+      officePhone: officePhone || "",
+      city: city || "",
+      state: state || "",
+      pincode: pincode || "",
+      country: country || "India",
+      websiteUrl: websiteUrl || "",
+      linkedinUrl: linkedinUrl || "",
+      billingCurrency: billingCurrency || "INR — Indian Rupee",
+      paymentTerms: paymentTerms || "",
+      creditLimit: creditLimit || "",
+      preferredPaymentMode: preferredPaymentMode || "",
+      internalNotes: internalNotes || ""
     });
 
     await newClient.save();

@@ -426,19 +426,25 @@ const [targetPortalClient, setTargetPortalClient] = useState('');
     }
   }, [project?._id]);
 
+  // Inject component CSS once on mount
   useEffect(() => {
-    setCurrProject(project);
-  }, [project, project?.loggedHours, project?.progress, project?.status]);
+    const id = 'mpd-style';
+    if (!document.getElementById(id)) {
+      const tag = document.createElement('style');
+      tag.id = id;
+      tag.textContent = CSS;
+      document.head.appendChild(tag);
+    }
+  }, []);
 
+  // Load fresh data once on mount and when project _id changes
+  const mountedId = useRef(null);
   useEffect(() => {
-    setCurrTasks(tasks);
-  }, [tasks]);
-
-useEffect(() => {
-    loadLatest();
-  }, [loadLatest]);
-
-  // Auto-open invoice modal when navigated from project card New Invoice button
+    if (project?._id && project._id !== mountedId.current) {
+      mountedId.current = project._id;
+      loadLatest();
+    }
+  }, [project?._id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (autoOpenInvoice) {
       setActiveTab('payments');
@@ -888,7 +894,7 @@ const newFileObj = {
 
   return (
     <div className="mpd-root">
-      <style>{CSS}</style>
+      {/* CSS injected once via useEffect above */}
       
       {/* TOPBAR */}
       <div className="mpd-topbar">

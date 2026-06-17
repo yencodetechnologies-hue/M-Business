@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import React from "react";
 import "./DashboardModern.css";
 import axios from "axios";
@@ -2192,11 +2192,11 @@ const openEdit = (p) => {
   projects={projectsWithProgress} 
   searchQuery={search} 
   onViewTasks={(p) => { 
-    if (!p || !p._id) return; 
+    if (!p || (!p._id && !p.id)) return; 
     onViewTasks && onViewTasks(p); 
   }} 
   onEdit={(p) => { 
-    if (!p || !p._id) return;
+    if (!p || (!p._id && !p.id)) return;
     setJumpProject(p); 
     setActive("edit-project"); 
   }} 
@@ -3566,6 +3566,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     localStorage.setItem("activeTab_subadmin", toSave); 
   }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
+  const [_navPending, startNavTransition] = useTransition();
   const [fromEditProject, setFromEditProject] = useState(false);
   const [jumpInvoice, setJumpInvoice] = useState(null);
 const [invoicePrefill, setInvoicePrefill] = useState(null);
@@ -4673,7 +4674,7 @@ useEffect(() => {
 
   const page = findNavItem(validActive) || navItems[0];
 
-  useEffect(() => { if (!enforceMySubscriptions && validActive !== active) setActive(validActive); }, [user?.role, enforceMySubscriptions, validActive]);
+  // Note: removed setActive(validActive) here to prevent re-render loop
 
   useEffect(() => {
     if (validActive === "templates") {
@@ -5657,7 +5658,6 @@ const progress = p.progress || 25;
 
                 {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
-{validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
                 {validActive === "projects" && <ProjectsPage 
                   onBack={sidebarOverride === "dashboard" ? () => { setSidebarOverride(null); setActive("dashboard"); } : null} 
                   projects={projects} 
@@ -5670,8 +5670,10 @@ const progress = p.progress || 25;
                   config={config} 
                   onViewTasks={(proj) => { 
                     if (!proj) return;
-                    setJumpProject(proj); 
-                    setActive("project-details"); 
+                    startNavTransition(() => {
+                      setJumpProject(proj); 
+                      setActive("project-details");
+                    });
                   }} 
                   user={user} 
                   fetchTasks={fetchTasks} 

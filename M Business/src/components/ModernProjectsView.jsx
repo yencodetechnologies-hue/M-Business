@@ -203,14 +203,27 @@ export default function ModernProjectsView({
   const [search, setSearch]       = useState(searchQuery);
   const [statusFilter, setStatus] = useState('all');
   const [sortBy, setSort]         = useState('newest');
-  const [view, setView]           = useState('grid');    // 'grid' | 'list'
-  const [openMenu, setOpenMenu]   = useState(null);      // project _id with open menu
+  const [view, setView]           = useState('grid');
+  const [openMenu, setOpenMenu]   = useState(null);
+  const [page, setPage]           = useState(1);
+  const perPage = 12;
 
   // Close menu on outside click
   React.useEffect(() => {
     const close = () => setOpenMenu(null);
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
+  }, []);
+
+  // Inject CSS once on mount
+  React.useEffect(() => {
+    const id = 'mpv-style';
+    if (!document.getElementById(id)) {
+      const tag = document.createElement('style');
+      tag.id = id;
+      tag.textContent = CSS;
+      document.head.appendChild(tag);
+    }
   }, []);
 
   // KPI counts
@@ -248,6 +261,12 @@ export default function ModernProjectsView({
     return list;
   }, [projects, search, statusFilter, sortBy]);
 
+  // Reset page on filter/search change
+  React.useEffect(() => { setPage(1); }, [search, statusFilter, sortBy]);
+
+  const totalPages = Math.ceil(displayed.length / perPage);
+  const paginated = displayed.slice((page - 1) * perPage, page * perPage);
+
   const KPI_ITEMS = [
     { key: 'all',       label: 'All Projects', count: counts.all,       icon: 'ti-layout-kanban',   iconBg: P.primaryLight, iconColor: P.primary },
     { key: 'active',    label: 'Active',        count: counts.active,    icon: 'ti-player-play',     iconBg: P.greenLight,   iconColor: P.green },
@@ -258,7 +277,7 @@ export default function ModernProjectsView({
 
   return (
     <div className="mpv-root">
-      <style>{CSS}</style>
+      {/* CSS injected once via useEffect above */}
 
       {/* ── KPI Cards ── */}
       <div className="mpv-kpi-grid">
@@ -306,7 +325,7 @@ export default function ModernProjectsView({
 
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 12, color: P.textLight, fontWeight: 600 }}>
-            {displayed.length} of {projects.length} projects
+            {paginated.length} of {displayed.length} projects
           </span>
           <div className="mpv-view-btns">
             <button
@@ -334,7 +353,7 @@ export default function ModernProjectsView({
         </div>
       ) : (
         <div className={`mpv-grid${view === 'list' ? ' list' : ''}`}>
-          {displayed.map(p => {
+          {paginated.map(p => {
             const { label: statusLabel, cls: statusCls } = normaliseStatus(p.status);
             const pct      = Math.min(100, Math.max(0, p.progress || 0));
             const deadline = p.end || p.deadline;
@@ -505,6 +524,23 @@ export default function ModernProjectsView({
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 20, paddingBottom: 12 }}>
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: page === 1 ? P.bg : '#fff', color: page === 1 ? P.textLight : P.textDark, cursor: page === 1 ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Nunito',sans-serif" }}
+          >← Prev</button>
+          <span style={{ fontSize: 12, color: P.textLight, fontWeight: 700 }}>Page {page} of {totalPages}</span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${P.border}`, background: page === totalPages ? P.bg : '#fff', color: page === totalPages ? P.textLight : P.textDark, cursor: page === totalPages ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Nunito',sans-serif" }}
+          >Next →</button>
         </div>
       )}
     </div>

@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 export default function AddClientView({ onBack, onClientAdded, user }) {
   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  const today = new Date().toISOString().split('T')[0];
+const today = new Date().toISOString().split('T')[0];
 
   const [formData, setFormData] = useState({
     clientType: 'b2b',
@@ -44,6 +44,14 @@ export default function AddClientView({ onBack, onClientAdded, user }) {
   const [saving, setSaving] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('logo');
+  
+  const [customInputMode, setCustomInputMode] = useState({
+    category: false,
+    source: false,
+    country: false,
+    paymentTerms: false,
+    preferredPaymentMode: false
+  });
 
   const fileInputRef = useRef(null);
 
@@ -60,6 +68,16 @@ export default function AddClientView({ onBack, onClientAdded, user }) {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
+  const handleSelectChange = (e) => {
+    const { name, value } = e.target;
+    if (value === '__custom__') {
+      setCustomInputMode(prev => ({ ...prev, [name]: true }));
+      setFormData(prev => ({ ...prev, [name]: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+      if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -245,10 +263,17 @@ export default function AddClientView({ onBack, onClientAdded, user }) {
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Category / industry</label>
-                  <select name="category" value={formData.category} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                    <option value="">Select a category</option>
-                    <option>Web Development</option><option>Mobile App Development</option><option>UI/UX Design</option><option>Digital Marketing</option><option>IT Consulting</option><option>E-commerce</option><option>Healthcare</option><option>Education</option><option>Finance</option><option>Real Estate</option><option>Manufacturing</option><option>Retail</option><option>Logistics</option><option>Media & Entertainment</option><option>Other</option>
-                  </select>
+                  {customInputMode.category ? (
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input name="category" value={formData.category} onChange={handleChange} placeholder="Type custom category..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
+                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, category: false })); setFormData(prev => ({ ...prev, category: '' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                    </div>
+                  ) : (
+                    <select name="category" value={formData.category} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
+                      <option value="">Select a category</option>
+                      <option>Web Development</option><option>Mobile App Development</option><option>UI/UX Design</option><option>Digital Marketing</option><option>IT Consulting</option><option>E-commerce</option><option>Healthcare</option><option>Education</option><option>Finance</option><option>Real Estate</option><option>Manufacturing</option><option>Retail</option><option>Logistics</option><option>Media & Entertainment</option><option value="__custom__">Custom</option>
+                    </select>
+                  )}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Company tax / GST no.</label>
@@ -257,10 +282,17 @@ export default function AddClientView({ onBack, onClientAdded, user }) {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Client source</label>
-                  <select name="source" value={formData.source} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
-                    <option value="">How did they find you?</option>
-                    <option>Referral</option><option>Website / Organic</option><option>Social Media</option><option>Cold Outreach</option><option>LinkedIn</option><option>Event / Conference</option><option>Google Ads</option><option>Word of Mouth</option><option>Other</option>
-                  </select>
+                  {customInputMode.source ? (
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
+                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, source: false })); setFormData(prev => ({ ...prev, source: '' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                    </div>
+                  ) : (
+                    <select name="source" value={formData.source} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
+                      <option value="">How did they find you?</option>
+                      <option>Referral</option><option>Website / Organic</option><option>Social Media</option><option>Cold Outreach</option><option>LinkedIn</option><option>Event / Conference</option><option>Google Ads</option><option>Word of Mouth</option><option value="__custom__">Custom</option>
+                    </select>
+                  )}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Onboarded on</label>
@@ -306,7 +338,19 @@ export default function AddClientView({ onBack, onClientAdded, user }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>City</label><input name="city" value={formData.city} onChange={handleChange} placeholder="Chennai" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}/></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>State / province</label><input name="state" value={formData.state} onChange={handleChange} placeholder="Tamil Nadu" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}/></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pincode / ZIP</label><input name="pincode" value={formData.pincode} onChange={handleChange} placeholder="600001" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}/></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Country</label><select name="country" value={formData.country} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}><option>India</option><option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>Singapore</option><option>Australia</option><option>Canada</option><option>Germany</option><option>France</option><option>Other</option></select></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Country</label>
+                {customInputMode.country ? (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input name="country" value={formData.country} onChange={handleChange} placeholder="Type custom country..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, country: false })); setFormData(prev => ({ ...prev, country: 'India' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                  </div>
+                ) : (
+                  <select name="country" value={formData.country} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
+                    <option>India</option><option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>Singapore</option><option>Australia</option><option>Canada</option><option>Germany</option><option>France</option><option value="__custom__">Custom</option>
+                  </select>
+                )}
+              </div>
             </div>
           </div>
 
@@ -330,9 +374,33 @@ export default function AddClientView({ onBack, onClientAdded, user }) {
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Billing currency</label><select name="billingCurrency" value={formData.billingCurrency} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}><option>INR — Indian Rupee</option><option>USD — US Dollar</option><option>GBP — British Pound</option><option>EUR — Euro</option><option>AED — UAE Dirham</option><option>SGD — Singapore Dollar</option><option>AUD — Australian Dollar</option></select></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Payment terms</label><select name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}><option value="">Select terms</option><option>Due on receipt</option><option>Net 7</option><option>Net 15</option><option>Net 30</option><option>Net 45</option><option>Net 60</option><option>50% Advance + 50% on delivery</option><option>Custom</option></select></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Payment terms</label>
+                {customInputMode.paymentTerms ? (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} placeholder="Type custom terms..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); setFormData(prev => ({ ...prev, paymentTerms: '' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                  </div>
+                ) : (
+                  <select name="paymentTerms" value={formData.paymentTerms} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
+                    <option value="">Select terms</option><option>Due on receipt</option><option>Net 7</option><option>Net 15</option><option>Net 30</option><option>Net 45</option><option>Net 60</option><option>50% Advance + 50% on delivery</option><option value="__custom__">Custom</option>
+                  </select>
+                )}
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Credit limit</label><input type="number" name="creditLimit" value={formData.creditLimit} onChange={handleChange} placeholder="e.g. 50000" style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}/></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preferred payment mode</label><select name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}><option value="">Select mode</option><option>Bank Transfer / NEFT</option><option>UPI</option><option>Cheque</option><option>Credit Card</option><option>Cash</option><option>PayPal</option><option>Stripe</option><option>Other</option></select></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preferred payment mode</label>
+                {customInputMode.preferredPaymentMode ? (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleChange} placeholder="Type custom mode..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); setFormData(prev => ({ ...prev, preferredPaymentMode: '' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                  </div>
+                ) : (
+                  <select name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
+                    <option value="">Select mode</option><option>Bank Transfer / NEFT</option><option>UPI</option><option>Cheque</option><option>Credit Card</option><option>Cash</option><option>PayPal</option><option>Stripe</option><option value="__custom__">Custom</option>
+                  </select>
+                )}
+              </div>
             </div>
           </div>
 

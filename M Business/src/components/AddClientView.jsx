@@ -2,39 +2,40 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-export default function AddClientView({ onBack, onClientAdded, user }) {
+export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData }) {
+  const isEdit = !!editData;
   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split('T')[0];
 
   const [formData, setFormData] = useState({
-    clientType: 'b2b',
-    name: '',
-    company: '',
-    category: '',
-    gstNumber: '',
-    source: '',
-    onboardedOn: today,
-    status: 'Active',
-    contactPersonName: '',
-    designation: '',
-    email: '',
-    altEmail: '',
-    contactPersonNo: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    pincode: '',
-    country: 'India',
-    website: '',
-    linkedin: '',
-    billingCurrency: 'INR — Indian Rupee',
-    paymentTerms: '',
-    creditLimit: '',
-    preferredPaymentMode: '',
+    clientType: editData?.clientType || 'b2b',
+    name: editData?.clientName || editData?.name || '',
+    company: editData?.companyName || editData?.company || '',
+    category: editData?.category || '',
+    gstNumber: editData?.gstNumber || '',
+    source: editData?.clientSource || editData?.source || '',
+    onboardedOn: editData?.onboardedOn ? editData.onboardedOn.substring(0, 10) : today,
+    status: editData?.status || 'Active',
+    contactPersonName: editData?.contactPersonName || '',
+    designation: editData?.designation || '',
+    email: editData?.email || '',
+    altEmail: editData?.altEmail || '',
+    contactPersonNo: editData?.contactPersonNo || '',
+    phone: editData?.officePhone || editData?.phone || '',
+    address: editData?.address || '',
+    city: editData?.city || '',
+    state: editData?.state || '',
+    pincode: editData?.pincode || '',
+    country: editData?.country || 'India',
+    website: editData?.websiteUrl || editData?.website || '',
+    linkedin: editData?.linkedinUrl || editData?.linkedin || '',
+    billingCurrency: editData?.billingCurrency || 'INR — Indian Rupee',
+    paymentTerms: editData?.paymentTerms || '',
+    creditLimit: editData?.creditLimit || '',
+    preferredPaymentMode: editData?.preferredPaymentMode || '',
     password: '',
-    notes: '',
-    logoUrl: ''
+    notes: editData?.internalNotes || editData?.notes || '',
+    logoUrl: editData?.logoUrl || ''
   });
 
   const [showPass, setShowPass] = useState(false);
@@ -54,6 +55,24 @@ const today = new Date().toISOString().split('T')[0];
   });
 
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (isEdit) {
+      const predefinedCats = ['','Web Development','Mobile App Development','UI/UX Design','Digital Marketing','IT Consulting','E-commerce','Healthcare','Education','Finance','Real Estate','Manufacturing','Retail','Logistics','Media & Entertainment'];
+      const predefinedSources = ['','Referral','Website / Organic','Social Media','Cold Outreach','LinkedIn','Event / Conference','Google Ads','Word of Mouth'];
+      const predefinedCountries = ['India','United States','United Kingdom','United Arab Emirates','Singapore','Australia','Canada','Germany','France'];
+      const predefinedTerms = ['','Due on receipt','Net 7','Net 15','Net 30','Net 45','Net 60','50% Advance + 50% on delivery'];
+      const predefinedModes = ['','Bank Transfer / NEFT','UPI','Cheque','Credit Card','Cash','PayPal','Stripe'];
+
+      setCustomInputMode({
+        category: editData.category && !predefinedCats.includes(editData.category),
+        source: (editData.clientSource || editData.source) && !predefinedSources.includes(editData.clientSource || editData.source),
+        country: editData.country && !predefinedCountries.includes(editData.country),
+        paymentTerms: editData.paymentTerms && !predefinedTerms.includes(editData.paymentTerms),
+        preferredPaymentMode: editData.preferredPaymentMode && !predefinedModes.includes(editData.preferredPaymentMode)
+      });
+    }
+  }, [isEdit, editData]);
 
   useEffect(() => {
     // calculate progress
@@ -135,76 +154,39 @@ const today = new Date().toISOString().split('T')[0];
         internalNotes: formData.notes
       };
 
-      const res = await axios.post(`${BASE_URL}/api/clients/add`, payload, {
-        headers: { Authorization: `Bearer ${user?.token || ""}` }
-      });
-      toast.success('Client added successfully!');
-      if (onClientAdded) onClientAdded(res.data.client);
-      onBack();
+      if (isEdit) {
+        const res = await axios.put(`${BASE_URL}/api/clients/${editData._id}`, payload, {
+          headers: { Authorization: `Bearer ${user?.token || ""}` }
+        });
+        toast.success('Client updated successfully!');
+        if (onClientUpdated) onClientUpdated({ ...editData, ...payload, ...res.data?.client });
+        onBack();
+      } else {
+        const res = await axios.post(`${BASE_URL}/api/clients/add`, payload, {
+          headers: { Authorization: `Bearer ${user?.token || ""}` }
+        });
+        toast.success('Client added successfully!');
+        if (onClientAdded) onClientAdded(res.data.client);
+        onBack();
+      }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to save client');
+      toast.error(err.response?.data?.message || `Failed to ${isEdit ? 'update' : 'save'} client`);
     } finally {
       setSaving(false);
     }
   };
 
-  // Sections scroll spy could be implemented here, simplified for React
   return (
-    <div style={{ background: '#F4F6F8', minHeight: '100%', fontFamily: "'Nunito', sans-serif", color: '#1A2332' }}>
-      <header style={{ position: 'sticky', top: 0, zIndex: 100, background: '#fff', borderBottom: '1px solid #E0E6EA', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 32px', height: 60, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: '#5A6A7A' }}>🔙</button>
-          <div style={{ width: 32, height: 32, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14 }}>M</div>
-          <span style={{ fontSize: 15, fontWeight: 700 }}>M Business</span>
-          <div style={{ fontSize: 13, color: '#94A3B0', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span>&gt;</span>
-            Clients
-            <span>&gt;</span>
-            <span style={{ color: '#00BCD4', fontWeight: 600 }}>Add New Client</span>
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button onClick={() => setFormData({ ...formData, name: '' })} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 16px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#F4F6F8', color: '#5A6A7A', border: '1.5px solid #E0E6EA' }}>Reset</button>
-          <button onClick={submitForm} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 16px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#00BCD4', color: 'white', border: '1.5px solid #00BCD4' }}>
-            {saving ? 'Adding...' : 'Add Client'}
-          </button>
-        </div>
-      </header>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 24, maxWidth: 1200, margin: '0 auto', padding: '28px 24px', alignItems: 'start' }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ background: '#F4F6F8', width: '100%', maxWidth: 800, maxHeight: '90vh', overflowY: 'auto', borderRadius: 16, fontFamily: "'Nunito', sans-serif", color: '#1A2332', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
         
-        {/* SIDEBAR */}
-        <aside style={{ position: 'sticky', top: 84, background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94A3B0', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '4px 8px 12px', borderBottom: '1px solid #E0E6EA', marginBottom: 10 }}>Form sections</div>
-          
-          {[
-            { id: 'logo', icon: '🖼️', label: 'Logo' },
-            { id: 'basic', icon: '🏢', label: 'Basic info', dot: true },
-            { id: 'contact', icon: '📞', label: 'Primary contact', dot: true },
-            { id: 'address', icon: '📍', label: 'Address' },
-            { id: 'online', icon: '🌐', label: 'Online presence' },
-            { id: 'billing', icon: '💳', label: 'Billing & terms' },
-            { id: 'portal', icon: '🔒', label: 'Portal access' },
-            { id: 'notes', icon: '📝', label: 'Internal notes' }
-          ].map(nav => (
-            <a key={nav.id} href={`#${nav.id}`} onClick={() => setActiveSection(nav.id)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 8, cursor: 'pointer', textDecoration: 'none', fontSize: 13.5, fontWeight: activeSection === nav.id ? 600 : 500, color: activeSection === nav.id ? '#00BCD4' : '#5A6A7A', background: activeSection === nav.id ? '#E0F7FA' : 'transparent', transition: 'all 0.15s' }}>
-              <span style={{ fontSize: 16, width: 18, textAlign: 'center' }}>{nav.icon}</span> {nav.label}
-              {nav.dot && <div style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: '#00BCD4' }}></div>}
-            </a>
-          ))}
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', background: '#fff', borderBottom: '1px solid #E0E6EA', position: 'sticky', top: 0, zIndex: 10 }}>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{isEdit ? 'Edit Client' : 'Add New Client'}</h2>
+          <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#94A3B0' }}>✕</button>
+        </div>
 
-          <div style={{ background: '#E0F7FA', borderRadius: 20, height: 6, overflow: 'hidden', margin: '14px 0 4px' }}>
-            <div style={{ height: '100%', background: '#00BCD4', borderRadius: 20, width: `${progress}%`, transition: 'width 0.4s ease' }}></div>
-          </div>
-          <div style={{ fontSize: 11, color: '#94A3B0', textAlign: 'right' }}>{progress}% filled</div>
-
-          <div style={{ marginTop: 16, padding: '10px 12px', background: '#FFEBEE', borderRadius: 8, fontSize: 12, color: '#C62828', display: 'flex', alignItems: 'flex-start', gap: 6, lineHeight: 1.5 }}>
-            <span style={{ marginTop: 1 }}>⚠️</span> Fields marked * are required to save the client.
-          </div>
-        </aside>
-
-        {/* FORM CONTENT */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
           
           {/* Logo Section */}
           <div id="logo" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
@@ -266,7 +248,7 @@ const today = new Date().toISOString().split('T')[0];
                   {customInputMode.category ? (
                     <div style={{ display: 'flex', gap: 8 }}>
                       <input name="category" value={formData.category} onChange={handleChange} placeholder="Type custom category..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, category: false })); setFormData(prev => ({ ...prev, category: '' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, category: false })); setFormData(prev => ({ ...prev, category: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                     </div>
                   ) : (
                     <select name="category" value={formData.category} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -285,7 +267,7 @@ const today = new Date().toISOString().split('T')[0];
                   {customInputMode.source ? (
                     <div style={{ display: 'flex', gap: 8 }}>
                       <input name="source" value={formData.source} onChange={handleChange} placeholder="Type custom source..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, source: false })); setFormData(prev => ({ ...prev, source: '' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                      <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, source: false })); setFormData(prev => ({ ...prev, source: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                     </div>
                   ) : (
                     <select name="source" value={formData.source} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -296,14 +278,14 @@ const today = new Date().toISOString().split('T')[0];
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Onboarded on</label>
-                  <input type="date" name="onboardedOn" value={formData.onboardedOn} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}/>
+                  <input type="date" disabled name="onboardedOn" value={formData.onboardedOn} onChange={handleChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8', opacity: 0.8, cursor: 'not-allowed' }}/>
                 </div>
 
                 <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#5A6A7A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</label>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={() => setFormData({ ...formData, status: 'Active' })} style={{ flex: 1, padding: 10, borderRadius: 8, border: `1.5px solid ${formData.status === 'Active' ? '#26A69A' : '#E0E6EA'}`, background: formData.status === 'Active' ? '#E0F2F1' : '#F4F6F8', color: formData.status === 'Active' ? '#26A69A' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>✓ Active</button>
-                    <button onClick={() => setFormData({ ...formData, status: 'Inactive' })} style={{ flex: 1, padding: 10, borderRadius: 8, border: `1.5px solid ${formData.status === 'Inactive' ? '#EF9A9A' : '#E0E6EA'}`, background: formData.status === 'Inactive' ? '#FFEBEE' : '#F4F6F8', color: formData.status === 'Inactive' ? '#EF5350' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>✕ Inactive</button>
+                  <div style={{ display: 'flex', gap: 8, height: 42 }}>
+                    <button onClick={() => setFormData({ ...formData, status: 'Active' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Active' ? '#26A69A' : '#E0E6EA'}`, background: formData.status === 'Active' ? '#E0F2F1' : '#F4F6F8', color: formData.status === 'Active' ? '#26A69A' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>✓ Active</button>
+                    <button onClick={() => setFormData({ ...formData, status: 'Inactive' })} style={{ flex: 1, height: '100%', borderRadius: 8, border: `1.5px solid ${formData.status === 'Inactive' ? '#EF9A9A' : '#E0E6EA'}`, background: formData.status === 'Inactive' ? '#FFEBEE' : '#F4F6F8', color: formData.status === 'Inactive' ? '#EF5350' : '#94A3B0', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>✕ Inactive</button>
                   </div>
                 </div>
               </div>
@@ -343,7 +325,7 @@ const today = new Date().toISOString().split('T')[0];
                 {customInputMode.country ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="country" value={formData.country} onChange={handleChange} placeholder="Type custom country..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, country: false })); setFormData(prev => ({ ...prev, country: 'India' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, country: false })); setFormData(prev => ({ ...prev, country: 'India' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 ) : (
                   <select name="country" value={formData.country} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -379,7 +361,7 @@ const today = new Date().toISOString().split('T')[0];
                 {customInputMode.paymentTerms ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="paymentTerms" value={formData.paymentTerms} onChange={handleChange} placeholder="Type custom terms..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); setFormData(prev => ({ ...prev, paymentTerms: '' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, paymentTerms: false })); setFormData(prev => ({ ...prev, paymentTerms: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 ) : (
                   <select name="paymentTerms" value={formData.paymentTerms} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -393,7 +375,7 @@ const today = new Date().toISOString().split('T')[0];
                 {customInputMode.preferredPaymentMode ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleChange} placeholder="Type custom mode..." style={{ flex: 1, height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }} autoFocus/>
-                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); setFormData(prev => ({ ...prev, preferredPaymentMode: '' })); }} style={{ padding: '0 12px', background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A' }}>✕</button>
+                    <button type="button" onClick={() => { setCustomInputMode(prev => ({ ...prev, preferredPaymentMode: false })); setFormData(prev => ({ ...prev, preferredPaymentMode: '' })); }} style={{ width: 42, height: 42, background: '#F4F6F8', border: '1.5px solid #E0E6EA', borderRadius: 8, cursor: 'pointer', color: '#5A6A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 ) : (
                   <select name="preferredPaymentMode" value={formData.preferredPaymentMode} onChange={handleSelectChange} style={{ width: '100%', height: 42, padding: '0 14px', border: '1.5px solid #E0E6EA', borderRadius: 8, fontSize: 14, background: '#F4F6F8' }}>
@@ -430,7 +412,7 @@ const today = new Date().toISOString().split('T')[0];
           </div>
 
           {/* Internal Notes */}
-          <div id="notes" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden', marginBottom: 20 }}>
+          <div id="notes" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
               <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>📝</div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Internal Notes</div></div>
@@ -448,7 +430,7 @@ const today = new Date().toISOString().split('T')[0];
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#F4F6F8', color: '#5A6A7A', border: '1.5px solid #E0E6EA' }}>Cancel</button>
               <button onClick={submitForm} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#00BCD4', color: 'white', border: '1.5px solid #00BCD4' }}>
-                {saving ? 'Adding...' : 'Add Client'}
+                {saving ? (isEdit ? '' : '') : (isEdit ? 'Update Client' : 'Add Client')}
               </button>
             </div>
           </div>

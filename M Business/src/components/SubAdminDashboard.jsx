@@ -23,6 +23,7 @@ import { DOC_TYPES } from "./EmployeeProfilePanel";
 import EmployeeDetail from "./EmployeeDetail";
 import AuthPage from "./AuthPage";
 import MySubscriptions from "./MySubscriptions";
+import AddClientView from "./AddClientView";
 import EmployeeSubscriptionWarning from "./EmployeeSubscriptionWarning";
 import ModernEmployeeProjectDetails from "./ModernEmployeeProjectDetails";
 import ImageCropModal from "./ImageCropModal";
@@ -468,7 +469,7 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
 // ═══════════════════════════════════════════════════════════
 // CLIENTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject }) {
+function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user }) {
   const mainScrollRef = useRef(null);
   const [search, setSearch] = useState("");
   const [filterMode, setFilterMode] = useState("all");
@@ -1084,120 +1085,15 @@ const renderDocuments = () => {
 
       {/* Edit Modal */}
       {editClient && (
-        <Mdl title="Edit Client" onClose={() => setEditClient(null)}>
-          {/* LOGO */}
-          <div style={{marginBottom:16,padding:'14px',background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA'}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#5A6A7A',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:10}}>Client Logo</div>
-            <div style={{display:'flex',alignItems:'center',gap:16}}>
-              <div style={{position:'relative',width:72,height:72}}>
-                <div style={{width:72,height:72,borderRadius:14,background:'#fff',border:'2px dashed #E0E6EA',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
-                  {editForm.logoUrl ? <img src={editForm.logoUrl} alt="Logo" style={{width:'100%',height:'100%',objectFit:'contain'}} /> : <span style={{fontSize:30}}>🏢</span>}
-                </div>
-                <label style={{position:'absolute',bottom:0,right:0,background:'#00BCD4',width:24,height:24,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',border:'2px solid #fff'}}>
-                  <span style={{fontSize:12}}>📷</span>
-                  <input type="file" accept="image/*" style={{display:'none'}} onChange={e=>{const file=e.target.files[0];if(file){const r=new FileReader();r.onloadend=()=>setEditForm(p=>({...p,logoUrl:r.result}));r.readAsDataURL(file);}}} />
-                </label>
-              </div>
-              <div style={{fontSize:12,color:'#94A3B0'}}>PNG, JPG · Max 2MB</div>
-            </div>
-          </div>
-
-          {/* CLIENT TYPE */}
-          <div style={{marginBottom:14}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#5A6A7A',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:8}}>Client Type</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-              {[{val:'b2b',icon:'🏢',label:'B2B',sub:'Company / Business'},{val:'b2c',icon:'👤',label:'B2C',sub:'Individual'},{val:'freelancer',icon:'💼',label:'Freelancer',sub:'Consultant / Solo'}].map(t=>(
-                <div key={t.val} onClick={()=>setEditForm(p=>({...p,clientType:t.val}))}
-                  style={{border:`2px solid ${editForm.clientType===t.val?'#00BCD4':'#E0E6EA'}`,borderRadius:10,padding:'10px 8px',textAlign:'center',cursor:'pointer',background:editForm.clientType===t.val?'#E0F7FA':'#F4F6F8'}}>
-                  <div style={{fontSize:20,marginBottom:3}}>{t.icon}</div>
-                  <div style={{fontSize:12,fontWeight:700,color:editForm.clientType===t.val?'#007B8A':'#1A2332'}}>{t.label}</div>
-                  <div style={{fontSize:10,color:'#94A3B0'}}>{t.sub}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* BASIC INFO */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🏢 Basic Info</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="Client / Display Name *" value={editForm.clientName} onChange={v=>{setEditForm(p=>({...p,clientName:v}));setEditErr(p=>({...p,clientName:''}));}} error={editErr.clientName} />
-              <Fld label="Company Name" value={editForm.companyName} onChange={v=>setEditForm(p=>({...p,companyName:v}))} />
-              <Fld label="Category / Industry" value={editForm.category} onChange={v=>setEditForm(p=>({...p,category:v}))} options={['','Web Development','Mobile App Development','UI/UX Design','Digital Marketing','IT Consulting','E-commerce','Healthcare','Education','Finance','Real Estate','Manufacturing','Retail','Logistics','Media & Entertainment','Other']} />
-              <Fld label="Company Tax / GST No." value={editForm.gstNumber} onChange={v=>setEditForm(p=>({...p,gstNumber:v}))} />
-              <Fld label="Client Source" value={editForm.source} onChange={v=>setEditForm(p=>({...p,source:v}))} options={['','Referral','Website / Organic','Social Media','Cold Outreach','LinkedIn','Event / Conference','Google Ads','Word of Mouth','Other']} />
-              <Fld label="Onboarded On" value={editForm.onboardedOn} onChange={v=>setEditForm(p=>({...p,onboardedOn:v}))} type="date" />
-              <Fld label="Status" value={editForm.status} onChange={v=>setEditForm(p=>({...p,status:v}))} options={['Active','Inactive']} />
-            </div>
-          </div>
-
-          {/* PRIMARY CONTACT */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>📋 Primary Contact</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="Contact Person Name" value={editForm.contactPersonName} onChange={v=>setEditForm(p=>({...p,contactPersonName:v}))} />
-              <Fld label="Designation" value={editForm.designation} onChange={v=>setEditForm(p=>({...p,designation:v}))} />
-              <Fld label="Email *" value={editForm.email} onChange={v=>{setEditForm(p=>({...p,email:v}));setEditErr(p=>({...p,email:''}));}} type="email" error={editErr.email} />
-              <Fld label="Alt. Email" value={editForm.altEmail} onChange={v=>setEditForm(p=>({...p,altEmail:v}))} type="email" />
-              <Fld label="Contact Person Mobile" value={editForm.contactPersonNo} onChange={v=>setEditForm(p=>({...p,contactPersonNo:v}))} />
-              <Fld label="Office Phone" value={editForm.phone} onChange={v=>setEditForm(p=>({...p,phone:v}))} />
-            </div>
-          </div>
-
-          {/* ADDRESS */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>📍 Address</div>
-            <div style={{marginBottom:12}}><Fld label="Street / Building Address" value={editForm.address} onChange={v=>setEditForm(p=>({...p,address:v}))} /></div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="City" value={editForm.city} onChange={v=>setEditForm(p=>({...p,city:v}))} />
-              <Fld label="State / Province" value={editForm.state} onChange={v=>setEditForm(p=>({...p,state:v}))} />
-              <Fld label="Pincode / ZIP" value={editForm.pincode} onChange={v=>setEditForm(p=>({...p,pincode:v}))} />
-              <Fld label="Country" value={editForm.country} onChange={v=>setEditForm(p=>({...p,country:v}))} options={['India','United States','United Kingdom','United Arab Emirates','Singapore','Australia','Canada','Germany','France','Other']} />
-            </div>
-          </div>
-
-          {/* ONLINE PRESENCE */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🌐 Online Presence</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="Website URL" value={editForm.website} onChange={v=>setEditForm(p=>({...p,website:v}))} />
-              <Fld label="LinkedIn Profile" value={editForm.linkedin} onChange={v=>setEditForm(p=>({...p,linkedin:v}))} />
-            </div>
-          </div>
-
-          {/* BILLING & TERMS */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>💳 Billing & Terms</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-              <Fld label="Billing Currency" value={editForm.billingCurrency} onChange={v=>setEditForm(p=>({...p,billingCurrency:v}))} options={['INR — Indian Rupee','USD — US Dollar','GBP — British Pound','EUR — Euro','AED — UAE Dirham','SGD — Singapore Dollar','AUD — Australian Dollar']} />
-              <Fld label="Payment Terms" value={editForm.paymentTerms} onChange={v=>setEditForm(p=>({...p,paymentTerms:v}))} options={['','Due on receipt','Net 7','Net 15','Net 30','Net 45','Net 60','50% Advance + 50% on delivery','Custom']} />
-              <Fld label="Credit Limit" value={editForm.creditLimit} onChange={v=>setEditForm(p=>({...p,creditLimit:v}))} type="number" />
-              <Fld label="Preferred Payment Mode" value={editForm.preferredPaymentMode} onChange={v=>setEditForm(p=>({...p,preferredPaymentMode:v}))} options={['','Bank Transfer / NEFT','UPI','Cheque','Credit Card','Cash','PayPal','Stripe','Other']} />
-            </div>
-          </div>
-
-          {/* PORTAL PASSWORD */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🔒 Portal Access</div>
-            <div style={{ position: "relative" }}>
-               <input type={showClientPass ? "text" : "password"} value={editForm.password} onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))} style={{ width: "100%", border: `1.5px solid ${editErr.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Update client password (optional)" />
-               <button type="button" onClick={() => setShowClientPass(!showClientPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showClientPass ? "HIDE" : "SHOW"}</button>
-            </div>
-            {editErr.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {editErr.password}</div>}
-          </div>
-
-          {/* INTERNAL NOTES */}
-          <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>📝 Internal Notes</div>
-            <textarea value={editForm.notes} onChange={e=>setEditForm(p=>({...p,notes:e.target.value}))}
-              style={{width:'100%',border:'1.5px solid #E0E6EA',borderRadius:10,padding:'10px 14px',fontSize:13,color:T.text,background:'#fff',boxSizing:'border-box',outline:'none',minHeight:70,resize:'vertical',fontFamily:'inherit'}}
-              placeholder="Any internal context, special instructions..." />
-          </div>
-          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <button onClick={() => setEditClient(null)} style={{ flex: 1, padding: 10, background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ flex: 1, padding: 10, background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving..." : "Save Changes"}</button>
-          </div>
-        </Mdl>
+        <AddClientView 
+          editData={editClient} 
+          onBack={() => setEditClient(null)} 
+          onClientUpdated={(updatedClient) => { 
+            setClients(prev => prev.map(c => c._id === updatedClient._id ? updatedClient : c)); 
+            setEditClient(null); 
+          }} 
+          user={user} 
+        />
       )}
 
       {deleteTarget && <ConfirmModal title="Delete Client" message={`Are you sure you want to delete "${deleteTarget.clientName || deleteTarget.name}"? This cannot be undone.`} onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
@@ -2063,7 +1959,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // ═══════════════════════════════════════════════════════════
 // PROJECTS PAGE
 // ═══════════════════════════════════════════════════════════
-function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice }) {
+function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, onViewProject, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice }) {
   const [search, setSearch] = useState("");
 
   const projectsWithProgress = (projects || []).map(p => {
@@ -2195,6 +2091,10 @@ const openEdit = (p) => {
     if (!p || (!p._id && !p.id)) return; 
     onViewTasks && onViewTasks(p); 
   }} 
+  onClickProject={(p) => {
+    if (!p || (!p._id && !p.id)) return; 
+    onViewProject && onViewProject(p);
+  }}
   onEdit={(p) => { 
     if (!p || (!p._id && !p.id)) return;
     setJumpProject(p); 
@@ -2203,8 +2103,9 @@ const openEdit = (p) => {
   onDelete={(p) => setDeleteTarget(p)} 
   onNewInvoice={(p) => { 
     if (!p) return;
-    setJumpProject(p); 
-    setActive("project-details"); 
+    if (setJumpInvoice) setJumpInvoice(null); 
+    if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() }); 
+    if (setActive) setActive("invoices"); 
   }} 
 />
 
@@ -3746,7 +3647,8 @@ const [invoicePrefill, setInvoicePrefill] = useState(null);
   }, [profileDropdownOpen]);
 
   const [clients, setClients] = useState([]);
-  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", category: "" });
+  const todayStr = new Date().toISOString().split("T")[0];
+  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", category: "", onboardedOn: todayStr, clientType: "b2b", source: "", city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
@@ -4362,7 +4264,8 @@ useEffect(() => {
       setClients(prev => [res.data.client, ...prev]);
       // Store credentials for the success screen
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
-      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: "", city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
+      const todayStr = new Date().toISOString().split("T")[0];
+      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
       setNcError({});
       if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
       // Don't close modal yet if no return - show success screen (this depends on existing logic)
@@ -4670,7 +4573,7 @@ useEffect(() => {
   // Always land on mysubscriptions when enforced — never show dashboard
   const validActive = enforceMySubscriptions
     ? "mysubscriptions"
-    : ((findNavItem(active) || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
+    : ((findNavItem(active) || active === "addClient" || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
 
   const page = findNavItem(validActive) || navItems[0];
 
@@ -4832,7 +4735,7 @@ active={
                         setLimitModal({ type: "client", limit });
                         return;
                       }
-                      setNcError({}); setShowClientPass(false); setModal("client");
+                      setActive("addClient");
                     }}
                     style={{ opacity: isUsageAtLimit("client", clients.length) ? 0.5 : 1 }}
                   >
@@ -5568,7 +5471,7 @@ const progress = p.progress || 25;
 {validActive === "edit-project" && (
   <ModernProjectCreator
     key={jumpProject?._id}
-    editProject={jumpProject}        // ← இது important
+    editProject={jumpProject}        // ← ಇದು important
     clients={clients}
     employees={employees}
     onBack={() =>{ const returnTo = sidebarOverride || "projects";
@@ -5627,13 +5530,10 @@ const progress = p.progress || 25;
     }}
   />
 )}
+                {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setActive("clients"); }} user={user} />}
                 {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} setProjects={setProjects} onViewProject={(p) => { setSidebarOverride("clients"); setJumpProject(p); setActive("project-details"); }} onAddClient={() => {
                   const limit = getSubscriptionLimit("client");
-                  if (subscription && clients.length >= limit) {
-                    setLimitModal({ type: "client", limit });
-                    return;
-                  }
-                  setNcError({}); setShowClientPass(false); setModal("client");
+                  setActive("addClient");
                 }} triggerCrop={triggerCrop}  
  onCreateProject={(proj, isEdit) => { 
   setSidebarOverride("clients"); 
@@ -5654,7 +5554,7 @@ const progress = p.progress || 25;
     }
     setActive("create-project");
   }
-}}/>}
+}} user={user} />}
 
                 {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} projects={projectsWithProgress} tasks={tasks} setActive={setActive} setJumpProject={setJumpProject} />}
                 {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
@@ -5671,10 +5571,17 @@ const progress = p.progress || 25;
                   onViewTasks={(proj) => { 
                     if (!proj) return;
                     startNavTransition(() => {
-                      setJumpProject(proj); 
-                      setActive("project-details");
+                      setSelectedProjectForTasks(proj); 
+                      setActive("tasks");
                     });
                   }} 
+                  onViewProject={(proj) => {
+                    if (!proj) return;
+                    startNavTransition(() => {
+                      setJumpProject(proj);
+                      setActive("project-details");
+                    });
+                  }}
                   user={user} 
                   fetchTasks={fetchTasks} 
                   onCreateProject={() => { setSidebarOverride("clients"); setActive("create-project"); }} 
@@ -6150,10 +6057,10 @@ const progress = p.progress || 25;
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
                     <Fld label="Client / Display Name *" value={nc.name} onChange={v=>{setNc({...nc,name:v});setNcError(p=>({...p,name:''}));}} error={ncError.name} />
                     <Fld label="Company Name" value={nc.company} onChange={v=>setNc({...nc,company:v})} />
-                    <Fld label="Category / Industry" value={nc.category} onChange={v=>setNc({...nc,category:v})} options={['','Web Development','Mobile App Development','UI/UX Design','Digital Marketing','IT Consulting','E-commerce','Healthcare','Education','Finance','Real Estate','Manufacturing','Retail','Logistics','Media & Entertainment','Other']} />
+                    <Fld label="Category / Industry" value={nc.category} onChange={v=>setNc({...nc,category:v})} options={['','Web Development','Mobile App Development','UI/UX Design','Digital Marketing','IT Consulting','E-commerce','Healthcare','Education','Finance','Real Estate','Manufacturing','Retail','Logistics','Media & Entertainment']} allowCustom={true} />
                     <Fld label="Company Tax / GST No." value={nc.gstNumber} onChange={v=>setNc({...nc,gstNumber:v})} />
-                    <Fld label="Client Source" value={nc.source} onChange={v=>setNc({...nc,source:v})} options={['','Referral','Website / Organic','Social Media','Cold Outreach','LinkedIn','Event / Conference','Google Ads','Word of Mouth','Other']} />
-                    <Fld label="Onboarded On" value={nc.onboardedOn} onChange={v=>setNc({...nc,onboardedOn:v})} type="date" />
+                    <Fld label="Client Source" value={nc.source} onChange={v=>setNc({...nc,source:v})} options={['','Referral','Website / Organic','Social Media','Cold Outreach','LinkedIn','Event / Conference','Google Ads','Word of Mouth']} allowCustom={true} />
+                    <Fld label="Onboarded On" value={nc.onboardedOn} onChange={v=>setNc({...nc,onboardedOn:v})} type="date" disabled={true} />
                     <Fld label="Status" value={nc.status} onChange={v=>setNc({...nc,status:v})} options={['Active','Inactive']} />
                   </div>
                 </div>
@@ -6179,7 +6086,7 @@ const progress = p.progress || 25;
                     <Fld label="City" value={nc.city} onChange={v=>setNc({...nc,city:v})} />
                     <Fld label="State / Province" value={nc.state} onChange={v=>setNc({...nc,state:v})} />
                     <Fld label="Pincode / ZIP" value={nc.pincode} onChange={v=>setNc({...nc,pincode:v})} />
-                    <Fld label="Country" value={nc.country} onChange={v=>setNc({...nc,country:v})} options={['India','United States','United Kingdom','United Arab Emirates','Singapore','Australia','Canada','Germany','France','Other']} />
+                    <Fld label="Country" value={nc.country} onChange={v=>setNc({...nc,country:v})} options={['India','United States','United Kingdom','United Arab Emirates','Singapore','Australia','Canada','Germany','France']} allowCustom={true} />
                   </div>
                 </div>
 
@@ -6197,9 +6104,9 @@ const progress = p.progress || 25;
                   <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>💳 Billing & Terms</div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
                     <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v=>setNc({...nc,billingCurrency:v})} options={['INR — Indian Rupee','USD — US Dollar','GBP — British Pound','EUR — Euro','AED — UAE Dirham','SGD — Singapore Dollar','AUD — Australian Dollar']} />
-                    <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v=>setNc({...nc,paymentTerms:v})} options={['','Due on receipt','Net 7','Net 15','Net 30','Net 45','Net 60','50% Advance + 50% on delivery','Custom']} />
+                    <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v=>setNc({...nc,paymentTerms:v})} options={['','Due on receipt','Net 7','Net 15','Net 30','Net 45','Net 60','50% Advance + 50% on delivery']} allowCustom={true} />
                     <Fld label="Credit Limit" value={nc.creditLimit} onChange={v=>setNc({...nc,creditLimit:v})} type="number" />
-                    <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v=>setNc({...nc,preferredPaymentMode:v})} options={['','Bank Transfer / NEFT','UPI','Cheque','Credit Card','Cash','PayPal','Stripe','Other']} />
+                    <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v=>setNc({...nc,preferredPaymentMode:v})} options={['','Bank Transfer / NEFT','UPI','Cheque','Credit Card','Cash','PayPal','Stripe']} allowCustom={true} />
                   </div>
                 </div>
 

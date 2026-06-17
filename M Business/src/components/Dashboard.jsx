@@ -12,6 +12,7 @@ import AdminProposalManagement from "./AdminProposalManagement";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { QRCodeSVG } from "qrcode.react";
+import AddClientView from "./AddClientView";
 import { SubAdminDocumentsPage } from "./EmployeeProfilePanel";
 import { DOC_TYPES } from "./EmployeeProfilePanel";
 import ReportsPage from "./ReportsPage";
@@ -1866,9 +1867,9 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
   const addManager = async () => { const errors = {}; if (!nm.managerName.trim()) errors.managerName = "Name is required"; if (!nm.email.trim()) errors.email = "Email is required"; if (!nm.password.trim()) errors.password = "Password is required"; if (Object.keys(errors).length > 0) { setNmError(errors); return; } try { setMgrSaveLoading(true); const res = await axios.post(BASE_URL + "/api/managers/add", nm); setManagers(prev => [res.data.manager, ...prev]); setNm({ managerName: "", email: "", phone: "", department: "", role: "Manager", address: "", password: "", status: "Active" }); setNmError({}); setModal(null); } catch (err) { setNmError({ email: err.response?.data?.message || err.response?.data?.msg || "Failed to save" }); } finally { setMgrSaveLoading(false); } };
 
   const navItems = getNavForRole(user?.role);
-  const validActive = navItems.find(n => n.key === active) ? active : navItems[0]?.key || "dashboard";
-  const page = navItems.find(n => n.key === validActive) || navItems[0];
-  useEffect(() => { if (validActive !== active) setActive(validActive); }, [user?.role]);
+  const validActive = (navItems.find(n => n.key === active) || active === "addClient") ? active : navItems[0]?.key || "dashboard";
+  const page = navItems.find(n => n.key === validActive) || navItems.find(n => n.key === "clients") || navItems[0];
+  useEffect(() => { if (validActive !== active) setActive(validActive); }, [user?.role, active]);
 
   const displayName = user?.companyName || "Your Business";
   const initials = (displayName || "WS").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
@@ -1939,7 +1940,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
               <p style={{ margin: "3px 0 0", color: "var(--app-muted)", fontSize: 12 }}>{companyNameStr} M Business · {user?.role || "Admin"}</p>
             </div>
             <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0,fontSize:"14px" }}>
-              {validActive === "clients" && <button onClick={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} style={B("var(--app-accent)")}>+ Add Client</button>}
+              {validActive === "clients" && <button onClick={() => { setActive("addClient"); }} style={B("var(--app-accent)")}>+ Add Client</button>}
               {validActive === "employees" && <button onClick={() => { setNeError({}); setModal("employee"); }} style={B("var(--app-accent)")}>+ Add Employee</button>}
               {validActive === "projects" && <button onClick={() => { setNpError({}); setModal("project"); }} style={B("var(--app-muted)")}>+ New Project</button>}
               {validActive === "managers" && <button onClick={() => { setNmError({}); setShowMgrPass(false); setModal("manager"); }} style={B("#f59e0b")}>+ Add Manager</button>}
@@ -2028,7 +2029,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           </>}
 
           {/* ── Pages using new components ── */}
-          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onAddClient={() => { setNcError({}); setShowClientPass(false); setModal("client"); }} />}
+          {validActive === "clients" && <ClientsPage clients={clients} setClients={setClients} projects={projects} onAddClient={() => setActive("addClient")} />}
           {validActive === "employees" && <EmployeesPage employees={employees} setEmployees={setEmployees} />}
           {validActive === "managers" && <ManagersPage managers={managers} setManagers={setManagers} />}
           {validActive === "projects" && <ProjectsPage projects={projects} setProjects={setProjects} clients={clients} employees={employees} config={config} onViewTasks={(p) => { setSelectedProjectForTasks(p); setActive("tasks"); }} />}
@@ -2048,6 +2049,7 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
           {validActive === "interviews" && <InterviewPage companyId={companyId} companyName={companyNameStr} />}
           {validActive === "documents" && <SubAdminDocumentsPage employees={employees} />}
           {validActive === "reports" && <ReportsPage clients={clients} projects={projects} employees={employees} managers={managers} />}
+          {validActive === "addClient" && <AddClientView onBack={() => setActive("clients")} onClientAdded={(client) => { setClients(prev => [...prev, client]); setActive("clients"); }} user={user} />}
         </div>
       </div>
 

@@ -194,6 +194,7 @@ const CSS = `
 export default function ModernProjectsView({
   projects = [],
   onViewTasks,
+  onClickProject,
   onEdit,
   onDelete,
   onAssign,
@@ -372,7 +373,7 @@ export default function ModernProjectsView({
               <div
                 key={p._id || p.id || Math.random()}
                 className="mpv-card"
-                onClick={() => onViewTasks && onViewTasks(p)}
+                onClick={() => onClickProject ? onClickProject(p) : (onViewTasks && onViewTasks(p))}
               >
                 <div className="mpv-card-top">
                   {/* Row 1: status badge + priority + action menu */}

@@ -43,6 +43,11 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 app.use((req, res, next) => {
   req.companyId = req.headers['x-company-id'] || "";
+  console.log(`[API REQUEST] ${req.method} ${req.url} (companyId: "${req.companyId}")`);
+  const start = Date.now();
+  res.on('finish', () => {
+    console.log(`[API RESPONSE] ${req.method} ${req.url} -> ${res.statusCode} (${Date.now() - start}ms)`);
+  });
   next();
 });
 

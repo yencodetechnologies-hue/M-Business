@@ -223,28 +223,34 @@ contactEmail,
 
       let res;
       if (editProject) {
-        res = await axios.put(`${BASE_URL}/api/projects/${editProject._id || editProject.id}`, payload, { headers });
+        const projectId = editProject._id || editProject.id;
+        if (!projectId || projectId === 'undefined') {
+          alert('Error: Project ID is missing. Please go back and try again.');
+          setLoading(false);
+          return;
+        }
+        res = await axios.put(`${BASE_URL}/api/projects/${projectId}`, payload, { headers });
       } else {
         res = await axios.post(`${BASE_URL}/api/projects/add`, payload, { headers });
       }
       
-      // Notify assigned employees
-      if (assigned.length > 0) {
-        for (const empName of assigned) {
+      if (onSuccess) onSuccess(res.data);
+
+      // Fire-and-forget notifications (don't block on these)
+      if (!editProject && assigned.length > 0) {
+        assigned.forEach(empName => {
           const emp = employees.find(e => (e.name || e.employeeName || "").toLowerCase() === empName.toLowerCase());
           if (emp && (emp._id || emp.id)) {
-            await axios.post(`${BASE_URL}/api/notifications`, {
+            axios.post(`${BASE_URL}/api/notifications`, {
               userId: emp._id || emp.id,
               type: 'project',
               icon: '◈',
-              text: `You have been assigned to a new project: "${name}"`,
+              text: `You have been assigned to project: "${name}"`,
               link: 'projects'
             }).catch(() => {});
           }
-        }
+        });
       }
-
-      if (onSuccess) onSuccess(res.data);
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.msg || `Failed to ${editProject ? 'update' : 'create'} project`);

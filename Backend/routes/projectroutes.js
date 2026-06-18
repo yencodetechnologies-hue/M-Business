@@ -185,6 +185,13 @@ router.post("/add", async (req, res) => {
 // PUT update project
 router.put("/:id", async (req, res) => {
   try {
+    // Validate the ID is a proper MongoDB ObjectId
+    const rawId = req.params.id;
+    if (!rawId || rawId === "undefined" || rawId === "null" || !mongoose.Types.ObjectId.isValid(rawId)) {
+      console.error("PUT project: invalid or missing ID:", rawId);
+      return res.status(400).json({ msg: "Invalid project ID: " + rawId });
+    }
+
     // Check database connection
     if (mongoose.connection.readyState !== 1) {
       console.error("Database not connected! ReadyState:", mongoose.connection.readyState);
@@ -206,7 +213,7 @@ router.put("/:id", async (req, res) => {
 
     const companyId = req.companyId || "";
     const project = await Project.findOneAndUpdate(
-      { _id: req.params.id, companyId },
+      { _id: rawId, companyId },
       { $set: updateData },
       { new: true }
     );

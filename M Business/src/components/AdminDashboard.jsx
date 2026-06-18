@@ -110,75 +110,75 @@ export default function AdminDashboard({ user, setUser }) {
   const [tasks, setTasks] = useState([]);
   const [pkgError, setPkgError] = useState({});
 
-const [darkMode, setDarkMode] = useState(
-  () => localStorage.getItem("empDarkMode") === "true"
-);
-const T = darkMode ? {
-  bg: "#0a1628",
-  surface: "#112240",
-  sidebar: "#0d1b2a",
-  sidebarActive: "rgba(56,189,248,0.12)",
-  sidebarText: "rgba(255,255,255,0.45)",
-  sidebarTextActive: "#38bdf8",
-  border: "#1e3a5f",
-  borderDark: "#2a4a7f",
-  text: "#e2e8f0",
-  textMuted: "#94a3b8",
-  textFaint: "#4a6fa5",
-  accent: "#38bdf8",
-  accentLight: "rgba(56,189,248,0.1)",
-  success: "#34d399",
-  successBg: "rgba(52,211,153,0.1)",
-  successBorder: "rgba(52,211,153,0.25)",
-  warning: "#fbbf24",
-  warningBg: "rgba(251,191,36,0.1)",
-  warningBorder: "rgba(251,191,36,0.25)",
-  danger: "#f87171",
-  dangerBg: "rgba(248,113,113,0.1)",
-  dangerBorder: "rgba(248,113,113,0.25)",
-  info: "#38bdf8",
-  infoBg: "rgba(56,189,248,0.1)",
-  infoBorder: "rgba(56,189,248,0.25)",
-  radius: "14px",
-  radiusSm: "9px",
-  radiusLg: "20px",
-  shadow: "0 1px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
-  shadowMd: "0 4px 16px rgba(0,0,0,0.35)",
-  shadowLg: "0 12px 32px rgba(0,0,0,0.4)",
-} : {
-  // உங்கள் existing light T object இங்கே
-  bg: "#f5f3ff",
-  surface: "#ffffff",
-  sidebar: "#ffffff",
-  sidebarActive: "rgba(124,58,237,0.08)",
-  sidebarText: "#94a3b8",
-  sidebarTextActive: "#7c3aed",
-  border: "#ede9fe",
-  borderDark: "#ddd6fe",
-  text: "#1e1b4b",
-  textMuted: "#6b7280",
-  textFaint: "#a5b4fc",
-  accent: "#7c3aed",
-  accentLight: "#f5f3ff",
-  success: "#16a34a",
-  successBg: "#f0fdf4",
-  successBorder: "#bbf7d0",
-  warning: "#b45309",
-  warningBg: "#fffbeb",
-  warningBorder: "#fde68a",
-  danger: "#dc2626",
-  dangerBg: "#fef2f2",
-  dangerBorder: "#fecaca",
-  info: "#7c3aed",
-  infoBg: "#f5f3ff",
-  infoBorder: "#ddd6fe",
-  radius: "14px",
-  radiusSm: "9px",
-  radiusLg: "20px",
-  shadow: "0 1px 4px rgba(124,58,237,0.06)",
-  shadowMd: "0 4px 16px rgba(124,58,237,0.10)",
-  shadowLg: "0 12px 32px rgba(124,58,237,0.13)",
-};
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("empDarkMode") === "true"
+  );
+  const T = darkMode ? {
+    bg: "#0a1628",
+    surface: "#112240",
+    sidebar: "#0d1b2a",
+    sidebarActive: "rgba(56,189,248,0.12)",
+    sidebarText: "rgba(255,255,255,0.45)",
+    sidebarTextActive: "#38bdf8",
+    border: "#1e3a5f",
+    borderDark: "#2a4a7f",
+    text: "#e2e8f0",
+    textMuted: "#94a3b8",
+    textFaint: "#4a6fa5",
+    accent: "#38bdf8",
+    accentLight: "rgba(56,189,248,0.1)",
+    success: "#34d399",
+    successBg: "rgba(52,211,153,0.1)",
+    successBorder: "rgba(52,211,153,0.25)",
+    warning: "#fbbf24",
+    warningBg: "rgba(251,191,36,0.1)",
+    warningBorder: "rgba(251,191,36,0.25)",
+    danger: "#f87171",
+    dangerBg: "rgba(248,113,113,0.1)",
+    dangerBorder: "rgba(248,113,113,0.25)",
+    info: "#38bdf8",
+    infoBg: "rgba(56,189,248,0.1)",
+    infoBorder: "rgba(56,189,248,0.25)",
+    radius: "14px",
+    radiusSm: "9px",
+    radiusLg: "20px",
+    shadow: "0 1px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
+    shadowMd: "0 4px 16px rgba(0,0,0,0.35)",
+    shadowLg: "0 12px 32px rgba(0,0,0,0.4)",
+  } : {
+    // உங்கள் existing light T object இங்கே
+    bg: "#f5f3ff",
+    surface: "#ffffff",
+    sidebar: "#ffffff",
+    sidebarActive: "rgba(124,58,237,0.08)",
+    sidebarText: "#94a3b8",
+    sidebarTextActive: "#7c3aed",
+    border: "#ede9fe",
+    borderDark: "#ddd6fe",
+    text: "#1e1b4b",
+    textMuted: "#6b7280",
+    textFaint: "#a5b4fc",
+    accent: "#7c3aed",
+    accentLight: "#f5f3ff",
+    success: "#16a34a",
+    successBg: "#f0fdf4",
+    successBorder: "#bbf7d0",
+    warning: "#b45309",
+    warningBg: "#fffbeb",
+    warningBorder: "#fde68a",
+    danger: "#dc2626",
+    dangerBg: "#fef2f2",
+    dangerBorder: "#fecaca",
+    info: "#7c3aed",
+    infoBg: "#f5f3ff",
+    infoBorder: "#ddd6fe",
+    radius: "14px",
+    radiusSm: "9px",
+    radiusLg: "20px",
+    shadow: "0 1px 4px rgba(124,58,237,0.06)",
+    shadowMd: "0 4px 16px rgba(124,58,237,0.10)",
+    shadowLg: "0 12px 32px rgba(124,58,237,0.13)",
+  };
 
   const THEME = darkMode ? THEME_MAP.dark : THEME_MAP.light;
 
@@ -254,7 +254,7 @@ const T = darkMode ? {
       let apiDocs = res.data?.quotations || res.data || [];
       if (!Array.isArray(apiDocs)) apiDocs = [];
       let localDocs = [];
-      try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) {}
+      try { const d = localStorage.getItem("quotation_drafts"); localDocs = d ? JSON.parse(d) : []; } catch (e) { }
       const combined = [...apiDocs];
       localDocs.forEach(ld => {
         if (!combined.some(c => (c.quoteNo || c.qt?.quoteNo) === (ld.quoteNo || ld.qt?.quoteNo))) combined.push(ld);
@@ -513,17 +513,17 @@ const T = darkMode ? {
           {active === "dashboard" && <OverviewPage THEME={THEME} subadmins={subadmins} clients={clients} employees={employees} managers={managers} projects={projects} packages={packages} invoices={invoices} />}
           {active === "subadmins" && <SubadminsList THEME={THEME} subadmins={subadmins} refresh={fetchSubadmins} packages={packages} subscriptions={subscriptions} fetchSubscriptions={fetchSubscriptions} />}
           {active === "clients" && <ClientsPage THEME={THEME} clients={clients} setClients={setClients} onViewProject={(p) => { setJumpProject(p); setActive("project-details"); }} />}
-{active === "project-details" && jumpProject && (
-  <ModernProjectDetails
-    project={jumpProject}
-    onBack={() => { setActive("clients"); setJumpProject(null); }}
-    tasks={[]}
-    employees={[]}
-    user={user}
-    clients={clients}
-    onUpdate={() => {}}
-  />
-)}
+          {active === "project-details" && jumpProject && (
+            <ModernProjectDetails
+              project={jumpProject}
+              onBack={() => { setActive("clients"); setJumpProject(null); }}
+              tasks={[]}
+              employees={[]}
+              user={user}
+              clients={clients}
+              onUpdate={() => { }}
+            />
+          )}
           {active === "employees" && <EmployeesPage THEME={THEME} employees={employees} setEmployees={setEmployees} />}
           {active === "managers" && <ManagersPage THEME={THEME} managers={managers} setManagers={setManagers} />}
           {active === "projects" && <ProjectsPage THEME={THEME} projects={projects} tasks={tasks} setProjects={setProjects} clients={clients} employees={employees} fetchTasks={fetchTasks} />}
@@ -1250,54 +1250,54 @@ function SubadminsList({ THEME, subadmins, refresh, packages, subscriptions, fet
       {assignModalOpen && (() => {
         const selPkg = packages.find(p => p._id === selectedPackage);
         return (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 480, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow, maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-              <h3 style={{ margin: 0, fontWeight: 900, color: THEME.text }}>📦 Assign Package</h3>
-              <button onClick={() => setAssignModalOpen(false)} style={{ background: "transparent", border: "none", fontSize: 18, cursor: "pointer", color: THEME.muted }}>✕</button>
-            </div>
-            <p style={{ margin: "0 0 20px", color: THEME.muted, fontSize: 13 }}>Assigning to: <strong style={{ color: THEME.text }}>{selectedSubadmin.name}</strong> ({selectedSubadmin.email})</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6, textTransform: "uppercase" }}>Select Package *</label>
-                <select value={selectedPackage} onChange={e => setSelectedPackage(e.target.value)} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text, fontSize: 13 }}>
-                  <option value="">-- Choose Plan --</option>
-                  {packages.map(p => <option key={p._id} value={p._id}>{p.title} — ₹{p.price} / {p.no_of_days || 30} days</option>)}
-                </select>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+            <div style={{ background: THEME.card, padding: 32, borderRadius: 24, width: 480, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow, maxHeight: "90vh", overflowY: "auto" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                <h3 style={{ margin: 0, fontWeight: 900, color: THEME.text }}>📦 Assign Package</h3>
+                <button onClick={() => setAssignModalOpen(false)} style={{ background: "transparent", border: "none", fontSize: 18, cursor: "pointer", color: THEME.muted }}>✕</button>
               </div>
-              {selPkg && (
-                <div style={{ background: THEME.surface, borderRadius: 12, padding: 16, border: `1px solid ${THEME.border}` }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>Package Limits Preview</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-                    {[
-                      { label: "👥 Clients", val: selPkg.clientLimit || "—" },
-                      { label: "🧑‍💼 Employees", val: selPkg.employeeLimit || "—" },
-                      { label: "🔑 Managers", val: selPkg.managerLimit || "—" }
-                    ].map(({ label, val }) => (
-                      <div key={label} style={{ background: THEME.card, borderRadius: 8, padding: "10px 12px", border: `1px solid ${THEME.border}` }}>
-                        <div style={{ fontSize: 10, color: THEME.muted, marginBottom: 4 }}>{label}</div>
-                        <div style={{ fontSize: 13, fontWeight: 800, color: THEME.accent }}>{val}</div>
-                      </div>
-                    ))}
-                  </div>
+              <p style={{ margin: "0 0 20px", color: THEME.muted, fontSize: 13 }}>Assigning to: <strong style={{ color: THEME.text }}>{selectedSubadmin.name}</strong> ({selectedSubadmin.email})</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6, textTransform: "uppercase" }}>Select Package *</label>
+                  <select value={selectedPackage} onChange={e => setSelectedPackage(e.target.value)} style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text, fontSize: 13 }}>
+                    <option value="">-- Choose Plan --</option>
+                    {packages.map(p => <option key={p._id} value={p._id}>{p.title} — ₹{p.price} / {p.no_of_days || 30} days</option>)}
+                  </select>
                 </div>
-              )}
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6, textTransform: "uppercase" }}>Duration (Days)</label>
-                <input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} placeholder="30" style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text, fontSize: 13, boxSizing: "border-box" }} />
-              </div>
-              <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#b45309" }}>
-                ⚠️ This will cancel any existing active subscription for this subadmin and replace it with the selected package.
-              </div>
-              <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
-                <button onClick={() => setAssignModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, fontWeight: 700, background: THEME.surface, color: THEME.text, cursor: "pointer" }}>Cancel</button>
-                <button onClick={handleAssignPackage} disabled={assignLoading} style={{ flex: 2, padding: 12, borderRadius: 12, border: "none", background: assignLoading ? "#a78bfa" : THEME.accent, color: "#fff", fontWeight: 700, cursor: assignLoading ? "not-allowed" : "pointer" }}>
-                  {assignLoading ? "Assigning..." : "✓ Assign Package"}
-                </button>
+                {selPkg && (
+                  <div style={{ background: THEME.surface, borderRadius: 12, padding: 16, border: `1px solid ${THEME.border}` }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>Package Limits Preview</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                      {[
+                        { label: "👥 Clients", val: selPkg.clientLimit || "—" },
+                        { label: "🧑‍💼 Employees", val: selPkg.employeeLimit || "—" },
+                        { label: "🔑 Managers", val: selPkg.managerLimit || "—" }
+                      ].map(({ label, val }) => (
+                        <div key={label} style={{ background: THEME.card, borderRadius: 8, padding: "10px 12px", border: `1px solid ${THEME.border}` }}>
+                          <div style={{ fontSize: 10, color: THEME.muted, marginBottom: 4 }}>{label}</div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: THEME.accent }}>{val}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: THEME.muted, marginBottom: 6, textTransform: "uppercase" }}>Duration (Days)</label>
+                  <input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} placeholder="30" style={{ width: "100%", padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, background: THEME.surface, color: THEME.text, fontSize: 13, boxSizing: "border-box" }} />
+                </div>
+                <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#b45309" }}>
+                  ⚠️ This will cancel any existing active subscription for this subadmin and replace it with the selected package.
+                </div>
+                <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
+                  <button onClick={() => setAssignModalOpen(false)} style={{ flex: 1, padding: 12, borderRadius: 12, border: `1px solid ${THEME.border}`, fontWeight: 700, background: THEME.surface, color: THEME.text, cursor: "pointer" }}>Cancel</button>
+                  <button onClick={handleAssignPackage} disabled={assignLoading} style={{ flex: 2, padding: 12, borderRadius: 12, border: "none", background: assignLoading ? "#a78bfa" : THEME.accent, color: "#fff", fontWeight: 700, cursor: assignLoading ? "not-allowed" : "pointer" }}>
+                    {assignLoading ? "Assigning..." : "✓ Assign Package"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
         );
       })()}
     </div>
@@ -1453,10 +1453,10 @@ function SubadminDropdown({ value, options, onChange, darkMode }) {
               return (
                 <div
                   key={sub._id}
-                  onClick={() => { 
+                  onClick={() => {
                     // Pass as array since state expects array, but only containing ONE ID
-                    onChange([sub._id]); 
-                    setOpen(false); 
+                    onChange([sub._id]);
+                    setOpen(false);
                   }}
                   style={{
                     padding: "10px 14px", cursor: "pointer", fontSize: 13, borderRadius: 8,
@@ -1842,27 +1842,30 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
     (p.name || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.client || "").toLowerCase().includes(search.toLowerCase())
   );
-
   function openEdit(p) {
     setEditProj(p);
+
     setEditForm({
-      name:        p.name || "",
-      client:      p.client || "",
-      purpose:     p.purpose || p.category || "",
+      _id: p._id,
+      name: p.name || "",
+      client: p.client || "",
+      purpose: p.purpose || p.category || "",
       description: p.description || "",
-      start:       p.start || p.startDate || "",
-      end:         p.end || p.deadline || "",
-      budget:      p.budget || "",
-      status:      p.status || "In Progress",
-      priority:    p.priority || "medium",
-      assignedTo:  Array.isArray(p.assignedTo) ? p.assignedTo.join(", ") : (p.assignedTo || ""),
-      manager:     p.manager || "",
-      progress:    p.progress || 0,
+      start: p.start || p.startDate || "",
+      end: p.end || p.deadline || "",
+      budget: p.budget || "",
+      status: p.status || "In Progress",
+      priority: p.priority || "medium",
+      assignedTo: Array.isArray(p.assignedTo)
+        ? p.assignedTo.join(", ")
+        : (p.assignedTo || ""),
+      manager: p.manager || "",
+      progress: p.progress || 0,
       contactPersonName: p.contactPersonName || "",
-      contactPersonNo:   p.contactPersonNo || "",
+      contactPersonNo: p.contactPersonNo || "",
     });
   }
-
+  console.log("editProj =", editProj);
   async function handleEditSave(e) {
     e.preventDefault();
     if (!editForm.name.trim()) return;
@@ -1873,7 +1876,18 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
         assignedTo: editForm.assignedTo.split(",").map(s => s.trim()).filter(Boolean),
         progress: Number(editForm.progress) || 0,
       };
-      await axios.put(`${BASE_URL}/api/projects/${editProj._id}`, payload);
+      if (!editProj || !editProj._id) {
+        setSaving(false);
+        alert("Project ID missing");
+        return;
+      }
+
+      console.log("Updating project:", editProj._id);
+
+      await axios.put(
+        `${BASE_URL}/api/projects/${editProj._id}`,
+        payload
+      );
       setEditProj(null);
       if (setProjects) {
         const res = await axios.get(BASE_URL + "/api/projects");
@@ -1895,20 +1909,20 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
     return (
       <div style={{ background: THEME.card, borderRadius: 24, padding: 32, border: `1.5px solid ${THEME.border}`, boxShadow: THEME.shadow }}>
         <div style={{ marginBottom: "20px" }}>
-          <button 
-            onClick={() => setViewTasksProj(null)} 
+          <button
+            onClick={() => setViewTasksProj(null)}
             style={{ padding: "8px 16px", background: THEME.surface, color: THEME.text, border: `1px solid ${THEME.border}`, borderRadius: "8px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
           >
             ← Back to Projects
           </button>
         </div>
         <div style={{ flex: 1 }}>
-          <TaskPage 
-            projects={projects} 
-            employees={employees} 
+          <TaskPage
+            projects={projects}
+            employees={employees}
             onUpdate={() => fetchTasks && fetchTasks()}
-            selectedProjectId={viewTasksProj._id || viewTasksProj.id || null} 
-            selectedProjectName={viewTasksProj.name || null} 
+            selectedProjectId={viewTasksProj._id || viewTasksProj.id || null}
+            selectedProjectName={viewTasksProj.name || null}
             onClearProjectFilter={() => setViewTasksProj(null)}
             onSelectProject={(p) => setViewTasksProj(p)}
           />

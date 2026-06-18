@@ -183,7 +183,7 @@ function DetailField({ label, value, fullWidth }) {
   );
 }
 
-export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice, onNewProposal, onNewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone }) {
+export default function ModernProjectDetails({ project, onBack, tasks = [], employees = [], user, clients = [], onEdit, onDelete, onLogTime, onUpdate, fetchProjects, fetchTasks, onMessageTeam, hideTopActions, onNext, onNewInvoice, onViewInvoice, onNewProposal, onNewQuotation, autoOpenInvoice, onAutoOpenInvoiceDone }) {
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('project_tabs_order');
@@ -1539,8 +1539,14 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
                             <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                               <div style={{ position: 'relative' }}>
-                                <button onClick={() => setPreviewInvoice(prev => prev?.invoiceNo === inv.invoiceNo ? null : { ...inv, projectName: currProject.name, clientName, currency })} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#00BCD4' }} title="Change Status"><i className="ti ti-eye"></i></button>
-                                {previewInvoice?.invoiceNo === inv.invoiceNo && (
+                                <button onClick={() => {
+                                  if (onViewInvoice) {
+                                    onViewInvoice({ ...inv, projectName: currProject.name, clientName, currency });
+                                  } else {
+                                    setPreviewInvoice(prev => prev?.invoiceNo === inv.invoiceNo ? null : { ...inv, projectName: currProject.name, clientName, currency });
+                                  }
+                                }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#00BCD4' }} title="View Invoice"><i className="ti ti-eye"></i></button>
+                                {previewInvoice?.invoiceNo === inv.invoiceNo && !onViewInvoice && (
                                   <div style={{ position: 'absolute', right: 0, top: 30, zIndex: 999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.12)', minWidth: 140, overflow: 'hidden' }}>
                                     {[
                                       { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },

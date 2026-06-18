@@ -12,7 +12,7 @@ const P = {
 };
 
 const CSS = `
-.mpc-root { font-family:'Nunito',sans-serif; background:var(--bg); min-height:100vh; padding:0; box-sizing:border-box; }
+.mpc-root { font-family:'Nunito',sans-serif; background:var(--bg); min-height:0; padding:0; box-sizing:border-box; }
 .mpc-root * { box-sizing:border-box; }
 .mpc-create-layout { display:grid; grid-template-columns:1fr 340px; gap:24px; align-items:start; }
 
@@ -132,30 +132,41 @@ const [contactEmail, setContactEmail] = useState(editProject?.contactEmail || ed
   const [billed, setBilled] = useState(editProject?.billed || '');
   const [received, setReceived] = useState(editProject?.received || '');
 const [pending, setPending] = useState(editProject?.pending || '');
-
-// Auto-calculate pending
-useEffect(() => {
-  if (budget && received) {
-    const calc = Number(budget) - Number(received);
-    setPending(calc >= 0 ? String(calc) : '0');
-  }
-}, [budget, received]);
   const [spent, setSpent] = useState(editProject?.spent || '');
 
-  const [milestones, setMilestones] = useState(editProject?.milestones?.length ? editProject.milestones : [
-   
-    { name: 'Development Complete', date: '' }
-  ]);
-
-  const [portalOpts, setPortalOpts] = useState(editProject?.portalSettings || {
+  const defaultPortalOpts = {
     enablePortal: true,
     showProgress: true,
     showMilestones: true,
     showTeam: false,
-    allowMessages: true
+    allowMessages: true,
+  };
+
+  const normalizeMilestones = (list) => {
+    if (!Array.isArray(list) || list.length === 0) {
+      return [{ name: 'Development Complete', date: '' }];
+    }
+    return list.map(m => ({
+      name: m?.name || '',
+      date: safeDate(m?.date),
+    }));
+  };
+
+  const [milestones, setMilestones] = useState(() => normalizeMilestones(editProject?.milestones));
+
+  const [portalOpts, setPortalOpts] = useState(() => {
+    const ps = editProject?.portalSettings || editProject?.portalOpts;
+    if (!ps || typeof ps !== 'object') return { ...defaultPortalOpts };
+    return { ...defaultPortalOpts, ...ps };
   });
 
-  // No useEffect needed — useState initializers above already populate from editProject
+  // Auto-calculate pending
+  useEffect(() => {
+    if (budget && received) {
+      const calc = Number(budget) - Number(received);
+      setPending(calc >= 0 ? String(calc) : '0');
+    }
+  }, [budget, received]);
 
   // Calculate Progress Steps dynamically
   const stepInfo = 1;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useTransition } from "react";
+﻿import { useState, useEffect, useRef, useTransition } from "react";
 import React from "react";
 import "./DashboardModern.css";
 import axios from "axios";
@@ -35,8 +35,8 @@ import ModernProjectDetails from "./ModernProjectDetails";
 
 
 const T = { primary: "var(--app-primary)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)", surface: "var(--app-bg)" };
-const formatCurrency = (amount, currency = "₹", compact = false, disableCompact = false) => {
-  const sym = currency || "₹";
+const formatCurrency = (amount, currency = "â‚¹", compact = false, disableCompact = false) => {
+  const sym = currency || "â‚¹";
   const num = Number(amount) || 0;
   const absNum = Math.abs(num);
 
@@ -58,11 +58,11 @@ const formatCurrency = (amount, currency = "₹", compact = false, disableCompac
 
 const formatShortCurrency = (val) => {
   const num = Number(val);
-  if (isNaN(num) || num === 0) return "₹0";
+  if (isNaN(num) || num === 0) return "â‚¹0";
   
   const absNum = Math.abs(num);
   if (absNum >= 1e15) {
-    return `₹${num.toExponential(2)}`;
+    return `â‚¹${num.toExponential(2)}`;
   }
   
   let formatted = "";
@@ -79,7 +79,7 @@ const formatShortCurrency = (val) => {
   } else {
     formatted = num.toFixed(0);
   }
-  return `₹${formatted}`;
+  return `â‚¹${formatted}`;
 };
 
 const formatDate = (dateStr) => {
@@ -251,7 +251,7 @@ function SC({ title, children, action }) {
 function Search({ value, onChange, placeholder }) {
   return (
     <div style={{ position: "relative", marginBottom: 16 }}>
-      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span>
+      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>ðŸ”</span>
       <input type="text" placeholder={placeholder || "Search..."} value={value} onChange={e => onChange(e.target.value)}
         style={{ width: "100%", padding: "10px 14px 10px 40px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none", fontFamily: "inherit" }} />
     </div>
@@ -260,11 +260,14 @@ function Search({ value, onChange, placeholder }) {
 
 function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-      <div style={{ background: "var(--app-card)", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }}>
+    <div
+      style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.55)", backdropFilter: "blur(8px)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div style={{ background: "var(--app-card)", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }} onClick={e => e.stopPropagation()}>
         <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>âœ•</button>
         </div>
         <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>{children}</div>
       </div>
@@ -305,7 +308,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
         if (isNumericField && val && !/^\d*$/.test(val)) return;
         onChange(val);
       }} style={s} placeholder={placeholder || ""} disabled={disabled} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {error}</div>}
     </div>
   );
 }
@@ -368,7 +371,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
     <div style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div style={{ background: "var(--app-card)", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }}>
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "rgba(var(--red-rgb),0.1)" : "rgba(var(--app-accent-rgb),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
-          {danger ? "  Delete️" : "✅"}
+          {danger ? "  Deleteï¸" : "âœ…"}
         </div>
         <h3 style={{ textAlign: "center", margin: "0 0 8px", fontSize: 16, fontWeight: 800, color: T.text }}>{title}</h3>
         <p style={{ textAlign: "center", color: "#6b7280", fontSize: 13, margin: "0 0 22px" }}>{message}</p>
@@ -381,12 +384,12 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
   );
 }
 
-// ── Action Buttons (View / Edit / Delete) ────────────────────
+// â”€â”€ Action Buttons (View / Edit / Delete) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ActionBtns({ onView, onEdit, onDelete, onShare }) {
   return (
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
       {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>View</button>}
-      {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span>🔗</span></button>}
+      {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span>ðŸ”—</span></button>}
       {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f59e0b", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>Edit</button>}
       {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>  Delete</button>}
     </div>
@@ -407,13 +410,13 @@ function InfoRow({ icon, label, value }) {
 }
 
 function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
-  const icons = { client: "👥", employee: "👨‍💼", manager: "🧑‍💼" };
+  const icons = { client: "ðŸ‘¥", employee: "ðŸ‘¨â€ðŸ’¼", manager: "ðŸ§‘â€ðŸ’¼" };
   const labels = { client: "Clients", employee: "Employees", manager: "Managers" };
 
   return (
     <Mdl title="Limit Reached" onClose={onClose} maxWidth={450} zIndex={2000}>
       <div style={{ textAlign: "center", padding: "10px 0" }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>{icons[type] || "⚠️"}</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>{icons[type] || "âš ï¸"}</div>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 12 }}>
           {labels[type] || "Resource"} Limit Reached
         </h3>
@@ -432,7 +435,7 @@ function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
             onClick={onUpgrade}
             style={{ flex: 1, padding: "12px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, color: "#fff", cursor: "pointer", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)", fontFamily: "inherit" }}
           >
-            🚀 Upgrade Plan
+            ðŸš€ Upgrade Plan
           </button>
         </div>
       </div>
@@ -449,15 +452,15 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
     <div style={{ position: "relative" }}>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
         {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>â–¼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>ðŸ”</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No clients found</div>
-              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>✓</span>}</div>); })}
+              : filtered.map((c, i) => { const name = c.clientName || c.name || ""; const company = c.companyName || c.company || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</div>{company && <div style={{ fontSize: 11, color: "var(--app-muted)" }}>{company}</div>}</div>{isSel && <span style={{ fontSize: 14, color: "var(--app-accent)" }}>âœ“</span>}</div>); })}
           </div>
         </div>
       )}
@@ -466,9 +469,9 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // CLIENTS PAGE
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function ClientsPage({ clients, setClients, projects = [], setProjects, onAddClient, onViewProject, triggerCrop, onCreateProject, user }) {
   const mainScrollRef = useRef(null);
   const [search, setSearch] = useState("");
@@ -535,7 +538,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       country: c.country || "India",
       website: c.website || "",
       linkedin: c.linkedin || "",
-      billingCurrency: c.billingCurrency || "INR — Indian Rupee",
+      billingCurrency: c.billingCurrency || "INR â€” Indian Rupee",
       paymentTerms: c.paymentTerms || "",
       creditLimit: c.creditLimit || "",
       preferredPaymentMode: c.preferredPaymentMode || "",
@@ -558,12 +561,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       const res = await axios.put(`${BASE_URL}/api/clients/${editClient._id}`, editForm);
       setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm, ...res.data.client } : c));
       setEditClient(null);
-      showToast("✅ Client updated successfully!");
+      showToast("âœ… Client updated successfully!");
     } catch (err) {
       console.error(err);
       setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm } : c));
       setEditClient(null);
-      showToast("✅ Client updated locally!");
+      showToast("âœ… Client updated locally!");
     } finally { 
       setSaving(false); 
     }
@@ -573,7 +576,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     setClients(prev => prev.filter(c => c._id !== deleteTarget._id));
     if (activeClientId === deleteTarget._id) setActiveClientId(null);
     setDeleteTarget(null);
-    showToast("🗑️ Client deleted!");
+    showToast("ðŸ—‘ï¸ Client deleted!");
   };
 
   const updateStatus = async (c, newStatus) => {
@@ -582,7 +585,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     } catch { }
     setClients(prev => prev.map(x => x._id === c._id ? { ...x, status: newStatus } : x));
     setStatusDropOpen(false);
-    showToast(`✅ Status changed to ${newStatus}`);
+    showToast(`âœ… Status changed to ${newStatus}`);
   };
 
   const getStatusCfg = (status) => {
@@ -625,8 +628,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <div style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: st.dot, border: "1.5px solid #fff" }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
-          <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "â€”"}</div>
+          <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "â€”"}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
 
@@ -656,18 +659,18 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <div style={{ padding: "14px 16px" }}>
             {[
               { icon: "ti-mail", label: "Email", val: activeClient.email, bg: "#E0F7FA", col: "#00BCD4" },
-              { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "—", bg: "#E0F7FA", col: "#00BCD4" },
-              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "—", bg: "#E0F7FA", col: "#00BCD4" },
-{ icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#F3E8FF", col: "#7C5CFC" },
-{ icon: "ti-phone", label: "Phone", val: activeClient.phone || "—", bg: "#E0F7FA", col: "#00BCD4" },
-{ icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "—", bg: "#EFF4FF", col: "#2563EB" },
+              { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "â€”", bg: "#E0F7FA", col: "#00BCD4" },
+              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "â€”", bg: "#E0F7FA", col: "#00BCD4" },
+{ icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "â€”", bg: "#F3E8FF", col: "#7C5CFC" },
+{ icon: "ti-phone", label: "Phone", val: activeClient.phone || "â€”", bg: "#E0F7FA", col: "#00BCD4" },
+{ icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "â€”", bg: "#EFF4FF", col: "#2563EB" },
 { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active", bg: "#E8FAF3", col: "#26C281" },
               { icon: "ti-map-pin", label: "Company Address", val: activeClient.address, bg: "#FEF5E6", col: "#F5A623" },
 
             ].filter(Boolean).map((row, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 4 ? 10 : 0 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: row.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: row.col, flexShrink: 0 }}><i className={`ti ${row.icon}`} /></div>
-                <div><div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", marginTop: 1 }}>{row.val || "—"}</div></div>
+                <div><div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", marginTop: 1 }}>{row.val || "â€”"}</div></div>
               </div>
             ))}
           </div>
@@ -711,16 +714,16 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                       </div>
                     </div>
                    <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
-<button onClick={() => onViewProject && onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>
+<button onClick={() => onViewProject && onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View â†’</button>
 <button onClick={async (e) => { 
   e.stopPropagation(); 
-  if(!window.confirm(`"${p.name}" delete பண்ணவா?`)) return; 
+  if(!window.confirm(`"${p.name}" delete à®ªà®£à¯à®£à®µà®¾?`)) return; 
   try { 
     await axios.delete(`${BASE_URL}/api/projects/${p._id}`); 
     setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
-    showToast("🗑️ Project deleted!"); 
+    showToast("ðŸ—‘ï¸ Project deleted!"); 
   } catch(err) { 
-    showToast("❌ Delete failed!"); 
+    showToast("âŒ Delete failed!"); 
   } 
 }} style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#EF4444", cursor: "pointer", fontWeight: 700 }}>Delete</button>
                   </div>
@@ -745,7 +748,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
         <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE" }}>No projects for this client</div>
       ) : clientProjects.map((p, i) => (
         <div key={i} style={{ background: "#fff", border: "1.5px solid #E0EEF0", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📁</div>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>ðŸ“</div>
           <div style={{ flex: 1 }}>
             <div 
   onClick={() => onViewProject && onViewProject(p)} 
@@ -753,21 +756,21 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 >
   {p.name}
 </div>
-            <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 2 }}>{p.type || "—"} · {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
+            <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 2 }}>{p.type || "â€”"} Â· {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#26C281" }}>{p.status || "Active"}</span>
-{onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>}
+{onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View â†’</button>}
 <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
 <button onClick={async (e) => { 
   e.stopPropagation(); 
-  if(!window.confirm(`"${p.name}" delete பண்ணவா?`)) return; 
+  if(!window.confirm(`"${p.name}" delete à®ªà®£à¯à®£à®µà®¾?`)) return; 
   try { 
     await axios.delete(`${BASE_URL}/api/projects/${p._id}`); 
     setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
-    showToast("🗑️ Project deleted!"); 
+    showToast("ðŸ—‘ï¸ Project deleted!"); 
   } catch(err) { 
-    showToast("❌ Delete failed!"); 
+    showToast("âŒ Delete failed!"); 
   } 
 }} style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#EF4444", cursor: "pointer", fontWeight: 700 }}>Delete</button>
           </div>
@@ -817,16 +820,16 @@ const renderDocuments = () => {
           : c
       ));
 
-      showToast("✅ Document uploaded!");
+      showToast("âœ… Document uploaded!");
       setDocUploading(false);
     };
     reader.onerror = () => {
-      showToast("❌ Failed to read file!");
+      showToast("âŒ Failed to read file!");
       setDocUploading(false);
     };
     reader.readAsDataURL(file);
   } catch (err) {
-    showToast("❌ Upload failed!");
+    showToast("âŒ Upload failed!");
     setDocUploading(false);
   }
 };
@@ -850,7 +853,7 @@ const renderDocuments = () => {
       </div>
       {docs.length === 0 ? (
         <div style={{ textAlign: "center", padding: 40, color: "#A0B8BE", fontSize: 12 }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>ðŸ“‚</div>
           No documents uploaded yet
         </div>
       ) : (
@@ -860,12 +863,12 @@ const renderDocuments = () => {
               padding: 12, background: "#F5FAFA", 
               border: "1.5px solid #E0EEF0", borderRadius: 10, cursor: "pointer" 
             }}>
-              <div style={{ fontSize: 22, marginBottom: 8 }}>📄</div>
+              <div style={{ fontSize: 22, marginBottom: 8 }}>ðŸ“„</div>
               <div style={{ fontSize: 11, fontWeight: 700, color: "#1A2E35" }}>
                 {d.name || d.fileName || "Document"}
               </div>
               <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>
-                {d.size || d.type || "—"}
+                {d.size || d.type || "â€”"}
               </div>
             </div>
           ))}
@@ -877,8 +880,8 @@ const renderDocuments = () => {
 
   const renderActivity = () => {
     const activity = [
-      { icon: "ti-user-plus", bg: "#E0F7FA", color: "#00BCD4", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
-      ...clientProjects.map(p => ({ icon: "ti-briefcase", bg: "#EFF4FF", color: "#2563EB", title: `Project <b>${p.name}</b> created`, time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "—" })),
+      { icon: "ti-user-plus", bg: "#E0F7FA", color: "#00BCD4", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "â€”" },
+      ...clientProjects.map(p => ({ icon: "ti-briefcase", bg: "#EFF4FF", color: "#2563EB", title: `Project <b>${p.name}</b> created`, time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "â€”" })),
     ];
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
@@ -909,12 +912,12 @@ const renderDocuments = () => {
           <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>{c.clientName || c.name}</div>
           <div style={{ fontSize: 11, opacity: .7, marginBottom: 14, wordBreak: "break-all" }}>{portalUrl}</div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => { navigator.clipboard.writeText(portalUrl); showToast("📋 Portal link copied!"); }} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-copy" style={{ fontSize: 13 }} />Copy Link</button>
+            <button onClick={() => { navigator.clipboard.writeText(portalUrl); showToast("ðŸ“‹ Portal link copied!"); }} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-copy" style={{ fontSize: 13 }} />Copy Link</button>
             <button onClick={() => window.open(portalUrl, "_blank")} style={{ flex: 1, padding: 8, background: "rgba(255,255,255,.15)", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}><i className="ti ti-external-link" style={{ fontSize: 13 }} />Open Portal</button>
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-          {[{ val: clientProjects.length, label: "Projects" }, { val: "—", label: "Last Login" }, { val: c.status || "Active", label: "Status" }].map((s, i) => (
+          {[{ val: clientProjects.length, label: "Projects" }, { val: "â€”", label: "Last Login" }, { val: c.status || "Active", label: "Status" }].map((s, i) => (
             <div key={i} style={{ padding: "10px 12px", background: "#fff", borderRadius: 9, border: "1.5px solid #E0EEF0" }}>
               <div style={{ fontSize: 16, fontWeight: 800, color: "#1A2E35" }}>{s.val}</div>
               <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{s.label}</div>
@@ -942,12 +945,12 @@ const renderDocuments = () => {
     <div style={{ display: "flex", height: "100%", overflow: "hidden", background: "#F5FAFA" }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      {/* ── CLIENT LIST ── */}
+      {/* â”€â”€ CLIENT LIST â”€â”€ */}
       <div style={{ width: 300, minWidth: 300, background: "#fff", borderRight: "1.5px solid #E0EEF0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ padding: "14px 16px 10px", borderBottom: "1px solid #E0EEF0", flexShrink: 0 }}>
           <div style={{ position: "relative", marginBottom: 10 }}>
             <i className="ti ti-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#A0B8BE", fontSize: 14 }} />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clients…" style={{ width: "100%", padding: "8px 12px 8px 32px", background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, color: "#1A2E35", fontFamily: "inherit", outline: "none" }} onFocus={e => e.target.style.borderColor = "#00BCD4"} onBlur={e => e.target.style.borderColor = "#E0EEF0"} />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clientsâ€¦" style={{ width: "100%", padding: "8px 12px 8px 32px", background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 9, fontSize: 12, color: "#1A2E35", fontFamily: "inherit", outline: "none" }} onFocus={e => e.target.style.borderColor = "#00BCD4"} onBlur={e => e.target.style.borderColor = "#E0EEF0"} />
           </div>
           <div style={{ display: "flex", gap: 4, overflowX: "auto" }}>
             {["all", "active", "pending", "inactive"].map(f => (
@@ -977,7 +980,7 @@ const renderDocuments = () => {
         </div>
       </div>
 
-      {/* ── DETAIL PANEL ── */}
+      {/* â”€â”€ DETAIL PANEL â”€â”€ */}
       {activeClient ? (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
 
@@ -990,7 +993,7 @@ const renderDocuments = () => {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
-                  <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2E35", letterSpacing: "-.3px" }}>{activeClient.clientName || activeClient.name || "—"}</div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2E35", letterSpacing: "-.3px" }}>{activeClient.clientName || activeClient.name || "â€”"}</div>
                   {/* Status badge with dropdown */}
                   <div style={{ position: "relative" }} ref={statusDropRef}>
                     <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px 5px 9px", background: st.bg, border: `1.5px solid ${st.dot}`, borderRadius: 20, fontSize: 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
@@ -1029,7 +1032,7 @@ const renderDocuments = () => {
                 </div>
                 <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
                   {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E0F7FA", color: "#00BCD4" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
-                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
+                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "â€”"}</span>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 6, flexShrink: 0, flexWrap: "wrap" }}>
@@ -1041,7 +1044,7 @@ const renderDocuments = () => {
             {/* Stats bar */}
             <div style={{ display: "flex", gap: 0, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, overflow: "hidden" }}>
               {[
-                { val: cRevenue ? "₹" + Number(cRevenue).toLocaleString("en-IN") : "₹0", label: "Total Revenue", color: "#00BCD4" },
+                { val: cRevenue ? "â‚¹" + Number(cRevenue).toLocaleString("en-IN") : "â‚¹0", label: "Total Revenue", color: "#00BCD4" },
                 { val: clientProjects.length, label: "Projects" },
                 { val: (activeClient?.invoiceCount || 0), label: "Invoices" },
                 { val: (activeClient?.documents?.length || 0), label: "Documents" },
@@ -1076,7 +1079,7 @@ const renderDocuments = () => {
         </div>
       ) : (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}>👥</div>
+          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}>ðŸ‘¥</div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2E35" }}>Select a Client</div>
           <div style={{ fontSize: 12, color: "#A0B8BE" }}>Choose a client from the list to view details</div>
           <button onClick={onAddClient} style={{ padding: "9px 20px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", marginTop: 8 }}>+ Add First Client</button>
@@ -1110,30 +1113,30 @@ const renderDocuments = () => {
               )}
             </div>
             {[
-              { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "—" },
-              { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "—" },
-              { icon: "ti-mail", label: "Email", val: activeClient.email || "—" },
-              { icon: "ti-phone", label: "Phone", val: activeClient.phone || "—" },
-              { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "—" },
-              { icon: "ti-phone-call", label: "Contact No", val: activeClient.contactPersonNo || "—" },
-              { icon: "ti-tag", label: "Category", val: activeClient.category || "—" },
-              { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "—" },
-              { icon: "ti-map-pin", label: "Address", val: activeClient.address || "—" },
-              { icon: "ti-map", label: "City", val: activeClient.city || "—" },
-              { icon: "ti-map-2", label: "State", val: activeClient.state || "—" },
-              { icon: "ti-hash", label: "Pincode", val: activeClient.pincode || "—" },
-              { icon: "ti-world", label: "Country", val: activeClient.country || "—" },
-              { icon: "ti-globe", label: "Website", val: activeClient.website || "—" },
-              { icon: "ti-brand-linkedin", label: "LinkedIn", val: activeClient.linkedin || "—" },
-              { icon: "ti-coin", label: "Billing Currency", val: activeClient.billingCurrency || "—" },
-              { icon: "ti-credit-card", label: "Payment Terms", val: activeClient.paymentTerms || "—" },
-              { icon: "ti-wallet", label: "Credit Limit", val: activeClient.creditLimit || "—" },
-              { icon: "ti-cash", label: "Preferred Payment", val: activeClient.preferredPaymentMode || "—" },
-              { icon: "ti-source", label: "Client Source", val: activeClient.source || "—" },
+              { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "â€”" },
+              { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "â€”" },
+              { icon: "ti-mail", label: "Email", val: activeClient.email || "â€”" },
+              { icon: "ti-phone", label: "Phone", val: activeClient.phone || "â€”" },
+              { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "â€”" },
+              { icon: "ti-phone-call", label: "Contact No", val: activeClient.contactPersonNo || "â€”" },
+              { icon: "ti-tag", label: "Category", val: activeClient.category || "â€”" },
+              { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "â€”" },
+              { icon: "ti-map-pin", label: "Address", val: activeClient.address || "â€”" },
+              { icon: "ti-map", label: "City", val: activeClient.city || "â€”" },
+              { icon: "ti-map-2", label: "State", val: activeClient.state || "â€”" },
+              { icon: "ti-hash", label: "Pincode", val: activeClient.pincode || "â€”" },
+              { icon: "ti-world", label: "Country", val: activeClient.country || "â€”" },
+              { icon: "ti-globe", label: "Website", val: activeClient.website || "â€”" },
+              { icon: "ti-brand-linkedin", label: "LinkedIn", val: activeClient.linkedin || "â€”" },
+              { icon: "ti-coin", label: "Billing Currency", val: activeClient.billingCurrency || "â€”" },
+              { icon: "ti-credit-card", label: "Payment Terms", val: activeClient.paymentTerms || "â€”" },
+              { icon: "ti-wallet", label: "Credit Limit", val: activeClient.creditLimit || "â€”" },
+              { icon: "ti-cash", label: "Preferred Payment", val: activeClient.preferredPaymentMode || "â€”" },
+              { icon: "ti-source", label: "Client Source", val: activeClient.source || "â€”" },
               { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active" },
-              { icon: "ti-calendar", label: "Joined", val: activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
-              { icon: "ti-notes", label: "Notes", val: activeClient.notes || "—" },
-            ].filter(row => row.val && row.val !== "—").map((row, i) => (
+              { icon: "ti-calendar", label: "Joined", val: activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "â€”" },
+              { icon: "ti-notes", label: "Notes", val: activeClient.notes || "â€”" },
+            ].filter(row => row.val && row.val !== "â€”").map((row, i) => (
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: "#F5FAFA", borderRadius: 9, border: "1px solid #E0EEF0" }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#00BCD4", flexShrink: 0 }}>
                   <i className={`ti ${row.icon}`} />
@@ -1214,14 +1217,14 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
       if (viewEmp && viewEmp._id === editEmp._id) {
         setViewEmp(updated);
       }
-      setEditEmp(null); showToast("✅ Employee updated successfully!");
+      setEditEmp(null); showToast("âœ… Employee updated successfully!");
     } catch {
       const updated = { ...editEmp, ...editForm };
       setEmployees(prev => prev.map(e => e._id === editEmp._id ? updated : e));
       if (viewEmp && viewEmp._id === editEmp._id) {
         setViewEmp(updated);
       }
-      setEditEmp(null); showToast("✅ Updated locally!");
+      setEditEmp(null); showToast("âœ… Updated locally!");
     } finally { setSaving(false); }
   };
   const doDelete = async () => {
@@ -1232,14 +1235,14 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
       if (viewEmp && viewEmp._id === deleteTarget._id) {
         setViewEmp(null);
       }
-      showToast("🗑️ Employee deleted!");
+      showToast("ðŸ—‘ï¸ Employee deleted!");
     } catch {
       setEmployees(p => p.filter(e => e._id !== deleteTarget._id));
       setDeleteTarget(null);
       if (viewEmp && viewEmp._id === deleteTarget._id) {
         setViewEmp(null);
       }
-      showToast("🗑️ Deleted locally!");
+      showToast("ðŸ—‘ï¸ Deleted locally!");
     }
   };
 
@@ -1263,10 +1266,10 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
               await axios.put(`${BASE_URL}/api/employees/status/${viewEmp._id}`, { status: "Inactive" });
               setViewEmp(prev => ({ ...prev, status: "Inactive" }));
               setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, status: "Inactive" } : e));
-              showToast("👤 Employee deactivated!");
+              showToast("ðŸ‘¤ Employee deactivated!");
             } catch (err) {
               console.error("Failed to deactivate employee:", err);
-              showToast("❌ Failed to deactivate employee");
+              showToast("âŒ Failed to deactivate employee");
             }
           }}
           onChangeRole={async () => {
@@ -1276,10 +1279,10 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
               await axios.put(`${BASE_URL}/api/employees/${viewEmp._id}`, { role: newRole });
               setViewEmp(prev => ({ ...prev, role: newRole }));
               setEmployees(prev => prev.map(e => e._id === viewEmp._id ? { ...e, role: newRole } : e));
-              showToast("💼 Role updated successfully!");
+              showToast("ðŸ’¼ Role updated successfully!");
             } catch (err) {
               console.error("Failed to update role:", err);
-              showToast("❌ Failed to update role");
+              showToast("âŒ Failed to update role");
             }
           }}
           empDocs={empDocs} 
@@ -1305,7 +1308,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
             <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
 
             <div style={{ marginTop: 14 }}>
-              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>ðŸ¦ BANK DETAILS</div>
               <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
                 <Fld label="Bank Name" value={editForm.bankName} onChange={v => setEditForm(p => ({ ...p, bankName: v }))} />
                 <Fld label="IFSC Code" value={editForm.ifscCode} onChange={v => setEditForm(p => ({ ...p, ifscCode: v }))} />
@@ -1315,7 +1318,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
             <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
               <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes →"}</button>
+              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
             </div>
           </Mdl>
         )}
@@ -1345,13 +1348,13 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       {/* Share Onboarding Link Card (Kept as requested) */}
       <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>ðŸ”—</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Employee Onboarding Link</div>
           <div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
         </div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "âœ… Copied!" : "ðŸ“‹ Copy Link"}</button>
           <button onClick={() => {
             const text = `Hi,
 
@@ -1360,7 +1363,7 @@ Please fill in your onboarding details at the following link to join our team:
 ${onboardingLink}`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
           }} style={{ background: "#25D366", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
-            <span>💬</span> WhatsApp
+            <span>ðŸ’¬</span> WhatsApp
           </button>
         </div>
       </div>
@@ -1422,7 +1425,7 @@ ${onboardingLink}`;
             <tbody>
               {filtered.map((e, i) => {
                 const eid = e.employeeId || e._id?.substring(0, 6).toUpperCase() || `EMP-${String(i + 1).padStart(3, "0")}`;
-                const jDate = e.joiningDate ? new Date(e.joiningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "—";
+                const jDate = e.joiningDate ? new Date(e.joiningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "â€”";
                 let st = e.status || "Pending";
                 if (st === "Approved") st = "Active";
                 if (st === "Rejected") st = "Inactive";
@@ -1450,8 +1453,8 @@ ${onboardingLink}`;
                     <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
                       <span style={{ background: "#f1f5f9", color: "var(--text-mid)", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6 }}>{e.role || "Employee"}</span>
                     </td>
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 12, color: "var(--text-mid)", fontWeight: 600 }}>{e.department || "—"}</td>
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{e.email || "—"}</td>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 12, color: "var(--text-mid)", fontWeight: 600 }}>{e.department || "â€”"}</td>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{e.email || "â€”"}</td>
                     <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{jDate}</td>
                     <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
                       <div style={badgeStyle}><div style={dotStyle}></div> {st}</div>
@@ -1488,7 +1491,7 @@ ${onboardingLink}`;
           <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
 
           <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+            <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>ðŸ¦ BANK DETAILS</div>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
               <Fld label="Bank Name" value={editForm.bankName} onChange={v => setEditForm(p => ({ ...p, bankName: v }))} />
               <Fld label="IFSC Code" value={editForm.ifscCode} onChange={v => setEditForm(p => ({ ...p, ifscCode: v }))} />
@@ -1498,7 +1501,7 @@ ${onboardingLink}`;
 
           <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
             <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
           </div>
         </Mdl>
       )}
@@ -1519,7 +1522,7 @@ ${onboardingLink}`;
   );
 }
 // MANAGERS PAGE
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function ManagersPage({ managers, setManagers }) {
   const [search, setSearch] = useState("");
   const [viewMgr, setViewMgr] = useState(null);
@@ -1554,11 +1557,11 @@ function ManagersPage({ managers, setManagers }) {
       const res = await axios.put(`${BASE_URL}/api/managers/${editMgr._id}`, editForm);
       setManagers(prev => prev.map(m => m._id === editMgr._id ? { ...m, ...(res.data || editForm) } : m));
       setEditMgr(null);
-      showToast("✅ Manager updated!");
+      showToast("âœ… Manager updated!");
     } catch {
       setManagers(prev => prev.map(m => m._id === editMgr._id ? { ...m, ...editForm } : m));
       setEditMgr(null);
-      showToast("✅ Updated locally!");
+      showToast("âœ… Updated locally!");
     } finally { setSaving(false); }
   };
 
@@ -1568,7 +1571,7 @@ function ManagersPage({ managers, setManagers }) {
     } catch { }
     setManagers(prev => prev.filter(m => m._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast(" Delete️ Manager deleted!");
+    showToast(" Deleteï¸ Manager deleted!");
   };
 
   return (
@@ -1576,7 +1579,7 @@ function ManagersPage({ managers, setManagers }) {
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-        {[{ t: "Total Managers", v: managers.length, i: "🧑‍💼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Managers", v: managers.length, i: "ðŸ§‘â€ðŸ’¼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "âœ…", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
@@ -1601,15 +1604,15 @@ function ManagersPage({ managers, setManagers }) {
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(m.managerName || "?")[0].toUpperCase()}</div>
-                        <span style={{ fontWeight: 700, color: T.text }}>{m.managerName || "—"}</span>
+                        <span style={{ fontWeight: 700, color: T.text }}>{m.managerName || "â€”"}</span>
                       </div>
                     </td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.email || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.phone || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.email || "â€”"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.phone || "â€”"}</td>
                     <td style={{ padding: "12px 14px", color: "#f59e0b", fontSize: 12, fontWeight: 600 }}>{m.role || "Manager"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.department || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.department || "â€”"}</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={m.status || "Active"} /></td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{m.createdAt ? new Date(m.createdAt).toLocaleDateString() : "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{m.createdAt ? new Date(m.createdAt).toLocaleDateString() : "â€”"}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <ActionBtns onView={() => setViewMgr(m)} onEdit={() => openEdit(m)} onDelete={() => setDeleteTarget(m)} />
                     </td>
@@ -1631,11 +1634,11 @@ function ManagersPage({ managers, setManagers }) {
             </div>
             <div style={{ marginLeft: "auto" }}><Badge label={viewMgr.status || "Active"} /></div>
           </div>
-          <InfoRow icon="📧" label="Email" value={viewMgr.email} />
-          <InfoRow icon="📱" label="Phone" value={viewMgr.phone} />
-          <InfoRow icon="🏢" label="Department" value={viewMgr.department} />
-          <InfoRow icon="📍" label="Address" value={viewMgr.address} />
-          <InfoRow icon="📅" label="Joined" value={viewMgr.createdAt ? new Date(viewMgr.createdAt).toLocaleDateString() : "—"} />
+          <InfoRow icon="ðŸ“§" label="Email" value={viewMgr.email} />
+          <InfoRow icon="ðŸ“±" label="Phone" value={viewMgr.phone} />
+          <InfoRow icon="ðŸ¢" label="Department" value={viewMgr.department} />
+          <InfoRow icon="ðŸ“" label="Address" value={viewMgr.address} />
+          <InfoRow icon="ðŸ“…" label="Joined" value={viewMgr.createdAt ? new Date(viewMgr.createdAt).toLocaleDateString() : "â€”"} />
 
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => { setViewMgr(null); openEdit(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
@@ -1657,7 +1660,7 @@ function ManagersPage({ managers, setManagers }) {
           <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditMgr(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
           </div>
         </Mdl>
       )}
@@ -1667,9 +1670,9 @@ function ManagersPage({ managers, setManagers }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SUBADMINS PAGE
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [], quotations = [] }) {
   const [search, setSearch] = useState("");
   const [viewSub, setViewSub] = useState(null);
@@ -1708,11 +1711,11 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
       const res = await axios.put(`${BASE_URL}/api/subadmins/${editSub._id}`, editForm);
       setSubadmins(prev => prev.map(s => s._id === editSub._id ? { ...s, ...(res.data.subadmin || editForm) } : s));
       setEditSub(null);
-      showToast("✅ Subadmin updated!");
+      showToast("âœ… Subadmin updated!");
     } catch {
       setSubadmins(prev => prev.map(s => s._id === editSub._id ? { ...s, ...editForm } : s));
       setEditSub(null);
-      showToast("✅ Subadmin updated locally!");
+      showToast("âœ… Subadmin updated locally!");
     } finally { setSaving(false); }
   };
 
@@ -1723,7 +1726,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
     } catch { }
     setSubadmins(prev => prev.filter(s => s._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast(" Delete️ Subadmin deleted!");
+    showToast(" Deleteï¸ Subadmin deleted!");
   };
 
   // Filter related data for the viewed subadmin
@@ -1772,7 +1775,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
       {toastMsg && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toastMsg}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-        {[{ t: "Total Subadmins", v: subadmins.length, i: "🛡️", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "✅", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "⛔", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Subadmins", v: subadmins.length, i: "ðŸ›¡ï¸", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "âœ…", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
@@ -1797,15 +1800,15 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(s.name || "?")[0].toUpperCase()}</div>
-                        <span style={{ fontWeight: 700, color: T.text }}>{s.name || "—"}</span>
+                        <span style={{ fontWeight: 700, color: T.text }}>{s.name || "â€”"}</span>
                       </div>
                     </td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12, fontWeight: 600 }}>{s.companyName || s.company || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.email || "—"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.phone || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12, fontWeight: 600 }}>{s.companyName || s.company || "â€”"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.email || "â€”"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.phone || "â€”"}</td>
                     <td style={{ padding: "12px 14px", color: "#3b82f6", fontSize: 12, fontWeight: 600 }}>Subadmin</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={s.status || "Active"} /></td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "â€”"}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <ActionBtns onView={() => handleViewSubadmin(s)} onEdit={() => openEdit(s)} onDelete={() => setDeleteTarget(s)} />
                     </td>
@@ -1832,16 +1835,16 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
             {/* Basic Info */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12, marginBottom: 20 }}>
-              <InfoRow icon="🏢" label="Company" value={viewSub.companyName || viewSub.company || "—"} />
-              <InfoRow icon="💼" label="Company Type" value={viewSub.companyType || "IT"} />
-              <InfoRow icon="👥" label="Employees" value={viewSub.employeeCount || "0-10"} />
-              <InfoRow icon="📧" label="Email" value={viewSub.email} />
-              <InfoRow icon="📱" label="Phone" value={viewSub.phone} />
-              <InfoRow icon="📅" label="Joined" value={viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleDateString() : "—"} />
+              <InfoRow icon="ðŸ¢" label="Company" value={viewSub.companyName || viewSub.company || "â€”"} />
+              <InfoRow icon="ðŸ’¼" label="Company Type" value={viewSub.companyType || "IT"} />
+              <InfoRow icon="ðŸ‘¥" label="Employees" value={viewSub.employeeCount || "0-10"} />
+              <InfoRow icon="ðŸ“§" label="Email" value={viewSub.email} />
+              <InfoRow icon="ðŸ“±" label="Phone" value={viewSub.phone} />
+              <InfoRow icon="ðŸ“…" label="Joined" value={viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleDateString() : "â€”"} />
               <div style={{ gridColumn: "span 2", height: 1, background: "#bfdbfe", margin: "10px 0" }} />
-              <InfoRow icon="🏢" label="Client Limit" value={viewSub.clientLimit || "Not set (Default 10)"} />
-              <InfoRow icon="👨‍💼" label="Employee Limit" value={viewSub.employeeLimit || "Not set (Default 20)"} />
-              <InfoRow icon="🧑‍💼" label="Manager Limit" value={viewSub.managerLimit || "Not set (Default 5)"} />
+              <InfoRow icon="ðŸ¢" label="Client Limit" value={viewSub.clientLimit || "Not set (Default 10)"} />
+              <InfoRow icon="ðŸ‘¨â€ðŸ’¼" label="Employee Limit" value={viewSub.employeeLimit || "Not set (Default 20)"} />
+              <InfoRow icon="ðŸ§‘â€ðŸ’¼" label="Manager Limit" value={viewSub.managerLimit || "Not set (Default 5)"} />
             </div>
 
             {/* Stats Cards */}
@@ -1864,16 +1867,16 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
             {relatedQuotations.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: 8 }}>
-                  <span>📋</span> Quotations ({relatedQuotations.length})
+                  <span>ðŸ“‹</span> Quotations ({relatedQuotations.length})
                 </h4>
                 <div style={{ maxHeight: 150, overflowY: "auto", border: "1px solid #e0f2fe", borderRadius: 10, background: "#f0f9ff" }}>
                   {relatedQuotations.map((q, idx) => (
                     <div key={idx} style={{ padding: "10px 14px", borderBottom: "1px solid #e0f2fe", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{q.quotationNumber || q.quoteNumber || `Quote #${idx + 1}`}</div>
-                        <div style={{ fontSize: 11, color: "#64748b" }}>{q.client || q.clientName || "—"}</div>
+                        <div style={{ fontSize: 11, color: "#64748b" }}>{q.client || q.clientName || "â€”"}</div>
                       </div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#0ea5e9" }}>{q.amount || q.total || "—"}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#0ea5e9" }}>{q.amount || q.total || "â€”"}</div>
                     </div>
                   ))}
                 </div>
@@ -1884,7 +1887,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
             {relatedEmployees.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: 8 }}>
-                  <span>👨‍💼</span> Employees ({relatedEmployees.length})
+                  <span>ðŸ‘¨â€ðŸ’¼</span> Employees ({relatedEmployees.length})
                 </h4>
                 <div style={{ maxHeight: 150, overflowY: "auto", border: "1px solid var(--app-border)", borderRadius: 10, background: "var(--app-bg)" }}>
                   {relatedEmployees.map((e, idx) => (
@@ -1893,7 +1896,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(e.name || "?")[0].toUpperCase()}</div>
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{e.name}</div>
-                          <div style={{ fontSize: 11, color: "#64748b" }}>{e.role || e.department || "—"}</div>
+                          <div style={{ fontSize: 11, color: "#64748b" }}>{e.role || e.department || "â€”"}</div>
                         </div>
                       </div>
                       <Badge label={e.status || "Active"} />
@@ -1907,7 +1910,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
             {relatedManagers.length > 0 && (
               <div style={{ marginBottom: 20 }}>
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: 8 }}>
-                  <span>🧑‍💼</span> Managers ({relatedManagers.length})
+                  <span>ðŸ§‘â€ðŸ’¼</span> Managers ({relatedManagers.length})
                 </h4>
                 <div style={{ maxHeight: 150, overflowY: "auto", border: "1px solid #fed7aa", borderRadius: 10, background: "#fff7ed" }}>
                   {relatedManagers.map((m, idx) => (
@@ -1916,7 +1919,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(m.managerName || m.name || "?")[0].toUpperCase()}</div>
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{m.managerName || m.name}</div>
-                          <div style={{ fontSize: 11, color: "#64748b" }}>{m.department || "—"}</div>
+                          <div style={{ fontSize: 11, color: "#64748b" }}>{m.department || "â€”"}</div>
                         </div>
                       </div>
                       <Badge label={m.status || "Active"} />
@@ -1946,7 +1949,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditSub(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving…" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
           </div>
         </Mdl>
       )}
@@ -1956,9 +1959,9 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PROJECTS PAGE
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, onViewProject, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice }) {
   const [search, setSearch] = useState("");
 
@@ -1973,13 +1976,9 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
 
   const [viewTasksProj, setViewTasksProj] = useState(null);
   const [viewProj, setViewProj] = useState(null);
-  const [editProj, setEditProj] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [assignModal, setAssignModal] = useState(null);
-  const [editForm, setEditForm] = useState({ currency: "₹" });
-  const [editErr, setEditErr] = useState({});
   const [assignTo, setAssignTo] = useState([]);
-  const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
 
   // UseEffect removed to prevent unnecessary popup
@@ -1994,44 +1993,10 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
 const openEdit = (p) => {
+  if (!p || (!p._id && !p.id)) return;
   setJumpProject(p);
   if (onEditProject) {
     onEditProject(p);
-  } else {
-    let currentProgress = p.progress || 0;
-    const s = (p.status || "").toLowerCase();
-    if (s === "completed" || s === "done") currentProgress = 100;
-
-    setEditForm({
-      name: p.name || "",
-      client: p.client || "",
-      contactPersonName: p.contactPersonName || "",
-      contactPersonNo: p.contactPersonNo || "",
-      category: p.category || "Web Development",
-
-      purpose: p.purpose || "",
-      description: p.description || "",
-      start: p.start ? new Date(p.start).toISOString().split('T')[0] : "",
-      end: p.end ? new Date(p.end).toISOString().split('T')[0] : (p.deadline ? new Date(p.deadline).toISOString().split('T')[0] : ""),
-      budget: p.budget || "",
-      currency: p.currency || "₹",
-      team: p.team || "",
-      status: p.status || "Pending",
-      progress: currentProgress,
-      assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []),
-      manager: p.manager || "",
-      loggedHours: p.loggedHours || 0,
-      milestones: Array.isArray(p.milestones) ? p.milestones : [],
-      portalOpts: p.portalOpts || {
-        enablePortal: false,
-        showProgress: false,
-        showMilestones: false,
-        showTeam: false,
-        allowMessages: false
-      },
-    });
-    setEditErr({});
-    setEditProj(p);
   }
 };
 
@@ -2039,7 +2004,7 @@ const openEdit = (p) => {
     try { await axios.delete(`${BASE_URL}/api/projects/${deleteTarget._id}`); } catch { }
     setProjects(prev => prev.filter(p => p._id !== deleteTarget._id));
     setDeleteTarget(null);
-    showToast(" Delete️ Project deleted!");
+    showToast(" Deleteï¸ Project deleted!");
   };
 
   const doAssign = async () => {
@@ -2048,7 +2013,7 @@ const openEdit = (p) => {
       await axios.put(`${BASE_URL}/api/projects/${assignModal._id}`, { assignedTo: assignTo });
       setProjects(prev => prev.map(p => p._id === assignModal._id ? { ...p, assignedTo: assignTo } : p));
       setAssignModal(null); setAssignTo([]);
-      showToast("✅ Employees assigned!");
+      showToast("âœ… Employees assigned!");
     } catch (err) { alert(err.response?.data?.msg || "Failed to assign"); }
   };
 
@@ -2070,7 +2035,7 @@ const openEdit = (p) => {
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
-      {/* ── Page header ── */}
+      {/* â”€â”€ Page header â”€â”€ */}
   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
     {onBack && (
@@ -2095,11 +2060,7 @@ const openEdit = (p) => {
     if (!p || (!p._id && !p.id)) return; 
     onViewProject && onViewProject(p);
   }}
-  onEdit={(p) => { 
-    if (!p || (!p._id && !p.id)) return;
-    setJumpProject(p); 
-    setActive("edit-project"); 
-  }} 
+  onEdit={(p) => openEdit(p)} 
   onDelete={(p) => setDeleteTarget(p)} 
   onNewInvoice={(p) => { 
     if (!p) return;
@@ -2127,8 +2088,8 @@ const openEdit = (p) => {
                 ["Manager", viewProj.manager],
                 ["Contact Person", viewProj.contactPersonName],
                 ["Contact No", viewProj.contactPersonNo],
-                ["Start Date", viewProj.start ? new Date(viewProj.start).toLocaleDateString("en-IN") : "—"],
-                ["Deadline", (viewProj.end || viewProj.deadline) ? new Date(viewProj.end || viewProj.deadline).toLocaleDateString("en-IN") : "—"],
+                ["Start Date", viewProj.start ? new Date(viewProj.start).toLocaleDateString("en-IN") : "â€”"],
+                ["Deadline", (viewProj.end || viewProj.deadline) ? new Date(viewProj.end || viewProj.deadline).toLocaleDateString("en-IN") : "â€”"],
                 ["Budget", formatCurrency(viewProj.budget, viewProj.currency)],
                 ["Progress", `${viewProj.progress || 0}%`],
 
@@ -2136,12 +2097,12 @@ const openEdit = (p) => {
               ].map(([label, val]) => (
                 <div key={label}>
                   <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{label}</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{val || "—"}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{val || "â€”"}</div>
                 </div>
               ))}
               <div style={{ gridColumn: "1 / -1" }}>
                 <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Description</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--app-sidebar)", lineHeight: 1.6 }}>{viewProj.description || viewProj.purpose || "—"}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--app-sidebar)", lineHeight: 1.6 }}>{viewProj.description || viewProj.purpose || "â€”"}</div>
               </div>
             </div>
 
@@ -2166,7 +2127,7 @@ const openEdit = (p) => {
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {viewProj.milestones.map((m, idx) => (
                     <div key={idx} style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", padding: "8px 12px", background: "var(--app-bg)", borderRadius: 10 }}>
-                      {m.name}{m.date ? ` — ${new Date(m.date).toLocaleDateString("en-IN")}` : ""}
+                      {m.name}{m.date ? ` â€” ${new Date(m.date).toLocaleDateString("en-IN")}` : ""}
                     </div>
                   ))}
                 </div>
@@ -2175,252 +2136,12 @@ const openEdit = (p) => {
 
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); openEdit(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>Edit</button>
-              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>👤 Assign</button>
+              <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setAssignModal(viewProj); setAssignTo(Array.isArray(viewProj.assignedTo) ? viewProj.assignedTo : (viewProj.assignedTo ? [viewProj.assignedTo] : [])); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}>ðŸ‘¤ Assign</button>
               <button onClick={(e) => { e.stopPropagation(); setViewProj(null); setDeleteTarget(viewProj); }} style={{ flex: 1, padding: "11px", background: "linear-gradient(135deg,#ef4444,#dc2626)", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13 }}> Delete</button>
             </div>
           </div>
         </Mdl>
       )}
-{editProj && (
-  <Mdl title="Edit Project" onClose={() => setEditProj(null)}>
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-      
-      {/* Project Name */}
-      <Fld label="Project Name *" value={editForm.name}
-        onChange={v => { setEditForm(p => ({ ...p, name: v })); setEditErr(p => ({ ...p, name: "" })); }}
-        error={editErr.name} />
-
-      {/* Client */}
-      <div style={{ marginBottom: 14 }}>
-        <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label>
-        <ClientDropdown clients={clients} value={editForm.client}
-          onChange={v => { setEditForm(p => ({ ...p, client: v })); setEditErr(p => ({ ...p, client: "" })); }}
-          error={editErr.client} />
-        {editErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {editErr.client}</div>}
-      </div>
-
-      {/* Contact */}
-      <Fld label="Contact Person Name" value={editForm.contactPersonName}
-        onChange={v => setEditForm(p => ({ ...p, contactPersonName: v }))} />
-      <Fld label="Contact Person No" value={editForm.contactPersonNo}
-        onChange={v => setEditForm(p => ({ ...p, contactPersonNo: v }))} />
-
-      {/* Category */}
-      <Fld label="Category" value={editForm.category}
-        onChange={v => setEditForm(p => ({ ...p, category: v }))}
-        options={["Web Development", "Mobile App", "UI/UX Design", "Marketing", "Consulting", "Other"]} />
-
-
-
-      {/* Purpose */}
-      <Fld label="Purpose" value={editForm.purpose}
-        onChange={v => setEditForm(p => ({ ...p, purpose: v }))} />
-
-      {/* Manager */}
-      <Fld label="Manager" value={editForm.manager}
-        onChange={v => setEditForm(p => ({ ...p, manager: v }))}
-        placeholder="Manager name" />
-
-      {/* Budget */}
-      <div style={{ marginBottom: 14 }}>
-        <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>BUDGET</label>
-        <div style={{ display: "flex", gap: 8 }}>
-          <select value={editForm.currency}
-            onChange={e => setEditForm(p => ({ ...p, currency: e.target.value }))}
-            style={{ width: 70, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}>
-            {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <input type="text" value={editForm.budget}
-            onChange={e => setEditForm(p => ({ ...p, budget: e.target.value }))}
-            style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
-            placeholder="0.00" />
-        </div>
-      </div>
-
-
-
-      {/* Dates */}
-      <Fld label="Start Date" value={editForm.start} type="date"
-        onChange={v => setEditForm(p => ({ ...p, start: v }))} />
-      <Fld label="End / Deadline Date" value={editForm.end} type="date"
-        onChange={v => setEditForm(p => ({ ...p, end: v }))} />
-
-      {/* Team */}
-      <Fld label="Team Members" value={editForm.team}
-        onChange={v => setEditForm(p => ({ ...p, team: v }))} />
-
-      {/* Status */}
-      <Fld label="Status" value={editForm.status}
-        onChange={v => {
-          let updatedProgress = editForm.progress || 0;
-          if (v.toLowerCase() === "completed" || v.toLowerCase() === "done") updatedProgress = 100;
-          else if (v.toLowerCase() === "pending") updatedProgress = 0;
-          else if (v.toLowerCase() === "in progress" && (editForm.progress || 0) === 0) updatedProgress = 50;
-          setEditForm(prev => ({ ...prev, status: v, progress: updatedProgress }));
-        }}
-        options={["Active", "On Hold", "Completed", "Overdue"]} allowCustom={true} />
-
-      {/* Progress */}
-      <Fld label="Progress (%)" value={editForm.progress || 0} type="number" placeholder="0"
-        onChange={v => {
-          let val = Number(v);
-          if (val < 0) val = 0;
-          if (val > 100) val = 100;
-          setEditForm(prev => ({ ...prev, progress: val }));
-        }} />
-    </div>
-
-    {/* Description - full width */}
-    <Fld label="Description" value={editForm.description}
-      onChange={v => setEditForm(p => ({ ...p, description: v }))} />
-
-    {/* ── Milestones ── */}
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <label style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>MILESTONES</label>
-        <button onClick={() => setEditForm(p => ({ ...p, milestones: [...(p.milestones || []), { name: "", date: "", done: false }] }))}
-          style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-          + Add Milestone
-        </button>
-      </div>
-      {(editForm.milestones || []).length === 0 && (
-        <div style={{ fontSize: 12, color: "var(--app-muted)", fontStyle: "italic", padding: "8px 0" }}>No milestones added</div>
-      )}
-      {(editForm.milestones || []).map((ms, idx) => (
-        <div key={idx} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
-          <input type="checkbox" checked={ms.done}
-            onChange={e => setEditForm(p => {
-              const m = [...p.milestones];
-              m[idx] = { ...m[idx], done: e.target.checked };
-              return { ...p, milestones: m };
-            })}
-            style={{ width: 16, height: 16, cursor: "pointer", flexShrink: 0 }} />
-          <input type="text" value={ms.name} placeholder="Milestone name"
-            onChange={e => setEditForm(p => {
-              const m = [...p.milestones];
-              m[idx] = { ...m[idx], name: e.target.value };
-              return { ...p, milestones: m };
-            })}
-            style={{ flex: 1, border: "1.5px solid var(--app-border)", borderRadius: 8, padding: "7px 10px", fontSize: 12, background: "var(--app-bg)", outline: "none", textDecoration: ms.done ? "line-through" : "none", color: ms.done ? "var(--app-muted)" : T.text }} />
-          <input type="date" value={ms.date}
-            onChange={e => setEditForm(p => {
-              const m = [...p.milestones];
-              m[idx] = { ...m[idx], date: e.target.value };
-              return { ...p, milestones: m };
-            })}
-            style={{ border: "1.5px solid var(--app-border)", borderRadius: 8, padding: "7px 10px", fontSize: 12, background: "var(--app-bg)", outline: "none" }} />
-          <button onClick={() => setEditForm(p => ({ ...p, milestones: p.milestones.filter((_, i) => i !== idx) }))}
-            style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 9px", color: "#ef4444", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>×</button>
-        </div>
-      ))}
-    </div>
-
-    {/* ── Client Portal Settings ── */}
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <label style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>CLIENT PORTAL SETTINGS</label>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)" }}>
-          <input type="checkbox" checked={editForm.portalOpts?.enablePortal || false}
-            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, enablePortal: e.target.checked } }))}
-            style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--app-accent)" }} />
-          Enable client portal for this project
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", opacity: editForm.portalOpts?.enablePortal ? 1 : 0.5 }}>
-          <input type="checkbox" checked={editForm.portalOpts?.showProgress || false}
-            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, showProgress: e.target.checked } }))}
-            disabled={!editForm.portalOpts?.enablePortal}
-            style={{ width: 16, height: 16, cursor: editForm.portalOpts?.enablePortal ? "pointer" : "not-allowed", accentColor: "var(--app-accent)" }} />
-          Show project progress to client
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", opacity: editForm.portalOpts?.enablePortal ? 1 : 0.5 }}>
-          <input type="checkbox" checked={editForm.portalOpts?.showMilestones || false}
-            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, showMilestones: e.target.checked } }))}
-            disabled={!editForm.portalOpts?.enablePortal}
-            style={{ width: 16, height: 16, cursor: editForm.portalOpts?.enablePortal ? "pointer" : "not-allowed", accentColor: "var(--app-accent)" }} />
-          Show milestones to client
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", opacity: editForm.portalOpts?.enablePortal ? 1 : 0.5 }}>
-          <input type="checkbox" checked={editForm.portalOpts?.showTeam || false}
-            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, showTeam: e.target.checked } }))}
-            disabled={!editForm.portalOpts?.enablePortal}
-            style={{ width: 16, height: 16, cursor: editForm.portalOpts?.enablePortal ? "pointer" : "not-allowed", accentColor: "var(--app-accent)" }} />
-          Show team members to client
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--app-sidebar)", opacity: editForm.portalOpts?.enablePortal ? 1 : 0.5 }}>
-          <input type="checkbox" checked={editForm.portalOpts?.allowMessages || false}
-            onChange={e => setEditForm(p => ({ ...p, portalOpts: { ...p.portalOpts, allowMessages: e.target.checked } }))}
-            disabled={!editForm.portalOpts?.enablePortal}
-            style={{ width: 16, height: 16, cursor: editForm.portalOpts?.enablePortal ? "pointer" : "not-allowed", accentColor: "var(--app-accent)" }} />
-          Allow client to send messages
-        </label>
-      </div>
-    </div>
-
-    {/* ── Assign Employees ── */}
-    <div style={{ marginBottom: 14 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-        <label style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>ASSIGN EMPLOYEES</label>
-        <button onClick={() => onAddEmployee && onAddEmployee()}
-          style={{ background: "none", border: "none", color: "var(--app-accent)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-          + Add Employee
-        </button>
-      </div>
-      <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "12px", background: "var(--app-bg)", maxHeight: 200, overflowY: "auto" }}>
-        {employees.length === 0
-          ? <div style={{ color: "var(--app-muted)", fontSize: 13, textAlign: "center", padding: 20 }}>No employees available</div>
-          : employees.map(emp => (
-            <div key={emp._id || emp.email} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--app-bg)" }}>
-              <input type="checkbox" id={`edit-emp-${emp._id || emp.email}`}
-                checked={Array.isArray(editForm.assignedTo) ? editForm.assignedTo.includes(emp.name) : editForm.assignedTo === emp.name}
-                onChange={e => {
-                  const cur = Array.isArray(editForm.assignedTo) ? editForm.assignedTo : (editForm.assignedTo ? [editForm.assignedTo] : []);
-                  setEditForm(p => ({ ...p, assignedTo: e.target.checked ? [...cur, emp.name] : cur.filter(n => n !== emp.name) }));
-                }}
-                style={{ width: 16, height: 16, cursor: "pointer" }} />
-              <label htmlFor={`edit-emp-${emp._id || emp.email}`}
-                style={{ flex: 1, cursor: "pointer", fontSize: 13, color: "var(--app-sidebar)", display: "flex", alignItems: "center", gap: 8 }}>
-                <span>{emp.name}</span>
-                {emp.department && <span style={{ fontSize: 11, color: "#a78bba", background: "var(--app-border)", padding: "2px 6px", borderRadius: 4 }}>{emp.department}</span>}
-              </label>
-            </div>
-          ))}
-      </div>
-
-      {/* Selected tags */}
-      {editForm.assignedTo && editForm.assignedTo.length > 0 && (
-        <div style={{ marginTop: 10 }}>
-          <div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, marginBottom: 6 }}>
-            SELECTED ({editForm.assignedTo.length})
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {editForm.assignedTo.map(name => (
-              <div key={name} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--app-border)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "4px 10px" }}>
-                <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, fontWeight: 700 }}>{name[0]?.toUpperCase()}</div>
-                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--app-muted)" }}>{name}</span>
-                <button onClick={() => setEditForm(p => ({ ...p, assignedTo: p.assignedTo.filter(n => n !== name) }))}
-                  style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}>×</button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-
-    {/* Actions */}
-    <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
-      <button onClick={() => setEditProj(null)}
-        style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>
-        Cancel
-      </button>
-      <button onClick={saveEdit} disabled={saving}
-        style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>
-        {saving ? "Saving…" : "Save Changes →"}
-      </button>
-    </div>
-  </Mdl>
-)}
 
       {assignModal && (
         <Mdl title="Assign Employees" onClose={() => setAssignModal(null)} maxWidth={450}>
@@ -2462,7 +2183,7 @@ const openEdit = (p) => {
                         onClick={(e) => { e.stopPropagation(); setAssignTo(assignTo.filter(n => n !== name)); }}
                         style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                       >
-                        ×
+                        Ã—
                       </button>
                     </div>
                   ))}
@@ -2472,7 +2193,7 @@ const openEdit = (p) => {
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button onClick={() => setAssignModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment →</button>
+            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment â†’</button>
           </div>
         </Mdl>
       )}
@@ -2482,9 +2203,9 @@ const openEdit = (p) => {
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PROJECT STATUS PAGE (unchanged, just pass managers properly)
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function SearchDropdown({ label, items, displayKey, value, onChange, error, placeholder }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -2494,18 +2215,18 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
       <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", position: "relative", userSelect: "none", minHeight: 42, boxSizing: "border-box" }}>
         {value || placeholder || "-- Select --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>â–¼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No results</div>
-              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>✓</span>}</div>); })}
+              : filtered.map((item, i) => { const name = item[displayKey] || ""; const isSel = value === name; return (<div key={i} onClick={() => { onChange(name); setOpen(false); setSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: isSel ? "var(--app-border)" : "transparent", borderBottom: "1px solid var(--app-bg)" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = isSel ? "var(--app-border)" : "transparent"}><div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{name[0]?.toUpperCase() || "?"}</div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{name}</span>{isSel && <span style={{ marginLeft: "auto", color: "var(--app-accent)" }}>âœ“</span>}</div>); })}
           </div>
         </div>
       )}
       {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {error}</div>}
     </div>
   );
 }
@@ -2535,11 +2256,11 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
   useEffect(() => { setCurrentPage(1); }, [tsSearch, tsFilter, trackList.length]);
   const paginated = displayed.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  const tsStats = [{ t: "Total", v: trackList.length, i: "📁", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "⚡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "✅", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "🕐", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "⏸️", c: "var(--app-accent)" }];
+  const tsStats = [{ t: "Total", v: trackList.length, i: "ðŸ“", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "âš¡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "âœ…", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "ðŸ•", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "â¸ï¸", c: "var(--app-accent)" }];
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
   const openEdit = (p) => { setTsForm({ projectId: p.projectId || p.id || "", name: p.name || "", client: p.client || "", manager: p.manager || "", employee: p.employee || "", deadline: p.deadline || "", status: p.status || "In Progress", progress: p.progress || p.pct || 0, notes: p.notes || p.note || "" }); setTsErr({}); setTsEditId(p._id || p.id); setTsModal("edit"); };
-  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0–100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "✅ Project added!" : "✅ Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("✅ Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
-  const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" Delete️ Deleted!"); };
+  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0â€“100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "âœ… Project added!" : "âœ… Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("âœ… Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
+  const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" Deleteï¸ Deleted!"); };
   const B2 = (color) => ({ background: "var(--app-accent-gradient)", color: "#ffffff", border: "none", borderRadius: 12, padding: "12px 22px", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)" });
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -2549,7 +2270,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search…" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
+          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>ðŸ”</span><input placeholder="Searchâ€¦" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
           {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
         </div>
         <button onClick={openAdd} style={B2("var(--app-accent)")}>
@@ -2565,10 +2286,10 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                 : paginated.map((p, i) => (<tr key={p._id || p.id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                   <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 11, color: "var(--app-muted)" }}>{p.projectId || p.id || `PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                   <td style={{ padding: "11px 12px", fontWeight: 700, color: T.text }}>{p.name}</td>
-                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "—"}</span></div></td>
-                  <td style={{ padding: "11px 12px", color: "var(--app-muted)", fontSize: 12 }}>{p.manager || "—"}</td>
-                  <td style={{ padding: "11px 12px", color: "var(--app-muted)", fontSize: 12 }}>{p.employee || "—"}</td>
-                  <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap" }}>{p.deadline || "—"}</td>
+                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "â€”"}</span></div></td>
+                  <td style={{ padding: "11px 12px", color: "var(--app-muted)", fontSize: 12 }}>{p.manager || "â€”"}</td>
+                  <td style={{ padding: "11px 12px", color: "var(--app-muted)", fontSize: 12 }}>{p.employee || "â€”"}</td>
+                  <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap" }}>{p.deadline || "â€”"}</td>
                   <td style={{ padding: "11px 12px" }}>
                     <select
                       value={p.status || "Pending"}
@@ -2577,9 +2298,9 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                         try {
                           await axios.put(`${BASE_URL}/api/project-status/${p._id || p.id}`, { status: newStatus });
                           setTrackList(prev => prev.map(track => (track._id || track.id) === (p._id || p.id) ? { ...track, status: newStatus } : track));
-                          showToast("✅ Status updated!");
+                          showToast("âœ… Status updated!");
                         } catch {
-                          showToast("❌ Update failed");
+                          showToast("âŒ Update failed");
                         }
                       }}
                       style={{
@@ -2600,17 +2321,17 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                     </select>
                   </td>
                   <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "var(--app-border)", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,var(--app-accent),var(--app-accent))", borderRadius: 6, height: "100%" }} /></div><span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span></div></td>
-                  <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `📝 ${p.notes || p.note}` : "—"}</span></td>
+                  <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `ðŸ“ ${p.notes || p.note}` : "â€”"}</span></td>
                   <td style={{ padding: "11px 12px" }}>
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       <ActionBtns onEdit={() => openEdit(p)} onDelete={() => deleteTs(p._id || p.id)} />
                       <button onClick={(e) => {
                         e.stopPropagation();
-                        const text = `📊 *Project Status Update*\n\nProject: ${p.name}\nStatus: ${p.status}\nProgress: ${p.progress || p.pct || 0}%\nDeadline: ${p.deadline || "—"}\nNotes: ${p.notes || p.note || "No notes"}`;
+                        const text = `ðŸ“Š *Project Status Update*\n\nProject: ${p.name}\nStatus: ${p.status}\nProgress: ${p.progress || p.pct || 0}%\nDeadline: ${p.deadline || "â€”"}\nNotes: ${p.notes || p.note || "No notes"}`;
                         const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                         window.open(wpUrl, "_blank");
                       }} style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <span>🔗</span>
+                        <span>ðŸ”—</span>
                       </button>
                     </div>
                   </td>
@@ -2624,30 +2345,30 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
           <Fld label="Project ID" value={tsForm.projectId || "Auto-generated"} onChange={v => setTsForm({ ...tsForm, projectId: v })} placeholder="Auto-generated (PRJ001)" disabled={tsModal === "add"} />
           <Fld label="Project Name *" value={tsForm.name} onChange={v => { setTsForm({ ...tsForm, name: v }); setTsErr(p => ({ ...p, name: "" })); }} error={tsErr.name} />
-          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {tsErr.client}</div>}</div>
+          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {tsErr.client}</div>}</div>
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
           <SearchDropdown label="Employee" items={employeeNames} displayKey="name" value={tsForm.employee} onChange={v => setTsForm({ ...tsForm, employee: v })} placeholder="-- Select Employee --" />
           <Fld label="Deadline *" value={tsForm.deadline} type="date" onChange={v => { setTsForm({ ...tsForm, deadline: v }); setTsErr(p => ({ ...p, deadline: "" })); }} error={tsErr.deadline} />
           <Fld label="Status" value={tsForm.status} onChange={v => setTsForm({ ...tsForm, status: v })} options={["Active", "On Hold", "Completed", "Overdue"]} allowCustom={true} />
-          <Fld label="Progress (0–100)" value={String(tsForm.progress)} type="number" onChange={v => { setTsForm({ ...tsForm, progress: v }); setTsErr(p => ({ ...p, progress: "" })); }} error={tsErr.progress} placeholder="e.g. 65" />
+          <Fld label="Progress (0â€“100)" value={String(tsForm.progress)} type="number" onChange={v => { setTsForm({ ...tsForm, progress: v }); setTsErr(p => ({ ...p, progress: "" })); }} error={tsErr.progress} placeholder="e.g. 65" />
         </div>
-        <Fld label="Notes" value={tsForm.notes} onChange={v => setTsForm({ ...tsForm, notes: v })} placeholder="Brief update…" />
+        <Fld label="Notes" value={tsForm.notes} onChange={v => setTsForm({ ...tsForm, notes: v })} placeholder="Brief updateâ€¦" />
         <div style={{ background: "var(--app-bg)", borderRadius: 12, padding: "12px 16px", border: "1px solid var(--app-border)", marginBottom: 14 }}>
           <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 8 }}>PROGRESS PREVIEW</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "var(--app-border)", borderRadius: 6, height: 8 }}><div style={{ width: `${Math.min(100, Math.max(0, Number(tsForm.progress) || 0))}%`, background: "linear-gradient(90deg,var(--app-accent),var(--app-accent))", borderRadius: 6, height: "100%", transition: "width 0.3s" }} /></div><span style={{ fontSize: 13, fontWeight: 800, color: "var(--app-accent)", width: 36, textAlign: "right" }}>{Math.min(100, Math.max(0, Number(tsForm.progress) || 0))}%</span></div>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
           <button onClick={() => setTsModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Saving…" : tsModal === "add" ? "Save Project →" : "Next →"}</button>
+          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Savingâ€¦" : tsModal === "add" ? "Save Project â†’" : "Next â†’"}</button>
         </div>
       </Mdl>)}
     </div>
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // INTERVIEW PAGE (unchanged)
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function InterviewPage({ companyId, companyName }) {
   const CID = companyId || "69b8fe0a6e3d6f1e056f3109";
   const CNAME = companyName || "My Business";
@@ -2682,7 +2403,7 @@ function InterviewPage({ companyId, companyName }) {
     const c = updated[idx];
     const id = c._id || c.id;
     if (id) axios.patch(`${API_URL}/api/interviews/${id}/status`, { status: finalVal }).catch(() => { });
-    showToast(`✅ Status → "${finalVal}"`);
+    showToast(`âœ… Status â†’ "${finalVal}"`);
     if (viewModal && (viewModal._id || viewModal.id) === id) setViewModal(updated[idx]);
   };
 
@@ -2700,14 +2421,14 @@ function InterviewPage({ companyId, companyName }) {
         document.execCommand("copy");
         document.body.removeChild(el);
       }
-      showToast("✅ Link copied!");
+      showToast("âœ… Link copied!");
     } catch (err) {
       console.error("Copy failed:", err);
-      showToast("❌ Copy failed. Please copy manually.");
+      showToast("âŒ Copy failed. Please copy manually.");
     }
   };
-  const deleteCandidate = (idx) => { if (!window.confirm("Delete this candidate?")) return; const c = candidates[idx]; const id = c._id || c.id; if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { }); persist(candidates.filter((_, i) => i !== idx)); showToast(" Delete️ Deleted"); setViewModal(null); };
-  const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+  const deleteCandidate = (idx) => { if (!window.confirm("Delete this candidate?")) return; const c = candidates[idx]; const id = c._id || c.id; if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { }); persist(candidates.filter((_, i) => i !== idx)); showToast(" Deleteï¸ Deleted"); setViewModal(null); };
+  const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "â€”";
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -2723,23 +2444,23 @@ function InterviewPage({ companyId, companyName }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
       <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.25)" }}>
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>ðŸ”—</div>
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✅ Copied!" : "📋 Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "âœ… Copied!" : "ðŸ“‹ Copy Link"}</button>
           <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
         </div>
       </div>
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        {[{ t: "Total", v: counts.total, i: "🎯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "⏳", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✅", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "❌", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {[{ t: "Total", v: counts.total, i: "ðŸŽ¯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "â³", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "âœ…", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "âŒ", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
       </div>
       <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
         <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)" }}>All Candidates ({displayed.length})</h3>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
-          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "🎯 All" : f === "pending" ? "⏳ Pending" : f === "hired" ? "✅ Hired" : "❌ Rejected"}</button>))}
+          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>ðŸ”</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
+          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "ðŸŽ¯ All" : f === "pending" ? "â³ Pending" : f === "hired" ? "âœ… Hired" : "âŒ Rejected"}</button>))}
         </div>
-        {loading ? (<div style={{ textAlign: "center", padding: 50, color: "var(--app-muted)" }}>Loading candidates...</div>) : displayed.length === 0 ? (<div style={{ textAlign: "center", padding: "50px 20px", color: "var(--app-muted)" }}><div style={{ fontSize: 48, marginBottom: 12 }}>📭</div><div style={{ fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 6 }}>{candidates.length === 0 ? "No applications yet" : "No results found"}</div></div>) : (
+        {loading ? (<div style={{ textAlign: "center", padding: 50, color: "var(--app-muted)" }}>Loading candidates...</div>) : displayed.length === 0 ? (<div style={{ textAlign: "center", padding: "50px 20px", color: "var(--app-muted)" }}><div style={{ fontSize: 48, marginBottom: 12 }}>ðŸ“­</div><div style={{ fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 6 }}>{candidates.length === 0 ? "No applications yet" : "No results found"}</div></div>) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 950 }}>
               <thead><tr style={{ background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))" }}>{["#", "Candidate", "Contact", "Experience", "Role", "Interviewer", "Date", "Status", "Resume", "Actions"].map(h => (<th key={h} style={{ padding: "10px 12px", textAlign: "left", color: "var(--app-muted)", fontWeight: 700, fontSize: 10, borderBottom: "2px solid var(--app-border)", whiteSpace: "nowrap" }}>{h.toUpperCase()}</th>))}</tr></thead>
@@ -2749,15 +2470,15 @@ function InterviewPage({ companyId, companyName }) {
                   const finalResumeUrl = resumeUrl; return (
                     <tr key={c._id || c.id || i} style={{ borderBottom: "1px solid #f3f0ff", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "12px 12px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}</td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "var(--app-sidebar)" }}>{c.name || "—"}</span></div></td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "var(--app-muted)" }}>{c.email || "—"}</div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile || ""}</div></td>
-                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>🎓 Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>💼 {c.years || "?"}yrs</span>}</td>
-                      <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-sidebar)", fontSize: 12 }}>{c.role || "—"}</td>
-                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)" }}>{c.interviewerName || <span style={{ color: "#ddd" }}>—</span>}</td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "var(--app-sidebar)" }}>{c.name || "â€”"}</span></div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "var(--app-muted)" }}>{c.email || "â€”"}</div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile || ""}</div></td>
+                      <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>ðŸŽ“ Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>ðŸ’¼ {c.years || "?"}yrs</span>}</td>
+                      <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-sidebar)", fontSize: 12 }}>{c.role || "â€”"}</td>
+                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)" }}>{c.interviewerName || <span style={{ color: "#ddd" }}>â€”</span>}</td>
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
-                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">⏳ Pending</option><option value="hired">✅ Hired</option><option value="rejected">❌ Rejected</option></select></td>
-                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>👤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> Delete</button></div></td>
+                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">â³ Pending</option><option value="hired">âœ… Hired</option><option value="rejected">âŒ Rejected</option></select></td>
+                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>ðŸ“„</button> : <span style={{ fontSize: 11, color: "#ddd" }}>â€”</span>}</td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>ðŸ‘¤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> Delete</button></div></td>
                     </tr>
                   );
                 })}
@@ -2771,8 +2492,8 @@ function InterviewPage({ companyId, companyName }) {
         <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.55)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
             <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
-              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-sidebar)" }}>👤 Candidate Profile</h2>
-              <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-sidebar)" }}>ðŸ‘¤ Candidate Profile</h2>
+              <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>âœ•</button>
             </div>
             <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
@@ -2781,16 +2502,16 @@ function InterviewPage({ companyId, companyName }) {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 17, fontWeight: 800, color: "var(--app-sidebar)" }}>{viewModal.name}</div>
-                  <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{viewModal.role || "—"}</div>
+                  <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{viewModal.role || "â€”"}</div>
                 </div>
                 <span style={{ background: `${sC(viewModal.status || "Pending")}18`, color: sC(viewModal.status || "Pending"), border: `1px solid ${sC(viewModal.status || "Pending")}33`, padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
-                  {viewModal.status?.toLowerCase() === "hired" ? "✅ Hired" : viewModal.status?.toLowerCase() === "rejected" ? "❌ Rejected" : "⏳ Pending"}
+                  {viewModal.status?.toLowerCase() === "hired" ? "âœ… Hired" : viewModal.status?.toLowerCase() === "rejected" ? "âŒ Rejected" : "â³ Pending"}
                 </span>
               </div>
 
               {viewModal._resolvedResumeUrl && (
                 <div style={{ marginBottom: 20 }}>
-                  <h3 style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>📄 Resume</h3>
+                  <h3 style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>ðŸ“„ Resume</h3>
                   <div style={{ border: "1.5px solid var(--app-border)", borderRadius: 12, overflow: "hidden", background: "var(--app-bg)" }}>
                     <iframe
                       src={viewModal._resolvedResumeUrl}
@@ -2800,13 +2521,13 @@ function InterviewPage({ companyId, companyName }) {
                         e.target.style.display = 'none';
                         const errorDiv = document.createElement('div');
                         errorDiv.style.cssText = 'padding: 50px; text-align: center; color: #ef4444; font-size: 14px; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 12px; margin: 20px;';
-                        errorDiv.innerHTML = '📄 Resume file not found<br><span style="font-size: 12px; color: #991b1b;">The resume file may have been deleted or moved</span>';
+                        errorDiv.innerHTML = 'ðŸ“„ Resume file not found<br><span style="font-size: 12px; color: #991b1b;">The resume file may have been deleted or moved</span>';
                         e.target.parentNode.appendChild(errorDiv);
                       }}
                     />
                     <div style={{ padding: "12px", background: "#fff", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "center" }}>
                       <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--app-accent)", color: "#fff", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
-                        🔗 Open in New Tab
+                        ðŸ”— Open in New Tab
                       </a>
                     </div>
                   </div>
@@ -2815,26 +2536,26 @@ function InterviewPage({ companyId, companyName }) {
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12 }}>
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📧 Email</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.email || "—"}</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ“§ Email</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.email || "â€”"}</div>
                 </div>
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📱 Mobile</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.mobile || "—"}</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ“± Mobile</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.mobile || "â€”"}</div>
                 </div>
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>💼 Experience</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ’¼ Experience</div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>
-                    {(viewModal.experience || "").toLowerCase() === "fresher" ? "🎓 Fresher" : `💼 ${viewModal.years || "?"} years`}
+                    {(viewModal.experience || "").toLowerCase() === "fresher" ? "ðŸŽ“ Fresher" : `ðŸ’¼ ${viewModal.years || "?"} years`}
                   </div>
                 </div>
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>📅 Applied Date</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ“… Applied Date</div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{fmt(viewModal.date || viewModal.createdAt)}</div>
                 </div>
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
-                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>👨‍💼 Interviewer</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.interviewerName || "—"}</div>
+                  <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ‘¨â€ðŸ’¼ Interviewer</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.interviewerName || "â€”"}</div>
                 </div>
               </div>
             </div>
@@ -2845,9 +2566,9 @@ function InterviewPage({ companyId, companyName }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PROFILE MODAL  
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoChange, paymentHistory, projects, invoices, onLogoUpload }) {
 
   const logoRef = useRef();
@@ -2870,7 +2591,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
     <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
       <div style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 650, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
         <div style={{ background: "linear-gradient(135deg,var(--app-muted),var(--app-accent),var(--app-accent))", padding: "28px 28px 22px", textAlign: "center", flexShrink: 0, position: "relative" }}>
-          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>âœ•</button>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 8, margin: "0 auto 12px", position: "relative", width: "fit-content" }}>
             {companyLogo ? (
               <img src={companyLogo} alt="logo" style={{ height: 72, width: "auto", maxWidth: "180px", borderRadius: 16, objectFit: "contain", flexShrink: 0, border: "3px solid rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.22)", display: "block" }} />
@@ -2882,11 +2603,11 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
               style={{ position: "absolute", bottom: -5, right: -5, padding: "6px", background: "rgba(255,255,255,0.9)", border: "none", borderRadius: 8, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}
               title="Upload Logo"
             >
-              📷
+              ðŸ“·
             </button>
           </div>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>{displayName}</h2>
-          <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{user?.email || "—"}</p>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{user?.email || "â€”"}</p>
           {user?.role && !user.role.toLowerCase().includes("subadmin") && (
             <span style={{ display: "inline-block", marginTop: 8, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.28)", borderRadius: 100, padding: "3px 12px", fontSize: 10, fontWeight: 700, color: "#fff", letterSpacing: 1, textTransform: "uppercase" }}>{user.role}</span>
           )}
@@ -2896,7 +2617,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
           {/* Personal Info */}
           <div>
             <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-muted)", marginBottom: 12, letterSpacing: 1 }}>PERSONAL DETAILS</div>
-            {[{ icon: "👤", label: "Full Name", value: displayName }, { icon: "📧", label: "Email", value: user?.email || "—" }, { icon: "📱", label: "Phone", value: user?.phone || "—" }, { icon: "🎭", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
+            {[{ icon: "ðŸ‘¤", label: "Full Name", value: displayName }, { icon: "ðŸ“§", label: "Email", value: user?.email || "â€”" }, { icon: "ðŸ“±", label: "Phone", value: user?.phone || "â€”" }, { icon: "ðŸŽ­", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{icon}</div>
                 <div style={{ flex: 1 }}>
@@ -2907,7 +2628,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
             ))}
 
             <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#fdf4ff", borderRadius: 9, border: "1px solid #fae8ff", marginBottom: 16 }}>
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(168,85,247,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>🏢</div>
+              <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(168,85,247,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>ðŸ¢</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 9, color: "var(--app-accent)", fontWeight: 700, textTransform: "uppercase" }}>Company Name</div>
                 {editingComp ? (
@@ -2970,7 +2691,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
                       </div>
                     </div>
                     <div style={{ textAlign: "right", marginLeft: 10 }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: "#22c55e" }}>₹{payment.amount?.toLocaleString() || "0"}</div>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: "#22c55e" }}>â‚¹{payment.amount?.toLocaleString() || "0"}</div>
                       <div style={{ fontSize: 9, color: "#22c55e", fontWeight: 700, textTransform: "uppercase" }}>{payment.status || "paid"}</div>
                     </div>
                   </div>
@@ -3002,7 +2723,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
         <div style={{ padding: "12px 24px 18px", borderTop: "1px solid var(--app-border)", flexShrink: 0, background: "#faf8ff" }}>
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={onClose} style={{ flex: 1, padding: "10px", background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", cursor: "pointer", fontFamily: "inherit" }}>Close</button>
-            <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>🚪 Logout</button>
+            <button onClick={onLogout} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>ðŸšª Logout</button>
           </div>
         </div>
         <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }}
@@ -3014,9 +2735,9 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SIDEBAR
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, companyLogo, onLogoChange, enforceMySubscriptions, onLogoUploadClick, setSelectedProjectForTasks }) {
   const items = navItems || NAV;
   const companyName = user?.companyName || "";
@@ -3086,14 +2807,14 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
             <span className="logo-mark" onClick={onLogoUploadClick} style={{ cursor: "pointer" }}>{companyName || "MBusiness"}</span>
           )}
           <span className="logo-badge" style={{ position: "absolute", bottom: 2, right: 10, width: 20, height: 20, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }} onClick={onLogoUploadClick}>+</span>
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">âœ•</button>
         </div>
 
         <div className="profile-area">
           <div className="profile-avatar">{initials || "P"}</div>
           <div>
             <div className="profile-name">{user?.name || "Admin"}</div>
-            <div className="profile-logout" onClick={onLogout}>Logout →</div>
+            <div className="profile-logout" onClick={onLogout}>Logout â†’</div>
           </div>
         </div>
 
@@ -3152,20 +2873,20 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PACKAGES PAGE
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const DEFAULT_PLANS = [
   {
-    title: "Trial", price: 0, icon: "✨", type: "free",
+    title: "Trial", price: 0, icon: "âœ¨", type: "free",
     features: ["30 Days Free Trial", "5 Projects", "5 Invoices", "Single business manage", "Managers: 1", "Clients: 5", "Employees: 20"]
   },
   {
-    title: "Starter", price: 999, icon: "🌱",
+    title: "Starter", price: 999, icon: "ðŸŒ±",
     features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 1", "Clients: 3", "Employees: 10", "Email Support"]
   },
   {
-    title: "Professional", price: 2999, icon: "🚀", type: "pro",
+    title: "Professional", price: 2999, icon: "ðŸš€", type: "pro",
     features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"]
   }
 ];
@@ -3187,14 +2908,14 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
       <div style={{ position: "absolute", top: -100, right: -100, width: 300, height: 300, background: `${THEME.accent}05`, borderRadius: "50%", filter: "blur(60px)" }} />
 
       <div style={{ textAlign: "center", marginBottom: 44, position: "relative", zIndex: 1 }}>
-        <div style={{ display: "inline-block", padding: "6px 16px", background: `${THEME.accent}12`, borderRadius: 100, color: THEME.accent, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 14 }}>💎 Choose Plan</div>
+        <div style={{ display: "inline-block", padding: "6px 16px", background: `${THEME.accent}12`, borderRadius: 100, color: THEME.accent, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 14 }}>ðŸ’Ž Choose Plan</div>
         <h1 style={{ fontSize: 34, fontWeight: 900, color: "#1e1b4b", margin: "0 0 10px", letterSpacing: "-1px", lineHeight: 1 }}>Choose your Plan</h1>
         <p style={{ color: "#64748b", fontWeight: 600, fontSize: 14, maxWidth: 400, margin: "0 auto" }}>Select the best plan for your business growth.</p>
       </div>
 
       {displayedPackages.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 20px", position: "relative", zIndex: 1 }}>
-          <div style={{ fontSize: 54, marginBottom: 20, opacity: 0.5 }}>📦</div>
+          <div style={{ fontSize: 54, marginBottom: 20, opacity: 0.5 }}>ðŸ“¦</div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "#94a3b8", marginBottom: 8 }}>No Packages Available</h2>
         </div>
       ) : (
@@ -3240,14 +2961,14 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
                   }}>POPULAR</div>
                 )}
 
-                <div style={{ width: 48, height: 48, borderRadius: 14, background: `${THEME.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, marginBottom: 20 }}>{p.icon || "🚀"}</div>
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: `${THEME.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, marginBottom: 20 }}>{p.icon || "ðŸš€"}</div>
 
                 <div style={{ fontSize: 20, fontWeight: 900, color: "#1e1b4b", marginBottom: 4, letterSpacing: "-0.4px" }}>{p.title}</div>
                 <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 20, fontWeight: 700, textTransform: "uppercase" }}>Monthly Plan</div>
 
                 <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
                   <span style={{ fontSize: 42, fontWeight: 900, color: "#1e1b4b", lineHeight: 1, letterSpacing: "-2px" }}>
-                    {p.type === "free" ? "Free" : p.price ? `₹${parseFloat(p.price).toLocaleString("en-IN")}` : "Custom"}
+                    {p.type === "free" ? "Free" : p.price ? `â‚¹${parseFloat(p.price).toLocaleString("en-IN")}` : "Custom"}
                   </span>
                   {p.price > 0 && <span style={{ fontSize: 13, color: "#94a3b8", marginBottom: 6, fontWeight: 600 }}>/mo</span>}
                 </div>
@@ -3257,7 +2978,7 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
                 <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1, marginBottom: 24 }}>
                   {features.map((f, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: `${THEME.accent}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: THEME.accent, fontWeight: 900, flexShrink: 0 }}>✓</div>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: `${THEME.accent}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: THEME.accent, fontWeight: 900, flexShrink: 0 }}>âœ“</div>
                       <span style={{ fontSize: 13, color: "#475569", fontWeight: 600 }}>{f}</span>
                     </div>
                   ))}
@@ -3293,9 +3014,9 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // VENDORS PAGE
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function VendorsPage({ vendors, setVendors }) {
   const [search, setSearch] = useState("");
   const [viewVendor, setViewVendor] = useState(null);
@@ -3343,9 +3064,9 @@ function VendorsPage({ vendors, setVendors }) {
       const res = await axios.put(`${BASE_URL}/api/vendors/${editVendor._id}`, payload);
       setVendors(prev => prev.map(v => v._id === editVendor._id ? { ...v, ...res.data } : v));
       setEditVendor(null);
-      showToast("✅ Vendor updated!");
+      showToast("âœ… Vendor updated!");
     } catch (err) {
-      showToast("❌ Update failed!");
+      showToast("âŒ Update failed!");
     } finally { setSaving(false); }
   };
 
@@ -3354,9 +3075,9 @@ function VendorsPage({ vendors, setVendors }) {
       await axios.delete(`${BASE_URL}/api/vendors/${deleteTarget._id}`);
       setVendors(prev => prev.filter(v => v._id !== deleteTarget._id));
       setDeleteTarget(null);
-      showToast(" Delete️ Vendor deleted!");
+      showToast(" Deleteï¸ Vendor deleted!");
     } catch {
-      showToast("❌ Delete failed!");
+      showToast("âŒ Delete failed!");
     }
   };
 
@@ -3387,7 +3108,7 @@ function VendorsPage({ vendors, setVendors }) {
                       <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{formatCurrency(paid, v.currency)}</td>
                       <td style={{ padding: "12px 14px", color: balance > 0 ? "#EF4444" : "#22C55E", fontWeight: 700 }}>{formatCurrency(balance, v.currency)}</td>
                       <td style={{ padding: "12px 14px" }}><Badge label={v.modeOfPayment} /></td>
-                      <td style={{ padding: "12px 14px", color: "var(--app-muted)" }}>{v.dateOfPurchase ? new Date(v.dateOfPurchase).toLocaleDateString() : "—"}</td>
+                      <td style={{ padding: "12px 14px", color: "var(--app-muted)" }}>{v.dateOfPurchase ? new Date(v.dateOfPurchase).toLocaleDateString() : "â€”"}</td>
                       <td style={{ padding: "12px 14px" }}>
                         <ActionBtns onView={() => setViewVendor(v)} onEdit={() => openEdit(v)} onDelete={() => setDeleteTarget(v)} />
                       </td>
@@ -3409,12 +3130,12 @@ function VendorsPage({ vendors, setVendors }) {
               <div style={{ fontSize: 13, color: "var(--app-accent)", marginTop: 2 }}>{viewVendor.vendorProduct}</div>
             </div>
           </div>
-          <InfoRow icon="💰" label="Total Amount" value={formatCurrency(viewVendor.amountTaxGst, viewVendor.currency)} />
-          <InfoRow icon="💸" label="Paid Amount" value={formatCurrency(viewVendor.paidAmount, viewVendor.currency)} />
-          <InfoRow icon="⚖️" label="Balance Due" value={formatCurrency((viewVendor.amountTaxGst || 0) - (viewVendor.paidAmount || 0), viewVendor.currency)} />
-          <InfoRow icon="💳" label="Mode of Payment" value={viewVendor.modeOfPayment} />
-          <InfoRow icon="📅" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
-          <InfoRow icon="📝" label="Description" value={viewVendor.productDescription} />
+          <InfoRow icon="ðŸ’°" label="Total Amount" value={formatCurrency(viewVendor.amountTaxGst, viewVendor.currency)} />
+          <InfoRow icon="ðŸ’¸" label="Paid Amount" value={formatCurrency(viewVendor.paidAmount, viewVendor.currency)} />
+          <InfoRow icon="âš–ï¸" label="Balance Due" value={formatCurrency((viewVendor.amountTaxGst || 0) - (viewVendor.paidAmount || 0), viewVendor.currency)} />
+          <InfoRow icon="ðŸ’³" label="Mode of Payment" value={viewVendor.modeOfPayment} />
+          <InfoRow icon="ðŸ“…" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "â€”"} />
+          <InfoRow icon="ðŸ“" label="Description" value={viewVendor.productDescription} />
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => { setViewVendor(null); openEdit(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
             <button onClick={() => { setViewVendor(null); setDeleteTarget(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#EF4444,#dc2626)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}> Delete</button>
@@ -3436,7 +3157,7 @@ function VendorsPage({ vendors, setVendors }) {
           <Fld label="Product Description" value={editForm.productDescription} onChange={v => setEditForm(p => ({ ...p, productDescription: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditVendor(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Saving…" : "Save Changes →"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
           </div>
         </Mdl>
       )}
@@ -3447,16 +3168,16 @@ function VendorsPage({ vendors, setVendors }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAIN DASHBOARD
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export default function Dashboard({ setUser, user, fixedLogo }) {
   const companyNameStr = user?.companyName || "M Business";
   const [dashSearch, setDashSearch] = useState("");
   const [dashTasksProj, setDashTasksProj] = useState(null);
   const [active, setActive] = useState(() => {
     const saved = localStorage.getItem("activeTab_subadmin") || "dashboard";
-    // Refresh பண்ணும்போது projects/project-details-ல இருந்தா dashboard-க்கு போ
+    // Refresh à®ªà®£à¯à®£à¯à®®à¯à®ªà¯‹à®¤à¯ projects/project-details-à®² à®‡à®°à¯à®¨à¯à®¤à®¾ dashboard-à®•à¯à®•à¯ à®ªà¯‹
     if (["project-details", "create-project", "edit-project"].includes(saved)) return "projects";
     return saved;
   });
@@ -3467,6 +3188,11 @@ export default function Dashboard({ setUser, user, fixedLogo }) {
     localStorage.setItem("activeTab_subadmin", toSave); 
   }, [active]);
   const [jumpProject, setJumpProject] = useState(null);
+  useEffect(() => {
+    if (active === "edit-project" && !jumpProject) {
+      setActive("projects");
+    }
+  }, [active, jumpProject]);
   const [_navPending, startNavTransition] = useTransition();
   const [fromEditProject, setFromEditProject] = useState(false);
   const [jumpInvoice, setJumpInvoice] = useState(null);
@@ -3489,7 +3215,7 @@ const [invoicePrefill, setInvoicePrefill] = useState(null);
   const [cropAspect, setCropAspect] = useState(1);
   const [accounts, setAccounts] = useState([]);
 
-  // ← இது மட்டும் இருக்கணும் (KEEP THIS)
+  // â† à®‡à®¤à¯ à®®à®Ÿà¯à®Ÿà¯à®®à¯ à®‡à®°à¯à®•à¯à®•à®£à¯à®®à¯ (KEEP THIS)
   const [appTheme, setAppTheme] = useState(() => localStorage.getItem("appTheme") || "teal");
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [customColor, setCustomColor] = useState(() => localStorage.getItem("appCustomColor") || "var(--app-accent)");
@@ -3648,7 +3374,7 @@ const [invoicePrefill, setInvoicePrefill] = useState(null);
 
   const [clients, setClients] = useState([]);
   const todayStr = new Date().toISOString().split("T")[0];
-  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", category: "", onboardedOn: todayStr, clientType: "b2b", source: "", city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
+  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", category: "", onboardedOn: todayStr, clientType: "b2b", source: "", city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR â€” Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
@@ -3677,7 +3403,7 @@ const [invoicePrefill, setInvoicePrefill] = useState(null);
     return { ...p, progress: pct };
   });
   const [projLoading, setProjLoading] = useState(false);
-  const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Pending", progress: 0, assignedTo: [] });
+  const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "â‚¹", team: "", status: "Pending", progress: 0, assignedTo: [] });
   const [npError, setNpError] = useState({});
   const [projSaveLoading, setProjSaveLoading] = useState(false);
 
@@ -3706,8 +3432,8 @@ const [invoicePrefill, setInvoicePrefill] = useState(null);
   const [showSubPass, setShowSubPass] = useState(false);
 
   const [packages, setPackages] = useState([]);
-  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
-  const [editPkgForm, setEditPkgForm] = useState({ title: "", description: "", icon: "📦", type: "paid", price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", status: "Active", assignedSubadmins: [] });
+  const [npkg, setNpkg] = useState({ title: "", description: "", icon: "ðŸ“¦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
+  const [editPkgForm, setEditPkgForm] = useState({ title: "", description: "", icon: "ðŸ“¦", type: "paid", price: "", noOfDays: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", status: "Active", assignedSubadmins: [] });
   const [pkgError, setPkgError] = useState({});
   const [pkgSaveLoading, setPkgSaveLoading] = useState(false);
 
@@ -3827,7 +3553,7 @@ const mainScrollRef = useRef(null);
     fetchPendingLeaves(); fetchEmployeeDocs();
   }, []);
 
-  // ── Listen for SEND_DOCUMENT from template designer iframe ──
+  // â”€â”€ Listen for SEND_DOCUMENT from template designer iframe â”€â”€
   useEffect(() => {
     const handleMessage = async (e) => {
       if (e.data && e.data.type === "SEND_DOCUMENT") {
@@ -3871,7 +3597,7 @@ const mainScrollRef = useRef(null);
           const idx = all.findIndex((d) => d.id === id || (d.qt && d.qt.quoteNo === id));
           const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
           const total = subtotal * (1 + (qt.gstRate || 0) / 100);
-          const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "—", total, savedAt: Date.now(), qt, items, status: "draft" };
+          const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "â€”", total, savedAt: Date.now(), qt, items, status: "draft" };
 
           if (idx >= 0) all[idx] = entry;
           else all.unshift(entry);
@@ -4017,7 +3743,7 @@ const mainScrollRef = useRef(null);
     return String(id).trim();
   };
 
-  // Dashboard.jsx-ல் இருக்கும் parseLimit function-ஐ இதாக மாத்துங்க:
+  // Dashboard.jsx-à®²à¯ à®‡à®°à¯à®•à¯à®•à¯à®®à¯ parseLimit function-à® à®‡à®¤à®¾à®• à®®à®¾à®¤à¯à®¤à¯à®™à¯à®•:
 
   const parseLimit = (limitStr) => {
     if (limitStr === undefined || limitStr === null || limitStr === "") return 10;
@@ -4110,7 +3836,7 @@ useEffect(() => {
     setEditPkgForm({
       title: pkg.title || "",
       description: pkg.description || "",
-      icon: pkg.icon || "📦",
+      icon: pkg.icon || "ðŸ“¦",
       type: pkg.type || "paid",
       price: pkg.price || "",
       noOfDays: pkg.no_of_days || pkg.noOfDays || "",
@@ -4213,7 +3939,7 @@ useEffect(() => {
             return;
           }
         } else {
-          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
+          alert("âŒ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
           return;
         }
       }
@@ -4265,7 +3991,7 @@ useEffect(() => {
       // Store credentials for the success screen
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
       const todayStr = new Date().toISOString().split("T")[0];
-      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
+      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR â€” Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
       setNcError({});
       if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
       // Don't close modal yet if no return - show success screen (this depends on existing logic)
@@ -4300,7 +4026,7 @@ useEffect(() => {
             return;
           }
         } else {
-          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
+          alert("âŒ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
           return;
         }
       }
@@ -4359,7 +4085,7 @@ useEffect(() => {
             await axios.post(`${BASE_URL}/api/notifications`, {
               userId: emp._id || emp.id,
               type: 'project',
-              icon: '◈',
+              icon: 'â—ˆ',
               text: `You have been assigned to a new project: "${projectName}"`,
               link: 'projects'
             });
@@ -4378,10 +4104,10 @@ useEffect(() => {
         notifyAssigned(res.data._id, np.name, np.assignedTo);
       }
 
-      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "₹", team: "", status: "Active", progress: 0, assignedTo: [] });
+      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "â‚¹", team: "", status: "Active", progress: 0, assignedTo: [] });
       setNpError({});
       setModal(null);
-      toast.success("✅ Project created successfully!");
+      toast.success("âœ… Project created successfully!");
     } catch (err) {
       setNpError({ name: err.response?.data?.msg || "Failed to save project" });
     } finally {
@@ -4409,7 +4135,7 @@ useEffect(() => {
             return;
           }
         } else {
-          alert("❌ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
+          alert("âŒ No Active Subscription: You do not have an active subscription package. Please contact your administrator to assign a package.");
           return;
         }
       }
@@ -4473,7 +4199,7 @@ useEffect(() => {
       const packageData = {
         title: npkg.title,
         description: npkg.description,
-        icon: npkg.icon || "📦",
+        icon: npkg.icon || "ðŸ“¦",
         type: npkg.type || "paid",
         no_of_days: parseInt(npkg.noOfDays) || 30,
         price: parseFloat(npkg.price) || 0,
@@ -4495,13 +4221,13 @@ useEffect(() => {
 
       const res = await axios.post(BASE_URL + "/api/packages", packageData);
       setPackages(prev => [...prev, res.data]);
-      setNpkg({ title: "", description: "", icon: "📦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
+      setNpkg({ title: "", description: "", icon: "ðŸ“¦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
       setPkgError({});
       setModal(null);
-      toast.success("✅ Package added!");
+      toast.success("âœ… Package added!");
     } catch (err) {
       console.error("Add package error:", err);
-      toast.error("❌ Failed to add package: " + (err.response?.data?.msg || err.message));
+      toast.error("âŒ Failed to add package: " + (err.response?.data?.msg || err.message));
     } finally { setPkgSaveLoading(false); }
   };
 
@@ -4534,15 +4260,15 @@ useEffect(() => {
       setNv({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
       setNvError({});
       setModal(null);
-      toast.success("✅ Vendor Added Successfully!");
+      toast.success("âœ… Vendor Added Successfully!");
     } catch (err) {
       console.error('Add vendor error:', err);
-      toast.error("❌ Failed to add vendor: " + (err.response?.data?.message || err.message));
+      toast.error("âŒ Failed to add vendor: " + (err.response?.data?.message || err.message));
     } finally { setVendorSaveLoading(false); }
   };
 
 
-  // ── Subscription gate: subadmins must subscribe before accessing dashboard ──
+  // â”€â”€ Subscription gate: subadmins must subscribe before accessing dashboard â”€â”€
   const roleLower = (user?.role || "").toLowerCase().trim();
   const isSubAdmin = roleLower === "subadmin" || roleLower === "sub_admin" || roleLower === "sub-admin";
   const isAdmin = user?.email === "admin@gmail.com";
@@ -4553,7 +4279,7 @@ useEffect(() => {
   let enforceMySubscriptions = false;
   // Subadmin subscription blocking logic removed as requested
   const rawNavItems = getNavForRole(user?.role);
-  // When restricted, ONLY show My Subscriptions (no dashboard — must subscribe first)
+  // When restricted, ONLY show My Subscriptions (no dashboard â€” must subscribe first)
   const navItems = enforceMySubscriptions
     ? rawNavItems.filter(n => ["mysubscriptions"].includes(n.key))
     : rawNavItems;
@@ -4570,7 +4296,7 @@ useEffect(() => {
     return null;
   };
 
-  // Always land on mysubscriptions when enforced — never show dashboard
+  // Always land on mysubscriptions when enforced â€” never show dashboard
   const validActive = enforceMySubscriptions
     ? "mysubscriptions"
     : ((findNavItem(active) || active === "addClient" || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
@@ -4678,7 +4404,7 @@ active={
         {/* Mobile Topbar */}
         <div className="mob-topbar no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#fff", borderBottom: "1px solid var(--app-border)", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)" }}>
           {!enforceMySubscriptions ? (
-            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>☰</button>
+            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--app-muted)", padding: "2px 6px", lineHeight: 1 }}>â˜°</button>
           ) : (
             <div style={{ width: 40 }} />
           )}
@@ -4818,7 +4544,7 @@ active={
           <div className="content">
             <EmployeeSubscriptionWarning user={user} trigger={subscription?.updatedAt || subscription?._id} onRenew={() => { setForceUpgradeTab(true); setActive("mysubscriptions"); }} />
 
-            {/* ── Dashboard ── */}
+            {/* â”€â”€ Dashboard â”€â”€ */}
             {validActive === "dashboard" && (
               <>
                 {/* Theme Picker - Dashboard Page */}
@@ -4831,7 +4557,7 @@ active={
                       width: 300, maxHeight: "70vh", overflowY: "auto"
                     }}>
                       <div style={{ fontSize: 13, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 14 }}>
-                        🎨 Choose Theme
+                        ðŸŽ¨ Choose Theme
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
                         {Object.entries(THEMES).map(([key, t]) => (
@@ -4853,7 +4579,7 @@ active={
                       {/* Custom Color Picker Section */}
                       <div style={{ marginTop: 16, borderTop: "1.5px solid var(--app-border)", paddingTop: 14 }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                          🎯 Custom Color
+                          ðŸŽ¯ Custom Color
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           <div style={{ position: "relative", flexShrink: 0 }}>
@@ -4867,7 +4593,7 @@ active={
                             }}
                               onClick={() => document.getElementById("customColorInput")?.click()}
                             >
-                              <span style={{ fontSize: 16 }}>🎨</span>
+                              <span style={{ fontSize: 16 }}>ðŸŽ¨</span>
                             </div>
                             <input
                               id="customColorInput"
@@ -4926,7 +4652,7 @@ active={
                       display: "flex", alignItems: "center", justifyContent: "center",
                       transition: "all 0.2s"
                     }}>
-                    🎨
+                    ðŸŽ¨
                   </button>
                 </div>
                 {/* Subscription Status Alert (Blocking) Removed as requested */}
@@ -4943,7 +4669,7 @@ active={
                     alignItems: "center",
                     gap: 12
                   }}>
-                    <div style={{ fontSize: 24 }}>⚠️</div>
+                    <div style={{ fontSize: 24 }}>âš ï¸</div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 700, color: "#92400e", marginBottom: 4 }}>
                         Subscription Renewal Required
@@ -5042,7 +4768,7 @@ active={
                                   <i className="ti ti-folder"></i>
                                 </div>
                                 <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                  — same
+                                  â€” same
                                 </div>
                               </div>
                               <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
@@ -5131,7 +4857,7 @@ active={
                                     <i className="ti ti-users" style={{ color: "#0097A7" }}></i> Recent Clients
                                   </div>
                                   <div onClick={() => setActive("clients")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
-                                    View All →
+                                    View All â†’
                                   </div>
                                 </div>
                                 <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
@@ -5256,7 +4982,7 @@ active={
                                     <i className="ti ti-folder" style={{ color: "#00BCD4" }}></i> Active Projects
                                   </div>
                                   <div onClick={() => setActive("projects")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
-                                    View All →
+                                    View All â†’
                                   </div>
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -5274,7 +5000,7 @@ const progress = p.progress || 25;
                                           <div style={{ width: 3, background: bColor, borderRadius: 2 }}></div>
                                           <div>
                                             <div style={{ fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{p.name || p.title}</div>
-                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} • Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : "TBA"}</div>
+                                            <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)", marginTop: 2 }}>{clients.find(c => c._id === p.clientId)?.clientName || "Internal"} â€¢ Due {p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : "TBA"}</div>
                                           </div>
                                         </div>
                                         <div style={{ width: 100, textAlign: "right" }}>
@@ -5304,7 +5030,7 @@ const progress = p.progress || 25;
                                     <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
                                   </div>
                                   <div style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
-                                    HR Panel →
+                                    HR Panel â†’
                                   </div>
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -5323,7 +5049,7 @@ const progress = p.progress || 25;
                                         return ` (${diffDays}d)`;
                                       } catch (err) { return ""; }
                                     };
-                                    const detail = `${l.type || "Leave"} • ${l.from} - ${l.to}${getDuration()}`;
+                                    const detail = `${l.type || "Leave"} â€¢ ${l.from} - ${l.to}${getDuration()}`;
                                     
                                     return (
                                       <div key={l._id || i} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: i === pendingLeaves.length - 1 ? "none" : "1px solid rgba(0,0,0,0.04)" }}>
@@ -5365,7 +5091,7 @@ const progress = p.progress || 25;
                                     </span>
                                   </div>
                                   <div onClick={() => setActive("tasks")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
-                                    All Tasks →
+                                    All Tasks â†’
                                   </div>
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -5374,7 +5100,7 @@ const progress = p.progress || 25;
                                       <input type="checkbox" style={{ marginTop: 2, accentColor: "#00BCD4" }} />
                                       <div style={{ flex: 1 }}>
                                         <div style={{ fontSize: 13, fontWeight: 700, color: "#0f1c2e", marginBottom: 2 }}>{t.title}</div>
-                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} • Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : "TBA"}</div>
+                                        <div style={{ fontSize: 11, color: "rgba(15,28,46,0.5)" }}>{employees.find(e => e._id === t.assignee)?.name || "Unassigned"} â€¢ Due {t.deadline ? new Date(t.deadline).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) : "TBA"}</div>
                                       </div>
                                       <div style={{ background: "#fef2f2", color: "#dc2626", padding: "4px 8px", borderRadius: 6, fontSize: 9, fontWeight: 800, letterSpacing: "0.5px" }}>HIGH</div>
                                     </div>
@@ -5449,7 +5175,7 @@ const progress = p.progress || 25;
               </>
             )}
 
-                {/* ── Pages using new components ── */}
+                {/* â”€â”€ Pages using new components â”€â”€ */}
                 {validActive === "create-project" && (
                   <ModernProjectCreator
                     key="create"
@@ -5468,15 +5194,13 @@ const progress = p.progress || 25;
                   />
                 )}
 
-{validActive === "edit-project" && (
+{validActive === "edit-project" && jumpProject && (
   <ModernProjectCreator
-    key={jumpProject?._id}
-    editProject={jumpProject}        // ← ಇದು important
+    key={jumpProject._id || jumpProject.id}
+    editProject={jumpProject}
     clients={clients}
     employees={employees}
-    onBack={() =>{ const returnTo = sidebarOverride || "projects";
-  setSidebarOverride(null);
-  setActive(returnTo);}}
+    onBack={() => { const returnTo = sidebarOverride || "projects"; setSidebarOverride(null); setActive(returnTo); }}
     onSuccess={async (updatedProj) => {
       const saved = updatedProj?.project || updatedProj || jumpProject;
       const merged = { ...jumpProject, ...saved };
@@ -5507,10 +5231,11 @@ const progress = p.progress || 25;
 }}
     hideTopActions={fromEditProject}
     onBack={() => { setFromEditProject(false); setActive("projects"); }} 
-    onEdit={(updatedProj) => { 
+    onEdit={(updatedProj) => {
       setFromEditProject(false);
-      if(updatedProj) setJumpProject(updatedProj); 
-      setActive("edit-project"); 
+      setSidebarOpen(false);
+      if (updatedProj) setJumpProject(updatedProj);
+      startNavTransition(() => setActive("edit-project"));
     }}
     onUpdate={fetchTasks}
     fetchTasks={fetchTasks}
@@ -5541,12 +5266,13 @@ const progress = p.progress || 25;
   setSidebarOverride("clients"); 
   if (isEdit && proj) {
     setJumpProject(proj);
-    setActive("edit-project");
+    setSidebarOpen(false);
+    startNavTransition(() => setActive("edit-project"));
   } else {
-    // Active client-ஓட details புதிய project-க்கு pass பண்ணு
+    // Active client-à®“à®Ÿ details à®ªà¯à®¤à®¿à®¯ project-à®•à¯à®•à¯ pass à®ªà®£à¯à®£à¯
     const activeC = clients.find(c => c._id === proj?._id) || clients.find(c => (c.clientName || c.name) === proj?.client);
     if (activeC) {
-      // ClientsPage-ல் activeClient select ஆகி இருக்கு — அந்த client details save பண்ணு
+      // ClientsPage-à®²à¯ activeClient select à®†à®•à®¿ à®‡à®°à¯à®•à¯à®•à¯ â€” à®…à®¨à¯à®¤ client details save à®ªà®£à¯à®£à¯
       setJumpProject({ 
         _prefillClient: activeC.clientName || activeC.name,
         _prefillContactName: activeC.contactPersonName || "",
@@ -5587,7 +5313,11 @@ const progress = p.progress || 25;
                   user={user} 
                   fetchTasks={fetchTasks} 
                   onCreateProject={() => { setSidebarOverride("clients"); setActive("create-project"); }} 
-                  onEditProject={(p) => { setJumpProject(p); setActive("edit-project"); }} 
+                  onEditProject={(p) => {
+                    setSidebarOpen(false);
+                    setJumpProject(p);
+                    startNavTransition(() => setActive("edit-project"));
+                  }} 
                   setActive={setActive} 
                   setInvoicePrefill={setInvoicePrefill} 
                   setJumpInvoice={setJumpInvoice} 
@@ -5739,7 +5469,7 @@ const progress = p.progress || 25;
                     <div style={{ fontSize: 13, fontWeight: 700, color: T.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
                     <div style={{ fontSize: 11, color: "var(--app-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
                   </div>
-                  <span style={{ fontSize: 12 }}>✓</span>
+                  <span style={{ fontSize: 12 }}>âœ“</span>
                 </div>
               </div>
 
@@ -5810,7 +5540,7 @@ const progress = p.progress || 25;
                   onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
-                  <span style={{ fontSize: 14 }}>👤</span> Profile
+                  <span style={{ fontSize: 14 }}>ðŸ‘¤</span> Profile
                 </button>
                 {(isAdmin ||
                   user?.businessLimit?.toLowerCase().includes("multiple") ||
@@ -5846,7 +5576,7 @@ const progress = p.progress || 25;
                       onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
-                      <span style={{ fontSize: 14 }}>➕</span> Add account
+                      <span style={{ fontSize: 14 }}>âž•</span> Add account
                     </button>
                   )}
                 <button
@@ -5872,7 +5602,7 @@ const progress = p.progress || 25;
                   onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
-                  <span style={{ fontSize: 14 }}>🚪</span> Logout            </button>
+                  <span style={{ fontSize: 14 }}>ðŸšª</span> Logout            </button>
               </div>
             </div>
           )}
@@ -5897,7 +5627,7 @@ const progress = p.progress || 25;
                   fontSize: 14,
                 }}
               >
-                ✕
+                âœ•
               </button>
               <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
             </div>
@@ -5917,12 +5647,12 @@ const progress = p.progress || 25;
           />}
 
 
-          {/* ── Add Client Modal ── */}
+          {/* â”€â”€ Add Client Modal â”€â”€ */}
           {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
-          {modal === "client" && <Mdl title={clientSuccessData ? "✅ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
+          {modal === "client" && <Mdl title={clientSuccessData ? "âœ… Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
             {clientSuccessData ? (
               <div style={{ textAlign: "center", padding: "5px 0" }}>
-                <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>✓</div>
+                <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>âœ“</div>
                 <h3 style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 8 }}>Registration Successful!</h3>
                 <p style={{ fontSize: 13, color: "#64748b", marginBottom: 16, lineHeight: 1.4, maxWidth: 340, margin: "0 auto 16px" }}>
                   The client account for <strong style={{ color: T.primary }}>{clientSuccessData.name}</strong> has been created.
@@ -5945,11 +5675,11 @@ const progress = p.progress || 25;
                     onClick={() => {
                       const text = `Hi ${clientSuccessData.name},\n\nYour client account has been created successfully!\n\n*Login Credentials*\nEmail: ${clientSuccessData.email}\nPassword: ${clientSuccessData.password || "Not set"}\n\nLogin URL: ${window.location.origin}\n\nPlease change your password after your first login.`;
                       navigator.clipboard.writeText(text);
-                      toast.success("📋 Credentials copied!");
+                      toast.success("ðŸ“‹ Credentials copied!");
                     }}
                     style={{ width: "100%", background: "var(--app-accent-gradient)", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(var(--app-accent-rgb),0.2)", transition: "all 0.2s" }}
                   >
-                    📋 Copy Login Details
+                    ðŸ“‹ Copy Login Details
                   </button>
 
                   <button
@@ -5960,7 +5690,7 @@ const progress = p.progress || 25;
                     }}
                     style={{ width: "100%", background: "#25D366", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 13, boxShadow: "0 6px 15px rgba(37,211,102,0.2)" }}
                   >
-                    <span style={{ fontSize: 16 }}>💬</span> Share via WhatsApp
+                    <span style={{ fontSize: 16 }}>ðŸ’¬</span> Share via WhatsApp
                   </button>
 
                   <button
@@ -6023,7 +5753,7 @@ const progress = p.progress || 25;
                         />
                       ) : (
                         <div style={{ textAlign: "center" }}>
-                          <div style={{ fontSize: 40, marginBottom: 8 }}>🏢</div>
+                          <div style={{ fontSize: 40, marginBottom: 8 }}>ðŸ¢</div>
                           <div style={{ fontSize: 10, fontWeight: 800, color: "var(--app-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Upload Logo</div>
                         </div>
                       )}
@@ -6035,14 +5765,14 @@ const progress = p.progress || 25;
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 16, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.4)",
                       border: "3px solid #fff"
-                    }}>📷</div>
+                    }}>ðŸ“·</div>
                   </div>
                 </div>
-                {/* ── CLIENT TYPE ── */}
+                {/* â”€â”€ CLIENT TYPE â”€â”€ */}
                 <div style={{marginBottom:16}}>
                   <div style={{fontSize:11,fontWeight:700,color:'#5A6A7A',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:8}}>Client Type <span style={{color:'#EF5350'}}>*</span></div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-                    {[{val:'b2b',icon:'🏢',label:'B2B',sub:'Company / Business'},{val:'b2c',icon:'👤',label:'B2C',sub:'Individual person'},{val:'freelancer',icon:'💼',label:'Freelancer',sub:'Consultant / Solo'}].map(t=>(
+                    {[{val:'b2b',icon:'ðŸ¢',label:'B2B',sub:'Company / Business'},{val:'b2c',icon:'ðŸ‘¤',label:'B2C',sub:'Individual person'},{val:'freelancer',icon:'ðŸ’¼',label:'Freelancer',sub:'Consultant / Solo'}].map(t=>(
                       <div key={t.val} onClick={()=>setNc(p=>({...p,clientType:t.val}))}
                         style={{border:`2px solid ${nc.clientType===t.val?'#00BCD4':'#E0E6EA'}`,borderRadius:10,padding:'12px 8px',textAlign:'center',cursor:'pointer',background:nc.clientType===t.val?'#E0F7FA':'#F4F6F8',transition:'all .15s'}}>
                         <div style={{fontSize:22,marginBottom:4}}>{t.icon}</div>
@@ -6053,9 +5783,9 @@ const progress = p.progress || 25;
                   </div>
                 </div>
 
-                {/* ── BASIC INFO ── */}
+                {/* â”€â”€ BASIC INFO â”€â”€ */}
                 <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🏢 Basic Info</div>
+                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>ðŸ¢ Basic Info</div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
                     <Fld label="Client / Display Name *" value={nc.name} onChange={v=>{setNc({...nc,name:v});setNcError(p=>({...p,name:''}));}} error={ncError.name} />
                     <Fld label="Company Name" value={nc.company} onChange={v=>setNc({...nc,company:v})} />
@@ -6067,9 +5797,9 @@ const progress = p.progress || 25;
                   </div>
                 </div>
 
-                {/* ── PRIMARY CONTACT ── */}
+                {/* â”€â”€ PRIMARY CONTACT â”€â”€ */}
                 <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>📋 Primary Contact</div>
+                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>ðŸ“‹ Primary Contact</div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
                     <Fld label="Contact Person Name" value={nc.contactPersonName} onChange={v=>setNc({...nc,contactPersonName:v})} />
                     <Fld label="Designation" value={nc.designation||''} onChange={v=>setNc({...nc,designation:v})} />
@@ -6080,9 +5810,9 @@ const progress = p.progress || 25;
                   </div>
                 </div>
 
-                {/* ── ADDRESS ── */}
+                {/* â”€â”€ ADDRESS â”€â”€ */}
                 <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>📍 Address</div>
+                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>ðŸ“ Address</div>
                   <div style={{marginBottom:12}}><Fld label="Street / Building Address" value={nc.address} onChange={v=>setNc({...nc,address:v})} /></div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
                     <Fld label="City" value={nc.city} onChange={v=>setNc({...nc,city:v})} />
@@ -6092,41 +5822,41 @@ const progress = p.progress || 25;
                   </div>
                 </div>
 
-                {/* ── ONLINE PRESENCE ── */}
+                {/* â”€â”€ ONLINE PRESENCE â”€â”€ */}
                 <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🌐 Online Presence</div>
+                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>ðŸŒ Online Presence</div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
                     <Fld label="Website URL" value={nc.website} onChange={v=>setNc({...nc,website:v})} />
                     <Fld label="LinkedIn Profile" value={nc.linkedin} onChange={v=>setNc({...nc,linkedin:v})} />
                   </div>
                 </div>
 
-                {/* ── BILLING & TERMS ── */}
+                {/* â”€â”€ BILLING & TERMS â”€â”€ */}
                 <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>💳 Billing & Terms</div>
+                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>ðŸ’³ Billing & Terms</div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-                    <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v=>setNc({...nc,billingCurrency:v})} options={['INR — Indian Rupee','USD — US Dollar','GBP — British Pound','EUR — Euro','AED — UAE Dirham','SGD — Singapore Dollar','AUD — Australian Dollar']} />
+                    <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v=>setNc({...nc,billingCurrency:v})} options={['INR â€” Indian Rupee','USD â€” US Dollar','GBP â€” British Pound','EUR â€” Euro','AED â€” UAE Dirham','SGD â€” Singapore Dollar','AUD â€” Australian Dollar']} />
                     <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v=>setNc({...nc,paymentTerms:v})} options={['','Due on receipt','Net 7','Net 15','Net 30','Net 45','Net 60','50% Advance + 50% on delivery']} allowCustom={true} />
                     <Fld label="Credit Limit" value={nc.creditLimit} onChange={v=>setNc({...nc,creditLimit:v})} type="number" />
                     <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v=>setNc({...nc,preferredPaymentMode:v})} options={['','Bank Transfer / NEFT','UPI','Cheque','Credit Card','Cash','PayPal','Stripe']} allowCustom={true} />
                   </div>
                 </div>
 
-                {/* ── PORTAL ACCESS ── */}
+                {/* â”€â”€ PORTAL ACCESS â”€â”€ */}
                 <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🔒 Portal Access</div>
+                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>ðŸ”’ Portal Access</div>
                   <div style={{position:'relative',marginBottom:4}}>
                     <input type={showClientPass?'text':'password'} value={nc.password} onChange={e=>setNc({...nc,password:e.target.value})}
                       style={{width:'100%',border:`1.5px solid ${ncError.password?'#EF4444':'var(--app-border)'}`,borderRadius:10,padding:'10px 46px 10px 14px',fontSize:13,color:T.text,background:'var(--app-bg)',boxSizing:'border-box',outline:'none'}}
                       placeholder="Set client portal password *" />
                     <button type="button" onClick={()=>setShowClientPass(!showClientPass)} style={{position:'absolute',right:14,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'var(--app-muted)',fontSize:11,fontWeight:700,fontFamily:'inherit'}}>{showClientPass?'HIDE':'SHOW'}</button>
                   </div>
-                  {ncError.password && <div style={{fontSize:11,color:'#EF4444',marginTop:4}}>⚠️ {ncError.password}</div>}
+                  {ncError.password && <div style={{fontSize:11,color:'#EF4444',marginTop:4}}>âš ï¸ {ncError.password}</div>}
                 </div>
 
-                {/* ── INTERNAL NOTES ── */}
+                {/* â”€â”€ INTERNAL NOTES â”€â”€ */}
                 <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>📝 Internal Notes</div>
+                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>ðŸ“ Internal Notes</div>
                   <textarea value={nc.notes} onChange={e=>setNc({...nc,notes:e.target.value})}
                     style={{width:'100%',border:'1.5px solid #E0E6EA',borderRadius:10,padding:'10px 14px',fontSize:13,color:T.text,background:'#fff',boxSizing:'border-box',outline:'none',minHeight:70,resize:'vertical',fontFamily:'inherit'}}
                     placeholder="Any internal context, special instructions, or notes..." />
@@ -6140,7 +5870,7 @@ const progress = p.progress || 25;
             )}
           </Mdl>}
 
-          {/* ── Add Employee Modal ── */}
+          {/* â”€â”€ Add Employee Modal â”€â”€ */}
           {modal === "employee" && <Mdl title="Add New Employee" onClose={() => setModal(null)}>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
               <Fld label="Full Name *" value={ne.name} onChange={v => setNe({ ...ne, name: v })} error={neError.name} />
@@ -6157,7 +5887,7 @@ const progress = p.progress || 25;
             <Fld label="Address" value={ne.address} onChange={v => setNe({ ...ne, address: v })} />
 
             <div style={{ marginTop: 14 }}>
-              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>🏦 BANK DETAILS</div>
+              <div style={{ fontSize: 11, color: "var(--app-sidebar)", fontWeight: 800, marginBottom: 10 }}>ðŸ¦ BANK DETAILS</div>
               <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
                 <Fld label="Bank Name" value={ne.bankName} onChange={v => setNe({ ...ne, bankName: v })} />
                 <Fld label="IFSC Code" value={ne.ifscCode} onChange={v => setNe({ ...ne, ifscCode: v })} />
@@ -6170,7 +5900,7 @@ const progress = p.progress || 25;
                 <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
                 <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
               </div>
-              {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {neError.password}</div>}
+              {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {neError.password}</div>}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
               <button onClick={() => {
@@ -6179,14 +5909,14 @@ const progress = p.progress || 25;
                 const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                 window.open(wpUrl, "_blank");
               }} style={{ background: "#dcfce7", border: "1.5px solid #bbf7d0", color: "#16a34a", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 700, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
-                <span>💬</span> Share Link
+                <span>ðŸ’¬</span> Share Link
               </button>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
               <button onClick={addEmployee} disabled={empSaveLoading} style={{ ...B("var(--app-accent)"), opacity: empSaveLoading ? 0.7 : 1 }}>{empSaveLoading ? "Saving..." : "Add Employee"}</button>
             </div>
           </Mdl>}
 
-          {/* ── Add Project Modal ── */}
+          {/* â”€â”€ Add Project Modal â”€â”€ */}
           {modal === "project" && <Mdl title="Create New Project" onClose={() => setModal(null)}>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
               <Fld label="Project Name *" value={np.name} onChange={v => { setNp({ ...np, name: v }); setNpError(p => ({ ...p, name: "" })); }} error={npError.name} />
@@ -6215,7 +5945,7 @@ const progress = p.progress || 25;
                     setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false);
                   }}
                 />
-                {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}
+                {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {npError.client}</div>}
               </div>
               <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
               <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
@@ -6228,7 +5958,7 @@ const progress = p.progress || 25;
                     onChange={e => setNp({ ...np, currency: e.target.value })}
                     style={{ width: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
                   >
-                    {["₹", "$", "€", "£", "¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
+                    {["â‚¹", "$", "â‚¬", "Â£", "Â¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                   <input
                     type="text"
@@ -6326,7 +6056,7 @@ const progress = p.progress || 25;
                           onClick={(e) => { e.stopPropagation(); setNp(prev => ({ ...prev, assignedTo: prev.assignedTo.filter(n => n !== name) })); }}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 14, padding: "0 2px", fontWeight: 700 }}
                         >
-                          ×
+                          Ã—
                         </button>
                       </div>
                     ))}
@@ -6341,7 +6071,7 @@ const progress = p.progress || 25;
             </div>
           </Mdl>}
 
-          {/* ── Add Manager Modal ── */}
+          {/* â”€â”€ Add Manager Modal â”€â”€ */}
           {modal === "manager" && <Mdl title="Add New Manager" onClose={() => setModal(null)}>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
               <Fld label="Manager Name *" value={nm.managerName} onChange={v => { setNm({ ...nm, managerName: v }); setNmError(p => ({ ...p, managerName: "" })); }} error={nmError.managerName} />
@@ -6358,15 +6088,15 @@ const progress = p.progress || 25;
                 <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
                 <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
               </div>
-              {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nmError.password}</div>}
+              {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {nmError.password}</div>}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager →"}</button>
+              <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager â†’"}</button>
             </div>
           </Mdl>}
 
-          {/* ── Add Subadmin Modal ── */}
+          {/* â”€â”€ Add Subadmin Modal â”€â”€ */}
           {modal === "subadmin" && <Mdl title="Add New Subadmin" onClose={() => setModal(null)}>
             <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
               <Fld label="Full Name *" value={ns.name} onChange={v => { setNs({ ...ns, name: v }); setNsError(p => ({ ...p, name: "" })); }} error={nsError.name} />
@@ -6385,19 +6115,19 @@ const progress = p.progress || 25;
                 <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
                 <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
               </div>
-              {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nsError.password}</div>}
+              {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {nsError.password}</div>}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin →"}</button>
+              <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin â†’"}</button>
             </div>
           </Mdl>}
 
-          {/* ── Add Package Modal ── */}
+          {/* â”€â”€ Add Package Modal â”€â”€ */}
           {modal === "package_add" && <Mdl title="Add New Package" onClose={() => setModal(null)} maxWidth={700}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
               <Fld label="Package Title *" value={npkg.title} onChange={v => { setNpkg({ ...npkg, title: v }); setPkgError(p => ({ ...p, title: "" })); }} error={pkgError.title} />
-              <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. 📦" />
+              <Fld label="Icon (Emoji)" value={npkg.icon} onChange={v => setNpkg({ ...npkg, icon: v })} placeholder="e.g. ðŸ“¦" />
 
               <Fld label="Description" value={npkg.description} onChange={v => setNpkg({ ...npkg, description: v })} />
             </div>
@@ -6405,10 +6135,10 @@ const progress = p.progress || 25;
             <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
               <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-                <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. ₹999" />
-                <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. ₹2,499" />
-                <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. ₹4,499" />
-                <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. ₹7,999" />
+                <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. â‚¹999" />
+                <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. â‚¹2,499" />
+                <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. â‚¹4,499" />
+                <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. â‚¹7,999" />
               </div>
             </div>
 
@@ -6432,7 +6162,7 @@ const progress = p.progress || 25;
                       transition: "all 0.2s"
                     }}
                   >
-                    {npkg.businessLimit === mode ? "✓ " : ""}{mode}
+                    {npkg.businessLimit === mode ? "âœ“ " : ""}{mode}
                   </button>
                 ))}
               </div>
@@ -6480,7 +6210,7 @@ const progress = p.progress || 25;
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package →"}</button>
+              <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package â†’"}</button>
             </div>
           </Mdl>}
 
@@ -6496,17 +6226,17 @@ const progress = p.progress || 25;
             <Fld label="Product Description" value={nv.productDescription} onChange={v => setNv({ ...nv, productDescription: v })} />
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor →"}</button>
+              <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor â†’"}</button>
             </div>
           </Mdl>}
 
-          {/* ── View Package Modal ── */}
+          {/* â”€â”€ View Package Modal â”€â”€ */}
           {viewPackage && (
             <Mdl title={`Package Details: ${viewPackage.title}`} onClose={() => setViewPackage(null)} maxWidth={500}>
               <div style={{ padding: "10px 0" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
                   <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--app-accent-gradient)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
-                    {viewPackage.icon || "📦"}
+                    {viewPackage.icon || "ðŸ“¦"}
                   </div>
                   <div>
                     <div style={{ fontSize: 18, fontWeight: 800, color: T.text }}>{viewPackage.title}</div>
@@ -6514,15 +6244,15 @@ const progress = p.progress || 25;
                   </div>
                 </div>
 
-                <InfoRow icon="📄" label="Description" value={viewPackage.description} />
-                <InfoRow icon="📅" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
-                <InfoRow icon="💰" label="Price" value={viewPackage.type === "free" ? "Free" : `₹${viewPackage.price || 0}`} />
-                <InfoRow icon="🗓️" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
-                <InfoRow icon="🏢" label="Business" value={viewPackage.businessLimit || ""} />
-                <InfoRow icon="👨‍💼" label="Manager" value={viewPackage.managerLimit || ""} />
-                <InfoRow icon="👥" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
-                <InfoRow icon="👤" label="Employee" value={viewPackage.employeeLimit || ""} />
-                <InfoRow icon="📊" label="Status" value={viewPackage.status || "Active"} />
+                <InfoRow icon="ðŸ“„" label="Description" value={viewPackage.description} />
+                <InfoRow icon="ðŸ“…" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
+                <InfoRow icon="ðŸ’°" label="Price" value={viewPackage.type === "free" ? "Free" : `â‚¹${viewPackage.price || 0}`} />
+                <InfoRow icon="ðŸ—“ï¸" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
+                <InfoRow icon="ðŸ¢" label="Business" value={viewPackage.businessLimit || ""} />
+                <InfoRow icon="ðŸ‘¨â€ðŸ’¼" label="Manager" value={viewPackage.managerLimit || ""} />
+                <InfoRow icon="ðŸ‘¥" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
+                <InfoRow icon="ðŸ‘¤" label="Employee" value={viewPackage.employeeLimit || ""} />
+                <InfoRow icon="ðŸ“Š" label="Status" value={viewPackage.status || "Active"} />
 
                 {viewPackage.features && viewPackage.features.length > 0 && (
                   <div style={{ marginTop: 20 }}>
@@ -6530,7 +6260,7 @@ const progress = p.progress || 25;
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {(Array.isArray(viewPackage.features) ? viewPackage.features : viewPackage.features.split('\\n')).map((f, i) => (
                         <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text }}>
-                          <span style={{ color: "#22c55e" }}>✓</span> {f}
+                          <span style={{ color: "#22c55e" }}>âœ“</span> {f}
                         </div>
                       ))}
                     </div>
@@ -6543,7 +6273,7 @@ const progress = p.progress || 25;
             </Mdl>
           )}
 
-          {/* ── Edit Package Modal ── */}
+          {/* â”€â”€ Edit Package Modal â”€â”€ */}
           {editPackage && (
             <Mdl title={`Edit Package: ${editPackage.title}`} onClose={() => setEditPackage(null)} maxWidth={700}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
@@ -6575,7 +6305,7 @@ const progress = p.progress || 25;
                         transition: "all 0.2s"
                       }}
                     >
-                      {editPkgForm.businessLimit === mode ? "✓ " : ""}{mode}
+                      {editPkgForm.businessLimit === mode ? "âœ“ " : ""}{mode}
                     </button>
                   ))}
                 </div>
@@ -6624,7 +6354,7 @@ const progress = p.progress || 25;
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
                 <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-                <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
+                <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes â†’"}</button>
               </div>
             </Mdl>
           )}
@@ -6638,14 +6368,14 @@ const progress = p.progress || 25;
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <Badge label={viewProject.status || "Pending"} />
                     <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
-                      <span>👥</span> {viewProject.client}
+                      <span>ðŸ‘¥</span> {viewProject.client}
                     </div>
                   </div>
                 </div>
 
                 {/* Budget Row */}
                 <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 18 }}>
-                  <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>💰</div>
+                  <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>ðŸ’°</div>
                   <div>
                     <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>BUDGET</div>
                     <div style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)" }}>{formatCurrency(viewProject.budget, viewProject.currency)}</div>
@@ -6670,10 +6400,10 @@ const progress = p.progress || 25;
 
                 {/* Purpose Row */}
                 <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--app-bg)", borderRadius: 16, border: "1px solid var(--app-border)", marginBottom: 24 }}>
-                  <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>🎯</div>
+                  <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>ðŸŽ¯</div>
                   <div>
                     <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "—"}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "â€”"}</div>
                   </div>
                 </div>
 

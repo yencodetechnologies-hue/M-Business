@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import React from "react";
 import "./DashboardModern.css";
 import axios from "axios";
@@ -31,12 +31,13 @@ import PaymentDashboard from "./PaymentDashboard";
 import ModernProjectsView from "./ModernProjectsView";
 import ModernProjectCreator from "./ModernProjectCreator";
 import ModernProjectDetails from "./ModernProjectDetails";
+import ProjectPaymentModals from "./ProjectPaymentModals";
 
 
 
 const T = { primary: "var(--app-primary)", sidebar: "var(--app-sidebar)", accent: "var(--app-accent)", bg: "var(--app-bg)", card: "var(--app-card)", text: "var(--app-text)", muted: "var(--app-muted)", border: "var(--app-border)", surface: "var(--app-bg)" };
-const formatCurrency = (amount, currency = "â‚¹", compact = false, disableCompact = false) => {
-  const sym = currency || "â‚¹";
+const formatCurrency = (amount, currency = "Rs.", compact = false, disableCompact = false) => {
+  const sym = currency || "Rs.";
   const num = Number(amount) || 0;
   const absNum = Math.abs(num);
 
@@ -58,11 +59,11 @@ const formatCurrency = (amount, currency = "â‚¹", compact = false, disableCo
 
 const formatShortCurrency = (val) => {
   const num = Number(val);
-  if (isNaN(num) || num === 0) return "â‚¹0";
+  if (isNaN(num) || num === 0) return "Rs.0";
   
   const absNum = Math.abs(num);
   if (absNum >= 1e15) {
-    return `â‚¹${num.toExponential(2)}`;
+    return `Rs.${num.toExponential(2)}`;
   }
   
   let formatted = "";
@@ -79,7 +80,7 @@ const formatShortCurrency = (val) => {
   } else {
     formatted = num.toFixed(0);
   }
-  return `â‚¹${formatted}`;
+  return `Rs.${formatted}`;
 };
 
 const formatDate = (dateStr) => {
@@ -251,7 +252,7 @@ function SC({ title, children, action }) {
 function Search({ value, onChange, placeholder }) {
   return (
     <div style={{ position: "relative", marginBottom: 16 }}>
-      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>ðŸ”</span>
+      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span>
       <input type="text" placeholder={placeholder || "Search..."} value={value} onChange={e => onChange(e.target.value)}
         style={{ width: "100%", padding: "10px 14px 10px 40px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none", fontFamily: "inherit" }} />
     </div>
@@ -267,7 +268,7 @@ function Mdl({ title, onClose, children, maxWidth = 820, zIndex = 1000 }) {
       <div style={{ background: "var(--app-card)", borderRadius: 20, width: "100%", maxWidth, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }} onClick={e => e.stopPropagation()}>
         <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: T.text }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>âœ•</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
         </div>
         <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>{children}</div>
       </div>
@@ -308,7 +309,7 @@ function Fld({ label, value, onChange, options, type = "text", error, placeholde
         if (isNumericField && val && !/^\d*$/.test(val)) return;
         onChange(val);
       }} style={s} placeholder={placeholder || ""} disabled={disabled} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
     </div>
   );
 }
@@ -371,7 +372,7 @@ function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Del
     <div style={{ position: "fixed", inset: 0, background: "rgba(var(--app-accent-rgb),0.6)", backdropFilter: "blur(8px)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div style={{ background: "var(--app-card)", borderRadius: 18, width: "100%", maxWidth: 400, padding: "28px 28px 22px", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb),0.25)", border: "1px solid var(--app-border)" }}>
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: danger ? "rgba(var(--red-rgb),0.1)" : "rgba(var(--app-accent-rgb),0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 14px" }}>
-          {danger ? "  Deleteï¸" : "âœ…"}
+          {danger ? "  Deleteï¸" : "✓"}
         </div>
         <h3 style={{ textAlign: "center", margin: "0 0 8px", fontSize: 16, fontWeight: 800, color: T.text }}>{title}</h3>
         <p style={{ textAlign: "center", color: "#6b7280", fontSize: 13, margin: "0 0 22px" }}>{message}</p>
@@ -389,7 +390,7 @@ function ActionBtns({ onView, onEdit, onDelete, onShare }) {
   return (
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
       {onView && <button onClick={(e) => { e.stopPropagation(); onView(); }} title="View" style={{ background: "var(--app-bg)", border: "1px solid #ddd6fe", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>View</button>}
-      {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span>ðŸ”—</span></button>}
+      {onShare && <button onClick={(e) => { e.stopPropagation(); onShare(); }} title="Share Onboarding Link" style={{ background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#166534", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}><span>🔗</span></button>}
       {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit" style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f59e0b", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>Edit</button>}
       {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete" style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}>  Delete</button>}
     </div>
@@ -410,13 +411,13 @@ function InfoRow({ icon, label, value }) {
 }
 
 function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
-  const icons = { client: "ðŸ‘¥", employee: "ðŸ‘¨â€ðŸ’¼", manager: "ðŸ§‘â€ðŸ’¼" };
+  const icons = { client: "👥", employee: "ðŸ‘¨â€ðŸ’¼", manager: "ðŸ§‘â€ðŸ’¼" };
   const labels = { client: "Clients", employee: "Employees", manager: "Managers" };
 
   return (
     <Mdl title="Limit Reached" onClose={onClose} maxWidth={450} zIndex={2000}>
       <div style={{ textAlign: "center", padding: "10px 0" }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>{icons[type] || "âš ï¸"}</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>{icons[type] || "⚠️"}</div>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--app-sidebar)", marginBottom: 12 }}>
           {labels[type] || "Resource"} Limit Reached
         </h3>
@@ -435,7 +436,7 @@ function LimitReachedModal({ type, limit, onClose, onUpgrade }) {
             onClick={onUpgrade}
             style={{ flex: 1, padding: "12px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, color: "#fff", cursor: "pointer", boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.3)", fontFamily: "inherit" }}
           >
-            ðŸš€ Upgrade Plan
+            🚀 Upgrade Plan
           </button>
         </div>
       </div>
@@ -452,11 +453,11 @@ function ClientDropdown({ clients, value, onChange, error, onAddClient }) {
     <div style={{ position: "relative" }}>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", userSelect: "none", boxSizing: "border-box", position: "relative", minHeight: 42 }}>
         {value ? (<div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{value[0].toUpperCase()}</div><span>{value}</span>{selected?.companyName && <span style={{ fontSize: 11, color: "var(--app-muted)" }}>({selected.companyName})</span>}</div>) : "-- Select Client --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>â–¼</span>
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "var(--app-card)", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
-          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>ðŸ”</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
+          <div style={{ padding: "10px 10px 6px" }}><div style={{ position: "relative" }}><span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}>🔍</span><input autoFocus placeholder="Search client..." value={search} onChange={e => setSearch(e.target.value)} onClick={e => e.stopPropagation()} style={{ width: "100%", padding: "7px 10px 7px 30px", border: "1.5px solid var(--app-border)", borderRadius: 8, fontSize: 12, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} /></div></div>
           {onAddClient && <div onClick={() => { setOpen(false); setSearch(""); onAddClient(); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", background: "linear-gradient(90deg,var(--app-border),var(--app-bg))", borderBottom: "2px solid var(--app-border)" }}><div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>+</div><div><div style={{ fontSize: 13, fontWeight: 700, color: "var(--app-accent)" }}>Add New Client</div></div></div>}
           <div style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.length === 0 ? <div style={{ padding: 14, textAlign: "center", color: "var(--app-muted)", fontSize: 13 }}>No clients found</div>
@@ -538,7 +539,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       country: c.country || "India",
       website: c.website || "",
       linkedin: c.linkedin || "",
-      billingCurrency: c.billingCurrency || "INR â€” Indian Rupee",
+      billingCurrency: c.billingCurrency || "INR — Indian Rupee",
       paymentTerms: c.paymentTerms || "",
       creditLimit: c.creditLimit || "",
       preferredPaymentMode: c.preferredPaymentMode || "",
@@ -561,12 +562,12 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
       const res = await axios.put(`${BASE_URL}/api/clients/${editClient._id}`, editForm);
       setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm, ...res.data.client } : c));
       setEditClient(null);
-      showToast("âœ… Client updated successfully!");
+      showToast("✓ Client updated successfully!");
     } catch (err) {
       console.error(err);
       setClients(prev => prev.map(c => c._id === editClient._id ? { ...c, ...editForm } : c));
       setEditClient(null);
-      showToast("âœ… Client updated locally!");
+      showToast("✓ Client updated locally!");
     } finally { 
       setSaving(false); 
     }
@@ -576,7 +577,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     setClients(prev => prev.filter(c => c._id !== deleteTarget._id));
     if (activeClientId === deleteTarget._id) setActiveClientId(null);
     setDeleteTarget(null);
-    showToast("ðŸ—‘ï¸ Client deleted!");
+    showToast("🗑️ Client deleted!");
   };
 
   const updateStatus = async (c, newStatus) => {
@@ -585,7 +586,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
     } catch { }
     setClients(prev => prev.map(x => x._id === c._id ? { ...x, status: newStatus } : x));
     setStatusDropOpen(false);
-    showToast(`âœ… Status changed to ${newStatus}`);
+    showToast(`✓ Status changed to ${newStatus}`);
   };
 
   const getStatusCfg = (status) => {
@@ -628,8 +629,8 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <div style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: st.dot, border: "1.5px solid #fff" }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "â€”"}</div>
-          <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "â€”"}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#1A2E35", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.clientName || c.name || "—"}</div>
+          <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.companyName || c.company || "—"}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
 
@@ -659,18 +660,18 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
           <div style={{ padding: "14px 16px" }}>
             {[
               { icon: "ti-mail", label: "Email", val: activeClient.email, bg: "#E0F7FA", col: "#00BCD4" },
-              { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "â€”", bg: "#E0F7FA", col: "#00BCD4" },
-              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "â€”", bg: "#E0F7FA", col: "#00BCD4" },
-{ icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "â€”", bg: "#F3E8FF", col: "#7C5CFC" },
-{ icon: "ti-phone", label: "Phone", val: activeClient.phone || "â€”", bg: "#E0F7FA", col: "#00BCD4" },
-{ icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "â€”", bg: "#EFF4FF", col: "#2563EB" },
+              { icon: "ti-user", label: "Contact Person Name", val: activeClient.contactPersonName || "—", bg: "#E0F7FA", col: "#00BCD4" },
+              { icon: "ti-user", label: "Contact Person No", val: activeClient.contactPersonNo || "—", bg: "#E0F7FA", col: "#00BCD4" },
+{ icon: "ti-briefcase", label: "Category", val: activeClient.category || activeClient.industry || "—", bg: "#F3E8FF", col: "#7C5CFC" },
+{ icon: "ti-phone", label: "Phone", val: activeClient.phone || "—", bg: "#E0F7FA", col: "#00BCD4" },
+{ icon: "ti-building-bank", label: "Company Tax / GST", val: activeClient.gstNumber || "—", bg: "#EFF4FF", col: "#2563EB" },
 { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active", bg: "#E8FAF3", col: "#26C281" },
               { icon: "ti-map-pin", label: "Company Address", val: activeClient.address, bg: "#FEF5E6", col: "#F5A623" },
 
             ].filter(Boolean).map((row, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 4 ? 10 : 0 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: row.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: row.col, flexShrink: 0 }}><i className={`ti ${row.icon}`} /></div>
-                <div><div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", marginTop: 1 }}>{row.val || "â€”"}</div></div>
+                <div><div style={{ fontSize: 10, color: "#A0B8BE", fontWeight: 600 }}>{row.label}</div><div style={{ fontSize: 12, fontWeight: 700, color: "#1A2E35", marginTop: 1 }}>{row.val || "—"}</div></div>
               </div>
             ))}
           </div>
@@ -714,14 +715,14 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
                       </div>
                     </div>
                    <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
-<button onClick={() => onViewProject && onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View â†’</button>
+<button onClick={() => onViewProject && onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>
 <button onClick={async (e) => { 
   e.stopPropagation(); 
   if(!window.confirm(`"${p.name}" delete à®ªà®£à¯à®£à®µà®¾?`)) return; 
   try { 
     await axios.delete(`${BASE_URL}/api/projects/${p._id}`); 
     setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
-    showToast("ðŸ—‘ï¸ Project deleted!"); 
+    showToast("🗑️ Project deleted!"); 
   } catch(err) { 
     showToast("âŒ Delete failed!"); 
   } 
@@ -756,11 +757,11 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
 >
   {p.name}
 </div>
-            <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 2 }}>{p.type || "â€”"} Â· {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
+            <div style={{ fontSize: 11, color: "#A0B8BE", marginTop: 2 }}>{p.type || "—"} Â· {p.end ? new Date(p.end).toLocaleDateString("en-IN") : "No deadline"}</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E8FAF3", color: "#26C281" }}>{p.status || "Active"}</span>
-{onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View â†’</button>}
+{onViewProject && <button onClick={() => onViewProject(p)} style={{ background: "#E0F7FA", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#00BCD4", cursor: "pointer", fontWeight: 700 }}>View →</button>}
 <button onClick={() => onCreateProject && onCreateProject(p, true)} style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 6, padding: "4px 10px", fontSize: 11, color: "#F59E0B", cursor: "pointer", fontWeight: 700 }}>Edit</button>
 <button onClick={async (e) => { 
   e.stopPropagation(); 
@@ -768,7 +769,7 @@ function ClientsPage({ clients, setClients, projects = [], setProjects, onAddCli
   try { 
     await axios.delete(`${BASE_URL}/api/projects/${p._id}`); 
     setProjects && setProjects(prev => prev.filter(proj => proj._id !== p._id));
-    showToast("ðŸ—‘ï¸ Project deleted!"); 
+    showToast("🗑️ Project deleted!"); 
   } catch(err) { 
     showToast("âŒ Delete failed!"); 
   } 
@@ -820,7 +821,7 @@ const renderDocuments = () => {
           : c
       ));
 
-      showToast("âœ… Document uploaded!");
+      showToast("✓ Document uploaded!");
       setDocUploading(false);
     };
     reader.onerror = () => {
@@ -868,7 +869,7 @@ const renderDocuments = () => {
                 {d.name || d.fileName || "Document"}
               </div>
               <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>
-                {d.size || d.type || "â€”"}
+                {d.size || d.type || "—"}
               </div>
             </div>
           ))}
@@ -880,8 +881,8 @@ const renderDocuments = () => {
 
   const renderActivity = () => {
     const activity = [
-      { icon: "ti-user-plus", bg: "#E0F7FA", color: "#00BCD4", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "â€”" },
-      ...clientProjects.map(p => ({ icon: "ti-briefcase", bg: "#EFF4FF", color: "#2563EB", title: `Project <b>${p.name}</b> created`, time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "â€”" })),
+      { icon: "ti-user-plus", bg: "#E0F7FA", color: "#00BCD4", title: `<b>${activeClient?.clientName || activeClient?.name}</b> added as client`, time: activeClient?.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
+      ...clientProjects.map(p => ({ icon: "ti-briefcase", bg: "#EFF4FF", color: "#2563EB", title: `Project <b>${p.name}</b> created`, time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "—" })),
     ];
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
@@ -917,7 +918,7 @@ const renderDocuments = () => {
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-          {[{ val: clientProjects.length, label: "Projects" }, { val: "â€”", label: "Last Login" }, { val: c.status || "Active", label: "Status" }].map((s, i) => (
+          {[{ val: clientProjects.length, label: "Projects" }, { val: "—", label: "Last Login" }, { val: c.status || "Active", label: "Status" }].map((s, i) => (
             <div key={i} style={{ padding: "10px 12px", background: "#fff", borderRadius: 9, border: "1.5px solid #E0EEF0" }}>
               <div style={{ fontSize: 16, fontWeight: 800, color: "#1A2E35" }}>{s.val}</div>
               <div style={{ fontSize: 10, color: "#A0B8BE", marginTop: 2 }}>{s.label}</div>
@@ -993,7 +994,7 @@ const renderDocuments = () => {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
-                  <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2E35", letterSpacing: "-.3px" }}>{activeClient.clientName || activeClient.name || "â€”"}</div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2E35", letterSpacing: "-.3px" }}>{activeClient.clientName || activeClient.name || "—"}</div>
                   {/* Status badge with dropdown */}
                   <div style={{ position: "relative" }} ref={statusDropRef}>
                     <button onClick={() => setStatusDropOpen(v => !v)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px 5px 9px", background: st.bg, border: `1.5px solid ${st.dot}`, borderRadius: 20, fontSize: 11, fontWeight: 800, color: st.color, cursor: "pointer", fontFamily: "inherit" }}>
@@ -1032,7 +1033,7 @@ const renderDocuments = () => {
                 </div>
                 <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
                   {activeClient.address && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#E0F7FA", color: "#00BCD4" }}><i className="ti ti-map-pin" style={{ fontSize: 10, marginRight: 2 }} />{activeClient.address}</span>}
-                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "â€”"}</span>
+                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#F8FAFB", color: "#A0B8BE" }}><i className="ti ti-clock" style={{ fontSize: 10, marginRight: 2 }} />Joined {activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—"}</span>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 6, flexShrink: 0, flexWrap: "wrap" }}>
@@ -1044,7 +1045,7 @@ const renderDocuments = () => {
             {/* Stats bar */}
             <div style={{ display: "flex", gap: 0, background: "#F5FAFA", border: "1.5px solid #E0EEF0", borderRadius: 10, overflow: "hidden" }}>
               {[
-                { val: cRevenue ? "â‚¹" + Number(cRevenue).toLocaleString("en-IN") : "â‚¹0", label: "Total Revenue", color: "#00BCD4" },
+                { val: cRevenue ? "Rs." + Number(cRevenue).toLocaleString("en-IN") : "Rs.0", label: "Total Revenue", color: "#00BCD4" },
                 { val: clientProjects.length, label: "Projects" },
                 { val: (activeClient?.invoiceCount || 0), label: "Invoices" },
                 { val: (activeClient?.documents?.length || 0), label: "Documents" },
@@ -1079,7 +1080,7 @@ const renderDocuments = () => {
         </div>
       ) : (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}>ðŸ‘¥</div>
+          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#00BCD4" }}>👥</div>
           <div style={{ fontSize: 15, fontWeight: 800, color: "#1A2E35" }}>Select a Client</div>
           <div style={{ fontSize: 12, color: "#A0B8BE" }}>Choose a client from the list to view details</div>
           <button onClick={onAddClient} style={{ padding: "9px 20px", background: "#00BCD4", border: "none", borderRadius: 9, fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit", marginTop: 8 }}>+ Add First Client</button>
@@ -1113,30 +1114,30 @@ const renderDocuments = () => {
               )}
             </div>
             {[
-              { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "â€”" },
-              { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "â€”" },
-              { icon: "ti-mail", label: "Email", val: activeClient.email || "â€”" },
-              { icon: "ti-phone", label: "Phone", val: activeClient.phone || "â€”" },
-              { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "â€”" },
-              { icon: "ti-phone-call", label: "Contact No", val: activeClient.contactPersonNo || "â€”" },
-              { icon: "ti-tag", label: "Category", val: activeClient.category || "â€”" },
-              { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "â€”" },
-              { icon: "ti-map-pin", label: "Address", val: activeClient.address || "â€”" },
-              { icon: "ti-map", label: "City", val: activeClient.city || "â€”" },
-              { icon: "ti-map-2", label: "State", val: activeClient.state || "â€”" },
-              { icon: "ti-hash", label: "Pincode", val: activeClient.pincode || "â€”" },
-              { icon: "ti-world", label: "Country", val: activeClient.country || "â€”" },
-              { icon: "ti-globe", label: "Website", val: activeClient.website || "â€”" },
-              { icon: "ti-brand-linkedin", label: "LinkedIn", val: activeClient.linkedin || "â€”" },
-              { icon: "ti-coin", label: "Billing Currency", val: activeClient.billingCurrency || "â€”" },
-              { icon: "ti-credit-card", label: "Payment Terms", val: activeClient.paymentTerms || "â€”" },
-              { icon: "ti-wallet", label: "Credit Limit", val: activeClient.creditLimit || "â€”" },
-              { icon: "ti-cash", label: "Preferred Payment", val: activeClient.preferredPaymentMode || "â€”" },
-              { icon: "ti-source", label: "Client Source", val: activeClient.source || "â€”" },
+              { icon: "ti-user", label: "Client Name", val: activeClient.clientName || activeClient.name || "—" },
+              { icon: "ti-building", label: "Company Name", val: activeClient.companyName || activeClient.company || "—" },
+              { icon: "ti-mail", label: "Email", val: activeClient.email || "—" },
+              { icon: "ti-phone", label: "Phone", val: activeClient.phone || "—" },
+              { icon: "ti-user-circle", label: "Contact Person", val: activeClient.contactPersonName || "—" },
+              { icon: "ti-phone-call", label: "Contact No", val: activeClient.contactPersonNo || "—" },
+              { icon: "ti-tag", label: "Category", val: activeClient.category || "—" },
+              { icon: "ti-building-bank", label: "GST Number", val: activeClient.gstNumber || "—" },
+              { icon: "ti-map-pin", label: "Address", val: activeClient.address || "—" },
+              { icon: "ti-map", label: "City", val: activeClient.city || "—" },
+              { icon: "ti-map-2", label: "State", val: activeClient.state || "—" },
+              { icon: "ti-hash", label: "Pincode", val: activeClient.pincode || "—" },
+              { icon: "ti-world", label: "Country", val: activeClient.country || "—" },
+              { icon: "ti-globe", label: "Website", val: activeClient.website || "—" },
+              { icon: "ti-brand-linkedin", label: "LinkedIn", val: activeClient.linkedin || "—" },
+              { icon: "ti-coin", label: "Billing Currency", val: activeClient.billingCurrency || "—" },
+              { icon: "ti-credit-card", label: "Payment Terms", val: activeClient.paymentTerms || "—" },
+              { icon: "ti-wallet", label: "Credit Limit", val: activeClient.creditLimit || "—" },
+              { icon: "ti-cash", label: "Preferred Payment", val: activeClient.preferredPaymentMode || "—" },
+              { icon: "ti-source", label: "Client Source", val: activeClient.source || "—" },
               { icon: "ti-toggle-right", label: "Status", val: activeClient.status || "Active" },
-              { icon: "ti-calendar", label: "Joined", val: activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "â€”" },
-              { icon: "ti-notes", label: "Notes", val: activeClient.notes || "â€”" },
-            ].filter(row => row.val && row.val !== "â€”").map((row, i) => (
+              { icon: "ti-calendar", label: "Joined", val: activeClient.createdAt ? new Date(activeClient.createdAt).toLocaleDateString("en-IN") : "—" },
+              { icon: "ti-notes", label: "Notes", val: activeClient.notes || "—" },
+            ].filter(row => row.val && row.val !== "—").map((row, i) => (
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: "#F5FAFA", borderRadius: 9, border: "1px solid #E0EEF0" }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: "#E0F7FA", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#00BCD4", flexShrink: 0 }}>
                   <i className={`ti ${row.icon}`} />
@@ -1217,14 +1218,14 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
       if (viewEmp && viewEmp._id === editEmp._id) {
         setViewEmp(updated);
       }
-      setEditEmp(null); showToast("âœ… Employee updated successfully!");
+      setEditEmp(null); showToast("✓ Employee updated successfully!");
     } catch {
       const updated = { ...editEmp, ...editForm };
       setEmployees(prev => prev.map(e => e._id === editEmp._id ? updated : e));
       if (viewEmp && viewEmp._id === editEmp._id) {
         setViewEmp(updated);
       }
-      setEditEmp(null); showToast("âœ… Updated locally!");
+      setEditEmp(null); showToast("✓ Updated locally!");
     } finally { setSaving(false); }
   };
   const doDelete = async () => {
@@ -1235,14 +1236,14 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
       if (viewEmp && viewEmp._id === deleteTarget._id) {
         setViewEmp(null);
       }
-      showToast("ðŸ—‘ï¸ Employee deleted!");
+      showToast("🗑️ Employee deleted!");
     } catch {
       setEmployees(p => p.filter(e => e._id !== deleteTarget._id));
       setDeleteTarget(null);
       if (viewEmp && viewEmp._id === deleteTarget._id) {
         setViewEmp(null);
       }
-      showToast("ðŸ—‘ï¸ Deleted locally!");
+      showToast("🗑️ Deleted locally!");
     }
   };
 
@@ -1318,7 +1319,7 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
             <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
               <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
+              <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
             </div>
           </Mdl>
         )}
@@ -1348,13 +1349,13 @@ function EmployeesPage({ employees, setEmployees, projects = [], tasks = [], set
 
       {/* Share Onboarding Link Card (Kept as requested) */}
       <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.2)", marginBottom: 6 }}>
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>ðŸ”—</div>
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Employee Onboarding Link</div>
           <div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{onboardingLink}</div>
         </div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "âœ… Copied!" : "ðŸ“‹ Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✓ Copied!" : "ðŸ“‹ Copy Link"}</button>
           <button onClick={() => {
             const text = `Hi,
 
@@ -1425,7 +1426,7 @@ ${onboardingLink}`;
             <tbody>
               {filtered.map((e, i) => {
                 const eid = e.employeeId || e._id?.substring(0, 6).toUpperCase() || `EMP-${String(i + 1).padStart(3, "0")}`;
-                const jDate = e.joiningDate ? new Date(e.joiningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "â€”";
+                const jDate = e.joiningDate ? new Date(e.joiningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : "—";
                 let st = e.status || "Pending";
                 if (st === "Approved") st = "Active";
                 if (st === "Rejected") st = "Inactive";
@@ -1453,8 +1454,8 @@ ${onboardingLink}`;
                     <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
                       <span style={{ background: "#f1f5f9", color: "var(--text-mid)", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6 }}>{e.role || "Employee"}</span>
                     </td>
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 12, color: "var(--text-mid)", fontWeight: 600 }}>{e.department || "â€”"}</td>
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{e.email || "â€”"}</td>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 12, color: "var(--text-mid)", fontWeight: 600 }}>{e.department || "—"}</td>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{e.email || "—"}</td>
                     <td style={{ padding: "13px 16px", verticalAlign: "middle", fontSize: 13 }}>{jDate}</td>
                     <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
                       <div style={badgeStyle}><div style={dotStyle}></div> {st}</div>
@@ -1501,7 +1502,7 @@ ${onboardingLink}`;
 
           <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
             <button onClick={() => setEditEmp(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
           </div>
         </Mdl>
       )}
@@ -1557,11 +1558,11 @@ function ManagersPage({ managers, setManagers }) {
       const res = await axios.put(`${BASE_URL}/api/managers/${editMgr._id}`, editForm);
       setManagers(prev => prev.map(m => m._id === editMgr._id ? { ...m, ...(res.data || editForm) } : m));
       setEditMgr(null);
-      showToast("âœ… Manager updated!");
+      showToast("✓ Manager updated!");
     } catch {
       setManagers(prev => prev.map(m => m._id === editMgr._id ? { ...m, ...editForm } : m));
       setEditMgr(null);
-      showToast("âœ… Updated locally!");
+      showToast("✓ Updated locally!");
     } finally { setSaving(false); }
   };
 
@@ -1579,7 +1580,7 @@ function ManagersPage({ managers, setManagers }) {
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-        {[{ t: "Total Managers", v: managers.length, i: "ðŸ§‘â€ðŸ’¼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "âœ…", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Managers", v: managers.length, i: "ðŸ§‘â€ðŸ’¼", c: "#f59e0b" }, { t: "Active", v: managers.filter(m => m.status === "Active").length, i: "✓", c: "#22C55E" }, { t: "Inactive", v: managers.filter(m => m.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
@@ -1604,15 +1605,15 @@ function ManagersPage({ managers, setManagers }) {
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(m.managerName || "?")[0].toUpperCase()}</div>
-                        <span style={{ fontWeight: 700, color: T.text }}>{m.managerName || "â€”"}</span>
+                        <span style={{ fontWeight: 700, color: T.text }}>{m.managerName || "—"}</span>
                       </div>
                     </td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.email || "â€”"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.phone || "â€”"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.email || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.phone || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#f59e0b", fontSize: 12, fontWeight: 600 }}>{m.role || "Manager"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.department || "â€”"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{m.department || "—"}</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={m.status || "Active"} /></td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{m.createdAt ? new Date(m.createdAt).toLocaleDateString() : "â€”"}</td>
+                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{m.createdAt ? new Date(m.createdAt).toLocaleDateString() : "—"}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <ActionBtns onView={() => setViewMgr(m)} onEdit={() => openEdit(m)} onDelete={() => setDeleteTarget(m)} />
                     </td>
@@ -1638,7 +1639,7 @@ function ManagersPage({ managers, setManagers }) {
           <InfoRow icon="ðŸ“±" label="Phone" value={viewMgr.phone} />
           <InfoRow icon="ðŸ¢" label="Department" value={viewMgr.department} />
           <InfoRow icon="ðŸ“" label="Address" value={viewMgr.address} />
-          <InfoRow icon="ðŸ“…" label="Joined" value={viewMgr.createdAt ? new Date(viewMgr.createdAt).toLocaleDateString() : "â€”"} />
+          <InfoRow icon="ðŸ“…" label="Joined" value={viewMgr.createdAt ? new Date(viewMgr.createdAt).toLocaleDateString() : "—"} />
 
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => { setViewMgr(null); openEdit(viewMgr); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
@@ -1660,7 +1661,7 @@ function ManagersPage({ managers, setManagers }) {
           <Fld label="Address" value={editForm.address} onChange={v => setEditForm(p => ({ ...p, address: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditMgr(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
           </div>
         </Mdl>
       )}
@@ -1711,11 +1712,11 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
       const res = await axios.put(`${BASE_URL}/api/subadmins/${editSub._id}`, editForm);
       setSubadmins(prev => prev.map(s => s._id === editSub._id ? { ...s, ...(res.data.subadmin || editForm) } : s));
       setEditSub(null);
-      showToast("âœ… Subadmin updated!");
+      showToast("✓ Subadmin updated!");
     } catch {
       setSubadmins(prev => prev.map(s => s._id === editSub._id ? { ...s, ...editForm } : s));
       setEditSub(null);
-      showToast("âœ… Subadmin updated locally!");
+      showToast("✓ Subadmin updated locally!");
     } finally { setSaving(false); }
   };
 
@@ -1775,7 +1776,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
       {toastMsg && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toastMsg}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-        {[{ t: "Total Subadmins", v: subadmins.length, i: "ðŸ›¡ï¸", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "âœ…", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
+        {[{ t: "Total Subadmins", v: subadmins.length, i: "ðŸ›¡ï¸", c: "#3b82f6" }, { t: "Active", v: subadmins.filter(s => (s.status || "Active") === "Active").length, i: "✓", c: "#22C55E" }, { t: "Inactive", v: subadmins.filter(s => s.status === "Inactive").length, i: "â›”", c: "#EF4444" }].map(({ t, v, i, c }) => (
           <div key={t} style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{i}</div>
             <div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5 }}>{t.toUpperCase()}</div><div style={{ fontSize: 24, fontWeight: 800, color: c }}>{v}</div></div>
@@ -1800,15 +1801,15 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#60a5fa)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(s.name || "?")[0].toUpperCase()}</div>
-                        <span style={{ fontWeight: 700, color: T.text }}>{s.name || "â€”"}</span>
+                        <span style={{ fontWeight: 700, color: T.text }}>{s.name || "—"}</span>
                       </div>
                     </td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12, fontWeight: 600 }}>{s.companyName || s.company || "â€”"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.email || "â€”"}</td>
-                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.phone || "â€”"}</td>
+                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12, fontWeight: 600 }}>{s.companyName || s.company || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.email || "—"}</td>
+                    <td style={{ padding: "12px 14px", color: "#6b7280", fontSize: 12 }}>{s.phone || "—"}</td>
                     <td style={{ padding: "12px 14px", color: "#3b82f6", fontSize: 12, fontWeight: 600 }}>Subadmin</td>
                     <td style={{ padding: "12px 14px" }}><Badge label={s.status || "Active"} /></td>
-                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "â€”"}</td>
+                    <td style={{ padding: "12px 14px", color: "var(--app-muted)", fontSize: 12 }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}</td>
                     <td style={{ padding: "12px 14px" }}>
                       <ActionBtns onView={() => handleViewSubadmin(s)} onEdit={() => openEdit(s)} onDelete={() => setDeleteTarget(s)} />
                     </td>
@@ -1835,12 +1836,12 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
             {/* Basic Info */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12, marginBottom: 20 }}>
-              <InfoRow icon="ðŸ¢" label="Company" value={viewSub.companyName || viewSub.company || "â€”"} />
+              <InfoRow icon="ðŸ¢" label="Company" value={viewSub.companyName || viewSub.company || "—"} />
               <InfoRow icon="ðŸ’¼" label="Company Type" value={viewSub.companyType || "IT"} />
-              <InfoRow icon="ðŸ‘¥" label="Employees" value={viewSub.employeeCount || "0-10"} />
+              <InfoRow icon="👥" label="Employees" value={viewSub.employeeCount || "0-10"} />
               <InfoRow icon="ðŸ“§" label="Email" value={viewSub.email} />
               <InfoRow icon="ðŸ“±" label="Phone" value={viewSub.phone} />
-              <InfoRow icon="ðŸ“…" label="Joined" value={viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleDateString() : "â€”"} />
+              <InfoRow icon="ðŸ“…" label="Joined" value={viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleDateString() : "—"} />
               <div style={{ gridColumn: "span 2", height: 1, background: "#bfdbfe", margin: "10px 0" }} />
               <InfoRow icon="ðŸ¢" label="Client Limit" value={viewSub.clientLimit || "Not set (Default 10)"} />
               <InfoRow icon="ðŸ‘¨â€ðŸ’¼" label="Employee Limit" value={viewSub.employeeLimit || "Not set (Default 20)"} />
@@ -1874,9 +1875,9 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                     <div key={idx} style={{ padding: "10px 14px", borderBottom: "1px solid #e0f2fe", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{q.quotationNumber || q.quoteNumber || `Quote #${idx + 1}`}</div>
-                        <div style={{ fontSize: 11, color: "#64748b" }}>{q.client || q.clientName || "â€”"}</div>
+                        <div style={{ fontSize: 11, color: "#64748b" }}>{q.client || q.clientName || "—"}</div>
                       </div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#0ea5e9" }}>{q.amount || q.total || "â€”"}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#0ea5e9" }}>{q.amount || q.total || "—"}</div>
                     </div>
                   ))}
                 </div>
@@ -1896,7 +1897,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-muted),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(e.name || "?")[0].toUpperCase()}</div>
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{e.name}</div>
-                          <div style={{ fontSize: 11, color: "#64748b" }}>{e.role || e.department || "â€”"}</div>
+                          <div style={{ fontSize: 11, color: "#64748b" }}>{e.role || e.department || "—"}</div>
                         </div>
                       </div>
                       <Badge label={e.status || "Active"} />
@@ -1919,7 +1920,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#fbbf24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>{(m.managerName || m.name || "?")[0].toUpperCase()}</div>
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{m.managerName || m.name}</div>
-                          <div style={{ fontSize: 11, color: "#64748b" }}>{m.department || "â€”"}</div>
+                          <div style={{ fontSize: 11, color: "#64748b" }}>{m.department || "—"}</div>
                         </div>
                       </div>
                       <Badge label={m.status || "Active"} />
@@ -1949,7 +1950,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditSub(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "linear-gradient(135deg,#3b82f6,#60a5fa)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
           </div>
         </Mdl>
       )}
@@ -1962,7 +1963,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PROJECTS PAGE
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, onViewProject, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice }) {
+function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, onViewProject, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice, fetchProjects }) {
   const [search, setSearch] = useState("");
 
   const projectsWithProgress = (projects || []).map(p => {
@@ -1980,6 +1981,16 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
   const [assignModal, setAssignModal] = useState(null);
   const [assignTo, setAssignTo] = useState([]);
   const [toast, setToast] = useState("");
+  const [payModalsState, setPayModalsState] = useState({
+    showNewInvoice: false,
+    showPayment: false,
+    showAdvance: false,
+    showMilestonePayment: false,
+    showAdditional: false,
+    editData: null,
+    editIndex: null
+  });
+  const [payModalProject, setPayModalProject] = useState(null);
 
   // UseEffect removed to prevent unnecessary popup
 
@@ -2013,7 +2024,7 @@ const openEdit = (p) => {
       await axios.put(`${BASE_URL}/api/projects/${assignModal._id}`, { assignedTo: assignTo });
       setProjects(prev => prev.map(p => p._id === assignModal._id ? { ...p, assignedTo: assignTo } : p));
       setAssignModal(null); setAssignTo([]);
-      showToast("âœ… Employees assigned!");
+      showToast("✓ Employees assigned!");
     } catch (err) { alert(err.response?.data?.msg || "Failed to assign"); }
   };
 
@@ -2045,7 +2056,10 @@ const openEdit = (p) => {
     )}
     <div style={{ fontSize: 20, fontWeight: 900, color: "#1A2332" }}>Projects</div>
   </div>
-  <button className="create-btn" onClick={() => { if (setJumpInvoice) setJumpInvoice(null); setInvoicePrefill && setInvoicePrefill({ client: "", project: "", _t: Date.now() }); setActive && setActive("invoices"); }}>
+  <button className="create-btn" onClick={() => {
+    setPayModalProject(null);
+    setPayModalsState(prev => ({ ...prev, showNewInvoice: true }));
+  }}>
     <i className="ti ti-plus"></i> New Invoice
   </button>
 </div>
@@ -2064,11 +2078,21 @@ const openEdit = (p) => {
   onDelete={(p) => setDeleteTarget(p)} 
   onNewInvoice={(p) => { 
     if (!p) return;
-    if (setJumpInvoice) setJumpInvoice(null); 
-    if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() }); 
-    if (setActive) setActive("invoices"); 
+    setPayModalProject(p);
+    setPayModalsState(prev => ({ ...prev, showNewInvoice: true }));
   }} 
 />
+
+      {/* New Invoice Popup Modal */}
+      <ProjectPaymentModals
+        project={payModalProject}
+        projects={projects}
+        modalsState={payModalsState}
+        setModalsState={setPayModalsState}
+        onSaveSuccess={() => {
+          if (fetchProjects) fetchProjects();
+        }}
+      />
 
       {viewProj && (
         <Mdl title="Project Details" onClose={() => setViewProj(null)} maxWidth={620}>
@@ -2088,8 +2112,8 @@ const openEdit = (p) => {
                 ["Manager", viewProj.manager],
                 ["Contact Person", viewProj.contactPersonName],
                 ["Contact No", viewProj.contactPersonNo],
-                ["Start Date", viewProj.start ? new Date(viewProj.start).toLocaleDateString("en-IN") : "â€”"],
-                ["Deadline", (viewProj.end || viewProj.deadline) ? new Date(viewProj.end || viewProj.deadline).toLocaleDateString("en-IN") : "â€”"],
+                ["Start Date", viewProj.start ? new Date(viewProj.start).toLocaleDateString("en-IN") : "—"],
+                ["Deadline", (viewProj.end || viewProj.deadline) ? new Date(viewProj.end || viewProj.deadline).toLocaleDateString("en-IN") : "—"],
                 ["Budget", formatCurrency(viewProj.budget, viewProj.currency)],
                 ["Progress", `${viewProj.progress || 0}%`],
 
@@ -2097,12 +2121,12 @@ const openEdit = (p) => {
               ].map(([label, val]) => (
                 <div key={label}>
                   <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{label}</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{val || "â€”"}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{val || "—"}</div>
                 </div>
               ))}
               <div style={{ gridColumn: "1 / -1" }}>
                 <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Description</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--app-sidebar)", lineHeight: 1.6 }}>{viewProj.description || viewProj.purpose || "â€”"}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--app-sidebar)", lineHeight: 1.6 }}>{viewProj.description || viewProj.purpose || "—"}</div>
               </div>
             </div>
 
@@ -2127,7 +2151,7 @@ const openEdit = (p) => {
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {viewProj.milestones.map((m, idx) => (
                     <div key={idx} style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)", padding: "8px 12px", background: "var(--app-bg)", borderRadius: 10 }}>
-                      {m.name}{m.date ? ` â€” ${new Date(m.date).toLocaleDateString("en-IN")}` : ""}
+                      {m.name}{m.date ? ` — ${new Date(m.date).toLocaleDateString("en-IN")}` : ""}
                     </div>
                   ))}
                 </div>
@@ -2193,7 +2217,7 @@ const openEdit = (p) => {
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button onClick={() => setAssignModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment â†’</button>
+            <button onClick={doAssign} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Save Assignment →</button>
           </div>
         </Mdl>
       )}
@@ -2215,7 +2239,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
       <label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>{label.toUpperCase()}</label>
       <div onClick={() => setOpen(!open)} style={{ width: "100%", border: `1.5px solid ${error ? "#EF4444" : open ? "var(--app-accent)" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 36px 10px 14px", fontSize: 13, color: value ? T.text : "var(--app-muted)", background: "var(--app-bg)", cursor: "pointer", position: "relative", userSelect: "none", minHeight: 42, boxSizing: "border-box" }}>
         {value || placeholder || "-- Select --"}
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>â–¼</span>
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`, fontSize: 10, color: "var(--app-muted)", transition: "0.2s" }}>▼</span>
       </div>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1.5px solid var(--app-border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(var(--app-accent-rgb, 124, 58, 237),0.15)", zIndex: 999, overflow: "hidden" }}>
@@ -2226,7 +2250,7 @@ function SearchDropdown({ label, items, displayKey, value, onChange, error, plac
         </div>
       )}
       {open && <div style={{ position: "fixed", inset: 0, zIndex: 998 }} onClick={() => { setOpen(false); setSearch(""); }} />}
-      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {error}</div>}
+      {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
     </div>
   );
 }
@@ -2256,10 +2280,10 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
   useEffect(() => { setCurrentPage(1); }, [tsSearch, tsFilter, trackList.length]);
   const paginated = displayed.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  const tsStats = [{ t: "Total", v: trackList.length, i: "ðŸ“", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "âš¡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "âœ…", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "ðŸ•", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "â¸ï¸", c: "var(--app-accent)" }];
+  const tsStats = [{ t: "Total", v: trackList.length, i: "ðŸ“", c: "var(--app-accent)" }, { t: "In Progress", v: trackList.filter(p => p.status === "In Progress").length, i: "âš¡", c: "var(--app-muted)" }, { t: "Completed", v: trackList.filter(p => p.status === "Completed").length, i: "✓", c: "#22C55E" }, { t: "Pending", v: trackList.filter(p => p.status === "Pending").length, i: "ðŸ•", c: "#F59E0B" }, { t: "On Hold", v: trackList.filter(p => p.status === "On Hold").length, i: "â¸ï¸", c: "var(--app-accent)" }];
   const openAdd = () => { setTsForm(EMPTY); setTsErr({}); setTsEditId(null); setTsModal("add"); };
   const openEdit = (p) => { setTsForm({ projectId: p.projectId || p.id || "", name: p.name || "", client: p.client || "", manager: p.manager || "", employee: p.employee || "", deadline: p.deadline || "", status: p.status || "In Progress", progress: p.progress || p.pct || 0, notes: p.notes || p.note || "" }); setTsErr({}); setTsEditId(p._id || p.id); setTsModal("edit"); };
-  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0â€“100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "âœ… Project added!" : "âœ… Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("âœ… Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
+  const saveTs = async () => { const errs = {}; if (!tsForm.name.trim()) errs.name = "Project name required"; if (!tsForm.client.trim()) errs.client = "Company name required"; if (!tsForm.deadline) errs.deadline = "Deadline required"; const pv = Number(tsForm.progress); if (isNaN(pv) || pv < 0 || pv > 100) errs.progress = "0â€“100 only"; if (Object.keys(errs).length) { setTsErr(errs); return; } try { setTsSaving(true); const payload = { ...tsForm, progress: Number(tsForm.progress) }; if (tsModal === "add") { if (!payload.projectId) { const maxId = Math.max(...trackList.map(p => { const match = (p.projectId || p.id || "").match(/PRJ(\d+)/); return match ? parseInt(match[1]) : 0; }), 0); payload.projectId = `PRJ${String(maxId + 1).padStart(3, "0")}`; } const res = await axios.post(BASE_URL + "/api/project-status", payload); setTrackList(prev => [res.data, ...prev]); } else { const res = await axios.put(`${BASE_URL}/api/project-status/${tsEditId}`, payload); setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? res.data : p)); } showToast(tsModal === "add" ? "✓ Project added!" : "✓ Project updated!"); setTsModal(null); } catch { if (tsModal === "add") { const local = { ...tsForm, _id: Date.now().toString(), projectId: tsForm.projectId || `PRJ${String(trackList.length + 1).padStart(3, "0")}`, progress: Number(tsForm.progress) }; setTrackList(prev => [local, ...prev]); } else { setTrackList(prev => prev.map(p => (p._id || p.id) === tsEditId ? { ...p, ...tsForm, progress: Number(tsForm.progress) } : p)); } showToast("✓ Saved locally!"); setTsModal(null); } finally { setTsSaving(false); } };
   const deleteTs = async (id) => { if (!window.confirm("Delete?")) return; try { await axios.delete(`${BASE_URL}/api/project-status/${id}`); } catch { } setTrackList(prev => prev.filter(p => (p._id || p.id) !== id)); showToast(" Deleteï¸ Deleted!"); };
   const B2 = (color) => ({ background: "var(--app-accent-gradient)", color: "#ffffff", border: "none", borderRadius: 12, padding: "12px 22px", fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)" });
   return (
@@ -2270,7 +2294,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>ðŸ”</span><input placeholder="Searchâ€¦" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
+          <div style={{ position: "relative" }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Searchâ€¦" value={tsSearch} onChange={e => setTsSearch(e.target.value)} style={{ padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", width: 240, color: T.text }} /></div>
           {["All", "In Progress", "Pending", "Completed", "On Hold"].map(f => (<button key={f} onClick={() => setTsFilter(f)} style={{ padding: "7px 13px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: tsFilter === f ? "var(--app-accent)" : "var(--app-border)", background: tsFilter === f ? "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)" : "#fff", color: tsFilter === f ? "var(--app-accent)" : "var(--app-muted)" }}>{f}</button>))}
         </div>
         <button onClick={openAdd} style={B2("var(--app-accent)")}>
@@ -2286,10 +2310,10 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                 : paginated.map((p, i) => (<tr key={p._id || p.id || i} style={{ borderBottom: "1px solid #f3f0ff" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                   <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 11, color: "var(--app-muted)" }}>{p.projectId || p.id || `PRJ${String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}`}</td>
                   <td style={{ padding: "11px 12px", fontWeight: 700, color: T.text }}>{p.name}</td>
-                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "â€”"}</span></div></td>
-                  <td style={{ padding: "11px 12px", color: "var(--app-muted)", fontSize: 12 }}>{p.manager || "â€”"}</td>
-                  <td style={{ padding: "11px 12px", color: "var(--app-muted)", fontSize: 12 }}>{p.employee || "â€”"}</td>
-                  <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap" }}>{p.deadline || "â€”"}</td>
+                  <td style={{ padding: "11px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700, flexShrink: 0 }}>{(p.client || "?")[0].toUpperCase()}</div><span style={{ color: T.text, fontSize: 12 }}>{p.client || "—"}</span></div></td>
+                  <td style={{ padding: "11px 12px", color: "var(--app-muted)", fontSize: 12 }}>{p.manager || "—"}</td>
+                  <td style={{ padding: "11px 12px", color: "var(--app-muted)", fontSize: 12 }}>{p.employee || "—"}</td>
+                  <td style={{ padding: "11px 12px", fontFamily: "monospace", fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap" }}>{p.deadline || "—"}</td>
                   <td style={{ padding: "11px 12px" }}>
                     <select
                       value={p.status || "Pending"}
@@ -2298,7 +2322,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                         try {
                           await axios.put(`${BASE_URL}/api/project-status/${p._id || p.id}`, { status: newStatus });
                           setTrackList(prev => prev.map(track => (track._id || track.id) === (p._id || p.id) ? { ...track, status: newStatus } : track));
-                          showToast("âœ… Status updated!");
+                          showToast("✓ Status updated!");
                         } catch {
                           showToast("âŒ Update failed");
                         }
@@ -2321,17 +2345,17 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
                     </select>
                   </td>
                   <td style={{ padding: "11px 12px", minWidth: 130 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ flex: 1, background: "var(--app-border)", borderRadius: 6, height: 7 }}><div style={{ width: `${p.progress || p.pct || 0}%`, background: p.progress === 100 || p.pct === 100 ? "linear-gradient(90deg,#22C55E,#4ade80)" : "linear-gradient(90deg,var(--app-accent),var(--app-accent))", borderRadius: 6, height: "100%" }} /></div><span style={{ fontSize: 12, fontWeight: 700, color: sc(p.status), width: 32, textAlign: "right" }}>{p.progress || p.pct || 0}%</span></div></td>
-                  <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `ðŸ“ ${p.notes || p.note}` : "â€”"}</span></td>
+                  <td style={{ padding: "11px 12px", maxWidth: 180 }}><span style={{ fontSize: 12, color: "var(--app-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }} title={p.notes || p.note}>{(p.notes || p.note) ? `ðŸ“ ${p.notes || p.note}` : "—"}</span></td>
                   <td style={{ padding: "11px 12px" }}>
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       <ActionBtns onEdit={() => openEdit(p)} onDelete={() => deleteTs(p._id || p.id)} />
                       <button onClick={(e) => {
                         e.stopPropagation();
-                        const text = `ðŸ“Š *Project Status Update*\n\nProject: ${p.name}\nStatus: ${p.status}\nProgress: ${p.progress || p.pct || 0}%\nDeadline: ${p.deadline || "â€”"}\nNotes: ${p.notes || p.note || "No notes"}`;
+                        const text = `ðŸ“Š *Project Status Update*\n\nProject: ${p.name}\nStatus: ${p.status}\nProgress: ${p.progress || p.pct || 0}%\nDeadline: ${p.deadline || "—"}\nNotes: ${p.notes || p.note || "No notes"}`;
                         const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                         window.open(wpUrl, "_blank");
                       }} style={{ padding: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 7, cursor: "pointer", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <span>ðŸ”—</span>
+                        <span>🔗</span>
                       </button>
                     </div>
                   </td>
@@ -2345,7 +2369,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
         <div className="modal-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
           <Fld label="Project ID" value={tsForm.projectId || "Auto-generated"} onChange={v => setTsForm({ ...tsForm, projectId: v })} placeholder="Auto-generated (PRJ001)" disabled={tsModal === "add"} />
           <Fld label="Project Name *" value={tsForm.name} onChange={v => { setTsForm({ ...tsForm, name: v }); setTsErr(p => ({ ...p, name: "" })); }} error={tsErr.name} />
-          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {tsErr.client}</div>}</div>
+          <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>COMPANY NAME *</label><ClientDropdown clients={clientNames.length ? clients : []} value={tsForm.client} onChange={v => { setTsForm({ ...tsForm, client: v }); setTsErr(p => ({ ...p, client: "" })); }} error={tsErr.client} />{tsErr.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {tsErr.client}</div>}</div>
           <SearchDropdown label="Manager" items={managerNames} displayKey="name" value={tsForm.manager} onChange={v => setTsForm({ ...tsForm, manager: v })} placeholder="-- Select Manager --" />
           <SearchDropdown label="Employee" items={employeeNames} displayKey="name" value={tsForm.employee} onChange={v => setTsForm({ ...tsForm, employee: v })} placeholder="-- Select Employee --" />
           <Fld label="Deadline *" value={tsForm.deadline} type="date" onChange={v => { setTsForm({ ...tsForm, deadline: v }); setTsErr(p => ({ ...p, deadline: "" })); }} error={tsErr.deadline} />
@@ -2359,7 +2383,7 @@ function ProjectStatusPage({ clients, employees, managers, config }) {
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
           <button onClick={() => setTsModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Savingâ€¦" : tsModal === "add" ? "Save Project â†’" : "Next â†’"}</button>
+          <button onClick={saveTs} disabled={tsSaving} style={{ ...B2("var(--app-accent)"), opacity: tsSaving ? 0.7 : 1 }}>{tsSaving ? "Savingâ€¦" : tsModal === "add" ? "Save Project →" : "Next →"}</button>
         </div>
       </Mdl>)}
     </div>
@@ -2403,7 +2427,7 @@ function InterviewPage({ companyId, companyName }) {
     const c = updated[idx];
     const id = c._id || c.id;
     if (id) axios.patch(`${API_URL}/api/interviews/${id}/status`, { status: finalVal }).catch(() => { });
-    showToast(`âœ… Status â†’ "${finalVal}"`);
+    showToast(`✓ Status → "${finalVal}"`);
     if (viewModal && (viewModal._id || viewModal.id) === id) setViewModal(updated[idx]);
   };
 
@@ -2421,14 +2445,14 @@ function InterviewPage({ companyId, companyName }) {
         document.execCommand("copy");
         document.body.removeChild(el);
       }
-      showToast("âœ… Link copied!");
+      showToast("✓ Link copied!");
     } catch (err) {
       console.error("Copy failed:", err);
       showToast("âŒ Copy failed. Please copy manually.");
     }
   };
   const deleteCandidate = (idx) => { if (!window.confirm("Delete this candidate?")) return; const c = candidates[idx]; const id = c._id || c.id; if (id) axios.delete(`${API_URL}/api/interviews/${id}`).catch(() => { }); persist(candidates.filter((_, i) => i !== idx)); showToast(" Deleteï¸ Deleted"); setViewModal(null); };
-  const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "â€”";
+  const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -2444,21 +2468,21 @@ function InterviewPage({ companyId, companyName }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {toast && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: "#fff", border: "1.5px solid #22c55e", borderRadius: 12, padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#22c55e", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}>{toast}</div>}
       <div style={{ background: "var(--app-sidebar)", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", boxShadow: "0 8px 24px rgba(59,7,100,0.25)" }}>
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>ðŸ”—</div>
+        <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🔗</div>
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Candidate Application Link</div><div style={{ fontSize: 12, color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" }}>{appLink}</div></div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "âœ… Copied!" : "ðŸ“‹ Copy Link"}</button>
+          <button onClick={copyLink} style={{ background: linkCopied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.15)", border: `1px solid ${linkCopied ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.3)"}`, borderRadius: 9, padding: "9px 16px", color: linkCopied ? "#4ade80" : "#ffffff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{linkCopied ? "✓ Copied!" : "ðŸ“‹ Copy Link"}</button>
           <button onClick={() => window.open(appLink, "_blank")} style={{ background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 9, padding: "9px 16px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>View Preview Form</button>
         </div>
       </div>
       <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
-        {[{ t: "Total", v: counts.total, i: "ðŸŽ¯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "â³", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "âœ…", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "âŒ", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
+        {[{ t: "Total", v: counts.total, i: "ðŸŽ¯", c: "var(--app-accent)" }, { t: "Pending", v: counts.pending, i: "â³", c: "#F59E0B" }, { t: "Hired", v: counts.hired, i: "✓", c: "#22C55E" }, { t: "Rejected", v: counts.rejected, i: "âŒ", c: "#EF4444" }].map(({ t, v, i, c }) => (<div key={t} style={{ background: "#fff", borderRadius: 14, padding: "18px 16px", boxShadow: "0 4px 18px rgba(var(--app-accent-rgb, 124, 58, 237),0.07)", border: "1px solid var(--app-border)", position: "relative", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${c},${c}88)` }} /><div style={{ width: 36, height: 36, borderRadius: 10, background: `${c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, marginBottom: 8 }}>{i}</div><div style={{ fontSize: 10, color: "var(--app-muted)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 }}>{t.toUpperCase()}</div><div style={{ fontSize: 26, fontWeight: 800, color: c }}>{v}</div></div>))}
       </div>
       <div style={{ background: "#fff", borderRadius: 16, padding: 22, boxShadow: "0 4px 24px rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", border: "1px solid var(--app-border)" }}>
         <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)" }}>All Candidates ({displayed.length})</h3>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>ðŸ”</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
-          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "ðŸŽ¯ All" : f === "pending" ? "â³ Pending" : f === "hired" ? "âœ… Hired" : "âŒ Rejected"}</button>))}
+          <div style={{ position: "relative", flex: 1, minWidth: 200 }}><span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>🔍</span><input placeholder="Search name, role, email, mobile..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", padding: "9px 14px 9px 34px", border: "1.5px solid var(--app-border)", borderRadius: 10, fontSize: 13, background: "var(--app-bg)", outline: "none", fontFamily: "inherit", color: "var(--app-sidebar)", boxSizing: "border-box" }} /></div>
+          {["all", "pending", "hired", "rejected"].map(f => (<button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "1.5px solid", borderColor: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-border)", background: filter === f ? `${f === "all" ? "var(--app-accent)" : sC(f)}15` : "#fff", color: filter === f ? (f === "all" ? "var(--app-accent)" : sC(f)) : "var(--app-muted)", transition: "all 0.15s" }}>{f === "all" ? "ðŸŽ¯ All" : f === "pending" ? "â³ Pending" : f === "hired" ? "✓ Hired" : "âŒ Rejected"}</button>))}
         </div>
         {loading ? (<div style={{ textAlign: "center", padding: 50, color: "var(--app-muted)" }}>Loading candidates...</div>) : displayed.length === 0 ? (<div style={{ textAlign: "center", padding: "50px 20px", color: "var(--app-muted)" }}><div style={{ fontSize: 48, marginBottom: 12 }}>ðŸ“­</div><div style={{ fontSize: 15, fontWeight: 700, color: "var(--app-sidebar)", marginBottom: 6 }}>{candidates.length === 0 ? "No applications yet" : "No results found"}</div></div>) : (
           <div style={{ overflowX: "auto" }}>
@@ -2470,14 +2494,14 @@ function InterviewPage({ companyId, companyName }) {
                   const finalResumeUrl = resumeUrl; return (
                     <tr key={c._id || c.id || i} style={{ borderBottom: "1px solid #f3f0ff", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = "var(--app-bg)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: "12px 12px", color: "var(--app-muted)", fontSize: 11, fontFamily: "monospace" }}>{String((currentPage - 1) * itemsPerPage + i + 1).padStart(3, "0")}</td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "var(--app-sidebar)" }}>{c.name || "â€”"}</span></div></td>
-                      <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "var(--app-muted)" }}>{c.email || "â€”"}</div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile || ""}</div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{(c.name || "?")[0].toUpperCase()}</div><span style={{ fontWeight: 700, color: "var(--app-sidebar)" }}>{c.name || "—"}</span></div></td>
+                      <td style={{ padding: "12px 12px" }}><div style={{ fontSize: 12, color: "var(--app-muted)" }}>{c.email || "—"}</div><div style={{ fontSize: 11, color: "var(--app-muted)", marginTop: 2 }}>{c.mobile || ""}</div></td>
                       <td style={{ padding: "12px 12px" }}>{(c.experience || "").toLowerCase() === "fresher" ? <span style={{ background: "rgba(34,197,94,0.12)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>ðŸŽ“ Fresher</span> : <span style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.12)", color: "var(--app-accent)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.25)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>ðŸ’¼ {c.years || "?"}yrs</span>}</td>
-                      <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-sidebar)", fontSize: 12 }}>{c.role || "â€”"}</td>
-                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)" }}>{c.interviewerName || <span style={{ color: "#ddd" }}>â€”</span>}</td>
+                      <td style={{ padding: "12px 12px", fontWeight: 600, color: "var(--app-sidebar)", fontSize: 12 }}>{c.role || "—"}</td>
+                      <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)" }}>{c.interviewerName || <span style={{ color: "#ddd" }}>—</span>}</td>
                       <td style={{ padding: "12px 12px", fontSize: 12, color: "var(--app-muted)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{fmt(c.date || c.createdAt)}</td>
-                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">â³ Pending</option><option value="hired">âœ… Hired</option><option value="rejected">âŒ Rejected</option></select></td>
-                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>ðŸ“„</button> : <span style={{ fontSize: 11, color: "#ddd" }}>â€”</span>}</td>
+                      <td style={{ padding: "12px 12px" }}><select value={status} onChange={e => updateStatus(idx, e.target.value)} style={{ background: status === "hired" ? "rgba(34,197,94,0.1)" : status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)", border: `1.5px solid ${sC(status)}44`, borderRadius: 8, padding: "5px 10px", color: sC(status), fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", fontFamily: "inherit" }}><option value="pending">â³ Pending</option><option value="hired">✓ Hired</option><option value="rejected">âŒ Rejected</option></select></td>
+                      <td style={{ padding: "12px 12px" }}>{finalResumeUrl ? <button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.1)", border: "1px solid rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "var(--app-accent)", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap" }}>ðŸ“„</button> : <span style={{ fontSize: 11, color: "#ddd" }}>—</span>}</td>
                       <td style={{ padding: "12px 12px" }}><div style={{ display: "flex", gap: 5 }}><button onClick={() => setViewModal({ ...c, _resolvedResumeUrl: finalResumeUrl })} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "var(--app-muted)", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>ðŸ‘¤</button><button onClick={() => deleteCandidate(idx)} style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 7, padding: "5px 10px", fontSize: 12, color: "#ef4444", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}> Delete</button></div></td>
                     </tr>
                   );
@@ -2493,7 +2517,7 @@ function InterviewPage({ companyId, companyName }) {
           <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 820, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.25)" }}>
             <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(90deg,var(--app-bg),var(--app-bg))", flexShrink: 0 }}>
               <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--app-sidebar)" }}>ðŸ‘¤ Candidate Profile</h2>
-              <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>âœ•</button>
+              <button onClick={() => setViewModal(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--app-muted)", padding: "4px 8px" }}>✕</button>
             </div>
             <div style={{ overflowY: "auto", padding: "20px 22px", flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: "linear-gradient(135deg,var(--app-bg),var(--app-bg))", borderRadius: 14, border: "1px solid var(--app-border)", marginBottom: 18 }}>
@@ -2502,10 +2526,10 @@ function InterviewPage({ companyId, companyName }) {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 17, fontWeight: 800, color: "var(--app-sidebar)" }}>{viewModal.name}</div>
-                  <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{viewModal.role || "â€”"}</div>
+                  <div style={{ fontSize: 13, color: "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{viewModal.role || "—"}</div>
                 </div>
                 <span style={{ background: `${sC(viewModal.status || "Pending")}18`, color: sC(viewModal.status || "Pending"), border: `1px solid ${sC(viewModal.status || "Pending")}33`, padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
-                  {viewModal.status?.toLowerCase() === "hired" ? "âœ… Hired" : viewModal.status?.toLowerCase() === "rejected" ? "âŒ Rejected" : "â³ Pending"}
+                  {viewModal.status?.toLowerCase() === "hired" ? "✓ Hired" : viewModal.status?.toLowerCase() === "rejected" ? "âŒ Rejected" : "â³ Pending"}
                 </span>
               </div>
 
@@ -2527,7 +2551,7 @@ function InterviewPage({ companyId, companyName }) {
                     />
                     <div style={{ padding: "12px", background: "#fff", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "center" }}>
                       <a href={viewModal._resolvedResumeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--app-accent)", color: "#fff", padding: "8px 16px", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
-                        ðŸ”— Open in New Tab
+                        🔗 Open in New Tab
                       </a>
                     </div>
                   </div>
@@ -2537,11 +2561,11 @@ function InterviewPage({ companyId, companyName }) {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12 }}>
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
                   <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ“§ Email</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.email || "â€”"}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.email || "—"}</div>
                 </div>
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
                   <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ“± Mobile</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.mobile || "â€”"}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.mobile || "—"}</div>
                 </div>
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
                   <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ’¼ Experience</div>
@@ -2555,7 +2579,7 @@ function InterviewPage({ companyId, companyName }) {
                 </div>
                 <div style={{ padding: 12, background: "var(--app-bg)", borderRadius: 10, border: "1px solid var(--app-border)" }}>
                   <div style={{ fontSize: 11, color: "var(--app-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>ðŸ‘¨â€ðŸ’¼ Interviewer</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.interviewerName || "â€”"}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--app-sidebar)" }}>{viewModal.interviewerName || "—"}</div>
                 </div>
               </div>
             </div>
@@ -2591,7 +2615,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
     <div style={{ position: "fixed", inset: 0, background: "rgba(59,7,100,0.6)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
       <div style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 650, maxHeight: "90vh", boxShadow: "0 32px 80px rgba(var(--app-accent-rgb, 124, 58, 237),0.3)", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
         <div style={{ background: "linear-gradient(135deg,var(--app-muted),var(--app-accent),var(--app-accent))", padding: "28px 28px 22px", textAlign: "center", flexShrink: 0, position: "relative" }}>
-          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>âœ•</button>
+          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.2)", border: "none", width: 30, height: 30, borderRadius: 8, color: "#fff", fontSize: 16, cursor: "pointer" }}>✕</button>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 8, margin: "0 auto 12px", position: "relative", width: "fit-content" }}>
             {companyLogo ? (
               <img src={companyLogo} alt="logo" style={{ height: 72, width: "auto", maxWidth: "180px", borderRadius: 16, objectFit: "contain", flexShrink: 0, border: "3px solid rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.22)", display: "block" }} />
@@ -2607,7 +2631,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
             </button>
           </div>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#fff" }}>{displayName}</h2>
-          <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{user?.email || "â€”"}</p>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{user?.email || "—"}</p>
           {user?.role && !user.role.toLowerCase().includes("subadmin") && (
             <span style={{ display: "inline-block", marginTop: 8, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.28)", borderRadius: 100, padding: "3px 12px", fontSize: 10, fontWeight: 700, color: "#fff", letterSpacing: 1, textTransform: "uppercase" }}>{user.role}</span>
           )}
@@ -2617,7 +2641,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
           {/* Personal Info */}
           <div>
             <div style={{ fontSize: 11, fontWeight: 800, color: "var(--app-muted)", marginBottom: 12, letterSpacing: 1 }}>PERSONAL DETAILS</div>
-            {[{ icon: "ðŸ‘¤", label: "Full Name", value: displayName }, { icon: "ðŸ“§", label: "Email", value: user?.email || "â€”" }, { icon: "ðŸ“±", label: "Phone", value: user?.phone || "â€”" }, { icon: "ðŸŽ­", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
+            {[{ icon: "ðŸ‘¤", label: "Full Name", value: displayName }, { icon: "ðŸ“§", label: "Email", value: user?.email || "—" }, { icon: "ðŸ“±", label: "Phone", value: user?.phone || "—" }, { icon: "ðŸŽ­", label: "Role", value: user?.role || "user" }].map(({ icon, label, value }) => (
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "var(--app-bg)", borderRadius: 9, border: "1px solid var(--app-border)", marginBottom: 7 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(var(--app-accent-rgb, 124, 58, 237),0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{icon}</div>
                 <div style={{ flex: 1 }}>
@@ -2691,7 +2715,7 @@ function ProfileModal({ user, setUser, onClose, onLogout, companyLogo, onLogoCha
                       </div>
                     </div>
                     <div style={{ textAlign: "right", marginLeft: 10 }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: "#22c55e" }}>â‚¹{payment.amount?.toLocaleString() || "0"}</div>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: "#22c55e" }}>Rs.{payment.amount?.toLocaleString() || "0"}</div>
                       <div style={{ fontSize: 9, color: "#22c55e", fontWeight: 700, textTransform: "uppercase" }}>{payment.status || "paid"}</div>
                     </div>
                   </div>
@@ -2807,14 +2831,14 @@ function Sidebar({ user, active, setActive, onLogout, open, onClose, navItems, c
             <span className="logo-mark" onClick={onLogoUploadClick} style={{ cursor: "pointer" }}>{companyName || "MBusiness"}</span>
           )}
           <span className="logo-badge" style={{ position: "absolute", bottom: 2, right: 10, width: 20, height: 20, borderRadius: "50%", background: "var(--app-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff", cursor: "pointer", border: "2px solid #fff", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }} onClick={onLogoUploadClick}>+</span>
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">âœ•</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", marginLeft: "auto", fontSize: 16 }} className="sidebar-close">✕</button>
         </div>
 
         <div className="profile-area">
           <div className="profile-avatar">{initials || "P"}</div>
           <div>
             <div className="profile-name">{user?.name || "Admin"}</div>
-            <div className="profile-logout" onClick={onLogout}>Logout â†’</div>
+            <div className="profile-logout" onClick={onLogout}>Logout →</div>
           </div>
         </div>
 
@@ -2886,7 +2910,7 @@ const DEFAULT_PLANS = [
     features: ["5 Projects", "10 Invoices", "Single business manage", "Managers: 1", "Clients: 3", "Employees: 10", "Email Support"]
   },
   {
-    title: "Professional", price: 2999, icon: "ðŸš€", type: "pro",
+    title: "Professional", price: 2999, icon: "🚀", type: "pro",
     features: ["Unlimited Projects", "Unlimited Invoices", "Multiple business manage", "Managers: 3", "Clients: 10", "Employees: 50", "Priority Support"]
   }
 ];
@@ -2961,14 +2985,14 @@ function PackagesPage({ packages, onSubscribe, THEME }) {
                   }}>POPULAR</div>
                 )}
 
-                <div style={{ width: 48, height: 48, borderRadius: 14, background: `${THEME.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, marginBottom: 20 }}>{p.icon || "ðŸš€"}</div>
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: `${THEME.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, marginBottom: 20 }}>{p.icon || "🚀"}</div>
 
                 <div style={{ fontSize: 20, fontWeight: 900, color: "#1e1b4b", marginBottom: 4, letterSpacing: "-0.4px" }}>{p.title}</div>
                 <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 20, fontWeight: 700, textTransform: "uppercase" }}>Monthly Plan</div>
 
                 <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 8 }}>
                   <span style={{ fontSize: 42, fontWeight: 900, color: "#1e1b4b", lineHeight: 1, letterSpacing: "-2px" }}>
-                    {p.type === "free" ? "Free" : p.price ? `â‚¹${parseFloat(p.price).toLocaleString("en-IN")}` : "Custom"}
+                    {p.type === "free" ? "Free" : p.price ? `Rs.${parseFloat(p.price).toLocaleString("en-IN")}` : "Custom"}
                   </span>
                   {p.price > 0 && <span style={{ fontSize: 13, color: "#94a3b8", marginBottom: 6, fontWeight: 600 }}>/mo</span>}
                 </div>
@@ -3064,7 +3088,7 @@ function VendorsPage({ vendors, setVendors }) {
       const res = await axios.put(`${BASE_URL}/api/vendors/${editVendor._id}`, payload);
       setVendors(prev => prev.map(v => v._id === editVendor._id ? { ...v, ...res.data } : v));
       setEditVendor(null);
-      showToast("âœ… Vendor updated!");
+      showToast("✓ Vendor updated!");
     } catch (err) {
       showToast("âŒ Update failed!");
     } finally { setSaving(false); }
@@ -3108,7 +3132,7 @@ function VendorsPage({ vendors, setVendors }) {
                       <td style={{ padding: "12px 14px", color: "#22C55E", fontWeight: 600 }}>{formatCurrency(paid, v.currency)}</td>
                       <td style={{ padding: "12px 14px", color: balance > 0 ? "#EF4444" : "#22C55E", fontWeight: 700 }}>{formatCurrency(balance, v.currency)}</td>
                       <td style={{ padding: "12px 14px" }}><Badge label={v.modeOfPayment} /></td>
-                      <td style={{ padding: "12px 14px", color: "var(--app-muted)" }}>{v.dateOfPurchase ? new Date(v.dateOfPurchase).toLocaleDateString() : "â€”"}</td>
+                      <td style={{ padding: "12px 14px", color: "var(--app-muted)" }}>{v.dateOfPurchase ? new Date(v.dateOfPurchase).toLocaleDateString() : "—"}</td>
                       <td style={{ padding: "12px 14px" }}>
                         <ActionBtns onView={() => setViewVendor(v)} onEdit={() => openEdit(v)} onDelete={() => setDeleteTarget(v)} />
                       </td>
@@ -3134,7 +3158,7 @@ function VendorsPage({ vendors, setVendors }) {
           <InfoRow icon="ðŸ’¸" label="Paid Amount" value={formatCurrency(viewVendor.paidAmount, viewVendor.currency)} />
           <InfoRow icon="âš–ï¸" label="Balance Due" value={formatCurrency((viewVendor.amountTaxGst || 0) - (viewVendor.paidAmount || 0), viewVendor.currency)} />
           <InfoRow icon="ðŸ’³" label="Mode of Payment" value={viewVendor.modeOfPayment} />
-          <InfoRow icon="ðŸ“…" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "â€”"} />
+          <InfoRow icon="ðŸ“…" label="Date of Purchase" value={viewVendor.dateOfPurchase ? new Date(viewVendor.dateOfPurchase).toLocaleDateString() : "—"} />
           <InfoRow icon="ðŸ“" label="Description" value={viewVendor.productDescription} />
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => { setViewVendor(null); openEdit(viewVendor); }} style={{ flex: 1, padding: "10px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>Edit</button>
@@ -3157,7 +3181,7 @@ function VendorsPage({ vendors, setVendors }) {
           <Fld label="Product Description" value={editForm.productDescription} onChange={v => setEditForm(p => ({ ...p, productDescription: v }))} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
             <button onClick={() => setEditVendor(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes â†’"}</button>
+            <button onClick={saveEdit} disabled={saving} style={{ background: "var(--app-accent-gradient)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff", cursor: saving ? "not-allowed" : "pointer" }}>{saving ? "Savingâ€¦" : "Save Changes →"}</button>
           </div>
         </Mdl>
       )}
@@ -3374,7 +3398,7 @@ const [invoicePrefill, setInvoicePrefill] = useState(null);
 
   const [clients, setClients] = useState([]);
   const todayStr = new Date().toISOString().split("T")[0];
-  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", category: "", onboardedOn: todayStr, clientType: "b2b", source: "", city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR â€” Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
+  const [nc, setNc] = useState({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", contactPersonName: "", contactPersonNo: "", gstNumber: "", logoUrl: "", category: "", onboardedOn: todayStr, clientType: "b2b", source: "", city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
   const [ncError, setNcError] = useState({});
   const [saveLoading, setSaveLoading] = useState(false);
   const [showClientPass, setShowClientPass] = useState(false);
@@ -3403,7 +3427,7 @@ const [invoicePrefill, setInvoicePrefill] = useState(null);
     return { ...p, progress: pct };
   });
   const [projLoading, setProjLoading] = useState(false);
-  const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "â‚¹", team: "", status: "Pending", progress: 0, assignedTo: [] });
+  const [np, setNp] = useState({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Pending", progress: 0, assignedTo: [] });
   const [npError, setNpError] = useState({});
   const [projSaveLoading, setProjSaveLoading] = useState(false);
 
@@ -3597,7 +3621,7 @@ const mainScrollRef = useRef(null);
           const idx = all.findIndex((d) => d.id === id || (d.qt && d.qt.quoteNo === id));
           const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.quantity) || 0), 0);
           const total = subtotal * (1 + (qt.gstRate || 0) / 100);
-          const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "â€”", total, savedAt: Date.now(), qt, items, status: "draft" };
+          const entry = { id, quoteNo: qt.quoteNo, client: qt.client || "—", total, savedAt: Date.now(), qt, items, status: "draft" };
 
           if (idx >= 0) all[idx] = entry;
           else all.unshift(entry);
@@ -3991,7 +4015,7 @@ useEffect(() => {
       // Store credentials for the success screen
       setClientSuccessData({ email: nc.email, password: nc.password, name: nc.name });
       const todayStr = new Date().toISOString().split("T")[0];
-      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR â€” Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
+      setNc({ name: "", company: "", email: "", phone: "", address: "", project: "", password: "", status: "Active", role: "client", logoUrl: "", gstNumber: "", contactPersonName: "", contactPersonNo: "", category: "", clientType: "b2b", source: "", onboardedOn: todayStr, city: "", state: "", pincode: "", country: "India", website: "", linkedin: "", billingCurrency: "INR — Indian Rupee", paymentTerms: "", creditLimit: "", preferredPaymentMode: "", notes: "", designation: "", altEmail: "" });
       setNcError({});
       if (returnToModal) { setModal(returnToModal); setReturnToModal(null); }
       // Don't close modal yet if no return - show success screen (this depends on existing logic)
@@ -4104,10 +4128,10 @@ useEffect(() => {
         notifyAssigned(res.data._id, np.name, np.assignedTo);
       }
 
-      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "â‚¹", team: "", status: "Active", progress: 0, assignedTo: [] });
+      setNp({ name: "", client: "", contactPersonName: "", contactPersonNo: "", purpose: "", description: "", start: "", end: "", budget: "", currency: "Rs.", team: "", status: "Active", progress: 0, assignedTo: [] });
       setNpError({});
       setModal(null);
-      toast.success("âœ… Project created successfully!");
+      toast.success("✓ Project created successfully!");
     } catch (err) {
       setNpError({ name: err.response?.data?.msg || "Failed to save project" });
     } finally {
@@ -4224,7 +4248,7 @@ useEffect(() => {
       setNpkg({ title: "", description: "", icon: "ðŸ“¦", monthlyPrice: "", quarterlyPrice: "", halfYearlyPrice: "", annualPrice: "", features: "", planDuration: "Monthly", businessLimit: "", managerLimit: "", clientLimit: "3 Client manage", employeeLimit: "", type: "paid", price: "", noOfDays: "", assignedSubadmins: [] });
       setPkgError({});
       setModal(null);
-      toast.success("âœ… Package added!");
+      toast.success("✓ Package added!");
     } catch (err) {
       console.error("Add package error:", err);
       toast.error("âŒ Failed to add package: " + (err.response?.data?.msg || err.message));
@@ -4260,7 +4284,7 @@ useEffect(() => {
       setNv({ vendorName: "", vendorProduct: "", amountTaxGst: "", date: "", paidAmount: "", productDescription: "", dateOfPurchase: "", modeOfPayment: "Cash" });
       setNvError({});
       setModal(null);
-      toast.success("âœ… Vendor Added Successfully!");
+      toast.success("✓ Vendor Added Successfully!");
     } catch (err) {
       console.error('Add vendor error:', err);
       toast.error("âŒ Failed to add vendor: " + (err.response?.data?.message || err.message));
@@ -4279,7 +4303,7 @@ useEffect(() => {
   let enforceMySubscriptions = false;
   // Subadmin subscription blocking logic removed as requested
   const rawNavItems = getNavForRole(user?.role);
-  // When restricted, ONLY show My Subscriptions (no dashboard â€” must subscribe first)
+  // When restricted, ONLY show My Subscriptions (no dashboard — must subscribe first)
   const navItems = enforceMySubscriptions
     ? rawNavItems.filter(n => ["mysubscriptions"].includes(n.key))
     : rawNavItems;
@@ -4296,7 +4320,7 @@ useEffect(() => {
     return null;
   };
 
-  // Always land on mysubscriptions when enforced â€” never show dashboard
+  // Always land on mysubscriptions when enforced — never show dashboard
   const validActive = enforceMySubscriptions
     ? "mysubscriptions"
     : ((findNavItem(active) || active === "addClient" || active === "tasks" || active === "create-project" || active === "edit-project" || active === "project-details" || active === "projects" || active === "invoices") ? active : navItems[0]?.key || "dashboard");
@@ -4669,7 +4693,7 @@ active={
                     alignItems: "center",
                     gap: 12
                   }}>
-                    <div style={{ fontSize: 24 }}>âš ï¸</div>
+                    <div style={{ fontSize: 24 }}>⚠️</div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 700, color: "#92400e", marginBottom: 4 }}>
                         Subscription Renewal Required
@@ -4768,7 +4792,7 @@ active={
                                   <i className="ti ti-folder"></i>
                                 </div>
                                 <div style={{ background: "#f1f5f9", color: "#64748b", padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-                                  â€” same
+                                  — same
                                 </div>
                               </div>
                               <div style={{ fontSize: 26, fontWeight: 800, color: "#0f1c2e", marginBottom: 4 }}>
@@ -4857,7 +4881,7 @@ active={
                                     <i className="ti ti-users" style={{ color: "#0097A7" }}></i> Recent Clients
                                   </div>
                                   <div onClick={() => setActive("clients")} style={{ fontSize: 13, fontWeight: 700, color: "#0097A7", cursor: "pointer" }}>
-                                    View All â†’
+                                    View All →
                                   </div>
                                 </div>
                                 <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
@@ -4982,7 +5006,7 @@ active={
                                     <i className="ti ti-folder" style={{ color: "#00BCD4" }}></i> Active Projects
                                   </div>
                                   <div onClick={() => setActive("projects")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
-                                    View All â†’
+                                    View All →
                                   </div>
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -5030,7 +5054,7 @@ const progress = p.progress || 25;
                                     <span style={{ background: "#fff7ed", color: "#ea580c", padding: "4px 8px", borderRadius: 6, fontSize: 10, fontWeight: 800 }}>{pendingLeaves.length} PENDING</span>
                                   </div>
                                   <div style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
-                                    HR Panel â†’
+                                    HR Panel →
                                   </div>
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -5091,7 +5115,7 @@ const progress = p.progress || 25;
                                     </span>
                                   </div>
                                   <div onClick={() => setActive("tasks")} style={{ fontSize: 13, fontWeight: 700, color: "#00BCD4", cursor: "pointer" }}>
-                                    All Tasks â†’
+                                    All Tasks →
                                   </div>
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -5272,7 +5296,7 @@ const progress = p.progress || 25;
     // Active client-à®“à®Ÿ details à®ªà¯à®¤à®¿à®¯ project-à®•à¯à®•à¯ pass à®ªà®£à¯à®£à¯
     const activeC = clients.find(c => c._id === proj?._id) || clients.find(c => (c.clientName || c.name) === proj?.client);
     if (activeC) {
-      // ClientsPage-à®²à¯ activeClient select à®†à®•à®¿ à®‡à®°à¯à®•à¯à®•à¯ â€” à®…à®¨à¯à®¤ client details save à®ªà®£à¯à®£à¯
+      // ClientsPage-à®²à¯ activeClient select à®†à®•à®¿ à®‡à®°à¯à®•à¯à®•à¯ — à®…à®¨à¯à®¤ client details save à®ªà®£à¯à®£à¯
       setJumpProject({ 
         _prefillClient: activeC.clientName || activeC.name,
         _prefillContactName: activeC.contactPersonName || "",
@@ -5321,6 +5345,7 @@ const progress = p.progress || 25;
                   setActive={setActive} 
                   setInvoicePrefill={setInvoicePrefill} 
                   setJumpInvoice={setJumpInvoice} 
+                  fetchProjects={fetchProjects} 
                   onAddEmployee={() => {
                     const limit = getSubscriptionLimit("employee");
                     if (subscription && employees.length >= limit) {
@@ -5627,7 +5652,7 @@ const progress = p.progress || 25;
                   fontSize: 14,
                 }}
               >
-                âœ•
+                ✕
               </button>
               <AuthPage setUser={handleAuthSetUser} initialTab={accountAuthTab} />
             </div>
@@ -5649,7 +5674,7 @@ const progress = p.progress || 25;
 
           {/* â”€â”€ Add Client Modal â”€â”€ */}
           {limitModal && <LimitReachedModal type={limitModal.type} limit={limitModal.limit} onClose={() => setLimitModal(null)} onUpgrade={() => { setLimitModal(null); setForceUpgradeTab(true); setActive("mysubscriptions"); }} />}
-          {modal === "client" && <Mdl title={clientSuccessData ? "âœ… Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
+          {modal === "client" && <Mdl title={clientSuccessData ? "✓ Client Added Successfully" : "Add New Client"} onClose={() => { setModal(null); setClientSuccessData(null); }} maxWidth={clientSuccessData ? 460 : 780}>
             {clientSuccessData ? (
               <div style={{ textAlign: "center", padding: "5px 0" }}>
                 <div style={{ width: 54, height: 54, background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 14px", boxShadow: "0 6px 15px rgba(22,163,74,0.12)" }}>âœ“</div>
@@ -5835,7 +5860,7 @@ const progress = p.progress || 25;
                 <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
                   <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>ðŸ’³ Billing & Terms</div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 18px'}}>
-                    <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v=>setNc({...nc,billingCurrency:v})} options={['INR â€” Indian Rupee','USD â€” US Dollar','GBP â€” British Pound','EUR â€” Euro','AED â€” UAE Dirham','SGD â€” Singapore Dollar','AUD â€” Australian Dollar']} />
+                    <Fld label="Billing Currency" value={nc.billingCurrency} onChange={v=>setNc({...nc,billingCurrency:v})} options={['INR — Indian Rupee','USD — US Dollar','GBP — British Pound','EUR — Euro','AED — UAE Dirham','SGD — Singapore Dollar','AUD — Australian Dollar']} />
                     <Fld label="Payment Terms" value={nc.paymentTerms} onChange={v=>setNc({...nc,paymentTerms:v})} options={['','Due on receipt','Net 7','Net 15','Net 30','Net 45','Net 60','50% Advance + 50% on delivery']} allowCustom={true} />
                     <Fld label="Credit Limit" value={nc.creditLimit} onChange={v=>setNc({...nc,creditLimit:v})} type="number" />
                     <Fld label="Preferred Payment Mode" value={nc.preferredPaymentMode} onChange={v=>setNc({...nc,preferredPaymentMode:v})} options={['','Bank Transfer / NEFT','UPI','Cheque','Credit Card','Cash','PayPal','Stripe']} allowCustom={true} />
@@ -5844,14 +5869,14 @@ const progress = p.progress || 25;
 
                 {/* â”€â”€ PORTAL ACCESS â”€â”€ */}
                 <div style={{background:'#F4F6F8',borderRadius:12,border:'1px solid #E0E6EA',padding:'14px 16px',marginBottom:14}}>
-                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>ðŸ”’ Portal Access</div>
+                  <div style={{fontSize:11,fontWeight:700,color:'#00BCD4',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:12}}>🔍’ Portal Access</div>
                   <div style={{position:'relative',marginBottom:4}}>
                     <input type={showClientPass?'text':'password'} value={nc.password} onChange={e=>setNc({...nc,password:e.target.value})}
                       style={{width:'100%',border:`1.5px solid ${ncError.password?'#EF4444':'var(--app-border)'}`,borderRadius:10,padding:'10px 46px 10px 14px',fontSize:13,color:T.text,background:'var(--app-bg)',boxSizing:'border-box',outline:'none'}}
                       placeholder="Set client portal password *" />
                     <button type="button" onClick={()=>setShowClientPass(!showClientPass)} style={{position:'absolute',right:14,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'var(--app-muted)',fontSize:11,fontWeight:700,fontFamily:'inherit'}}>{showClientPass?'HIDE':'SHOW'}</button>
                   </div>
-                  {ncError.password && <div style={{fontSize:11,color:'#EF4444',marginTop:4}}>âš ï¸ {ncError.password}</div>}
+                  {ncError.password && <div style={{fontSize:11,color:'#EF4444',marginTop:4}}>⚠️ {ncError.password}</div>}
                 </div>
 
                 {/* â”€â”€ INTERNAL NOTES â”€â”€ */}
@@ -5900,7 +5925,7 @@ const progress = p.progress || 25;
                 <input type={showEmpPass ? "text" : "password"} value={ne.password} onChange={e => { setNe({ ...ne, password: e.target.value }); setNeError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${neError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set employee login password" />
                 <button type="button" onClick={() => setShowEmpPass(!showEmpPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showEmpPass ? "HIDE" : "SHOW"}</button>
               </div>
-              {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {neError.password}</div>}
+              {neError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {neError.password}</div>}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
               <button onClick={() => {
@@ -5945,7 +5970,7 @@ const progress = p.progress || 25;
                     setReturnToModal(modal); setModal("client"); setNcError({}); setShowClientPass(false);
                   }}
                 />
-                {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {npError.client}</div>}
+                {npError.client && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {npError.client}</div>}
               </div>
               <Fld label="Contact Person Name" value={np.contactPersonName} onChange={v => setNp({ ...np, contactPersonName: v })} />
               <Fld label="Contact Person No" value={np.contactPersonNo} onChange={v => setNp({ ...np, contactPersonNo: v })} />
@@ -5958,7 +5983,7 @@ const progress = p.progress || 25;
                     onChange={e => setNp({ ...np, currency: e.target.value })}
                     style={{ width: 80, border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
                   >
-                    {["â‚¹", "$", "â‚¬", "Â£", "Â¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
+                    {["Rs.", "$", "â‚¬", "Â£", "Â¥", "AED", "SAR", "QAR", "CAD", "AUD", "SGD", "KWD", "BHD", "OMR"].map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                   <input
                     type="text"
@@ -6088,11 +6113,11 @@ const progress = p.progress || 25;
                 <input type={showMgrPass ? "text" : "password"} value={nm.password} onChange={e => { setNm({ ...nm, password: e.target.value }); setNmError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nmError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set manager password" />
                 <button type="button" onClick={() => setShowMgrPass(!showMgrPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showMgrPass ? "HIDE" : "SHOW"}</button>
               </div>
-              {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {nmError.password}</div>}
+              {nmError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nmError.password}</div>}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager â†’"}</button>
+              <button onClick={addManager} disabled={mgrSaveLoading} style={{ ...B("var(--app-accent)"), opacity: mgrSaveLoading ? 0.7 : 1 }}>{mgrSaveLoading ? "Saving..." : "Save Manager →"}</button>
             </div>
           </Mdl>}
 
@@ -6115,11 +6140,11 @@ const progress = p.progress || 25;
                 <input type={showSubPass ? "text" : "password"} value={ns.password} onChange={e => { setNs({ ...ns, password: e.target.value }); setNsError(p => ({ ...p, password: "" })); }} style={{ width: "100%", border: `1.5px solid ${nsError.password ? "#EF4444" : "var(--app-border)"}`, borderRadius: 10, padding: "10px 46px 10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", boxSizing: "border-box", outline: "none" }} placeholder="Set subadmin password" />
                 <button type="button" onClick={() => setShowSubPass(!showSubPass)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--app-muted)", fontSize: 11, fontWeight: 700, fontFamily: "inherit" }}>{showSubPass ? "HIDE" : "SHOW"}</button>
               </div>
-              {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>âš ï¸ {nsError.password}</div>}
+              {nsError.password && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {nsError.password}</div>}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin â†’"}</button>
+              <button onClick={addSubadmin} disabled={subSaveLoading} style={{ ...B("var(--app-accent)"), opacity: subSaveLoading ? 0.7 : 1 }}>{subSaveLoading ? "Saving..." : "Save Subadmin →"}</button>
             </div>
           </Mdl>}
 
@@ -6135,10 +6160,10 @@ const progress = p.progress || 25;
             <div style={{ background: "#f8fafc", padding: 18, borderRadius: 16, border: "1px solid #f1f5f9", margin: "14px 0" }}>
               <div style={{ fontSize: 11, color: "#64748b", fontWeight: 800, letterSpacing: 1, marginBottom: 12 }}>PRICING OPTIONS</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }} className="modal-2col">
-                <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. â‚¹999" />
-                <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. â‚¹2,499" />
-                <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. â‚¹4,499" />
-                <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. â‚¹7,999" />
+                <Fld label="Monthly Price" value={npkg.monthlyPrice} onChange={v => setNpkg({ ...npkg, monthlyPrice: v })} placeholder="e.g. Rs.999" />
+                <Fld label="Quarterly Price" value={npkg.quarterlyPrice} onChange={v => setNpkg({ ...npkg, quarterlyPrice: v })} placeholder="e.g. Rs.2,499" />
+                <Fld label="Half-Yearly Price" value={npkg.halfYearlyPrice} onChange={v => setNpkg({ ...npkg, halfYearlyPrice: v })} placeholder="e.g. Rs.4,499" />
+                <Fld label="Annual Price" value={npkg.annualPrice} onChange={v => setNpkg({ ...npkg, annualPrice: v })} placeholder="e.g. Rs.7,999" />
               </div>
             </div>
 
@@ -6210,7 +6235,7 @@ const progress = p.progress || 25;
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package â†’"}</button>
+              <button onClick={addPackage} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Creating..." : "Create Package →"}</button>
             </div>
           </Mdl>}
 
@@ -6226,7 +6251,7 @@ const progress = p.progress || 25;
             <Fld label="Product Description" value={nv.productDescription} onChange={v => setNv({ ...nv, productDescription: v })} />
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
               <button onClick={() => setModal(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-              <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor â†’"}</button>
+              <button onClick={addVendor} disabled={vendorSaveLoading} style={{ ...B("var(--app-accent)"), opacity: vendorSaveLoading ? 0.7 : 1 }}>{vendorSaveLoading ? "Saving..." : "Save Vendor →"}</button>
             </div>
           </Mdl>}
 
@@ -6246,11 +6271,11 @@ const progress = p.progress || 25;
 
                 <InfoRow icon="ðŸ“„" label="Description" value={viewPackage.description} />
                 <InfoRow icon="ðŸ“…" label="Duration" value={`${viewPackage.no_of_days || viewPackage.noOfDays || 30} days`} />
-                <InfoRow icon="ðŸ’°" label="Price" value={viewPackage.type === "free" ? "Free" : `â‚¹${viewPackage.price || 0}`} />
+                <InfoRow icon="ðŸ’°" label="Price" value={viewPackage.type === "free" ? "Free" : `Rs.${viewPackage.price || 0}`} />
                 <InfoRow icon="ðŸ—“ï¸" label="Plan Duration" value={viewPackage.planDuration || "Monthly"} />
                 <InfoRow icon="ðŸ¢" label="Business" value={viewPackage.businessLimit || ""} />
                 <InfoRow icon="ðŸ‘¨â€ðŸ’¼" label="Manager" value={viewPackage.managerLimit || ""} />
-                <InfoRow icon="ðŸ‘¥" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
+                <InfoRow icon="👥" label="Clients (Company Name)" value={viewPackage.clientLimit || ""} />
                 <InfoRow icon="ðŸ‘¤" label="Employee" value={viewPackage.employeeLimit || ""} />
                 <InfoRow icon="ðŸ“Š" label="Status" value={viewPackage.status || "Active"} />
 
@@ -6354,7 +6379,7 @@ const progress = p.progress || 25;
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
                 <button onClick={() => setEditPackage(null)} style={{ background: "var(--app-bg)", border: "1px solid var(--app-border)", color: T.text, borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
-                <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes â†’"}</button>
+                <button onClick={savePackageEdit} disabled={pkgSaveLoading} style={{ ...B("var(--app-accent)"), opacity: pkgSaveLoading ? 0.7 : 1 }}>{pkgSaveLoading ? "Saving..." : "Save Changes →"}</button>
               </div>
             </Mdl>
           )}
@@ -6368,7 +6393,7 @@ const progress = p.progress || 25;
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <Badge label={viewProject.status || "Pending"} />
                     <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--app-muted)", fontSize: 13, fontWeight: 600 }}>
-                      <span>ðŸ‘¥</span> {viewProject.client}
+                      <span>👥</span> {viewProject.client}
                     </div>
                   </div>
                 </div>
@@ -6403,7 +6428,7 @@ const progress = p.progress || 25;
                   <div style={{ width: 42, height: 42, background: "#fff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 12px rgba(var(--app-accent-rgb, 124, 58, 237), 0.08)" }}>ðŸŽ¯</div>
                   <div>
                     <div style={{ fontSize: 9, color: "var(--app-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>PURPOSE</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "â€”"}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--app-sidebar)" }}>{viewProject.purpose || "—"}</div>
                   </div>
                 </div>
 

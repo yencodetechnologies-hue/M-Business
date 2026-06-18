@@ -27,6 +27,7 @@ const cancelBtnStyle = { padding: '10px 24px', background: '#fff', color: '#4A55
 
 export default function ProjectPaymentModals({
   project,
+  projects = [],
   modalsState,
   setModalsState,
   onSaveSuccess
@@ -36,6 +37,7 @@ export default function ProjectPaymentModals({
   // Generic form state
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
+  const [selectedProjId, setSelectedProjId] = useState('');
 
   useEffect(() => {
     if (editData) {
@@ -43,35 +45,41 @@ export default function ProjectPaymentModals({
       return;
     }
 
+    const activeProject = project || projects.find(p => p._id === selectedProjId);
+
     if (showNewInvoice && !form.invoiceNo) {
-      const len = (project?.invoices || []).length + 1;
-      setForm(prev => ({ ...prev, invoiceNo: `INV-${String(len).padStart(3, '0')}` }));
+      setForm(prev => ({ 
+        ...prev, 
+        invoiceNo: `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+        issueDate: new Date().toISOString().split('T')[0]
+      }));
     }
-    if (showPayment && !form.paymentNo) {
-      const len = (project?.paymentsReceived || []).length + 1;
+    if (showPayment && !form.paymentNo && activeProject) {
+      const len = (activeProject?.paymentsReceived || []).length + 1;
       setForm(prev => ({ ...prev, paymentNo: `PAY-${String(len).padStart(3, '0')}` }));
     }
-    if (showAdvance && !form.advanceNo) {
-      const len = (project?.advances || []).length + 1;
+    if (showAdvance && !form.advanceNo && activeProject) {
+      const len = (activeProject?.advances || []).length + 1;
       setForm(prev => ({ ...prev, advanceNo: `ADV-${String(len).padStart(3, '0')}` }));
     }
-    if (showAdditional && !form.chargeNo) {
-      const len = (project?.additionalCharges || []).length + 1;
+    if (showAdditional && !form.chargeNo && activeProject) {
+      const len = (activeProject?.additionalCharges || []).length + 1;
       setForm(prev => ({ ...prev, chargeNo: `ADC-${String(len).padStart(3, '0')}` }));
     }
-    if (showMilestonePayment && !form.milestoneNo) {
-      const len = (project?.milestonePayments || []).length + 1;
+    if (showMilestonePayment && !form.milestoneNo && activeProject) {
+      const len = (activeProject?.milestonePayments || []).length + 1;
       setForm(prev => ({ ...prev, milestoneNo: `MS-${String(len).padStart(3, '0')}` }));
     }
-    if (showExpense && !form.expenseNo) {
-      const len = (project?.expenses || []).length + 1;
+    if (showExpense && !form.expenseNo && activeProject) {
+      const len = (activeProject?.expenses || []).length + 1;
       setForm(prev => ({ ...prev, expenseNo: `EXP-${String(len).padStart(3, '0')}` }));
     }
-  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, project, editData]);
+  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, project, editData, selectedProjId, projects]);
 
   const closeModals = () => {
     setModalsState({ showNewInvoice: false, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: null, editIndex: null });
     setForm({});
+    setSelectedProjId('');
   };
 
   const handleInputChange = (field, value) => {
@@ -90,7 +98,14 @@ export default function ProjectPaymentModals({
       else if (type === 'milestone') arrayName = 'milestonePayments';
       else if (type === 'expense') arrayName = 'expenses';
 
-      const currentList = project[arrayName] || [];
+      const targetProject = project || projects.find(p => p._id === selectedProjId);
+      if (!targetProject) {
+        alert("Please select a project.");
+        setSaving(false);
+        return;
+      }
+
+      const currentList = targetProject[arrayName] || [];
       let updatedList = [...currentList];
 
       const payloadToSave = { ...form };
@@ -111,7 +126,7 @@ export default function ProjectPaymentModals({
         updatedList = [newRecord, ...currentList];
       }
 
-      let updatesPayload = project.updates || [];
+      let updatesPayload = targetProject.updates || [];
       if (form.notifyClient) {
         const title = `New ${type.charAt(0).toUpperCase() + type.slice(1)} Added`;
         const no = form.invoiceNo || form.paymentNo || form.advanceNo || form.chargeNo || form.milestoneNo || form.expenseNo || '';
@@ -142,10 +157,10 @@ export default function ProjectPaymentModals({
           return isNaN(num) ? 0 : num;
         };
         const diff = editIndex !== undefined ? (parseAmt(form.amount) - parseAmt(currentList[editIndex]?.amount)) : parseAmt(form.amount);
-        updatePayload.spent = parseAmt(project.spent) + diff;
+        updatePayload.spent = parseAmt(targetProject.spent) + diff;
       }
 
-      await axios.put(`${BASE_URL}/api/projects/${project._id}`, updatePayload);
+      await axios.put(`${BASE_URL}/api/projects/${targetProject._id}`, updatePayload);
 
       onSaveSuccess();
       closeModals();
@@ -158,6 +173,7 @@ export default function ProjectPaymentModals({
   };
 
   if (showNewInvoice) {
+    const activeProject = project || projects.find(p => p._id === selectedProjId);
     return (
       <div style={overlayStyle}>
         <div style={modalStyle}>
@@ -239,16 +255,51 @@ export default function ProjectPaymentModals({
                 <div className="inv-creator-card-title">Bill To (Client)</div>
               </div>
               <div className="inv-creator-card-body">
-                <div className="inv-creator-form-row">
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">Company / Client Name</label>
-                    <input className="inv-creator-form-input" type="text" value={project.client || ''} readOnly />
+                {(!project || !project._id) ? (
+                  <div className="inv-creator-form-row">
+                    <div className="inv-creator-form-group" style={{ gridColumn: 'span 2' }}>
+                      <label className="inv-creator-form-label">Select Project</label>
+                      <select
+                        className="inv-creator-form-select"
+                        required
+                        value={selectedProjId}
+                        onChange={e => {
+                          const pid = e.target.value;
+                          setSelectedProjId(pid);
+                          const pObj = projects.find(item => item._id === pid);
+                          if (pObj) {
+                            const len = (pObj.invoices || []).length + 1;
+                            setForm(prev => ({
+                              ...prev,
+                              invoiceNo: `INV-${String(len).padStart(3, '0')}`
+                            }));
+                          }
+                        }}
+                      >
+                        <option value="">-- Choose Project --</option>
+                        {projects.map(pObj => (
+                          <option key={pObj._id} value={pObj._id}>
+                            {pObj.name} ({pObj.client || 'No Client'})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">Project</label>
-                    <input className="inv-creator-form-input" type="text" value={project.name || ''} readOnly />
+                ) : null}
+
+                {activeProject ? (
+                  <div className="inv-creator-form-row">
+                    <div className="inv-creator-form-group">
+                      <label className="inv-creator-form-label">Company / Client Name</label>
+                      <input className="inv-creator-form-input" type="text" value={activeProject.client || ''} readOnly />
+                    </div>
+                    <div className="inv-creator-form-group">
+                      <label className="inv-creator-form-label">Project</label>
+                      <input className="inv-creator-form-input" type="text" value={activeProject.name || ''} readOnly />
+                    </div>
                   </div>
-                </div>
+                ) : null}
+
                 <div className="inv-creator-form-row">
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Description</label>

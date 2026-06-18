@@ -339,7 +339,7 @@ export default function AddClientView({ onBack, onClientAdded, onClientUpdated, 
           {/* Online Presence */}
           <div id="online" style={{ background: '#fff', border: '1px solid #E0E6EA', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid #E0E6EA', background: 'linear-gradient(90deg, #E0F7FA 0%, #ffffff 100%)' }}>
-              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}>🌐</div>
+              <div style={{ width: 36, height: 36, background: '#00BCD4', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 17 }}><i className="ti ti-world"></i></div>
               <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 700 }}>Online Presence</div></div>
             </div>
             <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

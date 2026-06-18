@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
+const GST_RATES = [0, 5, 12, 18, 28];
+
 const overlayStyle = {
   position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)',
   display: 'flex', alignItems: 'center', justifyContent: 'center'
@@ -30,7 +32,8 @@ export default function ProjectPaymentModals({
   projects = [],
   modalsState,
   setModalsState,
-  onSaveSuccess
+  onSaveSuccess,
+  clients = [],
 }) {
   const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, editData, editIndex } = modalsState;
 
@@ -38,6 +41,11 @@ export default function ProjectPaymentModals({
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
   const [selectedProjId, setSelectedProjId] = useState('');
+  const [items, setItems] = useState([{ id: 1, description: '', quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
+
+  const addItem = () => setItems(prev => [...prev, { id: Date.now() + Math.random(), description: '', quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
+  const removeItem = (id) => { if (items.length > 1) setItems(prev => prev.filter(it => it.id !== id)); };
+  const updateItem = (id, field, val) => setItems(prev => prev.map(it => it.id === id ? { ...it, [field]: val } : it));
 
   useEffect(() => {
     if (editData) {
@@ -80,6 +88,7 @@ export default function ProjectPaymentModals({
     setModalsState({ showNewInvoice: false, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: null, editIndex: null });
     setForm({});
     setSelectedProjId('');
+    setItems([{ id: Date.now(), description: '', quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
   };
 
   const handleInputChange = (field, value) => {
@@ -108,7 +117,15 @@ export default function ProjectPaymentModals({
       const currentList = targetProject[arrayName] || [];
       let updatedList = [...currentList];
 
-      const payloadToSave = { ...form };
+      // For invoices, compute total from line items
+      let computedAmount = form.amount;
+      if (type === 'invoice') {
+        const iSub = items.reduce((s, it) => s + (parseFloat(it.quantity)||0) * (parseFloat(it.rate)||0), 0);
+        const iGst = items.reduce((s, it) => { const lb = (parseFloat(it.quantity)||0)*(parseFloat(it.rate)||0); const rg = parseFloat(it.gstRate)||18; return s + (it.isGstIncluded ? lb - lb/(1+rg/100) : lb*rg/100); }, 0);
+        const iDisc = iSub * ((form.discountPct||0)/100);
+        computedAmount = Math.round(iSub - iDisc + iGst + (parseFloat(form.extraCharges)||0));
+      }
+      const payloadToSave = { ...form, ...(type === 'invoice' ? { lineItems: items, amount: computedAmount } : {}) };
       if (payloadToSave.category === 'Other' && payloadToSave.customCategory) {
         payloadToSave.category = payloadToSave.customCategory;
       }
@@ -174,6 +191,10 @@ export default function ProjectPaymentModals({
 
   if (showNewInvoice) {
     const activeProject = project || projects.find(p => p._id === selectedProjId);
+    const subtotal = items.reduce((s, it) => s + (parseFloat(it.quantity)||0) * (parseFloat(it.rate)||0), 0);
+    const gstAmt = items.reduce((s, it) => { const lb = (parseFloat(it.quantity)||0)*(parseFloat(it.rate)||0); const rg = parseFloat(it.gstRate)||18; return s + (it.isGstIncluded ? lb - lb/(1+rg/100) : lb*rg/100); }, 0);
+    const discAmt = subtotal * ((form.discountPct||0)/100);
+    const grandTotal = subtotal - discAmt + gstAmt + (parseFloat(form.extraCharges)||0);
     return (
       <div style={overlayStyle}>
         <div style={modalStyle}>
@@ -253,55 +274,37 @@ export default function ProjectPaymentModals({
               <div className="inv-creator-card-header">
                 <div className="inv-creator-card-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-user-circle"></i></div>
                 <div className="inv-creator-card-title">Bill To (Client)</div>
+                <button type="button" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', background: 'var(--teal-lighter,#E0F7FA)', border: '1.5px solid var(--teal,#00BCD4)', borderRadius: 7, fontSize: 10, fontWeight: 700, color: 'var(--teal,#00BCD4)', cursor: 'pointer' }}>
+                  <i className="ti ti-plus" style={{ fontSize: 12 }}></i> Add Client
+                </button>
               </div>
               <div className="inv-creator-card-body">
-                {(!project || !project._id) ? (
-                  <div className="inv-creator-form-row">
-                    <div className="inv-creator-form-group" style={{ gridColumn: 'span 2' }}>
-                      <label className="inv-creator-form-label">Select Project</label>
-                      <select
-                        className="inv-creator-form-select"
-                        required
-                        value={selectedProjId}
-                        onChange={e => {
-                          const pid = e.target.value;
-                          setSelectedProjId(pid);
-                          const pObj = projects.find(item => item._id === pid);
-                          if (pObj) {
-                            const len = (pObj.invoices || []).length + 1;
-                            setForm(prev => ({
-                              ...prev,
-                              invoiceNo: `INV-${String(len).padStart(3, '0')}`
-                            }));
-                          }
-                        }}
-                      >
-                        <option value="">-- Choose Project --</option>
-                        {projects.map(pObj => (
-                          <option key={pObj._id} value={pObj._id}>
-                            {pObj.name} ({pObj.client || 'No Client'})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                ) : null}
-
-                {activeProject ? (
-                  <div className="inv-creator-form-row">
-                    <div className="inv-creator-form-group">
-                      <label className="inv-creator-form-label">Company / Client Name</label>
-                      <input className="inv-creator-form-input" type="text" value={activeProject.client || ''} readOnly />
-                    </div>
-                    <div className="inv-creator-form-group">
-                      <label className="inv-creator-form-label">Project</label>
-                      <input className="inv-creator-form-input" type="text" value={activeProject.name || ''} readOnly />
-                    </div>
-                  </div>
-                ) : null}
-
                 <div className="inv-creator-form-row">
                   <div className="inv-creator-form-group">
+                    <label className="inv-creator-form-label">COMPANY / CLIENT NAME *</label>
+                    {clients.length > 0 ? (
+                      <select className="inv-creator-form-select" required value={form.client || activeProject?.client || ''} onChange={e => handleInputChange('client', e.target.value)}>
+                        <option value="">-- Select Company Name --</option>
+                        {clients.map(c => <option key={c._id} value={c.name || c.clientName}>{c.name || c.clientName}</option>)}
+                      </select>
+                    ) : (
+                      <input className="inv-creator-form-input" type="text" value={activeProject?.client || form.client || ''} readOnly={!!project} onChange={e => !project && handleInputChange('client', e.target.value)} placeholder="Client Name" />
+                    )}
+                  </div>
+                  <div className="inv-creator-form-group">
+                    <label className="inv-creator-form-label">PROJECT</label>
+                    {project ? (
+                      <input className="inv-creator-form-input" type="text" value={project.name || ''} readOnly />
+                    ) : (
+                      <select className="inv-creator-form-select" value={selectedProjId} onChange={e => { const pid = e.target.value; setSelectedProjId(pid); const pObj = projects.find(item => item._id === pid); if (pObj) { const len = (pObj.invoices || []).length + 1; setForm(prev => ({ ...prev, invoiceNo: `INV-${String(len).padStart(3, '0')}` })); } }}>
+                        <option value="">-- Select Project --</option>
+                        {projects.map(p => <option key={p._id} value={p._id}>{p.name} ({p.client || 'No Client'})</option>)}
+                      </select>
+                    )}
+                  </div>
+                </div>
+                <div className="inv-creator-form-row">
+                  <div className="inv-creator-form-group" style={{ gridColumn: 'span 2' }}>
                     <label className="inv-creator-form-label">Description</label>
                     <input required className="inv-creator-form-input" type="text" value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Development Sprint 3" />
                   </div>
@@ -316,76 +319,85 @@ export default function ProjectPaymentModals({
                 <div className="inv-creator-card-title">Line Items</div>
               </div>
               <div className="inv-creator-card-body">
-                {/* Amount + Tax inline table */}
-                <div className="inv-creator-form-row">
+                <table className="inv-creator-items-table" style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 12 }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
+                      <th style={{ width: '36%', textAlign: 'left', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 6px' }}>DESCRIPTION</th>
+                      <th style={{ width: '10%', textAlign: 'center', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 4px' }}>QTY</th>
+                      <th style={{ width: '18%', textAlign: 'left', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 4px' }}>UNIT PRICE</th>
+                      <th style={{ width: '18%', textAlign: 'left', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 4px' }}>TAX %</th>
+                      <th style={{ width: '14%', textAlign: 'right', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 4px' }}>TOTAL</th>
+                      <th style={{ width: '4%' }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map(item => {
+                      const lb = (parseFloat(item.quantity)||0) * (parseFloat(item.rate)||0);
+                      const rg = parseFloat(item.gstRate) || 18;
+                      const isI = item.isGstIncluded || false;
+                      const lineTotal = isI ? lb : lb + lb * rg / 100;
+                      return (
+                        <tr key={item.id} style={{ borderBottom: '1px solid #f8fafc' }}>
+                          <td style={{ padding: '6px 6px' }}>
+                            <input type="text" placeholder="Item description" value={item.description || ''} onChange={e => updateItem(item.id, 'description', e.target.value)}
+                              style={{ width: '100%', padding: '7px 8px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
+                          </td>
+                          <td style={{ padding: '6px 4px' }}>
+                            <input type="number" value={item.quantity === 0 ? '' : item.quantity} onChange={e => updateItem(item.id, 'quantity', e.target.value === '' ? 0 : Number(e.target.value))} onWheel={e => e.target.blur()}
+                              style={{ width: '100%', padding: '7px 6px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 12, outline: 'none', textAlign: 'center', boxSizing: 'border-box' }} />
+                          </td>
+                          <td style={{ padding: '6px 4px' }}>
+                            <input type="number" value={item.rate === 0 ? '' : item.rate} onChange={e => updateItem(item.id, 'rate', e.target.value === '' ? 0 : Number(e.target.value))} onWheel={e => e.target.blur()}
+                              style={{ width: '100%', padding: '7px 8px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
+                          </td>
+                          <td style={{ padding: '6px 4px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                              <select value={rg} onChange={e => updateItem(item.id, 'gstRate', Number(e.target.value))}
+                                style={{ width: '100%', padding: '5px 4px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 11, outline: 'none' }}>
+                                {GST_RATES.map(r => <option key={r} value={r}>{r}%</option>)}
+                              </select>
+                              <select value={isI ? 'incl' : 'excl'} onChange={e => updateItem(item.id, 'isGstIncluded', e.target.value === 'incl')}
+                                style={{ width: '100%', padding: '4px 4px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 9, fontWeight: 700, outline: 'none' }}>
+                                <option value="excl">Excl</option>
+                                <option value="incl">Incl</option>
+                              </select>
+                            </div>
+                          </td>
+                          <td style={{ padding: '6px 4px', textAlign: 'right', fontSize: 12, fontWeight: 700, color: '#1A2332', whiteSpace: 'nowrap' }}>
+                            INR {lineTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                          <td style={{ padding: '6px 2px', textAlign: 'center' }}>
+                            <button type="button" onClick={() => removeItem(item.id)} disabled={items.length === 1}
+                              style={{ background: 'none', border: 'none', color: items.length === 1 ? '#cbd5e1' : '#ef4444', cursor: items.length === 1 ? 'not-allowed' : 'pointer', fontSize: 14, padding: 4 }}>
+                              <i className="ti ti-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <button type="button" onClick={addItem}
+                  style={{ width: '100%', padding: '10px', border: '2px dashed #00BCD4', borderRadius: 8, background: '#F0FDFE', color: '#00BCD4', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16 }}>
+                  <i className="ti ti-plus" style={{ fontSize: 14 }}></i> Add Line Item
+                </button>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12 }}>
                   <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">Amount (Base)</label>
-                    <input required className="inv-creator-form-input" type="number" value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" onWheel={e => e.target.blur()} />
-                  </div>
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">Discount (%)</label>
+                    <label className="inv-creator-form-label">DISCOUNT (%)</label>
                     <input className="inv-creator-form-input" type="number" value={form.discountPct || 0} onChange={e => handleInputChange('discountPct', Number(e.target.value))} placeholder="0" onWheel={e => e.target.blur()} />
                   </div>
-                </div>
-                <div className="inv-creator-form-row">
                   <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">GST / Tax Rate (%)</label>
-                    <select className="inv-creator-form-select" value={form.taxPercent ?? 18} onChange={e => handleInputChange('taxPercent', e.target.value === 'custom' ? '' : Number(e.target.value))}>
-                      <option value={0}>0% (No Tax)</option>
-                      <option value={5}>5% (GST)</option>
-                      <option value={12}>12% (GST)</option>
-                      <option value={18}>18% (GST)</option>
-                      <option value={28}>28% (GST)</option>
-                      <option value="custom">Custom %</option>
-                    </select>
-                    {form.taxPercent === '' && (
-                      <input className="inv-creator-form-input" type="number" style={{ marginTop: 6 }} value={form.customTaxPercent || ''} onChange={e => handleInputChange('customTaxPercent', Number(e.target.value))} placeholder="Enter custom %" />
-                    )}
-                  </div>
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">Tax Type</label>
-                    <select className="inv-creator-form-select" value={form.taxType || 'exclusive'} onChange={e => handleInputChange('taxType', e.target.value)}>
-                      <option value="exclusive">Excluding Tax</option>
-                      <option value="inclusive">Including Tax</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="inv-creator-form-row">
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">Shipping / Extra Charges</label>
+                    <label className="inv-creator-form-label">SHIPPING / EXTRA CHARGES</label>
                     <input className="inv-creator-form-input" type="number" value={form.extraCharges || 0} onChange={e => handleInputChange('extraCharges', Number(e.target.value))} placeholder="0" onWheel={e => e.target.blur()} />
                   </div>
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">Status</label>
-                    <select className="inv-creator-form-select" value={form.status || 'Pending'} onChange={e => handleInputChange('status', e.target.value)}>
-                      <option>Pending</option>
-                      <option>Sent</option>
-                      <option>Paid</option>
-                      <option>Overdue</option>
-                    </select>
-                  </div>
                 </div>
-                {/* Totals summary */}
-                {(form.amount > 0) && (() => {
-                  const base = Number(form.amount) || 0;
-                  const disc = base * ((Number(form.discountPct) || 0) / 100);
-                  const afterDisc = base - disc;
-                  const taxRate = Number(form.taxPercent === '' ? (form.customTaxPercent || 0) : (form.taxPercent ?? 18));
-                  const gst = form.taxType === 'inclusive'
-                    ? afterDisc - afterDisc / (1 + taxRate / 100)
-                    : afterDisc * (taxRate / 100);
-                  const extra = Number(form.extraCharges) || 0;
-                  const grandTotal = form.taxType === 'inclusive' ? afterDisc + extra : afterDisc + gst + extra;
-                  return (
-                    <div className="inv-creator-totals-section" style={{ marginTop: 10 }}>
-                      <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">INR{base.toLocaleString()}</span></div>
-                      {disc > 0 && <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount</span><span className="inv-creator-total-val">- INR{Math.round(disc).toLocaleString()}</span></div>}
-                      <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax ({taxRate}%)</span><span className="inv-creator-total-val">+ INR{Math.round(gst).toLocaleString()}</span></div>
-                      {extra > 0 && <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ INR{extra.toLocaleString()}</span></div>}
-                      <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">INR{Math.round(grandTotal).toLocaleString()}</span></div>
-                    </div>
-                  );
-                })()}
+                <div className="inv-creator-totals-section" style={{ marginTop: 4 }}>
+                  <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">INR {subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                  <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount</span><span className="inv-creator-total-val">- INR {discAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                  <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax</span><span className="inv-creator-total-val">+ INR {gstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                  <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ INR {(parseFloat(form.extraCharges)||0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                  <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">INR {grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                </div>
               </div>
             </div>
 

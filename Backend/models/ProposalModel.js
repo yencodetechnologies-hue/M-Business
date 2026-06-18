@@ -13,6 +13,8 @@ const ProposalSchema = new mongoose.Schema(
     theme:     { type: String, default: "Violet" },
     format:    { type: String, default: "ppt" },
     slides:    { type: Array,   default: [] },
+    html:      { type: String,  default: "" },
+    formData:  { type: Object,  default: {} },
     rejectNote: { type: String,  default: "" },
     submittedAt: { type: Date, default: null },
     companyId: { type: String, default: "" },

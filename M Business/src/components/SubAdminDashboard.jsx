@@ -10537,6 +10537,11 @@ const progress = p.progress || 25;
 
     onMessageTeam={() => setActive("messaging")}
 
+    onNewProposal={(proj) => {
+      setSidebarOverride("proposals");
+      setActive("proposals");
+    }}
+
     onNewInvoice={(proj) => {
 
       setJumpInvoice(null);

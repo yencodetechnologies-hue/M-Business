@@ -347,14 +347,56 @@ export function uploadCover() {
   z.innerHTML = `<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div class="cover-zone-txt" style="color:var(--teal)">Cover image uploaded</div><div class="cover-zone-sub">Click to change</div>`;
 }
 
-export function saveDraft() { selSt(document.querySelectorAll('.sc')[0],'DRAFT'); alert('Proposal saved as draft!'); }
+export function extractProposalData() {
+  let val = 0;
+  try {
+    const grandTotalStr = document.getElementById('grandTotal')?.textContent || '0';
+    val = Number(grandTotalStr.replace(/[^0-9.-]+/g,""));
+  } catch(err) {}
+
+  return {
+    title: document.getElementById('propTitle')?.value || 'New Proposal',
+    client: document.getElementById('toComp')?.value || '',
+    format: 'a4-proposal',
+    value: val,
+    html: document.getElementById('propDoc')?.outerHTML || ''
+  };
+}
+
+export function saveDraft() { 
+  selSt(document.querySelectorAll('.sc')[0],'DRAFT'); 
+  if (window._onSaveProposal) {
+    const data = extractProposalData();
+    data.status = 'draft';
+    window._onSaveProposal(data);
+  } else {
+    alert('Proposal saved as draft! (UI Only)'); 
+  }
+}
+
 export function sendProposal() {
   const c = getEl('toComp').value;
   if (!c) { alert('Please enter client name first.'); getEl('toComp').focus(); return; }
   selSt(document.querySelectorAll('.sc')[1],'SENT');
-  alert('Proposal sent to ' + c + '!');
+  if (window._onSaveProposal) {
+    const data = extractProposalData();
+    data.status = 'pending';
+    window._onSaveProposal(data);
+  } else {
+    alert('Proposal sent to ' + c + '!');
+  }
 }
-export function markWon() { selSt(document.querySelectorAll('.sc')[3],'WON'); alert('Proposal marked as Won 🏆'); }
+
+export function markWon() { 
+  selSt(document.querySelectorAll('.sc')[3],'WON'); 
+  if (window._onSaveProposal) {
+    const data = extractProposalData();
+    data.status = 'approved';
+    window._onSaveProposal(data);
+  } else {
+    alert('Proposal marked as Won 🏆'); 
+  }
+}
 
 // Init
 calcTotal();

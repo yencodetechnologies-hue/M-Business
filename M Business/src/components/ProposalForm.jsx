@@ -52,21 +52,7 @@ export default function ProposalForm({ onBack, onSave }) {
     if (backBtn) backBtn.onclick = onBack;
 
     const actions = c.querySelectorAll('.topbar-actions button');
-    actions.forEach((btn, idx) => {
-      if (idx === 0) return; // Skip Duplicate
-      btn.onclick = () => {
-        const title = document.getElementById('propTitle')?.value || 'New Proposal';
-        const client = document.getElementById('toComp')?.value || '';
-        
-        let val = 0;
-        try {
-          const grandTotalStr = document.getElementById('grandTotal')?.textContent || '0';
-          val = Number(grandTotalStr.replace(/[^0-9.-]+/g,""));
-        } catch(err) {}
-        
-        onSave({ title, client, value: val });
-      };
-    });
+    // Removed override to allow ProposalFormLogic.js to handle clicks
 
     // Initial Render Update
     setTimeout(() => {

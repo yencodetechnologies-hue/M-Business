@@ -1,13 +1,13 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
 const overlayStyle = {
-  position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)', 
+  position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)',
   display: 'flex', alignItems: 'center', justifyContent: 'center'
 };
 const modalStyle = {
-  background: '#fff', borderRadius: 14, width: 500, padding: 24, 
+  background: '#fff', borderRadius: 14, width: 500, padding: 24,
   boxShadow: '0 8px 32px rgba(0,0,0,0.15)', boxSizing: 'border-box',
   maxHeight: '90vh', overflowY: 'auto'
 };
@@ -25,11 +25,11 @@ const btnRowStyle = { display: 'flex', justifyContent: 'center', gap: 12, margin
 const submitBtnStyle = { padding: '10px 24px', background: '#00BCD4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
 const cancelBtnStyle = { padding: '10px 24px', background: '#fff', color: '#4A5568', border: '1.5px solid #E8EDF2', borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: 'pointer' };
 
-export default function ProjectPaymentModals({ 
-  project, 
-  modalsState, 
-  setModalsState, 
-  onSaveSuccess 
+export default function ProjectPaymentModals({
+  project,
+  modalsState,
+  setModalsState,
+  onSaveSuccess
 }) {
   const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, editData, editIndex } = modalsState;
 
@@ -42,7 +42,7 @@ export default function ProjectPaymentModals({
       setForm(editData);
       return;
     }
-    
+
     if (showNewInvoice && !form.invoiceNo) {
       const len = (project?.invoices || []).length + 1;
       setForm(prev => ({ ...prev, invoiceNo: `INV-${String(len).padStart(3, '0')}` }));
@@ -93,16 +93,16 @@ export default function ProjectPaymentModals({
       const currentList = project[arrayName] || [];
       let updatedList = [...currentList];
 
-   const payloadToSave = { ...form };
-if (payloadToSave.category === 'Other' && payloadToSave.customCategory) {
-  payloadToSave.category = payloadToSave.customCategory;
-}
-if (payloadToSave.paymentMode === 'Custom' && payloadToSave.customPaymentMode) {
-  payloadToSave.paymentMode = payloadToSave.customPaymentMode;
-}
-if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
-  payloadToSave.taxPercent = payloadToSave.customTaxPercent;
-}
+      const payloadToSave = { ...form };
+      if (payloadToSave.category === 'Other' && payloadToSave.customCategory) {
+        payloadToSave.category = payloadToSave.customCategory;
+      }
+      if (payloadToSave.paymentMode === 'Custom' && payloadToSave.customPaymentMode) {
+        payloadToSave.paymentMode = payloadToSave.customPaymentMode;
+      }
+      if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
+        payloadToSave.taxPercent = payloadToSave.customTaxPercent;
+      }
 
       if (editIndex !== undefined && editIndex !== null) {
         updatedList[editIndex] = { ...updatedList[editIndex], ...payloadToSave };
@@ -115,7 +115,7 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
       if (form.notifyClient) {
         const title = `New ${type.charAt(0).toUpperCase() + type.slice(1)} Added`;
         const no = form.invoiceNo || form.paymentNo || form.advanceNo || form.chargeNo || form.milestoneNo || form.expenseNo || '';
-        const amt = form.amount ? ` for Γé╣${form.amount}` : '';
+        const amt = form.amount ? ` for INR${form.amount}` : '';
         const newUpdate = {
           text: `A new ${type} (${no})${amt} has been recorded and is visible in the client portal.`,
           title: title,
@@ -133,16 +133,16 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
       if (form.notifyClient) {
         updatePayload.updates = updatesPayload;
       }
-      
+
       // If it's an expense, also update the 'spent' counter for backward compatibility
       if (type === 'expense') {
-         const parseAmt = (val) => {
-           if (val === undefined || val === null) return 0;
-           const num = Number(String(val).replace(/[^0-9.-]+/g, ''));
-           return isNaN(num) ? 0 : num;
-         };
-         const diff = editIndex !== undefined ? (parseAmt(form.amount) - parseAmt(currentList[editIndex]?.amount)) : parseAmt(form.amount);
-         updatePayload.spent = parseAmt(project.spent) + diff;
+        const parseAmt = (val) => {
+          if (val === undefined || val === null) return 0;
+          const num = Number(String(val).replace(/[^0-9.-]+/g, ''));
+          return isNaN(num) ? 0 : num;
+        };
+        const diff = editIndex !== undefined ? (parseAmt(form.amount) - parseAmt(currentList[editIndex]?.amount)) : parseAmt(form.amount);
+        updatePayload.spent = parseAmt(project.spent) + diff;
       }
 
       await axios.put(`${BASE_URL}/api/projects/${project._id}`, updatePayload);
@@ -163,17 +163,17 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{background:'#E0F7FA', color:'#00BCD4', padding:8, borderRadius:8}}><i className="ti ti-file-invoice"></i></div>
+              <div style={{ background: '#E0F7FA', color: '#00BCD4', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
               New Invoice
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Γ£ò</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
           </div>
           <form onSubmit={e => handleSave(e, 'invoice')}>
 
-            {/* ΓöÇΓöÇ 1. INVOICE DETAILS ΓöÇΓöÇ */}
+            {/* -- 1. INVOICE DETAILS -- */}
             <div className="inv-creator-card">
               <div className="inv-creator-card-header">
-                <div className="inv-creator-card-icon" style={{background:"var(--teal-light)",color:"var(--teal)"}}><i className="ti ti-receipt-2"></i></div>
+                <div className="inv-creator-card-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}><i className="ti ti-receipt-2"></i></div>
                 <div className="inv-creator-card-title">Invoice Details</div>
               </div>
               <div className="inv-creator-card-body">
@@ -190,7 +190,7 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                 <div className="inv-creator-form-row">
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Due Date</label>
-                    <div style={{display:'flex', gap:10}}>
+                    <div style={{ display: 'flex', gap: 10 }}>
                       <select className="inv-creator-form-select"
                         value={form.dueDateType || '30'}
                         onChange={e => {
@@ -202,7 +202,7 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                               .toISOString().split('T')[0];
                             handleInputChange('dueDate', newDue);
                           }
-                        }} style={{flex:1}}>
+                        }} style={{ flex: 1 }}>
                         <option value="0">Due on receipt</option>
                         <option value="15">Next 15 days</option>
                         <option value="30">Next 30 days</option>
@@ -213,7 +213,7 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                         <input type="date" className="inv-creator-form-input"
                           value={form.dueDate || ''}
                           onChange={e => handleInputChange('dueDate', e.target.value)}
-                          style={{flex:1}} />
+                          style={{ flex: 1 }} />
                       )}
                     </div>
                   </div>
@@ -221,6 +221,7 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                     <label className="inv-creator-form-label">Category</label>
                     <select className="inv-creator-form-select" value={form.category || 'Consulting'} onChange={e => handleInputChange('category', e.target.value)}>
                       <option value="Advance Payment">Advance Payment</option>
+                      <option value="Additional Payment">Additional Payment</option>
                       <option value="Milestone">Milestone</option>
                       <option value="Final Invoice">Final Invoice</option>
                       <option value="Monthly Retainer">Monthly Retainer</option>
@@ -231,10 +232,10 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
               </div>
             </div>
 
-            {/* ΓöÇΓöÇ 2. BILL TO (CLIENT) ΓöÇΓöÇ */}
+            {/* -- 2. BILL TO (CLIENT) -- */}
             <div className="inv-creator-card">
               <div className="inv-creator-card-header">
-                <div className="inv-creator-card-icon" style={{background:"var(--amber-bg)",color:"var(--amber)"}}><i className="ti ti-user-circle"></i></div>
+                <div className="inv-creator-card-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-user-circle"></i></div>
                 <div className="inv-creator-card-title">Bill To (Client)</div>
               </div>
               <div className="inv-creator-card-body">
@@ -257,10 +258,10 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
               </div>
             </div>
 
-            {/* ΓöÇΓöÇ 3. LINE ITEMS ΓöÇΓöÇ */}
+            {/* -- 3. LINE ITEMS -- */}
             <div className="inv-creator-card">
               <div className="inv-creator-card-header">
-                <div className="inv-creator-card-icon" style={{background:"var(--blue-bg)",color:"var(--blue)"}}><i className="ti ti-list-details"></i></div>
+                <div className="inv-creator-card-icon" style={{ background: "var(--blue-bg)", color: "var(--blue)" }}><i className="ti ti-list-details"></i></div>
                 <div className="inv-creator-card-title">Line Items</div>
               </div>
               <div className="inv-creator-card-body">
@@ -268,7 +269,7 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                 <div className="inv-creator-form-row">
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Amount (Base)</label>
-                    <input required className="inv-creator-form-input" type="number" value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="Γé╣ 0" onWheel={e => e.target.blur()} />
+                    <input required className="inv-creator-form-input" type="number" value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" onWheel={e => e.target.blur()} />
                   </div>
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Discount (%)</label>
@@ -287,7 +288,7 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                       <option value="custom">Custom %</option>
                     </select>
                     {form.taxPercent === '' && (
-                      <input className="inv-creator-form-input" type="number" style={{marginTop:6}} value={form.customTaxPercent || ''} onChange={e => handleInputChange('customTaxPercent', Number(e.target.value))} placeholder="Enter custom %" />
+                      <input className="inv-creator-form-input" type="number" style={{ marginTop: 6 }} value={form.customTaxPercent || ''} onChange={e => handleInputChange('customTaxPercent', Number(e.target.value))} placeholder="Enter custom %" />
                     )}
                   </div>
                   <div className="inv-creator-form-group">
@@ -325,26 +326,36 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                   const extra = Number(form.extraCharges) || 0;
                   const grandTotal = form.taxType === 'inclusive' ? afterDisc + extra : afterDisc + gst + extra;
                   return (
-                    <div className="inv-creator-totals-section" style={{marginTop:10}}>
-                      <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">Γé╣{base.toLocaleString()}</span></div>
-                      {disc > 0 && <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount</span><span className="inv-creator-total-val">- Γé╣{Math.round(disc).toLocaleString()}</span></div>}
-                      <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax ({taxRate}%)</span><span className="inv-creator-total-val">+ Γé╣{Math.round(gst).toLocaleString()}</span></div>
-                      {extra > 0 && <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ Γé╣{extra.toLocaleString()}</span></div>}
-                      <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">Γé╣{Math.round(grandTotal).toLocaleString()}</span></div>
+                    <div className="inv-creator-totals-section" style={{ marginTop: 10 }}>
+                      <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">INR{base.toLocaleString()}</span></div>
+                      {disc > 0 && <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount</span><span className="inv-creator-total-val">- INR{Math.round(disc).toLocaleString()}</span></div>}
+                      <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax ({taxRate}%)</span><span className="inv-creator-total-val">+ INR{Math.round(gst).toLocaleString()}</span></div>
+                      {extra > 0 && <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ INR{extra.toLocaleString()}</span></div>}
+                      <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">INR{Math.round(grandTotal).toLocaleString()}</span></div>
                     </div>
                   );
                 })()}
               </div>
             </div>
 
-            {/* ΓöÇΓöÇ 4. PAYMENT TERMS & BANK DETAILS ΓöÇΓöÇ */}
+            {/* -- 4. PAYMENT TERMS & BANK DETAILS -- */}
             <div className="inv-creator-card">
               <div className="inv-creator-card-header">
-                <div className="inv-creator-card-icon" style={{background:"var(--green-bg)",color:"var(--green)"}}><i className="ti ti-clock"></i></div>
+                <div className="inv-creator-card-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-clock"></i></div>
                 <div className="inv-creator-card-title">Payment Terms & Bank Details</div>
               </div>
               <div className="inv-creator-card-body">
                 <div className="inv-creator-form-row">
+                  <div className="inv-creator-form-group">
+                    <label className="inv-creator-form-label">Status</label>
+                    <select className="inv-creator-form-select" value={form.status || "Pending"} onChange={(e) => handleInputChange("status", e.target.value)}>
+                      <option value="Pending">⏳ Pending</option>
+                      <option value="Paid">✔ Paid</option>
+                      <option value="Overdue">⚠ Overdue</option>
+                      <option value="Sent">📨 Sent</option>
+                      <option value="Draft">📝 Draft</option>
+                    </select>
+                  </div>
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Payment Method</label>
                     <select className="inv-creator-form-select" value={form.paymentMode || 'Bank Transfer / NEFT'} onChange={e => handleInputChange('paymentMode', e.target.value)}>
@@ -357,21 +368,21 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                   </div>
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Currency</label>
-                    <select className="inv-creator-form-select" value={form.currency || 'Γé╣'} onChange={e => handleInputChange('currency', e.target.value)}>
-                      <option value="Γé╣">Γé╣ INR ΓÇô Indian Rupee</option>
-                      <option value="$">$ USD ΓÇô US Dollar</option>
-                      <option value="Γé¼">Γé¼ EUR ΓÇô Euro</option>
-                      <option value="┬ú">┬ú GBP ΓÇô British Pound</option>
-                      <option value="AED ">AED ΓÇô UAE Dirham</option>
-                      <option value="SAR ">SAR ΓÇô Saudi Riyal</option>
-                      <option value="S$">S$ SGD ΓÇô Singapore Dollar</option>
-                      <option value="A$">A$ AUD ΓÇô Australian Dollar</option>
-                      <option value="C$">C$ CAD ΓÇô Canadian Dollar</option>
-                      <option value="┬Ñ">┬Ñ JPY ΓÇô Japanese Yen</option>
-                      <option value="QAR ">QAR ΓÇô Qatari Riyal</option>
-                      <option value="KWD ">KWD ΓÇô Kuwaiti Dinar</option>
-                      <option value="OMR ">OMR ΓÇô Omani Rial</option>
-                      <option value="BHD ">BHD ΓÇô Bahraini Dinar</option>
+                    <select className="inv-creator-form-select" value={form.currency || 'INR'} onChange={e => handleInputChange('currency', e.target.value)}>
+                      <option value="INR">INR - Indian Rupee</option>
+                      <option value="USD">USD - US Dollar</option>
+                      <option value="EUR">EUR - Euro</option>
+                      <option value="GBP">GBP - British Pound</option>
+                      <option value="AED">AED - UAE Dirham</option>
+                      <option value="SAR">SAR - Saudi Riyal</option>
+                      <option value="SGD">SGD - Singapore Dollar</option>
+                      <option value="AUD">AUD - Australian Dollar</option>
+                      <option value="CAD">CAD - Canadian Dollar</option>
+                      <option value="JPY">JPY - Japanese Yen</option>
+                      <option value="QAR">QAR - Qatari Riyal</option>
+                      <option value="KWD">KWD - Kuwaiti Dinar</option>
+                      <option value="OMR">OMR - Omani Rial</option>
+                      <option value="BHD">BHD - Bahraini Dinar</option>
                     </select>
                   </div>
                 </div>
@@ -398,20 +409,20 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                 <div className="inv-creator-form-row">
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Notes</label>
-                    <textarea className="inv-creator-form-input" style={{height:70, resize:'vertical'}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Additional notes for this invoice..." />
+                    <textarea className="inv-creator-form-input" style={{ height: 70, resize: 'vertical' }} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Additional notes for this invoice..." />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-inv" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-inv" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
+              <label htmlFor="notify-inv" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal (Notify Client)</label>
             </div>
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : 'Γ£ô Save Invoice'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Save Invoice'}</button>
             </div>
           </form>
         </div>
@@ -425,10 +436,10 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{background:'#DCFCE7', color:'#22C55E', padding:8, borderRadius:8}}><i className="ti ti-credit-card"></i></div>
+              <div style={{ background: '#DCFCE7', color: '#22C55E', padding: 8, borderRadius: 8 }}><i className="ti ti-credit-card"></i></div>
               Record Payment
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Γ£ò</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
           </div>
           <form onSubmit={e => handleSave(e, 'payment')}>
             <div style={rowStyle}>
@@ -438,9 +449,9 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                 {(project.invoices || []).map(inv => <option key={inv.invoiceNo} value={inv.invoiceNo}>{inv.invoiceNo} - {inv.description}</option>)}
               </select></div>
             </div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Sprint 2 Balance Payment" /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Sprint 2 Balance Payment" /></div>
             <div style={rowStyle}>
-              <div><label style={labelStyle}>Amount Received</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="Γé╣ 0" /></div>
+              <div><label style={labelStyle}>Amount Received</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" /></div>
               <div><label style={labelStyle}>Payment Date</label><input type="date" required style={inputStyle} value={form.paymentDate || ''} onChange={e => handleInputChange('paymentDate', e.target.value)} /></div>
             </div>
             <div style={rowStyle}>
@@ -449,16 +460,16 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
               </select></div>
               <div><label style={labelStyle}>Transaction Ref</label><input style={inputStyle} value={form.transactionRef || ''} onChange={e => handleInputChange('transactionRef', e.target.value)} placeholder="TXN / UTR / Cheque No." /></div>
             </div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:80}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Any additional notes..." /></div>
-            
-            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Notes</label><textarea style={{ ...inputStyle, height: 80 }} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Any additional notes..." /></div>
+
+            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-pay" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-pay" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
+              <label htmlFor="notify-pay" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal (Notify Client)</label>
             </div>
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : 'Γ£ô Record Payment'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Record Payment'}</button>
             </div>
           </form>
         </div>
@@ -472,19 +483,19 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{background:'#EDE9FE', color:'#8B5CF6', padding:8, borderRadius:8}}><i className="ti ti-pig-money"></i></div>
+              <div style={{ background: '#EDE9FE', color: '#8B5CF6', padding: 8, borderRadius: 8 }}><i className="ti ti-pig-money"></i></div>
               Add Advance Payment
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Γ£ò</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
           </div>
           <form onSubmit={e => handleSave(e, 'advance')}>
             <div style={rowStyle}>
               <div><label style={labelStyle}>Advance #</label><input required style={inputStyle} value={form.advanceNo || ''} onChange={e => handleInputChange('advanceNo', e.target.value)} placeholder="ADV-003" /></div>
               <div><label style={labelStyle}>Project</label><select style={inputStyle} disabled><option>{project.name}</option></select></div>
             </div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Phase 2 advance" /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Phase 2 advance" /></div>
             <div style={rowStyle}>
-              <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="Γé╣ 0" /></div>
+              <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" /></div>
               <div><label style={labelStyle}>Date Received</label><input type="date" required style={inputStyle} value={form.dateReceived || ''} onChange={e => handleInputChange('dateReceived', e.target.value)} /></div>
             </div>
             <div style={rowStyle}>
@@ -495,17 +506,17 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                 <option>Pending</option><option>Partially Adjusted</option><option>Fully Adjusted</option>
               </select></div>
             </div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Amount Adjusted So Far</label><input type="number" style={inputStyle} value={form.amountAdjusted || ''} onChange={e => handleInputChange('amountAdjusted', Number(e.target.value))} placeholder="Γé╣ 0" /></div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:80}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Terms or remarks..." /></div>
-            
-            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Amount Adjusted So Far</label><input type="number" style={inputStyle} value={form.amountAdjusted || ''} onChange={e => handleInputChange('amountAdjusted', Number(e.target.value))} placeholder="INR 0" /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Notes</label><textarea style={{ ...inputStyle, height: 80 }} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Terms or remarks..." /></div>
+
+            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-adv" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-adv" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
+              <label htmlFor="notify-adv" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal (Notify Client)</label>
             </div>
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : 'Γ£ô Save Advance'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Save Advance'}</button>
             </div>
           </form>
         </div>
@@ -514,102 +525,102 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
   }
 
   if (showMilestonePayment) {
-  return (
-    <div style={overlayStyle}>
-      <div style={modalStyle}>
-        <div style={headerStyle}>
-          <h3 style={titleStyle}>
-            <div style={{background:'#FEF3C7', color:'#F59E0B', padding:8, borderRadius:8}}>
-              <i className="ti ti-flag"></i>
-            </div>
-            Add Milestone Payment
-          </h3>
-          <button style={closeBtnStyle} onClick={closeModals}>Γ£ò</button>
-        </div>
-        <form onSubmit={e => handleSave(e, 'milestone')}>
-          <div style={rowStyle}>
-            <div>
-              <label style={labelStyle}>Milestone #</label>
-              <input required style={inputStyle} value={form.milestoneNo || ''} onChange={e => handleInputChange('milestoneNo', e.target.value)} placeholder="MS-005" />
-            </div>
-            <div>
-              <label style={labelStyle}>Project</label>
-              <select style={inputStyle} disabled><option>{project.name}</option></select>
-            </div>
+    return (
+      <div style={overlayStyle}>
+        <div style={modalStyle}>
+          <div style={headerStyle}>
+            <h3 style={titleStyle}>
+              <div style={{ background: '#FEF3C7', color: '#F59E0B', padding: 8, borderRadius: 8 }}>
+                <i className="ti ti-flag"></i>
+              </div>
+              Add Milestone Payment
+            </h3>
+            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
           </div>
-
-          <div style={{marginBottom: 16}}>
-            <label style={labelStyle}>Milestone Name</label>
-            <select
-              required
-              style={inputStyle}
-              value={form.name || ''}
-              onChange={e => handleInputChange('name', e.target.value)}
-            >
-              <option value="">-- Select Milestone --</option>
-              {(project?.milestones || []).map((m, i) => (
-                <option key={i} value={m.name}>{m.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{marginBottom: 16}}>
-            <label style={labelStyle}>Description / Deliverables</label>
-            <textarea required style={{...inputStyle, height:60}} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="What will be delivered at this milestone?" />
-          </div>
-
-          <div style={rowStyle}>
-            <div>
-              <label style={labelStyle}>Amount</label>
-              <input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="Γé╣ 0" />
+          <form onSubmit={e => handleSave(e, 'milestone')}>
+            <div style={rowStyle}>
+              <div>
+                <label style={labelStyle}>Milestone #</label>
+                <input required style={inputStyle} value={form.milestoneNo || ''} onChange={e => handleInputChange('milestoneNo', e.target.value)} placeholder="MS-005" />
+              </div>
+              <div>
+                <label style={labelStyle}>Project</label>
+                <select style={inputStyle} disabled><option>{project.name}</option></select>
+              </div>
             </div>
-            <div>
-              <label style={labelStyle}>% of Total</label>
-              <input type="number" style={inputStyle} value={form.percentage || ''} onChange={e => handleInputChange('percentage', Number(e.target.value))} placeholder="e.g. 25" />
-            </div>
-          </div>
 
-          <div style={rowStyle}>
-            <div>
-              <label style={labelStyle}>Due Date</label>
-              <input type="date" required style={inputStyle} value={form.dueDate || ''} onChange={e => handleInputChange('dueDate', e.target.value)} />
-            </div>
-            <div>
-              <label style={labelStyle}>Status</label>
-              <select style={inputStyle} value={form.status || 'Upcoming'} onChange={e => handleInputChange('status', e.target.value)}>
-                <option>Upcoming</option>
-                <option>Invoiced</option>
-                <option>Paid</option>
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Milestone Name</label>
+              <select
+                required
+                style={inputStyle}
+                value={form.name || ''}
+                onChange={e => handleInputChange('name', e.target.value)}
+              >
+                <option value="">-- Select Milestone --</option>
+                {(project?.milestones || []).map((m, i) => (
+                  <option key={i} value={m.name}>{m.name}</option>
+                ))}
               </select>
             </div>
-          </div>
 
-          <div style={rowStyle}>
-            <div>
-              <label style={labelStyle}>Paid On</label>
-              <input type="date" style={inputStyle} value={form.paidOn || ''} onChange={e => handleInputChange('paidOn', e.target.value)} />
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Description / Deliverables</label>
+              <textarea required style={{ ...inputStyle, height: 60 }} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="What will be delivered at this milestone?" />
             </div>
-            <div></div>
-          </div>
 
-          <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
-            <input type="checkbox" id="notify-mil" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-            <label htmlFor="notify-mil" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>
-              Send to Client Portal (Notify Client)
-            </label>
-          </div>
+            <div style={rowStyle}>
+              <div>
+                <label style={labelStyle}>Amount</label>
+                <input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" />
+              </div>
+              <div>
+                <label style={labelStyle}>% of Total</label>
+                <input type="number" style={inputStyle} value={form.percentage || ''} onChange={e => handleInputChange('percentage', Number(e.target.value))} placeholder="e.g. 25" />
+              </div>
+            </div>
 
-          <div style={btnRowStyle}>
-            <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-            <button type="submit" style={submitBtnStyle} disabled={saving}>
-              {saving ? 'Saving...' : 'Γ£ô Save Milestone'}
-            </button>
-          </div>
-        </form>
+            <div style={rowStyle}>
+              <div>
+                <label style={labelStyle}>Due Date</label>
+                <input type="date" required style={inputStyle} value={form.dueDate || ''} onChange={e => handleInputChange('dueDate', e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>Status</label>
+                <select style={inputStyle} value={form.status || 'Upcoming'} onChange={e => handleInputChange('status', e.target.value)}>
+                  <option>Upcoming</option>
+                  <option>Invoiced</option>
+                  <option>Paid</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={rowStyle}>
+              <div>
+                <label style={labelStyle}>Paid On</label>
+                <input type="date" style={inputStyle} value={form.paidOn || ''} onChange={e => handleInputChange('paidOn', e.target.value)} />
+              </div>
+              <div></div>
+            </div>
+
+            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input type="checkbox" id="notify-mil" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
+              <label htmlFor="notify-mil" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>
+                Send to Client Portal (Notify Client)
+              </label>
+            </div>
+
+            <div style={btnRowStyle}>
+              <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>
+                {saving ? 'Saving...' : '✔ Save Milestone'}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   if (showAdditional) {
     return (
@@ -617,10 +628,10 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{background:'#FFEDD5', color:'#F97316', padding:8, borderRadius:8}}><i className="ti ti-circle-plus"></i></div>
+              <div style={{ background: '#FFEDD5', color: '#F97316', padding: 8, borderRadius: 8 }}><i className="ti ti-circle-plus"></i></div>
               Add Additional Charge
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Γ£ò</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
           </div>
           <form onSubmit={e => handleSave(e, 'additional')}>
             <div style={rowStyle}>
@@ -629,9 +640,9 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                 <option>Scope Change</option><option>Infrastructure</option><option>Consulting</option><option>Travel</option><option>Other</option>
               </select></div>
             </div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="Describe the additional charge" /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="Describe the additional charge" /></div>
             <div style={rowStyle}>
-              <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="Γé╣ 0" /></div>
+              <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" /></div>
               <div><label style={labelStyle}>Date</label><input type="date" required style={inputStyle} value={form.date || ''} onChange={e => handleInputChange('date', e.target.value)} /></div>
             </div>
             <div style={rowStyle}>
@@ -649,16 +660,16 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                 <option>Pending</option><option>Invoiced</option><option>Paid</option>
               </select></div>
             </div>
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Justification / Notes</label><textarea style={{...inputStyle, height:80}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Why is this charge being raised?" /></div>
-            
-            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Justification / Notes</label><textarea style={{ ...inputStyle, height: 80 }} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Why is this charge being raised?" /></div>
+
+            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-add" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-add" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Send to Client Portal (Notify Client)</label>
+              <label htmlFor="notify-add" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Send to Client Portal (Notify Client)</label>
             </div>
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : 'Γ£ô Save Charge'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Save Charge'}</button>
             </div>
           </form>
         </div>
@@ -672,10 +683,10 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
         <div style={modalStyle}>
           <div style={headerStyle}>
             <h3 style={titleStyle}>
-              <div style={{background:'#F3F4F6', color:'#6B7280', padding:8, borderRadius:8}}><i className="ti ti-receipt"></i></div>
+              <div style={{ background: '#F3F4F6', color: '#6B7280', padding: 8, borderRadius: 8 }}><i className="ti ti-receipt"></i></div>
               Add Project Expense
             </h3>
-            <button style={closeBtnStyle} onClick={closeModals}>Γ£ò</button>
+            <button style={closeBtnStyle} onClick={closeModals}>✖</button>
           </div>
           <form onSubmit={e => handleSave(e, 'expense')}>
             <div style={rowStyle}>
@@ -685,11 +696,11 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
               </select></div>
             </div>
             {form.category === 'Other' && (
-              <div style={{marginBottom: 16}}><label style={labelStyle}>Custom Category</label><input required style={inputStyle} value={form.customCategory || ''} onChange={e => handleInputChange('customCategory', e.target.value)} placeholder="Enter custom category" /></div>
+              <div style={{ marginBottom: 16 }}><label style={labelStyle}>Custom Category</label><input required style={inputStyle} value={form.customCategory || ''} onChange={e => handleInputChange('customCategory', e.target.value)} placeholder="Enter custom category" /></div>
             )}
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="Describe the expense" /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="Describe the expense" /></div>
             <div style={rowStyle}>
-              <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="Γé╣ 0" /></div>
+              <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" /></div>
               <div><label style={labelStyle}>Date Incurred</label><input type="date" required style={inputStyle} value={form.date || ''} onChange={e => handleInputChange('date', e.target.value)} /></div>
             </div>
             <div style={rowStyle}>
@@ -712,16 +723,16 @@ if (payloadToSave.taxPercent === '' && payloadToSave.customTaxPercent) {
                 <div></div>
               </div>
             )}
-            <div style={{marginBottom: 16}}><label style={labelStyle}>Notes</label><textarea style={{...inputStyle, height:60}} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Additional details..." /></div>
-            
-            <div style={{marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8}}>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Notes</label><textarea style={{ ...inputStyle, height: 60 }} value={form.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Additional details..." /></div>
+
+            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" id="notify-exp" checked={form.notifyClient || false} onChange={e => handleInputChange('notifyClient', e.target.checked)} />
-              <label htmlFor="notify-exp" style={{fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer'}}>Log to Project Updates</label>
+              <label htmlFor="notify-exp" style={{ fontSize: 12, color: '#4A5568', fontWeight: 600, cursor: 'pointer' }}>Log to Project Updates</label>
             </div>
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : 'Γ£ô Save Expense'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Save Expense'}</button>
             </div>
           </form>
         </div>

@@ -1882,7 +1882,6 @@ function ProjectsPage({ THEME, projects, tasks, setProjects, clients, employees,
         return;
       }
 
-      console.log("Updating project:", editProj._id);
 
       await axios.put(
         `${BASE_URL}/api/projects/${editProj._id}`,

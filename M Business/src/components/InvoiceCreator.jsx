@@ -28,26 +28,26 @@ function numberToWords(num) {
 function generateInvoiceNo() {
   return `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 }
-function formatCurrency(val, symbol = "₹", compact = false, disableCompact = false) {
+function formatCurrency(val, symbol = "INR", compact = false, disableCompact = false) {
   const num = parseFloat(val) || 0;
   const absNum = Math.abs(num);
-  
+
   if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
     try {
-      const isINR = symbol === "₹";
+      const isINR = symbol === "INR";
       const formatter = new Intl.NumberFormat(isINR ? 'en-IN' : 'en-US', {
         notation: 'compact',
         compactDisplay: 'short',
         maximumFractionDigits: 2
       });
-      return symbol + (/[A-Za-z]/.test(symbol) ? " " : "") + formatter.format(num);
+      return symbol + (" ") + formatter.format(num);
     } catch (e) {
       // Fallback
     }
   }
-  
-  const isINR = symbol === "₹";
-  return symbol + (/[A-Za-z]/.test(symbol) ? " " : "") + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const isINR = symbol === "INR";
+  return symbol + (" ") + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function formatDate(d) {
   if (!d) return "—";
@@ -250,7 +250,7 @@ function saveDraftLocal(inv, items, status = "draft") {
   const drafts = loadAllDrafts();
   const id = inv.invoiceNo;
   const existing = drafts.findIndex((d) => d.id === id);
-  
+
   let subtotal = 0;
   let total = 0;
   items.forEach((item) => {
@@ -339,12 +339,12 @@ function CanvasSignature({ onSave }) {
   React.useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     // Set logical size to match physical display layout to remove blur
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width || 340;
     canvas.height = rect.height || 150;
-    
+
     const ctx = canvas.getContext("2d");
     ctx.strokeStyle = "#1a2e35";
     ctx.lineWidth = 3.5;
@@ -355,7 +355,7 @@ function CanvasSignature({ onSave }) {
   const getPos = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    
+
     // Support mouse and touch coords
     let clientX, clientY;
     if (e.touches && e.touches.length > 0) {
@@ -365,7 +365,7 @@ function CanvasSignature({ onSave }) {
       clientX = e.clientX;
       clientY = e.clientY;
     }
-    
+
     return {
       x: (clientX - rect.left) * (canvas.width / rect.width),
       y: (clientY - rect.top) * (canvas.height / rect.height)
@@ -385,19 +385,19 @@ function CanvasSignature({ onSave }) {
     const pos = getPos(e);
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    
+
     const points = pointsRef.current;
     points.push(pos);
-    
+
     // Use quadratic curves for smooth lines
     if (points.length > 2) {
       const p1 = points[points.length - 3];
       const p2 = points[points.length - 2];
       const p3 = points[points.length - 1];
-      
+
       const midPointX = (p2.x + p3.x) / 2;
       const midPointY = (p2.y + p3.y) / 2;
-      
+
       ctx.beginPath();
       // Start from the previous midpoint
       const prevMidPointX = (p1.x + p2.x) / 2;
@@ -463,7 +463,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     if (step === "preview") window.scrollTo(0, 0);
   }, [step]);
 
- useEffect(() => {
+  useEffect(() => {
     if (jumpInvoice) {
       loadEntry(jumpInvoice);
       setStep("preview");
@@ -504,16 +504,16 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
 
   const handleExportCSV = (data) => {
     if (!data.length) {
-      showToast({msg: "No data to export", type: "err"});
+      showToast({ msg: "No data to export", type: "err" });
       return;
     }
     const headers = ["Invoice ID", "Client", "Project", "Issue Date", "Due Date", "Status", "Amount", "Currency"];
     const rows = data.map(e => [
-      e.invoiceNo, e.client, e.inv?.project || e.project || "", 
-      e.inv?.date || e.date, e.inv?.dueDate || e.dueDate, 
+      e.invoiceNo, e.client, e.inv?.project || e.project || "",
+      e.inv?.date || e.date, e.inv?.dueDate || e.dueDate,
       e.status, e.total || e.amount || 0, e.currency || "INR"
     ]);
-    const csvContent = "data:text/csv;charset=utf-8," 
+    const csvContent = "data:text/csv;charset=utf-8,"
       + [headers.join(","), ...rows.map(r => r.map(c => `"${c}"`).join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -523,7 +523,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     link.click();
     document.body.removeChild(link);
   };
-const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800); };
 
   const iframeRef = useRef(null);
 
@@ -549,7 +549,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
         };
         setInvoices(prev => [newDoc, ...prev]);
         setStep("list");
-        if(typeof showToast === 'function') showToast("Invoice saved successfully!");
+        if (typeof showToast === 'function') showToast("Invoice saved successfully!");
       }
     };
     window.addEventListener('message', handleMsg);
@@ -567,12 +567,13 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   const dueDefault = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
 
   const blank = {
-    invoiceNo: generateInvoiceNo(), orderNo: "", date: "2026-06-01", dueDate: "2026-06-15",dueDateType: "30",
+    invoiceNo: generateInvoiceNo(), orderNo: "", date: "2026-06-01", dueDate: "2026-06-15", dueDateType: "30",
     client: "", project: "", gstRate: 18, notes: "Thank you for your business! Please make payment within the due date.\nFor queries contact: yencodetechnologies@gmail.com",
     terms: "1. Payment is due within the agreed terms.\n2. Late payments are subject to 2% monthly interest.\n3. All disputes subject to Chennai jurisdiction.",
     companyName: "YENCODE Technologies", companyEmail: "yencodetechnologies@gmail.com",
     companyPhone: "+91 89254 33533", companyAddress: "Chennai, Tamil Nadu, India – 600001",
-    currency: "₹",
+    currency: "INR",
+    status: "pending",
     template: "Classic",
     footerMessage: "🙏 Thank you for considering us!",
     amountPaid: 0,
@@ -590,7 +591,7 @@ const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2800)
   };
 
   const [inv, setInv] = useState(blank);
-const [items, setItems] = useState([
+  const [items, setItems] = useState([
     { id: 1, description: "", quantity: 1, rate: "" }
   ]);
   const [editingId, setEditingId] = useState(null); // backend _id if editing existing
@@ -712,7 +713,7 @@ const [items, setItems] = useState([
       }
     });
     setErrors(errs);
-    
+
     if (Object.keys(errs).length > 0) {
       setTimeout(() => {
         if (firstErrId) {
@@ -742,7 +743,7 @@ const [items, setItems] = useState([
   };
 
   // ── Clear ───────────────────────────────────────────────────
- const clearForm = () => {
+  const clearForm = () => {
     setInv({ ...blank, invoiceNo: generateInvoiceNo() });
     setItems([
       { id: 1, description: "", quantity: 1, rate: "" }
@@ -755,17 +756,11 @@ const [items, setItems] = useState([
   const apiSave = async (status = "draft") => {
     try {
       if (editingId) {
-        let newStatus = status;
-        if (newStatus === "draft" && parseFloat(inv.amountPaid) > 0) {
-          newStatus = parseFloat(inv.amountPaid) < total ? "part_paid" : "paid";
-        }
+        const newStatus = inv.status || status;
         const res = await axios.put(`${BASE_URL}/api/invoices/${editingId}`, { inv, items, status: newStatus });
         return res.data;
       } else {
-        let newStatus = status;
-        if (newStatus === "draft" && parseFloat(inv.amountPaid) > 0) {
-          newStatus = parseFloat(inv.amountPaid) < total ? "part_paid" : "paid";
-        }
+        const newStatus = inv.status || status;
         const res = await axios.post(`${BASE_URL}/api/invoices`, { inv, items, status: newStatus });
         return res.data;
       }
@@ -970,34 +965,34 @@ const [items, setItems] = useState([
       const file = new File([blob], `Invoice_${entry.invoiceNo}.pdf`, { type: 'application/pdf' });
       const invData = entry.inv || inv;
       const text = `*${invData.companyName || "Your Business"}*\n\nInvoice: ${entry.invoiceNo}\nTotal: ${formatCurrency(entry.total, invData.currency)}`;
-      
-      if (type === "print") {
-         pdf.autoPrint();
-         const blobURL = pdf.output('bloburl');
-         window.open(blobURL, '_blank');
-         return;
-      }
-      
-      if (type === "wa") {
-         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-             await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, files: [file] });
-         } else {
-             const url = URL.createObjectURL(blob);
-             const a = document.createElement("a");
-             a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
-             showToast("PDF downloaded! Attach it in WhatsApp.");
-             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-         }
-      } else {
-         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-             await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, files: [file] });
-         } else {
-             const url = URL.createObjectURL(blob);
-             const a = document.createElement("a");
-             a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
 
-             showToast("PDF downloaded!");
-         }
+      if (type === "print") {
+        pdf.autoPrint();
+        const blobURL = pdf.output('bloburl');
+        window.open(blobURL, '_blank');
+        return;
+      }
+
+      if (type === "wa") {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, files: [file] });
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+          showToast("PDF downloaded! Attach it in WhatsApp.");
+          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+        }
+      } else {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ title: `Invoice ${entry.invoiceNo}`, text, files: [file] });
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url; a.download = file.name; a.click(); URL.revokeObjectURL(url);
+
+          showToast("PDF downloaded!");
+        }
       }
     } catch (err) {
       console.log(err);
@@ -1280,22 +1275,22 @@ const [items, setItems] = useState([
         )}
 
         {/* PAGE HEADER */}
-     <div className="page-header">
-  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-    {onBack && (
-      <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "#E0F7FA", border: "none", borderRadius: 10, cursor: "pointer", color: "#00BCD4", flexShrink: 0 }}>
-        <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
-      </button>
-    )}
-    <div>
-      <div className="page-title">Invoices</div>
-      <div className="page-sub">Track, manage and send invoices to your clients</div>
-    </div>
-  </div>
+        <div className="page-header">
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {onBack && (
+              <button onClick={onBack} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: "#E0F7FA", border: "none", borderRadius: 10, cursor: "pointer", color: "#00BCD4", flexShrink: 0 }}>
+                <i className="ti ti-arrow-left" style={{ fontSize: 18 }} />
+              </button>
+            )}
+            <div>
+              <div className="page-title">Invoices</div>
+              <div className="page-sub">Track, manage and send invoices to your clients</div>
+            </div>
+          </div>
           <div className="header-actions">
-            <button className="filter-btn"><i className="ti ti-filter" style={{fontSize:14}}></i> Filter</button>
-            <button className="filter-btn"><i className="ti ti-calendar" style={{fontSize:14}}></i> May 2026</button>
-            <button className="filter-btn"><i className="ti ti-download" style={{fontSize:14}}></i> Export</button>
+            <button className="filter-btn"><i className="ti ti-filter" style={{ fontSize: 14 }}></i> Filter</button>
+            <button className="filter-btn"><i className="ti ti-calendar" style={{ fontSize: 14 }}></i> May 2026</button>
+            <button className="filter-btn"><i className="ti ti-download" style={{ fontSize: 14 }}></i> Export</button>
           </div>
         </div>
 
@@ -1303,52 +1298,52 @@ const [items, setItems] = useState([
         <div className="stats-row">
           <div className="stat-card" onClick={() => { clearForm(); setStep("form"); }}>
             <div className="stat-card-inner">
-              <div className="stat-icon" style={{background:"var(--teal-light)",color:"var(--teal)"}}><i className="ti ti-receipt-2"></i></div>
+              <div className="stat-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}><i className="ti ti-receipt-2"></i></div>
               <div>
                 <div className="stat-num">{enriched.length}</div>
                 <div className="stat-label">Total Invoices</div>
-                <div className="stat-amount" style={{color:"var(--teal)"}}>{formatCurrency(totalAmt, inv.currency)} total</div>
+                <div className="stat-amount" style={{ color: "var(--teal)" }}>{formatCurrency(totalAmt, inv.currency)} total</div>
               </div>
             </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{width:"100%",background:"var(--teal)"}}></div></div>
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: "100%", background: "var(--teal)" }}></div></div>
           </div>
           <div className="stat-card">
             <div className="stat-card-inner">
-              <div className="stat-icon" style={{background:"var(--green-bg)",color:"var(--green)"}}><i className="ti ti-circle-check"></i></div>
+              <div className="stat-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
               <div>
                 <div className="stat-num">{enriched.filter(e => e.status === "paid" || e.status === "part_paid").length}</div>
                 <div className="stat-label">Paid</div>
-                <div className="stat-amount" style={{color:"var(--green)"}}>{formatCurrency(paidAmt, inv.currency)} received</div>
+                <div className="stat-amount" style={{ color: "var(--green)" }}>{formatCurrency(paidAmt, inv.currency)} received</div>
               </div>
             </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{width: (totalAmt > 0 ? (paidAmt/totalAmt)*100 : 0)+"%",background:"var(--green)"}}></div></div>
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: (totalAmt > 0 ? (paidAmt / totalAmt) * 100 : 0) + "%", background: "var(--green)" }}></div></div>
           </div>
           <div className="stat-card">
             <div className="stat-card-inner">
-              <div className="stat-icon" style={{background:"var(--amber-bg)",color:"var(--amber)"}}><i className="ti ti-clock"></i></div>
+              <div className="stat-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
               <div>
                 <div className="stat-num">{unpaidCnt}</div>
                 <div className="stat-label">Pending</div>
-                <div className="stat-amount" style={{color:"var(--amber)"}}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)} due</div>
+                <div className="stat-amount" style={{ color: "var(--amber)" }}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)} due</div>
               </div>
             </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{width: (totalAmt > 0 ? (Math.max(0, totalAmt - paidAmt)/totalAmt)*100 : 0)+"%",background:"var(--amber)"}}></div></div>
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: (totalAmt > 0 ? (Math.max(0, totalAmt - paidAmt) / totalAmt) * 100 : 0) + "%", background: "var(--amber)" }}></div></div>
           </div>
           <div className="stat-card">
             <div className="stat-card-inner">
-              <div className="stat-icon" style={{background:"var(--red-bg)",color:"var(--red)"}}><i className="ti ti-alert-circle"></i></div>
+              <div className="stat-icon" style={{ background: "var(--red-bg)", color: "var(--red)" }}><i className="ti ti-alert-circle"></i></div>
               <div>
                 <div className="stat-num">{enriched.filter(e => e.status === "overdue").length}</div>
                 <div className="stat-label">Overdue</div>
-                <div className="stat-amount" style={{color:"var(--red)"}}>Action needed</div>
+                <div className="stat-amount" style={{ color: "var(--red)" }}>Action needed</div>
               </div>
             </div>
-            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{width:"11%",background:"var(--red)"}}></div></div>
+            <div className="stat-bar-wrap"><div className="stat-bar-fill" style={{ width: "11%", background: "var(--red)" }}></div></div>
           </div>
         </div>
 
         {/* TABS */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between", marginBottom: 20}}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <div className="tabs" style={{ display: "flex", gap: 10, alignItems: "center" }}>
             {onBack && (
               <button onClick={onBack} style={{ padding: "8px", background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#0f1c2e", display: "flex", alignItems: "center" }} title="Back to Dashboard">
@@ -1369,39 +1364,39 @@ const [items, setItems] = useState([
           <div className="table-toolbar">
             <div className="toolbar-left">
               <div className="toolbar-search">
-                <i className="ti ti-search" style={{fontSize:14,color:"var(--text3)"}}></i>
+                <i className="ti ti-search" style={{ fontSize: 14, color: "var(--text3)" }}></i>
                 <input type="text" placeholder="Search by invoice ID, client…" value={listSearch} onChange={(e) => setListSearch(e.target.value)} />
               </div>
-              <button className="sort-btn" onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}><i className={sortOrder === "desc" ? "ti ti-sort-descending" : "ti ti-sort-ascending"} style={{fontSize:13}}></i> Sort by Date</button>
-                <div style={{ position: "relative" }}>
-                  <select className="sort-btn" value={clientFilter} onChange={e => setClientFilter(e.target.value)} style={{ appearance: "none", cursor: "pointer", paddingRight: 24, paddingLeft: 10 }}>
-                    <option value="all">All Clients</option>
-                    {[...new Set(enriched.map(e => e.client).filter(Boolean))].map(c => (
-                      <option key={c} value={c}>{c.substring(0, 15)}{c.length > 15 ? '...' : ''}</option>
-                    ))}
-                  </select>
-                  <i className="ti ti-chevron-down" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", fontSize: 14, color: "var(--text3)" }}></i>
-                </div>
+              <button className="sort-btn" onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}><i className={sortOrder === "desc" ? "ti ti-sort-descending" : "ti ti-sort-ascending"} style={{ fontSize: 13 }}></i> Sort by Date</button>
+              <div style={{ position: "relative" }}>
+                <select className="sort-btn" value={clientFilter} onChange={e => setClientFilter(e.target.value)} style={{ appearance: "none", cursor: "pointer", paddingRight: 24, paddingLeft: 10 }}>
+                  <option value="all">All Clients</option>
+                  {[...new Set(enriched.map(e => e.client).filter(Boolean))].map(c => (
+                    <option key={c} value={c}>{c.substring(0, 15)}{c.length > 15 ? '...' : ''}</option>
+                  ))}
+                </select>
+                <i className="ti ti-chevron-down" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", fontSize: 14, color: "var(--text3)" }}></i>
               </div>
-              <button className="export-btn" onClick={() => {
-                const filteredData = enriched.filter(e => {
-                  if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
-                  if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "part_paid") return false;
-                  if (filterTab === "overdue" && e.status !== "overdue") return false;
-                  if (filterTab === "draft" && e.status !== "draft") return false;
-                  if (clientFilter !== "all" && e.client !== clientFilter) return false;
-                  const term = listSearch.toLowerCase();
-                  return (e.invoiceNo || "").toLowerCase().includes(term) || (e.client || "").toLowerCase().includes(term) || (e.inv?.project || e.project || "").toLowerCase().includes(term);
-                }).sort((a, b) => {
-                  const dateA = new Date(a.inv?.date || a.date || 0).getTime();
-                  const dateB = new Date(b.inv?.date || b.date || 0).getTime();
-                  return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-                });
-                handleExportCSV(filteredData);
-              }}><i className="ti ti-download" style={{fontSize:13}}></i> Export CSV</button>
+            </div>
+            <button className="export-btn" onClick={() => {
+              const filteredData = enriched.filter(e => {
+                if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
+                if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "part_paid") return false;
+                if (filterTab === "overdue" && e.status !== "overdue") return false;
+                if (filterTab === "draft" && e.status !== "draft") return false;
+                if (clientFilter !== "all" && e.client !== clientFilter) return false;
+                const term = listSearch.toLowerCase();
+                return (e.invoiceNo || "").toLowerCase().includes(term) || (e.client || "").toLowerCase().includes(term) || (e.inv?.project || e.project || "").toLowerCase().includes(term);
+              }).sort((a, b) => {
+                const dateA = new Date(a.inv?.date || a.date || 0).getTime();
+                const dateB = new Date(b.inv?.date || b.date || 0).getTime();
+                return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+              });
+              handleExportCSV(filteredData);
+            }}><i className="ti ti-download" style={{ fontSize: 13 }}></i> Export CSV</button>
           </div>
 
-          <div style={{overflowX:"auto"}}>
+          <div style={{ overflowX: "auto" }}>
             <table>
               <thead>
                 <tr>
@@ -1419,9 +1414,9 @@ const [items, setItems] = useState([
               </thead>
               <tbody>
                 {listLoading ? (
-                  <tr><td colSpan={10} style={{textAlign:"center",padding:40,color:"var(--text3)"}}></td></tr>
+                  <tr><td colSpan={10} style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}></td></tr>
                 ) : enriched.length === 0 ? (
-                  <tr><td colSpan={10} style={{textAlign:"center",padding:40,color:"var(--text3)"}}></td></tr>
+                  <tr><td colSpan={10} style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}></td></tr>
                 ) : enriched.filter(e => {
                   if (filterTab === "paid" && e.status !== "paid" && e.status !== "part_paid") return false;
                   if (filterTab === "pending" && e.status !== "unpaid" && e.status !== "part_paid") return false;
@@ -1450,24 +1445,24 @@ const [items, setItems] = useState([
                   return (
                     <tr key={entry.id || idx} onClick={() => { loadEntry(entry); setStep("preview"); }}>
                       <td onClick={e => e.stopPropagation()}><input type="checkbox" className="cb" /></td>
-                      <td className="inv-id" style={{color: "var(--teal)", fontWeight: 800}}>{entry.invoiceNo || "—"}</td>
+                      <td className="inv-id" style={{ color: "var(--teal)", fontWeight: 800 }}>{entry.invoiceNo || "—"}</td>
                       <td>
                         <div className="client-chip">
-                          <div className="client-av" style={{background:`linear-gradient(135deg,var(--teal),#006E7F)`}}>
+                          <div className="client-av" style={{ background: `linear-gradient(135deg,var(--teal),#006E7F)` }}>
                             {(entry.client || "?")[0].toUpperCase()}
                           </div>
                           <span className="client-name">{entry.client || "—"}</span>
                         </div>
                       </td>
-                      <td style={{color: "var(--text2)"}}>{invD.project || entry.project || "—"}</td>
+                      <td style={{ color: "var(--text2)" }}>{invD.project || entry.project || "—"}</td>
                       <td>
-                        {isPaid ? <span className="badge advance">Advance</span> : 
-                         isDraft ? <span className="badge draft">Draft</span> : 
-                         <span className="badge" style={{background:"var(--purple-bg)",color:"var(--purple)"}}>Milestone</span>}
+                        {isPaid ? <span className="badge advance">Advance</span> :
+                          isDraft ? <span className="badge draft">Draft</span> :
+                            <span className="badge" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}>Milestone</span>}
                       </td>
                       <td className={isPaid || isPartPaid ? "amount-pos" : ""}>{formatCurrency(entry.total, entry.inv?.currency || inv.currency)}</td>
-                      <td style={{color:"var(--text2)"}}>{formatDate(invD.date || entry.date)}</td>
-                      <td style={{color: isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text2)", fontWeight: isOverdue || isPending ? 700 : 400}}>
+                      <td style={{ color: "var(--text2)" }}>{formatDate(invD.date || entry.date)}</td>
+                      <td style={{ color: isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text2)", fontWeight: isOverdue || isPending ? 700 : 400 }}>
                         {formatDate(invD.dueDate || entry.dueDate)}
                       </td>
                       <td onClick={e => e.stopPropagation()}>
@@ -1476,7 +1471,7 @@ const [items, setItems] = useState([
                           disabled={statusUpdating === entry.id}
                           onChange={e => handleStatusChange(entry, e.target.value)}
                           style={{
-                            background: "transparent", border: "none", fontSize: 10, fontWeight: 700, 
+                            background: "transparent", border: "none", fontSize: 10, fontWeight: 700,
                             cursor: "pointer", outline: "none", fontFamily: "inherit",
                             color: isPaid ? "var(--green)" : isOverdue ? "var(--red)" : isPending ? "var(--amber)" : "var(--text3)"
                           }}>
@@ -1513,9 +1508,9 @@ const [items, setItems] = useState([
           <div className="pagination">
             <div className="page-info">Showing {enriched.length} of {enriched.length} invoices</div>
             <div className="page-btns">
-              <button className="page-btn"><i className="ti ti-chevron-left" style={{fontSize:14}}></i></button>
+              <button className="page-btn"><i className="ti ti-chevron-left" style={{ fontSize: 14 }}></i></button>
               <button className="page-btn active">1</button>
-              <button className="page-btn"><i className="ti ti-chevron-right" style={{fontSize:14}}></i></button>
+              <button className="page-btn"><i className="ti ti-chevron-right" style={{ fontSize: 14 }}></i></button>
             </div>
           </div>
         </div>
@@ -1528,67 +1523,67 @@ const [items, setItems] = useState([
             <div className="summary-title">Invoice Summary</div>
             <div className="summary-item">
               <div className="si-left">
-                <div className="si-icon" style={{background:"var(--green-bg)",color:"var(--green)"}}><i className="ti ti-circle-check"></i></div>
+                <div className="si-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-circle-check"></i></div>
                 <div>
                   <div className="si-label">Total Collected</div>
                   <div className="si-count">{enriched.filter(e => e.status === "paid" || e.status === "part_paid").length} invoices paid</div>
                 </div>
               </div>
-              <div className="si-amount" style={{color:"var(--green)"}}>{formatCurrency(paidAmt, inv.currency)}</div>
+              <div className="si-amount" style={{ color: "var(--green)" }}>{formatCurrency(paidAmt, inv.currency)}</div>
             </div>
             <div className="summary-item">
               <div className="si-left">
-                <div className="si-icon" style={{background:"var(--amber-bg)",color:"var(--amber)"}}><i className="ti ti-clock"></i></div>
+                <div className="si-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-clock"></i></div>
                 <div>
                   <div className="si-label">Awaiting Payment</div>
                   <div className="si-count">{unpaidCnt} invoices pending</div>
                 </div>
               </div>
-              <div className="si-amount" style={{color:"var(--amber)"}}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)}</div>
+              <div className="si-amount" style={{ color: "var(--amber)" }}>{formatCurrency(Math.max(0, totalAmt - paidAmt), inv.currency)}</div>
             </div>
             <div className="summary-item">
               <div className="si-left">
-                <div className="si-icon" style={{background:"var(--red-bg)",color:"var(--red)"}}><i className="ti ti-alert-circle"></i></div>
+                <div className="si-icon" style={{ background: "var(--red-bg)", color: "var(--red)" }}><i className="ti ti-alert-circle"></i></div>
                 <div>
                   <div className="si-label">Overdue Amount</div>
                   <div className="si-count">{enriched.filter(e => e.status === "overdue").length} invoice overdue</div>
                 </div>
               </div>
-              <div className="si-amount" style={{color:"var(--red)"}}>{formatCurrency(0, inv.currency)}</div>
+              <div className="si-amount" style={{ color: "var(--red)" }}>{formatCurrency(0, inv.currency)}</div>
             </div>
             <div className="summary-item">
               <div className="si-left">
-                <div className="si-icon" style={{background:"var(--surface2)",color:"var(--text3)"}}><i className="ti ti-file"></i></div>
+                <div className="si-icon" style={{ background: "var(--surface2)", color: "var(--text3)" }}><i className="ti ti-file"></i></div>
                 <div>
                   <div className="si-label">Draft Invoices</div>
                   <div className="si-count">{draftCnt} not yet sent</div>
                 </div>
               </div>
-              <div className="si-amount" style={{color:"var(--text3)"}}>{formatCurrency(0, inv.currency)}</div>
+              <div className="si-amount" style={{ color: "var(--text3)" }}>{formatCurrency(0, inv.currency)}</div>
             </div>
             {/* mini bar chart */}
-            <div style={{marginTop:4}}>
-              <div style={{fontSize:11,fontWeight:700,color:"var(--text2)",marginBottom:10}}>Revenue Breakdown</div>
-              <div style={{display:"flex",gap:3,height:60,alignItems:"flex-end"}}>
-                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{width:"100%",background:"var(--teal)",borderRadius:"4px 4px 0 0",height:60,opacity:.9}}></div>
-                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>May</div>
+            <div style={{ marginTop: 4 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", marginBottom: 10 }}>Revenue Breakdown</div>
+              <div style={{ display: "flex", gap: 3, height: 60, alignItems: "flex-end" }}>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div style={{ width: "100%", background: "var(--teal)", borderRadius: "4px 4px 0 0", height: 60, opacity: .9 }}></div>
+                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>May</div>
                 </div>
-                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{width:"100%",background:"var(--green)",borderRadius:"4px 4px 0 0",height:42}}></div>
-                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>Apr</div>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div style={{ width: "100%", background: "var(--green)", borderRadius: "4px 4px 0 0", height: 42 }}></div>
+                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>Apr</div>
                 </div>
-                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{width:"100%",background:"var(--amber)",borderRadius:"4px 4px 0 0",height:30}}></div>
-                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>Mar</div>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div style={{ width: "100%", background: "var(--amber)", borderRadius: "4px 4px 0 0", height: 30 }}></div>
+                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>Mar</div>
                 </div>
-                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{width:"100%",background:"var(--border)",borderRadius:"4px 4px 0 0",height:20}}></div>
-                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>Feb</div>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div style={{ width: "100%", background: "var(--border)", borderRadius: "4px 4px 0 0", height: 20 }}></div>
+                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>Feb</div>
                 </div>
-                <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{width:"100%",background:"var(--border)",borderRadius:"4px 4px 0 0",height:36}}></div>
-                  <div style={{fontSize:9,color:"var(--text3)",fontWeight:600}}>Jan</div>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div style={{ width: "100%", background: "var(--border)", borderRadius: "4px 4px 0 0", height: 36 }}></div>
+                  <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 600 }}>Jan</div>
                 </div>
               </div>
             </div>
@@ -1608,7 +1603,7 @@ const [items, setItems] = useState([
                 return (
                   <div className="activity-item" key={entry.id || i}>
                     <div className="act-dot-wrap">
-                      <div className="act-dot" style={{background: dotColor}}></div>
+                      <div className="act-dot" style={{ background: dotColor }}></div>
                       <div className="act-line"></div>
                     </div>
                     <div>
@@ -1677,7 +1672,7 @@ const [items, setItems] = useState([
           <button onClick={() => triggerPDFShare({ id: editingId, invoiceNo: inv.invoiceNo, total: total }, "print")} style={{ padding: "10px 22px", background: "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", color: "#fff", fontFamily: "inherit" }}>🖨️ Print / PDF</button>
         </div>
 
-                {/* Pagination Logic */}
+        {/* Pagination Logic */}
         {(() => {
           const ITEMS_PER_PAGE_FIRST = 10;
           const ITEMS_PER_PAGE_REST = 16;
@@ -1702,216 +1697,216 @@ const [items, setItems] = useState([
 
                 return (
                   <div key={pageIndex} className="invoice-paper print-container" style={{ position: "relative", maxWidth: 794, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 24px 80px rgba(var(--app-accent-rgb, 124, 58, 237), 0.25)", display: "flex", flexDirection: "column", minHeight: 1122, width: "100%" }}>
-          {/* Header */}
-          {isFirstPage && (<div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
-            <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, ${currentT.primaryColor}0d, transparent)`, top: -80, right: -40, pointerEvents: "none" }} />
-            <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
-              <div>
-                {effectiveLogo ? (
-                  <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
-                ) : (
-                  <div style={{ height: 60, width: 60, background: currentT.logoColor || "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
-                    {effectiveCompanyName[0] || "?"}
+                    {/* Header */}
+                    {isFirstPage && (<div className="avoid-break" style={{ background: "#f8fafc", padding: "28px 32px", position: "relative", overflow: "hidden", flexShrink: 0, borderBottom: "1px solid var(--app-border)" }}>
+                      <div style={{ position: "absolute", width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, ${currentT.primaryColor}0d, transparent)`, top: -80, right: -40, pointerEvents: "none" }} />
+                      <div className="inv-hgrid" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1, gap: 20 }}>
+                        <div>
+                          {effectiveLogo ? (
+                            <img src={effectiveLogo} alt="logo" style={{ height: 85, maxWidth: "100%", borderRadius: 10, marginBottom: 12, objectFit: "contain" }} />
+                          ) : (
+                            <div style={{ height: 60, width: 60, background: currentT.logoColor || "var(--app-accent)", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 900, color: "#fff" }}>
+                              {effectiveCompanyName[0] || "?"}
+                            </div>
+                          )}
+                          <div style={{ fontSize: 24, fontWeight: 900, color: "#0f1c2e", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName || effectiveCompanyName}</div>
+                          {inv.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{inv.companyEmail}</div>}
+                          {inv.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyPhone}</div>}
+                          {inv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyAddress}</div>}
+                        </div>
+                        <div className="inv-hright" style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 36, fontWeight: 900, color: `${currentT.primaryColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{inv.invoiceNo}</div>
+                          {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
+                          <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
+                            <div style={{ textAlign: "right" }}>
+                              <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
+                              <div style={{ fontSize: 12, color: "#0f1c2e", fontWeight: 700 }}>{formatDate(inv.date)}</div>
+                            </div>
+                            <div style={{ textAlign: "right" }}>
+                              <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
+                              <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
+                            </div>
+                          </div>
+                          {(balanceDue > 0 && amountPaid > 0) ? (
+                            <div style={{ marginTop: 12, textAlign: "right" }}>
+                              <span style={{
+                                display: "inline-block",
+                                padding: "4px 14px",
+                                border: "1.5px solid #f59e0b",
+                                borderRadius: 20,
+                                color: "#b45309",
+                                fontSize: 11,
+                                fontWeight: 800,
+                                background: "#fef3c7",
+                                letterSpacing: 1
+                              }}>
+                                PART PAID
+                              </span>
+                            </div>
+                          ) : balanceDue <= 0 ? (
+                            <div style={{ marginTop: 12, textAlign: "right" }}>
+                              <span style={{
+                                display: "inline-block",
+                                padding: "4px 14px",
+                                border: "1.5px solid #10b981",
+                                borderRadius: 20,
+                                color: "#059669",
+                                fontSize: 11,
+                                fontWeight: 800,
+                                background: "#d1fae5",
+                                letterSpacing: 1
+                              }}>
+                                PAID
+                              </span>
+                            </div>
+                          ) : null}
+                          {inv.project && (
+                            <div style={{ marginTop: 24, textAlign: "right" }}>
+                              <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>PROJECT</div>
+                              <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", lineHeight: 1.4 }}>{inv.project}</div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>)}
+
+                    {/* Bill To */}
+                    {isFirstPage && (<div className="inv-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
+                      <div style={{ padding: "20px 32px" }}>
+                        <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
+                        <div style={{ fontSize: 17, fontWeight: 800, color: "#0f1c2e" }}>{inv.client || "—"}</div>
+                        {selectedClient?.companyName && <div style={{ fontSize: 13, color: currentT.primaryColor || "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
+                        {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
+                        {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
+                        {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: currentT.primaryColor || "var(--app-accent)", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
+                      </div>
+                    </div>)}
+
+                    {/* Items */}
+                    <div className="inv-table-wrap" style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
+                        <thead>
+                          <tr className="avoid-break" style={{ background: "#f8fafc" }}>
+                            {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
+                              <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pageItems.map((item, idx) => {
+                            const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+                            const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
+                            return (
+                              <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-border)" }}>
+                                <td style={{ padding: "12px 11px", color: "#64748b", fontWeight: 700, fontSize: 12 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
+                                <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0f1c2e" }}>{item.description || "—"}</td>
+                                <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
+                                <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
+                                <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#6b7280" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
+                                <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {isLastPage && (<>
+                      {/* Totals with QR Scanner */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", padding: "0 32px 16px" }}>
+                        {/* QR Scanner */}
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
+                          <div style={{ fontSize: "8px", color: "#64748b", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
+                          <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
+                            <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="#0f1c2e" />
+                          </div>
+                        </div>
+
+                        {/* Totals */}
+                        <div className="inv-totals" style={{ width: "200px" }}>
+                          <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
+                            <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
+                            <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
+                          </div>
+                          <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
+                            <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
+                            <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
+                          </div>
+                          {amountPaid > 0 && (
+                            <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
+                              <span className="lbl" style={{ color: "#64748b" }}>Paid (Advance)</span>
+                              <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
+                            </div>
+                          )}
+                          <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
+                            <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
+                            <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Amount in Words */}
+                      <div style={{ margin: "8px 32px 0", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
+                        <span style={{ fontSize: "9px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
+                        <span style={{ fontSize: "9px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
+                      </div>
+
+                      {/* Payment details */}
+                      {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
+                        <div className="inv-bank" style={{ margin: "12px 32px 0", padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}` }}>
+                          <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
+                          <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
+                            {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
+                            {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
+                            {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
+                            {inv.upiId && <div style={{ marginTop: "2px" }}>UPI: {inv.upiId}</div>}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Notes & Terms + Signature */}
+                      <div className="inv-footer avoid-break" style={{ margin: "16px 32px 24px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                        <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                          {inv.notes && (
+                            <div>
+                              <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
+                              <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.notes}</div>
+                            </div>
+                          )}
+                          {inv.terms && (
+                            <div>
+                              <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
+                              <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="inv-sig" style={{ textAlign: "right", minWidth: "120px" }}>
+                          <div style={{ height: "35px", display: "flex", alignItems: "flex-end", justifyContent: "flex-end", marginBottom: "3px" }}>
+                            {inv.signature ? (
+                              inv.signatureType === "image" ? (
+                                <img src={inv.signature} alt="Signature" style={{ maxHeight: "30px", maxWidth: "120px", objectFit: "contain" }} />
+                              ) : (
+                                <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: "16px", fontWeight: "bold", color: "#1a2e35" }}>{inv.signature}</div>
+                              )
+                            ) : null}
+                          </div>
+                          <div className="inv-sig-line" style={{ width: "100%", height: "1px", background: "var(--app-border)", marginBottom: "3px" }}></div>
+                          <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
+                          <div className="inv-sig-role" style={{ fontSize: "8px", color: "#64748b" }}>Authorized Signatory</div>
+                        </div>
+                      </div>
+
+                    </>)}
+
+                    <div className="flex-spacer" style={{ flex: 1 }} />
+
+                    {/* Footer message */}
+                    <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, pageBreakBefore: "auto", breakBefore: "auto" }}>
+                      <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: currentT.primaryColor || "#7c3aed" }}>{inv.footerMessage}</div>
+                      <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{inv.invoiceNo}</div>
+                    </div>
                   </div>
-                )}
-                <div style={{ fontSize: 24, fontWeight: 900, color: "#0f1c2e", textTransform: "uppercase", letterSpacing: 1 }}>{inv.companyName || effectiveCompanyName}</div>
-                {inv.companyEmail && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>{inv.companyEmail}</div>}
-                {inv.companyPhone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyPhone}</div>}
-                {inv.companyAddress && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{inv.companyAddress}</div>}
-              </div>
-              <div className="inv-hright" style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 36, fontWeight: 900, color: `${currentT.primaryColor}1a`, letterSpacing: -2, lineHeight: 1, marginBottom: 4 }}>INVOICE</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: currentT.primaryColor || "var(--app-accent)" }}>{inv.invoiceNo}</div>
-                {inv.orderNo && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>Order # {inv.orderNo}</div>}
-                <div style={{ marginTop: 14, display: "flex", gap: 20, justifyContent: "flex-end" }}>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DATE</div>
-                    <div style={{ fontSize: 12, color: "#0f1c2e", fontWeight: 700 }}>{formatDate(inv.date)}</div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 1.5, marginBottom: 3 }}>DUE DATE</div>
-                    <div style={{ fontSize: 12, color: "#ea580c", fontWeight: 700 }}>{formatDate(inv.dueDate)}</div>
-                  </div>
-                </div>
-                {(balanceDue > 0 && amountPaid > 0) ? (
-                  <div style={{ marginTop: 12, textAlign: "right" }}>
-                    <span style={{
-                      display: "inline-block",
-                      padding: "4px 14px",
-                      border: "1.5px solid #f59e0b",
-                      borderRadius: 20,
-                      color: "#b45309",
-                      fontSize: 11,
-                      fontWeight: 800,
-                      background: "#fef3c7",
-                      letterSpacing: 1
-                    }}>
-                      PART PAID
-                    </span>
-                  </div>
-                ) : balanceDue <= 0 ? (
-                  <div style={{ marginTop: 12, textAlign: "right" }}>
-                    <span style={{
-                      display: "inline-block",
-                      padding: "4px 14px",
-                      border: "1.5px solid #10b981",
-                      borderRadius: 20,
-                      color: "#059669",
-                      fontSize: 11,
-                      fontWeight: 800,
-                      background: "#d1fae5",
-                      letterSpacing: 1
-                    }}>
-                      PAID
-                    </span>
-                  </div>
-                ) : null}
-                {inv.project && (
-                  <div style={{ marginTop: 24, textAlign: "right" }}>
-                    <div style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, letterSpacing: 2, marginBottom: 6 }}>PROJECT</div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: "#0f1c2e", lineHeight: 1.4 }}>{inv.project}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>)}
-
-          {/* Bill To */}
-          {isFirstPage && (<div className="inv-btgrid avoid-break" style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: "2px solid var(--app-border)", flexShrink: 0 }}>
-            <div style={{ padding: "20px 32px" }}>
-              <div style={{ fontSize: 9, color: "#64748b", fontWeight: 700, letterSpacing: 2, marginBottom: 10 }}>BILL TO</div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#0f1c2e" }}>{inv.client || "—"}</div>
-              {selectedClient?.companyName && <div style={{ fontSize: 13, color: currentT.primaryColor || "var(--app-accent)", fontWeight: 600, marginTop: 2 }}>{selectedClient.companyName}</div>}
-              {selectedClient?.email && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 5 }}>📧 {selectedClient.email}</div>}
-              {selectedClient?.phone && <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>📱 {selectedClient.phone}</div>}
-              {selectedClient?.gstNumber && <div style={{ fontSize: 12, color: currentT.primaryColor || "var(--app-accent)", marginTop: 4, fontWeight: 600 }}>💎 GST: {selectedClient.gstNumber}</div>}
-            </div>
-          </div>)}
-
-          {/* Items */}
-          <div className="inv-table-wrap" style={{ padding: isFirstPage ? "22px 32px" : "80px 32px 22px", overflowX: "auto", flexShrink: 0 }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
-              <thead>
-                <tr className="avoid-break" style={{ background: "#f8fafc" }}>
-                  {["#", "Description", "Qty", "Unit Rate", "Tax Rate", "Amount"].map((h, i) => (
-                    <th key={i} style={{ padding: "9px 11px", fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: 1.5, borderBottom: "2px solid var(--app-border)", textAlign: ["Amount", "Unit Rate", "Qty", "Tax Rate"].includes(h) ? "right" : "left" }}>{h.toUpperCase()}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {pageItems.map((item, idx) => {
-                  const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
-                  const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
-                  return (
-                    <tr key={item.id} className="avoid-break" style={{ borderBottom: "1px solid var(--app-border)" }}>
-                      <td style={{ padding: "12px 11px", color: "#64748b", fontWeight: 700, fontSize: 12 }}>{String(globalItemOffset + idx + 1).padStart(2, "0")}</td>
-                      <td style={{ padding: "12px 11px", fontSize: 13, fontWeight: 600, color: "#0f1c2e" }}>{item.description || "—"}</td>
-                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{item.quantity}</td>
-                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#374151" }}>{formatCurrency(item.rate, inv.currency)}</td>
-                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 13, color: "#6b7280" }}>{rateGst}% {isIncl ? "(Incl)" : ""}</td>
-                      <td style={{ padding: "12px 11px", textAlign: "right", fontSize: 14, fontWeight: 700, color: "#0f1c2e" }}>{formatCurrency((parseFloat(item.rate) || 0) * (parseFloat(item.quantity) || 0), inv.currency)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {isLastPage && (<>
-          {/* Totals with QR Scanner */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", padding: "0 32px 16px" }}>
-            {/* QR Scanner */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "var(--app-bg)", borderRadius: 8, padding: "8px", border: "1px solid var(--app-border)", minWidth: 95 }}>
-              <div style={{ fontSize: "8px", color: "#64748b", fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>SCAN INVOICE</div>
-              <div style={{ background: "#fff", padding: 5, borderRadius: 4, border: "1px solid var(--app-border)" }}>
-                <QRCodeSVG value={qrData} size={80} bgColor="#ffffff" fgColor="#0f1c2e" />
-              </div>
-            </div>
-
-            {/* Totals */}
-            <div className="inv-totals" style={{ width: "200px" }}>
-              <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                <span className="lbl" style={{ color: "#64748b" }}>Subtotal</span>
-                <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(subtotal, inv.currency)}</span>
-              </div>
-              <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                <span className="lbl" style={{ color: "#64748b" }}>GST / Tax</span>
-                <span className="val" style={{ fontWeight: "700" }}>{formatCurrency(gstAmt, inv.currency)}</span>
-              </div>
-              {amountPaid > 0 && (
-                <div className="inv-total-row" style={{ display: "flex", justify: "space-between", padding: "4px 0", fontSize: "10px", borderBottom: "1px solid var(--app-border)" }}>
-                  <span className="lbl" style={{ color: "#64748b" }}>Paid (Advance)</span>
-                  <span className="val" style={{ fontWeight: "700", color: "var(--green)" }}>-{formatCurrency(amountPaid, inv.currency)}</span>
-                </div>
-              )}
-              <div className="inv-grand-row" style={{ display: "flex", justify: "space-between", padding: "6px 8px", background: "#0f1c2e", borderRadius: "6px", marginTop: "4px", color: "#fff" }}>
-                <span className="lbl" style={{ fontSize: "10px", fontWeight: "800" }}>Balance Due</span>
-                <span className="val" style={{ fontSize: "12px", fontWeight: "900" }}>{formatCurrency(balanceDue, inv.currency)}</span>
-              </div>
-            </div>
-          </div>
-          {/* Amount in Words */}
-          <div style={{ margin: "8px 32px 0", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
-            <span style={{ fontSize: "9px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
-            <span style={{ fontSize: "9px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === '₹' ? 'INR ' : (inv.currency || '₹') + ' '}{numberToWords(Math.round(balanceDue))}</span>
-          </div>
-
-          {/* Payment details */}
-          {(inv.bankName || inv.accountNumber || inv.ifscCode || inv.upiId) && (
-            <div className="inv-bank" style={{ margin: "12px 32px 0", padding: "8px 10px", background: currentT.primaryBg, borderRadius: "6px", borderLeft: `3px solid ${currentT.primaryColor}` }}>
-              <div className="inv-bank-title" style={{ fontSize: "9px", fontWeight: "700", color: currentT.primaryColor, marginBottom: "3px" }}>Payment Details</div>
-              <div className="inv-bank-detail" style={{ fontSize: "9px", color: "#0f1c2e", lineHeight: "1.5" }}>
-                {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
-                {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
-                {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
-                {inv.upiId && <div style={{marginTop: "2px"}}>UPI: {inv.upiId}</div>}
-              </div>
-            </div>
-          )}
-
-          {/* Notes & Terms + Signature */}
-          <div className="inv-footer avoid-break" style={{ margin: "16px 32px 24px", paddingTop: "10px", borderTop: "1px solid var(--app-border)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-            <div className="inv-notes" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-              {inv.notes && (
-                <div>
-                  <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Notes</div>
-                  <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.notes}</div>
-                </div>
-              )}
-              {inv.terms && (
-                <div>
-                  <div className="inv-notes-title" style={{ fontSize: "8px", fontWeight: "700", color: currentT.primaryColor, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: "2px" }}>Terms & Conditions</div>
-                  <div className="inv-notes-text" style={{ fontSize: "8px", color: "#64748b", lineHeight: "1.5" }}>{inv.terms}</div>
-                </div>
-              )}
-            </div>
-            <div className="inv-sig" style={{ textAlign: "right", minWidth: "120px" }}>
-              <div style={{ height: "35px", display: "flex", alignItems: "flex-end", justifyContent: "flex-end", marginBottom: "3px" }}>
-                {inv.signature ? (
-                  inv.signatureType === "image" ? (
-                    <img src={inv.signature} alt="Signature" style={{ maxHeight: "30px", maxWidth: "120px", objectFit: "contain" }} />
-                  ) : (
-                    <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: "16px", fontWeight: "bold", color: "#1a2e35" }}>{inv.signature}</div>
-                  )
-                ) : null}
-              </div>
-              <div className="inv-sig-line" style={{ width: "100%", height: "1px", background: "var(--app-border)", marginBottom: "3px" }}></div>
-              <div className="inv-sig-name" style={{ fontSize: "9px", fontWeight: "700", color: "#0f1c2e" }}>{inv.companyName || effectiveCompanyName}</div>
-              <div className="inv-sig-role" style={{ fontSize: "8px", color: "#64748b" }}>Authorized Signatory</div>
-            </div>
-          </div>
-
-          </>)}
-
-          <div className="flex-spacer" style={{ flex: 1 }} />
-
-          {/* Footer message */}
-          <div style={{ background: "#ffffff", borderTop: "2px solid #f1f5f9", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, pageBreakBefore: "auto", breakBefore: "auto" }}>
-            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{effectiveCompanyName}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: currentT.primaryColor || "#7c3aed" }}>{inv.footerMessage}</div>
-            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>{inv.invoiceNo}</div>
-          </div>
-        </div>
                 );
               })}
             </div>
@@ -1992,14 +1987,14 @@ const [items, setItems] = useState([
 
       {/* Split Layout Container */}
       <div className="invoice-creator-split-container" style={{ display: "grid", gridTemplateColumns: "1fr 450px", gap: "24px", alignItems: "start", marginTop: 16 }}>
-        
-                {/* Left Panel: Scrollable form cards */}
+
+        {/* Left Panel: Scrollable form cards */}
         <div className="inv-creator-form-side">
-          
+
           {/* TEMPLATE */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{background:"var(--purple-bg)",color:"var(--purple)"}}><i className="ti ti-layout-grid"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--purple-bg)", color: "var(--purple)" }}><i className="ti ti-layout-grid"></i></div>
               <div className="inv-creator-card-title">Invoice Template</div>
             </div>
             <div className="inv-creator-card-body">
@@ -2022,7 +2017,7 @@ const [items, setItems] = useState([
           {/* INVOICE DETAILS */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{background:"var(--teal-light)",color:"var(--teal)"}}><i className="ti ti-receipt-2"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--teal-light)", color: "var(--teal)" }}><i className="ti ti-receipt-2"></i></div>
               <div className="inv-creator-card-title">Invoice Details</div>
             </div>
             <div className="inv-creator-card-body">
@@ -2039,46 +2034,47 @@ const [items, setItems] = useState([
               <div className="inv-creator-form-row">
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Due Date</label>
-                                {/* Line 2234 - existing label கு கீழே, terms grid-க்கு பதிலா இதை போடு */}
-<div style={{display:'flex', gap:10}}>
-  <select className="inv-creator-form-select"
-    value={inv.dueDateType || '30'}
-    onChange={e => {
-      const val = e.target.value;
-      upd('dueDateType', val);
-      if (val !== 'custom') {
-        const days = parseInt(val) || 0;
-        const newDue = new Date(new Date(inv.date).getTime() + days * 86400000)
-          .toISOString().split('T')[0];
-        upd('dueDate', newDue);
-      }
-    }} style={{flex:1}}>
-    <option value="0">Due on receipt</option>
-    <option value="15">Next 15 days</option>
-    <option value="30">Next 30 days</option>
-    <option value="45">Next 45 days</option>
-    <option value="custom">Custom date</option>
-  </select>
-  {inv.dueDateType === 'custom' && (
-    <input type="date" className="inv-creator-form-input"
-      value={inv.dueDate}
-      onChange={e => upd('dueDate', e.target.value)}
-      style={{flex:1}} />
-  )}
-</div>
+                  {/* Line 2234 - existing label கு கீழே, terms grid-க்கு பதிலா இதை போடு */}
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <select className="inv-creator-form-select"
+                      value={inv.dueDateType || '30'}
+                      onChange={e => {
+                        const val = e.target.value;
+                        upd('dueDateType', val);
+                        if (val !== 'custom') {
+                          const days = parseInt(val) || 0;
+                          const newDue = new Date(new Date(inv.date).getTime() + days * 86400000)
+                            .toISOString().split('T')[0];
+                          upd('dueDate', newDue);
+                        }
+                      }} style={{ flex: 1 }}>
+                      <option value="0">Due on receipt</option>
+                      <option value="15">Next 15 days</option>
+                      <option value="30">Next 30 days</option>
+                      <option value="45">Next 45 days</option>
+                      <option value="custom">Custom date</option>
+                    </select>
+                    {inv.dueDateType === 'custom' && (
+                      <input type="date" className="inv-creator-form-input"
+                        value={inv.dueDate}
+                        onChange={e => upd('dueDate', e.target.value)}
+                        style={{ flex: 1 }} />
+                    )}
+                  </div>
                 </div>
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Category</label>
                   <select className="inv-creator-form-select" value={inv.category || "Consulting"} onChange={(e) => upd("category", e.target.value)}>
                     <option value="Advance Payment">Advance Payment</option>
+                    <option value="Additional Payment">Additional Payment</option>
                     <option value="Milestone">Milestone</option>
                     <option value="Final Invoice">Final Invoice</option>
                     <option value="Monthly Retainer">Monthly Retainer</option>
                     <option value="Consulting">Consulting</option>
                   </select>
                 </div>
-  
-              </div>            
+
+              </div>
             </div>
           </div>
 
@@ -2119,22 +2115,22 @@ const [items, setItems] = useState([
           {/* BILL TO (CLIENT) */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{background:"var(--amber-bg)",color:"var(--amber)"}}><i className="ti ti-user-circle"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-user-circle"></i></div>
               <div className="inv-creator-card-title">Bill To (Client)</div>
-              <button onClick={onAddClient} style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:"5px",padding:"5px 10px",background:"var(--teal-lighter)",border:"1.5px solid var(--teal)",borderRadius:"7px",fontSize:"10px",fontWeight:"700",color:"var(--teal)",cursor:"pointer",fontFamily:"inherit"}}>
-                <i className="ti ti-plus" style={{fontSize:"12px"}}></i> Add Client
+              <button onClick={onAddClient} style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "5px", padding: "5px 10px", background: "var(--teal-lighter)", border: "1.5px solid var(--teal)", borderRadius: "7px", fontSize: "10px", fontWeight: "700", color: "var(--teal)", cursor: "pointer", fontFamily: "inherit" }}>
+                <i className="ti ti-plus" style={{ fontSize: "12px" }}></i> Add Client
               </button>
             </div>
             <div className="inv-creator-card-body">
               <div className="inv-creator-form-row">
-                <div className="inv-creator-form-group" id="field-client" style={{marginBottom: 0}}>
-                  <label className="inv-creator-form-label" style={{color: errors.client ? "#ef4444" : "var(--text2)"}}>Company / Client Name *</label>
+                <div className="inv-creator-form-group" id="field-client" style={{ marginBottom: 0 }}>
+                  <label className="inv-creator-form-label" style={{ color: errors.client ? "#ef4444" : "var(--text2)" }}>Company / Client Name *</label>
                   <CompanyDropdown clients={clients} value={inv.client}
                     onChange={(val) => { upd("client", val); upd("project", ""); setErrors((p) => { const n = { ...p }; delete n.client; return n; }); }}
                     error={errors.client} onAddCompany={onAddClient} />
                   {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>⚠ {errors.client}</div>}
                 </div>
-                <div className="inv-creator-form-group" style={{marginBottom: 0}}>
+                <div className="inv-creator-form-group" style={{ marginBottom: 0 }}>
                   <label className="inv-creator-form-label">Project</label>
                   <ProjectDropdown projects={filteredProjects} value={inv.project}
                     onChange={(val) => upd("project", val)}
@@ -2155,19 +2151,19 @@ const [items, setItems] = useState([
           {/* LINE ITEMS */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{background:"var(--blue-bg)",color:"var(--blue)"}}><i className="ti ti-list-details"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--blue-bg)", color: "var(--blue)" }}><i className="ti ti-list-details"></i></div>
               <div className="inv-creator-card-title">Line Items</div>
             </div>
             <div className="inv-creator-card-body">
               <table className="inv-creator-items-table">
                 <thead>
                   <tr>
-                    <th style={{width:"36%"}}>Description</th>
-                    <th style={{width:"12%"}}>Qty</th>
-                    <th style={{width:"18%"}}>Unit Price</th>
-                    <th style={{width:"14%"}}>Tax %</th>
-                    <th style={{width:"16%",textAlign:"right"}}>Total</th>
-                    <th style={{width:"4%"}}></th>
+                    <th style={{ width: "36%" }}>Description</th>
+                    <th style={{ width: "12%" }}>Qty</th>
+                    <th style={{ width: "18%" }}>Unit Price</th>
+                    <th style={{ width: "14%" }}>Tax %</th>
+                    <th style={{ width: "16%", textAlign: "right" }}>Total</th>
+                    <th style={{ width: "4%" }}></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2189,7 +2185,7 @@ const [items, setItems] = useState([
                           <input type="number" className="inv-creator-item-input num" value={item.quantity === 0 ? "" : item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} />
                         </td>
                         <td>
-                          <input type="number" id={`item_${item.id}_rate`} className="inv-creator-item-input num" value={item.rate === 0 ? "" : item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} style={{width:"90px"}} />
+                          <input type="number" id={`item_${item.id}_rate`} className="inv-creator-item-input num" value={item.rate === 0 ? "" : item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} style={{ width: "90px" }} />
                           {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                         </td>
                         <td>
@@ -2228,11 +2224,11 @@ const [items, setItems] = useState([
                   })}
                 </tbody>
               </table>
-              <button className="inv-creator-add-item-btn" onClick={addItem}><i className="ti ti-plus" style={{fontSize:"14px"}}></i> Add Line Item</button>
+              <button className="inv-creator-add-item-btn" onClick={addItem}><i className="ti ti-plus" style={{ fontSize: "14px" }}></i> Add Line Item</button>
 
               {/* TOTALS */}
               <div className="inv-creator-totals-section">
-                <div className="inv-creator-form-row" style={{marginBottom:"10px"}}>
+                <div className="inv-creator-form-row" style={{ marginBottom: "10px" }}>
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Discount (%)</label>
                     <input className="inv-creator-form-input" type="number" value={inv.discountPct || 0} onChange={(e) => upd("discountPct", Number(e.target.value))} placeholder="0" />
@@ -2254,12 +2250,21 @@ const [items, setItems] = useState([
           {/* PAYMENT TERMS */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{background:"var(--green-bg)",color:"var(--green)"}}><i className="ti ti-clock"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--green-bg)", color: "var(--green)" }}><i className="ti ti-clock"></i></div>
               <div className="inv-creator-card-title">Payment Terms & Bank Details</div>
             </div>
             <div className="inv-creator-card-body">
-            
+
               <div className="inv-creator-form-row">
+                <div className="inv-creator-form-group">
+                  <label className="inv-creator-form-label">Status</label>
+                  <select className="inv-creator-form-select" value={inv.status || "pending"} onChange={(e) => upd("status", e.target.value)}>
+                    <option value="pending">⏳ Pending</option>
+                    <option value="paid">✔ Paid</option>
+                    <option value="overdue">⚠ Overdue</option>
+                    <option value="sent">📨 Sent</option>
+                  </select>
+                </div>
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Payment Method</label>
                   <select className="inv-creator-form-select" value={inv.paymentMode} onChange={(e) => upd("paymentMode", e.target.value)}>
@@ -2272,21 +2277,21 @@ const [items, setItems] = useState([
                 </div>
                 <div className="inv-creator-form-group">
                   <label className="inv-creator-form-label">Currency</label>
-                  <select className="inv-creator-form-select" value={inv.currency} onChange={(e) => upd("currency", e.target.value)}>
-                    <option value="₹">₹ INR – Indian Rupee</option>
-                    <option value="$">$ USD – US Dollar</option>
-                    <option value="€">€ EUR – Euro</option>
-                    <option value="£">£ GBP – British Pound</option>
-                    <option value="AED ">AED – UAE Dirham</option>
-                    <option value="SAR ">SAR – Saudi Riyal</option>
-                    <option value="S$">S$ SGD – Singapore Dollar</option>
-                    <option value="A$">A$ AUD – Australian Dollar</option>
-                    <option value="C$">C$ CAD – Canadian Dollar</option>
-                    <option value="¥">¥ JPY – Japanese Yen</option>
-                    <option value="QAR ">QAR – Qatari Riyal</option>
-                    <option value="KWD ">KWD – Kuwaiti Dinar</option>
-                    <option value="OMR ">OMR – Omani Rial</option>
-                    <option value="BHD ">BHD – Bahraini Dinar</option>
+                  <select className="inv-creator-form-select" value={inv.currency || 'INR'} onChange={e => upd('currency', e.target.value)}>
+                    <option value="INR">INR - Indian Rupee</option>
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - British Pound</option>
+                    <option value="AED">AED - UAE Dirham</option>
+                    <option value="SAR">SAR - Saudi Riyal</option>
+                    <option value="SGD">SGD - Singapore Dollar</option>
+                    <option value="AUD">AUD - Australian Dollar</option>
+                    <option value="CAD">CAD - Canadian Dollar</option>
+                    <option value="JPY">JPY - Japanese Yen</option>
+                    <option value="QAR">QAR - Qatari Riyal</option>
+                    <option value="KWD">KWD - Kuwaiti Dinar</option>
+                    <option value="OMR">OMR - Omani Rial</option>
+                    <option value="BHD">BHD - Bahraini Dinar</option>
                   </select>
                 </div>
               </div>
@@ -2316,7 +2321,7 @@ const [items, setItems] = useState([
           {/* NOTES & TERMS */}
           <div className="inv-creator-card">
             <div className="inv-creator-card-header">
-              <div className="inv-creator-card-icon" style={{background:"var(--amber-bg)",color:"var(--amber)"}}><i className="ti ti-notes"></i></div>
+              <div className="inv-creator-card-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-notes"></i></div>
               <div className="inv-creator-card-title">Notes, Terms & Signature</div>
             </div>
             <div className="inv-creator-card-body">
@@ -2457,7 +2462,7 @@ const [items, setItems] = useState([
 
             {/* LIVE INVOICE PREVIEW */}
             <div className="invoice-preview" style={{ padding: "20px", fontFamily: currentT.fontFamily, fontSize: "11px", color: "#1A2E35", background: "#fff", minHeight: "560px" }}>
-              
+
               {/* HEADER */}
               <div className="inv-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", paddingBottom: "12px", borderBottom: currentT.headerUnderline }}>
                 <div className="inv-logo-area">
@@ -2479,8 +2484,8 @@ const [items, setItems] = useState([
                   <div className="inv-title-word" style={{ fontSize: "24px", fontWeight: "900", color: currentT.primaryColor, letterSpacing: "-.5px" }}>INVOICE</div>
                   <div className="inv-id" style={{ fontSize: "11px", fontWeight: "700", color: "#0f1c2e", marginTop: "4px" }}>#{inv.invoiceNo}</div>
                   <div className="inv-dates" style={{ fontSize: "9px", color: "#64748b", marginTop: "2px", lineHeight: "1.6" }}>
-                    <span>Issue: {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : "—"}</span><br/>
-                    <span>Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : "—"}</span>
+                    <span>Issue: {inv.date ? new Date(inv.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</span><br />
+                    <span>Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "—"}</span>
                   </div>
                   {inv.amountPaid < total ? (
                     inv.amountPaid > 0 ? (
@@ -2508,7 +2513,7 @@ const [items, setItems] = useState([
                         {selectedClient.email && <div>{selectedClient.email}</div>}
                         {selectedClient.phone && <div>{selectedClient.phone}</div>}
                         {selectedClient.address && <div>{selectedClient.address}</div>}
-                        {selectedClient.gstNumber && <div style={{fontWeight: 700, color: currentT.primaryColor}}>GST: {selectedClient.gstNumber}</div>}
+                        {selectedClient.gstNumber && <div style={{ fontWeight: 700, color: currentT.primaryColor }}>GST: {selectedClient.gstNumber}</div>}
                       </>
                     ) : (
                       <span style={{ color: "#64748b" }}>Enter client details in the form</span>
@@ -2524,7 +2529,7 @@ const [items, setItems] = useState([
               </div>
 
               {/* ITEMS TABLE */}
-               <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
+              <table className="inv-items-table" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px" }}>
                 <thead>
                   <tr style={{ background: "#f8fafc" }}>
                     <th style={{ padding: "6px 8px", fontSize: "9px", fontWeight: "800", color: "#64748b", textAlign: "left" }}>#</th>
@@ -2588,7 +2593,7 @@ const [items, setItems] = useState([
               {/* Amount in Words */}
               <div style={{ marginTop: "8px", padding: "7px 12px", background: "#f8fafc", border: "1px dashed #CBD5E1", borderRadius: "6px" }}>
                 <span style={{ fontSize: "9px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px" }}>Amount in Words: </span>
-                <span style={{ fontSize: "9px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === '₹' ? 'INR ' : (inv.currency || '₹') + ' '}{numberToWords(Math.round(balanceDue))}</span>
+                <span style={{ fontSize: "9px", fontWeight: "800", color: "#0f1c2e" }}>{inv.currency === 'INR' ? 'INR ' : (inv.currency || 'INR') + ' '}{numberToWords(Math.round(balanceDue))}</span>
               </div>
 
               {/* BANK DETAILS */}
@@ -2599,7 +2604,7 @@ const [items, setItems] = useState([
                     {inv.bankName && <span>Bank: {inv.bankName} &nbsp;|&nbsp; </span>}
                     {inv.accountNumber && <span>A/C: {inv.accountNumber} &nbsp;|&nbsp; </span>}
                     {inv.ifscCode && <span>IFSC: {inv.ifscCode}</span>}
-                    {inv.upiId && <div style={{marginTop: "2px"}}>UPI: {inv.upiId}</div>}
+                    {inv.upiId && <div style={{ marginTop: "2px" }}>UPI: {inv.upiId}</div>}
                   </div>
                 </div>
               )}
@@ -2641,26 +2646,26 @@ const [items, setItems] = useState([
         </div>
 
       </div>
-        {/* Bottom save buttons */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
-          <button onClick={handleSaveDraft} disabled={!!saving}
-            style={{ padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
-            {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved as Draft!" : "💾 Save Draft"}
-          </button>
+      {/* Bottom save buttons */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 32 }}>
+        <button onClick={handleSaveDraft} disabled={!!saving}
+          style={{ padding: "13px", background: draftSaved ? "#22c55e" : "#fff", border: `1.5px solid ${draftSaved ? "#22c55e" : "#e5e7eb"}`, borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: saving ? "not-allowed" : "pointer", color: draftSaved ? "#fff" : "#374151", fontFamily: "inherit", transition: "all 0.3s" }}>
+          {saving === "draft" ? "Saving…" : draftSaved ? "✅ Saved as Draft!" : "💾 Save Draft"}
+        </button>
 
-          {editingId && (
-            <>
-              <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }} title="Share Link">🔗 Share</button>
-              <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }} title="Share on WhatsApp">💬 WhatsApp</button>
-            </>
-          )}
+        {editingId && (
+          <>
+            <button onClick={() => shareInvoice({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#2563eb", fontFamily: "inherit" }} title="Share Link">🔗 Share</button>
+            <button onClick={() => shareWhatsApp({ id: editingId, invoiceNo: inv.invoiceNo, total: total })} style={{ padding: "13px 18px", background: "#dcfce7", border: "1.5px solid #bbf7d0", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: "pointer", color: "#16a34a", fontFamily: "inherit" }} title="Share on WhatsApp">💬 WhatsApp</button>
+          </>
+        )}
 
-          <button onClick={handleSavePreview} disabled={!!saving}
-            style={{ padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
-            {saving === "preview" ? "Saving…" : "Preview & Print →"}
-          </button>
-        </div>
+        <button onClick={handleSavePreview} disabled={!!saving}
+          style={{ padding: "13px", background: saving === "preview" ? "#9ca3af" : "linear-gradient(135deg,var(--app-accent),var(--app-accent))", border: "none", borderRadius: 12, fontWeight: 800, fontSize: 15, cursor: saving ? "not-allowed" : "pointer", color: "#fff", fontFamily: "inherit" }}>
+          {saving === "preview" ? "Saving…" : "Preview & Print →"}
+        </button>
       </div>
+    </div>
   );
 }
 

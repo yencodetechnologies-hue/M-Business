@@ -5477,10 +5477,12 @@ const progress = p.progress || 25;
     onBack={() =>{ const returnTo = sidebarOverride || "projects";
   setSidebarOverride(null);
   setActive(returnTo);}}
-    onSuccess={(updatedProj) => {
+    onSuccess={async (updatedProj) => {
       const saved = updatedProj?.project || updatedProj || jumpProject;
+      const merged = { ...jumpProject, ...saved };
+      setJumpProject(merged);
       fetchProjects();
-      setJumpProject(saved);
+      setSidebarOverride(null);
       setFromEditProject(true);
       setActive("project-details");
     }}

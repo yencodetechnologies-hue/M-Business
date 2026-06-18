@@ -155,39 +155,7 @@ useEffect(() => {
     allowMessages: true
   });
 
-  useEffect(() => {
-    if (editProject) {
-      setName(editProject.name || '');
-      setDescription(editProject.description || '');
-      setClient(editProject.client || '');
-      setCategory(editProject.category || 'Web Development');
-      setPriority(editProject.priority || 'medium');
-      setStatus(editProject.status || 'Active');
-      setProgress(editProject.progress || 0);
-      setStart(editProject.start ? new Date(editProject.start).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
-      setEnd(editProject.end || editProject.deadline || '');
-      setAssigned(Array.isArray(editProject.assignedTo) ? editProject.assignedTo : (editProject.assignedTo ? [editProject.assignedTo] : []));
-      setBudget(editProject.budget || '');
-      setCurrency(editProject.currency || '₹');
-      setContactPersonName(editProject.contactPersonName || '');
-setContactPersonNo(editProject.contactPersonNo || '');
-setContactEmail(editProject.contactEmail || editProject.clientEmail || '');
-      setBilled(editProject.billed || '');
-      setReceived(editProject.received || '');
-      setPending(editProject.pending || '');
-      setSpent(editProject.spent || '');
-      setMilestones(editProject.milestones?.length ? editProject.milestones : [
-      
-      ]);
-      setPortalOpts(editProject.portalSettings || {
-        enablePortal: true,
-        showProgress: true,
-        showMilestones: true,
-        showTeam: false,
-        allowMessages: true
-      });
-    }
-  }, [editProject]);
+  // No useEffect needed — useState initializers above already populate from editProject
 
   // Calculate Progress Steps dynamically
   const stepInfo = 1;
@@ -554,7 +522,7 @@ contactEmail,
           {onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
           <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
             {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
-            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? 'Next' : 'Create & Launch Project')}
+            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? '✅ Update Project' : 'Create & Launch Project')}
           </button>
         </div>
       </div>

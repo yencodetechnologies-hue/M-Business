@@ -1,16 +1,10 @@
 import sys
-sys.stdout.reconfigure(encoding='utf-8')
 
 filepath = r'c:\M Business\M Business\src\components\ModernProjectDetails.jsx'
 
 with open(filepath, 'r', encoding='utf-8') as f:
     lines = f.readlines()
 
-print(f"Total lines: {len(lines)}")
-print(f"Line 1984: {lines[1983][:80]}")
-print(f"Line 2169: {lines[2168][:80]}")
-
-# The new Invoice Preview Modal code to inject
 new_block = '''      {/* Invoice Preview Modal - Full Template */}
       {previewInvoice && (() => {
         const inv = previewInvoice;
@@ -66,11 +60,11 @@ new_block = '''      {/* Invoice Preview Modal - Full Template */}
                 </button>
                 <button onClick={() => setPreviewInvoice(null)}
                   style={{ padding: '9px 18px', background: '#1e293b', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer', color: '#fff' }}>
-                  \u2715 Close
+                  ✕ Close
                 </button>
               </div>
               {/* Invoice Paper */}
-              <div id="invoice-print-area" style={{ background: '#fff', borderRadius: 18, boxShadow: '0 24px 80px rgba(0,188,212,0.18)', fontFamily: "\'Plus Jakarta Sans\', Arial, sans-serif", overflow: 'hidden' }}>
+              <div id="invoice-print-area" style={{ background: '#fff', borderRadius: 18, boxShadow: '0 24px 80px rgba(0,188,212,0.18)', fontFamily: "'Plus Jakarta Sans', Arial, sans-serif", overflow: 'hidden' }}>
                 {/* Header */}
                 <div style={{ background: '#f8fafc', padding: '28px 36px', borderBottom: '1px solid #e5e7eb', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', width: 240, height: 240, borderRadius: '50%', background: `radial-gradient(circle, ${accentColor}0d, transparent)`, top: -80, right: -40 }} />
@@ -116,11 +110,11 @@ new_block = '''      {/* Invoice Preview Modal - Full Template */}
                 {/* Bill To */}
                 <div style={{ padding: '20px 36px', borderBottom: '2px solid #e5e7eb' }}>
                   <div style={{ fontSize: 9, color: '#64748b', fontWeight: 700, letterSpacing: 2, marginBottom: 10, textTransform: 'uppercase' }}>Bill To</div>
-                  <div style={{ fontSize: 17, fontWeight: 800, color: '#0f1c2e' }}>{inv.clientName || clientName || '\u2014'}</div>
+                  <div style={{ fontSize: 17, fontWeight: 800, color: '#0f1c2e' }}>{inv.clientName || clientName || '—'}</div>
                   {clientInfo?.companyName && <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginTop: 2 }}>{clientInfo.companyName}</div>}
-                  {clientInfo?.email && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 5 }}>\uD83D\uDCE7 {clientInfo.email}</div>}
-                  {clientInfo?.phone && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>\uD83D\uDCF1 {clientInfo.phone}</div>}
-                  {clientInfo?.gstNumber && <div style={{ fontSize: 12, color: accentColor, marginTop: 4, fontWeight: 600 }}>\uD83D\uDC8E GST: {clientInfo.gstNumber}</div>}
+                  {clientInfo?.email && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 5 }}>Email: {clientInfo.email}</div>}
+                  {clientInfo?.phone && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>Phone: {clientInfo.phone}</div>}
+                  {clientInfo?.gstNumber && <div style={{ fontSize: 12, color: accentColor, marginTop: 4, fontWeight: 600 }}>GST: {clientInfo.gstNumber}</div>}
                 </div>
                 {/* Line Items */}
                 <div style={{ padding: '22px 36px' }}>
@@ -186,23 +180,23 @@ new_block = '''      {/* Invoice Preview Modal - Full Template */}
                   <div style={{ position: 'relative' }}>
                     {(() => {
                       const st = (inv.status || '').toLowerCase();
-                      const cfg = st === 'paid' ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '\u2713' }
-                        : st === 'overdue' ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '\u26A0' }
-                        : st === 'sent' ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '\uD83D\uDCE8' }
-                        : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '\u23F3' };
+                      const cfg = st === 'paid' ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: 'Done' }
+                        : st === 'overdue' ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: 'Warn' }
+                        : st === 'sent' ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: 'Sent' }
+                        : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: 'Wait' };
                       return (
                         <>
                           <span onClick={() => setShowStatusDropdown(prev => !prev)}
                             style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}>
-                            {cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>\u25BC</span>
+                            {cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span>
                           </span>
                           {showStatusDropdown && (
                             <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
                               {[
-                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '\u23F3' },
-                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '\u2713' },
-                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '\u26A0' },
-                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '\uD83D\uDCE8' },
+                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: 'Wait' },
+                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: 'Done' },
+                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: 'Warn' },
+                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: 'Sent' },
                               ].map(opt => (
                                 <div key={opt.label}
                                   onClick={async () => {
@@ -217,7 +211,7 @@ new_block = '''      {/* Invoice Preview Modal - Full Template */}
                                   onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}>
                                   <span>{opt.icon}</span>
                                   <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
-                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>\u2713</span>}
+                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>Done</span>}
                                 </div>
                               ))}
                             </div>
@@ -235,10 +229,9 @@ new_block = '''      {/* Invoice Preview Modal - Full Template */}
       })()}
 '''
 
-# Replace lines 1984-2168 (0-indexed: 1983-2167) with new block
-new_lines = lines[:1983] + [new_block] + lines[2168:]
+new_lines = lines[:1983] + [new_block + "\n"] + lines[2168:]
 
 with open(filepath, 'w', encoding='utf-8') as f:
     f.writelines(new_lines)
 
-print(f"Done! New file has {len(new_lines)} lines")
+print("Done! Updated ModernProjectDetails.jsx with correct template style.")

@@ -34,6 +34,7 @@ export default function ProjectPaymentModals({
   setModalsState,
   onSaveSuccess,
   clients = [],
+  onAddClient = () => {},
 }) {
   const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, editData, editIndex } = modalsState;
 
@@ -50,6 +51,9 @@ export default function ProjectPaymentModals({
   useEffect(() => {
     if (editData) {
       setForm(editData);
+      if (editData.lineItems && editData.lineItems.length > 0) {
+        setItems(editData.lineItems);
+      }
       return;
     }
 
@@ -274,7 +278,7 @@ export default function ProjectPaymentModals({
               <div className="inv-creator-card-header">
                 <div className="inv-creator-card-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-user-circle"></i></div>
                 <div className="inv-creator-card-title">Bill To (Client)</div>
-                <button type="button" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', background: 'var(--teal-lighter,#E0F7FA)', border: '1.5px solid var(--teal,#00BCD4)', borderRadius: 7, fontSize: 10, fontWeight: 700, color: 'var(--teal,#00BCD4)', cursor: 'pointer' }}>
+                <button type="button" onClick={onAddClient} style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', background: 'var(--teal-lighter,#E0F7FA)', border: '1.5px solid var(--teal,#00BCD4)', borderRadius: 7, fontSize: 10, fontWeight: 700, color: 'var(--teal,#00BCD4)', cursor: 'pointer' }}>
                   <i className="ti ti-plus" style={{ fontSize: 12 }}></i> Add Client
                 </button>
               </div>

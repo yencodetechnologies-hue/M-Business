@@ -5205,10 +5205,10 @@ const progress = p.progress || 25;
       const saved = updatedProj?.project || updatedProj || jumpProject;
       const merged = { ...jumpProject, ...saved };
       setJumpProject(merged);
-      fetchProjects();
+      setProjects(prev => prev.map(p => (p._id === merged._id ? { ...p, ...merged } : p)));
       setSidebarOverride(null);
       setFromEditProject(true);
-      setActive("project-details");
+      startNavTransition(() => setActive("project-details"));
     }}
   />
 )}

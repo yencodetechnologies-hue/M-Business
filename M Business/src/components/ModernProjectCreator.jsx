@@ -245,7 +245,7 @@ contactEmail,
         res = await axios.post(`${BASE_URL}/api/projects/add`, payload, { headers });
       }
       
-      if (onSuccess) onSuccess(res.data);
+      if (onSuccess) await onSuccess(res.data);
 
       // Fire-and-forget notifications (don't block on these)
       if (!editProject && assigned.length > 0) {

@@ -2183,52 +2183,11 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
 
 {/* Footer */}
                 {/* Footer */}
-                <div style={{ borderTop: '1px solid #e5e7eb', padding: '10px 36px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
-                  <div style={{ position: 'relative' }}>
-                    {(() => {
-                      const st = (inv.status || '').toLowerCase();
-                      const cfg = st === 'paid' ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '✓' }
-                        : st === 'overdue' ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '⚠' }
-                          : st === 'sent' ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '📨' }
-                            : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '⏳' };
-                      return (
-                        <>
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}` }}>
-  {cfg.icon} {cfg.label}
-</span>
-                          {showStatusDropdown && (
-                            <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
-                              {[
-                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },
-                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '✓' },
-                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '⚠' },
-                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
-                              ].map(opt => (
-                                <div key={opt.label}
-                                  onClick={async () => {
-                                    const updatedInvoices = (currProject.invoices || []).map(x => x.invoiceNo === inv.invoiceNo ? { ...x, status: opt.label } : x);
-                                    await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
-                                    setShowStatusDropdown(false);
-                                    setPreviewInvoice(prev => ({ ...prev, status: opt.label }));
-                                    loadLatest();
-                                  }}
-                                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', cursor: 'pointer', background: st === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }}
-                                  onMouseEnter={e => e.currentTarget.style.background = opt.bg}
-                                  onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}>
-                                  <span>{opt.icon}</span>
-                                  <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
-                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓</span>}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </div>
-                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{currProject?.name}</div>
-                </div>
+               {/* Footer */}
+<div style={{ borderTop: '1px solid #e5e7eb', padding: '10px 36px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
+  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{currProject?.name}</div>
+</div>
               </div>
             </div>
           </div>

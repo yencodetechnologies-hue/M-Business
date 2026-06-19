@@ -33,36 +33,36 @@ export default function ProjectPaymentModals({
   clients = [],
 }) {
   const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, editData, editIndex } = modalsState;
-const [items, setItems] = useState([{ id: 1, description: "", quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
-const [inv, setInv] = useState({});
-const [errors, setErrors] = useState({});
+  const [items, setItems] = useState([{ id: 1, description: "", quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
+  const [inv, setInv] = useState({});
+  const [errors, setErrors] = useState({});
 
-const addItem = () => setItems(p => [...p, { id: Date.now(), description: "", quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
-const removeItem = (id) => { if (items.length > 1) setItems(p => p.filter(i => i.id !== id)); };
-const updItem = (id, f, v) => setItems(p => p.map(i => i.id === id ? { ...i, [f]: v } : i));
+  const addItem = () => setItems(p => [...p, { id: Date.now(), description: "", quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
+  const removeItem = (id) => { if (items.length > 1) setItems(p => p.filter(i => i.id !== id)); };
+  const updItem = (id, f, v) => setItems(p => p.map(i => i.id === id ? { ...i, [f]: v } : i));
 
-const GST_RATES = [0, 5, 12, 18, 28];
+  const GST_RATES = [0, 5, 12, 18, 28];
 
-let subtotal = 0, gstAmt = 0, total = 0;
-items.forEach(item => {
-  const q = parseFloat(item.quantity) || 0;
-  const r = parseFloat(item.rate) || 0;
-  const rateGst = parseFloat(item.gstRate) || 18;
-  const isIncl = item.isGstIncluded || false;
-  const base = q * r;
-  if (isIncl) {
-    const sub = base / (1 + rateGst / 100);
-    subtotal += sub; gstAmt += base - sub; total += base;
-  } else {
-    const tax = base * rateGst / 100;
-    subtotal += base; gstAmt += tax; total += base + tax;
-  }
-});
+  let subtotal = 0, gstAmt = 0, total = 0;
+  items.forEach(item => {
+    const q = parseFloat(item.quantity) || 0;
+    const r = parseFloat(item.rate) || 0;
+    const rateGst = parseFloat(item.gstRate) || 18;
+    const isIncl = item.isGstIncluded || false;
+    const base = q * r;
+    if (isIncl) {
+      const sub = base / (1 + rateGst / 100);
+      subtotal += sub; gstAmt += base - sub; total += base;
+    } else {
+      const tax = base * rateGst / 100;
+      subtotal += base; gstAmt += tax; total += base + tax;
+    }
+  });
 
-const formatCurrency = (val, symbol = "INR") => {
-  const num = parseFloat(val) || 0;
-  return symbol + " " + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-};
+  const formatCurrency = (val, symbol = "INR") => {
+    const num = parseFloat(val) || 0;
+    return symbol + " " + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
   // Generic form state
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
@@ -198,7 +198,6 @@ const formatCurrency = (val, symbol = "INR") => {
             <h3 style={titleStyle}>
               <div style={{ background: '#E0F7FA', color: '#00BCD4', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
               New Invoice
-              
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✖</button>
           </div>
@@ -557,7 +556,23 @@ const formatCurrency = (val, symbol = "INR") => {
               <div><label style={labelStyle}>Advance #</label><input required style={inputStyle} value={form.advanceNo || ''} onChange={e => handleInputChange('advanceNo', e.target.value)} placeholder="ADV-003" /></div>
               <div><label style={labelStyle}>Project</label><select style={inputStyle} disabled><option>{project.name}</option></select></div>
             </div>
-            <div style={{ marginBottom: 16 }}><label style={labelStyle}>Description</label><input required style={inputStyle} value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Phase 2 advance" /></div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Heading</label>
+              <input required style={inputStyle} value={form.heading || ''} onChange={e => handleInputChange('heading', e.target.value)} placeholder="e.g. Phase 2 Advance Heading" />
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Description</label>
+              <div style={{ position: 'relative' }}>
+                <textarea
+                  required
+                  style={{ ...inputStyle, height: 100, resize: 'vertical', paddingBottom: 32 }}
+                  value={form.description || ''}
+                  onChange={e => handleInputChange('description', e.target.value)}
+                  placeholder="e.g. Phase 2 advance details..."
+                />
+            
+              </div>
+            </div>
             <div style={rowStyle}>
               <div><label style={labelStyle}>Amount</label><input required type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="INR 0" /></div>
               <div><label style={labelStyle}>Date Received</label><input type="date" required style={inputStyle} value={form.dateReceived || ''} onChange={e => handleInputChange('dateReceived', e.target.value)} /></div>

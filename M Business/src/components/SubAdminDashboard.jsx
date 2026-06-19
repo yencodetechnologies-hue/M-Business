@@ -4114,14 +4114,13 @@ const openEdit = (p) => {
 
   </div>
 
- // REPLACE with:
-<button className="create-btn" onClick={() => {
-    setInvoicePrefill(null);
-    setJumpInvoice(null);
-    setActive("invoices");
-}}>
+  <button className="create-btn" onClick={() => {
+    if (setInvoicePrefill) setInvoicePrefill({ client: "", project: "", _t: Date.now() });
+    if (setJumpInvoice) setJumpInvoice(null);
+    if (setActive) setActive("invoices");
+  }}>
     <i className="ti ti-plus"></i> New Invoice
-</button>
+  </button>
 
 </div>
 
@@ -4151,13 +4150,12 @@ const openEdit = (p) => {
 
   onDelete={(p) => setDeleteTarget(p)} 
 
-// REPLACE with:
-onNewInvoice={(p) => { 
+  onNewInvoice={(p) => { 
     if (!p) return;
-    setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() });
-    setJumpInvoice(null);
-    setActive("invoices");
-}}
+    if (setInvoicePrefill) setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() });
+    if (setJumpInvoice) setJumpInvoice(true);
+    if (setActive) setActive("invoices");
+  }} 
 
 />
 
@@ -10538,13 +10536,9 @@ const progress = p.progress || 25;
     }}
 
     onNewInvoice={(proj) => {
-
-      setJumpInvoice(null);
-
       setInvoicePrefill({ client: proj.client || "", project: proj.name || "", _t: Date.now() });
-
+      setJumpInvoice(null);
       setActive("invoices");
-
     }}
 
     onLogTime={async (hours) => {
@@ -13028,4 +13022,3 @@ const progress = p.progress || 25;
   );
 
 }
-

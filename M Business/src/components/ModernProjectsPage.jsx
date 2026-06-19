@@ -345,10 +345,10 @@ onBack={() => { sessionStorage.removeItem('selectedProjectId'); setSelectedProje
               onEdit={() => openEdit(selectedProject)}
               onDelete={() => setDeleteTarget(selectedProject)}
           onLogTime={(e) => openLogTime(selectedProject, e)}
- onNewInvoice={(proj) => {
-  setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now(), startStep: 'template' });
-  setShowInvoiceCreator(true);
-}}
+              onNewInvoice={(proj) => {
+                setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now() });
+                setShowInvoiceCreator(true);
+              }}
             />
           </div>
         </div>

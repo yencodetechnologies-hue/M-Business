@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { BASE_URL } from '../config';
 
 export default function AddClientView({ onBack, onClientAdded, onClientUpdated, user, editData }) {
   const isEdit = !!editData;
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
   const today = new Date().toISOString().split('T')[0];
 
   const [formData, setFormData] = useState({

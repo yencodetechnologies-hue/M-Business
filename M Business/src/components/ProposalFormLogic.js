@@ -347,6 +347,20 @@ export function uploadCover() {
   z.innerHTML = `<i class="ti ti-check" style="font-size:22px;color:var(--teal)"></i><div class="cover-zone-txt" style="color:var(--teal)">Cover image uploaded</div><div class="cover-zone-sub">Click to change</div>`;
 }
 
+export function signProposal(btn) {
+  if (!btn) return;
+  const name = document.getElementById('pv-from')?.innerText || 'Yencode Technologies';
+  btn.innerHTML = `<i class='ti ti-check' style='font-size:18px;color:var(--teal)'></i><div style='font-size:11px;color:var(--teal);font-weight:700;margin-top:3px'>${name} — Signed</div>`;
+  btn.style.borderColor = 'var(--teal)';
+  btn.style.background = 'var(--teal-lighter)';
+  
+  // Update the preview document signature as well
+  const pvSig = document.getElementById('pv-sig1');
+  if (pvSig) {
+    pvSig.innerHTML = `<div style="color:var(--teal);font-family:'Caveat',cursive;font-size:24px;line-height:1;margin-bottom:5px;">${name}</div><div style="font-size:10px;color:var(--text3)">Signed Digitally</div>`;
+  }
+}
+
 export function extractProposalData() {
   let val = 0;
   try {

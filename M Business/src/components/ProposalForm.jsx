@@ -9,52 +9,27 @@ export default function ProposalForm({ onBack, onSave }) {
     const c = containerRef.current;
     if (!c) return;
 
-    // Expose logic to window so inline HTML string events don't throw ReferenceError
+    // Expose ALL logic functions to window so dangerouslySetInnerHTML onclick attrs work natively
     Object.assign(window, logic);
+    window._onSaveProposal = onSave;
 
-    const handleClick = (e) => {
-      const btn = e.target.closest('[onclick]');
-      if (btn) {
-        const code = btn.getAttribute('onclick');
-        const funcMatch = code.match(/^([a-zA-Z0-9_]+)\(/);
-        if (funcMatch) {
-          const funcName = funcMatch[1];
-          if (typeof logic[funcName] === 'function') {
-            try {
-              if (code.includes('this')) {
-                logic[funcName](btn);
-              } else {
-                logic[funcName]();
-              }
-            } catch(err) {
-              console.error('Click error:', err);
-            }
-          }
-        }
-      }
+    // Hook up back button
+    const hookUp = () => {
+      const backBtn = c.querySelector('.back-btn');
+      if (backBtn) backBtn.onclick = onBack;
     };
+    hookUp();
 
-    const handleInput = (e) => {
-      // Always update preview on any input in the form
+    const handleInput = () => {
       try {
         if (logic.up) logic.up();
         if (logic.calcTotal) logic.calcTotal();
-      } catch (err) {
-        console.error('Input error:', err);
-      }
+      } catch (err) {}
     };
 
-    c.addEventListener('click', handleClick);
     c.addEventListener('input', handleInput);
 
-    // Hook up topbar buttons explicitly
-    const backBtn = c.querySelector('.back-btn');
-    if (backBtn) backBtn.onclick = onBack;
-
-    const actions = c.querySelectorAll('.topbar-actions button');
-    // Removed override to allow ProposalFormLogic.js to handle clicks
-
-    // Initial Render Update
+    // Initial render update
     setTimeout(() => {
       try {
         if (logic.calcTotal) logic.calcTotal();
@@ -67,10 +42,10 @@ export default function ProposalForm({ onBack, onSave }) {
     }, 300);
 
     return () => {
-      c.removeEventListener('click', handleClick);
       c.removeEventListener('input', handleInput);
     };
   }, [onBack, onSave]);
+
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 99999, background: "var(--bg)", overflowY: "auto" }}>
@@ -887,7 +862,7 @@ YENCODE Technologies | yencodetechnologies@gmail.com | +91 89254 33533</textarea
         </div>
         <div class="form-row">
           <div class="fg"><label class="fl">Our Signature</label>
-            <div class="sig-box" onclick="this.innerHTML='<i class=\'ti ti-check\' style=\'font-size:18px;color:var(--teal)\'></i><div style=\'font-size:11px;color:var(--teal);font-weight:700;margin-top:3px\'>Prabhu R — Signed</div>'">
+            <div class="sig-box" onclick="signProposal(this)">
               <i class="ti ti-signature" style="font-size:22px;color:var(--text3)"></i>
               <div style="font-size:11px;color:var(--text3);font-weight:600">Click to sign</div>
             </div>

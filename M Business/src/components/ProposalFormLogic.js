@@ -4,12 +4,12 @@
 export let msCount = 5;
 export let currentStatus = 'DRAFT';
 
-export const fmtDate = v => { try { return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch { return v; } };
+export const fmtDate = v => { try { return new Date(v).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); } catch { return v; } };
 export const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
 
 const getEl = (id) => {
   const el = document.getElementById(id);
-  if (!el) return { value: '', textContent: '', innerHTML: '', style: {}, classList: { add: ()=>{}, remove: ()=>{}, toggle: ()=>{} }, focus: ()=>{} };
+  if (!el) return { value: '', textContent: '', innerHTML: '', style: {}, classList: { add: () => { }, remove: () => { }, toggle: () => { } }, focus: () => { } };
   return el;
 };
 
@@ -18,18 +18,32 @@ const getEl = (id) => {
 
 /* ── SECTION TOGGLES ── */
 export function toggleSection(btn, id) {
-  const sec = getEl(id);
-  const pvSec = getEl('pv-sec-' + id.replace('sec-',''));
+  const secId = (id || '').trim().replace(/['"]/g, '');
   btn.classList.toggle('on');
   const show = btn.classList.contains('on');
-  if (sec) sec.style.display = show ? '' : 'none';
-  if (pvSec) pvSec.style.display = show ? '' : 'none';
+  const sec = document.getElementById(secId);
+  if (sec) {
+    sec.style.display = show ? 'block' : 'none';
+  }
+const pvMap = {
+    'sec-team': 'pv-sec-team',
+    'sec-value': 'pv-sec-value',
+    'sec-casestudies': 'pv-sec-cs',
+    'sec-testimonials': 'pv-sec-tm',
+    'sec-risks': 'pv-sec-risks',
+    'sec-faq': 'pv-sec-faq',
+    'sec-whyus': 'pv-sec-whyus'
+  };
+  const pvId = pvMap[secId] || ('pv-sec-' + secId.replace('sec-', ''));
+  const pvSec = document.getElementById(pvId);
+  if (pvSec) {
+    pvSec.style.display = show ? 'block' : 'none';
+  }
 }
-
 /* ── STATUS ── */
 export function selSt(el, val) {
-  document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won','lost','sent','neg','exp'].includes(x)).join(' '));
-  const classMap = { DRAFT:'active-sc', SENT:'sent', NEGOTIATION:'neg', WON:'won', LOST:'lost', EXPIRED:'exp' };
+  document.querySelectorAll('.sc').forEach(c => c.className = 'sc ' + c.className.split(' ').filter(x => ['won', 'lost', 'sent', 'neg', 'exp'].includes(x)).join(' '));
+  const classMap = { DRAFT: 'active-sc', SENT: 'sent', NEGOTIATION: 'neg', WON: 'won', LOST: 'lost', EXPIRED: 'exp' };
   document.querySelectorAll('.sc').forEach(c => { c.className = 'sc'; });
   el.classList.add(classMap[val] || 'active-sc');
   currentStatus = val;
@@ -56,7 +70,7 @@ export function up() {
   getEl('pv-to').textContent = tc || '— Client —';
   getEl('pv-to').style.color = tc ? 'var(--text)' : 'var(--text3)';
   const tp = getEl('toPerson').value, te = getEl('toEmail').value, ta = getEl('toAddr').value;
-  getEl('pv-to-d').innerHTML = tc ? `${tp ? tp+'<br>' : ''}${te ? te+'<br>' : ''}${ta}` : '<span style="color:var(--text3)">Fill in client details</span>';
+  getEl('pv-to-d').innerHTML = tc ? `${tp ? tp + '<br>' : ''}${te ? te + '<br>' : ''}${ta}` : '<span style="color:var(--text3)">Fill in client details</span>';
   getEl('pv-sig2').textContent = tc || '— Client —';
   getEl('pv-sig2').style.color = tc ? 'var(--text)' : 'var(--text3)';
   getEl('pv-sig2-role').textContent = tc || 'Awaiting';
@@ -82,7 +96,7 @@ export function up() {
   // Payment
   getEl('pv-pay').textContent = 'Payment: ' + getEl('paySchedule').value;
   // Closing
-  getEl('pv-closing').innerHTML = (getEl('closing').value || '').replace(/\n/g,'<br>');
+  getEl('pv-closing').innerHTML = (getEl('closing').value || '').replace(/\n/g, '<br>');
 }
 
 export function updateMilestonesPreview() {
@@ -91,8 +105,8 @@ export function updateMilestonesPreview() {
   items.forEach((it, i) => {
     const ti = it.querySelector('.ms-inp'), di = it.querySelector('.ms-date'), de = it.querySelector('.ms-desc');
     const isLast = i === items.length - 1;
-    html += `<div class="tl-pi"><div class="tl-left"><div class="tl-dot">${i+1}</div>${!isLast?'<div class="tl-line-p"></div>':''}</div>
-      <div><div class="tl-pi-title">${ti?ti.value:'Milestone'}</div>${di&&di.value?`<div class="tl-pi-date">${fmtDate(di.value)}</div>`:''}${de&&de.value?`<div class="tl-pi-desc">${de.value}</div>`:''}</div></div>`;
+    html += `<div class="tl-pi"><div class="tl-left"><div class="tl-dot">${i + 1}</div>${!isLast ? '<div class="tl-line-p"></div>' : ''}</div>
+      <div><div class="tl-pi-title">${ti ? ti.value : 'Milestone'}</div>${di && di.value ? `<div class="tl-pi-date">${fmtDate(di.value)}</div>` : ''}${de && de.value ? `<div class="tl-pi-desc">${de.value}</div>` : ''}</div></div>`;
   });
   getEl('pv-timeline').innerHTML = html;
 }
@@ -105,7 +119,7 @@ export function updateTeamPreview() {
     const r = it.querySelector('.tc-role').textContent;
     const av = it.querySelector('.tc-av');
     const bg = av ? av.style.background : 'var(--teal)';
-    const init = n.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const init = n.trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
     html += `<div class="tp-card" style="display:flex;align-items:center;gap:7px"><div class="tp-av-p" style="background:${bg}">${init}</div><div><div class="tp-name-p">${n}</div><div class="tp-role-p">${r}</div></div></div>`;
   });
   getEl('pv-team').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No team members</span>';
@@ -126,7 +140,7 @@ export function updateRisksPreview() {
     if (!inputs[0] || !inputs[0].value) return;
     const lik = sel ? sel.value : 'Medium';
     const cls = lik === 'High' ? 'h' : lik === 'Low' ? 'l' : 'm';
-    html += `<div class="risk-pi"><span class="risk-badge-p ${cls}">${lik}</span><div><div class="risk-pi-text">${inputs[0].value}</div>${inputs[1]?`<div class="risk-pi-mit">↳ ${inputs[1].value}</div>`:''}</div></div>`;
+    html += `<div class="risk-pi"><span class="risk-badge-p ${cls}">${lik}</span><div><div class="risk-pi-text">${inputs[0].value}</div>${inputs[1] ? `<div class="risk-pi-mit">↳ ${inputs[1].value}</div>` : ''}</div></div>`;
   });
   getEl('pv-risks').innerHTML = html || '<span style="color:var(--text3);font-size:10px">No risks added</span>';
 }
@@ -313,9 +327,9 @@ export function addTeamMember() {
   const exp = prompt('Years of experience (e.g. 5+ years · Web Dev):') || '';
   const skills = prompt('Skills (comma-separated):') || '';
   const c = getEl('teamList');
-  const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))','linear-gradient(135deg,var(--purple),#4E35B0)','linear-gradient(135deg,var(--amber),#D4880A)','linear-gradient(135deg,var(--blue),#1A4DB5)'];
+  const colors = ['linear-gradient(135deg,var(--teal),var(--teal4))', 'linear-gradient(135deg,var(--purple),#4E35B0)', 'linear-gradient(135deg,var(--amber),#D4880A)', 'linear-gradient(135deg,var(--blue),#1A4DB5)'];
   const col = colors[Math.floor(Math.random() * colors.length)];
-  const init = name.trim().split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const init = name.trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
   const skillTags = skills ? skills.split(',').map(s => `<span class="tc-skill">${s.trim()}</span>`).join('') : '';
   const d = document.createElement('div');
   d.className = 'team-card';
@@ -353,7 +367,7 @@ export function signProposal(btn) {
   btn.innerHTML = `<i class='ti ti-check' style='font-size:18px;color:var(--teal)'></i><div style='font-size:11px;color:var(--teal);font-weight:700;margin-top:3px'>${name} — Signed</div>`;
   btn.style.borderColor = 'var(--teal)';
   btn.style.background = 'var(--teal-lighter)';
-  
+
   // Update the preview document signature as well
   const pvSig = document.getElementById('pv-sig1');
   if (pvSig) {
@@ -365,8 +379,8 @@ export function extractProposalData() {
   let val = 0;
   try {
     const grandTotalStr = document.getElementById('grandTotal')?.textContent || '0';
-    val = Number(grandTotalStr.replace(/[^0-9.-]+/g,""));
-  } catch(err) {}
+    val = Number(grandTotalStr.replace(/[^0-9.-]+/g, ""));
+  } catch (err) { }
 
   return {
     title: document.getElementById('propTitle')?.value || 'New Proposal',
@@ -377,8 +391,8 @@ export function extractProposalData() {
   };
 }
 
-export function saveDraft() { 
-  selSt(document.querySelectorAll('.sc')[0],'DRAFT'); 
+export function saveDraft() {
+  selSt(document.querySelectorAll('.sc')[0], 'DRAFT');
   if (window._onSaveProposal) {
     const data = extractProposalData();
     data.status = 'draft';
@@ -389,7 +403,7 @@ export function saveDraft() {
 export function sendProposal() {
   const c = getEl('toComp').value;
   if (!c) { alert('Please enter client name first.'); getEl('toComp').focus(); return; }
-  selSt(document.querySelectorAll('.sc')[1],'SENT');
+  selSt(document.querySelectorAll('.sc')[1], 'SENT');
   if (window._onSaveProposal) {
     const data = extractProposalData();
     data.status = 'pending';
@@ -397,8 +411,8 @@ export function sendProposal() {
   }
 }
 
-export function markWon() { 
-  selSt(document.querySelectorAll('.sc')[3],'WON'); 
+export function markWon() {
+  selSt(document.querySelectorAll('.sc')[3], 'WON');
   if (window._onSaveProposal) {
     const data = extractProposalData();
     data.status = 'approved';

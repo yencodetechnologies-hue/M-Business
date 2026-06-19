@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as logic from './ProposalFormLogic';
 
-export default function ProposalForm({ onBack, onSave }) {
+export default function ProposalForm({ onBack, onSave,initialData  }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -76,6 +76,20 @@ fetch('/api/clients').then(r => r.json()).then(d => { window._clientsData = d; }
       }
     };
     setTimeout(hookUp, 300);
+    // Existing data load
+if (initialData) {
+  setTimeout(() => {
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && val) el.value = val;
+    };
+    setVal('propTitle', initialData.title);
+    setVal('toComp', initialData.client);
+    if (logic.up) logic.up();
+    if (logic.calcTotal) logic.calcTotal();
+  }, 400);
+}
+
     const handleInput = () => {
       try {
         if (logic.up) logic.up();

@@ -977,7 +977,15 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   }, []);
   // ← empty deps — uses functional setters, no stale closure
 
-  const openDoc = (d) => { setDoc({ ...d }); setPage(0); setView("editor"); };
+const openDoc = (d) => {
+  if (d.slides && d.slides.length > 0) {
+    // Canvas proposal — editor-ல் திற
+    setDoc({ ...d }); setPage(0); setView("editor");
+  } else {
+    // ProposalForm data — form-ல் திற
+    setDoc({ ...d }); setView("form");
+  }
+};
   const createNew = (initialData = {}) => {
     const nd = { ...makeInitialProposal(THEMES[0].name, companyName || ""), ...initialData, value: initialData.value ? Number(initialData.value) : 0 };
     setProposals(prev => [nd, ...prev]);
@@ -1349,11 +1357,15 @@ export default function CanvaProposal({ clients = [], openNew = false, onOpenNew
   }
 
   // ══ FORM VIEW ══════════════════════════════════════════════════════════════
-  if (view === "form") {
-    return <ProposalForm onBack={() => setView("list")} onSave={(data) => {
+if (view === "form") {
+  return <ProposalForm 
+    onBack={() => setView("list")} 
+    initialData={doc}
+    onSave={(data) => {
       createNew(data);
-    }} />;
-  }
+    }} 
+  />;
+}
 
   // ══ LIST VIEW ══════════════════════════════════════════════════════════════
 

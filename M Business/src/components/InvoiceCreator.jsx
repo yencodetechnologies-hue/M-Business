@@ -2125,18 +2125,24 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
               <div className="inv-creator-form-row">
                 <div className="inv-creator-form-group" id="field-client" style={{ marginBottom: 0 }}>
                   <label className="inv-creator-form-label" style={{ color: errors.client ? "#ef4444" : "var(--text2)" }}>Company / Client Name *</label>
-<input className="inv-creator-form-input" type="text" 
-  value={form.client || ''} 
-  onChange={e => handleInputChange('client', e.target.value)} 
-  placeholder="Client name" />
+<CompanyDropdown
+  clients={clients}
+  value={inv.client}
+  onChange={v => { upd("client", v); }}
+  error={errors.client}
+  onAddCompany={onAddClient}
+/>
                   {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>⚠ {errors.client}</div>}
                 </div>
                 <div className="inv-creator-form-group" style={{ marginBottom: 0 }}>
                   <label className="inv-creator-form-label">Project</label>
-<input className="inv-creator-form-input" type="text" 
-  value={form.project || ''} 
-  onChange={e => handleInputChange('project', e.target.value)} 
-  placeholder="Project name" />
+<ProjectDropdown
+  projects={filteredProjects}
+  value={inv.project}
+  onChange={v => upd("project", v)}
+  onAddProject={onAddProject}
+  disabled={!inv.client}
+/>
                 </div>
               </div>
               {selectedClient && (
@@ -2232,11 +2238,11 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
                 <div className="inv-creator-form-row" style={{ marginBottom: "10px" }}>
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Discount (%)</label>
-                    <input className="inv-creator-form-input" type="number" value={form.discountPct || 0} onChange={(e) => handleInputChange("discountPct", Number(e.target.value))} placeholder="0" />
+                    <input className="inv-creator-form-input" type="number" value={inv.discountPct || 0} onChange={(e) => upd("discountPct", Number(e.target.value))} placeholder="0" />
                   </div>
                   <div className="inv-creator-form-group">
                     <label className="inv-creator-form-label">Shipping / Extra Charges</label>
-                    <input className="inv-creator-form-input" type="number" value={form.extraCharges || 0} onChange={(e) => handleInputChange("extraCharges", Number(e.target.value))} placeholder="0" />
+                    <input className="inv-creator-form-input" type="number" value={inv.extraCharges || 0} onChange={(e) => upd("extraCharges", Number(e.target.value))} placeholder="0" />
                   </div>
                 </div>
                 <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">{formatCurrency(subtotal, inv.currency)}</span></div>

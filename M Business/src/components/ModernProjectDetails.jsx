@@ -1498,7 +1498,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     </div>
                     {/* Rows */}
                     {(currProject.invoices && currProject.invoices.length > 0) ? (
-                      currProject.invoices.map((inv, i) => {
+                      currProject.invoices.map((invoiceRec, i) => {
+                        const inv = invoiceRec;
                         const invTaxAmt = inv.taxType === 'inclusive' ? 0 : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
                         const totalInvoiceAmt = (inv.amount || 0) + invTaxAmt;
                         return (
@@ -1572,7 +1573,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </div>
                                 )}
                               </div>
-                              <button onClick={() => setPaymentModalsState(prev => ({ ...prev, showNewInvoice: true, editData: inv, editIndex: i }))} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
+                             <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, { ...inv }, i); } else { setPaymentModalsState({ showNewInvoice: true, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: { ...inv }, editIndex: i }); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
                               <button onClick={() => handleDeleteRecord('invoices', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
                             </div>
                           </div>

@@ -470,13 +470,25 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
   }, [jumpInvoice]);
 
-  useEffect(() => {
+ useEffect(() => {
     if (newInvoicePrefill) {
-      setInv({ ...blank, invoiceNo: generateInvoiceNo(), client: newInvoicePrefill.client || "", project: newInvoicePrefill.project || "" });
-      setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
-      setEditingId(null);
-      setErrors({});
-      setStep("form");
+      if (newInvoicePrefill.editData) {
+        // Edit mode — pre-fill existing invoice data
+        const ed = newInvoicePrefill.editData;
+        setInv({ ...blank, ...ed, client: ed.client || newInvoicePrefill.client || '', project: ed.project || newInvoicePrefill.project || '' });
+        const lineItems = ed.items || ed.lineItems;
+        setItems(lineItems && lineItems.length > 0 ? lineItems.map((it, i) => ({ ...it, id: it.id || i + 1 })) : [{ id: 1, description: ed.description || '', quantity: 1, rate: ed.amount || '' }]);
+        setEditingId(newInvoicePrefill.projectId || null);
+        setErrors({});
+        setStep("form");
+      } else {
+        // New invoice
+        setInv({ ...blank, invoiceNo: generateInvoiceNo(), client: newInvoicePrefill.client || "", project: newInvoicePrefill.project || "" });
+        setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
+        setEditingId(null);
+        setErrors({});
+        setStep("form");
+      }
     }
   }, [newInvoicePrefill]);
 

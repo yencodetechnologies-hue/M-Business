@@ -345,11 +345,10 @@ onBack={() => { sessionStorage.removeItem('selectedProjectId'); setSelectedProje
               onEdit={() => openEdit(selectedProject)}
               onDelete={() => setDeleteTarget(selectedProject)}
           onLogTime={(e) => openLogTime(selectedProject, e)}
-              onNewInvoice={(proj) => {
-                setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now() });
-                setShowInvoiceCreator(true);
-              }}
-            />
+ onNewInvoice={(proj, editInv, editIdx) => {
+  setInvoicePrefill({ client: proj.client || '', project: proj.name || '', _t: Date.now(), ...(editInv ? { editData: editInv, editIndex: editIdx, projectId: proj._id } : {}) });
+  setShowInvoiceCreator(true);
+}}        />
           </div>
         </div>
         {/* Modals rendered on top */}

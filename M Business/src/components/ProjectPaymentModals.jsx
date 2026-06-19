@@ -68,19 +68,23 @@ export default function ProjectPaymentModals({
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    setForm({});
+    setItems([{ id: 1, description: "", quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
+
     if (editData) {
       setForm(editData);
-      if (editData.lineItems && editData.lineItems.length > 0) {
-        setItems(editData.lineItems.map((it, idx) => ({ ...it, id: it.id || idx + 1 })));
+      const lineItems = editData.items || editData.lineItems;
+      if (lineItems && lineItems.length > 0) {
+        setItems(lineItems.map((it, idx) => ({ ...it, id: it.id || idx + 1 })));
       }
       return;
     }
 
-    if (showNewInvoice && !form.invoiceNo) {
+    if (showNewInvoice) {
       const len = (project?.invoices || []).length + 1;
       setForm(prev => ({ ...prev, invoiceNo: `INV-${String(len).padStart(3, '0')}` }));
     }
-    if (showPayment && !form.paymentNo) {
+    if (showPayment) {
       const len = (project?.paymentsReceived || []).length + 1;
       setForm(prev => ({ ...prev, paymentNo: `PAY-${String(len).padStart(3, '0')}` }));
     }
@@ -100,7 +104,7 @@ export default function ProjectPaymentModals({
       const len = (project?.expenses || []).length + 1;
       setForm(prev => ({ ...prev, expenseNo: `EXP-${String(len).padStart(3, '0')}` }));
     }
-  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, project, editData]);
+  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, project, editData, editIndex]);
 
   const closeModals = () => {
     setModalsState({ showNewInvoice: false, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: null, editIndex: null });
@@ -197,7 +201,7 @@ export default function ProjectPaymentModals({
           <div style={headerStyle}>
             <h3 style={titleStyle}>
               <div style={{ background: '#E0F7FA', color: '#00BCD4', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
-              New Invoice
+            {editData ? `Edit Invoice — ${editData.invoiceNo || ''}` : 'New Invoice'}
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✖</button>
           </div>
@@ -485,7 +489,7 @@ export default function ProjectPaymentModals({
 
             <div style={btnRowStyle}>
               <button type="button" style={cancelBtnStyle} onClick={closeModals}>Cancel</button>
-              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : '✔ Save Invoice'}</button>
+              <button type="submit" style={submitBtnStyle} disabled={saving}>{saving ? 'Saving...' : editData ? '✔ Update Invoice' : '✔ Save Invoice'}</button>
             </div>
           </form>
         </div>
@@ -570,7 +574,7 @@ export default function ProjectPaymentModals({
                   onChange={e => handleInputChange('description', e.target.value)}
                   placeholder="e.g. Phase 2 advance details..."
                 />
-            
+
               </div>
             </div>
             <div style={rowStyle}>

@@ -198,6 +198,7 @@ const formatCurrency = (val, symbol = "INR") => {
             <h3 style={titleStyle}>
               <div style={{ background: '#E0F7FA', color: '#00BCD4', padding: 8, borderRadius: 8 }}><i className="ti ti-file-invoice"></i></div>
               New Invoice
+              
             </h3>
             <button style={closeBtnStyle} onClick={closeModals}>✖</button>
           </div>

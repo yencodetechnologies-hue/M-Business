@@ -470,15 +470,15 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
   }, [jumpInvoice]);
 
-  useEffect(() => {
-    if (newInvoicePrefill) {
-      setInv({ ...blank, invoiceNo: generateInvoiceNo(), client: newInvoicePrefill.client || "", project: newInvoicePrefill.project || "" });
-      setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
-      setEditingId(null);
-      setErrors({});
-      setStep("form");
-    }
-  }, [newInvoicePrefill]);
+useEffect(() => {
+  if (newInvoicePrefill) {
+    setInv({ ...blank, invoiceNo: generateInvoiceNo(), client: newInvoicePrefill.client || "", project: newInvoicePrefill.project || "" });
+    setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
+    setEditingId(null);
+    setErrors({});
+    setStep(newInvoicePrefill.startStep || "form");
+  }
+}, [newInvoicePrefill]);
 
   const [invoiceList, setInvoiceList] = useState([]);
   const [listLoading, setListLoading] = useState(false);

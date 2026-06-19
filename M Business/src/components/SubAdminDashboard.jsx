@@ -4114,17 +4114,14 @@ const openEdit = (p) => {
 
   </div>
 
-  <button className="create-btn" onClick={() => {
-
-    setPayModalProject(null);
-
-    setPayModalsState(prev => ({ ...prev, showNewInvoice: true }));
-
-  }}>
-
+ // REPLACE with:
+<button className="create-btn" onClick={() => {
+    setInvoicePrefill(null);
+    setJumpInvoice(null);
+    setActive("invoices");
+}}>
     <i className="ti ti-plus"></i> New Invoice
-
-  </button>
+</button>
 
 </div>
 
@@ -4154,15 +4151,13 @@ const openEdit = (p) => {
 
   onDelete={(p) => setDeleteTarget(p)} 
 
-  onNewInvoice={(p) => { 
-
+// REPLACE with:
+onNewInvoice={(p) => { 
     if (!p) return;
-
-    setPayModalProject(p);
-
-    setPayModalsState(prev => ({ ...prev, showNewInvoice: true }));
-
-  }} 
+    setInvoicePrefill({ client: p.client || "", project: p.name || "", _t: Date.now() });
+    setJumpInvoice(null);
+    setActive("invoices");
+}}
 
 />
 

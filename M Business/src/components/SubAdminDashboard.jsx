@@ -3928,8 +3928,7 @@ function SubadminsPage({ subadmins, setSubadmins, employees = [], managers = [],
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, onViewProject, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice, fetchProjects }) {
-
+function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpProject, setJumpProject, config, onViewTasks, onViewProject, user, fetchTasks, onAddEmployee, onBack, onCreateProject, onEditProject, setActive, setInvoicePrefill, setJumpInvoice, fetchProjects, setPrevActiveBeforeInvoice, active }) {
   const [search, setSearch] = useState("");
 
 
@@ -4117,9 +4116,8 @@ function ProjectsPage({ projects, tasks, setProjects, clients, employees, jumpPr
         <button className="create-btn" onClick={() => {
           if (setInvoicePrefill) setInvoicePrefill({ client: "", project: "", _t: Date.now() });
           if (setJumpInvoice) setJumpInvoice(null);
-          setPrevActiveBeforeInvoice(active);
-          if (setActive) setPrevActiveBeforeInvoice(active);
-          setActive("invoices");
+        if (setPrevActiveBeforeInvoice) setPrevActiveBeforeInvoice(active);
+if (setActive) setActive("invoices");
         }}>
           <i className="ti ti-plus"></i> New Invoice
         </button>
@@ -10706,6 +10704,8 @@ onViewInvoice={(entry) => {
               setJumpInvoice={setJumpInvoice}
 
               fetchProjects={fetchProjects}
+
+              setPrevActiveBeforeInvoice={setPrevActiveBeforeInvoice}
 
               onAddEmployee={() => {
 

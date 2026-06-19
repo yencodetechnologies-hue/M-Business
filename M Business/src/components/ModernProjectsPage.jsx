@@ -224,6 +224,23 @@ export default function ModernProjectsPage({ user }) {
     }
   }
 
+  // ── Save a project-local invoice (from InvoiceCreator edit) ────
+  async function handleSaveLocalProjectInvoice(projectId, index, invoiceRecord) {
+    try {
+      const proj = projects.find(p => p._id === projectId) || selectedProject;
+      const list = [...((proj && proj.invoices) || [])];
+      if (index != null && index >= 0 && index < list.length) {
+        list[index] = invoiceRecord;
+      } else {
+        list.push(invoiceRecord);
+      }
+      await axios.put(`${BASE_URL}/api/projects/${projectId}`, { invoices: list });
+      await fetchAll();
+    } catch (err) {
+      alert('Failed to save invoice: ' + (err.response?.data?.msg || err.message));
+    }
+  }
+
   // ── Delete ────────────────────────────────────────────────────
   async function handleDelete() {
     if (!deleteTarget) return;
@@ -365,6 +382,7 @@ export default function ModernProjectsPage({ user }) {
               clients={clients}
               projects={projects}
               newInvoicePrefill={invoicePrefill}
+              onSaveLocalInvoice={handleSaveLocalProjectInvoice}
               onBack={() => setShowInvoiceCreator(false)}
             />
           </div>

@@ -453,7 +453,7 @@ function CanvasSignature({ onSave }) {
 }
 
 // ════════════════════════════════════════════════════════════
-export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill }) {
+export default function InvoiceCreator({ user, clients = [], projects = [], companyLogo, companyName, onLogoChange, onAddClient, onAddProject, onBack, jumpInvoice, newInvoicePrefill, onSaveLocalInvoice }) {
   const effectiveLogo = companyLogo || DEFAULT_LOGO_URL;
   const effectiveCompanyName = companyName || "";
 
@@ -470,7 +470,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     }
   }, [jumpInvoice]);
 
- useEffect(() => {
+  useEffect(() => {
     if (newInvoicePrefill) {
       if (newInvoicePrefill.editData) {
         // Edit mode — pre-fill existing invoice data
@@ -478,7 +478,12 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         setInv({ ...blank, ...ed, client: ed.client || newInvoicePrefill.client || '', project: ed.project || newInvoicePrefill.project || '' });
         const lineItems = ed.items || ed.lineItems;
         setItems(lineItems && lineItems.length > 0 ? lineItems.map((it, i) => ({ ...it, id: it.id || i + 1 })) : [{ id: 1, description: ed.description || '', quantity: 1, rate: ed.amount || '' }]);
-        setEditingId(newInvoicePrefill.projectId || null);
+        setEditingId(null);
+        setLocalEditTarget(
+          newInvoicePrefill.projectId && newInvoicePrefill.editIndex != null
+            ? { projectId: newInvoicePrefill.projectId, index: newInvoicePrefill.editIndex }
+            : null
+        );
         setErrors({});
         setStep("form");
       } else {
@@ -486,6 +491,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
         setInv({ ...blank, invoiceNo: generateInvoiceNo(), client: newInvoicePrefill.client || "", project: newInvoicePrefill.project || "" });
         setItems([{ id: 1, description: "", quantity: 1, rate: "" }]);
         setEditingId(null);
+        setLocalEditTarget(null);
         setErrors({});
         setStep("form");
       }
@@ -607,6 +613,7 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
     { id: 1, description: "", quantity: 1, rate: "" }
   ]);
   const [editingId, setEditingId] = useState(null); // backend _id if editing existing
+  const [localEditTarget, setLocalEditTarget] = useState(null); // { projectId, index } for project-local invoices // backend _id if editing existing
 
   const getTemplateStyles = (templateName) => {
     switch (templateName) {
@@ -742,28 +749,28 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   };
 
   // ── Load entry into form (EDIT) ─────────────────────────────
-const loadEntry = (entry) => {
-  // entry.inv இருந்தா use பண்ணு, இல்லன்னா entry itself-ஐ inv-ஆ treat பண்ணு
-  const invData = entry.inv || entry;
-  setInv({
-    ...blank,
-    ...invData,
-    invoiceNo: invData.invoiceNo || entry.invoiceNo || blank.invoiceNo,
-    client: invData.client || entry.client || '',
-    date: invData.date || entry.date || blank.date,
-    dueDate: invData.dueDate || entry.dueDate || blank.dueDate,
-    status: invData.status || entry.status || 'draft',
-  });
-  setItems(
-    entry.items?.length
-      ? entry.items.map((it, i) => ({ ...it, id: it.id || i + 1 }))
-      : [{ id: 1, description: '', quantity: 1, rate: '' }]
-  );
-  setEditingId(entry._id || entry.id || null);
-  setErrors({});
-  setDraftSaved(false);
-  setStep("form");
-};
+  const loadEntry = (entry) => {
+    // entry.inv இருந்தா use பண்ணு, இல்லன்னா entry itself-ஐ inv-ஆ treat பண்ணு
+    const invData = entry.inv || entry;
+    setInv({
+      ...blank,
+      ...invData,
+      invoiceNo: invData.invoiceNo || entry.invoiceNo || blank.invoiceNo,
+      client: invData.client || entry.client || '',
+      date: invData.date || entry.date || blank.date,
+      dueDate: invData.dueDate || entry.dueDate || blank.dueDate,
+      status: invData.status || entry.status || 'draft',
+    });
+    setItems(
+      entry.items?.length
+        ? entry.items.map((it, i) => ({ ...it, id: it.id || i + 1 }))
+        : [{ id: 1, description: '', quantity: 1, rate: '' }]
+    );
+    setEditingId(entry._id || entry.id || null);
+    setErrors({});
+    setDraftSaved(false);
+    setStep("form");
+  };
 
   // ── Clear ───────────────────────────────────────────────────
   const clearForm = () => {
@@ -792,10 +799,31 @@ const loadEntry = (entry) => {
     }
   };
 
+  // ── Build record for project-local invoice array ─────────────
+  const buildLocalInvoiceRecord = () => ({
+    invoiceNo: inv.invoiceNo,
+    description: items[0]?.description || inv.notes || 'Invoice',
+    amount: subtotal,
+    taxType: inv.isGstIncluded ? 'inclusive' : 'exclusive',
+    taxPercent: items[0]?.gstRate !== undefined ? Number(items[0].gstRate) : Number(inv.gstRate) || 0,
+    issueDate: inv.date,
+    dueDate: inv.dueDate,
+    status: inv.status || 'pending',
+    notes: inv.notes,
+    items,
+  });
+
   // ── Save Draft ──────────────────────────────────────────────
   const handleSaveDraft = async () => {
     if (!validate()) return;
     setSaving("draft");
+    if (localEditTarget && onSaveLocalInvoice) {
+      await onSaveLocalInvoice(localEditTarget.projectId, localEditTarget.index, buildLocalInvoiceRecord());
+      setSaving(false);
+      showToast("💾 Invoice updated!");
+      setTimeout(() => { if (onBack) onBack(); }, 800);
+      return;
+    }
     const data = await apiSave("draft");
     saveDraftLocal(inv, items, "draft");
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);
@@ -812,6 +840,13 @@ const loadEntry = (entry) => {
   const handleSavePreview = async () => {
     if (!validate()) return;
     setSaving("preview");
+    if (localEditTarget && onSaveLocalInvoice) {
+      await onSaveLocalInvoice(localEditTarget.projectId, localEditTarget.index, buildLocalInvoiceRecord());
+      setSaving(false);
+      setStep("preview");
+      window.scrollTo(0, 0);
+      return;
+    }
     const data = await apiSave("draft");
     saveDraftLocal(inv, items, "draft");
     if (data.success && data.invoice?._id) setEditingId(data.invoice._id);
@@ -2148,24 +2183,24 @@ const loadEntry = (entry) => {
               <div className="inv-creator-form-row">
                 <div className="inv-creator-form-group" id="field-client" style={{ marginBottom: 0 }}>
                   <label className="inv-creator-form-label" style={{ color: errors.client ? "#ef4444" : "var(--text2)" }}>Company / Client Name *</label>
-<CompanyDropdown
-  clients={clients}
-  value={inv.client}
-  onChange={v => { upd("client", v); }}
-  error={errors.client}
-  onAddCompany={onAddClient}
-/>
+                  <CompanyDropdown
+                    clients={clients}
+                    value={inv.client}
+                    onChange={v => { upd("client", v); }}
+                    error={errors.client}
+                    onAddCompany={onAddClient}
+                  />
                   {errors.client && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4, fontWeight: 600 }}>⚠ {errors.client}</div>}
                 </div>
                 <div className="inv-creator-form-group" style={{ marginBottom: 0 }}>
                   <label className="inv-creator-form-label">Project</label>
-<ProjectDropdown
-  projects={filteredProjects}
-  value={inv.project}
-  onChange={v => upd("project", v)}
-  onAddProject={onAddProject}
-  disabled={!inv.client}
-/>
+                  <ProjectDropdown
+                    projects={filteredProjects}
+                    value={inv.project}
+                    onChange={v => upd("project", v)}
+                    onAddProject={onAddProject}
+                    disabled={!inv.client}
+                  />
                 </div>
               </div>
               {selectedClient && (

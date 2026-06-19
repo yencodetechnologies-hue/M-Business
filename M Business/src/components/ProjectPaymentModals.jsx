@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../config';
-
-const GST_RATES = [0, 5, 12, 18, 28];
 
 const overlayStyle = {
   position: 'fixed', inset: 0, zIndex: 99995, background: 'rgba(0,0,0,0.5)',
@@ -29,75 +27,60 @@ const cancelBtnStyle = { padding: '10px 24px', background: '#fff', color: '#4A55
 
 export default function ProjectPaymentModals({
   project,
-  projects = [],
   modalsState,
   setModalsState,
   onSaveSuccess,
   clients = [],
-  onAddClient = () => {},
 }) {
   const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, editData, editIndex } = modalsState;
 
   // Generic form state
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
-  const [selectedProjId, setSelectedProjId] = useState('');
-  const [items, setItems] = useState([{ id: 1, description: '', quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
-
-  const addItem = () => setItems(prev => [...prev, { id: Date.now() + Math.random(), description: '', quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
-  const removeItem = (id) => { if (items.length > 1) setItems(prev => prev.filter(it => it.id !== id)); };
-  const updateItem = (id, field, val) => setItems(prev => prev.map(it => it.id === id ? { ...it, [field]: val } : it));
 
   useEffect(() => {
     if (editData) {
       setForm(editData);
       if (editData.lineItems && editData.lineItems.length > 0) {
-        setItems(editData.lineItems);
+        setItems(editData.lineItems.map((it, idx) => ({ ...it, id: it.id || idx + 1 })));
       }
       return;
     }
 
-    const activeProject = project || projects.find(p => p._id === selectedProjId);
-
     if (showNewInvoice && !form.invoiceNo) {
-      setForm(prev => ({ 
-        ...prev, 
-        invoiceNo: `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
-        issueDate: new Date().toISOString().split('T')[0]
-      }));
+      const len = (project?.invoices || []).length + 1;
+      setForm(prev => ({ ...prev, invoiceNo: `INV-${String(len).padStart(3, '0')}` }));
     }
-    if (showPayment && !form.paymentNo && activeProject) {
-      const len = (activeProject?.paymentsReceived || []).length + 1;
+    if (showPayment && !form.paymentNo) {
+      const len = (project?.paymentsReceived || []).length + 1;
       setForm(prev => ({ ...prev, paymentNo: `PAY-${String(len).padStart(3, '0')}` }));
     }
-    if (showAdvance && !form.advanceNo && activeProject) {
-      const len = (activeProject?.advances || []).length + 1;
+    if (showAdvance && !form.advanceNo) {
+      const len = (project?.advances || []).length + 1;
       setForm(prev => ({ ...prev, advanceNo: `ADV-${String(len).padStart(3, '0')}` }));
     }
-    if (showAdditional && !form.chargeNo && activeProject) {
-      const len = (activeProject?.additionalCharges || []).length + 1;
+    if (showAdditional && !form.chargeNo) {
+      const len = (project?.additionalCharges || []).length + 1;
       setForm(prev => ({ ...prev, chargeNo: `ADC-${String(len).padStart(3, '0')}` }));
     }
-    if (showMilestonePayment && !form.milestoneNo && activeProject) {
-      const len = (activeProject?.milestonePayments || []).length + 1;
+    if (showMilestonePayment && !form.milestoneNo) {
+      const len = (project?.milestonePayments || []).length + 1;
       setForm(prev => ({ ...prev, milestoneNo: `MS-${String(len).padStart(3, '0')}` }));
     }
-    if (showExpense && !form.expenseNo && activeProject) {
-      const len = (activeProject?.expenses || []).length + 1;
+    if (showExpense && !form.expenseNo) {
+      const len = (project?.expenses || []).length + 1;
       setForm(prev => ({ ...prev, expenseNo: `EXP-${String(len).padStart(3, '0')}` }));
     }
-  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, project, editData, selectedProjId, projects]);
+  }, [showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, project, editData]);
 
   const closeModals = () => {
     setModalsState({ showNewInvoice: false, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: null, editIndex: null });
     setForm({});
-    setSelectedProjId('');
-    setItems([{ id: Date.now(), description: '', quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = useCallback((field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
-  };
+  }, []);
 
   const handleSave = async (e, type) => {
     e.preventDefault();
@@ -111,25 +94,10 @@ export default function ProjectPaymentModals({
       else if (type === 'milestone') arrayName = 'milestonePayments';
       else if (type === 'expense') arrayName = 'expenses';
 
-      const targetProject = project || projects.find(p => p._id === selectedProjId);
-      if (!targetProject) {
-        alert("Please select a project.");
-        setSaving(false);
-        return;
-      }
-
-      const currentList = targetProject[arrayName] || [];
+      const currentList = project[arrayName] || [];
       let updatedList = [...currentList];
 
-      // For invoices, compute total from line items
-      let computedAmount = form.amount;
-      if (type === 'invoice') {
-        const iSub = items.reduce((s, it) => s + (parseFloat(it.quantity)||0) * (parseFloat(it.rate)||0), 0);
-        const iGst = items.reduce((s, it) => { const lb = (parseFloat(it.quantity)||0)*(parseFloat(it.rate)||0); const rg = parseFloat(it.gstRate)||18; return s + (it.isGstIncluded ? lb - lb/(1+rg/100) : lb*rg/100); }, 0);
-        const iDisc = iSub * ((form.discountPct||0)/100);
-        computedAmount = Math.round(iSub - iDisc + iGst + (parseFloat(form.extraCharges)||0));
-      }
-      const payloadToSave = { ...form, ...(type === 'invoice' ? { lineItems: items, amount: computedAmount } : {}) };
+      const payloadToSave = { ...form };
       if (payloadToSave.category === 'Other' && payloadToSave.customCategory) {
         payloadToSave.category = payloadToSave.customCategory;
       }
@@ -147,7 +115,7 @@ export default function ProjectPaymentModals({
         updatedList = [newRecord, ...currentList];
       }
 
-      let updatesPayload = targetProject.updates || [];
+      let updatesPayload = project.updates || [];
       if (form.notifyClient) {
         const title = `New ${type.charAt(0).toUpperCase() + type.slice(1)} Added`;
         const no = form.invoiceNo || form.paymentNo || form.advanceNo || form.chargeNo || form.milestoneNo || form.expenseNo || '';
@@ -178,10 +146,10 @@ export default function ProjectPaymentModals({
           return isNaN(num) ? 0 : num;
         };
         const diff = editIndex !== undefined ? (parseAmt(form.amount) - parseAmt(currentList[editIndex]?.amount)) : parseAmt(form.amount);
-        updatePayload.spent = parseAmt(targetProject.spent) + diff;
+        updatePayload.spent = parseAmt(project.spent) + diff;
       }
 
-      await axios.put(`${BASE_URL}/api/projects/${targetProject._id}`, updatePayload);
+      await axios.put(`${BASE_URL}/api/projects/${project._id}`, updatePayload);
 
       onSaveSuccess();
       closeModals();
@@ -194,11 +162,6 @@ export default function ProjectPaymentModals({
   };
 
   if (showNewInvoice) {
-    const activeProject = project || projects.find(p => p._id === selectedProjId);
-    const subtotal = items.reduce((s, it) => s + (parseFloat(it.quantity)||0) * (parseFloat(it.rate)||0), 0);
-    const gstAmt = items.reduce((s, it) => { const lb = (parseFloat(it.quantity)||0)*(parseFloat(it.rate)||0); const rg = parseFloat(it.gstRate)||18; return s + (it.isGstIncluded ? lb - lb/(1+rg/100) : lb*rg/100); }, 0);
-    const discAmt = subtotal * ((form.discountPct||0)/100);
-    const grandTotal = subtotal - discAmt + gstAmt + (parseFloat(form.extraCharges)||0);
     return (
       <div style={overlayStyle}>
         <div style={modalStyle}>
@@ -273,138 +236,142 @@ export default function ProjectPaymentModals({
               </div>
             </div>
 
-            {/* -- 2. BILL TO (CLIENT) -- */}
+            {/* LINE ITEMS */}
             <div className="inv-creator-card">
               <div className="inv-creator-card-header">
-                <div className="inv-creator-card-icon" style={{ background: "var(--amber-bg)", color: "var(--amber)" }}><i className="ti ti-user-circle"></i></div>
-                <div className="inv-creator-card-title">Bill To (Client)</div>
-                <button type="button" onClick={onAddClient} style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', background: 'var(--teal-lighter,#E0F7FA)', border: '1.5px solid var(--teal,#00BCD4)', borderRadius: 7, fontSize: 10, fontWeight: 700, color: 'var(--teal,#00BCD4)', cursor: 'pointer' }}>
-                  <i className="ti ti-plus" style={{ fontSize: 12 }}></i> Add Client
-                </button>
+                <div className="inv-creator-card-icon" style={{ background: "var(--blue-bg)", color: "var(--blue)" }}>
+                  <i className="ti ti-list-details"></i>
+                </div>
+                <div className="inv-creator-card-title">Amount Details</div>
               </div>
               <div className="inv-creator-card-body">
-                <div className="inv-creator-form-row">
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">COMPANY / CLIENT NAME *</label>
-                    {clients.length > 0 ? (
-                      <select className="inv-creator-form-select" required value={form.client || activeProject?.client || ''} onChange={e => handleInputChange('client', e.target.value)}>
-                        <option value="">-- Select Company Name --</option>
-                        {clients.map(c => <option key={c._id} value={c.name || c.clientName}>{c.name || c.clientName}</option>)}
-                      </select>
-                    ) : (
-                      <input className="inv-creator-form-input" type="text" value={activeProject?.client || form.client || ''} readOnly={!!project} onChange={e => !project && handleInputChange('client', e.target.value)} placeholder="Client Name" />
-                    )}
+                <div style={rowStyle}>
+                  <div>
+                    <label style={labelStyle}>Amount</label>
+                    <input type="number" style={inputStyle} value={form.amount || ''} onChange={e => handleInputChange('amount', Number(e.target.value))} placeholder="0" />
                   </div>
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">PROJECT</label>
-                    {project ? (
-                      <input className="inv-creator-form-input" type="text" value={project.name || ''} readOnly />
-                    ) : (
-                      <select className="inv-creator-form-select" value={selectedProjId} onChange={e => { const pid = e.target.value; setSelectedProjId(pid); const pObj = projects.find(item => item._id === pid); if (pObj) { const len = (pObj.invoices || []).length + 1; setForm(prev => ({ ...prev, invoiceNo: `INV-${String(len).padStart(3, '0')}` })); } }}>
-                        <option value="">-- Select Project --</option>
-                        {projects.map(p => <option key={p._id} value={p._id}>{p.name} ({p.client || 'No Client'})</option>)}
-                      </select>
-                    )}
+                  <div>
+                    <label style={labelStyle}>Tax %</label>
+                    <select style={inputStyle} value={form.taxPercent || '18'} onChange={e => handleInputChange('taxPercent', e.target.value)}>
+                      <option value="0">0%</option>
+                      <option value="5">5%</option>
+                      <option value="12">12%</option>
+                      <option value="18">18%</option>
+                      <option value="28">28%</option>
+                    </select>
                   </div>
                 </div>
-                <div className="inv-creator-form-row">
-                  <div className="inv-creator-form-group" style={{ gridColumn: 'span 2' }}>
-                    <label className="inv-creator-form-label">Description</label>
-                    <input required className="inv-creator-form-input" type="text" value={form.description || ''} onChange={e => handleInputChange('description', e.target.value)} placeholder="e.g. Development Sprint 3" />
+                <div style={rowStyle}>
+                  <div>
+                    <label style={labelStyle}>Discount (%)</label>
+                    <input type="number" style={inputStyle} value={form.discountPct || ''} onChange={e => handleInputChange('discountPct', Number(e.target.value))} placeholder="0" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Extra Charges</label>
+                    <input type="number" style={inputStyle} value={form.extraCharges || ''} onChange={e => handleInputChange('extraCharges', Number(e.target.value))} placeholder="0" />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* -- 3. LINE ITEMS -- */}
+            {/* LINE ITEMS */}
             <div className="inv-creator-card">
               <div className="inv-creator-card-header">
                 <div className="inv-creator-card-icon" style={{ background: "var(--blue-bg)", color: "var(--blue)" }}><i className="ti ti-list-details"></i></div>
                 <div className="inv-creator-card-title">Line Items</div>
               </div>
               <div className="inv-creator-card-body">
-                <table className="inv-creator-items-table" style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 12 }}>
+                <table className="inv-creator-items-table">
                   <thead>
-                    <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
-                      <th style={{ width: '36%', textAlign: 'left', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 6px' }}>DESCRIPTION</th>
-                      <th style={{ width: '10%', textAlign: 'center', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 4px' }}>QTY</th>
-                      <th style={{ width: '18%', textAlign: 'left', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 4px' }}>UNIT PRICE</th>
-                      <th style={{ width: '18%', textAlign: 'left', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 4px' }}>TAX %</th>
-                      <th style={{ width: '14%', textAlign: 'right', fontSize: 10, fontWeight: 800, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.5px', padding: '8px 4px' }}>TOTAL</th>
-                      <th style={{ width: '4%' }}></th>
+                    <tr>
+                      <th style={{ width: "36%" }}>Description</th>
+                      <th style={{ width: "12%" }}>Qty</th>
+                      <th style={{ width: "18%" }}>Unit Price</th>
+                      <th style={{ width: "14%" }}>Tax %</th>
+                      <th style={{ width: "16%", textAlign: "right" }}>Total</th>
+                      <th style={{ width: "4%" }}></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map(item => {
-                      const lb = (parseFloat(item.quantity)||0) * (parseFloat(item.rate)||0);
-                      const rg = parseFloat(item.gstRate) || 18;
-                      const isI = item.isGstIncluded || false;
-                      const lineTotal = isI ? lb : lb + lb * rg / 100;
+                    {items.map((item, idx) => {
+                      const dErr = errors[`item_${item.id}_description`];
+                      const rErr = errors[`item_${item.id}_rate`];
+                      const lineBase = (parseFloat(item.quantity) || 0) * (parseFloat(item.rate) || 0);
+                      const rateGst = item.gstRate !== undefined ? parseFloat(item.gstRate) : (parseFloat(inv.gstRate) || 18);
+                      const isIncl = item.isGstIncluded !== undefined ? item.isGstIncluded : (inv.isGstIncluded || false);
+                      const lineTax = isIncl ? (lineBase - (lineBase / (1 + rateGst / 100))) : (lineBase * (rateGst / 100));
+                      const lineTotal = isIncl ? lineBase : (lineBase + lineTax);
                       return (
-                        <tr key={item.id} style={{ borderBottom: '1px solid #f8fafc' }}>
-                          <td style={{ padding: '6px 6px' }}>
-                            <input type="text" placeholder="Item description" value={item.description || ''} onChange={e => updateItem(item.id, 'description', e.target.value)}
-                              style={{ width: '100%', padding: '7px 8px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
+                        <tr key={item.id}>
+                          <td>
+                            <input type="text" id={`item_${item.id}_description`} className="inv-creator-item-input desc" placeholder="Item description" value={item.description || ""} onChange={(e) => updItem(item.id, "description", e.target.value)} />
+                            {dErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                           </td>
-                          <td style={{ padding: '6px 4px' }}>
-                            <input type="number" value={item.quantity === 0 ? '' : item.quantity} onChange={e => updateItem(item.id, 'quantity', e.target.value === '' ? 0 : Number(e.target.value))} onWheel={e => e.target.blur()}
-                              style={{ width: '100%', padding: '7px 6px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 12, outline: 'none', textAlign: 'center', boxSizing: 'border-box' }} />
+                          <td>
+                            <input type="number" className="inv-creator-item-input num" value={item.quantity === 0 ? "" : item.quantity} onChange={(e) => updItem(item.id, "quantity", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} />
                           </td>
-                          <td style={{ padding: '6px 4px' }}>
-                            <input type="number" value={item.rate === 0 ? '' : item.rate} onChange={e => updateItem(item.id, 'rate', e.target.value === '' ? 0 : Number(e.target.value))} onWheel={e => e.target.blur()}
-                              style={{ width: '100%', padding: '7px 8px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 12, outline: 'none', boxSizing: 'border-box' }} />
+                          <td>
+                            <input type="number" id={`item_${item.id}_rate`} className="inv-creator-item-input num" value={item.rate === 0 ? "" : item.rate} onChange={(e) => updItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))} onWheel={(e) => e.target.blur()} style={{ width: "90px" }} />
+                            {rErr && <div style={{ fontSize: 11, color: "#ef4444", marginTop: 2 }}>⚠ Required</div>}
                           </td>
-                          <td style={{ padding: '6px 4px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                              <select value={rg} onChange={e => updateItem(item.id, 'gstRate', Number(e.target.value))}
-                                style={{ width: '100%', padding: '5px 4px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 11, outline: 'none' }}>
-                                {GST_RATES.map(r => <option key={r} value={r}>{r}%</option>)}
+                          <td>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                              <select
+                                className="inv-creator-form-select"
+                                value={rateGst}
+                                onChange={(e) => updItem(item.id, "gstRate", Number(e.target.value))}
+                                style={{ width: "75px", padding: "6px 8px", fontSize: "11px", height: "32px", backgroundPosition: "right 6px center" }}
+                              >
+                                {GST_RATES.map((rate) => (
+                                  <option key={rate} value={rate}>
+                                    {rate}%
+                                  </option>
+                                ))}
                               </select>
-                              <select value={isI ? 'incl' : 'excl'} onChange={e => updateItem(item.id, 'isGstIncluded', e.target.value === 'incl')}
-                                style={{ width: '100%', padding: '4px 4px', border: '1.5px solid #E8EDF2', borderRadius: 6, fontSize: 9, fontWeight: 700, outline: 'none' }}>
+                              <select
+                                className="inv-creator-form-select"
+                                value={isIncl ? "incl" : "excl"}
+                                onChange={(e) => updItem(item.id, "isGstIncluded", e.target.value === "incl")}
+                                style={{ width: "75px", padding: "4px 6px", fontSize: "9px", height: "26px", fontWeight: "700", backgroundPosition: "right 6px center" }}
+                              >
                                 <option value="excl">Excl</option>
                                 <option value="incl">Incl</option>
                               </select>
                             </div>
                           </td>
-                          <td style={{ padding: '6px 4px', textAlign: 'right', fontSize: 12, fontWeight: 700, color: '#1A2332', whiteSpace: 'nowrap' }}>
-                            INR {lineTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          <td className="inv-creator-item-total">
+                            {formatCurrency(lineTotal, inv.currency)}
                           </td>
-                          <td style={{ padding: '6px 2px', textAlign: 'center' }}>
-                            <button type="button" onClick={() => removeItem(item.id)} disabled={items.length === 1}
-                              style={{ background: 'none', border: 'none', color: items.length === 1 ? '#cbd5e1' : '#ef4444', cursor: items.length === 1 ? 'not-allowed' : 'pointer', fontSize: 14, padding: 4 }}>
-                              <i className="ti ti-trash"></i>
-                            </button>
+                          <td>
+                            <button className="inv-creator-del-row-btn" onClick={() => removeItem(item.id)} disabled={items.length === 1}><i className="ti ti-trash"></i></button>
                           </td>
                         </tr>
                       );
                     })}
                   </tbody>
                 </table>
-                <button type="button" onClick={addItem}
-                  style={{ width: '100%', padding: '10px', border: '2px dashed #00BCD4', borderRadius: 8, background: '#F0FDFE', color: '#00BCD4', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16 }}>
-                  <i className="ti ti-plus" style={{ fontSize: 14 }}></i> Add Line Item
-                </button>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12 }}>
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">DISCOUNT (%)</label>
-                    <input className="inv-creator-form-input" type="number" value={form.discountPct || 0} onChange={e => handleInputChange('discountPct', Number(e.target.value))} placeholder="0" onWheel={e => e.target.blur()} />
+                <button className="inv-creator-add-item-btn" onClick={addItem}><i className="ti ti-plus" style={{ fontSize: "14px" }}></i> Add Line Item</button>
+
+                {/* TOTALS */}
+                <div className="inv-creator-totals-section">
+                  <div className="inv-creator-form-row" style={{ marginBottom: "10px" }}>
+                    <div className="inv-creator-form-group">
+                      <label className="inv-creator-form-label">Discount (%)</label>
+                      <input className="inv-creator-form-input" type="number" value={form.discountPct || 0} onChange={(e) => handleInputChange("discountPct", Number(e.target.value))} placeholder="0" />
+                    </div>
+                    <div className="inv-creator-form-group">
+                      <label className="inv-creator-form-label">Shipping / Extra Charges</label>
+                      <input className="inv-creator-form-input" type="number" value={form.extraCharges || 0} onChange={(e) => handleInputChange("extraCharges", Number(e.target.value))} placeholder="0" />
+                    </div>
                   </div>
-                  <div className="inv-creator-form-group">
-                    <label className="inv-creator-form-label">SHIPPING / EXTRA CHARGES</label>
-                    <input className="inv-creator-form-input" type="number" value={form.extraCharges || 0} onChange={e => handleInputChange('extraCharges', Number(e.target.value))} placeholder="0" onWheel={e => e.target.blur()} />
-                  </div>
-                </div>
-                <div className="inv-creator-totals-section" style={{ marginTop: 4 }}>
-                  <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">INR {subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
-                  <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount</span><span className="inv-creator-total-val">- INR {discAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
-                  <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax</span><span className="inv-creator-total-val">+ INR {gstAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
-                  <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ INR {(parseFloat(form.extraCharges)||0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
-                  <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">INR {grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                  <div className="inv-creator-total-row"><span className="inv-creator-total-label">Subtotal</span><span className="inv-creator-total-val">{formatCurrency(subtotal, inv.currency)}</span></div>
+                  <div className="inv-creator-total-row discount"><span className="inv-creator-total-label">Discount</span><span className="inv-creator-total-val">- {formatCurrency((subtotal * (inv.discountPct || 0) / 100), inv.currency)}</span></div>
+                  <div className="inv-creator-total-row tax"><span className="inv-creator-total-label">GST / Tax</span><span className="inv-creator-total-val">+ {formatCurrency(gstAmt, inv.currency)}</span></div>
+                  <div className="inv-creator-total-row"><span className="inv-creator-total-label">Extra Charges</span><span className="inv-creator-total-val">+ {formatCurrency(inv.extraCharges || 0, inv.currency)}</span></div>
+                  <div className="inv-creator-total-row grand"><span className="inv-creator-total-label">Total Amount</span><span className="inv-creator-total-val">{formatCurrency(total - (subtotal * (inv.discountPct || 0) / 100) + (inv.extraCharges || 0), inv.currency)}</span></div>
                 </div>
               </div>
             </div>
-
             {/* -- 4. PAYMENT TERMS & BANK DETAILS -- */}
             <div className="inv-creator-card">
               <div className="inv-creator-card-header">

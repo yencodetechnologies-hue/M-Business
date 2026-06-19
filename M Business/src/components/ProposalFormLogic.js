@@ -22,10 +22,8 @@ export function toggleSection(btn, id) {
   btn.classList.toggle('on');
   const show = btn.classList.contains('on');
   const sec = document.getElementById(secId);
-  if (sec) {
-    sec.style.display = show ? 'block' : 'none';
-  }
-const pvMap = {
+  if (sec) sec.style.display = show ? 'block' : 'none';
+  const pvMap = {
     'sec-team': 'pv-sec-team',
     'sec-value': 'pv-sec-value',
     'sec-casestudies': 'pv-sec-cs',
@@ -36,9 +34,7 @@ const pvMap = {
   };
   const pvId = pvMap[secId] || ('pv-sec-' + secId.replace('sec-', ''));
   const pvSec = document.getElementById(pvId);
-  if (pvSec) {
-    pvSec.style.display = show ? 'block' : 'none';
-  }
+  if (pvSec) pvSec.style.display = show ? 'block' : 'none';
 }
 /* ── STATUS ── */
 export function selSt(el, val) {
@@ -346,11 +342,22 @@ export function addTeamMember() {
 }
 
 export function fillClient() {
-  getEl('toComp').value = 'STA Corporation';
-  getEl('toPerson').value = 'STA Admin';
-  getEl('toEmail').value = 'sta@example.com';
-  getEl('toPhone').value = '+91 98765 43210';
-  getEl('toAddr').value = 'Chennai, Tamil Nadu, India';
+  const clients = window._clientsData || [];
+  if (clients.length === 0) {
+    alert('No clients found. Please add clients first.');
+    return;
+  }
+  const names = clients.map((c, i) => `${i + 1}. ${c.name || c.clientName}`).join('\n');
+  const choice = prompt('Select client number:\n' + names);
+  if (!choice) return;
+  const idx = parseInt(choice) - 1;
+  const client = clients[idx];
+  if (!client) return;
+  getEl('toComp').value = client.name || client.clientName || '';
+  getEl('toPerson').value = client.contactPerson || '';
+  getEl('toEmail').value = client.email || '';
+  getEl('toPhone').value = client.phone || '';
+  getEl('toAddr').value = client.address || '';
   up();
 }
 

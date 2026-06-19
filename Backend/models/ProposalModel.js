@@ -19,6 +19,9 @@ const ProposalSchema = new mongoose.Schema(
     submittedAt: { type: Date, default: null },
     companyId: { type: String, default: "" },
     assignedEmployee: { type: String, default: "" },
+    clientSignature: { type: String, default: '' },
+clientName: { type: String, default: '' },
+clientSignedAt: { type: Date }
   },
   { timestamps: true }
 );

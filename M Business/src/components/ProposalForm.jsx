@@ -12,7 +12,8 @@ export default function ProposalForm({ onBack, onSave }) {
     // Expose ALL logic functions to window so dangerouslySetInnerHTML onclick attrs work natively
     Object.assign(window, logic);
     window._onSaveProposal = onSave;
-
+window._clientsData = window._clientsData || [];
+fetch('/api/clients').then(r => r.json()).then(d => { window._clientsData = d; }).catch(() => {});
     // Hook up back button
     // Hook up back button + all topbar buttons
     const hookUp = () => {
@@ -37,7 +38,7 @@ export default function ProposalForm({ onBack, onSave }) {
           } else if (rawArgs.startsWith('this,')) {
             const rest = rawArgs.slice(5).replace(/['"]/g, '').trim();
             logic[fn](el, rest);
-          } else {
+} else {
             const args = rawArgs.split(',').map(a => a.trim().replace(/^['"]|['"]$/g, ''));
             logic[fn](...args);
           }
@@ -46,7 +47,14 @@ export default function ProposalForm({ onBack, onSave }) {
 
       // Duplicate button (no onclick attr)
       const dupBtn = c.querySelector('.topbar-actions .btn-o:first-child');
-      if (dupBtn) dupBtn.onclick = () => alert('Save the proposal first, then duplicate from the list.');
+   if (dupBtn) dupBtn.onclick = () => {
+  if (window._onSaveProposal) {
+    const data = logic.extractProposalData();
+    data.title = data.title + ' (Copy)';
+    data.status = 'draft';
+    window._onSaveProposal(data);
+  }
+};
 
       // Cover upload — real file picker
       const coverZone = c.querySelector('#coverZone');

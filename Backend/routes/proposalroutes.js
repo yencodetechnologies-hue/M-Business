@@ -199,4 +199,19 @@ router.delete("/:dbId", async (req, res) => {
   }
 });
 
+// Client signature save
+// CORRECT
+router.put('/:id/client-sign', async (req, res) => {
+  try {
+    const { clientSignature, clientName } = req.body;
+    const proposal = await Proposal.findByIdAndUpdate(
+      req.params.id,
+      { clientSignature, clientName, clientSignedAt: new Date() },
+      { new: true }
+    );
+    res.json(proposal);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 module.exports = router;

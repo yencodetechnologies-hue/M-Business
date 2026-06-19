@@ -11,26 +11,26 @@ const DEFAULT_LOGO_URL = "";
 function generateQuoteNo() {
   return `QT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 }
-function formatCurrency(val, symbol = "₹", compact = false, disableCompact = false) {
+function formatCurrency(val, symbol = "INR", compact = false, disableCompact = false) {
   const num = parseFloat(val) || 0;
   const absNum = Math.abs(num);
   
   if (!disableCompact && ((compact && absNum >= 100000) || absNum >= 10000000)) {
     try {
-      const isINR = symbol === "₹";
+      const isINR = symbol === "INR";
       const formatter = new Intl.NumberFormat(isINR ? 'en-IN' : 'en-US', {
         notation: 'compact',
         compactDisplay: 'short',
         maximumFractionDigits: 2
       });
-      return symbol + (/[A-Za-z]/.test(symbol) ? " " : "") + formatter.format(num);
+      return symbol + (" ") + formatter.format(num);
     } catch (e) {
       // Fallback
     }
   }
   
-  const isINR = symbol === "₹";
-  return symbol + (/[A-Za-z]/.test(symbol) ? " " : "") + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const isINR = symbol === "INR";
+  return symbol + (" ") + num.toLocaleString(isINR ? "en-IN" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function formatDate(d) {
   if (!d) return "—";
@@ -187,7 +187,7 @@ export default function QuotationCreator({ user, clients = [], projects = [], co
     companyAddress: user?.address || user?.companyAddress || "",
     companyWebsite: user?.website || "",
     companyGst: user?.gstNumber || user?.gstNo || "",
-    currency: "₹",
+    currency: "INR",
     template: "Modern",
     footerMessage: "🙏 Thank you for considering us!",
     isGstIncluded: false,

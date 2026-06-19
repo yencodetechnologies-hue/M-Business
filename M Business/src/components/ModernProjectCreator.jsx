@@ -125,7 +125,7 @@ const [assigned, setAssigned] = useState(() => {
   return [String(a)];
 });
   const [budget, setBudget] = useState(editProject?.budget || '');
-  const [currency, setCurrency] = useState(editProject?.currency || 'Rs.');
+  const [currency, setCurrency] = useState(editProject?.currency || '₹');
   const [contactPersonName, setContactPersonName] = useState(editProject?.contactPersonName || '');
 const [contactPersonNo, setContactPersonNo] = useState(editProject?.contactPersonNo || '');
 const [contactEmail, setContactEmail] = useState(editProject?.contactEmail || editProject?.clientEmail || '');
@@ -413,7 +413,7 @@ contactEmail,
               <label>Total Project Budget ({currency})</label>
               <div style={{ display: 'flex', gap: 10 }}>
                 <select value={currency} onChange={e => setCurrency(e.target.value)} style={{ width: 80 }}>
-                  {["Rs.", "USD", "EUR", "GBP", "AED", "SAR", "AUD"].map(c => <option key={c} value={c}>{c}</option>)}
+                  {["₹", "$", "€", "£", "AED", "SAR", "AUD"].map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
                 <input type="number" value={budget} onChange={e => setBudget(e.target.value)} placeholder="e.g. 850000" />
               </div>
@@ -539,7 +539,7 @@ contactEmail,
           {onBack && <button className="mpc-btn mpc-btn-outline" onClick={onBack}>Cancel</button>}
           <button className="mpc-btn mpc-btn-primary" onClick={handleCreate} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
             {loading ? <i className="ti ti-loader" style={{ animation: 'spin 1s linear infinite' }} /> : <i className="ti ti-rocket" />}
-            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? '✓ Update Project' : 'Create & Launch Project')}
+            {loading ? (editProject ? 'Updating...' : 'Launching...') : (editProject ? '✅ Update Project' : 'Create & Launch Project')}
           </button>
         </div>
       </div>

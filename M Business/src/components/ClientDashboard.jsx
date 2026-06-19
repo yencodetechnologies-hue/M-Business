@@ -231,7 +231,7 @@ export default function ClientDashboard({ user, setUser }) {
           }
           return inv;
         }));
-        alert("Payment of ₹" + remainingAmount.toLocaleString("en-IN") + " completed successfully!");
+        alert("Payment of INR " + remainingAmount.toLocaleString("en-IN") + " completed successfully!");
       }
     } catch (err) {
       console.error("Payment failed:", err);
@@ -788,7 +788,7 @@ const allFiles = [...docCards, ...(projects.flatMap(p => p.files || []))
 
   // Render Hero Helper
   function renderHero() {
-    const pendingAmountFormatted = totalPending >= 1000 ? `₹${(totalPending / 1000).toFixed(0)}K` : `₹${totalPending.toLocaleString("en-IN")}`;
+    const pendingAmountFormatted = totalPending >= 1000 ? `INR ${(totalPending / 1000).toFixed(0)}K` : `INR ${totalPending.toLocaleString("en-IN")}`;
     const dashoffset = 289 - (activeProjProgress / 100) * 289; // Circle stroke dash offsets
 
     return (

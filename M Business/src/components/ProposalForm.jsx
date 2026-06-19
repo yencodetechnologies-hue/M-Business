@@ -14,17 +14,65 @@ export default function ProposalForm({ onBack, onSave }) {
     window._onSaveProposal = onSave;
 
     // Hook up back button
+    // Hook up back button + all topbar buttons
     const hookUp = () => {
       const backBtn = c.querySelector('.back-btn');
       if (backBtn) backBtn.onclick = onBack;
-    };
-    hookUp();
 
+      c.querySelectorAll('[onclick]').forEach(el => {
+        const oc = el.getAttribute('onclick');
+        if (!oc) return;
+        // Handle: fn() or fn(this) or fn(this,'arg') or fn('arg1','arg2')
+        const fnMatch = oc.match(/^([a-zA-Z0-9_]+)\((.*)\)$/);
+        if (!fnMatch) return;
+        const fn = fnMatch[1];
+        const rawArgs = fnMatch[2].trim();
+        if (typeof logic[fn] !== 'function') return;
+        el.onclick = (e) => {
+          e.stopPropagation();
+          if (!rawArgs) {
+            logic[fn]();
+          } else if (rawArgs === 'this') {
+            logic[fn](el);
+          } else if (rawArgs.startsWith('this,')) {
+            const rest = rawArgs.slice(5).replace(/['"]/g, '').trim();
+            logic[fn](el, rest);
+          } else {
+            const args = rawArgs.split(',').map(a => a.trim().replace(/^['"]|['"]$/g, ''));
+            logic[fn](...args);
+          }
+        };
+      });
+
+      // Duplicate button (no onclick attr)
+      const dupBtn = c.querySelector('.topbar-actions .btn-o:first-child');
+      if (dupBtn) dupBtn.onclick = () => alert('Save the proposal first, then duplicate from the list.');
+
+      // Cover upload — real file picker
+      const coverZone = c.querySelector('#coverZone');
+      if (coverZone) {
+        coverZone.onclick = () => {
+          const inp = document.createElement('input');
+          inp.type = 'file'; inp.accept = 'image/*';
+          inp.onchange = (e) => {
+            const file = e.target.files[0]; if (!file) return;
+            const url = URL.createObjectURL(file);
+            coverZone.style.backgroundImage = `url(${url})`;
+            coverZone.style.backgroundSize = 'cover';
+            coverZone.style.backgroundPosition = 'center';
+            coverZone.style.borderColor = 'var(--teal)';
+            coverZone.innerHTML = `<div style="color:var(--teal);font-weight:700;font-size:12px">✓ Cover image uploaded</div><div style="font-size:10px;color:var(--text3)">Click to change</div>`;
+          };
+          inp.click();
+        };
+      }
+    };
+    setTimeout(hookUp, 300);
     const handleInput = () => {
       try {
         if (logic.up) logic.up();
         if (logic.calcTotal) logic.calcTotal();
-      } catch (err) {}
+      } catch (err) { }
     };
 
     c.addEventListener('input', handleInput);
@@ -38,7 +86,7 @@ export default function ProposalForm({ onBack, onSave }) {
         if (logic.updateTeamPreview) logic.updateTeamPreview();
         if (logic.updateValuePreview) logic.updateValuePreview();
         if (logic.updateRisksPreview) logic.updateRisksPreview();
-      } catch(e) { console.error('Init error', e); }
+      } catch (e) { console.error('Init error', e); }
     }, 300);
 
     return () => {
@@ -355,9 +403,10 @@ body{display:flex;min-height:100vh}
   .topbar-actions .btn-o{display:none}
 }
 `}</style>
-      <div 
-        ref={containerRef} 
-        dangerouslySetInnerHTML={{ __html: `<div class="main">
+      <div
+        ref={containerRef}
+        dangerouslySetInnerHTML={{
+          __html: `<div class="main">
   <header class="topbar">
     <div class="topbar-left">
       <button class="back-btn"><i class="ti ti-arrow-left" style="font-size:13px"></i> Proposals</button>
@@ -1034,7 +1083,7 @@ YENCODE Technologies | yencodetechnologies@gmail.com | +91 89254 33533</textarea
   </div><!-- /content -->
 </div><!-- /main -->
 
-` }} 
+` }}
       />
     </div>
   );

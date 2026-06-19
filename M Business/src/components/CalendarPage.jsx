@@ -143,7 +143,7 @@ export default function CalendarPage({ projects = [], tasks = [], clients = [], 
 
       if (modal === "add") {
         if (form.category === "Project") {
-          const payload = { name: form.name, client: form.client, start: form.date, end: form.date, deadline: form.date, status: "Pending", budget: "0", currency: "₹" };
+          const payload = { name: form.name, client: form.client, start: form.date, end: form.date, deadline: form.date, status: "Pending", budget: "0", currency: "INR" };
           const r = await axios.post(`${BASE_URL}/api/projects/add`, payload);
           if (onUpdateProject) onUpdateProject();
           showToast("✅ Project added!");

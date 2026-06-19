@@ -2012,9 +2012,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
         const statusLabel = s === 'paid' ? 'PAID' : s === 'part_paid' ? 'PART PAID' : s === 'overdue' ? 'OVERDUE' : s === 'sent' ? 'SENT' : s === 'draft' ? 'DRAFT' : 'PENDING';
         const statusStyle = s === 'paid' ? { bg: '#d1fae5', color: '#059669', border: '#10b981' }
           : s === 'part_paid' ? { bg: '#fef3c7', color: '#b45309', border: '#f59e0b' }
-          : s === 'overdue' ? { bg: '#fee2e2', color: '#dc2626', border: '#ef4444' }
-          : s === 'sent' ? { bg: '#dbeafe', color: '#1d4ed8', border: '#3b82f6' }
-          : { bg: '#f1f5f9', color: '#64748b', border: '#94a3b8' };
+            : s === 'overdue' ? { bg: '#fee2e2', color: '#dc2626', border: '#ef4444' }
+              : s === 'sent' ? { bg: '#dbeafe', color: '#1d4ed8', border: '#3b82f6' }
+                : { bg: '#f1f5f9', color: '#64748b', border: '#94a3b8' };
         const fmtDate = (d) => { if (!d) return '—'; return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); };
         const fmtAmt = (n) => `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         return (
@@ -2088,9 +2088,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <div style={{ fontSize: 9, color: '#64748b', fontWeight: 700, letterSpacing: 2, marginBottom: 10, textTransform: 'uppercase' }}>Bill To</div>
                   <div style={{ fontSize: 17, fontWeight: 800, color: '#0f1c2e' }}>{inv.clientName || clientName || '—'}</div>
                   {clientInfo?.companyName && <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginTop: 2 }}>{clientInfo.companyName}</div>}
-                  {clientInfo?.email && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 5 }}>Email: {clientInfo.email}</div>}
-                  {clientInfo?.phone && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>Phone: {clientInfo.phone}</div>}
-                  {clientInfo?.gstNumber && <div style={{ fontSize: 12, color: accentColor, marginTop: 4, fontWeight: 600 }}>GST: {clientInfo.gstNumber}</div>}
+                  {clientInfo?.email && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 5 }}>📧 {clientInfo.email}</div>}
+                  {clientInfo?.phone && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>📱 {clientInfo.phone}</div>}
+                  {clientInfo?.gstNumber && <div style={{ fontSize: 12, color: accentColor, marginTop: 4, fontWeight: 600 }}>💎 GST: {clientInfo.gstNumber}</div>}
                 </div>
                 {/* Line Items */}
                 <div style={{ padding: '22px 36px' }}>
@@ -2156,10 +2156,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   <div style={{ position: 'relative' }}>
                     {(() => {
                       const st = (inv.status || '').toLowerCase();
-                      const cfg = st === 'paid' ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: 'Done' }
-                        : st === 'overdue' ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: 'Warn' }
-                        : st === 'sent' ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: 'Sent' }
-                        : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: 'Wait' };
+                      const cfg = st === 'paid' ? { label: 'Paid', bg: '#DCFCE7', color: '#15803D', icon: '✓' }
+                        : st === 'overdue' ? { label: 'Overdue', bg: '#FEE2E2', color: '#DC2626', icon: '⚠' }
+                          : st === 'sent' ? { label: 'Sent', bg: '#DBEAFE', color: '#1D4ED8', icon: '📨' }
+                            : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '⏳' };
                       return (
                         <>
                           <span onClick={() => setShowStatusDropdown(prev => !prev)}
@@ -2169,10 +2169,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           {showStatusDropdown && (
                             <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
                               {[
-                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: 'Wait' },
-                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: 'Done' },
-                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: 'Warn' },
-                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: 'Sent' },
+                                { label: 'Pending', color: '#B45309', bg: '#FEF3C7', icon: '⏳' },
+                                { label: 'Paid', color: '#15803D', bg: '#DCFCE7', icon: '✓' },
+                                { label: 'Overdue', color: '#DC2626', bg: '#FEE2E2', icon: '⚠' },
+                                { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
                               ].map(opt => (
                                 <div key={opt.label}
                                   onClick={async () => {
@@ -2187,7 +2187,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   onMouseLeave={e => e.currentTarget.style.background = st === opt.label.toLowerCase() ? opt.bg : '#fff'}>
                                   <span>{opt.icon}</span>
                                   <span style={{ fontSize: 13, fontWeight: 700, color: opt.color }}>{opt.label}</span>
-                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>Done</span>}
+                                  {st === opt.label.toLowerCase() && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓</span>}
                                 </div>
                               ))}
                             </div>
@@ -2208,111 +2208,26 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       {showUploadModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div style={{ background: '#fff', borderRadius: P.radius, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}>
-            {/* Header */}
             <div style={{ background: `linear-gradient(135deg,${P.primary},${P.primaryDark})`, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <i className="ti ti-upload" style={{ color: '#fff', fontSize: 18 }}></i>
-                <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
-              </div>
-              <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✕</button>
+              <span style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>Upload File</span>
+              <button onClick={() => setShowUploadModal(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
-
-            {/* Body */}
-            <div style={{ padding: '22px 24px', maxHeight: '80vh', overflowY: 'auto' }}>
-
-              {/* Drop Zone */}
-              <div onClick={() => document.getElementById('modal-file-input').click()}
-                style={{ border: `2px dashed ${uploadFileObj ? P.primary : P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16, background: uploadFileObj ? P.primaryLight : P.bg, transition: 'all .2s' }}>
-                <i className={`ti ${uploadFileObj ? 'ti-file-check' : 'ti-cloud-upload'}`} style={{ fontSize: 28, color: uploadFileObj ? P.green : P.textLight, display: 'block', marginBottom: 6 }}></i>
-                {uploadFileObj ? (
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>{uploadFileObj.name}</div>
-                    <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>{(uploadFileObj.size / 1024).toFixed(1)} KB · Click to change</div>
-                  </div>
-                ) : (
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Click to browse or drag & drop</div>
-                    <div style={{ fontSize: 11, color: P.textLight, marginTop: 3 }}>Images, PDFs, Docs supported</div>
-                  </div>
-                )}
+            <div style={{ padding: '22px 24px' }}>
+              <div onClick={() => document.getElementById('modal-file-input').click()} style={{ border: `2px dashed ${P.border}`, borderRadius: 10, padding: '22px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: 16 }}>
+                {uploadFileObj ? <div style={{ fontSize: 13, fontWeight: 700 }}>{uploadFileObj.name}</div> : <div style={{ fontSize: 13, color: P.textLight }}>Click to browse or drag & drop</div>}
               </div>
               <input id="modal-file-input" type="file" onChange={handleModalFileSelect} style={{ display: 'none' }} />
-
-              {/* Heading */}
-              <div style={{ marginBottom: 12 }}>
-                <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>File Heading</label>
-                <input type="text" value={uploadHeading} onChange={e => setUploadHeading(e.target.value)} placeholder="e.g. Design Mockup v2"
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', boxSizing: 'border-box' }} />
-              </div>
-
-              {/* Description */}
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', display: 'block', marginBottom: 5 }}>Description</label>
-                <textarea value={uploadDescription} onChange={e => setUploadDescription(e.target.value)} placeholder="Brief description of this file..." rows={2}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
-              </div>
-
-              {/* Share With label */}
-              <div style={{ fontSize: 11, fontWeight: 800, color: P.textLight, textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>Share With</div>
-
-              {/* Client Portal Toggle */}
-              <div style={{ border: `1.5px solid ${uploadSendToClient ? P.primary : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10, background: uploadSendToClient ? P.primaryLight : '#fff', transition: 'all .15s' }}>
-                <div onClick={() => { const newVal = !uploadSendToClient; setUploadSendToClient(newVal); setUploadClientName(newVal ? (currProject.client || clientName || '') : ''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToClient ? P.primary : P.border}`, background: uploadSendToClient ? P.primary : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {uploadSendToClient && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
-                  </div>
-                  <i className="ti ti-building" style={{ color: P.primary, fontSize: 16 }}></i>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Client Portal</span>
-                </div>
-                {uploadSendToClient && (
-                  <select value={uploadClientName} onChange={e => setUploadClientName(e.target.value)}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.primary}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
-                    <option value="">-- Select Client --</option>
-                    {currProject.client && <option value={currProject.client}>{currProject.client}</option>}
-                    {(clients || []).filter(c => (c.clientName || c.name) !== currProject.client).map(c => (
-                      <option key={c._id || c.clientName} value={c.clientName || c.name}>{c.clientName || c.name}</option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {/* Employee Portal Toggle */}
-              <div style={{ border: `1.5px solid ${uploadSendToEmployee ? P.purple : P.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 20, background: uploadSendToEmployee ? P.purpleLight : '#fff', transition: 'all .15s' }}>
-                <div onClick={() => { setUploadSendToEmployee(!uploadSendToEmployee); setUploadEmployeeName(''); }} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                  <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${uploadSendToEmployee ? P.purple : P.border}`, background: uploadSendToEmployee ? P.purple : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {uploadSendToEmployee && <span style={{ color: '#fff', fontSize: 11, fontWeight: 900 }}>✓</span>}
-                  </div>
-                  <i className="ti ti-users" style={{ color: P.purple, fontSize: 16 }}></i>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: P.textDark }}>Send to Employee Portal</span>
-                </div>
-                {uploadSendToEmployee && (
-                  <select value={uploadEmployeeName} onChange={e => setUploadEmployeeName(e.target.value)}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${P.purple}`, fontSize: 13, fontFamily: 'Nunito,sans-serif', outline: 'none', background: '#fff', color: P.textDark, marginTop: 10 }}>
-                    <option value="">-- Select Employee --</option>
-                    {(employees || []).map(emp => (
-                      <option key={emp._id} value={emp.name || emp.employeeName}>{emp.name || emp.employeeName}{emp.role ? ` (${emp.role})` : ''}</option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {/* Buttons */}
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => { setShowUploadModal(false); setUploadFileObj(null); setUploadHeading(''); setUploadDescription(''); setUploadSendToClient(false); setUploadSendToEmployee(false); }}
-                  style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-                  Cancel
-                </button>
-                <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal}
-                  style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: (!uploadFileObj || uploadingModal) ? P.border : P.primary, color: (!uploadFileObj || uploadingModal) ? P.textLight : '#fff', fontFamily: 'Nunito,sans-serif', fontSize: 13, fontWeight: 800, cursor: (!uploadFileObj || uploadingModal) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s' }}>
-                  <i className="ti ti-upload" style={{ fontSize: 15 }}></i>
+              <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+                <button onClick={() => setShowUploadModal(false)} style={{ flex: 1, padding: '10px', borderRadius: 10, border: `1.5px solid ${P.border}`, background: 'transparent', color: P.textMid, cursor: 'pointer' }}>Cancel</button>
+                <button onClick={handleModalUpload} disabled={!uploadFileObj || uploadingModal} style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: P.primary, color: '#fff', cursor: 'pointer', fontWeight: 800 }}>
                   {uploadingModal ? 'Uploading...' : 'Upload & Share'}
                 </button>
               </div>
-
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

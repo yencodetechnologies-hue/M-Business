@@ -348,7 +348,9 @@ export default function InvoiceViewer() {
                 </div>
               )}
 
-              {/* Bill To */}
+              {/*
+              
+              */}
               {isFirstPage && (
                 <div className="inv-btgrid" style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: currentT.borderStyle || "2px solid #f1f5f9", flexShrink: 0 }}>
                   <div style={{ padding: "20px 32px" }}>

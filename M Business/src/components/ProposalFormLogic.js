@@ -383,8 +383,6 @@ export function saveDraft() {
     const data = extractProposalData();
     data.status = 'draft';
     window._onSaveProposal(data);
-  } else {
-    alert('Proposal saved as draft! (UI Only)'); 
   }
 }
 
@@ -396,8 +394,6 @@ export function sendProposal() {
     const data = extractProposalData();
     data.status = 'pending';
     window._onSaveProposal(data);
-  } else {
-    alert('Proposal sent to ' + c + '!');
   }
 }
 
@@ -407,8 +403,6 @@ export function markWon() {
     const data = extractProposalData();
     data.status = 'approved';
     window._onSaveProposal(data);
-  } else {
-    alert('Proposal marked as Won 🏆'); 
   }
 }
 

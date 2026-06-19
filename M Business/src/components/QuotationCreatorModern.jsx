@@ -113,7 +113,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
 
   // ── Totals ──
   const subtotal = items.reduce((s, i) => s + (parseFloat(i.rate) || 0) * (parseFloat(i.qty) || 0), 0);
-  const fmt = (n) => '₹' + Number(n).toLocaleString('en-IN');
+  const fmt = (n) => 'INR ' + Number(n).toLocaleString('en-IN');
 
   // ── Validity selection ──
   const validityOptions = ['7', '15', '30', '45', '60', 'Custom'];
@@ -656,7 +656,7 @@ function ModernForm({ onBack, user, clients = [], editEntry = null }) {
                   <tr>
                     <th>Description</th>
                     <th style={{ width: 60 }}>Qty</th>
-                    <th style={{ width: 100 }}>Rate (₹)</th>
+                    <th style={{ width: 100 }}>Rate (INR)</th>
                     <th style={{ width: 90, textAlign: 'right' }}>Total</th>
                     <th style={{ width: 30 }}></th>
                   </tr>

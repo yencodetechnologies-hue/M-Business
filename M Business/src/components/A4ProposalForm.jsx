@@ -3,14 +3,14 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 
 const THEMES = [
-  { name:"Violet",  p:"var(--app-accent)", g:"linear-gradient(135deg,var(--app-accent),var(--app-muted))", l:"var(--app-border)", t:"var(--app-accent)" },
-  { name:"Cobalt",  p:"#1d4ed8", g:"linear-gradient(135deg,#1e40af,#3b82f6)", l:"#dbeafe", t:"#1e3a8a" },
-  { name:"Emerald", p:"#059669", g:"linear-gradient(135deg,#065f46,#10b981)", l:"#d1fae5", t:"#064e3b" },
+  { name: "Violet", p: "var(--app-accent)", g: "linear-gradient(135deg,var(--app-accent),var(--app-muted))", l: "var(--app-border)", t: "var(--app-accent)" },
+  { name: "Cobalt", p: "#1d4ed8", g: "linear-gradient(135deg,#1e40af,#3b82f6)", l: "#dbeafe", t: "#1e3a8a" },
+  { name: "Emerald", p: "#059669", g: "linear-gradient(135deg,#065f46,#10b981)", l: "#d1fae5", t: "#064e3b" },
 ];
 
 const T = {
   primary: "var(--app-sidebar)",
-  sidebar: "var(--app-text)", 
+  sidebar: "var(--app-text)",
   accent: "var(--app-accent)",
   bg: "var(--app-bg)",
   card: "#FFFFFF",
@@ -20,31 +20,31 @@ const T = {
 };
 
 function Fld({ label, value, onChange, type = "text", error, placeholder, disabled }) {
-  const s = { 
-    width: "100%", 
-    border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`, 
-    borderRadius: 10, 
-    padding: "10px 14px", 
-    fontSize: 13, 
-    color: T.text, 
-    background: disabled ? "var(--app-border)" : "var(--app-bg)", 
-    boxSizing: "border-box", 
-    outline: "none", 
-    fontFamily: "inherit", 
-    opacity: disabled ? 0.7 : 1 
+  const s = {
+    width: "100%",
+    border: `1.5px solid ${error ? "#EF4444" : "var(--app-border)"}`,
+    borderRadius: 10,
+    padding: "10px 14px",
+    fontSize: 13,
+    color: T.text,
+    background: disabled ? "var(--app-border)" : "var(--app-bg)",
+    boxSizing: "border-box",
+    outline: "none",
+    fontFamily: "inherit",
+    opacity: disabled ? 0.7 : 1
   };
   return (
     <div style={{ marginBottom: 14 }}>
       <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>
         {label.toUpperCase()}
       </label>
-      <input 
-        type={type} 
-        value={value} 
-        onChange={e => onChange(e.target.value)} 
-        style={s} 
-        placeholder={placeholder || ""} 
-        disabled={disabled} 
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        style={s}
+        placeholder={placeholder || ""}
+        disabled={disabled}
       />
       {error && <div style={{ fontSize: 11, color: "#EF4444", marginTop: 4 }}>⚠️ {error}</div>}
     </div>
@@ -54,12 +54,12 @@ function Fld({ label, value, onChange, type = "text", error, placeholder, disabl
 function ClientDropdown({ clients, value, onChange, error }) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
-  const filtered = clients.filter(c => 
+  const filtered = clients.filter(c =>
     (c.clientName || c.name || "").toLowerCase().includes(search.toLowerCase()) ||
     (c.companyName || c.company || "").toLowerCase().includes(search.toLowerCase())
   );
   const selected = clients.find(c => (c.clientName || c.name) === value);
-  
+
   return (
     <div style={{ position: "relative", marginBottom: 14 }}>
       <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>
@@ -264,7 +264,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
       "Completion"
     ],
     companyAddress: "",
-    currency: "₹"
+    currency: "INR"
   });
 
   const [errors, setErrors] = useState({});
@@ -284,9 +284,9 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
   };
 
   const addScopeOfWork = () => {
-    setFormData(prev => ({ 
-      ...prev, 
-      scopeOfWork: [...prev.scopeOfWork, ""] 
+    setFormData(prev => ({
+      ...prev,
+      scopeOfWork: [...prev.scopeOfWork, ""]
     }));
   };
 
@@ -328,7 +328,7 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
       setSaving(true);
       const proposalData = {
         ...formData,
-        id: `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random()*9000)+1000)}`,
+        id: `PROP-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
         status: "draft",
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
@@ -614,58 +614,58 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-        <Fld 
-          label="Company Name" 
-          value={formData.companyName} 
-          onChange={v => updateFormData("companyName", v)} 
+        <Fld
+          label="Company Name"
+          value={formData.companyName}
+          onChange={v => updateFormData("companyName", v)}
         />
-        <Fld 
-          label="Reference No" 
-          value={formData.refNo} 
-          onChange={v => updateFormData("refNo", v)} 
+        <Fld
+          label="Reference No"
+          value={formData.refNo}
+          onChange={v => updateFormData("refNo", v)}
         />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
-        <Fld 
-          label="Date" 
-          value={formData.date} 
-          onChange={v => updateFormData("date", v)} 
+        <Fld
+          label="Date"
+          value={formData.date}
+          onChange={v => updateFormData("date", v)}
         />
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 11, color: "var(--app-accent)", fontWeight: 700, letterSpacing: 0.5, marginBottom: 5 }}>CURRENCY</label>
-          <select 
-            value={formData.currency} 
+          <select
+            value={formData.currency}
             onChange={e => updateFormData("currency", e.target.value)}
             style={{ width: "100%", border: "1.5px solid var(--app-border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: T.text, background: "var(--app-bg)", outline: "none" }}
           >
-            <option value="₹">INR (₹)</option>
-            <option value="$">USD ($)</option>
-            <option value="€">EUR (€)</option>
-            <option value="£">GBP (£)</option>
+            <option value="INR">INR</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
           </select>
         </div>
       </div>
 
-      <ClientDropdown 
+      <ClientDropdown
         clients={clients}
         value={formData.clientName}
         onChange={v => updateFormData("clientName", v)}
         error={errors.clientName}
       />
 
-      <Fld 
-        label="Client Address" 
-        value={formData.clientAddress} 
-        onChange={v => updateFormData("clientAddress", v)} 
+      <Fld
+        label="Client Address"
+        value={formData.clientAddress}
+        onChange={v => updateFormData("clientAddress", v)}
         error={errors.clientAddress}
         placeholder="Enter complete client address"
       />
 
-      <Fld 
-        label="Project Type" 
-        value={formData.projectType} 
-        onChange={v => updateFormData("projectType", v)} 
+      <Fld
+        label="Project Type"
+        value={formData.projectType}
+        onChange={v => updateFormData("projectType", v)}
         error={errors.projectType}
         placeholder="e.g., APARTMENT INTERIORS, VILLA DESIGN, etc."
       />
@@ -730,10 +730,10 @@ export default function A4ProposalForm({ clients, onSave, onCancel, initialData 
         </button>
       </div>
 
-      <Fld 
-        label="Company Address" 
-        value={formData.companyAddress} 
-        onChange={v => updateFormData("companyAddress", v)} 
+      <Fld
+        label="Company Address"
+        value={formData.companyAddress}
+        onChange={v => updateFormData("companyAddress", v)}
         multiline
         rows={3}
       />

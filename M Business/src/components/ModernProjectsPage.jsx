@@ -52,7 +52,7 @@ function progGradient(cls) {
 // ─── Empty form state ──────────────────────────────────────────
 const EMPTY_FORM = {
   name: '', client: '', purpose: '', description: '',
-  start: '', end: '', budget: '', currency: '₹',
+  start: '', end: '', budget: '', currency: 'INR',
   status: 'In Progress', priority: 'medium',
   assignedTo: '', manager: '', progress: 0,
   contactPersonName: '', contactPersonNo: '',
@@ -286,7 +286,7 @@ const [pRes, tRes, cRes] = await Promise.all([
       contactPersonNo: p.contactPersonNo || '',
       assignedTo: Array.isArray(p.assignedTo) ? p.assignedTo : (p.assignedTo ? [p.assignedTo] : []),
       budget: Number(p.budget) || 0,
-      currency: p.currency || '₹',
+      currency: p.currency || 'INR',
       billed: p.billed || 0,
       received: p.received || 0,
       pending: p.pending || 0,

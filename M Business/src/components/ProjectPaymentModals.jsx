@@ -33,7 +33,36 @@ export default function ProjectPaymentModals({
   clients = [],
 }) {
   const { showNewInvoice, showPayment, showAdvance, showAdditional, showMilestonePayment, showExpense, editData, editIndex } = modalsState;
+const [items, setItems] = useState([{ id: 1, description: "", quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
+const [inv, setInv] = useState({});
+const [errors, setErrors] = useState({});
 
+const addItem = () => setItems(p => [...p, { id: Date.now(), description: "", quantity: 1, rate: 0, gstRate: 18, isGstIncluded: false }]);
+const removeItem = (id) => { if (items.length > 1) setItems(p => p.filter(i => i.id !== id)); };
+const updItem = (id, f, v) => setItems(p => p.map(i => i.id === id ? { ...i, [f]: v } : i));
+
+const GST_RATES = [0, 5, 12, 18, 28];
+
+let subtotal = 0, gstAmt = 0, total = 0;
+items.forEach(item => {
+  const q = parseFloat(item.quantity) || 0;
+  const r = parseFloat(item.rate) || 0;
+  const rateGst = parseFloat(item.gstRate) || 18;
+  const isIncl = item.isGstIncluded || false;
+  const base = q * r;
+  if (isIncl) {
+    const sub = base / (1 + rateGst / 100);
+    subtotal += sub; gstAmt += base - sub; total += base;
+  } else {
+    const tax = base * rateGst / 100;
+    subtotal += base; gstAmt += tax; total += base + tax;
+  }
+});
+
+const formatCurrency = (val, symbol = "INR") => {
+  const num = parseFloat(val) || 0;
+  return symbol + " " + num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
   // Generic form state
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);

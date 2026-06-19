@@ -454,22 +454,45 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
   }, [autoOpenInvoice]);
 
   // Auto-fetch invoices for this project to calculate Billed/Received/Pending
+  // Auto-fetch invoices for this project to calculate Billed/Received/Pending
   useEffect(() => {
     if (!project) return;
-    const pName = project.name || "";
-    const cName = project.client || project.clientName || "";
+    const norm = (s) => (s || "").toString().trim().toLowerCase();
+    const pName = norm(project.name);
+    const cName = norm(project.client || project.clientName);
     axios.get(`${BASE_URL}/api/invoices`)
       .then(res => {
         const all = res.data?.invoices || res.data || [];
         const matched = (Array.isArray(all) ? all : []).filter(e => {
-          const eProj = e.inv?.project || e.project;
-          const eClient = e.inv?.clientName || e.inv?.client || e.client;
+          const eProj = norm(e.inv?.project || e.project);
+          const eClient = norm(e.inv?.clientName || e.inv?.client || e.client);
           return (eProj && eProj === pName) || (!eProj && eClient === cName);
         });
         setProjectInvoices(matched);
       })
       .catch(() => setProjectInvoices([]));
   }, [project?._id, project?.name, project?.client]);
+
+  // Merge the simple project.invoices array with the rich global Invoices
+  // (created via the full InvoiceCreator form) so both show up in this list.
+  const mergedInvoices = React.useMemo(() => {
+    const local = (currProject?.invoices || []).map(inv => ({ ...inv, _source: 'local' }));
+    const globalOnly = (projectInvoices || [])
+      .filter(g => !local.some(l => l.invoiceNo === g.invoiceNo))
+      .map(g => ({
+        invoiceNo: g.invoiceNo,
+        description: (g.inv && g.inv.notes) || currProject?.name || 'Invoice',
+        amount: g.total || 0,
+        taxType: 'inclusive',
+        taxPercent: 0,
+        issueDate: g.date,
+        dueDate: g.dueDate,
+        status: g.status,
+        _source: 'global',
+        _globalId: g.id,
+      }));
+    return [...local, ...globalOnly];
+  }, [currProject?.invoices, projectInvoices]);
 
   if (!currProject) return null;
   // Derived Project Data
@@ -1447,7 +1470,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8EDF2' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 900, color: '#0D1B2A' }}>
                         <i className="ti ti-file-invoice" style={{ color: '#00BCD4', fontSize: 15 }}></i> Invoices
-                        <span style={{ background: '#E0F7FA', color: '#0097A7', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{(currProject.invoices || []).length || 0}</span>
+                        <span style={{ background: '#E0F7FA', color: '#0097A7', fontSize: 10, fontWeight: 900, padding: '2px 8px', borderRadius: 20 }}>{mergedInvoices.length || 0}</span>
                       </div>
                       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                         {selectedPaymentItems.length > 0 && activePayTab === 'inv' && (
@@ -1487,8 +1510,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                     {/* Table Header */}
                     <div style={{ display: 'grid', gridTemplateColumns: '40px 2fr 1fr 1fr 1fr 80px', gap: 8, padding: '8px 18px', background: '#FAFBFD', borderBottom: '1px solid #E8EDF2' }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <input type="checkbox" checked={(currProject.invoices || []).length > 0 && selectedPaymentItems.length === (currProject.invoices || []).length} onChange={e => {
-                          if (e.target.checked) setSelectedPaymentItems((currProject.invoices || []).map((_, idx) => idx));
+                        <input type="checkbox" checked={mergedInvoices.length > 0 && selectedPaymentItems.length === mergedInvoices.length} onChange={e => {
+                          if (e.target.checked) setSelectedPaymentItems(mergedInvoices.map((_, idx) => idx));
                           else setSelectedPaymentItems([]);
                         }} style={{ cursor: 'pointer' }} />
                       </div>
@@ -1497,8 +1520,8 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                       ))}
                     </div>
                     {/* Rows */}
-                    {(currProject.invoices && currProject.invoices.length > 0) ? (
-                      currProject.invoices.map((invoiceRec, i) => {
+                    {(mergedInvoices && mergedInvoices.length > 0) ? (
+                      mergedInvoices.map((invoiceRec, i) => {
                         const inv = invoiceRec;
                         const invTaxAmt = inv.taxType === 'inclusive' ? 0 : Math.round((inv.amount || 0) * (inv.taxPercent || 0) / 100);
                         const totalInvoiceAmt = (inv.amount || 0) + invTaxAmt;
@@ -1542,7 +1565,10 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                               <div style={{ position: 'relative' }}>
                                 <button onClick={() => {
-                                  if (onViewInvoice) {
+                                  const fullGlobal = inv._source === 'global' ? projectInvoices.find(g => g.id === inv._globalId) : null;
+                                  if (inv._source === 'global' && onViewInvoice) {
+                                    onViewInvoice(fullGlobal || inv);
+                                  } else if (onViewInvoice) {
                                     onViewInvoice({ ...inv, projectName: currProject.name, clientName, currency });
                                   } else {
                                     setPreviewInvoice(prev => prev?.invoiceNo === inv.invoiceNo ? null : { ...inv, projectName: currProject.name, clientName, currency });
@@ -1557,8 +1583,12 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                       { label: 'Sent', color: '#1D4ED8', bg: '#DBEAFE', icon: '📨' },
                                     ].map(opt => (
                                       <div key={opt.label} onClick={async () => {
-                                        const updatedInvoices = (currProject.invoices || []).map((x, xi) => xi === i ? { ...x, status: opt.label } : x);
-                                        await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
+                                        if (inv._source === 'global') {
+                                          await axios.patch(`${BASE_URL}/api/invoices/${inv._globalId}/status`, { status: opt.label.toLowerCase() });
+                                        } else {
+                                          const updatedInvoices = (currProject.invoices || []).map((x, xi) => xi === i ? { ...x, status: opt.label } : x);
+                                          await axios.put(`${BASE_URL}/api/projects/${currProject._id}`, { invoices: updatedInvoices });
+                                        }
                                         setPreviewInvoice(null);
                                         loadLatest();
                                       }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', cursor: 'pointer', background: (inv.status || '').toLowerCase() === opt.label.toLowerCase() ? opt.bg : '#fff', borderBottom: '1px solid #F3F4F6' }}
@@ -1573,8 +1603,16 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                                   </div>
                                 )}
                               </div>
-                             <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, { ...inv }, i); } else { setPaymentModalsState({ showNewInvoice: true, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: { ...inv }, editIndex: i }); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
-                              <button onClick={() => handleDeleteRecord('invoices', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
+                              {inv._source === 'global' ? (
+                                <button onClick={() => { const fullGlobal = projectInvoices.find(g => g.id === inv._globalId); if (onViewInvoice) onViewInvoice(fullGlobal || inv); }} title="Edit (opens full invoice editor)" style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }}><i className="ti ti-edit"></i></button>
+                              ) : (
+                                <button onClick={() => { if (onNewInvoice) { onNewInvoice(currProject, { ...inv }, i); } else { setPaymentModalsState({ showNewInvoice: true, showPayment: false, showAdvance: false, showAdditional: false, showMilestonePayment: false, showExpense: false, editData: { ...inv }, editIndex: i }); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#7B8FA1' }} title="Edit"><i className="ti ti-edit"></i></button>
+                              )}
+                              {inv._source === 'global' ? (
+                                <button onClick={async () => { if (confirm('Delete this invoice?')) { await axios.delete(`${BASE_URL}/api/invoices/${inv._globalId}`); loadLatest(); } }} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
+                              ) : (
+                                <button onClick={() => handleDeleteRecord('invoices', i)} style={{ width: 26, height: 26, borderRadius: 6, background: 'none', border: '1px solid #E8EDF2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#EF4444' }} title="Delete"><i className="ti ti-trash"></i></button>
+                              )}
                             </div>
                           </div>
                         )

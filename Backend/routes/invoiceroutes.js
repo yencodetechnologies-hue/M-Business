@@ -311,7 +311,7 @@ router.post("/", async (req, res) => {
       subtotal,
       gstAmt,
       total,
-      status: "draft",
+   status: status || "draft",
       amountPaid:     parseFloat(inv.amountPaid) || 0,
       paymentMode:    inv.paymentMode            || "GPay",
       transactionId:  inv.transactionId          || "",

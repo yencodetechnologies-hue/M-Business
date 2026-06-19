@@ -1491,7 +1491,7 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                           else setSelectedPaymentItems([]);
                         }} style={{ cursor: 'pointer' }} />
                       </div>
-                      {['Invoice', 'Amount', 'Issue Date', 'Due Date', ''].map(h => (
+                      {['Invoice', 'Amount', 'Issue Date', 'Due Date', 'Status'].map(h => (
                         <div key={h} style={{ fontSize: 10, fontWeight: 900, color: '#7B8FA1', textTransform: 'uppercase', letterSpacing: '.7px' }}>{h}</div>
                       ))}
                     </div>
@@ -1982,8 +1982,15 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
       )}
 
       {/* Invoice Preview Modal - Full Template */}
-      {previewInvoice && (() => {
-        const inv = previewInvoice;
+     {previewInvoice && (() => {
+  const inv = {
+    notes: 'Thank you for your business! Please make payment within the due date.',
+    terms: '1. Payment is due within the agreed terms.\n2. Late payments are subject to 2% monthly interest.\n3. All disputes subject to Chennai jurisdiction.',
+    companyName: user?.companyName || 'YENCODE Technologies',
+    companyEmail: user?.email || 'yencodetechnologies@gmail.com',
+    companyPhone: user?.phone || '+91 89254 33533',
+    ...previewInvoice
+  };
         const clientInfo = clients?.find(c => (c.clientName || c.name) === (inv.clientName || clientName));
         const lineItems = (inv.items && inv.items.length > 0) ? inv.items : [
           { id: 1, description: inv.description || 'Service', quantity: 1, rate: inv.amount || 0, gstRate: inv.taxPercent || 0 }
@@ -2144,12 +2151,37 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                   </div>
                 </div>
                 {/* Notes */}
-                {inv.notes && (
-                  <div style={{ padding: '14px 36px', borderTop: '1px solid #e5e7eb', background: '#f8fafc' }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, color: accentColor, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Notes</div>
-                    <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.6 }}>{inv.notes}</div>
-                  </div>
-                )}
+             {/* Notes & Terms + Signature */}
+<div style={{ margin: '0 36px 24px', paddingTop: '10px', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+    {inv.notes && (
+      <div>
+        <div style={{ fontSize: 9, fontWeight: 700, color: accentColor, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Notes</div>
+        <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.6 }}>{inv.notes}</div>
+      </div>
+    )}
+    {inv.terms && (
+      <div>
+        <div style={{ fontSize: 9, fontWeight: 700, color: accentColor, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Terms & Conditions</div>
+        <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.6 }}>{inv.terms}</div>
+      </div>
+    )}
+  </div>
+  <div style={{ textAlign: 'right', minWidth: 120 }}>
+    <div style={{ height: 35, display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', marginBottom: 3 }}>
+      {inv.signature && (
+        inv.signatureType === 'image'
+          ? <img src={inv.signature} alt="Signature" style={{ maxHeight: 30, maxWidth: 120, objectFit: 'contain' }} />
+          : <div style={{ fontFamily: "'Dancing Script', cursive", fontSize: 18, fontWeight: 'bold', color: '#1a2e35' }}>{inv.signature}</div>
+      )}
+    </div>
+    <div style={{ width: '100%', height: 1, background: '#e5e7eb', marginBottom: 3 }}></div>
+    <div style={{ fontSize: 10, fontWeight: 700, color: '#0f1c2e' }}>{inv.companyName || user?.companyName || 'Your Company'}</div>
+    <div style={{ fontSize: 9, color: '#64748b' }}>Authorized Signatory</div>
+  </div>
+</div>
+
+{/* Footer */}
                 {/* Footer */}
                 <div style={{ borderTop: '1px solid #e5e7eb', padding: '10px 36px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>{inv.invoiceNo}</div>
@@ -2162,10 +2194,9 @@ export default function ModernProjectDetails({ project, onBack, tasks = [], empl
                             : { label: 'Pending', bg: '#FEF3C7', color: '#B45309', icon: '⏳' };
                       return (
                         <>
-                          <span onClick={() => setShowStatusDropdown(prev => !prev)}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}`, cursor: 'pointer', userSelect: 'none' }}>
-                            {cfg.icon} {cfg.label} <span style={{ fontSize: 10 }}>▼</span>
-                          </span>
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 14px', borderRadius: 20, background: cfg.bg, color: cfg.color, fontSize: 12, fontWeight: 800, border: `1.5px solid ${cfg.color}` }}>
+  {cfg.icon} {cfg.label}
+</span>
                           {showStatusDropdown && (
                             <div style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: '#fff', border: '1px solid #E8EDF2', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', minWidth: 150, overflow: 'hidden' }}>
                               {[

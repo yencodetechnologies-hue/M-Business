@@ -730,17 +730,28 @@ export default function InvoiceCreator({ user, clients = [], projects = [], comp
   };
 
   // ── Load entry into form (EDIT) ─────────────────────────────
-  const loadEntry = (entry) => {
-    setInv(entry.inv || blank);
-    setItems(entry.items?.length
+const loadEntry = (entry) => {
+  // entry.inv இருந்தா use பண்ணு, இல்லன்னா entry itself-ஐ inv-ஆ treat பண்ணு
+  const invData = entry.inv || entry;
+  setInv({
+    ...blank,
+    ...invData,
+    invoiceNo: invData.invoiceNo || entry.invoiceNo || blank.invoiceNo,
+    client: invData.client || entry.client || '',
+    date: invData.date || entry.date || blank.date,
+    dueDate: invData.dueDate || entry.dueDate || blank.dueDate,
+    status: invData.status || entry.status || 'draft',
+  });
+  setItems(
+    entry.items?.length
       ? entry.items.map((it, i) => ({ ...it, id: it.id || i + 1 }))
-      : [{ id: 1, description: "", quantity: 1, rate: "" }]
-    );
-    setEditingId(entry.id || null);
-    setErrors({});
-    setDraftSaved(false);
-    setStep("form");
-  };
+      : [{ id: 1, description: '', quantity: 1, rate: '' }]
+  );
+  setEditingId(entry._id || entry.id || null);
+  setErrors({});
+  setDraftSaved(false);
+  setStep("form");
+};
 
   // ── Clear ───────────────────────────────────────────────────
   const clearForm = () => {
